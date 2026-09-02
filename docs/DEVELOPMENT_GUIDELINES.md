@@ -11,10 +11,17 @@ Phase 1 baseline (`ARCHITECTURE.md` §7).
 ## 1. Local environment (EXISTING — verified in Phase 0)
 
 Prerequisites: JDK 17+ (21 works), Maven 3.9+, Node 16/18 (20 works with a flag),
-MySQL 8/9, Redis.
+MySQL 8/9, Redis. **Or** just Docker:
+
+```bash
+# 0. One command for MySQL + Redis + Mailpit (SMTP sink, UI http://localhost:8025)
+cp .env.example .env        # git-ignored; compose + your shell both read it
+docker compose up -d        # brings up nadoumi-mysql / nadoumi-redis / nadoumi-mailpit
+```
 
 ```bash
 # 1. Database  (D8: the DB name is `ry-vue`, matching committed config)
+#   Skipped if you used `docker compose up -d` above (MYSQL_DATABASE creates it).
 mysql -uroot -e "CREATE DATABASE \`ry-vue\` DEFAULT CHARACTER SET utf8mb4;"
 #   Schema is created by Flyway on first boot (V1__ruoyi_baseline.sql).
 #   Do NOT hand-load sql/*.sql — an empty database is correct.

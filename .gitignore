@@ -43,6 +43,8 @@ nbdist/
 # Nadoumi
 /config/*
 !/config/application-local.yml.example
+/.env
+/mail-outbox.log
 nadoumi-web/.output/
 nadoumi-web/.nuxt/
 nadoumi-admin/dist/

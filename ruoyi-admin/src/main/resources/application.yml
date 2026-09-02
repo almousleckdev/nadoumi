@@ -120,6 +120,36 @@ spring:
           max-active: 8
           # max blocking wait (negative = unlimited)
           max-wait: -1ms
+  # outbound email (spec Revision 2 §15). Only used when nadoumi.mail.transport=smtp.
+  # Dev: Mailpit from docker-compose.yml (localhost:1025, no auth). Staging/prod:
+  # Gmail (smtp.gmail.com:587 + App Password) or any SMTP — env only, no code change.
+  mail:
+    host: ${SPRING_MAIL_HOST:localhost}
+    port: ${SPRING_MAIL_PORT:1025}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          auth: ${SPRING_MAIL_SMTP_AUTH:false}
+          starttls:
+            enable: ${SPRING_MAIL_SMTP_STARTTLS:false}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# Nadoumi-specific configuration
+nadoumi:
+  mail:
+    # log  = write rendered mails to logFile + expose GET /api/dev/mail/latest (no network)
+    # smtp = send via spring.mail.* above
+    transport: ${NADOUMI_MAIL_TRANSPORT:log}
+    from: ${NADOUMI_MAIL_FROM:no-reply@nadoumi.local}
+    logFile: ${NADOUMI_MAIL_LOG_FILE:./mail-outbox.log}
+  web:
+    # used in transactional emails (e.g. the "account already exists" message)
+    loginUrl: ${NADOUMI_WEB_LOGIN_URL:http://localhost:3000/login}
 
 # token
 token:
