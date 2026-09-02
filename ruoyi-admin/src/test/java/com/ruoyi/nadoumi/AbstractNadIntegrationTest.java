@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Boots the full RuoYi + Nadoumi context against throwaway MySQL + Redis containers.
- * Flyway builds V1..V5 into the fresh database. Auto-skips without Docker.
+ * Flyway builds the full migration set into the fresh database. Auto-skips without Docker.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
