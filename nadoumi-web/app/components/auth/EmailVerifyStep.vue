@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { OtpPurpose } from '~/composables/useOtp'
 
-const props = defineProps<{ email: string; purpose: OtpPurpose; emailLocked?: boolean }>()
+const props = withDefaults(
+  defineProps<{ email: string; purpose: OtpPurpose; emailLocked?: boolean; canVerify?: boolean }>(),
+  { canVerify: true },
+)
 const emit = defineEmits<{ 'update:email': [value: string]; verified: [ticket: string] }>()
 
 const { t } = useI18n()
@@ -48,7 +51,7 @@ async function submitCode(code: string) {
           @update:model-value="emit('update:email', $event)"
         />
       </NField>
-      <NButton :loading="busy" @click="sendCode">{{ t('auth.otp.verify') }}</NButton>
+      <NButton :loading="busy" :disabled="!canVerify || !email" @click="sendCode">{{ t('auth.otp.verify') }}</NButton>
     </template>
 
     <template v-else>

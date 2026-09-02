@@ -1,7 +1,10 @@
+// Register + open a session entirely server-side (spec §8.1). The browser sends
+// the password once and the verified-email `ticket`; it gets back only
+// { signedIn: true } and never sees the JWT.
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
-    fullName?: string; username: string; email?: string
-    password: string; code?: string; uuid?: string
+    firstName: string; lastName: string; email: string
+    password: string; ticket: string
   }>(event)
   const base = backendBaseUrl(event)
 
@@ -9,12 +12,11 @@ export default defineEventHandler(async (event) => {
     await $fetch(`${base}/api/student/register`, {
       method: 'POST',
       body: {
-        username: body.username,
-        password: body.password,
-        nickName: body.fullName,
+        firstName: body.firstName,
+        lastName: body.lastName,
         email: body.email,
-        code: body.code,
-        uuid: body.uuid,
+        password: body.password,
+        ticket: body.ticket,
       },
     })
   }
@@ -26,7 +28,7 @@ export default defineEventHandler(async (event) => {
 
   const { token } = await $fetch<{ token: string }>(`${base}/api/student/login`, {
     method: 'POST',
-    body: { username: body.username, password: body.password, code: body.code, uuid: body.uuid },
+    body: { email: body.email, password: body.password },
   })
   setStudentToken(event, token)
   return { signedIn: true }
