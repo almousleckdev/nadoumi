@@ -35,3 +35,49 @@ export interface Page<T> {
   totalElements: number
   totalPages: number
 }
+
+export interface SessionDto {
+  authenticated: boolean
+  user?: { userId: number; username: string; nickName: string | null }
+  applicants?: { applicantId: number; accessRole: string; capabilities: string[] }[]
+}
+
+export interface ApplicantDto {
+  id: number
+  givenName: string
+  familyName: string
+  dob: string | null
+  nationality: string | null
+  passportNo: string | null
+  email: string | null
+  phone: string | null
+  status: 'DRAFT' | 'ACTIVE' | 'UNLINKED' | 'ARCHIVED'
+}
+
+export interface EducationDto {
+  id: number
+  institution: string
+  level: string | null
+  field: string | null
+  gpa: number | null
+  gpaScale: number | null
+  startDate: string | null
+  endDate: string | null
+}
+
+export interface TestScoreDto {
+  id: number
+  testType: string
+  score: string
+  subScoresJson: string | null
+  takenOn: string | null
+  expiresOn: string | null
+}
+
+export interface ContactDto {
+  id: number
+  relation: 'GUARDIAN' | 'EMERGENCY' | 'OTHER'
+  name: string
+  email: string | null
+  phone: string | null
+}
