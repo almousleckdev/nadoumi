@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const localePath = useLocalePath()
+const route = useRoute()
 const { status, user, signOut } = useSession()
 const open = ref(false)
 
@@ -13,6 +14,11 @@ const links = [
   { to: '/about', key: 'nav.about' },
   { to: '/contact', key: 'nav.contact' },
 ]
+
+function isActive(to: string): boolean {
+  const target = localePath(to)
+  return to === '/' ? route.path === target : route.path.startsWith(target)
+}
 </script>
 
 <template>
@@ -25,8 +31,19 @@ const links = [
         </NuxtLink>
 
         <nav class="hidden items-center gap-6 md:flex">
-          <NuxtLink v-for="l in links" :key="l.to" :to="localePath(l.to)" class="text-sm text-slate-600 hover:text-slate-900">
+          <NuxtLink
+            v-for="l in links"
+            :key="l.to"
+            :to="localePath(l.to)"
+            class="relative py-4 text-sm no-underline transition-colors hover:no-underline"
+            :class="isActive(l.to) ? 'font-medium text-slate-900' : 'text-slate-600 hover:text-slate-900'"
+          >
             {{ t(l.key) }}
+            <span
+              v-if="isActive(l.to)"
+              class="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-brand-500"
+              aria-hidden="true"
+            />
           </NuxtLink>
         </nav>
 
@@ -40,7 +57,7 @@ const links = [
             </NDropdown>
           </template>
           <template v-else>
-            <NuxtLink :to="localePath('/login')" class="text-sm font-medium text-slate-700 hover:text-slate-900">{{ t('nav.signIn') }}</NuxtLink>
+            <NuxtLink :to="localePath('/login')" class="text-sm font-medium text-slate-700 no-underline hover:text-slate-900 hover:no-underline">{{ t('nav.signIn') }}</NuxtLink>
             <NButton :to="localePath('/register')" size="sm">{{ t('nav.createAccount') }}</NButton>
           </template>
           <button
@@ -54,7 +71,16 @@ const links = [
       </div>
 
       <nav v-show="open" id="site-nav" class="grid gap-1 pb-3 md:hidden">
-        <NuxtLink v-for="l in links" :key="l.to" :to="localePath(l.to)" class="rounded px-2 py-2 text-sm text-slate-700 hover:bg-slate-50" @click="open = false">
+        <NuxtLink
+          v-for="l in links"
+          :key="l.to"
+          :to="localePath(l.to)"
+          class="rounded px-2 py-2 text-sm no-underline hover:bg-slate-50 hover:no-underline"
+          :class="isActive(l.to)
+            ? 'border-s-2 border-brand-500 font-medium text-slate-900'
+            : 'text-slate-700'"
+          @click="open = false"
+        >
           {{ t(l.key) }}
         </NuxtLink>
       </nav>
