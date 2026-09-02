@@ -21,6 +21,8 @@ export default defineNuxtConfig({
     // by the layouts — without this it resolves to <MarketingSiteHeader> and
     // silently renders nothing.
     { path: '~/components/marketing', pathPrefix: false },
+    // onboarding/ document + wizard components, unprefixed (<PassportUploadCard>, …).
+    { path: '~/components/onboarding', pathPrefix: false },
     '~/components',
   ],
   fonts: {
