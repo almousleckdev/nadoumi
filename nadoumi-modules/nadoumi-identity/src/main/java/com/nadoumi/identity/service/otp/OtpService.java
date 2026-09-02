@@ -12,6 +12,7 @@ import java.util.HexFormat;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class OtpService {
     private final String loginUrl;
     private final Supplier<String> codeGenerator;
 
+    @Autowired
     public OtpService(RedisCache redis, MailSender mail, MailTemplates templates, TicketService tickets,
             @Value("${nadoumi.web.loginUrl:http://localhost:3000/login}") String loginUrl) {
         this(redis, mail, templates, tickets, loginUrl, OtpService::randomSixDigits);

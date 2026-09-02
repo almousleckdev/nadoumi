@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(6);
+        assertThat(applied).isEqualTo(8);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -104,6 +104,13 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_dept WHERE dept_id BETWEEN 101 AND 109")).isEqualTo("0");
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job WHERE job_id IN (1,2,3)")).isEqualTo("0");
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key = 'nadoumi_super_admin'")).isEqualTo("1");
+
+        // V7 — email-first student identity
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'sys_user' AND column_name = 'email_verified'")).isEqualTo("1");
+        // V8 — the RuoYi initial-password nag is off
+        assertThat(single(ds, "SELECT config_value FROM sys_config WHERE config_key = 'sys.account.initPasswordModify'"))
+                .isEqualTo("0");
     }
 
     @Test
@@ -118,7 +125,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(5); // V2..V6
+        assertThat(applied).isEqualTo(7); // V2..V8
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
