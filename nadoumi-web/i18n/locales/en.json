@@ -66,6 +66,12 @@
       "resendIn": "Resend in {n}s",
       "verified": "Verified",
       "badCode": "That code is invalid or expired."
+    },
+    "reset": {
+      "title": "Reset password",
+      "newPassword": "New password",
+      "done": "Your password has been reset. You can now sign in with your new password.",
+      "toLogin": "Go to sign in"
     }
   },
   "dashboard": {
@@ -85,8 +91,10 @@
     "contactsTitle": "Contacts", "contactsEmpty": "No contacts yet.",
     "relation": "Relationship", "contactName": "Name",
     "relationGUARDIAN": "Guardian", "relationEMERGENCY": "Emergency", "relationOTHER": "Other",
-    "accountTitle": "Account", "accountUser": "Signed in as", "passwordChange": "Password changes",
-    "passwordChangeBody": "To change your password, email support{'@'}nadoumi.com from your registered address.",
+    "accountTitle": "Account", "accountUser": "Signed in as",
+    "changePassword": "Change password", "pwCurrent": "Current password", "pwNew": "New password",
+    "pwConfirm": "Confirm new password", "pwUpdated": "Password updated.",
+    "pwOtherSessionsEnded": "You have been signed out on your other devices.",
     "savedOk": "Saved", "addedOk": "Added", "removedOk": "Removed", "removeConfirm": "Remove this entry?"
   },
   "validation": {
