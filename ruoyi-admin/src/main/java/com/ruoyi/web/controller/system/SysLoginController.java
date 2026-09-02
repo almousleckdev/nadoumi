@@ -112,10 +112,11 @@ public class SysLoginController {
         return Convert.toStr(configService.selectConfigByKey("sys.account.chrtype"), "0");
     }
 
-    // 检查初始密码是否提醒修改
+    // Nadoumi (spec Revision 2 §17): the RuoYi "your password is still the initial
+    // password" prompt is removed. Seeded accounts are forced to rotate through the
+    // password-expiry path instead (pwd_update_date IS NULL + passwordValidateDays).
     public boolean initPasswordIsModify(Date pwdUpdateDate) {
-        Integer initPasswordModify = Convert.toInt(configService.selectConfigByKey("sys.account.initPasswordModify"));
-        return initPasswordModify != null && initPasswordModify == 1 && pwdUpdateDate == null;
+        return false;
     }
 
     // 检查密码是否过期

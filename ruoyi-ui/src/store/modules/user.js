@@ -79,15 +79,9 @@ const user = {
           commit('SET_NAME', user.userName)
           commit('SET_NICK_NAME', user.nickName)
           commit('SET_AVATAR', avatar)
-          /* 初始密码提示 */
-          if(res.isDefaultModifyPwd) {
-            MessageBox.confirm('您的密码还是初始密码，请修改密码！',  '安全提示', {  confirmButtonText: '确定',  cancelButtonText: '取消',  type: 'warning' }).then(() => {
-              router.push({ name: 'Profile', params: { activeTab: 'resetPwd' } })
-            }).catch(() => {})
-          }
-          /* 过期密码提示 */
-          if(!res.isDefaultModifyPwd && res.isPasswordExpired) {
-            MessageBox.confirm('您的密码已过期，请尽快修改密码！',  '安全提示', {  confirmButtonText: '确定',  cancelButtonText: '取消',  type: 'warning' }).then(() => {
+          /* Password expired prompt (the "initial password" nag is removed - Nadoumi spec Revision 2 §17) */
+          if (res.isPasswordExpired) {
+            MessageBox.confirm('Your password has expired. Please change it now.', 'Security notice', { confirmButtonText: 'OK', cancelButtonText: 'Cancel', type: 'warning' }).then(() => {
               router.push({ name: 'Profile', params: { activeTab: 'resetPwd' } })
             }).catch(() => {})
           }
