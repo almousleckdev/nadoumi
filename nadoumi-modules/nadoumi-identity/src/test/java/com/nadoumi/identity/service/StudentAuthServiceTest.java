@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.identity.access.SessionRevoker;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadForbiddenException;
 import com.nadoumi.identity.mapper.NadIdentityMapper;
@@ -18,10 +19,13 @@ import com.nadoumi.identity.service.otp.TicketService;
 import com.nadoumi.identity.web.request.StudentLoginRequest;
 import com.nadoumi.identity.web.request.StudentRegisterRequest;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +40,10 @@ class StudentAuthServiceTest {
     private final UserApplicantAccessService grants = mock(UserApplicantAccessService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final TicketService tickets = mock(TicketService.class);
+    private final SessionRevoker sessionRevoker = mock(SessionRevoker.class);
 
     private final StudentAuthService service = new StudentAuthService(configService, userService, loginService,
-            tokenService, identityMapper, accessMapper, grants, caller, tickets);
+            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker);
 
     private static StudentRegisterRequest register(String email, String password, String ticket) {
         return new StudentRegisterRequest("Ada", "Lovelace", email, password, ticket);
@@ -132,5 +137,64 @@ class StudentAuthServiceTest {
         when(identityMapper.selectUserIdByEmailAndType("a@x.com", StudentAuthService.STUDENT_USER_TYPE))
                 .thenReturn(1L);
         assertThat(service.studentEmailExists("A@X.com")).isTrue();
+    }
+
+    @Test
+    void resetPassword_applies_the_new_password_revokes_every_session_and_issues_no_token() {
+        when(tickets.consume("tkt", OtpPurpose.PASSWORD_RESET)).thenReturn("a@x.com");
+        when(identityMapper.selectUserIdByEmailAndType("a@x.com", StudentAuthService.STUDENT_USER_TYPE))
+                .thenReturn(7L);
+
+        service.resetPassword("tkt", "BrandNew1!");
+
+        verify(userService).resetUserPwd(eq(7L), any(String.class));
+        verify(identityMapper).touchPwdUpdateDate(7L);
+        verify(sessionRevoker).revokeAll(7L, null);
+    }
+
+    @Test
+    void resetPassword_rejects_a_weak_password() {
+        when(tickets.consume("tkt", OtpPurpose.PASSWORD_RESET)).thenReturn("a@x.com");
+        when(identityMapper.selectUserIdByEmailAndType("a@x.com", StudentAuthService.STUDENT_USER_TYPE))
+                .thenReturn(7L);
+
+        assertThatThrownBy(() -> service.resetPassword("tkt", "weak"))
+                .isInstanceOf(NadBadRequestException.class)
+                .hasMessageContaining("password.tooShort");
+    }
+
+    @Test
+    void changePassword_verifies_the_current_password_and_keeps_the_callers_session() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        String currentEncoded = SecurityUtils.encryptPassword("OldPass1!");
+        SysUser user = new SysUser();
+        user.setUserId(7L);
+        user.setPassword(currentEncoded);
+        when(caller.requireUserId()).thenReturn(7L);
+        when(userService.selectUserById(7L)).thenReturn(user);
+        LoginUser me = new LoginUser();
+        me.setUser(user);
+        me.setToken("my-token");
+        when(tokenService.getLoginUser(request)).thenReturn(me);
+
+        service.changePassword(request, "OldPass1!", "NewPass1!");
+
+        verify(userService).resetUserPwd(eq(7L), any(String.class));
+        verify(sessionRevoker).revokeAll(7L, "my-token");
+        verify(tokenService).setLoginUser(me);
+    }
+
+    @Test
+    void changePassword_rejects_a_wrong_current_password() {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        SysUser user = new SysUser();
+        user.setUserId(7L);
+        user.setPassword(SecurityUtils.encryptPassword("OldPass1!"));
+        when(caller.requireUserId()).thenReturn(7L);
+        when(userService.selectUserById(7L)).thenReturn(user);
+
+        assertThatThrownBy(() -> service.changePassword(request, "WrongPass1!", "NewPass1!"))
+                .isInstanceOf(NadBadRequestException.class)
+                .hasMessageContaining("current password is incorrect");
     }
 }
