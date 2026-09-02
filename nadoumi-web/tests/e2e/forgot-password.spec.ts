@@ -26,8 +26,8 @@ async function registerAndSignOut(page: import('@playwright/test').Page, email: 
   await page.check('#accept-terms')
   await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeEnabled()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
-  await expect(page).toHaveURL(/\/dashboard\/onboarding/)
-  await page.locator('button[aria-haspopup="menu"]').last().click()
+  await expect(page).toHaveURL(/\/onboarding/)
+  await page.locator('[data-test="user-menu"]').click()
   await page.locator('[data-test="sign-out"]').click()
   await expect(page).toHaveURL(/\/$/)
 }
@@ -52,5 +52,6 @@ test('forgot-password -> OTP -> new password -> sign in with the new password', 
   await page.fill('#email', email)
   await page.fill('#password', NEW_PASSWORD)
   await page.getByRole('button', { name: /sign in/i }).click()
-  await expect(page).toHaveURL(/\/dashboard/)
+  // lands on the dashboard, or onboarding if this account's profile is incomplete
+  await expect(page).toHaveURL(/\/(dashboard|onboarding)/)
 })

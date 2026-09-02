@@ -4,8 +4,7 @@ useSeo(t('home.title'), t('home.subtitle'))
 
 const sections = [
   { to: '/scholarships', title: 'Scholarships', body: 'Funding opportunities by country, field and degree.' },
-  { to: '/universities', title: 'Universities', body: 'Partner and catalogue institutions worldwide.' },
-  { to: '/programs', title: 'Programs', body: 'Degree programmes and intakes.' },
+  { to: '/universities', title: 'Universities', body: 'Institutions worldwide — with the programmes each one offers.' },
 ]
 </script>
 

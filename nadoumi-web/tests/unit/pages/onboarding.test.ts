@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import Onboarding from '~/pages/dashboard/onboarding.vue'
+import Onboarding from '~/pages/onboarding.vue'
 
 vi.mock('~/composables/useSession', () => ({
   useSession: () => ({ activeApplicantId: ref(1), refresh: vi.fn() }),

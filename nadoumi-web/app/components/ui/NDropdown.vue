@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{ label?: string }>()
+defineProps<{ label?: string, triggerTestId?: string }>()
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 
@@ -25,6 +25,7 @@ onBeforeUnmount(() => {
       type="button"
       aria-haspopup="menu"
       :aria-expanded="open ? 'true' : 'false'"
+      :data-test="triggerTestId"
       class="inline-flex items-center gap-1 rounded-md px-2 py-1.5 hover:bg-slate-100"
       @click="open = !open"
     >

@@ -32,9 +32,9 @@ test('register wizard (OTP) -> auto-login -> onboarding -> sign out', async ({ p
   await next.click()
 
   // server-side auto-login → onboarding
-  await expect(page).toHaveURL(/\/dashboard\/onboarding/)
+  await expect(page).toHaveURL(/\/onboarding/)
 
-  await page.locator('button[aria-haspopup="menu"]').last().click()
+  await page.locator('[data-test="user-menu"]').click()
   await page.locator('[data-test="sign-out"]').click()
 
   await expect(page).toHaveURL(/\/$/)

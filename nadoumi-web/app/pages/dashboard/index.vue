@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
 
-definePageMeta({ layout: 'dashboard', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { user } = useSession()

@@ -67,7 +67,7 @@ async function submit() {
       },
     })
     await refresh()
-    await navigateTo(localePath('/dashboard/onboarding'))
+    await navigateTo(localePath('/onboarding'))
   }
   catch (err) {
     error.value = authErrorMessage(err, t)
