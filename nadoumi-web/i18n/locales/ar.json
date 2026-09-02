@@ -1,5 +1,5 @@
 {
-  "nav": { "home": "Home", "scholarships": "Scholarships", "universities": "Universities", "programs": "Programs", "destinations": "Destinations", "about": "About", "contact": "Contact", "signIn": "Sign in", "getStarted": "Create profile", "dashboard": "Dashboard" },
+  "nav": { "home": "Home", "scholarships": "Scholarships", "universities": "Universities", "programs": "Programs", "destinations": "Destinations", "about": "About", "contact": "Contact", "signIn": "Sign in", "getStarted": "Create profile", "createAccount": "Create account", "dashboard": "Dashboard" },
   "footer": {
     "mission": "Nadoumi helps international students discover and secure study opportunities abroad.",
     "explore": "Explore", "company": "Company", "getStarted": "Get started",
