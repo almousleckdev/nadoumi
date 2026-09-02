@@ -5,3 +5,7 @@ node_modules
 dist
 *.log
 .env
+
+# Playwright
+playwright-report
+test-results
