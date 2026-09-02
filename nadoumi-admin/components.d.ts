@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     ComingSoonCard: typeof import('./src/components/dashboard/ComingSoonCard.vue')['default']
     DashboardGroup: typeof import('./src/components/dashboard/DashboardGroup.vue')['default']
+    DonutStat: typeof import('./src/components/dashboard/DonutStat.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
@@ -36,7 +37,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTag: typeof import('element-plus/es')['ElTag']
-    ParentView: typeof import('./src/components/ParentView.vue')['default']
+    PageHeader: typeof import('./src/components/PageHeader.vue')['default']
     RecentApplicants: typeof import('./src/components/dashboard/RecentApplicants.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -1,33 +1,28 @@
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
-import { usePermissionStore } from '@/stores/permission'
 import { getToken } from '@/utils/auth'
 
 const WHITELIST = ['/login', '/404']
 
+// All routes are static (src/router/index.ts, built from src/config/nav.ts).
+// The guard only loads the signed-in user's roles/permissions once; screens and
+// the sidebar gate their own content with userStore.hasPerm().
 router.beforeEach(async (to) => {
-  const hasToken = getToken()
-
-  if (!hasToken) {
+  if (!getToken()) {
     return WHITELIST.includes(to.path) ? true : `/login?redirect=${encodeURIComponent(to.fullPath)}`
   }
 
   if (to.path === '/login') return '/'
 
   const userStore = useUserStore()
-  const permissionStore = usePermissionStore()
-
   if (userStore.roles.length === 0) {
     try {
       await userStore.fetchInfo()
-      const routes = await permissionStore.generateRoutes()
-      routes.forEach((r) => router.addRoute(r))
-      return { ...to, replace: true }
-    } catch {
+    }
+    catch {
       userStore.reset()
       return `/login?redirect=${encodeURIComponent(to.fullPath)}`
     }
   }
-
   return true
 })

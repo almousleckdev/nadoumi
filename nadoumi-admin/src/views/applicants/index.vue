@@ -1,5 +1,20 @@
 <template>
   <div class="nad-page">
+    <PageHeader
+      :title="t('applicant.title')"
+      :subtitle="t('applicant.subtitle')"
+    >
+      <template #actions>
+        <el-button
+          type="primary"
+          :icon="Plus"
+          @click="openCreate"
+        >
+          {{ t('common.add') }}
+        </el-button>
+      </template>
+    </PageHeader>
+
     <div class="nad-toolbar">
       <el-input
         v-model="query.name"
@@ -8,30 +23,80 @@
         style="width: 240px"
         @keyup.enter="reload"
       />
-      <el-select v-model="query.status" :placeholder="t('applicant.status')" clearable style="width: 160px">
-        <el-option v-for="s in STATUSES" :key="s" :label="s" :value="s" />
+      <el-select
+        v-model="query.status"
+        :placeholder="t('applicant.status')"
+        clearable
+        style="width: 160px"
+      >
+        <el-option
+          v-for="s in STATUSES"
+          :key="s"
+          :label="s"
+          :value="s"
+        />
       </el-select>
-      <el-button type="primary" @click="reload">{{ t('common.search') }}</el-button>
-      <el-button @click="resetQuery">{{ t('common.reset') }}</el-button>
-      <div class="spacer" />
-      <el-button type="primary" :icon="Plus" @click="openCreate">{{ t('common.add') }}</el-button>
+      <el-button
+        type="primary"
+        @click="reload"
+      >
+        {{ t('common.search') }}
+      </el-button>
+      <el-button @click="resetQuery">
+        {{ t('common.reset') }}
+      </el-button>
     </div>
 
-    <el-table v-loading="loading" :data="rows" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="givenName" :label="t('applicant.given')" />
-      <el-table-column prop="familyName" :label="t('applicant.family')" />
-      <el-table-column prop="nationality" :label="t('applicant.nationality')" width="120" />
-      <el-table-column prop="email" :label="t('applicant.email')" />
-      <el-table-column prop="phone" :label="t('applicant.phone')" width="150" />
-      <el-table-column prop="status" :label="t('applicant.status')" width="120">
+    <el-table
+      v-loading="loading"
+      :data="rows"
+      border
+    >
+      <el-table-column
+        prop="id"
+        label="ID"
+        width="80"
+      />
+      <el-table-column
+        prop="givenName"
+        :label="t('applicant.given')"
+      />
+      <el-table-column
+        prop="familyName"
+        :label="t('applicant.family')"
+      />
+      <el-table-column
+        prop="nationality"
+        :label="t('applicant.nationality')"
+        width="120"
+      />
+      <el-table-column
+        prop="email"
+        :label="t('applicant.email')"
+      />
+      <el-table-column
+        prop="phone"
+        :label="t('applicant.phone')"
+        width="150"
+      />
+      <el-table-column
+        prop="status"
+        :label="t('applicant.status')"
+        width="120"
+      >
         <template #default="scope">
-          <el-tag :type="statusType((scope.row as ApplicantRow).status)" disable-transitions>
+          <el-tag
+            :type="statusType((scope.row as ApplicantRow).status)"
+            disable-transitions
+          >
             {{ (scope.row as ApplicantRow).status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="t('common.actions')" width="120">
+      <el-table-column
+        :label="t('common.actions')"
+        width="120"
+      >
         <template #default="scope">
           <el-button
             v-if="(scope.row as ApplicantRow).status !== 'ARCHIVED'"
@@ -54,27 +119,63 @@
       @current-change="(p: number) => { query.page = p - 1; reload() }"
     />
 
-    <el-dialog v-model="createVisible" :title="t('common.add')" width="480px">
-      <el-form ref="createRef" :model="createForm" :rules="createRules" label-width="150px">
-        <el-form-item :label="t('applicant.given')" prop="givenName">
+    <el-dialog
+      v-model="createVisible"
+      :title="t('common.add')"
+      width="480px"
+    >
+      <el-form
+        ref="createRef"
+        :model="createForm"
+        :rules="createRules"
+        label-width="150px"
+      >
+        <el-form-item
+          :label="t('applicant.given')"
+          prop="givenName"
+        >
           <el-input v-model="createForm.givenName" />
         </el-form-item>
-        <el-form-item :label="t('applicant.family')" prop="familyName">
+        <el-form-item
+          :label="t('applicant.family')"
+          prop="familyName"
+        >
           <el-input v-model="createForm.familyName" />
         </el-form-item>
-        <el-form-item :label="t('applicant.nationality')" prop="nationality">
-          <el-input v-model="createForm.nationality" maxlength="2" placeholder="ISO alpha-2" />
+        <el-form-item
+          :label="t('applicant.nationality')"
+          prop="nationality"
+        >
+          <el-input
+            v-model="createForm.nationality"
+            maxlength="2"
+            placeholder="ISO alpha-2"
+          />
         </el-form-item>
-        <el-form-item :label="t('applicant.email')" prop="email">
+        <el-form-item
+          :label="t('applicant.email')"
+          prop="email"
+        >
           <el-input v-model="createForm.email" />
         </el-form-item>
-        <el-form-item :label="t('applicant.invitedEmail')" prop="invitedEmail">
+        <el-form-item
+          :label="t('applicant.invitedEmail')"
+          prop="invitedEmail"
+        >
           <el-input v-model="createForm.invitedEmail" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="createVisible = false">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" :loading="creating" @click="submitCreate">{{ t('common.confirm') }}</el-button>
+        <el-button @click="createVisible = false">
+          {{ t('common.cancel') }}
+        </el-button>
+        <el-button
+          type="primary"
+          :loading="creating"
+          @click="submitCreate"
+        >
+          {{ t('common.confirm') }}
+        </el-button>
       </template>
     </el-dialog>
   </div>
@@ -86,6 +187,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { archiveApplicant, createApplicant, listApplicants, type ApplicantRow } from '@/api/applicant'
+import PageHeader from '@/components/PageHeader.vue'
 
 const { t } = useI18n()
 

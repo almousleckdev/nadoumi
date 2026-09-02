@@ -7,8 +7,14 @@ export interface ApplicantStats {
   new30d: number
   active: number
   draft: number
+  /** rows inspected for profile completeness (bounded by SAMPLE_SIZE) */
+  sampledCount: number
+  /** of `sampledCount`, how many are missing a required field */
   incomplete: number
+  /** of `sampledCount`, how many have every required field */
+  complete: number
   recent: ApplicantRow[]
+  /** true when the real total exceeds the inspected sample */
   sampled: boolean
 }
 
@@ -37,6 +43,7 @@ export function useApplicantStats() {
         listApplicantsPage({ size: 1, status: 'DRAFT' }),
         listApplicantsPage({ size: SAMPLE_SIZE }),
       ])
+      const sampledCount = sample.content.length
       const incomplete = sample.content.filter(
         r => REQUIRED_FIELDS.some(f => !r[f]),
       ).length
@@ -45,7 +52,9 @@ export function useApplicantStats() {
         new30d: new30Page.totalElements,
         active: activePage.totalElements,
         draft: draftPage.totalElements,
+        sampledCount,
         incomplete,
+        complete: sampledCount - incomplete,
         recent: sample.content.slice(0, 8),
         sampled: sample.totalElements > SAMPLE_SIZE,
       }

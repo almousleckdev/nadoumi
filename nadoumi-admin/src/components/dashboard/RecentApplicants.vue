@@ -9,7 +9,7 @@
         <el-button
           link
           type="primary"
-          @click="router.push('/nadoumi/applicant')"
+          @click="router.push('/applicants')"
         >
           {{ t('dashboard.viewAll') }}
         </el-button>

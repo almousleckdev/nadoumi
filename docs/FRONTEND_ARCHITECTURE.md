@@ -199,16 +199,27 @@ RuoYi-Vue2/3 codebase.
 
 - **Stack:** Vue 3 + Vite 5 + Element Plus + Pinia + Vue Router 4 + vue-i18n
   (default **en**, `zh` stub). `pnpm dev` on port **8082**, proxy `/dev-api` → `:8080`.
-- **Auth:** `POST /login` → token in a cookie; `GET /getInfo` (user/roles/permissions,
-  `isDefaultModifyPwd`); `GET /getRouters` → the sidebar is built live from `sys_menu`.
-  `stores/permission.ts` maps each backend `component` string to a view; **any screen
-  not implemented here renders `views/placeholder.vue`** (so System / Monitor / Tool
-  menus resolve without 404).
-- **Screens built:** login, dashboard, profile (change password),
-  `views/nadoumi/applicant/index.vue` (real — lists / creates / archives against
-  `/api/staff/applicants`). Everything else = placeholder until built.
+- **Auth:** `POST /login` → JWT in cookie `nadoumi-admin-token`; `GET /getInfo`
+  → user + roles + permission tokens. **`/getRouters` is not used.**
+- **Navigation:** a static manifest, `src/config/nav.ts`, is the single source of
+  truth for the sidebar **and** the router (`src/router/index.ts` is built from
+  the implemented paths). Each item: `{ key, path, icon, perm?, status }`.
+  `status: 'implemented'` → a real screen, rendered as a link, gated by
+  `userStore.hasPerm(perm)`. `status: 'planned'` → a disabled row with a
+  "Planned" tag — no route, **no placeholder page**. Groups: Operations /
+  Business / Growth / Platform (`ADMIN_ARCHITECTURE.md` §2.2).
+- **Screens built:** login, dashboard (real applicant metrics + coming-soon for
+  unbuilt domains), `views/applicants/index.vue` (real — list / create / archive
+  against `/api/staff/applicants`), profile (change password). Planned modules
+  have no page at all.
+- **Shared UI:** `PageHeader`; dashboard primitives `DashboardGroup`, `StatCard`,
+  `DonutStat` (SVG, no chart lib), `ComingSoonCard`, `RecentApplicants`. Vitest
+  (`pnpm test`) covers the manifest, the composable and the primitives.
 - **`request.ts`** handles both response shapes: RuoYi `{code,msg,data}` (HTTP 200) and
-  Nadoumi `/api/**` bare bodies + `problem+json`.
+  Nadoumi `/api/**` bare bodies + `problem+json`; one deduped error toast.
+- **Design tokens** (`src/assets/styles/index.scss`): Orange-500 brand
+  (`#F97316` → `--el-color-primary`), navy sidebar, Inter / Plus Jakarta Sans /
+  Noto Sans Arabic, `prefers-reduced-motion` honoured.
 - CI: `pnpm build` (`.github/workflows/ci.yml`, `nadoumi-admin` job).
 - **`V6__nadoumi_english_labels.sql`** translates the inherited RuoYi `sys_menu` /
   `sys_dict_*` / `sys_config` labels to English so the admin reads English end to end.

@@ -1,7 +1,45 @@
+/* ── Nadoumi design tokens ─────────────────────────────────────────────
+   Orange-500 brand system (matches nadoumi-web). Element Plus is themed by
+   remapping its --el-color-primary* scale onto Tailwind's orange ramp so
+   every Element component (buttons, tags, active menu items…) picks it up. */
 :root {
-  --nad-accent: #0b5fff;
-  --nad-sidebar-bg: #1f2a44;
-  --nad-sidebar-fg: #c9d3e6;
+  --nad-brand-50: #fff7ed;
+  --nad-brand-100: #ffedd5;
+  --nad-brand-200: #fed7aa;
+  --nad-brand-300: #fdba74;
+  --nad-brand-400: #fb923c;
+  --nad-brand-500: #f97316; /* brand */
+  --nad-brand-600: #ea580c; /* CTA */
+  --nad-brand-700: #c2410c; /* text / hover */
+
+  --nad-ink: #1f2937;
+  --nad-ink-soft: #4b5563;
+  --nad-ink-faint: #9ca3af;
+  --nad-line: #e5e7eb;
+  --nad-canvas: #f4f5f7;
+  --nad-surface: #ffffff;
+
+  --nad-sidebar-bg: #10192f;
+  --nad-sidebar-bg-soft: #17223d;
+  --nad-sidebar-fg: #aeb9d0;
+  --nad-sidebar-fg-muted: #6b7794;
+
+  --nad-radius: 12px;
+  --nad-shadow-sm: 0 1px 2px rgba(16, 25, 47, 0.06), 0 1px 3px rgba(16, 25, 47, 0.05);
+  --nad-shadow-md: 0 6px 20px rgba(16, 25, 47, 0.08);
+  --nad-aside-w: 244px;
+  --nad-aside-w-collapsed: 68px;
+  --nad-header-h: 60px;
+
+  /* Element Plus primary → orange */
+  --el-color-primary: var(--nad-brand-500);
+  --el-color-primary-light-3: var(--nad-brand-400);
+  --el-color-primary-light-5: var(--nad-brand-300);
+  --el-color-primary-light-7: var(--nad-brand-200);
+  --el-color-primary-light-8: var(--nad-brand-100);
+  --el-color-primary-light-9: var(--nad-brand-50);
+  --el-color-primary-dark-2: var(--nad-brand-600);
+  --el-border-radius-base: 8px;
 }
 
 html,
@@ -12,11 +50,24 @@ body,
 }
 
 body {
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
+    Arial, 'Noto Sans Arabic', sans-serif;
+  color: var(--nad-ink);
+  background: var(--nad-canvas);
+  -webkit-font-smoothing: antialiased;
 }
 
+/* ── shared page scaffolding ─────────────────────────────────────────── */
 .nad-page {
-  padding: 16px;
+  padding: 24px;
+  max-width: 1360px;
+  margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+  .nad-page {
+    padding: 16px;
+  }
 }
 
 .nad-toolbar {
@@ -24,9 +75,23 @@ body {
   gap: 8px;
   flex-wrap: wrap;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .nad-toolbar .spacer {
   flex: 1;
+}
+
+.nad-card {
+  background: var(--nad-surface);
+  border: 1px solid var(--nad-line);
+  border-radius: var(--nad-radius);
+  box-shadow: var(--nad-shadow-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

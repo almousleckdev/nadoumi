@@ -4,10 +4,10 @@ import ComingSoonCard from '@/components/dashboard/ComingSoonCard.vue'
 import { mountOpts } from '../helpers'
 
 describe('ComingSoonCard', () => {
-  it('shows the label, a coming-soon tag and an em-dash value (never a number)', () => {
+  it('shows the label, a not-yet-available tag and an em-dash value (never a number)', () => {
     const w = mount(ComingSoonCard, { props: { label: 'Revenue', domain: 'Finance' }, ...mountOpts() })
     expect(w.find('.cs-card__label').text()).toBe('Revenue')
-    expect(w.text()).toContain('Coming soon')
+    expect(w.text()).toContain('Not yet available')
     expect(w.find('.cs-card__value').text()).toBe('—')
   })
 

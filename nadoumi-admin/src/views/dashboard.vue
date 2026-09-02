@@ -1,12 +1,27 @@
 <template>
   <div class="nad-page dash">
+    <PageHeader
+      :title="t('dashboard.title')"
+      :subtitle="t('dashboard.subtitle')"
+    >
+      <template #actions>
+        <el-button
+          :loading="loading"
+          :icon="Refresh"
+          @click="refresh"
+        >
+          {{ t('dashboard.refresh') }}
+        </el-button>
+      </template>
+    </PageHeader>
+
     <el-alert
       v-if="userStore.mustChangePassword"
       :title="t('profile.initialWarning')"
       type="warning"
       show-icon
       :closable="false"
-      class="dash__pw"
+      class="dash__row"
     >
       <el-button
         size="small"
@@ -17,25 +32,23 @@
       </el-button>
     </el-alert>
 
-    <header class="dash__head">
-      <div>
-        <h1 class="dash__title">
-          {{ t('dashboard.title') }}
-        </h1>
-        <p class="dash__subtitle">
-          {{ t('dashboard.subtitle') }}
-        </p>
-      </div>
+    <el-alert
+      v-if="error"
+      :title="error"
+      type="error"
+      show-icon
+      :closable="false"
+      class="dash__row"
+    >
       <el-button
-        :loading="loading"
-        :icon="Refresh"
+        size="small"
         @click="refresh"
       >
-        {{ t('dashboard.refresh') }}
+        {{ t('dashboard.retry') }}
       </el-button>
-    </header>
+    </el-alert>
 
-    <!-- Applicants — real, from /api/staff/applicants (interim source until the Reporting slice; ADMIN_ARCHITECTURE §6) -->
+    <!-- Applicants — real data from /api/staff/applicants (interim source, ADMIN_ARCHITECTURE §6.1) -->
     <DashboardGroup
       :title="t('dashboard.groups.applicants')"
       :subtitle="t('dashboard.liveData')"
@@ -56,7 +69,7 @@
       <StatCard
         :label="t('dashboard.k.incompleteProfiles')"
         :value="stats?.incomplete ?? null"
-        :hint="stats?.sampled ? t('dashboard.ofSample', { n: 200 }) : undefined"
+        :hint="stats?.sampled ? t('dashboard.ofSample', { n: stats.sampledCount }) : undefined"
         :state="cardState"
         :error-text="error ?? undefined"
       />
@@ -68,66 +81,57 @@
       />
     </DashboardGroup>
 
-    <!-- Applications — Application domain not built yet -->
-    <DashboardGroup :title="t('dashboard.groups.applications')">
-      <ComingSoonCard
-        v-for="k in APPLICATION_KEYS"
-        :key="k"
-        :label="t(`dashboard.k.${k}`)"
-        domain="Application"
+    <!-- Profile completion (real) + recent applicants (real) -->
+    <div class="dash__split">
+      <DonutStat
+        :label="t('dashboard.profileCompletion')"
+        :segments="completionSegments"
+        :center-value="completionPct"
+        :center-caption="t('dashboard.complete')"
+        :state="cardState"
+        :error-text="error ?? undefined"
       />
-    </DashboardGroup>
-
-    <!-- Finance — Finance / Payment domains not built yet -->
-    <DashboardGroup :title="t('dashboard.groups.finance')">
-      <ComingSoonCard
-        :label="t('dashboard.k.revenue')"
-        domain="Finance"
-      />
-      <ComingSoonCard
-        :label="t('dashboard.k.expenses')"
-        domain="Finance"
-      />
-      <ComingSoonCard
-        :label="t('dashboard.k.netEarnings')"
-        domain="Finance"
-      />
-      <ComingSoonCard
-        :label="t('dashboard.k.outstandingPayments')"
-        domain="Payment"
-      />
-    </DashboardGroup>
-
-    <!-- Operations — Employee / Workflow / Reporting domains not built yet -->
-    <DashboardGroup :title="t('dashboard.groups.operations')">
-      <ComingSoonCard
-        :label="t('dashboard.k.activeEmployees')"
-        domain="Employee"
-      />
-      <ComingSoonCard
-        :label="t('dashboard.k.pendingTasks')"
-        domain="Workflow"
-      />
-      <ComingSoonCard
-        :label="t('dashboard.k.operationalAlerts')"
-        domain="Reporting"
-      />
-    </DashboardGroup>
-
-    <div class="dash__lists">
       <RecentApplicants
         :rows="stats?.recent ?? []"
-        :loading="loading"
+        :loading="loading && !stats"
         :error="error"
       />
+    </div>
 
-      <el-card shadow="never">
+    <!-- Domains without a backend yet — honest coming-soon, never fake numbers -->
+    <DashboardGroup :title="t('dashboard.groups.notYet')">
+      <ComingSoonCard
+        v-for="c in comingSoon"
+        :key="c.key"
+        :label="t(`dashboard.k.${c.key}`)"
+        :domain="c.domain"
+      />
+    </DashboardGroup>
+
+    <!-- Activity & operational tasks — need the Reporting event store -->
+    <div class="dash__split">
+      <el-card
+        shadow="never"
+        class="dash__panel"
+      >
         <template #header>
-          {{ t('dashboard.recentActivity') }}
+          <span class="dash__panel-title">{{ t('dashboard.recentActivity') }}</span>
         </template>
         <el-empty
-          :description="t('dashboard.comingSoonNote', { domain: 'Reporting' })"
-          :image-size="72"
+          :description="t('dashboard.activityComingSoon')"
+          :image-size="64"
+        />
+      </el-card>
+      <el-card
+        shadow="never"
+        class="dash__panel"
+      >
+        <template #header>
+          <span class="dash__panel-title">{{ t('dashboard.pendingTasks') }}</span>
+        </template>
+        <el-empty
+          :description="t('dashboard.tasksComingSoon')"
+          :image-size="64"
         />
       </el-card>
     </div>
@@ -141,9 +145,11 @@ import { useRouter } from 'vue-router'
 import { Refresh } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { useApplicantStats } from '@/composables/useApplicantStats'
+import PageHeader from '@/components/PageHeader.vue'
+import DashboardGroup from '@/components/dashboard/DashboardGroup.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import ComingSoonCard from '@/components/dashboard/ComingSoonCard.vue'
-import DashboardGroup from '@/components/dashboard/DashboardGroup.vue'
+import DonutStat from '@/components/dashboard/DonutStat.vue'
 import RecentApplicants from '@/components/dashboard/RecentApplicants.vue'
 
 const { t } = useI18n()
@@ -153,39 +159,54 @@ const userStore = useUserStore()
 const { data: stats, loading, error, refresh } = useApplicantStats()
 
 const cardState = computed<'ok' | 'loading' | 'error'>(() =>
-  error.value ? 'error' : loading.value && !stats.value ? 'loading' : 'ok')
+  error.value ? 'error' : (loading.value && !stats.value ? 'loading' : 'ok'))
 
-const APPLICATION_KEYS = [
-  'totalApplications', 'newApplications', 'pendingReview', 'accepted', 'rejected',
+const completionSegments = computed(() => [
+  { label: t('dashboard.complete'), value: stats.value?.complete ?? 0, color: 'var(--nad-brand-500)' },
+  { label: t('dashboard.k.incompleteProfiles'), value: stats.value?.incomplete ?? 0, color: '#cbd5e1' },
+])
+const completionPct = computed(() => {
+  const s = stats.value
+  if (!s || s.sampledCount === 0) return '—'
+  return `${Math.round((s.complete / s.sampledCount) * 100)}%`
+})
+
+const comingSoon = [
+  { key: 'applications', domain: 'Application' },
+  { key: 'revenue', domain: 'Finance' },
+  { key: 'expenses', domain: 'Finance' },
+  { key: 'netEarnings', domain: 'Finance' },
+  { key: 'payments', domain: 'Payment' },
+  { key: 'employees', domain: 'Employee' },
+  { key: 'payroll', domain: 'Payroll' },
+  { key: 'notifications', domain: 'Notification' },
 ] as const
 
 onMounted(refresh)
 </script>
 
 <style scoped>
-.dash__pw {
+.dash__row {
   margin-bottom: 16px;
 }
-.dash__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.dash__title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-}
-.dash__subtitle {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
-}
-.dash__lists {
+.dash__split {
   display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.dash__panel {
+  border: 1px solid var(--nad-line);
+  border-radius: var(--nad-radius);
+}
+.dash__panel-title {
+  font-weight: 650;
+  font-size: 14px;
+  color: var(--nad-ink);
+}
+@media (max-width: 900px) {
+  .dash__split {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

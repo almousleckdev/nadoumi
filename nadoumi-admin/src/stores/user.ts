@@ -44,5 +44,14 @@ export const useUserStore = defineStore('user', () => {
     removeToken()
   }
 
-  return { token, name, nickName, avatar, roles, permissions, mustChangePassword, login, fetchInfo, logout, reset }
+  /** RuoYi convention: `*:*:*` (super admin) satisfies every check. */
+  function hasPerm(perm?: string): boolean {
+    if (!perm) return true
+    return permissions.value.includes('*:*:*') || permissions.value.includes(perm)
+  }
+
+  return {
+    token, name, nickName, avatar, roles, permissions, mustChangePassword,
+    login, fetchInfo, logout, reset, hasPerm,
+  }
 })
