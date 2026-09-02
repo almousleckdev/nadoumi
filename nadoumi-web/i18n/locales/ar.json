@@ -84,6 +84,15 @@
     "email": "Enter a valid email address.",
     "min": "Must be at least {n} characters.",
     "max": "Must be at most {n} characters.",
-    "len2": "Use the 2-letter country code."
+    "len2": "Use the 2-letter country code.",
+    "password": {
+      "tooShort": "Use at least 8 characters.",
+      "tooLong": "Use at most 32 characters.",
+      "needUpper": "Add an uppercase letter.",
+      "needLower": "Add a lowercase letter.",
+      "needDigit": "Add a number.",
+      "needSpecial": "Add a special character.",
+      "sameAsCurrent": "Choose a password different from your current one."
+    }
   }
 }
