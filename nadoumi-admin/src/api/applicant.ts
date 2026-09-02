@@ -10,6 +10,7 @@ export interface ApplicantRow {
   email: string | null
   phone: string | null
   status: string
+  createdAt: string | null
 }
 
 export interface Page<T> {

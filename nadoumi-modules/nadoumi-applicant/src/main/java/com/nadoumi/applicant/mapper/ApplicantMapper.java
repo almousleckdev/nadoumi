@@ -16,7 +16,8 @@ public interface ApplicantMapper {
     /** Staff list, PageHelper-paged. All args optional filters. */
     List<Applicant> search(@Param("name") String name,
                            @Param("status") ApplicantStatus status,
-                           @Param("nationality") String nationality);
+                           @Param("nationality") String nationality,
+                           @Param("createdAfter") java.time.LocalDateTime createdAfter);
 
     /** Student list — restricted to the caller's accessible applicant ids. Empty ids -> empty. */
     List<Applicant> findByIds(@Param("ids") Collection<Long> ids);
@@ -25,9 +26,11 @@ public interface ApplicantMapper {
 
     int update(Applicant applicant);
 
-    int updateStatus(@Param("id") Long id,
-                     @Param("status") ApplicantStatus status,
-                     @Param("updateBy") String updateBy);
+    int updateStatus(
+            @Param("id") Long id,
+            @Param("status") ApplicantStatus status,
+            @Param("updateBy") String updateBy
+    );
 
     List<ApplicantEducation> findEducation(@Param("applicantId") Long applicantId);
     ApplicantEducation findEducationById(@Param("id") Long id);

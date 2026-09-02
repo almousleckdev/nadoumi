@@ -24,6 +24,8 @@ import com.nadoumi.identity.access.NadoumiAccessServiceImpl;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
+
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -106,9 +108,9 @@ public class ApplicantService {
     }
 
     public PageResponse<ApplicantResponse> listForStaff(String name, ApplicantStatus status,
-            String nationality, int page, int size) {
+            String nationality, java.time.LocalDateTime createdAfter, int page, int size) {
         PageHelper.startPage(page + 1, size);
-        List<Applicant> rows = mapper.search(name, status, nationality);
+        List<Applicant> rows = mapper.search(name, status, nationality, createdAfter);
         long total = new PageInfo<>(rows).getTotal();
         boolean pii = includePii();
         List<ApplicantResponse> content = rows.stream().map(a -> ApplicantResponse.of(a, pii)).toList();
@@ -249,8 +251,11 @@ public class ApplicantService {
         return caller.isExternal() || rbac.hasPermi("nad:applicant:pii:view");
     }
 
-    private static void apply(Applicant a, String given, String family, java.time.LocalDate dob,
-            String nationality, String passportNo, String email, String phone) {
+    private static void apply(
+            Applicant a, String given,
+            String family, LocalDate dob,
+            String nationality, String passportNo,
+            String email, String phone) {
         a.setGivenName(given);
         a.setFamilyName(family);
         a.setDob(dob);

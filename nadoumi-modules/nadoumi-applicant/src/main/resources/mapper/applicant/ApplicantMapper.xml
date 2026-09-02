@@ -36,8 +36,9 @@
             </if>
             <if test="status != null">and status = #{status}</if>
             <if test="nationality != null and nationality != ''">and nationality = #{nationality}</if>
+            <if test="createdAfter != null">and create_time &gt;= #{createdAfter}</if>
         </where>
-        order by family_name, given_name, id
+        order by create_time desc, id desc
     </select>
 
     <select id="findByIds" resultMap="applicant">

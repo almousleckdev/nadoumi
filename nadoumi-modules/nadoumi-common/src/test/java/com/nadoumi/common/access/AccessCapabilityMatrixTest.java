@@ -32,8 +32,10 @@ class AccessCapabilityMatrixTest {
     @Test
     void agent_holds_everything_except_manage_access() {
         assertThat(AccessCapabilityMatrix.defaultCapabilities(AccessRole.AGENT))
-                .containsExactlyInAnyOrder(VIEW_PROFILE, EDIT_PROFILE, VIEW_APPLICATION,
-                        CREATE_APPLICATION, SUBMIT_APPLICATION, UPLOAD_DOCUMENT, VIEW_DOCUMENT,
+                .containsExactlyInAnyOrder(
+                        VIEW_PROFILE, EDIT_PROFILE, VIEW_APPLICATION,
+                        CREATE_APPLICATION, SUBMIT_APPLICATION,
+                        UPLOAD_DOCUMENT, VIEW_DOCUMENT,
                         MESSAGE_STAFF)
                 .doesNotContain(MANAGE_ACCESS);
     }
