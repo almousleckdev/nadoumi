@@ -19,7 +19,7 @@ async function changePassword(payload: { current: string; next: string }) {
     notice.value = `${t('dashboard.pwUpdated')} ${t('dashboard.pwOtherSessionsEnded')}`
   }
   catch (e) {
-    error.value = problemMessage(e, t('auth.genericError'))
+    error.value = authErrorMessage(e, t)
   }
   finally {
     busy.value = false

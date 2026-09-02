@@ -34,6 +34,6 @@ describe('EmailVerifyStep', () => {
     await new Promise(r => setTimeout(r))
 
     expect(w.emitted('verified')).toBeFalsy()
-    expect(w.text().toLowerCase()).toContain('invalid or expired')
+    expect(w.text().toLowerCase()).toContain('invalid or has expired')
   })
 })

@@ -26,6 +26,7 @@ import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Service;
@@ -83,7 +84,8 @@ public class StudentAuthService {
         if (!verifiedEmail.equals(email)) {
             throw new NadBadRequestException("email verification does not match this address");
         }
-        PasswordPolicy.violation(req.password(), null)
+        PasswordPolicy.violation(req.password(), null,
+                        List.of(req.firstName(), req.lastName(), emailLocalPart(email)))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
         if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
             throw new NadBadRequestException("email already registered");
@@ -134,7 +136,7 @@ public class StudentAuthService {
             // ticket was valid but the account is gone - nothing to do, reveal nothing
             return;
         }
-        PasswordPolicy.violation(newPassword, null)
+        PasswordPolicy.violation(newPassword, null, List.of(emailLocalPart(email)))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
         userService.resetUserPwd(userId, SecurityUtils.encryptPassword(newPassword));
         identityMapper.touchPwdUpdateDate(userId);
@@ -153,7 +155,8 @@ public class StudentAuthService {
         if (!SecurityUtils.matchesPassword(currentPassword, user.getPassword())) {
             throw new NadBadRequestException("current password is incorrect");
         }
-        PasswordPolicy.violation(newPassword, user.getPassword())
+        PasswordPolicy.violation(newPassword, user.getPassword(),
+                        personalTerms(user.getNickName(), user.getEmail()))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
 
         String encoded = SecurityUtils.encryptPassword(newPassword);
@@ -208,6 +211,25 @@ public class StudentAuthService {
 
     private static String normalizeEmail(String email) {
         return email.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static String emailLocalPart(String email) {
+        int at = email.indexOf('@');
+        return at > 0 ? email.substring(0, at) : email;
+    }
+
+    /** Personal terms a password must not contain: name words + email local-part. */
+    private static List<String> personalTerms(String displayName, String email) {
+        List<String> terms = new ArrayList<>();
+        if (displayName != null) {
+            for (String word : displayName.trim().split("\\s+")) {
+                if (!word.isBlank()) terms.add(word);
+            }
+        }
+        if (email != null && !email.isBlank()) {
+            terms.add(emailLocalPart(email));
+        }
+        return terms;
     }
 
     private static AccessibleApplicant toAccessible(UserApplicantAccess g) {
