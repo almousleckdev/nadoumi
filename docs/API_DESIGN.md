@@ -1,5 +1,7 @@
 # Nadoumi — API Design
 
+> Read `docs/PLATFORM_ARCHITECTURE.md` first — the approved enterprise-platform direction this doc rolls up to (2026-09-02).
+
 Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 
 > Reconciled with Rev 3. The §7 items that were open are now decided

@@ -1,5 +1,7 @@
 # Nadoumi — Applicant Onboarding
 
+> Read `docs/PLATFORM_ARCHITECTURE.md` first — the approved enterprise-platform direction this doc rolls up to (2026-09-02).
+
 Date: 2026-09-03 (Revision 3)
 Depends on: Document slice + object storage (`docs/DOCUMENT_MANAGEMENT.md`),
 University/Program/Scholarship catalog (`docs/DOMAIN_MODEL.md` §2.1).
