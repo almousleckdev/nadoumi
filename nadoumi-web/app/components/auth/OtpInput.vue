@@ -1,10 +1,15 @@
 <script setup lang="ts">
-const props = withDefaults(defineProps<{ modelValue: string; length?: number; disabled?: boolean }>(), {
-  length: 6,
-  disabled: false,
-})
+const props = withDefaults(defineProps<{
+  modelValue: string
+  length?: number
+  disabled?: boolean
+  /** verifying: dim + lock the boxes while the code is being checked */
+  busy?: boolean
+  invalid?: boolean
+}>(), { length: 6, disabled: false, busy: false, invalid: false })
 const emit = defineEmits<{ 'update:modelValue': [value: string]; complete: [value: string] }>()
 
+const { t } = useI18n()
 const boxes = ref<string[]>(Array.from({ length: props.length }, (_, i) => props.modelValue[i] ?? ''))
 const inputs = ref<HTMLInputElement[]>([])
 
@@ -33,6 +38,8 @@ function onKeydown(index: number, event: KeyboardEvent) {
   if (event.key === 'Backspace' && !boxes.value[index] && index > 0) {
     inputs.value[index - 1]?.focus()
   }
+  if (event.key === 'ArrowLeft' && index > 0) inputs.value[index - 1]?.focus()
+  if (event.key === 'ArrowRight' && index < props.length - 1) inputs.value[index + 1]?.focus()
 }
 
 function onPaste(event: ClipboardEvent) {
@@ -47,18 +54,27 @@ function onPaste(event: ClipboardEvent) {
 
 <template>
   <!-- always left-to-right: a numeric code is not mirrored in RTL -->
-  <div class="flex gap-2" dir="ltr">
+  <div
+    role="group"
+    :aria-label="t('auth.otp.groupLabel', { n: length })"
+    :aria-busy="busy"
+    class="flex gap-2 sm:gap-2.5"
+    dir="ltr"
+  >
     <input
       v-for="(box, i) in boxes"
       :key="i"
       :ref="(el: unknown) => registerInput(el as Element | null, i)"
       :value="box"
-      :disabled="disabled"
+      :disabled="disabled || busy"
       inputmode="numeric"
       autocomplete="one-time-code"
       maxlength="1"
-      :aria-label="`Digit ${i + 1}`"
-      class="h-12 w-10 rounded-md border border-slate-200 text-center text-lg font-semibold text-slate-900 focus-visible:border-brand-500 focus-visible:outline-none disabled:bg-slate-50"
+      :aria-label="t('auth.otp.digitLabel', { i: i + 1, n: length })"
+      class="h-11 w-11 rounded-lg border text-center text-lg font-semibold text-slate-900 outline-none transition-[border-color,background-color,box-shadow] duration-150 focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500/30 disabled:opacity-60 motion-reduce:transition-none"
+      :class="[
+        invalid ? 'border-red-400' : box ? 'border-brand-300 bg-brand-50/60' : 'border-slate-200',
+      ]"
       @input="onInput(i, $event)"
       @keydown="onKeydown(i, $event)"
       @paste="onPaste"
