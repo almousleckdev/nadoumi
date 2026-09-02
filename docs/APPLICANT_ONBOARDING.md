@@ -14,6 +14,10 @@ Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md`
 | **PLANNED** | Designed here; frontend may render it disabled/read-only with a "coming soon — not saved yet" note. Never faked as persisted. |
 | **REQUIRES BACKEND** | Needs a schema + endpoint that does not exist yet (this doc specifies it). |
 
+**Per-step backend gap** (Contacts endpoint to wire, Interests / Location / Photo
+/ Passport / onboarding-complete flag to build): see
+`ARCHITECTURE_GAP_ANALYSIS.md` §7 — kept in sync with this doc as each step lands.
+
 **Revision 3 build (`/dashboard/onboarding`):** a 7-step wizard shell —
 **Personal · Identity · Education · Interests · Location · Contact · Review** — with
 a persistent progress indicator. Steps backed by EXISTING endpoints save for real;

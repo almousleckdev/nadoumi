@@ -38,10 +38,12 @@ class OtpServiceTest {
 
     @Test
     void issue_stores_the_hashed_code_with_ttl_and_sends_mail_when_not_cooling_down() {
-        when(redis.hasKey(cooldownKey(OtpPurpose.REGISTER))).thenReturn(false);
+        when(redis.getExpire(cooldownKey(OtpPurpose.REGISTER))).thenReturn(-2L);
 
-        otp.issue(EMAIL, OtpPurpose.REGISTER);
+        OtpService.IssueResult result = otp.issue(EMAIL, OtpPurpose.REGISTER, false);
 
+        assertThat(result.sent()).isTrue();
+        assertThat(result.retryAfterSeconds()).isEqualTo(OtpService.COOLDOWN_SECONDS);
         verify(redis).setCacheObject(eq(otpKey(OtpPurpose.REGISTER)),
                 eq(OtpService.sha256(CODE) + "|0"), eq(OtpService.TTL_SECONDS), eq(TimeUnit.SECONDS));
         verify(redis).setCacheObject(eq(cooldownKey(OtpPurpose.REGISTER)),
@@ -50,12 +52,36 @@ class OtpServiceTest {
     }
 
     @Test
-    void issue_is_silent_during_the_resend_cooldown() {
-        when(redis.hasKey(cooldownKey(OtpPurpose.REGISTER))).thenReturn(true);
+    void issue_is_silent_during_the_resend_cooldown_and_reports_the_remaining_seconds() {
+        when(redis.getExpire(cooldownKey(OtpPurpose.REGISTER))).thenReturn(42L);
 
-        otp.issue(EMAIL, OtpPurpose.REGISTER);
+        OtpService.IssueResult result = otp.issue(EMAIL, OtpPurpose.REGISTER, false);
 
+        assertThat(result.sent()).isFalse();
+        assertThat(result.retryAfterSeconds()).isEqualTo(42);
         verify(redis, never()).setCacheObject(eq(otpKey(OtpPurpose.REGISTER)), any(), anyInt(), any());
+        verify(mail, never()).send(any());
+    }
+
+    @Test
+    void issue_sends_the_account_exists_notice_instead_of_a_code_when_the_email_is_registered() {
+        when(redis.getExpire(cooldownKey(OtpPurpose.REGISTER))).thenReturn(-2L);
+
+        OtpService.IssueResult result = otp.issue(EMAIL, OtpPurpose.REGISTER, true);
+
+        assertThat(result.sent()).isTrue();
+        verify(redis, never()).setCacheObject(eq(otpKey(OtpPurpose.REGISTER)), any(), anyInt(), any());
+        verify(mail).send(any(EmailMessage.class));
+    }
+
+    @Test
+    void issue_is_throttled_identically_for_a_registered_email_so_the_response_never_enumerates() {
+        when(redis.getExpire(cooldownKey(OtpPurpose.REGISTER))).thenReturn(30L);
+
+        OtpService.IssueResult result = otp.issue(EMAIL, OtpPurpose.REGISTER, true);
+
+        assertThat(result.sent()).isFalse();
+        assertThat(result.retryAfterSeconds()).isEqualTo(30);
         verify(mail, never()).send(any());
     }
 

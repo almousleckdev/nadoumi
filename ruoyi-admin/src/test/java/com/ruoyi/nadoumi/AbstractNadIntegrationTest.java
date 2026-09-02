@@ -67,6 +67,13 @@ public abstract class AbstractNadIntegrationTest {
         r.add("spring.flyway.password", MYSQL::getPassword);
         r.add("spring.data.redis.host", REDIS::getHost);
         r.add("spring.data.redis.port", () -> REDIS.getMappedPort(6379));
+        // Keep the ITs hermetic: a developer's ./config/application-local.yml is
+        // still picked up via spring.config.import and may point mail at a real
+        // Mailpit. Force the no-network adapter (@DynamicPropertySource wins over
+        // every file), so LoggingMailSender + DevMailController are the ones wired.
+        r.add("nadoumi.mail.transport", () -> "log");
+        r.add("spring.mail.host", () -> "localhost");
+        r.add("spring.mail.port", () -> "1025");
     }
 
     @Autowired protected MockMvc mvc;

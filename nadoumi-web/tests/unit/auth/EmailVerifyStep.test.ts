@@ -45,6 +45,15 @@ describe('EmailVerifyStep', () => {
     expect(w.text()).toMatch(/4 attempts/i)
   })
 
+  it('shows the "already sent, check spam" note when the backend reports throttled', async () => {
+    // e.g. the user reloaded mid-flow (JS cooldown lost) and re-requested within 60s
+    fetchImpl.mockResolvedValueOnce({ sent: true, throttled: true, retryAfter: 40 })
+    const w = await mountSuspended(EmailVerifyStep, { props: { email: 'a@x.com', purpose: 'REGISTER' } })
+    await w.find('button').trigger('click') // [Verify]
+    await flushPromises()
+    expect(w.text().toLowerCase()).toContain('check your inbox and spam')
+  })
+
   it('Edit email returns to the email stage and emits edit', async () => {
     fetchImpl.mockResolvedValueOnce({ sent: true })
     const w = await mountSuspended(EmailVerifyStep, { props: { email: 'a@x.com', purpose: 'REGISTER' } })

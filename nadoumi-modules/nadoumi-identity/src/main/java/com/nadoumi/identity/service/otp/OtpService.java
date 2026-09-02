@@ -55,22 +55,39 @@ public class OtpService {
         this.codeGenerator = codeGenerator;
     }
 
+    /** Outcome of {@link #issue}: whether a mail went out this call, and when a resend is allowed. */
+    public record IssueResult(boolean sent, int retryAfterSeconds) {
+    }
+
     /**
-     * Issue and email a code for {@code email}. No-op (no new code, no mail) while a
-     * previous request is still within the resend cooldown.
+     * Issue an email for {@code email}: a fresh OTP, or — when {@code accountExists}
+     * for a {@code REGISTER} request — the "account already exists" notice instead.
+     * A single 60 s cooldown covers both branches so the response cannot be used to
+     * tell a registered address from an unregistered one.
+     *
+     * @return {@link IssueResult#sent()} {@code false} with the remaining cooldown
+     *         when still throttled (no code, no mail); {@code true} otherwise.
      */
-    public void issue(String email, OtpPurpose purpose) {
-        if (Boolean.TRUE.equals(redis.hasKey(cooldownKey(purpose, email)))) {
-            return;
+    public IssueResult issue(String email, OtpPurpose purpose, boolean accountExists) {
+        long remaining = redis.getExpire(cooldownKey(purpose, email));
+        if (remaining > 0) {
+            return new IssueResult(false, (int) remaining);
         }
-        String code = codeGenerator.get();
-        redis.setCacheObject(otpKey(purpose, email), sha256(code) + "|0", TTL_SECONDS, TimeUnit.SECONDS);
         redis.setCacheObject(cooldownKey(purpose, email), "1", COOLDOWN_SECONDS, TimeUnit.SECONDS);
 
-        String template = purpose == OtpPurpose.REGISTER ? "otp-register" : "otp-password-reset";
-        String subject = purpose == OtpPurpose.REGISTER ? "Verify your email" : "Reset your password";
-        mail.send(new EmailMessage(email, subject, templates.render(template,
-                Map.of("otp", code, "ttlMinutes", Integer.toString(TTL_SECONDS / 60)))));
+        if (accountExists && purpose == OtpPurpose.REGISTER) {
+            mail.send(new EmailMessage(email, "Your Nadoumi account",
+                    templates.render("account-exists", Map.of("loginUrl", loginUrl))));
+        }
+        else {
+            String code = codeGenerator.get();
+            redis.setCacheObject(otpKey(purpose, email), sha256(code) + "|0", TTL_SECONDS, TimeUnit.SECONDS);
+            String template = purpose == OtpPurpose.REGISTER ? "otp-register" : "otp-password-reset";
+            String subject = purpose == OtpPurpose.REGISTER ? "Verify your email" : "Reset your password";
+            mail.send(new EmailMessage(email, subject, templates.render(template,
+                    Map.of("otp", code, "ttlMinutes", Integer.toString(TTL_SECONDS / 60)))));
+        }
+        return new IssueResult(true, COOLDOWN_SECONDS);
     }
 
     /**
@@ -102,12 +119,6 @@ public class OtpService {
         }
         redis.deleteObject(key);
         return tickets.mint(email, purpose);
-    }
-
-    /** Sent instead of an OTP when a REGISTER request targets an address that already has an account. */
-    public void sendAccountExists(String email) {
-        mail.send(new EmailMessage(email, "Your Nadoumi account",
-                templates.render("account-exists", Map.of("loginUrl", loginUrl))));
     }
 
     private static String otpKey(OtpPurpose purpose, String email) {

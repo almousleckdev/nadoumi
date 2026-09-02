@@ -11,21 +11,44 @@ is built on Vue 2**. Full staff permission detail: `docs/PERMISSION_CATALOGUE.md
 
 ## 1. What exists today (EXISTING)
 
-The restored `ruoyi-ui` (Vue 2 — see `docs/FRONTEND_ARCHITECTURE.md`) provides a
-working admin shell driven by the backend:
+### 1.0 Two frontends, one target — authoritative
+
+Verified 2026-09-02 (see `docs/ARCHITECTURE_GAP_ANALYSIS.md` §2):
+
+| | `nadoumi-admin` — **the Nadoumi admin** | `ruoyi-ui` — reference only, frozen |
+| --- | --- | --- |
+| Dev URL | **`http://localhost:8082`** | **`http://localhost:1024`** (wants `:80`) |
+| Stack | Vue 3 + Vite + TS + Element Plus + Pinia | Vue 2 + vue-cli-service + Element UI (stock RuoYi) |
+| Nadoumi screens | **Dashboard** (real, live applicant metrics) + **Applicants** (real list/create/archive) | none |
+| RuoYi platform screens | none yet — unknown `component` → `views/placeholder.vue` | all implemented |
+| Nadoumi commits | 2 | 2 tweaks on top of 696 upstream |
+
+**Decision (recorded):** `nadoumi-admin` is the single Nadoumi admin application;
+all business UI is built there. `ruoyi-ui` is reference-only and frozen — no
+Nadoumi feature work, kept runnable until `nadoumi-admin` covers the RuoYi
+platform screens operations need (§2), then removed in a dedicated change. It is
+**not** part of the default environment "up"; start it with `cd ruoyi-ui && npm
+run dev` when you need to consult a stock screen.
+
+### 1.1 Shared backend-driven shell
+
+Both apps are driven by the same backend contract:
 
 - **Login** → JWT; **`/getInfo`** → user/roles/permissions;
   **`/getRouters`** → dynamic sidebar built from `sys_menu`.
-- **Permission directives:** `v-hasPermi="['system:user:edit']"`,
-  `v-hasRole="['admin']"` (UX only; server re-checks).
-- **Screens:** dashboard; `System` (User, Role, Menu, Dept, Post, Dict, Config,
-  Notice, Log); `Monitor` (Online, Job, Druid, Server, Cache, Operlog, Logininfor);
-  `Tool` (Gen, Form Build, Swagger).
-- **CRUD pattern per screen:** `src/api/<area>.js` (axios calls) + `src/views/<area>/
-  index.vue` (Element UI table + search form + dialog form + pagination via
-  `pageNum`/`pageSize`). This pattern is what `ruoyi-generator` emits.
-- **Menu/permission data** lives in `sys_menu` (`M`/`C`/`F`) and is assigned to roles
-  via `sys_role_menu`.
+- **Permission directives / guards** are UX-only; the server re-checks every call.
+- **Menu/permission data** lives in `sys_menu` (`M`/`C`/`F`), assigned to roles
+  via `sys_role_menu` (Flyway `V2` seed, `V6` English relabel).
+
+`nadoumi-admin` resolves each backend route's `component` string against
+`src/views/**/*.vue`; anything unmatched renders `placeholder.vue`
+("This screen is not part of the Nadoumi admin yet") — a **transitional** state,
+never counted as a delivered feature.
+
+`ruoyi-ui` implements the full stock set: `System` (User, Role, Menu, Dept, Post,
+Dict, Config, Notice, Log); `Monitor` (Online, Job, Druid, Server, Cache, Operlog,
+Logininfor); `Tool` (Gen, Form Build, Swagger) — the reference for porting each
+into `nadoumi-admin`.
 
 Seed roles: `admin` (all), `common`, `nadoumi_super_admin`. Seed users: `almousleck`
 (day-to-day super-admin, `user_type='00'`, role `nadoumi_super_admin`); `admin`
@@ -92,6 +115,33 @@ stay separate domains** — Payments is transaction capture at the application b
 Finance is the ledger / invoicing / expense / revenue view, Payroll is employee
 compensation. They integrate through explicit read models and domain events, not by
 sharing tables.
+
+### 2.2 Sidebar navigation — current vs target
+
+The sidebar is `sys_menu` rendered by `/getRouters`. It must present two clearly
+separated groups; Nadoumi branches are **new `sys_menu` rows with their own
+`nad:*` permission**, never renamed RuoYi entries, added in the same change as the
+screen they point to.
+
+**Platform (RuoYi infrastructure)** — Users · Roles · Menus · Departments ·
+Posts · Dictionaries · Config parameters · Notices · Operation log · Login log ·
+Online users · Scheduled jobs · Cache monitor · (dev-only) Code generator /
+Form builder / API docs.
+Current: seeded and English-labelled (`V6`); implemented in `ruoyi-ui`;
+`nadoumi-admin` → `placeholder.vue`. Port the operations-critical ones first
+(Users, Roles, Dictionaries, Config, Online users, Scheduled jobs, Cache).
+
+**Nadoumi business** — Dashboard · Applicants · Applications · Universities ·
+Programs · Scholarships · Documents · Partnerships · Employees · Finance ·
+Payroll · Payments · Marketing/CMS · Communication · Notifications ·
+Reports & Analytics.
+Current: only `Nadoumi → Applicants` is seeded (`V2`), plus the static
+`Dashboard`. Both are real in `nadoumi-admin`. Every other branch is **PLANNED**
+and unseeded — it appears when its screen is built.
+
+Placeholder count is **not** feature count. A status report lists a Nadoumi
+screen as delivered only when it has a real view, a `sys_menu` row, a `nad:*`
+permission, server-side authorization, and a test.
 
 ### Roles (BASELINE — `sys_role` + `sys_role_menu`; data scope via `sys_role.data_scope`)
 
@@ -178,6 +228,29 @@ allow.
 Financial and HR widgets (`revenue`, `expenses`, `net earnings`, `outstanding
 payments`, `employee count`) are hidden entirely — not zeroed — for roles without
 the finance / HR report tokens.
+
+### 6.1 Current implementation status (EXISTING)
+
+The `nadoumi-admin` dashboard route ships now, composed from reusable widgets
+(`DashboardGroup`, `StatCard`, `ComingSoonCard`, `RecentApplicants`):
+
+- **Applicants group — live.** Total / new (30d) / active / incomplete-profile
+  counts and the recent-applicants list are read from the already-built
+  `GET /api/staff/applicants` staff endpoint (`nadoumi-applicant`). This is an
+  **interim source** until the Reporting slice (`rm_applicant_counts`,
+  `rm_application_recent`) exists; the widget contract and permission gates in
+  the table above remain the target. The endpoint gained a `createdAfter`
+  filter and a `createdAt` field on `ApplicantResponse` to support the counts.
+  Incomplete-profile is computed client-side over a bounded sample (200 rows)
+  and labelled as such — it is not a precise aggregate.
+- **Applications / Finance / Operations groups — coming-soon.** Every widget
+  whose bounded context (§7) is not built (Application, Finance, Payment,
+  Employee, Workflow, Reporting activity feed / alerts) renders a professional
+  `ComingSoonCard` with an em-dash value. No placeholder or fabricated numbers.
+
+When the Reporting read models land, the Applicants group switches to
+`rm_*` sources and the coming-soon cards are replaced context-by-context; no
+dashboard-layout change is required.
 
 ---
 

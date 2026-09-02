@@ -129,7 +129,9 @@
       "editEmail": "Edit email",
       "emailLabel": "Code sent to",
       "attemptsLeft": "{n} attempts remaining",
-      "verifying": "Verifying…"
+      "verifying": "Verifying…",
+      "resentNote": "A new code is on its way.",
+      "throttledNote": "We already sent a code — check your inbox and spam. You can request another shortly."
     },
     "reset": {
       "title": "Reset password",
