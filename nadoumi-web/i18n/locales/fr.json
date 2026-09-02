@@ -56,7 +56,15 @@
     "forgotTitle": "Password help",
     "forgotBody": "Password reset isn't self-service yet. Email support{'@'}nadoumi.com from your registered address and we'll help you back in.",
     "genericError": "Something went wrong. Please check your details and try again.",
-    "passwordMismatch": "Passwords do not match."
+    "passwordMismatch": "Passwords do not match.",
+    "otp": {
+      "verify": "Verify",
+      "sent": "We sent a 6-digit code to {email}. Enter it below.",
+      "resend": "Resend code",
+      "resendIn": "Resend in {n}s",
+      "verified": "Verified",
+      "badCode": "That code is invalid or expired."
+    }
   },
   "dashboard": {
     "nav": { "overview": "Overview", "profile": "Profile", "education": "Education", "testScores": "Test scores", "contacts": "Contacts", "account": "Account" },
