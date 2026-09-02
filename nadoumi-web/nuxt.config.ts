@@ -7,6 +7,12 @@ export default defineNuxtConfig({
   ssr: true,
   modules: ['@nuxt/eslint', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxtjs/i18n'],
   css: ['~/assets/css/main.css'],
+  // ui/ primitives are referenced unprefixed (e.g. <NDropdown>, <NSpinner>); keep
+  // the directory flat in the component registry rather than the default Ui* prefix.
+  components: [
+    { path: '~/components/ui', pathPrefix: false },
+    '~/components',
+  ],
   fonts: {
     families: [
       { name: 'Plus Jakarta Sans', provider: 'google', weights: [600, 700] },
@@ -27,10 +33,10 @@ export default defineNuxtConfig({
     defaultLocale: 'en',
     strategy: 'prefix_except_default',
     locales: [
-      { code: 'en', language: 'en', file: 'en.json' },
-      { code: 'fr', language: 'fr', file: 'fr.json' },
-      { code: 'ar', language: 'ar', file: 'ar.json', dir: 'rtl' },
-      { code: 'zh', language: 'zh-CN', file: 'zh.json' },
+      { code: 'en', language: 'en', file: 'en.json', name: 'English' },
+      { code: 'fr', language: 'fr', file: 'fr.json', name: 'Français' },
+      { code: 'ar', language: 'ar', file: 'ar.json', dir: 'rtl', name: 'العربية' },
+      { code: 'zh', language: 'zh-CN', file: 'zh.json', name: '中文' },
     ],
   },
   app: {
