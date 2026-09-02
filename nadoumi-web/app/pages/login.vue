@@ -8,14 +8,18 @@ const { refresh } = useSession()
 const form = reactive({ username: '', password: '', code: '', uuid: '' })
 const error = ref('')
 const busy = ref(false)
+const captchaRef = ref<{ enabled: boolean } | null>(null)
 
 async function submit() {
   error.value = ''
+  if (captchaRef.value?.enabled && !form.code) { error.value = t('auth.captcha'); return }
   busy.value = true
   try {
     await $fetch('/api/student-session', { method: 'POST', body: { ...form } })
     await refresh()
-    await navigateTo((route.query.redirect as string) || localePath('/dashboard'))
+    const r = route.query.redirect as string | undefined
+    const safe = !!r && r.startsWith('/') && !r.startsWith('//')
+    await navigateTo(safe ? r : localePath('/dashboard'))
   }
   catch (err) {
     error.value = problemMessage(err, t('auth.genericError'))
@@ -40,7 +44,7 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
         <NField :label="t('auth.password')" for="password" required>
           <NInput id="password" v-model="form.password" type="password" autocomplete="current-password" />
         </NField>
-        <AuthCaptcha v-model:code="form.code" v-model:uuid="form.uuid" />
+        <AuthCaptcha ref="captchaRef" v-model:code="form.code" v-model:uuid="form.uuid" />
         <NButton type="submit" :loading="busy" block>{{ t('auth.submitLogin') }}</NButton>
       </form>
     </NCard>
