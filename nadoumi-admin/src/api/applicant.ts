@@ -48,6 +48,57 @@ export interface Contact {
   phone: string | null
 }
 
+export interface AccessGrant {
+  id: number
+  userId: number | null
+  applicantId: number
+  applicationId: number | null
+  accessRole: string
+  status: string
+  invitedEmail: string | null
+  interim: boolean
+  grantedAt: string | null
+  expiresAt: string | null
+  revokedAt: string | null
+  revokeReason: string | null
+  effectiveCapabilities: string[]
+}
+
+export interface ApplicantProfileInput {
+  givenName: string
+  familyName: string
+  dob?: string | null
+  nationality?: string | null
+  passportNo?: string | null
+  email?: string | null
+  phone?: string | null
+}
+
+export interface EducationInput {
+  institution: string
+  level?: string | null
+  field?: string | null
+  gpa?: number | null
+  gpaScale?: number | null
+  startDate?: string | null
+  endDate?: string | null
+}
+
+export interface TestScoreInput {
+  testType: string
+  score: string
+  subScoresJson?: string | null
+  takenOn?: string | null
+  expiresOn?: string | null
+}
+
+export interface ContactInput {
+  relation: string
+  name: string
+  email?: string | null
+  phone?: string | null
+}
+
 export interface Page<T> {
   content: T[]
   page: number
@@ -80,14 +131,42 @@ export const createApplicant = (body: {
   phone?: string
 }) => request.post<unknown, Applicant>(BASE, body)
 
+export const updateApplicant = (id: number | string, body: ApplicantProfileInput) =>
+  request.put<unknown, Applicant>(`${BASE}/${id}`, body)
+
 export const archiveApplicant = (id: number | string) =>
   request.delete(`${BASE}/${id}`)
 
+// ---- education ----
 export const listEducation = (id: number | string) =>
   request.get<unknown, Education[]>(`${BASE}/${id}/education`)
+export const addEducation = (id: number | string, body: EducationInput) =>
+  request.post<unknown, Education>(`${BASE}/${id}/education`, body)
+export const updateEducation = (id: number | string, eduId: number, body: EducationInput) =>
+  request.put<unknown, Education>(`${BASE}/${id}/education/${eduId}`, body)
+export const deleteEducation = (id: number | string, eduId: number) =>
+  request.delete(`${BASE}/${id}/education/${eduId}`)
 
+// ---- test scores ----
 export const listTestScores = (id: number | string) =>
   request.get<unknown, TestScore[]>(`${BASE}/${id}/test-scores`)
+export const addTestScore = (id: number | string, body: TestScoreInput) =>
+  request.post<unknown, TestScore>(`${BASE}/${id}/test-scores`, body)
+export const updateTestScore = (id: number | string, scoreId: number, body: TestScoreInput) =>
+  request.put<unknown, TestScore>(`${BASE}/${id}/test-scores/${scoreId}`, body)
+export const deleteTestScore = (id: number | string, scoreId: number) =>
+  request.delete(`${BASE}/${id}/test-scores/${scoreId}`)
 
+// ---- contacts ----
 export const listContacts = (id: number | string) =>
   request.get<unknown, Contact[]>(`${BASE}/${id}/contacts`)
+export const addContact = (id: number | string, body: ContactInput) =>
+  request.post<unknown, Contact>(`${BASE}/${id}/contacts`, body)
+export const updateContact = (id: number | string, contactId: number, body: ContactInput) =>
+  request.put<unknown, Contact>(`${BASE}/${id}/contacts/${contactId}`, body)
+export const deleteContact = (id: number | string, contactId: number) =>
+  request.delete(`${BASE}/${id}/contacts/${contactId}`)
+
+// ---- access / delegation ----
+export const listAccess = (id: number | string) =>
+  request.get<unknown, AccessGrant[]>(`${BASE}/${id}/access`)

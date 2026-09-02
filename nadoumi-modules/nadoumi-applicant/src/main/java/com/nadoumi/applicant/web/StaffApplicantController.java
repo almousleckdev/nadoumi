@@ -95,6 +95,14 @@ public class StaffApplicantController {
         return service.addEducation(id, req);
     }
 
+    @PutMapping("/{id}/education/{educationId}")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
+    @Log(title = "Applicant education", businessType = BusinessType.UPDATE)
+    public EducationResponse updateEducation(@PathVariable Long id, @PathVariable Long educationId,
+            @Valid @RequestBody EducationRequest req) {
+        return service.updateEducation(id, educationId, req);
+    }
+
     @DeleteMapping("/{id}/education/{educationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
@@ -115,6 +123,21 @@ public class StaffApplicantController {
         return service.addTestScore(id, req);
     }
 
+    @PutMapping("/{id}/test-scores/{scoreId}")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
+    @Log(title = "Applicant test score", businessType = BusinessType.UPDATE)
+    public TestScoreResponse updateTestScore(@PathVariable Long id, @PathVariable Long scoreId,
+            @Valid @RequestBody TestScoreRequest req) {
+        return service.updateTestScore(id, scoreId, req);
+    }
+
+    @DeleteMapping("/{id}/test-scores/{scoreId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
+    public void deleteTestScore(@PathVariable Long id, @PathVariable Long scoreId) {
+        service.deleteTestScore(id, scoreId);
+    }
+
     @GetMapping("/{id}/contacts")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
     public List<ContactResponse> contacts(@PathVariable Long id) {
@@ -126,5 +149,20 @@ public class StaffApplicantController {
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public ContactResponse addContact(@PathVariable Long id, @Valid @RequestBody ContactRequest req) {
         return service.addContact(id, req);
+    }
+
+    @PutMapping("/{id}/contacts/{contactId}")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
+    @Log(title = "Applicant contact", businessType = BusinessType.UPDATE)
+    public ContactResponse updateContact(@PathVariable Long id, @PathVariable Long contactId,
+            @Valid @RequestBody ContactRequest req) {
+        return service.updateContact(id, contactId, req);
+    }
+
+    @DeleteMapping("/{id}/contacts/{contactId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
+    public void deleteContact(@PathVariable Long id, @PathVariable Long contactId) {
+        service.deleteContact(id, contactId);
     }
 }

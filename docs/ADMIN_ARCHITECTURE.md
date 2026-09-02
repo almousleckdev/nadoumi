@@ -78,9 +78,10 @@ in the nadoumi-web build**.
 | --- | --- | --- |
 | Dashboard | **IMPLEMENTED** | Real applicant KPIs + honest coming-soon (§6.1). |
 | Applicants — list | **IMPLEMENTED** | Search / status / nationality filter, pagination, archive. `GET /api/staff/applicants`. |
-| Applicants — detail | **IMPLEMENTED** (read) | Overview + Education + Test scores + Contacts tabs, read-only, PII gated server-side by `nad:applicant:pii:view`. |
-| Applicant — access / delegation | **CURRENT** (next) | Needs `GET /api/staff/applicants/{id}/access`; `nad:applicant:access:view`. |
-| Applicant — sub-resource edit (education / scores / contacts) | **CURRENT** (next) | Backend has `POST` + partial `DELETE`; needs `PUT` + full `DELETE`. |
+| Applicants — detail | **IMPLEMENTED** | Overview + Education + Test scores + Contacts + Access tabs. |
+| Applicant — profile edit | **IMPLEMENTED** | Drawer form → `PUT /api/staff/applicants/{id}` (`nad:applicant:edit`). PII fields hidden/locked without `nad:applicant:pii:view`. |
+| Applicant — education / test scores / contacts CRUD | **IMPLEMENTED** | Add / edit / remove via drawer forms; staff `POST` / `PUT` / `DELETE` on each sub-resource (`nad:applicant:edit`). |
+| Applicant — access / delegation | **IMPLEMENTED** (read) | Access tab lists grants from `GET /api/staff/applicants/{id}/access` (`nad:applicant:access:view`). Grant / revoke / transfer endpoints exist (`nad:applicant:access:manage`) — **CURRENT** to surface in the UI. Grantee name (vs `User #id`) needs a `sys_user` join — follow-up. |
 | Universities / Programs / Scholarships | **PLANNED** — Phase B | No backend. |
 | Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend. |
 | Partnerships / Employees / Roles & Permissions | **PLANNED** — Phase D | |
@@ -180,7 +181,15 @@ empty/error/loading surface or confirm dialog.
 | `ui/EmptyState` / `ui/ErrorState` / `ui/LoadingState` | The three non-content states, used directly and inside `DataTable`. |
 | `ui/AppTabs` | Underline tabs for detail pages (`{ key, label, count? }`). |
 | `ui/DescriptionList` | Key/value grid for detail overviews. |
+| `ui/StatePanel` | loading / error / empty gate wrapping any content slot (used by every detail tab). |
+| `ui/Drawer` | Side sheet with a consistent header + sticky cancel/save footer (`saving` disables both). Add/edit forms live here. |
+| `ui/FormSection` | Titled group inside a form. |
 | `composables/useConfirm` | Typed wrapper over `ElMessageBox` — the single confirm surface. |
+| `composables/useResourceList<T>` | fetch + loading/error/loaded state for a list resource; `load()` once, `reload()` forces. |
+
+**Form fields:** inside a validated form, use Element Plus `<el-form>` +
+`<el-form-item>` directly — that *is* the shared field component (a dependency,
+not duplication); no bespoke `FormField`. `FormSection` handles grouping.
 
 Shared prop types live in `ui/types.ts`. Dashboard widgets (`StatCard`,
 `DonutStat`, `ComingSoonCard`, `DashboardGroup`, `RecentApplicants`) build on the

@@ -196,6 +196,22 @@ public class ApplicantService {
     }
 
     @Transactional
+    public TestScoreResponse updateTestScore(Long applicantId, Long scoreId, TestScoreRequest req) {
+        requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
+        ApplicantTestScore s = mapper.findTestScoreById(scoreId);
+        if (s == null || !s.getApplicantId().equals(applicantId)) {
+            throw new NadNotFoundException("test score not found");
+        }
+        s.setTestType(req.testType());
+        s.setScore(req.score());
+        s.setSubScoresJson(req.subScoresJson());
+        s.setTakenOn(req.takenOn());
+        s.setExpiresOn(req.expiresOn());
+        mapper.updateTestScore(s);
+        return TestScoreResponse.of(s);
+    }
+
+    @Transactional
     public void deleteTestScore(Long applicantId, Long scoreId) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         if (mapper.deleteTestScore(scoreId, applicantId) == 0) {
@@ -220,6 +236,21 @@ public class ApplicantService {
         c.setEmail(req.email());
         c.setPhone(req.phone());
         mapper.insertContact(c);
+        return ContactResponse.of(c);
+    }
+
+    @Transactional
+    public ContactResponse updateContact(Long applicantId, Long contactId, ContactRequest req) {
+        requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
+        ApplicantContact c = mapper.findContactById(contactId);
+        if (c == null || !c.getApplicantId().equals(applicantId)) {
+            throw new NadNotFoundException("contact not found");
+        }
+        c.setRelation(req.relation());
+        c.setName(req.name());
+        c.setEmail(req.email());
+        c.setPhone(req.phone());
+        mapper.updateContact(c);
         return ContactResponse.of(c);
     }
 
