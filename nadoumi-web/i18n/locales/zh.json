@@ -145,8 +145,6 @@
     "pwStrong": "Strong password",
     "pwRequirements": "Your password needs:",
     "acceptBothShort": "I agree to the {terms} and the {privacy}",
-    "confirmEmail": "Confirm email",
-    "emailMismatch": "Email addresses do not match.",
     "step3Title": "Set a password",
     "registerStep": {
       "personal": "Personal",

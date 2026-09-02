@@ -56,13 +56,14 @@ contracts (no new backend endpoints).
 
 | Step | Fields / behaviour |
 | --- | --- |
-| **1 · Personal information** | First name, last name; helper line *"Enter your first and last name exactly as they appear on your passport."*; then **Email** + **Confirm email** (must match); `[Verify]`. **No password fields shown.** `[Verify]` is disabled until first name, last name, email and confirm-email are present and the two emails match. |
+| **1 · Personal information** | First name, last name; helper line *"Enter your first and last name exactly as they appear on your passport."*; then **Email**; `[Verify]`. **No confirm-email field** (the OTP is the email-ownership check) and **no password fields shown.** `[Verify]` is disabled until first name, last name and a syntactically valid email are present. |
 | **2 · Email verification** | Shows `Email: <address>` with an **`Edit email`** control that returns to step 1 and clears the OTP cleanly. Below it, the refined OTP interface (D-R3-2). On success: an **`Email verified ✓`** confirmation, then auto-advance to step 3. |
 | **3 · Password** | Password + confirm (show/hide, strength indicator, live requirements list). A **single Terms & Privacy checkbox** ("I agree to the Terms and the Privacy Policy" with both links). The password must not contain the first name, last name, or the derived username (email local-part). **`Next` stays disabled until: email verified ∧ password valid ∧ passwords match ∧ Terms accepted.** |
 | → | On submit: one `POST /api/student-account` (unchanged contract). On success the student is authenticated (server-side, httpOnly cookie) and redirected to the **onboarding flow** (`/dashboard/onboarding`, D-R3-3), not straight to `/dashboard/profile`. |
 
-Change from Revision 2: two consent checkboxes → **one**; redirect target → the
-onboarding wizard; explicit `Edit email` round-trip; explicit "verified" state.
+Change from Revision 2: two consent checkboxes → **one**; **confirm-email field
+removed** (the emailed OTP verifies ownership); redirect target → the onboarding
+wizard; explicit `Edit email` round-trip; explicit "verified" state.
 
 ### D-R3-2 — Refined `OtpInput` + `EmailVerifyStep` (one implementation)
 

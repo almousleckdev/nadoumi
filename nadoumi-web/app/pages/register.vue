@@ -7,7 +7,7 @@ const { refresh } = useSession()
 const STEPS = ['personal', 'verify', 'password'] as const
 const step = ref<1 | 2 | 3>(1)
 
-const form = reactive({ firstName: '', lastName: '', email: '', confirmEmail: '', password: '', confirm: '' })
+const form = reactive({ firstName: '', lastName: '', email: '', password: '', confirm: '' })
 const consent = ref({ terms: false, privacy: false })
 const ticket = ref('')
 const emailVerified = ref(false)
@@ -15,9 +15,10 @@ const error = ref('')
 const submitted = ref(false)
 const busy = ref(false)
 
+// The OTP verification is the email-ownership check — no separate confirm-email field.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const step1Valid = computed(() =>
-  Boolean(form.firstName.trim() && form.lastName.trim() && form.email
-    && form.email === form.confirmEmail))
+  Boolean(form.firstName.trim() && form.lastName.trim() && EMAIL_RE.test(form.email)))
 
 const forbidden = computed(() => [form.firstName, form.lastName, form.email.split('@')[0] ?? ''])
 const passwordResult = computed(() =>
@@ -96,7 +97,8 @@ useSeo(t('auth.registerTitle'), t('home.subtitle'))
     <NCard>
       <!-- Steps 1 & 2 · Personal information + email verification.
            EmailVerifyStep is mounted once and owns the OTP UI; `step` (1 vs 2) only
-           controls whether the name / confirm-email fields are shown above it. -->
+           controls whether the name fields are shown above it. The OTP is the
+           email-ownership check — there is no separate confirm-email field. -->
       <div v-if="step < 3" class="grid gap-4">
         <p class="text-sm font-semibold text-slate-700">
           {{ step === 1 ? t('auth.step1Title') : t('auth.step2Title') }}
@@ -113,14 +115,6 @@ useSeo(t('auth.registerTitle'), t('home.subtitle'))
             </NField>
           </div>
           <p class="text-xs text-slate-500">{{ t('auth.passportNameHint') }}</p>
-          <NField
-            :label="t('auth.confirmEmail')"
-            for="confirmEmail"
-            :error="form.confirmEmail && form.email !== form.confirmEmail ? t('auth.emailMismatch') : ''"
-            required
-          >
-            <NInput id="confirmEmail" v-model="form.confirmEmail" type="email" autocomplete="email" />
-          </NField>
         </template>
 
         <EmailVerifyStep

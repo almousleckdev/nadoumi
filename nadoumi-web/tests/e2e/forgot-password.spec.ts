@@ -16,7 +16,6 @@ async function registerAndSignOut(page: import('@playwright/test').Page, email: 
   await page.waitForLoadState('networkidle')
   await page.fill('#firstName', 'Reset')
   await page.fill('#lastName', 'User')
-  await page.fill('#confirmEmail', email)
   await page.fill('#otp-email', email)
   await expect(page.getByRole('button', { name: 'Verify', exact: true })).toBeEnabled()
   await page.getByRole('button', { name: 'Verify', exact: true }).click()

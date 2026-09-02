@@ -10,7 +10,6 @@ test('register wizard (OTP) -> auto-login -> onboarding -> sign out', async ({ p
   // Step 1 · personal information
   await page.fill('#firstName', 'E2E')
   await page.fill('#lastName', 'Tester')
-  await page.fill('#confirmEmail', email)
   await page.fill('#otp-email', email)
 
   const verify = page.getByRole('button', { name: 'Verify', exact: true })
