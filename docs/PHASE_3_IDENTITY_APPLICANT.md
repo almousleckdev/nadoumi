@@ -38,11 +38,19 @@ dormant column.
 ### Public / auth
 | Method | Path | Auth | Notes |
 | --- | --- | --- | --- |
-| POST | `/api/student/register` | anonymous (`@Anonymous`) | gated by `nad.student.register.enabled`; captcha honoured when `sys.account.captchaEnabled`; creates `sys_user` with `user_type='10'`, no roles. |
-| POST | `/api/student/login` | anonymous | rejects `user_type='00'` (403); reuses `SysLoginService` (captcha, 5-try/10-min lockout, JWT, Redis session); activates any pending invites for the caller's email. |
+| POST | `/api/student/register` | anonymous (`@Anonymous`) | gated by `nad.student.register.enabled`; captcha honoured when `sys.account.captchaEnabled`; creates `sys_user` with `user_type='10'`, no roles. **Revision 2 (PLANNED):** body `{ firstName, lastName, email, password, ticket }`; requires a verified-email OTP `ticket`; `user_name` server-generated; `email_verified=1`; `PasswordPolicy` enforced. |
+| POST | `/api/student/login` | anonymous | rejects `user_type='00'` (403); reuses `SysLoginService` (captcha, 5-try/10-min lockout, JWT, Redis session); activates any pending invites for the caller's email. **Revision 2 (PLANNED):** body `{ email, password, code?, uuid? }` — email-first; unknown email == wrong password. |
+| POST | `/api/student/email-otp` · `/api/student/email-otp/verify` | anonymous | **Revision 2 (PLANNED).** Redis OTP (6-digit, 600 s TTL, single-use, ≤5 attempts, 60 s resend cooldown) for `REGISTER` / `PASSWORD_RESET`. Non-enumerating (`email-otp` always `200 {sent:true}`). Verify → single-use `ticket`. Rate-limited; captcha-aware. |
+| POST | `/api/student/password/reset` | anonymous | **Revision 2 (PLANNED).** `{ ticket, newPassword }` → policy check, reset, **all sessions revoked**, `204`, no auto-login. |
+| POST | `/api/student/password` | bearer | **Revision 2 (PLANNED).** `{ currentPassword, newPassword }` → policy check (≠ current), **other sessions revoked**, `204`. |
 | GET | `/api/student/me` | bearer (external) | `{ userId, username, nickName, accessibleApplicants:[{applicantId, accessRole, capabilities[]}] }`. No roles / permissions. |
 | POST | `/api/student/logout` | bearer | deletes the Redis session. |
 | POST | `/login` | anonymous | RuoYi staff login, now **rejects `user_type != '00'`**. |
+
+**Revision 2 email delivery:** provider-agnostic `MailSender` port +
+`spring-boot-starter-mail`; `transport=log` (tests/CI) or `transport=smtp`
+(Mailpit locally via `docker-compose.yml`, Gmail for staging/prod). Full design:
+`docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md` §15.
 
 ### Student (external users, `@na` capability checks)
 `GET/POST /api/student/applicants`, `GET/PUT /api/student/applicants/{id}`,
@@ -115,6 +123,14 @@ without a Docker daemon. `FlywayMigrationsIT` stays `*IT` (failsafe).
   `docs/PERMISSION_CATALOGUE.md` §3 is seeded per-slice as its permissions land.
 - `RolePermissionMatrixTest` / `PiiAccessAuditTest` / confidentiality tests belong to
   later slices (no scholarship/partnership surface exists yet).
+- **Revision 2 (planned, not yet built):** student email verification, OTP-based
+  forgot-password, self-service change-password with session revocation, and the
+  move to email-first login. Adds `sys_user.email_verified` (migration V7) and a
+  provider-agnostic email channel. `~~No student password self-service~~` is no
+  longer a permanent gap — it is scheduled. See spec §15 + plan Part E.
+- Full applicant onboarding (photo/passport upload, residence branch, interests,
+  languages, work history, …) is a **dedicated later phase** — `docs/APPLICANT_ONBOARDING.md`
+  (PROPOSED). Phase 3's `nad_applicant` scope is unchanged by Revision 2.
 
 ## 7. Next phase
 

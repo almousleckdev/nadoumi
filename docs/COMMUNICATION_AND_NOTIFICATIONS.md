@@ -15,9 +15,13 @@ Two separate concerns (CLAUDE.md §12): **Chat** (people ↔ people) vs **Notifi
 - **Announcements only:** `sys_notice` + `sys_notice_read` — staff broadcast board,
   one-way, in-app.
 - **No** chat / conversations / messages / participants / attachments.
-- **No** notification framework — no in-app store, no mail sender
-  (`spring-boot-starter-mail` absent), no SMS/push/WhatsApp, no templating, no delivery
-  tracking.
+- **No** notification framework — no in-app store, no SMS/push/WhatsApp, no delivery
+  tracking. **Revision 2 (nadoumi-web build) adds the first slice of the email
+  channel:** `spring-boot-starter-mail`, a provider-agnostic `MailSender` port with
+  `smtp` / `log` adapters, and a minimal `${var}` text-template renderer — used only
+  for auth OTP / "account exists" mails so far. The full `nad_notification*` model,
+  preferences, per-locale templates, retry sweep, and SMS/push/WhatsApp remain
+  PLANNED (§4). See spec §15.
 - **No** realtime transport (no WebSocket/SSE dep or endpoint).
 - Reusable: `AsyncManager` / `AsyncFactory` / `ThreadPoolConfig`; Redis (pub/sub
   available); Quartz (JDBC store to be enabled — Phase 2).
@@ -113,8 +117,13 @@ provider webhooks → /api/internal/notifications/webhook/** → reconcile DELIV
 ```
 
 - **D6 APPROVED:** `NotificationChannel` SPI; **IN_APP + EMAIL only** built for v1.
-  Email via a single SMTP abstraction; concrete provider is deploy-time config
-  (**OPEN**: vendor choice). SMS / WhatsApp / PUSH: schema-ready, not implemented.
+  Email via a single SMTP abstraction; concrete provider is deploy-time config.
+  **Revision 2 partially realises this:** the `MailSender` port + `smtp`/`log`
+  adapters exist (spec §15.1). Deploy-time provider = **Mailpit** locally
+  (`docker-compose.yml`), **Gmail SMTP** for staging/prod (App Password), SES an
+  option later — all on the same port, env-configured. The `NotificationChannel`
+  SPI, `nad_notification*` persistence, and templating-per-locale still sit on top
+  of this and are PLANNED. SMS / WhatsApp / PUSH: schema-ready, not implemented.
 - Idempotency: `(notification_id, channel)` unique; bounded retries with backoff.
 - Localization: templates per `locale` (en first; ar / fr / zh as needed), fallback to
   en.

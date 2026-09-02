@@ -27,7 +27,25 @@ working admin shell driven by the backend:
 - **Menu/permission data** lives in `sys_menu` (`M`/`C`/`F`) and is assigned to roles
   via `sys_role_menu`.
 
-Seed roles: `admin` (all), `common`. Seed users: `admin`, `ry`.
+Seed roles: `admin` (all), `common`, `nadoumi_super_admin`. Seed users: `almousleck`
+(day-to-day super-admin, `user_type='00'`, role `nadoumi_super_admin`); `admin`
+(`user_id=1`) is **disabled** (`status='1'`) as the break-glass account. **Revision 2**
+removes the RuoYi "your password is still the initial password" prompt
+(`sys.account.initPasswordModify → 0`; the `ruoyi-ui` nag deleted;
+`SysLoginController.initPasswordIsModify` returns `false`) — forced first-login
+rotation for `almousleck` is carried by password expiry (`pwd_update_date IS NULL`
++ `passwordValidateDays = 90`). Credentials are never in UI, logs, source, or
+production-facing docs (`docs/SECURITY.md` §7).
+
+The full internal business platform (dashboard tiles + module list matching the
+product brief — Applications / Pending Review / New Applicants / Accepted / Rejected
+/ Revenue / Expenses / Net Earnings / Outstanding Payments / Employees / Recent
+Applications / Recent Activity / Operational Tasks / Alerts; modules for Applicants,
+Applications, Universities, Programs, Scholarships, Documents, Employees, Roles &
+Permissions, Marketing/CMS, Partnerships, Finance, Payments, Invoices, Expenses,
+Revenue/Earnings, Payroll, Notifications, Communication, Reports & Analytics, System
+Settings) is specified in **§2 and §6–7 as PLANNED architecture** and is **not built
+in the nadoumi-web build**.
 
 ## 2. Target admin scope for Nadoumi (PLANNED)
 

@@ -54,17 +54,35 @@ HashMap` is untyped and serializes entity graphs (fastjson `@type` hints visible
 Existing `/system|/monitor|/tool` stay staff-only, unchanged. New Nadoumi work lives
 under `/api/...`.
 
-### 4.1 Authentication endpoints (IMPLEMENTED — Phase 3, see `docs/PHASE_3_IDENTITY_APPLICANT.md`)
+### 4.1 Authentication endpoints (IMPLEMENTED — Phase 3; Revision 2 additions marked NEW)
 
 | Method | Path | Notes |
 | --- | --- | --- |
 | POST | `/login` | staff only — **rejects `user_type != '00'`**. |
-| POST | `/api/student/login` | externals only — **rejects `user_type = '00'`**. Same `SysLoginService` pipeline (captcha, lockout, JWT, Redis session). |
+| POST | `/api/student/register` | externals only. Gated by `nad.student.register.enabled`. **NEW (Revision 2):** body `{ firstName, lastName, email, password, ticket }`; requires an OTP `ticket` proving the email was verified; `user_name` is server-generated; `email_verified=1`; password checked by `PasswordPolicy`. |
+| POST | `/api/student/login` | externals only — **rejects `user_type = '00'`**. **NEW (Revision 2):** body `{ email, password, code?, uuid? }` — email-first. Unknown email returns the same generic error as a wrong password. Same `SysLoginService` pipeline (captcha, lockout, JWT, Redis session). |
+| POST | `/api/student/email-otp` | **NEW.** `@Anonymous`, rate-limited (5/h/email, 20/h/IP), captcha-aware. `{ email, purpose: REGISTER \| PASSWORD_RESET, code?, uuid? }` → **always** `200 { sent: true }` (non-enumerating; an already-registered email gets an "account exists" mail instead of an OTP). |
+| POST | `/api/student/email-otp/verify` | **NEW.** `@Anonymous`, rate-limited (10/10min/IP). `{ email, purpose, otp }` → `200 { ticket }` (opaque, single-use, ~10 min) \| `400` problem+json. |
+| POST | `/api/student/password/reset` | **NEW.** `@Anonymous`, rate-limited. `{ ticket, newPassword }` (ticket from a `PASSWORD_RESET` OTP). `PasswordPolicy`, BCrypt, `pwd_update_date=now`, **all sessions revoked**, `204`. No token, no auto-login. |
+| POST | `/api/student/password` | **NEW.** bearer (student). `{ currentPassword, newPassword }` → verify current, `PasswordPolicy` (incl. ≠ current), **other sessions revoked**, `204`. |
 | GET | `/api/student/me` | student-shaped identity: `{ user:{id,name,locale}, accessibleApplicants:[{applicantId, accessRole, capabilities[]}] }`. **No** `roles`/`permissions`. |
 | POST | `/api/student/logout` | invalidate token. |
+| GET | `/api/dev/mail/latest?to=` | **NEW, non-prod.** Only mounted when `nadoumi.mail.transport=log`. Returns the last email captured for a recipient — E2E OTP retrieval. |
 
 The Nuxt BFF (D2) sets the JWT in an httpOnly + Secure + SameSite=Lax cookie; browser
-JS never holds the raw token.
+JS never holds the raw token. Revision 2 BFF passthroughs:
+`student-email-otp.post`, `student-email-otp-verify.post`,
+`student-password-reset.post`, `student-password.post` (cookie-authed).
+Full design: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md` §15.
+
+### 4.2 Applicant onboarding endpoints (PROPOSED — later phase)
+
+The full guided onboarding (identity extras, residence branch, interests, languages,
+work, certifications, profile photo, passport) adds a set of section endpoints under
+`/api/student/applicants/{id}/…` — `profile`, `residence`, `interests`, `languages`,
+`work`, `certifications`, `photo`, `passport`, `onboarding`. Full contract:
+`docs/APPLICANT_ONBOARDING.md` §6. **Not implemented in the nadoumi-web build**;
+`/dashboard/profile` stays at its current field set (spec §16, D-R2-4).
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
