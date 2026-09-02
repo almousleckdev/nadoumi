@@ -11,6 +11,9 @@ export default defineNuxtConfig({
   // the directory flat in the component registry rather than the default Ui* prefix.
   components: [
     { path: '~/components/ui', pathPrefix: false },
+    // auth/ components keep their file name as the tag (<AuthCaptcha>), not the
+    // default path-prefixed <AuthAuthCaptcha>.
+    { path: '~/components/auth', pathPrefix: false },
     '~/components',
   ],
   fonts: {
