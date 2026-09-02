@@ -49,12 +49,37 @@
     "f3Body": "Follow each application's status, documents and decisions in your dashboard.",
     "statsIntro": "Built for students heading to China, Malaysia and beyond.",
     "ctaBandTitle": "Ready to start?",
-    "ctaBandBody": "Create a free profile and explore your options."
+    "ctaBandBody": "Create a free profile and explore your options.",
+    "valuesTitle": "Why Nadoumi",
+    "howTitle": "How it works",
+    "how1t": "Create your profile",
+    "how1b": "Add your details, education and documents once. Nadoumi reuses them for every application.",
+    "how2t": "Discover opportunities",
+    "how2b": "Browse universities and scholarships, and see the programmes each institution offers.",
+    "how3t": "Apply",
+    "how3b": "Start an application for yourself or a student you represent; Nadoumi pre-fills what it already knows.",
+    "how4t": "Track decisions",
+    "how4b": "Follow each application’s stage, requested documents and outcomes from your dashboard.",
+    "featuredTitle": "Featured universities",
+    "featuredEmpty": "Published universities will appear here as the catalogue grows.",
+    "seeAll": "See all"
   },
   "about": {
     "title": "About Nadoumi",
     "subtitle": "An international education platform.",
-    "body": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle — profile, documents, submission, decisions and enrolment."
+    "body": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle — profile, documents, submission, decisions and enrolment.",
+    "whoTitle": "Who it’s for",
+    "whoBody": "Students applying to study abroad, and the parents, relatives or advisers who help them — an account holder can manage applications for more than one student.",
+    "destinationsTitle": "Destinations",
+    "destinationsBody": "Nadoumi works with partner universities in China, Malaysia and other countries, and keeps a wider catalogue of institutions students can explore.",
+    "lifecycleTitle": "The application lifecycle",
+    "lc1": "Build a reusable applicant profile.",
+    "lc2": "Discover programmes and scholarships that fit.",
+    "lc3": "Submit an application — your details are captured as they were at that moment.",
+    "lc4": "Provide and track the documents each opportunity requires.",
+    "lc5": "Receive decisions and prepare for enrolment.",
+    "approachTitle": "Our approach",
+    "approachBody": "Public information about universities, programmes and scholarships is kept separate from internal partner and operational data. Students see what is relevant to them; everything else stays behind staff authorisation."
   },
   "contact": {
     "title": "Contact",
@@ -64,7 +89,15 @@
     "message": "Message",
     "send": "Send",
     "sent": "Thanks — we'll be in touch.",
-    "email_help": "Or email support{'@'}nadoumi.com"
+    "email_help": "Or email support{'@'}nadoumi.com",
+    "intro": "Questions about applications, scholarships or partner universities? Send us a message and the team will get back to you.",
+    "subject": "Subject",
+    "subjectOptional": "Optional",
+    "submit": "Send message",
+    "sending": "Sending…",
+    "successTitle": "Message sent",
+    "errorTitle": "Message not sent",
+    "errorBody": "Something went wrong sending your message. Please try again in a moment."
   },
   "catalog": {
     "scholarshipsTitle": "Scholarships",
@@ -77,7 +110,8 @@
     "emptyDetail": "We're still building this section.",
     "rollingDeadline": "Rolling deadline",
     "deadline": "Deadline {date}",
-    "backToList": "Back to list"
+    "backToList": "Back to list",
+    "featured": "Featured"
   },
   "auth": {
     "loginTitle": "Sign in",

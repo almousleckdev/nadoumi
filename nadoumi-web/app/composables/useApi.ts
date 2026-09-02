@@ -8,11 +8,15 @@ export function useApi() {
     return $fetch<T>(`/api/public/${stripLeadingSlash(path)}`, { query })
   }
 
+  function publicPost<T>(path: string, body: Record<string, unknown>) {
+    return $fetch<T>(`/api/public/${stripLeadingSlash(path)}`, { method: 'POST', body })
+  }
+
   function studentFetch<T>(path: string, opts?: Parameters<typeof $fetch>[1]) {
     return $fetch<T>(`/api/student/${stripLeadingSlash(path)}`, opts)
   }
 
-  return { publicGet, studentFetch }
+  return { publicGet, publicPost, studentFetch }
 }
 
 function stripLeadingSlash(p: string) {

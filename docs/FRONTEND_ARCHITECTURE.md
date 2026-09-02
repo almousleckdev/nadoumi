@@ -149,6 +149,25 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   `UniversityHighlight`; `UniversitySummary` gains `nameCn` / `province` / `type`
   / `featured`.
 
+**UPDATE 2026-09-02 (public website build-out):**
+- The five public pages are real, on the Tailwind + `NContainer` marketing shell.
+  `PageHero.vue` / `ContentCard.vue` rebuilt on the real design tokens (the old
+  undefined `nad-*` CSS is gone from every page touched).
+  - **Home** (`index.vue`) — hero + dual CTA, "Why Nadoumi" (3), "How it works"
+    (4 steps), a featured-universities strip from `/api/public/universities?size=6`
+    with a designed empty state, closing CTA band.
+  - **Scholarships / Universities** (`*/index.vue`) — `PageHero` + card grid or a
+    designed "not yet" state (the scholarships endpoint 404s until Step 4).
+  - **About** — real sections (who it's for, destinations, lifecycle, approach).
+  - **Contact** — form wired to `useApi().publicPost('contact', …)` →
+    `POST /api/public/contact`; `NField`/`NInput`/`NTextarea`, client validation
+    mirroring the backend, honeypot, success / error alerts.
+- `useApi` gains `publicPost<T>(path, body)`; the BFF `/api/public/[...path]`
+  passthrough already forwards POST.
+- i18n: new `home.*` / `about.*` / `contact.*` / `catalog.featured` keys added to
+  **all four** locale files (English values in fr/ar/zh until translated — the
+  `i18n-keys` parity test requires the identical key set).
+
 **PLANNED — Revision 2 (plan Parts E/F/G):** *(historical; nav line superseded above)*
 - Navbar: ~~Home, Scholarships, Universities, Programs, Destinations, About,
   Contact~~ + `Sign in` / `Create account`, → account menu when authed.

@@ -94,6 +94,7 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_applicant_contact");
         jdbc.update("delete from nad_applicant");
         jdbc.update("delete from nad_university");
+        jdbc.update("delete from nad_contact_inquiry");
         jdbc.update("delete from sys_user_role where user_id > 3");
         jdbc.update("delete from sys_user where user_id > 3");
     }
