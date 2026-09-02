@@ -2,18 +2,35 @@ package com.ruoyi.common.utils.http;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.ruoyi.common.utils.StringUtils;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
 
 /**
  * UserAgent解析工具类
- * 
+ *
+ * <p>The Yauaa analyzer scans the classpath for its YAML rule files while it
+ * builds. In a Spring Boot fat jar that scan can fail (e.g. the jar is rebuilt
+ * under a running process), and because the analyzer used to be a
+ * {@code static final} field the failure poisoned the whole class with an
+ * unrecoverable {@code NoClassDefFoundError} — which took every login down with
+ * it. The analyzer is now built lazily and, if it cannot load, we fall back to
+ * the regex parser below instead of failing. UA parsing is audit metadata; it
+ * must never break authentication.
+ *
  * @author ruoyi
  */
 public class UserAgentUtils
 {
     public static final String UNKNOWN = "";
+
+    private static final Logger log = LoggerFactory.getLogger(UserAgentUtils.class);
+
+    /** Built on first use; stays null (and {@link #analyzerUnavailable} true) if Yauaa cannot load. */
+    private static volatile UserAgentAnalyzer userAgentAnalyzer;
+    private static volatile boolean analyzerUnavailable = false;
 
     // 浏览器正则表达式模式
     private static final Pattern CHROME_PATTERN = Pattern.compile("Chrome/(\\d+)(?:\\.\\d+)*");
@@ -36,20 +53,58 @@ public class UserAgentUtils
     private static final Pattern LINUX_PATTERN = Pattern.compile("Linux");
     private static final Pattern CHROMEOS_PATTERN = Pattern.compile("CrOS");
 
-    private static final UserAgentAnalyzer userAgentAnalyzer = UserAgentAnalyzer
-            .newBuilder().hideMatcherLoadStats()
-            .withCache(5000)
-            .showMinimalVersion()
-            .withField(UserAgent.AGENT_NAME_VERSION)
-            .withField(UserAgent.OPERATING_SYSTEM_NAME_VERSION)
-            .build();
+    /**
+     * Lazily builds the Yauaa analyzer. Returns {@code null} (once, then cached)
+     * if it cannot be constructed, so callers fall back to the regex parser.
+     */
+    private static UserAgentAnalyzer analyzer()
+    {
+        if (analyzerUnavailable)
+        {
+            return null;
+        }
+        UserAgentAnalyzer local = userAgentAnalyzer;
+        if (local == null)
+        {
+            synchronized (UserAgentUtils.class)
+            {
+                local = userAgentAnalyzer;
+                if (local == null && !analyzerUnavailable)
+                {
+                    try
+                    {
+                        local = UserAgentAnalyzer
+                                .newBuilder().hideMatcherLoadStats()
+                                .withCache(5000)
+                                .showMinimalVersion()
+                                .withField(UserAgent.AGENT_NAME_VERSION)
+                                .withField(UserAgent.OPERATING_SYSTEM_NAME_VERSION)
+                                .build();
+                        userAgentAnalyzer = local;
+                    }
+                    catch (Throwable t)
+                    {
+                        analyzerUnavailable = true;
+                        log.warn("Yauaa user-agent analyzer unavailable; using the regex fallback. Cause: {}",
+                                t.toString());
+                    }
+                }
+            }
+        }
+        return local;
+    }
 
     /**
      * 获取客户端浏览器
      */
     public static String getBrowser(String userAgent)
     {
-        UserAgent.ImmutableUserAgent iua = userAgentAnalyzer.parse(userAgent);
+        UserAgentAnalyzer analyzer = analyzer();
+        if (analyzer == null)
+        {
+            return formatBrowser(StringUtils.nvl(userAgent, StringUtils.EMPTY));
+        }
+        UserAgent.ImmutableUserAgent iua = analyzer.parse(userAgent);
         String agentNameVersion = iua.get(UserAgent.AGENT_NAME_VERSION).getValue();
         if (StringUtils.isBlank(agentNameVersion) || agentNameVersion.contains("??"))
         {
@@ -63,7 +118,12 @@ public class UserAgentUtils
      */
     public static String getOperatingSystem(String userAgent)
     {
-        UserAgent.ImmutableUserAgent iua = userAgentAnalyzer.parse(userAgent);
+        UserAgentAnalyzer analyzer = analyzer();
+        if (analyzer == null)
+        {
+            return formatOperatingSystem(StringUtils.nvl(userAgent, StringUtils.EMPTY));
+        }
+        UserAgent.ImmutableUserAgent iua = analyzer.parse(userAgent);
         String operatingSystemNameVersion = iua.get(UserAgent.OPERATING_SYSTEM_NAME_VERSION).getValue();
         if (StringUtils.isBlank(operatingSystemNameVersion) || operatingSystemNameVersion.contains("??"))
         {
