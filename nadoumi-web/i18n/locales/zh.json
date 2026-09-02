@@ -263,5 +263,97 @@
     "termsIntro": "These terms govern your use of the Nadoumi platform.",
     "termsBody": "By creating an account you agree to provide accurate information and to use the platform only for legitimate education applications. Nadoumi may update these terms; material changes will be notified.",
     "contactLine": "Questions? Reach us via the contact page."
+  },
+  "onboarding": {
+    "title": "Set up your profile",
+    "intro": "A few steps to get your applicant profile ready. You can come back and edit any section later.",
+    "progress": "Step {n} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Finish",
+    "skip": "Skip for now",
+    "saved": "Saved",
+    "saving": "Saving…",
+    "legendRequired": "Required",
+    "legendRecommended": "Recommended",
+    "legendOptional": "Optional",
+    "comingSoon": "Coming soon — this section is shown for reference and is not saved yet.",
+    "steps": {
+      "personal": "Personal",
+      "identity": "Identity",
+      "education": "Education",
+      "interests": "Interests",
+      "location": "Location",
+      "contact": "Contact",
+      "review": "Review"
+    },
+    "personal": {
+      "title": "Personal information",
+      "blurb": "Your name as it appears on your passport."
+    },
+    "identity": {
+      "title": "Identity",
+      "blurb": "Passport and nationality details for your applications.",
+      "extras": "Gender, country of residence and preferred contact language will be added here."
+    },
+    "education": {
+      "title": "Education history",
+      "blurb": "Add each institution you have attended."
+    },
+    "interests": {
+      "title": "Study interests",
+      "blurb": "What and where you want to study."
+    },
+    "location": {
+      "title": "Current location",
+      "blurb": "Where you are now — this affects visa and logistics guidance."
+    },
+    "contact": {
+      "title": "Guardian / emergency contact",
+      "blurb": "Someone we can reach if we cannot reach you."
+    },
+    "review": {
+      "title": "Review",
+      "blurb": "Check what you have entered, then finish.",
+      "done": "Profile set up. You can refine any section from the dashboard."
+    },
+    "badge": {
+      "plannedBackend": "Coming soon"
+    },
+    "crop": {
+      "zoom": "Zoom",
+      "rotate": "Rotate",
+      "reset": "Reset",
+      "apply": "Use this crop"
+    },
+    "doc": {
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fit": "Fit",
+      "previewAlt": "Uploaded document"
+    },
+    "photo": {
+      "title": "Profile photo",
+      "guidance": "Face centred, plain background, even lighting. JPEG, PNG or WebP, up to 5 MB, at least 400x400.",
+      "none": "No photo",
+      "tooSmall": "Image must be at least {px}x{px} pixels."
+    },
+    "passport": {
+      "title": "Passport",
+      "guidance": "Upload a clear photo or scan of your passport photo page. The details must be readable.",
+      "none": "No passport uploaded",
+      "confirmReadable": "I confirm the passport details are clearly readable.",
+      "formats": "JPEG, PNG or PDF, up to 10 MB"
+    },
+    "upload": {
+      "choose": "Choose file",
+      "replace": "Replace",
+      "remove": "Remove",
+      "save": "Upload",
+      "notYet": "Uploading will be available once document storage is enabled.",
+      "badType": "Choose a JPEG, PNG or WebP image.",
+      "badTypePassport": "Choose a JPEG, PNG or PDF file.",
+      "tooBig": "File is larger than {mb} MB."
+    }
   }
 }
