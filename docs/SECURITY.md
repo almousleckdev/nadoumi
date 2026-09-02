@@ -69,9 +69,14 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
   `isAdmin(1)` shortcut, so a handful of RuoYi conveniences reserved to id 1
   (e.g. editing the break-glass account itself) are intentionally unavailable to it.
   The `almousleck` seed password (`Nadoumi2026#`) exists **only** as a BCrypt hash in
-  the initialization migration; `sys.account.initPasswordModify = 1` +
-  `pwd_update_date = NULL` force a change on first sign-in, and every real
-  environment must reset it.
+  `V5__nadoumi_baseline_seed.sql`. **Revision 2:** the confusing RuoYi
+  "your password is still the initial password" prompt is removed
+  (`sys.account.initPasswordModify → 0`, the `ruoyi-ui` nag deleted,
+  `SysLoginController.initPasswordIsModify` returns `false`). Forced first-login
+  rotation is instead carried by the password-**expiry** path — `pwd_update_date = NULL`
+  is treated as expired by `passwordIsExpiration` when
+  `sys.account.passwordValidateDays > 0` (Revision 2 sets it). Every real environment
+  must still reset this password.
 
 ### 4.1 Student authentication (IMPLEMENTED — Phase 3, see `docs/PHASE_3_IDENTITY_APPLICANT.md`)
 
@@ -81,6 +86,40 @@ The Nuxt BFF holds the JWT only in an httpOnly + Secure + SameSite=Lax cookie
 (`API_DESIGN.md` §4.1). Registration for externals is a distinct
 `/api/student/register` gated by its own config flag, separate from
 `sys.account.registerUser`.
+
+### 4.2 Student email verification, OTP & password reset (PLANNED — Revision 2, spec §15)
+
+**Identity:** email-first. `sys_user.user_name` for `user_type='10'` is a
+server-generated handle; the verified `email` (new `sys_user.email_verified` column)
+is the login key. Uniqueness among students is enforced in `StudentAuthService`;
+`idx_sys_user_email` supports the lookup.
+
+**OTP (Redis):** 6-digit numeric, `sha256`-stored, **TTL 600 s**, **single-use**
+(deleted on success), **≤5 verify attempts** then invalidated, **60 s** resend
+cooldown. `@RateLimiter` on `email-otp` (5/h/email, 20/h/IP) and
+`email-otp/verify` (10/10min/IP). Captcha (`sys.account.captchaEnabled`) additionally
+gates `email-otp`. A verified OTP mints an opaque **single-use ticket** (Redis, TTL
+600 s) consumed by `register` / `password/reset`. **No reset tokens in URLs; no
+JWT-in-link.**
+
+**Enumeration:** `email-otp` **always** returns `200 { sent: true }`. An
+already-registered email in a `REGISTER` request receives an "account exists" mail,
+not an OTP. `login` returns one generic error for both "unknown email" and "wrong
+password". `password/reset` with a valid ticket for a vanished account returns `204`.
+
+**Password policy (`PasswordPolicy`, `ruoyi-common`; TS mirror in `nadoumi-web`):**
+8–32 chars; ≥1 upper, ≥1 lower, ≥1 digit, ≥1 special; **≠ current**. Enforced on
+register, reset, and change.
+
+**Session revocation:** `SessionRevoker` deletes the user's `login_tokens:*` Redis
+sessions. `password/reset` revokes **all**; `POST /api/student/password` revokes all
+**except the caller's** and refreshes the caller's cached `LoginUser`. (RuoYi's own
+`updatePwd` does **not** do this — the gap this closes.)
+
+**Email transport:** a provider-agnostic `MailSender` port. `transport=log` (tests +
+CI, no network) or `transport=smtp` (Mailpit locally via `docker-compose.yml`, Gmail
+`smtp.gmail.com:587` + App Password for staging/prod). All creds are env-only
+(`SPRING_MAIL_*`, `NADOUMI_MAIL_*`) — never committed (§7).
 
 ## 2. Authorization (EXISTING)
 

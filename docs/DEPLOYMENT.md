@@ -160,7 +160,18 @@ zero-config start working.
 | `TOKEN_KID` / `TOKEN_HEADER` / `TOKEN_EXPIRE_TIME` | `v1` / `Authorization` / `30` | |
 | `DRUID_CONSOLE_USERNAME` / `DRUID_CONSOLE_PASSWORD` | `ruoyi` / `123456` | disable the servlet in prod |
 | `RUOYI_PROFILE` | `D:/ruoyi/uploadPath` | upload dir — set on macOS/Linux |
-| `NAD_STORAGE_*`, `NAD_MAIL_*` | — | reserved for Phase 4 (S3 / SMTP) |
+| `NADOUMI_MAIL_TRANSPORT` | `log` | `log` (write `./mail-outbox.log` + `GET /api/dev/mail/latest`, no network) or `smtp`. **Revision 2** |
+| `NADOUMI_MAIL_FROM` | `no-reply@nadoumi.local` | `From:` header |
+| `NADOUMI_MAIL_LOG_FILE` | `./mail-outbox.log` | `transport=log` sink |
+| `NADOUMI_WEB_LOGIN_URL` | `http://localhost:3000/login` | used in the "account exists" mail |
+| `SPRING_MAIL_HOST` / `_PORT` | `localhost` / `1025` | dev = Mailpit (`docker-compose.yml`); staging/prod = `smtp.gmail.com` / `587` |
+| `SPRING_MAIL_USERNAME` / `_PASSWORD` | *(empty)* | Gmail: account + 16-char **App Password** |
+| `SPRING_MAIL_SMTP_AUTH` / `SPRING_MAIL_SMTP_STARTTLS` | `false` / `false` | `true` / `true` for Gmail |
+| `NAD_STORAGE_*` | — | reserved for the Document slice (S3 / object storage) |
+
+**Local dev:** repo-root `docker-compose.yml` provides `mysql`, `redis`, and
+`mailpit` (SMTP `:1025`, web UI `:8025`). `cp .env.example .env && docker compose up -d`.
+`.env` is git-ignored; `docker compose` and the exported shell env both read it.
 
 ## 5. Phase 2 status — what landed
 

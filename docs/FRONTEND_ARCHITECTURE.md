@@ -104,15 +104,42 @@ forms, document upload, realtime (SSE) notifications, messaging.
 /ruoyi-ui          transitional Vue 2 admin — reference only, removed at admin parity
 ```
 
-### 7. `nadoumi-web` scaffold (EXISTING — added in the cleanup pass)
+### 7. `nadoumi-web` — public site + student dashboard
 
-Nuxt 3 (compat v4, `app/` layout). Structure: `app/{pages,components,composables,layouts,assets,types,locales}` +
-`server/api/{public,student}/[...path].ts` BFF passthroughs + `server/api/student-session.{post,delete}.ts`
-(sign in/out; JWT kept in an `httpOnly + Secure + SameSite=Lax` cookie) + `server/utils/backend.ts`.
-Public pages: **Home, Scholarships, Universities, Programs, About, Contact**, each using the shared
-`PageHero` / `ContentCard` / `AppHeader` / `AppFooter`. `useApi()` only ever calls the BFF, never the
-Spring API directly. i18n `en` (+ `fr`/`ar`/`zh` stubs). Catalog pages render empty until the
-University/Program/Scholarship API slices exist. CI: `pnpm lint` + `pnpm build` (`.github/workflows/ci.yml`).
+Nuxt 3 (compat v4, `app/` layout), SSR. Full design + decisions:
+`docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md` (incl.
+**Revision 2**) and `docs/superpowers/plans/2026-09-02-nadoumi-web-public-site.md`.
+
+**EXISTING (plan Tasks 1–17):** Tailwind + design tokens (brand `orange`, Plus
+Jakarta Sans / Inter / Noto Sans Arabic, light-only); hand-built `app/components/ui/`
+primitive set (no component library); `marketing/` (`SiteHeader`, `SiteFooter`) +
+`dashboard/` (`DashboardShell`, `ProfileForm`, `EducationList`, …) tiers; `default`
++ `dashboard` layouts. BFF: `server/api/student-session.{get,post,delete}.ts`,
+`student-account.post.ts` (server-side register+login), `student/[...path].ts`
+(bearer attached from an `httpOnly+Secure+SameSite=Lax` cookie),
+`public/[...path].ts`, `public/captcha.get.ts`. `useSession` + `auth`/`guest`
+middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`),
+`ar` RTL. Dashboard screens: overview, `/dashboard/profile` (first-run create),
+`/dashboard/education` (full CRUD). Catalog pages render designed empty-states.
+
+**PLANNED — Revision 2 (plan Parts E/F/G):**
+- Navbar: **Home, Scholarships, Universities, Programs, Destinations, About,
+  Contact** + `Sign in` / `Create account`, → account menu when authed.
+- Two-step `/register` (name + email → emailed OTP → password/**Next**) and a real
+  `/forgot-password` (email → OTP → new password → `/login`), sharing
+  `OtpInput` / `EmailVerifyStep` / `useOtp`.
+- `/dashboard/account` = real change-password (current/new/confirm) with backend
+  session revocation.
+- `passwordPolicy.ts` mirrors the backend `PasswordPolicy` (8–32, class rules, ≠ current).
+- New BFF passthroughs: `student-email-otp.post`, `student-email-otp-verify.post`,
+  `student-password-reset.post`, `student-password.post`.
+- Dashboard overview polish (welcome block, onboarding progress, `AsyncState`
+  loading/error/empty; **designed empty states, never fake data**).
+- Backend it consumes: spec §15 (email/OTP/password endpoints), email-first login.
+- Two hard-gated Playwright journeys (register-OTP, forgot-password).
+
+`useApi()` only ever calls the BFF, never Spring directly. CI: `pnpm lint` +
+`pnpm test` + `pnpm build` + the hard-gated E2E job.
 
 Shared: OpenAPI-generated TypeScript types once `/api/v1/**` exists; a small shared
 API-client package.

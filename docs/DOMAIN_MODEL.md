@@ -55,6 +55,9 @@ Logical module boundaries — **not** microservices. Initial modular monolith
 ```
 Identity & Access   sys_user (all humans) + nad_user_applicant_access (external authz)
 Applicant           applicant profile, education history, test scores, contacts
+                    → full onboarding (identity extras, residence, interests,
+                      languages, work, certifications, photo/passport) is PROPOSED
+                      in docs/APPLICANT_ONBOARDING.md — a later phase, not built now
 University           public catalog entity (may exist with no partnership)
 Program              degree programmes + intakes offered by a university
 Scholarship          funding opportunity; STUDENT view vs INTERNAL view
@@ -119,6 +122,13 @@ with zero new auth code; keeps the admin RBAC surface (`sys_role`/`sys_menu`)
 - `/api/student/login` (new) — external users only (`user_type in (10,20,30)`); rejects
   staff. Same `SysLoginService` pipeline; returns a student-shaped `getInfo`
   (no menus/roles; instead: accessible applicants + capabilities).
+
+**Revision 2 — external identity is email-first.** For `user_type` 10/20/30,
+`sys_user.user_name` is a **server-generated internal handle** (e.g. `stu_<slug>`),
+never shown; the **verified `email`** (`sys_user.email_verified = 1`, set via an OTP
+flow) is the login key and must be unique among externals (`idx_sys_user_email` +
+a service-level uniqueness check). Staff identity (`user_type='00'`) is unchanged —
+still `user_name` + RuoYi RBAC. See spec §15 / `docs/API_DESIGN.md` §4.1.
 
 Belt-and-braces on top of RBAC: a student token presented to `/system/**` fails on
 permissions anyway, but endpoint separation makes the boundary explicit and auditable.

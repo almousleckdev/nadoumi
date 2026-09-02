@@ -92,7 +92,7 @@ Invariants marked **INV** are enforced in both the schema
 
 | Table | Key columns | Notes / invariants |
 | --- | --- | --- |
-| `sys_user` (EXISTING) | + populate `user_type` | `00` staff · `10` student · `20` agent · `30` guardian. No RuoYi role/menu rows for `10/20/30`. **No ALTER needed** (column already exists). |
+| `sys_user` (EXISTING) | + populate `user_type`; **+ `email_verified` (Revision 2, `V7`)** | `00` staff · `10` student · `20` agent · `30` guardian. No RuoYi role/menu rows for `10/20/30`. **Revision 2:** `email_verified tinyint(1) NOT NULL DEFAULT 0` + non-unique `idx_sys_user_email`. For externals the verified `email` is the login key (unique among `user_type='10'`, enforced in `StudentAuthService`); `user_name` is a generated internal handle. OTP codes/tickets live in **Redis**, not MySQL (spec §15.2). |
 | `nad_user_applicant_access` | `id`, `user_id`→`sys_user`, `applicant_id`→`nad_applicant`, `application_id?`→`nad_application`, `access_role`(OWNER/AGENT/GUARDIAN/VIEWER), `status`(PENDING/ACTIVE/REVOKED/EXPIRED), `invited_email?`, `capability_overrides_json?`, `is_interim`(bool, default 0), `granted_by_user_id`, `granted_at`, `revoked_by_user_id?`, `revoked_at?`, `revoke_reason?`, `expires_at?` | **INV1** partial-unique `(applicant_id)` where `access_role='OWNER' AND status='ACTIVE'` → exactly one active owner. **INV2** partial-unique `(user_id, applicant_id, application_id)` where `status='ACTIVE'`. **INV3** a user cannot have OWNER + another active role on one applicant. `is_interim=1` only on the staff-held transitional OWNER grant (`expires_at` required, ≈ now+30d). Adding a privileged capability via `capability_overrides_json` requires a staff actor with `nad:applicant:access:manage`. Index `(user_id,status)`, `(applicant_id,status)`, `(status,expires_at)` for the expiry + invite-escalation sweep. Rows never hard-deleted. (MySQL has no partial indexes — INV1/INV2 are enforced by a generated helper column, e.g. `owner_guard = CASE WHEN access_role='OWNER' AND status='ACTIVE' THEN applicant_id END` with a plain `UNIQUE(owner_guard)`, plus a service-layer check.) |
 
 ### 5.2 Applicant
@@ -103,6 +103,14 @@ Invariants marked **INV** are enforced in both the schema
 | `nad_applicant_education` | `id`, `applicant_id`, `institution`, `level`(dict), `field?`, `gpa?`, `gpa_scale?`, `start_date?`, `end_date?` | Index `(applicant_id)`. |
 | `nad_applicant_test_score` | `id`, `applicant_id`, `test_type`(dict: IELTS/TOEFL/GAOKAO/SAT/GRE/…), `score`, `sub_scores_json?`, `taken_on`, `expires_on?` | Index `(applicant_id, test_type)`. |
 | `nad_applicant_contact` | `id`, `applicant_id`, `relation`(GUARDIAN/EMERGENCY/OTHER), `name`, `email?`, `phone?` | **Not** a login identity; a login guardian is a `sys_user` + grant. |
+
+**PROPOSED — full onboarding expansion (later phase, `docs/APPLICANT_ONBOARDING.md`).**
+Not built in the nadoumi-web build. Adds scalar columns to `nad_applicant` (gender,
+country of residence, residence branch fields incl. the *"currently in China?"*
+split) and new child tables `nad_applicant_language`, `nad_applicant_interest`,
+`nad_applicant_work`, `nad_applicant_certification`. Profile photo + passport image
+depend on the **Document slice + object storage** (`docs/DOCUMENT_MANAGEMENT.md`) —
+not on `nad_applicant`. Migration number assigned when the phase is scheduled.
 
 ### 5.3 University / Program / Partnership
 
@@ -185,15 +193,20 @@ reporting read-model tables/views.
 | `V3__nad_identity_access.sql` | **DONE (Phase 3).** `nad_user_applicant_access` + `owner_guard` / `active_guard` STORED generated columns (INV1 / INV2). FK to `nad_applicant` added in V4; FK to `nad_application` deferred to the Application slice. | Phase 3 ✅ |
 | `V4__nad_applicant.sql` | **DONE (Phase 3).** `nad_applicant` + `nad_applicant_education` / `_test_score` / `_contact`, plus the deferred `fk_uaa_applicant`. | Phase 3 ✅ |
 | `V5__nadoumi_baseline_seed.sql` | **DONE (Cleanup).** Removes RuoYi demo business data (`sys_dept` 101–109, `sys_post` 1–4, `sys_notice` 1–3, `sys_job` 1–3 + `RyTask`, user `ry`); disables `admin` (id 1) as a break-glass account (`status='1'`); creates super-admin **`almousleck`** (id 3, `user_type='00'`, `pwd_update_date` NULL so a change is forced) and role `nadoumi_super_admin` (id 3, all menus, `data_scope='1'`). Structural rows (menus, permissions, dict types, config keys) are kept. | Cleanup ✅ |
-| `V6__nad_university_program.sql` | `nad_university`, `nad_program`, `nad_program_intake`. | Phase 4 |
-| `V7__nad_scholarship.sql` | `nad_scholarship`, `nad_scholarship_internal`, `nad_scholarship_program`, view `v_scholarship_student`. | Phase 4 |
-| `V8__nad_workflow.sql` | `nad_wf_definition/stage/transition/stage_task_template/instance`. | Phase 4 |
-| `V9__nad_application.sql` | `nad_application` + all children (§5.5). | Phase 4 |
-| `V10+__…` | document, communication, notification, partnership, payment, content, reporting. | Phase 5+ |
+| `V6__nadoumi_english_labels.sql` | **DONE (Cleanup).** English `sys_config` names / dict labels. | Cleanup ✅ |
+| `V7__nad_student_email_verified.sql` | **Revision 2.** `sys_user.email_verified` + `idx_sys_user_email` (email-first external identity, spec §15.3). | nadoumi-web build |
+| `V8__drop_initial_password_nag.sql` | **Revision 2.** `sys.account.initPasswordModify → 0`, `sys.account.passwordValidateDays → 90` (spec §17). | nadoumi-web build |
+| `V9__nad_university_program.sql` | `nad_university`, `nad_program`, `nad_program_intake`. (was planned as V6) | Phase 4 |
+| `V10__nad_scholarship.sql` | `nad_scholarship`, `nad_scholarship_internal`, `nad_scholarship_program`, view `v_scholarship_student`. | Phase 4 |
+| `V11__nad_workflow.sql` | `nad_wf_definition/stage/transition/stage_task_template/instance`. | Phase 4 |
+| `V12__nad_application.sql` | `nad_application` + all children (§5.5). | Phase 4 |
+| `V13+__…` | document (+ object storage for onboarding photo/passport), applicant-onboarding expansion, communication, notification, partnership, payment, content, reporting. | Phase 5+ |
 
 - The **reviewed DDL draft** `docs/ddl/nad_core.draft.sql` is **not** under
   `db/migration` and Flyway never sees it. `V3`/`V4` were split out of it in Phase 3;
-  `V5`–`V8` follow in later slices.
+  later slices follow. **Migration numbers are assigned at creation time** — the
+  Phase-4+ rows above are indicative, not reserved (the Revision 2 `V7`/`V8` took the
+  next free slots after the `V6` English-labels migration).
 - `sys_menu` / `sys_role_menu` / role seeding is always a migration, never a console
   action.
 - No hand-run SQL in any shared environment. `flyway:clean` is disabled.
@@ -205,7 +218,7 @@ reporting read-model tables/views.
 | **D8** | DB name + credential strategy | **APPROVED** — secrets via env vars + optional git-ignored `config/application-local.yml` (`spring.config.import=optional:file:./config/application-local.yml`). Committed `application-druid.yml` default stays `ry-vue`/`root`/`password`; local dev DB is renamed `ry_vue`→`ry-vue` (one-time, documented in DEVELOPMENT_GUIDELINES §1). |
 | **D13** | PK generation — `bigint` auto-increment for v1 | **APPROVED** |
 | **D14** | Migration tool — Flyway (§6) | **APPROVED** |
-| **D9 / D11 / D12** | Table shapes (Application target, Document attachment, single task table) | **APPROVED** — §5 is the baseline; realized as `docs/ddl/nad_core.draft.sql` → `V3`–`V8`. |
+| **D9 / D11 / D12** | Table shapes (Application target, Document attachment, single task table) | **APPROVED** — §5 is the baseline; realized as `docs/ddl/nad_core.draft.sql` → `V3`–`V4` (Phase 3) then Phase-4+ migrations (§6). |
 | sub | `passport_no` uniqueness | **APPROVED** — soft warn, no unique constraint; staff-driven merge later. |
 | sub | Temporal type for new columns | **APPROVED** — match RuoYi (`datetime` + `GMT+8`) in v1. |
 | sub | `nad_partnership_program` (per-programme commission) | **OPEN** — deferred; commission stays at partnership level until a real need. |
