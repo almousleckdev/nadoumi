@@ -35,6 +35,50 @@ G-1 → Task 24** (Task 24's CI + docs step now also covers the Part E/F/G addit
 CI adds a MySQL+Redis service matrix and `NADOUMI_MAIL_TRANSPORT=log` for the two
 E2E specs).
 
+---
+
+## Revision 3 (2026-09-03) — registration UX, OTP component, onboarding
+
+Spec **Revision 3** (D-R3-1…D-R3-4). No backend endpoint changes. New / re-scoped
+frontend tasks, run after F-10:
+
+- **F-12 — `<SiteHeader>`/`<SiteFooter>` on every layout** (bugfix, already landed
+  in commit for `nuxt.config` `components: [{ path: '~/components/marketing',
+  pathPrefix: false }]`). Plus `layouts/auth.vue` used by all auth pages.
+- **F-13 — Refined `OtpInput` + `EmailVerifyStep`** (D-R3-2). Rewrite both,
+  smaller/tighter boxes, `role="group"` + per-box `aria-label`, filled/verifying/
+  error states, `Edit email` emit, reduced-motion transitions. Still the single OTP
+  implementation. Update `OtpInput.test.ts` / `EmailVerifyStep.test.ts`.
+- **F-14 — `/register` as a 3-step wizard** (D-R3-1). Step 1 personal + email +
+  confirm-email (matched) + `[Verify]` (disabled until valid); step 2 verify with
+  `Email: … [Edit email]` + `Email verified ✓`; step 3 password + **single**
+  Terms & Privacy checkbox; `Next` gated on `verified ∧ passwordValid ∧ match ∧
+  terms`; success → `navigateTo('/dashboard/onboarding')`. Collapse
+  `ConsentCheckboxes` from two boxes to one (keep the component, add a `single`
+  prop or a new `ConsentCheckbox`). Rewrite `register.test.ts`.
+- **F-15 — Onboarding multi-step shell** (D-R3-3). `/dashboard/onboarding` wizard:
+  `OnboardingProgress` (Personal · Identity · Education · Interests · Location ·
+  Contact · Review), `OnboardingStep` wrapper (title, blurb, Required/Recommended/
+  Optional legend), reduced-motion step transitions. Steps that map to EXISTING
+  endpoints (`ProfileForm`, `EducationList`, `ContactList`) are embedded and
+  actually save. PLANNED steps render disabled with a **"Coming soon — not saved
+  yet"** banner — **no `$fetch`, no fake success**. Review step + "Finish" →
+  `/dashboard`. `/dashboard` overview links to it when a profile exists.
+- **F-16 — Document components (client-only, PLANNED — REQUIRES BACKEND)**.
+  `app/components/onboarding/`: `ImageCropper` (crop/zoom/rotate on a `<canvas>`),
+  `DocumentPreview` (large pan/zoom/rotate viewer), `ProfilePhotoUploadCard`
+  (1:1 crop + quality guidance), `PassportUploadCard` (large readable preview,
+  zoom/rotate, format/size guidance). File validation (type + size) client-side.
+  **No upload endpoint** — the "Upload" action is disabled with an
+  "Available once document storage is enabled" note. No OCR / face-match claims.
+  Used by F-15's PLANNED photo/passport step.
+- **Task 24 (docs) extended** — `docs/APPLICANT_ONBOARDING.md` rewritten to the
+  7-step structure with an **EXISTING / PLANNED / REQUIRES BACKEND** column;
+  matching cross-references added to `DOMAIN_MODEL.md`, `DATABASE_DESIGN.md`,
+  `API_DESIGN.md`, `FRONTEND_ARCHITECTURE.md`.
+
+Revision-3 execution order: **F-12 → F-13 → F-14 → F-16 → F-15 → docs**.
+
 ## Global Constraints
 
 - **Public/student architecture:** Nuxt 3 (SSR) + Nitro BFF + httpOnly session cookie. No Next.js, no second SPA framework. Do not reopen.

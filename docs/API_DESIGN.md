@@ -81,8 +81,14 @@ The full guided onboarding (identity extras, residence branch, interests, langua
 work, certifications, profile photo, passport) adds a set of section endpoints under
 `/api/student/applicants/{id}/…` — `profile`, `residence`, `interests`, `languages`,
 `work`, `certifications`, `photo`, `passport`, `onboarding`. Full contract:
-`docs/APPLICANT_ONBOARDING.md` §6. **Not implemented in the nadoumi-web build**;
-`/dashboard/profile` stays at its current field set (spec §16, D-R2-4).
+`docs/APPLICANT_ONBOARDING.md` §6. **REQUIRES BACKEND — not implemented.**
+
+**Revision 3 (spec D-R3-3):** the `/dashboard/onboarding` wizard *shell* ships, but
+it only calls the **EXISTING** endpoints — `GET/PUT /api/student/applicants/{id}`,
+`.../education`, `.../contacts`. The PROPOSED section endpoints above
+(`profile` extras, `residence`, `interests`, `languages`, `work`,
+`certifications`, `photo`, `passport`, `onboarding`) remain PLANNED; the wizard
+renders those fields disabled with a "not saved yet" note and never posts them.
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 

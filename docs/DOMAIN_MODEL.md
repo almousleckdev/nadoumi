@@ -55,9 +55,12 @@ Logical module boundaries — **not** microservices. Initial modular monolith
 ```
 Identity & Access   sys_user (all humans) + nad_user_applicant_access (external authz)
 Applicant           applicant profile, education history, test scores, contacts
-                    → full onboarding (identity extras, residence, interests,
-                      languages, work, certifications, photo/passport) is PROPOSED
-                      in docs/APPLICANT_ONBOARDING.md — a later phase, not built now
+                    → Revision 3 builds a 7-step onboarding SHELL
+                      (/dashboard/onboarding): Personal/Identity/Education/Contact
+                      steps write to EXISTING endpoints; identity extras, residence,
+                      interests, languages, work, certifications, photo/passport are
+                      PLANNED / REQUIRES BACKEND (docs/APPLICANT_ONBOARDING.md) and
+                      are shown but never persisted
 University           public catalog entity (may exist with no partnership)
 Program              degree programmes + intakes offered by a university
 Scholarship          funding opportunity; STUDENT view vs INTERNAL view
