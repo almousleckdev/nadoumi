@@ -9,7 +9,7 @@
   "common": {
     "loading": "Loading", "save": "Save", "cancel": "Cancel", "add": "Add", "remove": "Remove",
     "edit": "Edit", "delete": "Delete", "confirm": "Confirm", "back": "Back", "search": "Search",
-    "none": "Nothing here yet", "retry": "Try again", "signOut": "Sign out"
+    "none": "Nothing here yet", "retry": "Try again", "signOut": "Sign out", "nothingYet": "Nothing here yet."
   },
   "home": {
     "title": "Study abroad with Nadoumi",
@@ -95,6 +95,9 @@
     "changePassword": "Change password", "pwCurrent": "Current password", "pwNew": "New password",
     "pwConfirm": "Confirm new password", "pwUpdated": "Password updated.",
     "pwOtherSessionsEnded": "You have been signed out on your other devices.",
+    "onboardingProgress": "Onboarding progress",
+    "comingSoon": "This area activates once applications are open.",
+    "sectionApplications": "Applications", "sectionActivity": "Recent activity", "sectionNotifications": "Notifications",
     "savedOk": "Saved", "addedOk": "Added", "removedOk": "Removed", "removeConfirm": "Remove this entry?"
   },
   "validation": {
