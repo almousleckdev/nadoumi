@@ -160,14 +160,15 @@ same change. Report per step.
 | **0 ✅** | **This doc** + fix outright-wrong stale lines in `DOMAIN_MODEL` / `DATABASE_DESIGN`; add `docs/DOMAIN_EVENTS.md` stub. | — |
 | **1 ✅** | Public nav → `Home · Scholarships · Universities · About · Contact`; drop `/programs` + `/destinations` routes; onboarding → `/onboarding` + completion gate. Web only. | — |
 | **2 ✅** | University profile depth (18 scalar cols) + `nad_university_ranking` / `nad_university_highlight`; admin sectioned drawer + detail; `PublicUniversityResponse` + `/api/public/universities` (published+active only); public `universities/[id]` page. Gallery deferred with the Document slice (Step 7). | V10 |
-| **3** | `nadoumi-program`: program type + majors + intake; Programs shown under the university (admin + public). | V11 |
-| **4** | `nadoumi-scholarship`: configurable aggregate + internal split + `v_scholarship_student`; staff CRUD (confidentiality DTOs); public list + detail. Confidentiality CI tests. | V12 |
-| **5** | `nad_outbox_event` + poller + `nadoumi-notification` (`nad_notification*` + templates + SSE). First event: `ScholarshipPublished`. | V13 |
-| **6** | `nadoumi-application`: `nad_application` + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). Public **Apply Now** (self / other student, prefilled, review, submit→snapshot). Student portal: my applications. Admin: application workbench + status change → event → notify. | V14–V15 |
-| **7** | `nadoumi-document`: version/event/requirement + object storage; per-application checklist from the requirement snapshot; wires into onboarding + applications. | V16 |
-| **8** | `nadoumi-communication`: conversations + messages + attachments on an application; SSE. | V17 |
-| **9** | `nadoumi-payment` + `nadoumi-finance`: fee kinds + invoice + refund; application-fee gate on the workflow; real dashboard finance aggregates. | V18–V19 |
-| **10** | Employee ops + assignment surface → CMS → Reporting depth. | V20+ |
+| **2b ✅** | Public website build-out: real Home / Scholarships / Universities / About / Contact on the Tailwind marketing shell. Contact slice — `nad_contact_inquiry` + anonymous rate-limited `POST /api/public/contact` (persist + notify support inbox), in `nadoumi-identity` until `nadoumi-content` exists. | V11 |
+| **3** | `nadoumi-program`: program type + majors + intake; Programs shown under the university (admin + public). | V12 |
+| **4** | `nadoumi-scholarship`: configurable aggregate + internal split + `v_scholarship_student`; staff CRUD (confidentiality DTOs); public list + detail. Confidentiality CI tests. | V13 |
+| **5** | `nad_outbox_event` + poller + `nadoumi-notification` (`nad_notification*` + templates + SSE). First event: `ScholarshipPublished`. | V14 |
+| **6** | `nadoumi-application`: `nad_application` + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). Public **Apply Now** (self / other student, prefilled, review, submit→snapshot). Student portal: my applications. Admin: application workbench + status change → event → notify. | V15–V16 |
+| **7** | `nadoumi-document`: version/event/requirement + object storage; per-application checklist from the requirement snapshot; wires into onboarding + applications. | V17 |
+| **8** | `nadoumi-communication`: conversations + messages + attachments on an application; SSE. | V18 |
+| **9** | `nadoumi-payment` + `nadoumi-finance`: fee kinds + invoice + refund; application-fee gate on the workflow; real dashboard finance aggregates. | V19–V20 |
+| **10** | Employee ops + assignment surface → CMS (incl. `nad_contact_inquiry` triage, move to `nadoumi-content`) → Reporting depth. | V21+ |
 
 Student Dashboard (workspace: profile completion, applications + pending actions,
 documents, notifications, communication, relevant opportunities, "My Students"

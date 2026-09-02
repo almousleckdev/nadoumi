@@ -141,6 +141,16 @@ and **only** rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
 | GET | `/api/public/universities` | anonymous | `q`, `country`, `page`, `size` (default 12) → `PageResponse<PublicUniversityResponse>`. |
 | GET | `/api/public/universities/{id}` | anonymous | `404` if the row is not PUBLISHED + ACTIVE. Consumed by `nadoumi-web` `universities/[id].vue`. |
 
+### 4.5 Public contact endpoint (IMPLEMENTED — `nadoumi-identity`)
+
+`PublicContactController`, `@Anonymous`, IP rate-limited (10 / hour). Persists a
+`nad_contact_inquiry` row and emails `nadoumi.mail.supportInbox`; a mail failure
+is logged, not surfaced. A filled honeypot (`website`) is accepted and dropped.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| POST | `/api/public/contact` | anonymous | body `{ name, email, subject?, message, locale?, website? }` → `202` no body. `400` (problem+json) on validation failure. Consumed by `nadoumi-web` `contact.vue` via the BFF `/api/public/**` passthrough. |
+
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403

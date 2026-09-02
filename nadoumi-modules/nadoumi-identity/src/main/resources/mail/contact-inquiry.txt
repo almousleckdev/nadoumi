@@ -1,0 +1,7 @@
+New enquiry from the Nadoumi website.
+
+Name:    ${name}
+Email:   ${email}
+Subject: ${subject}
+
+${message}

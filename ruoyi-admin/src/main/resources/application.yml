@@ -147,6 +147,8 @@ nadoumi:
     transport: ${NADOUMI_MAIL_TRANSPORT:log}
     from: ${NADOUMI_MAIL_FROM:no-reply@nadoumi.local}
     logFile: ${NADOUMI_MAIL_LOG_FILE:./mail-outbox.log}
+    # where public "Contact us" submissions are forwarded
+    supportInbox: ${NADOUMI_MAIL_SUPPORT_INBOX:support@nadoumi.local}
   web:
     # used in transactional emails (e.g. the "account already exists" message)
     loginUrl: ${NADOUMI_WEB_LOGIN_URL:http://localhost:3000/login}

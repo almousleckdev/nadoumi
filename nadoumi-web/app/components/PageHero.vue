@@ -1,19 +1,17 @@
 <script setup lang="ts">
-defineProps<{ title: string; subtitle?: string }>()
+defineProps<{ title: string, subtitle?: string }>()
 </script>
 
 <template>
-  <section class="nad-hero">
-    <div class="nad-container">
-      <h1>{{ title }}</h1>
-      <p v-if="subtitle">{{ subtitle }}</p>
-      <slot />
-    </div>
+  <section class="border-b border-slate-200 bg-slate-50">
+    <NContainer>
+      <div class="py-12 sm:py-16">
+        <h1 class="font-display text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          {{ title }}
+        </h1>
+        <p v-if="subtitle" class="mt-3 max-w-2xl text-lg text-slate-600">{{ subtitle }}</p>
+        <slot />
+      </div>
+    </NContainer>
   </section>
 </template>
-
-<style scoped>
-.nad-hero { padding: 3.5rem 0 2rem; }
-.nad-hero h1 { margin: 0 0 0.5rem; font-size: clamp(1.8rem, 4vw, 2.75rem); }
-.nad-hero p { margin: 0; color: var(--nad-muted); max-width: 44rem; }
-</style>
