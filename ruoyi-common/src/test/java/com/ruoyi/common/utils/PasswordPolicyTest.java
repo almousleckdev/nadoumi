@@ -2,6 +2,7 @@ package com.ruoyi.common.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class PasswordPolicyTest
@@ -35,5 +36,16 @@ class PasswordPolicyTest
     {
         String encoded = SecurityUtils.encryptPassword("Abcdef1!");
         assertThat(PasswordPolicy.violation("Zxcvbn2@", encoded)).isEmpty();
+    }
+
+    @Test
+    void rejects_a_password_that_contains_a_personal_term()
+    {
+        assertThat(PasswordPolicy.violation("Lovelace1!", null, List.of("Ada", "Lovelace", "ada")))
+                .contains("password.noPersonal");
+        // short terms (< 3 chars) are ignored
+        assertThat(PasswordPolicy.violation("Abcdef1!", null, List.of("Ab"))).isEmpty();
+        // a clean password with personal terms supplied still passes
+        assertThat(PasswordPolicy.violation("Zxcvbn2@", null, List.of("Ada", "Lovelace"))).isEmpty();
     }
 }

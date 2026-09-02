@@ -21,7 +21,7 @@ async function sendCode() {
     stage.value = 'otp'
   }
   catch (e) {
-    error.value = problemMessage(e, t('auth.genericError'))
+    error.value = authErrorMessage(e, t)
   }
 }
 
@@ -31,7 +31,7 @@ async function submitCode(code: string) {
     emit('verified', await verify(props.email, props.purpose, code))
   }
   catch (e) {
-    error.value = problemMessage(e, t('auth.otp.badCode'))
+    error.value = authErrorMessage(e, t)
   }
 }
 </script>

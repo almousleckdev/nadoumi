@@ -1,17 +1,18 @@
 <script setup lang="ts">
-definePageMeta({ middleware: 'guest' })
+definePageMeta({ middleware: 'guest', layout: 'auth' })
 const { t } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
 const { refresh } = useSession()
 
-const form = reactive({ username: '', password: '', code: '', uuid: '' })
+const form = reactive({ email: '', password: '', code: '', uuid: '' })
 const error = ref('')
 const busy = ref(false)
 const captchaRef = ref<{ enabled: boolean } | null>(null)
 
 async function submit() {
   error.value = ''
+  if (!form.email || !form.password) { error.value = t('validation.required'); return }
   if (captchaRef.value?.enabled && !form.code) { error.value = t('auth.captcha'); return }
   busy.value = true
   try {
@@ -22,7 +23,7 @@ async function submit() {
     await navigateTo(safe ? r : localePath('/dashboard'))
   }
   catch (err) {
-    error.value = problemMessage(err, t('auth.genericError'))
+    error.value = authErrorMessage(err, t)
   }
   finally {
     busy.value = false
@@ -33,17 +34,20 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
 </script>
 
 <template>
-  <div class="mx-auto max-w-md">
-    <h1 class="mb-6 font-display text-2xl font-bold">{{ t('auth.loginTitle') }}</h1>
+  <div>
+    <h1 class="mb-6 text-center font-display text-2xl font-bold text-slate-900">{{ t('auth.loginTitle') }}</h1>
     <NCard>
       <form class="grid gap-4" @submit.prevent="submit">
         <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
-        <NField :label="t('auth.username')" for="username" required>
-          <NInput id="username" v-model="form.username" autocomplete="username" />
+        <NField :label="t('auth.email')" for="email" required>
+          <NInput id="email" v-model="form.email" type="email" autocomplete="email" />
         </NField>
-        <NField :label="t('auth.password')" for="password" required>
-          <NInput id="password" v-model="form.password" type="password" autocomplete="current-password" />
-        </NField>
+        <PasswordField
+          id="password"
+          v-model="form.password"
+          :label="t('auth.password')"
+          autocomplete="current-password"
+        />
         <AuthCaptcha ref="captchaRef" v-model:code="form.code" v-model:uuid="form.uuid" />
         <NButton type="submit" :loading="busy" block>{{ t('auth.submitLogin') }}</NButton>
       </form>

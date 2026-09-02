@@ -40,13 +40,30 @@ async function completeStepOne(w: VueWrapper) {
 }
 
 describe('register page (two-step)', () => {
-  it('verifies the email in step 1 then posts the account with the ticket', async () => {
+  it('keeps Next disabled until the password is strong and both consents are checked', async () => {
+    const w = await mountSuspended(Register)
+    await completeStepOne(w)
+
+    const nextBtn = () => w.findAll('button').find(b => b.text().toLowerCase() === 'next')!
+    expect(nextBtn().attributes('disabled')).toBeDefined()
+
+    await w.find('#password').setValue('Abcdef1!')
+    await w.find('#confirm').setValue('Abcdef1!')
+    expect(nextBtn().attributes('disabled')).toBeDefined() // consents still unchecked
+
+    await w.find('#accept-terms').setValue(true)
+    await w.find('#accept-privacy').setValue(true)
+    expect(nextBtn().attributes('disabled')).toBeUndefined()
+  })
+
+  it('posts the account with the ticket once everything is valid', async () => {
     const w = await mountSuspended(Register)
     await completeStepOne(w)
 
     await w.find('#password').setValue('Abcdef1!')
     await w.find('#confirm').setValue('Abcdef1!')
-    await w.find('#terms').setValue(true)
+    await w.find('#accept-terms').setValue(true)
+    await w.find('#accept-privacy').setValue(true)
     await w.find('form').trigger('submit')
     await flushPromises()
 
@@ -61,17 +78,32 @@ describe('register page (two-step)', () => {
     expect(nav).toHaveBeenCalledWith('/dashboard/profile')
   })
 
-  it('blocks the step-2 submit when the password fails the policy', async () => {
+  it('a weak password blocks the submit and shows why', async () => {
     const w = await mountSuspended(Register)
     await completeStepOne(w)
 
     await w.find('#password').setValue('weak')
     await w.find('#confirm').setValue('weak')
-    await w.find('#terms').setValue(true)
+    await w.find('#accept-terms').setValue(true)
+    await w.find('#accept-privacy').setValue(true)
     await w.find('form').trigger('submit')
     await flushPromises()
 
     expect(fetchImpl.mock.calls.some(c => c[0] === '/api/student-account')).toBe(false)
     expect(w.text()).toContain('at least 8 characters')
+  })
+
+  it('a password containing the name is rejected client-side', async () => {
+    const w = await mountSuspended(Register)
+    await completeStepOne(w)
+
+    await w.find('#password').setValue('Lovelace1!')
+    await w.find('#confirm').setValue('Lovelace1!')
+    await w.find('#accept-terms').setValue(true)
+    await w.find('#accept-privacy').setValue(true)
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(fetchImpl.mock.calls.some(c => c[0] === '/api/student-account')).toBe(false)
   })
 })
