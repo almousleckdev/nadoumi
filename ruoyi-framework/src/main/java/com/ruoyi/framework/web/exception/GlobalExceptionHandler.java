@@ -36,8 +36,8 @@ public class GlobalExceptionHandler
     public AjaxResult handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',权限校验失败'{}'", requestURI, e.getMessage());
-        return AjaxResult.error(HttpStatus.FORBIDDEN, "没有权限，请联系管理员授权");
+        log.error("request '{}' failed authorization '{}'", requestURI, e.getMessage());
+        return AjaxResult.error(HttpStatus.FORBIDDEN, "You do not have permission, please contact an administrator");
     }
 
     /**
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler
             HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',不支持'{}'请求", requestURI, e.getMethod());
+        log.error("request '{}' does not support method '{}'", requestURI, e.getMethod());
         return AjaxResult.error(e.getMessage());
     }
 
@@ -70,8 +70,8 @@ public class GlobalExceptionHandler
     public AjaxResult handleMissingPathVariableException(MissingPathVariableException e, HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
-        log.error("请求路径中缺少必需的路径变量'{}',发生系统异常.", requestURI, e);
-        return AjaxResult.error(String.format("请求路径中缺少必需的路径变量[%s]", e.getVariableName()));
+        log.error("request is missing the required path variable '{}'; system error.", requestURI, e);
+        return AjaxResult.error(String.format("Missing required path variable [%s]", e.getVariableName()));
     }
 
     /**
@@ -86,8 +86,8 @@ public class GlobalExceptionHandler
         {
             value = EscapeUtil.clean(value);
         }
-        log.error("请求参数类型不匹配'{}',发生系统异常.", requestURI, e);
-        return AjaxResult.error(String.format("请求参数类型不匹配，参数[%s]要求类型为：'%s'，但输入值为：'%s'", e.getName(), e.getRequiredType().getName(), value));
+        log.error("request '{}' parameter type mismatch; system error.", requestURI, e);
+        return AjaxResult.error(String.format("Parameter type mismatch: [%s] expects '%s' but received '%s'", e.getName(), e.getRequiredType().getName(), value));
     }
 
     /**
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler
     public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生未知异常.", requestURI, e);
+        log.error("request '{}' raised an unknown error.", requestURI, e);
         return AjaxResult.error(e.getMessage());
     }
 
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler
     public AjaxResult handleException(Exception e, HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
-        log.error("请求地址'{}',发生系统异常.", requestURI, e);
+        log.error("request '{}' raised a system error.", requestURI, e);
         return AjaxResult.error(e.getMessage());
     }
 
@@ -140,6 +140,6 @@ public class GlobalExceptionHandler
     @ExceptionHandler(DemoModeException.class)
     public AjaxResult handleDemoModeException(DemoModeException e)
     {
-        return AjaxResult.error("演示模式，不允许操作");
+        return AjaxResult.error("Demo mode: this operation is not allowed");
     }
 }

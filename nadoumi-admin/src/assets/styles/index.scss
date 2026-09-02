@@ -1,0 +1,32 @@
+:root {
+  --nad-accent: #0b5fff;
+  --nad-sidebar-bg: #1f2a44;
+  --nad-sidebar-fg: #c9d3e6;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.nad-page {
+  padding: 16px;
+}
+
+.nad-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.nad-toolbar .spacer {
+  flex: 1;
+}

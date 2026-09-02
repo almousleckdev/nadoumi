@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.nadoumi</groupId>
+        <artifactId>nadoumi-modules</artifactId>
+        <version>3.9.2</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>nadoumi-common</artifactId>
+    <packaging>jar</packaging>
+
+    <description>
+        Cross-cutting Nadoumi SPIs and enums shared by all nadoumi-* modules.
+        Pure JDK, no Spring, no persistence. Implementations land in later phases.
+    </description>
+
+    <dependencies>
+        <!-- test only: the shared capability model carries real logic (override merge). -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

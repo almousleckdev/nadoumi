@@ -346,7 +346,7 @@ public class SysMenuServiceImpl implements ISysMenuService
         }
         catch (Exception e)
         {
-            throw new ServiceException("保存排序异常，请联系管理员");
+            throw new ServiceException("Failed to save the order, please contact an administrator");
         }
     }
 
@@ -403,17 +403,17 @@ public class SysMenuServiceImpl implements ISysMenuService
                 String dbRouteName = StringUtils.isEmpty(sysMenu.getRouteName()) ? dbPath : sysMenu.getRouteName();
                 if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == dbParentId.longValue())
                 {
-                    log.warn("[同级路由冲突] 同级下已存在相同路由路径 '{}'，冲突菜单：{}", dbPath, sysMenu.getMenuName());
+                    log.warn("[route conflict] a sibling route path '{}' already exists; conflicting menu: {}", dbPath, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
                 else if (StringUtils.equalsAnyIgnoreCase(path, dbPath) && parentId.longValue() == MENU_ROOT_ID)
                 {
-                    log.warn("[根目录路由冲突] 根目录下路由 '{}' 必须唯一，已被菜单 '{}' 占用", path, sysMenu.getMenuName());
+                    log.warn("[route conflict] top-level route '{}' must be unique; already used by menu '{}'", path, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
                 else if (StringUtils.equalsAnyIgnoreCase(routeName, dbRouteName))
                 {
-                    log.warn("[路由名称冲突] 路由名称 '{}' 需全局唯一，已被菜单 '{}' 使用", routeName, sysMenu.getMenuName());
+                    log.warn("[route conflict] route name '{}' must be globally unique; already used by menu '{}'", routeName, sysMenu.getMenuName());
                     return UserConstants.NOT_UNIQUE;
                 }
             }

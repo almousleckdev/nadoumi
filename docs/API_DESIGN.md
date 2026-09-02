@@ -1,0 +1,121 @@
+# Nadoumi — API Design
+
+Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
+
+> Reconciled with Rev 3. The §7 items that were open are now decided
+> (**recommended, pending your final nod** where marked).
+
+---
+
+## 1. Current API surface (EXISTING)
+
+Spring MVC `@RestController`s under `ruoyi-admin/.../web/controller` + `GenController` +
+`SysJob*Controller`. Base path `/` (no prefix). Consumed by `ruoyi-ui` via dev proxy
+`/dev-api/*` → `:8080`.
+
+### Auth / bootstrap
+| Method | Path | Auth | Purpose |
+| --- | --- | --- | --- |
+| GET | `/captchaImage` | anon | captcha image + uuid |
+| POST | `/login` | anon | `{username,password,code,uuid}` → `{token}` |
+| POST | `/register` | anon (if enabled) | self-registration |
+| POST | `/logout` | bearer | invalidate token |
+| GET | `/getInfo` | bearer | current user, roles, permissions, pwd-policy flags |
+| GET | `/getRouters` | bearer | dynamic menu tree for the SPA |
+
+### System / Monitor / Tool / Common
+`/system/**`, `/monitor/**`, `/tool/**`, `/common/{upload,uploads,download,download/resource}`,
+`/swagger-ui.html`, `/v3/api-docs/**`, `/druid/**`. (Details unchanged from Rev 1.)
+
+## 2. Response conventions (EXISTING)
+
+- `AjaxResult` (a `HashMap` → `{code,msg,data?}`, HTTP almost always 200) for
+  commands; `TableDataInfo` (`{code,msg,rows,total}`) for lists; pagination via
+  `pageNum`/`pageSize`; `GlobalExceptionHandler` maps errors to `AjaxResult`.
+- Controllers extend `BaseController`.
+- **Kept as-is for the existing `/system|/monitor|/tool` console endpoints** — the Vue
+  admin depends on them.
+
+## 3. Why not reuse this for Nadoumi
+
+HTTP 200 for everything breaks clients/caching/observability; `AjaxResult extends
+HashMap` is untyped and serializes entity graphs (fastjson `@type` hints visible in
+`/getInfo`); no versioning; no audience separation.
+
+## 4. Audience segmentation (BASELINE)
+
+| Namespace | Audience | Auth | Notes |
+| --- | --- | --- | --- |
+| `/api/public/**` | anonymous visitors, crawlers | none | catalog (universities, programmes, scholarships **from `v_scholarship_student`**), content pages. Real 200/404, `Cache-Control` + `ETag`. SEO surface (`FRONTEND_ARCHITECTURE.md`). |
+| `/api/student/**` | authenticated externals (`user_type` 10/20/30) | bearer JWT + `nad_user_applicant_access` **capability** check | profile, applications, documents, conversations, notifications, SSE stream. Every response is a student-view DTO. |
+| `/api/staff/**` | staff (`user_type='00'`) | bearer JWT + RBAC token (`nad:*`) + data/assignment scope | application workbench, catalog admin, workflow, partnerships, reporting. |
+| `/api/internal/**` | services / jobs / provider webhooks | network-restricted + signed/mTLS | payment + notification webhooks, batch. |
+
+Existing `/system|/monitor|/tool` stay staff-only, unchanged. New Nadoumi work lives
+under `/api/...`.
+
+### 4.1 Authentication endpoints (IMPLEMENTED — Phase 3, see `docs/PHASE_3_IDENTITY_APPLICANT.md`)
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| POST | `/login` | staff only — **rejects `user_type != '00'`**. |
+| POST | `/api/student/login` | externals only — **rejects `user_type = '00'`**. Same `SysLoginService` pipeline (captcha, lockout, JWT, Redis session). |
+| GET | `/api/student/me` | student-shaped identity: `{ user:{id,name,locale}, accessibleApplicants:[{applicantId, accessRole, capabilities[]}] }`. **No** `roles`/`permissions`. |
+| POST | `/api/student/logout` | invalidate token. |
+
+The Nuxt BFF (D2) sets the JWT in an httpOnly + Secure + SameSite=Lax cookie; browser
+JS never holds the raw token.
+
+## 5. Conventions for `/api/**` endpoints (BASELINE)
+
+- **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403
+  authorization/confidentiality; 404 not found / not visible; 409 optimistic-lock
+  conflict; 422 business-rule rejection.
+- **Typed payloads.** Java `record` request/response DTOs per context. **Never** a
+  MyBatis/JPA entity on the wire. Explicit field-by-field mapping (MapStruct or hand);
+  no reflective copy from an entity to a confidential-adjacent DTO.
+- **Response envelope — DECIDED (recommended, pending final nod):** **bare resource
+  bodies** everywhere (no `ApiResponse<T>` wrapper); errors as RFC 9457
+  `application/problem+json`. `AjaxResult` is not reused under `/api/**`.
+- **Pagination:** `?page=0&size=20&sort=field,desc`; response
+  `{ content, page, size, totalElements, totalPages }` (Spring `Page` shape).
+- **Versioning — DECIDED (recommended, pending final nod):** URI prefix **`/api/v1/...`**.
+- **Validation:** `jakarta.validation` on DTOs + `@Validated` controllers.
+- **Idempotency:** `Idempotency-Key` header required on `POST` for payments and
+  application submission.
+- **Auditing:** `@Log(title, businessType)` on every state-changing endpoint; business
+  history via `nad_application_event` / `nad_document_event` (distinct from
+  `sys_oper_log`).
+- **OpenAPI:** widen `springdoc` `packages-to-scan` to the Nadoumi controllers; one
+  group per namespace; **Swagger UI disabled in production**.
+- **Rate limiting:** `@RateLimiter` on auth, upload, message-post, and search
+  endpoints.
+
+## 6. Confidentiality rules on APIs (BASELINE — enforced, tested)
+
+- `/api/public/scholarships/**` and `/api/student/scholarships/**` read
+  **`v_scholarship_student`** and return `ScholarshipStudentView` only (no
+  university/partnership fields — the record cannot carry them).
+- Internal scholarship linkage: **only** `/api/staff/scholarships/{id}/internal`,
+  `@PreAuthorize("@na.canViewScholarshipInternal()")`.
+- Partnerships: **only** `/api/staff/partnerships/**`; no public/student route exists.
+- A programme under a partner university is indistinguishable from one under a
+  non-partner university on `/api/public/**` (no `isPartner`, no badge).
+- A response-body denylist advice on `/api/public|student` aborts (500 + security-log)
+  if a forbidden key (`universityId`, `partnership`, `commission`, …) appears on a
+  scholarship/university payload.
+- Confidential `sort`/`filter`/`groupBy` params → 400.
+- CI-blocking: `ScholarshipConfidentialityTest`, `PartnershipExposureTest`,
+  `UniversityPartnerLeakTest`.
+
+## 7. Decision status
+
+| Item | Status |
+| --- | --- |
+| Audience namespaces `/api/{public,student,staff,internal}` | **APPROVED** |
+| Response envelope | **DECIDED** — bare bodies + `problem+json`; *final confirmation pending*. |
+| Versioning | **DECIDED** — URI `/api/v1`; *final confirmation pending*. |
+| `/api/public` serving | **APPROVED** — same Spring app origin; a CDN/edge cache sits in front (reverse proxy, `DEPLOYMENT.md`). |
+| Error format (`problem+json`) scope | **APPROVED** — all `/api/**`; existing console endpoints keep `AjaxResult`. |
+| Student auth via `/api/student/login` + capability authz | **APPROVED** (D7/D10). |
+| Per-environment CORS origins | **OPEN** — deploy-time config, not design. |

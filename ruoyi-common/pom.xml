@@ -77,13 +77,21 @@
             <artifactId>poi-ooxml</artifactId>
         </dependency>
 
-        <!-- Token生成与解析-->
+        <!-- Token generation & parsing (JJWT 0.12.x) -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
+            <artifactId>jjwt-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
         </dependency>
 
-        <!-- Jaxb -->
+        <!-- Jaxb (retained: JJWT 0.12.x no longer needs it; remove once confirmed unused elsewhere) -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>

@@ -21,9 +21,9 @@ public class Constants
     public static final String GBK = "GBK";
 
     /**
-     * 系统语言
+     * Default system locale
      */
-    public static final Locale DEFAULT_LOCALE = Locale.SIMPLIFIED_CHINESE;
+    public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     /**
      * www主域

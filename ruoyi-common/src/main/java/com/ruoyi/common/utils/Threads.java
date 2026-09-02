@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author ruoyi
  */
-public class Threads
-{
+public class Threads {
     private static final Logger logger = LoggerFactory.getLogger(Threads.class);
 
     /**

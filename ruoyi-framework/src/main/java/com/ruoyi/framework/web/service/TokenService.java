@@ -21,8 +21,10 @@ import com.ruoyi.common.utils.ip.IpUtils;
 import com.ruoyi.common.utils.uuid.IdUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.charset.StandardCharsets;
+import javax.crypto.SecretKey;
 
 /**
  * token验证处理
@@ -38,9 +40,13 @@ public class TokenService
     @Value("${token.header}")
     private String header;
 
-    // 令牌秘钥
+    // 令牌秘钥 (>= 64 chars required for HS512; externalize via TOKEN_SECRET)
     @Value("${token.secret}")
     private String secret;
+
+    // 令牌密钥标识 (JWT "kid" header; supports future key rotation)
+    @Value("${token.kid:v1}")
+    private String kid;
 
     // 令牌有效期（默认30分钟）
     @Value("${token.expireTime}")
@@ -77,7 +83,7 @@ public class TokenService
             }
             catch (Exception e)
             {
-                log.error("获取用户信息异常'{}'", e.getMessage());
+                log.error("failed to resolve user '{}'", e.getMessage());
             }
         }
         return null;
@@ -178,10 +184,21 @@ public class TokenService
      */
     private String createToken(Map<String, Object> claims)
     {
-        String token = Jwts.builder()
-                .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
-        return token;
+        return Jwts.builder()
+                .header().keyId(kid).and()
+                .claims(claims)
+                .signWith(signingKey(), Jwts.SIG.HS512)
+                .compact();
+    }
+
+    /**
+     * 构建 HMAC-SHA 签名密钥
+     *
+     * @return 密钥
+     */
+    private SecretKey signingKey()
+    {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -193,9 +210,10 @@ public class TokenService
     private Claims parseToken(String token)
     {
         return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
+                .verifyWith(signingKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
@@ -264,7 +282,7 @@ public class TokenService
             // 刷新权限缓存
             loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
             refreshToken(loginUser);
-            log.info("角色[{}]权限变更，已刷新在线用户[{}]的权限缓存", roleId, loginUser.getUsername());
+            log.info("role [{}] permissions changed; refreshed the permission cache for online user [{}]", roleId, loginUser.getUsername());
         }
     }
 }

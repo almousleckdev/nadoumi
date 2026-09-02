@@ -130,7 +130,7 @@ public class LogAspect
         catch (Exception exp)
         {
             // 记录本地异常日志
-            log.error("异常信息:{}", exp.getMessage());
+            log.error("error: {}", exp.getMessage());
             exp.printStackTrace();
         }
         finally
@@ -211,7 +211,7 @@ public class LogAspect
                     }
                     catch (Exception e)
                     {
-                        log.error("请求参数拼装异常 msg:{}, 参数:{}", e.getMessage(), paramsArray, e);
+                        log.error("failed to assemble request parameters msg:{}, params:{}", e.getMessage(), paramsArray, e);
                     }
                 }
             }
