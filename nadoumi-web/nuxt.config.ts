@@ -31,6 +31,8 @@ export default defineNuxtConfig({
   },
   i18n: {
     defaultLocale: 'en',
+    // fallbackLocale lives in i18n/i18n.config.ts (the vue-i18n config); the
+    // @nuxtjs/i18n@9 module options type does not accept it at this level.
     strategy: 'prefix_except_default',
     locales: [
       { code: 'en', language: 'en', file: 'en.json', name: 'English' },
