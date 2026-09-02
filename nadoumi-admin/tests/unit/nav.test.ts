@@ -5,11 +5,11 @@ import en from '@/lang/en'
 const allItems: NavItem[] = NAV.flatMap(g => g.items)
 
 describe('nav manifest', () => {
-  it('exposes exactly the two built screens as implemented routes', () => {
+  it('exposes exactly the built screens as implemented routes', () => {
     expect(implementedPaths().sort()).toEqual(['/applicants', '/dashboard'])
   })
 
-  it('every item is either implemented or planned, with a path and an icon', () => {
+  it('every item is implemented or planned, with a path and an icon', () => {
     for (const item of allItems) {
       expect(['implemented', 'planned']).toContain(item.status)
       expect(item.path.startsWith('/')).toBe(true)
@@ -22,7 +22,7 @@ describe('nav manifest', () => {
     expect(new Set(paths).size).toBe(paths.length)
   })
 
-  it('every item and group has a matching i18n label', () => {
+  it('every item and named group has a matching i18n label', () => {
     for (const g of NAV) {
       if (g.key) expect(en.nav.groups[g.key as keyof typeof en.nav.groups]).toBeTruthy()
     }
@@ -31,9 +31,16 @@ describe('nav manifest', () => {
     }
   })
 
-  it('planned items still carry a permission token so they gate correctly', () => {
+  it('planned items carry the permission token they will gate on once built', () => {
     for (const item of allItems.filter(i => i.status === 'planned')) {
       expect(item.perm, `${item.key} needs a perm`).toBeTruthy()
     }
+  })
+
+  it('follows the approved group order', () => {
+    const namedGroups = NAV.map(g => g.key).filter(Boolean)
+    expect(namedGroups).toEqual([
+      'operations', 'education', 'people', 'finance', 'growth', 'communication', 'system',
+    ])
   })
 })

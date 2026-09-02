@@ -6,129 +6,103 @@
     >
       <template #actions>
         <el-button
+          v-if="userStore.hasPerm('nad:applicant:create')"
           type="primary"
           :icon="Plus"
-          @click="openCreate"
+          @click="createOpen = true"
         >
-          {{ t('common.add') }}
+          {{ t('applicant.new') }}
         </el-button>
       </template>
     </PageHeader>
 
-    <div class="nad-toolbar">
-      <el-input
+    <FilterBar
+      :dirty="dirty"
+      @clear="clearFilters"
+    >
+      <SearchInput
         v-model="query.name"
-        :placeholder="t('applicant.given') + ' / ' + t('applicant.family')"
-        clearable
-        style="width: 240px"
-        @keyup.enter="reload"
+        :placeholder="t('applicant.searchPlaceholder')"
+        @search="applyFilters"
       />
       <el-select
         v-model="query.status"
         :placeholder="t('applicant.status')"
         clearable
         style="width: 160px"
+        @change="applyFilters"
       >
         <el-option
           v-for="s in STATUSES"
           :key="s"
-          :label="s"
+          :label="titleCase(s)"
           :value="s"
         />
       </el-select>
-      <el-button
-        type="primary"
-        @click="reload"
-      >
-        {{ t('common.search') }}
-      </el-button>
-      <el-button @click="resetQuery">
-        {{ t('common.reset') }}
-      </el-button>
-    </div>
+      <el-input
+        v-model="query.nationality"
+        :placeholder="t('applicant.nationality')"
+        maxlength="2"
+        style="width: 130px"
+        @keyup.enter="applyFilters"
+      />
+    </FilterBar>
 
-    <el-table
-      v-loading="loading"
-      :data="rows"
-      border
-    >
-      <el-table-column
-        prop="id"
-        label="ID"
-        width="80"
-      />
-      <el-table-column
-        prop="givenName"
-        :label="t('applicant.given')"
-      />
-      <el-table-column
-        prop="familyName"
-        :label="t('applicant.family')"
-      />
-      <el-table-column
-        prop="nationality"
-        :label="t('applicant.nationality')"
-        width="120"
-      />
-      <el-table-column
-        prop="email"
-        :label="t('applicant.email')"
-      />
-      <el-table-column
-        prop="phone"
-        :label="t('applicant.phone')"
-        width="150"
-      />
-      <el-table-column
-        prop="status"
-        :label="t('applicant.status')"
-        width="120"
-      >
-        <template #default="scope">
-          <el-tag
-            :type="statusType((scope.row as ApplicantRow).status)"
-            disable-transitions
-          >
-            {{ (scope.row as ApplicantRow).status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="t('common.actions')"
-        width="120"
-      >
-        <template #default="scope">
-          <el-button
-            v-if="(scope.row as ApplicantRow).status !== 'ARCHIVED'"
-            link
-            type="danger"
-            @click="archive(scope.row as ApplicantRow)"
-          >
-            {{ t('common.delete') }}
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <el-pagination
-      style="margin-top: 12px; justify-content: flex-end"
-      layout="prev, pager, next, total"
+    <DataTable
+      :columns="columns"
+      :rows="rows"
+      :loading="loading"
+      :error="error"
       :total="total"
+      :page="query.page"
       :page-size="query.size"
-      :current-page="query.page + 1"
-      @current-change="(p: number) => { query.page = p - 1; reload() }"
-    />
+      clickable-rows
+      :empty-title="t('applicant.emptyTitle')"
+      :empty-description="t('applicant.emptyDesc')"
+      @update:page="(p: number) => { query.page = p; reload() }"
+      @retry="reload"
+      @row-click="(row) => goToDetail(Number(row.id))"
+    >
+      <template #cell-givenName="{ row }">
+        <div class="who">
+          <Avatar
+            :name="`${row.givenName} ${row.familyName}`"
+            :size="30"
+          />
+          <span class="who__name">{{ row.givenName }} {{ row.familyName }}</span>
+        </div>
+      </template>
+      <template #cell-passportNo="{ value }">
+        <span :class="{ masked: value === MASK }">{{ value ?? '—' }}</span>
+      </template>
+      <template #cell-status="{ value }">
+        <StatusBadge :status="value" />
+      </template>
+      <template #cell-createdAt="{ value }">
+        {{ fmtDate(value) }}
+      </template>
+      <template #cell-actions="{ row }">
+        <el-button
+          v-if="row.status !== 'ARCHIVED' && userStore.hasPerm('nad:applicant:archive')"
+          link
+          type="danger"
+          @click.stop="onArchive(row as Applicant)"
+        >
+          {{ t('applicant.archive') }}
+        </el-button>
+      </template>
+    </DataTable>
 
     <el-dialog
-      v-model="createVisible"
-      :title="t('common.add')"
+      v-model="createOpen"
+      :title="t('applicant.new')"
       width="480px"
     >
       <el-form
         ref="createRef"
         :model="createForm"
         :rules="createRules"
-        label-width="150px"
+        label-position="top"
       >
         <el-form-item
           :label="t('applicant.given')"
@@ -149,11 +123,11 @@
           <el-input
             v-model="createForm.nationality"
             maxlength="2"
-            placeholder="ISO alpha-2"
+            placeholder="ISO alpha-2 (e.g. MR)"
           />
         </el-form-item>
         <el-form-item
-          :label="t('applicant.email')"
+          :label="t('applicant.contactEmail')"
           prop="email"
         >
           <el-input v-model="createForm.email" />
@@ -162,11 +136,14 @@
           :label="t('applicant.invitedEmail')"
           prop="invitedEmail"
         >
-          <el-input v-model="createForm.invitedEmail" />
+          <el-input
+            v-model="createForm.invitedEmail"
+            :placeholder="t('applicant.invitedEmailHint')"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="createVisible = false">
+        <el-button @click="createOpen = false">
           {{ t('common.cancel') }}
         </el-button>
         <el-button
@@ -174,7 +151,7 @@
           :loading="creating"
           @click="submitCreate"
         >
-          {{ t('common.confirm') }}
+          {{ t('applicant.create') }}
         </el-button>
       </template>
     </el-dialog>
@@ -182,74 +159,118 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, ElMessageBox, type FormInstance } from 'element-plus'
+import { useRouter } from 'vue-router'
+import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
-import { archiveApplicant, createApplicant, listApplicants, type ApplicantRow } from '@/api/applicant'
+import {
+  archiveApplicant, createApplicant, listApplicants,
+  type Applicant, type ApplicantStatus,
+} from '@/api/applicant'
+import { useUserStore } from '@/stores/user'
+import { useConfirm } from '@/composables/useConfirm'
 import PageHeader from '@/components/PageHeader.vue'
+import FilterBar from '@/components/ui/FilterBar.vue'
+import SearchInput from '@/components/ui/SearchInput.vue'
+import DataTable from '@/components/ui/DataTable.vue'
+import type { DataTableColumn } from '@/components/ui/types'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import Avatar from '@/components/ui/Avatar.vue'
 
 const { t } = useI18n()
+const router = useRouter()
+const userStore = useUserStore()
+const { confirm } = useConfirm()
 
-const STATUSES = ['DRAFT', 'ACTIVE', 'UNLINKED', 'ARCHIVED']
+const MASK = '••••'
+const STATUSES: ApplicantStatus[] = ['DRAFT', 'ACTIVE', 'UNLINKED', 'ARCHIVED']
+
+const columns: DataTableColumn[] = [
+  { prop: 'givenName', label: t('applicant.name'), minWidth: 200 },
+  { prop: 'nationality', label: t('applicant.nationality'), width: 110, align: 'center' },
+  { prop: 'email', label: t('applicant.email'), minWidth: 200 },
+  { prop: 'passportNo', label: t('applicant.passport'), width: 130 },
+  { prop: 'status', label: t('applicant.status'), width: 140 },
+  { prop: 'createdAt', label: t('applicant.registered'), width: 170 },
+  { prop: 'actions', label: '', width: 110, align: 'right' },
+]
 
 const loading = ref(false)
-const rows = ref<ApplicantRow[]>([])
+const error = ref<string | null>(null)
+const rows = ref<Applicant[]>([])
 const total = ref(0)
-const query = reactive({ name: '', status: '', page: 0, size: 20 })
+const query = reactive({ name: '', status: '', nationality: '', page: 0, size: 20 })
 
-function statusType(s: string): 'success' | 'info' | 'warning' | undefined {
-  if (s === 'ACTIVE') return 'success'
-  if (s === 'ARCHIVED') return 'info'
-  if (s === 'UNLINKED') return 'warning'
-  return undefined
+const dirty = computed(() => Boolean(query.name || query.status || query.nationality))
+
+function titleCase(s: string) {
+  return s.charAt(0) + s.slice(1).toLowerCase()
+}
+function fmtDate(v: string | null): string {
+  if (!v) return '—'
+  const d = new Date(v.replace(' ', 'T'))
+  return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString()
+}
+function goToDetail(id: number) {
+  router.push(`/applicants/${id}`)
 }
 
 async function reload() {
   loading.value = true
+  error.value = null
   try {
     const res = await listApplicants({
       name: query.name || undefined,
       status: query.status || undefined,
+      nationality: query.nationality || undefined,
       page: query.page,
       size: query.size,
     })
     rows.value = res.content
     total.value = res.totalElements
-  } finally {
+  }
+  catch (e) {
+    error.value = (e as Error)?.message || t('state.errorTitle')
+  }
+  finally {
     loading.value = false
   }
 }
 
-function resetQuery() {
-  query.name = ''
-  query.status = ''
+function applyFilters() {
   query.page = 0
   reload()
 }
+function clearFilters() {
+  query.name = ''
+  query.status = ''
+  query.nationality = ''
+  applyFilters()
+}
 
-async function archive(row: ApplicantRow) {
-  await ElMessageBox.confirm(`${t('common.delete')} #${row.id}?`, { type: 'warning' })
+async function onArchive(row: Applicant) {
+  const ok = await confirm({
+    title: t('applicant.archiveTitle'),
+    message: t('applicant.archiveConfirm', { name: `${row.givenName} ${row.familyName}` }),
+    confirmText: t('applicant.archive'),
+    tone: 'danger',
+  })
+  if (!ok) return
   await archiveApplicant(row.id)
-  ElMessage.success(t('common.confirm'))
+  ElMessage.success(t('applicant.archived'))
   reload()
 }
 
 // create
-const createVisible = ref(false)
+const createOpen = ref(false)
 const creating = ref(false)
 const createRef = ref<FormInstance>()
 const createForm = reactive({ givenName: '', familyName: '', nationality: '', email: '', invitedEmail: '' })
 const createRules = {
-  givenName: [{ required: true, trigger: 'blur', message: t('applicant.given') }],
-  familyName: [{ required: true, trigger: 'blur', message: t('applicant.family') }],
-  invitedEmail: [{ required: true, type: 'email', trigger: 'blur', message: t('applicant.invitedEmail') }],
-}
-
-function openCreate() {
-  createForm.givenName = createForm.familyName = createForm.nationality = ''
-  createForm.email = createForm.invitedEmail = ''
-  createVisible.value = true
+  givenName: [{ required: true, trigger: 'blur', message: t('applicant.required') }],
+  familyName: [{ required: true, trigger: 'blur', message: t('applicant.required') }],
+  invitedEmail: [{ required: true, type: 'email', trigger: 'blur', message: t('applicant.emailInvalid') }],
 }
 
 async function submitCreate() {
@@ -264,12 +285,29 @@ async function submitCreate() {
       invitedEmail: createForm.invitedEmail,
     })
     ElMessage.success(t('applicant.createdOk'))
-    createVisible.value = false
-    reload()
-  } finally {
+    createOpen.value = false
+    Object.assign(createForm, { givenName: '', familyName: '', nationality: '', email: '', invitedEmail: '' })
+    applyFilters()
+  }
+  finally {
     creating.value = false
   }
 }
 
 onMounted(reload)
 </script>
+
+<style scoped>
+.who {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.who__name {
+  font-weight: 550;
+}
+.masked {
+  color: var(--nad-ink-faint);
+  letter-spacing: 0.1em;
+}
+</style>
