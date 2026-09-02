@@ -31,42 +31,28 @@ describe('Sidebar', () => {
     await router.isReady()
   })
 
-  it('renders implemented items as links and planned items as disabled rows with a tag', () => {
+  it('renders only implemented items — no planned rows, no placeholder text', () => {
     useUserStore().permissions = ['*:*:*']
     const w = mountSidebar()
 
-    const links = w.findAll('a.side__link')
-    expect(links.map(l => l.attributes('href'))).toEqual(
-      expect.arrayContaining(['/dashboard', '/applicants']),
-    )
-
-    const planned = w.findAll('.side__link--planned')
-    expect(planned.length).toBeGreaterThan(5)
-    for (const p of planned) {
-      expect(p.attributes('aria-disabled')).toBe('true')
-      expect(p.element.tagName).not.toBe('A')
-    }
-    expect(w.text()).toContain('Planned')
+    const hrefs = w.findAll('a.side__link').map(l => l.attributes('href'))
+    expect(hrefs.sort()).toEqual(['/applicants', '/dashboard'])
+    expect(w.text()).not.toMatch(/planned/i)
+    expect(w.text()).not.toContain('Payroll')
   })
 
   it('marks the current route active', () => {
     useUserStore().permissions = ['*:*:*']
     const w = mountSidebar()
-    const active = w.find('a.side__link--active')
-    expect(active.attributes('href')).toBe('/dashboard')
+    expect(w.find('a.side__link--active').attributes('href')).toBe('/dashboard')
   })
 
-  it('gates implemented links by permission but always shows the planned roadmap', () => {
-    useUserStore().permissions = [] // no tokens at all
+  it('withholds an implemented link the user has no permission for, and drops the empty group', () => {
+    useUserStore().permissions = [] // no tokens
     const w = mountSidebar()
 
-    // Dashboard has no perm requirement -> still a usable link
-    expect(w.find('a[href="/dashboard"]').exists()).toBe(true)
-    // Applicants needs nad:applicant:list -> the link is withheld
-    expect(w.find('a[href="/applicants"]').exists()).toBe(false)
-    // planned rows (and their groups) are still shown as roadmap
-    expect(w.text()).toContain('Payroll')
-    expect(w.text()).toContain('Business')
-    expect(w.findAll('.side__link--planned').length).toBeGreaterThan(10)
+    expect(w.find('a[href="/dashboard"]').exists()).toBe(true) // no perm required
+    expect(w.find('a[href="/applicants"]').exists()).toBe(false) // needs nad:applicant:list
+    expect(w.text()).not.toContain('Operations') // group has no visible item
   })
 })

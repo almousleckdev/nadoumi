@@ -70,13 +70,25 @@ Revenue/Earnings, Payroll, Notifications, Communication, Reports & Analytics, Sy
 Settings) is specified in **§2 and §6–7 as PLANNED architecture** and is **not built
 in the nadoumi-web build**.
 
-## 2. Target admin scope for Nadoumi (PLANNED)
+## 2. Target admin scope for Nadoumi
 
-This is the **full planned scope** of the Nadoumi internal platform. It is planned
-architecture only — **not implemented in the current `nadoumi-web` build**, and only
-`Applicants` (+ RuoYi `System` / `Monitor` / `Tool`) exists today. **RuoYi-Vue3 is
-the Admin UI baseline** (D1); these modules are delivered incrementally on
-`nadoumi-admin/`, each behind a Flyway `sys_menu` / `sys_role_menu` seed.
+### 2.0 Module status (keep current)
+
+| Module | Status | Notes |
+| --- | --- | --- |
+| Dashboard | **IMPLEMENTED** | Real applicant KPIs + honest coming-soon (§6.1). |
+| Applicants — list | **IMPLEMENTED** | Search / status / nationality filter, pagination, archive. `GET /api/staff/applicants`. |
+| Applicants — detail | **IMPLEMENTED** (read) | Overview + Education + Test scores + Contacts tabs, read-only, PII gated server-side by `nad:applicant:pii:view`. |
+| Applicant — access / delegation | **CURRENT** (next) | Needs `GET /api/staff/applicants/{id}/access`; `nad:applicant:access:view`. |
+| Applicant — sub-resource edit (education / scores / contacts) | **CURRENT** (next) | Backend has `POST` + partial `DELETE`; needs `PUT` + full `DELETE`. |
+| Universities / Programs / Scholarships | **PLANNED** — Phase B | No backend. |
+| Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend. |
+| Partnerships / Employees / Roles & Permissions | **PLANNED** — Phase D | |
+| Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | |
+| Marketing-CMS / Communication / Notifications / Reports / System-Audit | **PLANNED** — Phase F | |
+
+The rest of this section is the **full planned scope** — planned architecture,
+delivered incrementally on `nadoumi-admin/`.
 
 New top-level menu group **"Nadoumi"** (`sys_menu` `M`) with `C`/`F` children per
 domain. Each module maps to a bounded context (§7) and a permission prefix:
@@ -116,35 +128,63 @@ Finance is the ledger / invoicing / expense / revenue view, Payroll is employee
 compensation. They integrate through explicit read models and domain events, not by
 sharing tables.
 
-### 2.2 Sidebar navigation (EXISTING — Admin Phase 1)
+### 2.2 Sidebar navigation (EXISTING)
 
 The sidebar is a **static manifest in the frontend**, `nadoumi-admin/src/config/nav.ts`
 — the single source of truth for both the sidebar and the router (no
 `/getRouters`, no dynamic menu, no `placeholder.vue`). `/getInfo` is still called,
 only for the user's roles + permission tokens.
 
-Each manifest item declares `{ key, path, icon, perm?, status }`:
+Each manifest item declares `{ key, path, icon, perm?, status }`. The manifest
+carries the **full module map as the roadmap**, but the sidebar and router render
+**only `status: 'implemented'` items** the user is permitted to reach. Planned
+modules are **excluded from active navigation entirely** — no route, no page, no
+"planned" row. Building a module is one `status` flip plus the screen + route +
+tests in the same change.
 
-- `status: 'implemented'` → a real screen + route. Rendered as a link, gated by
-  `userStore.hasPerm(perm)`. Today: **Dashboard**, **Applicants**.
-- `status: 'planned'` → shown as a **disabled row with a "Planned" tag**, no route,
-  no page. It makes the roadmap visible without being a fake screen. Hidden
-  entirely from users whose token set could never include `perm`.
+Approved group order (`nav.groups`):
 
-Groups (headings): **Operations** (Applicants · Applications · Universities ·
-Programs · Scholarships · Documents · Partnerships) · **Business** (Employees ·
-Finance · Payroll · Payments) · **Growth** (Marketing/CMS · Communication ·
-Notifications · Reports & Analytics) · **Platform** (System). Dashboard sits
-above the groups.
+| Group | Items (→ status) |
+| --- | --- |
+| _(top)_ | Dashboard → **implemented** |
+| Operations | Applicants → **implemented** · Applications · Documents |
+| Education | Universities · Programs · Scholarships |
+| _(top)_ | Partnerships |
+| People | Employees · Roles & Permissions |
+| Finance | Payments · Invoices · Revenue · Expenses · Payroll |
+| Growth | Marketing / CMS |
+| Communication | Conversations · Notifications |
+| _(top)_ | Reports & Analytics |
+| System | Configuration · Audit Logs |
 
-A planned item becomes implemented in the same change that adds its view — flip
-`status`, add the `routes` entry, ship the screen, add tests. `sys_menu` seeding
-(`V2`) stays only for the RuoYi console screens `ruoyi-ui` still serves; the
-Nadoumi admin does not read it.
+Everything not marked **implemented** is **PLANNED** and absent from the running
+sidebar. A status report lists a Nadoumi screen as delivered only when it has a
+real view, a route, a `nad:*` permission, server-side authorization, and a test.
 
-Placeholder count is **not** feature count. A status report lists a Nadoumi
-screen as delivered only when it has a real view, a `sys_menu` row, a `nad:*`
-permission, server-side authorization, and a test.
+`sys_menu` seeding (`V2`) stays only for the RuoYi console screens `ruoyi-ui`
+still serves; the Nadoumi admin does not read it.
+
+### 2.3 Shared component library (EXISTING — `nadoumi-admin/src/components/ui/`)
+
+Every module composes from these; no module hand-rolls its own table, filter,
+empty/error/loading surface or confirm dialog.
+
+| Component | Responsibility |
+| --- | --- |
+| `PageHeader` (`components/`) | Title + subtitle + `#actions` slot. Every screen. |
+| `ui/DataTable` | `el-table` + pagination + built-in error / skeleton / empty states; `columns` prop, per-column `#cell-<prop>` slots, `row-click`. |
+| `ui/FilterBar` | Filter row layout + "Clear filters" affordance (`dirty` prop). |
+| `ui/SearchInput` | Debounced search field (`v-model` + `@search`). |
+| `ui/StatusBadge` | One status → tone vocabulary for the whole admin (`DEFAULT_MAP`). |
+| `ui/Avatar` | Initials / image circle. |
+| `ui/EmptyState` / `ui/ErrorState` / `ui/LoadingState` | The three non-content states, used directly and inside `DataTable`. |
+| `ui/AppTabs` | Underline tabs for detail pages (`{ key, label, count? }`). |
+| `ui/DescriptionList` | Key/value grid for detail overviews. |
+| `composables/useConfirm` | Typed wrapper over `ElMessageBox` — the single confirm surface. |
+
+Shared prop types live in `ui/types.ts`. Dashboard widgets (`StatCard`,
+`DonutStat`, `ComingSoonCard`, `DashboardGroup`, `RecentApplicants`) build on the
+same primitives.
 
 ### Roles (BASELINE — `sys_role` + `sys_role_menu`; data scope via `sys_role.data_scope`)
 

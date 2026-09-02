@@ -117,9 +117,10 @@
         <template #header>
           <span class="dash__panel-title">{{ t('dashboard.recentActivity') }}</span>
         </template>
-        <el-empty
+        <EmptyState
+          :title="t('dashboard.comingSoon')"
           :description="t('dashboard.activityComingSoon')"
-          :image-size="64"
+          icon="Bell"
         />
       </el-card>
       <el-card
@@ -129,9 +130,10 @@
         <template #header>
           <span class="dash__panel-title">{{ t('dashboard.pendingTasks') }}</span>
         </template>
-        <el-empty
+        <EmptyState
+          :title="t('dashboard.comingSoon')"
           :description="t('dashboard.tasksComingSoon')"
-          :image-size="64"
+          icon="List"
         />
       </el-card>
     </div>
@@ -151,6 +153,7 @@ import StatCard from '@/components/dashboard/StatCard.vue'
 import ComingSoonCard from '@/components/dashboard/ComingSoonCard.vue'
 import DonutStat from '@/components/dashboard/DonutStat.vue'
 import RecentApplicants from '@/components/dashboard/RecentApplicants.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
 
 const { t } = useI18n()
 const router = useRouter()

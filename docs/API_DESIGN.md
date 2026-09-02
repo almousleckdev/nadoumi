@@ -90,6 +90,28 @@ it only calls the **EXISTING** endpoints — `GET/PUT /api/student/applicants/{i
 `certifications`, `photo`, `passport`, `onboarding`) remain PLANNED; the wizard
 renders those fields disabled with a "not saved yet" note and never posts them.
 
+### 4.3 Staff applicant endpoints (IMPLEMENTED — consumed by `nadoumi-admin`)
+
+`/api/staff/applicants` — `StaffApplicantController`, all `@PreAuthorize`'d.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/staff/applicants` | `nad:applicant:list` | `name`, `status`, `nationality`, `createdAfter`, `page`, `size` → `PageResponse<ApplicantResponse>`. |
+| GET | `/api/staff/applicants/{id}` | `nad:applicant:view` | `ApplicantResponse` — `dob` + `passportNo` **masked** (`••••` → serialized `null`) unless the caller holds `nad:applicant:pii:view`. |
+| POST | `/api/staff/applicants` | `nad:applicant:create` | interim-owner + invite flow. `201`. |
+| PUT | `/api/staff/applicants/{id}` | `nad:applicant:edit` | |
+| DELETE | `/api/staff/applicants/{id}` | `nad:applicant:archive` | soft archive, `204`. |
+| GET / POST | `/api/staff/applicants/{id}/education` | view / edit | `POST` → `201`. |
+| DELETE | `/api/staff/applicants/{id}/education/{eduId}` | `nad:applicant:edit` | |
+| GET / POST | `/api/staff/applicants/{id}/test-scores` | view / edit | |
+| GET / POST | `/api/staff/applicants/{id}/contacts` | view / edit | |
+
+**Admin (Phase A) uses:** the list + `GET {id}` + the three sub-resource `GET`s
+(read-only detail tabs). **Gaps for the next admin slice:**
+`GET /api/staff/applicants/{id}/access` (delegation view, `nad:applicant:access:view`)
+does not exist; `PUT` / full `DELETE` for education / test-scores / contacts are
+missing on the staff side.
+
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403
