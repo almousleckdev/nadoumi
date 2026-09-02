@@ -7,8 +7,9 @@
   html { color: var(--text); background: var(--surface); }
   body { @apply font-sans antialiased; }
   h1, h2, h3, h4 { @apply font-display; text-wrap: balance; }
-  a { color: var(--brand-700); }
-  a:hover { text-decoration: underline; }
+  /* No global link colour or underline — every link/button is styled by its
+     component per the Nadoumi design system (Tailwind preflight already removes
+     the UA underline). */
   :where(button, a, input, select, textarea):focus-visible {
     outline: 2px solid var(--focus);
     outline-offset: 2px;

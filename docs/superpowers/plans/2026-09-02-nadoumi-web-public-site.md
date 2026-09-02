@@ -49,8 +49,9 @@ frontend tasks, run after F-10:
   smaller/tighter boxes, `role="group"` + per-box `aria-label`, filled/verifying/
   error states, `Edit email` emit, reduced-motion transitions. Still the single OTP
   implementation. Update `OtpInput.test.ts` / `EmailVerifyStep.test.ts`.
-- **F-14 — `/register` as a 3-step wizard** (D-R3-1). Step 1 personal + email +
-  confirm-email (matched) + `[Verify]` (disabled until valid); step 2 verify with
+- **F-14 — `/register` as a 3-step wizard** (D-R3-1). Step 1 personal + email
+  (**no confirm-email** — the OTP is the ownership check) + `[Verify]` (disabled
+  until both names + a valid email); step 2 verify with
   `Email: … [Edit email]` + `Email verified ✓`; step 3 password + **single**
   Terms & Privacy checkbox; `Next` gated on `verified ∧ passwordValid ∧ match ∧
   terms`; success → `navigateTo('/dashboard/onboarding')`. Collapse

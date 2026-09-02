@@ -31,7 +31,6 @@ beforeEach(() => {
 async function reachPasswordStep(w: VueWrapper) {
   await w.find('#firstName').setValue('Ada')
   await w.find('#lastName').setValue('Lovelace')
-  await w.find('#confirmEmail').setValue('ada@example.com')
   await w.find('#otp-email').setValue('ada@example.com')
   await w.find('button').trigger('click') // [Verify]
   await flushPromises()
@@ -43,19 +42,23 @@ async function reachPasswordStep(w: VueWrapper) {
 }
 
 describe('register wizard (3 steps)', () => {
-  it('keeps Verify disabled until names + email + matching confirm-email are present', async () => {
+  it('keeps Verify disabled until both names and a valid email are present', async () => {
     const w = await mountSuspended(Register)
     const verify = () => w.findAll('button').find(b => b.text().toLowerCase() === 'verify')!
     expect(verify().attributes('disabled')).toBeDefined()
 
     await w.find('#firstName').setValue('Ada')
     await w.find('#lastName').setValue('Lovelace')
-    await w.find('#otp-email').setValue('ada@example.com')
-    await w.find('#confirmEmail').setValue('ada@wrong.com')
+    await w.find('#otp-email').setValue('not-an-email')
     expect(verify().attributes('disabled')).toBeDefined()
 
-    await w.find('#confirmEmail').setValue('ada@example.com')
+    await w.find('#otp-email').setValue('ada@example.com')
     expect(verify().attributes('disabled')).toBeUndefined()
+  })
+
+  it('has no confirm-email field', async () => {
+    const w = await mountSuspended(Register)
+    expect(w.find('#confirmEmail').exists()).toBe(false)
   })
 
   it('gates Next on verified + strong password + match + consent, then posts and routes to onboarding', async () => {
