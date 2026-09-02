@@ -46,7 +46,9 @@
   },
   "auth": {
     "loginTitle": "Sign in", "registerTitle": "Create your profile",
-    "fullName": "Full name", "username": "Username", "usernameHint": "2–20 characters, used to sign in",
+    "fullName": "Full name", "firstName": "First name", "lastName": "Last name", "username": "Username", "usernameHint": "2–20 characters, used to sign in",
+    "passportNameHint": "Enter your name exactly as it appears on your passport.",
+    "step1Title": "Your details", "step2Title": "Set a password", "next": "Next",
     "email": "Email", "password": "Password", "confirmPassword": "Confirm password",
     "passwordHint": "5–20 characters", "captcha": "Enter the code shown", "captchaReload": "Reload image",
     "acceptTerms": "I agree to the {terms} and {privacy}.",

@@ -28,7 +28,7 @@ mockNuxtImport('setResponseStatus', () => (_e: unknown, code: number) => { state
 const { default: handler } = await import('~~/server/api/student-account.post')
 
 beforeEach(() => {
-  state.body = { username: 'sam', password: 'secret1', fullName: 'Sam Lee', email: 's@x.io' }
+  state.body = { firstName: 'Sam', lastName: 'Lee', email: 's@x.io', password: 'Secret12!', ticket: 'tkt_1' }
   state.token = undefined; state.status = 0; state.fetchImpl.mockReset()
 })
 
@@ -38,8 +38,14 @@ describe('POST /api/student-account', () => {
       .mockResolvedValueOnce({ userId: 1, username: 'sam' })   // register
       .mockResolvedValueOnce({ token: 'JWT123' })              // login
     const res = await handler({} as never)
-    expect(state.fetchImpl).toHaveBeenNthCalledWith(1, 'http://backend/api/student/register', expect.objectContaining({ method: 'POST' }))
-    expect(state.fetchImpl).toHaveBeenNthCalledWith(2, 'http://backend/api/student/login', expect.objectContaining({ method: 'POST' }))
+    expect(state.fetchImpl).toHaveBeenNthCalledWith(1, 'http://backend/api/student/register', expect.objectContaining({
+      method: 'POST',
+      body: expect.objectContaining({ firstName: 'Sam', lastName: 'Lee', email: 's@x.io', ticket: 'tkt_1' }),
+    }))
+    expect(state.fetchImpl).toHaveBeenNthCalledWith(2, 'http://backend/api/student/login', expect.objectContaining({
+      method: 'POST',
+      body: { email: 's@x.io', password: 'Secret12!' },
+    }))
     expect(state.token).toBe('JWT123')
     expect(res).toEqual({ signedIn: true })
     expect(JSON.stringify(res)).not.toContain('JWT123')
