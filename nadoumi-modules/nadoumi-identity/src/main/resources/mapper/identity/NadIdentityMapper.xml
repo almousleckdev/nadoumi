@@ -17,4 +17,18 @@
     <select id="selectUserIdByEmail" resultType="long">
         select user_id from sys_user where email = #{email} and del_flag = '0' limit 1
     </select>
+
+    <select id="selectUserIdByEmailAndType" resultType="long">
+        select user_id from sys_user
+        where email = #{email} and user_type = #{userType} and del_flag = '0'
+        limit 1
+    </select>
+
+    <update id="markEmailVerified">
+        update sys_user set email_verified = 1 where user_id = #{userId}
+    </update>
+
+    <update id="touchPwdUpdateDate">
+        update sys_user set pwd_update_date = now() where user_id = #{userId}
+    </update>
 </mapper>

@@ -107,11 +107,13 @@ public abstract class AbstractNadIntegrationTest {
     }
 
     protected String staffToken(String username) throws Exception {
-        return tokenFrom("/login", username);
+        return tokenFrom("/login", "{\"username\":\"" + username + "\",\"password\":\"" + PASSWORD + "\"}");
     }
 
+    /** Student login is email-first (Revision 2); {@link #createStudent} uses {@code <username>@example.test}. */
     protected String studentToken(String username) throws Exception {
-        return tokenFrom("/api/student/login", username);
+        return tokenFrom("/api/student/login",
+                "{\"email\":\"" + username + "@example.test\",\"password\":\"" + PASSWORD + "\"}");
     }
 
     protected String bearer(String token) {
@@ -128,9 +130,8 @@ public abstract class AbstractNadIntegrationTest {
         return u;
     }
 
-    private String tokenFrom(String path, String username) throws Exception {
-        String body = "{\"username\":\"" + username + "\",\"password\":\"" + PASSWORD + "\"}";
-        String res = mvc.perform(post(path).contentType("application/json").content(body))
+    private String tokenFrom(String path, String jsonBody) throws Exception {
+        String res = mvc.perform(post(path).contentType("application/json").content(jsonBody))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
         return JsonPath.read(res, "$.token");

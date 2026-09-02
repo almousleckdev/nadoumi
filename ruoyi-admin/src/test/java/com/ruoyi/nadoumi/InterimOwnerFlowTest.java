@@ -42,9 +42,10 @@ class InterimOwnerFlowTest extends AbstractNadIntegrationTest {
         assertThat(pending.get("invited_email")).isEqualTo("invitee@example.test");
         assertThat(pending.get("user_id")).isNull();
 
-        mvc.perform(post("/api/student/register").contentType("application/json").content("""
-                        {"username":"invitee","password":"nad-test-pass-1","email":"invitee@example.test"}"""))
-                .andExpect(status().isCreated());
+        // Revision 2 register is OTP-gated; the invite-promotion this test checks is
+        // driven by login (grants.acceptInvitesFor), so create the invitee directly
+        // and sign in — same effect, no OTP plumbing in the test.
+        createStudent("invitee");
         String inviteeTok = studentToken("invitee");
 
         Map<String, Object> promoted = jdbc.queryForMap(

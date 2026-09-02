@@ -28,8 +28,11 @@ class LoginBoundaryTest extends AbstractNadIntegrationTest {
         studentToken("student_ok"); // 200 + token asserted inside helper
 
         createStaff("staff_blocked", "ops_manager");
+        // A staff email is not a user_type='10' row, so it never resolves as a student.
+        // The response is the same generic "email or password is incorrect" (400) a
+        // wrong password gets — the boundary holds without disclosing the account type.
         mvc.perform(post("/api/student/login").contentType("application/json")
-                        .content("{\"username\":\"staff_blocked\",\"password\":\"" + PASSWORD + "\"}"))
-                .andExpect(status().isForbidden());
+                        .content("{\"email\":\"staff_blocked@staff.test\",\"password\":\"" + PASSWORD + "\"}"))
+                .andExpect(status().isBadRequest());
     }
 }

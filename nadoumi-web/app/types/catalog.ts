@@ -38,7 +38,7 @@ export interface Page<T> {
 
 export interface SessionDto {
   authenticated: boolean
-  user?: { userId: number; username: string; nickName: string | null }
+  user?: { userId: number; username: string; nickName: string | null; email: string | null }
   applicants?: { applicantId: number; accessRole: string; capabilities: string[] }[]
 }
 

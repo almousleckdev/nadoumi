@@ -34,13 +34,13 @@ describe('GET /api/student-session', () => {
   it('maps /me into a SessionDto when the cookie is valid', async () => {
     h3.cookie = 'jwt'
     h3.fetchImpl.mockResolvedValueOnce({
-      userId: 7, username: 'sam', nickName: 'Sam',
+      userId: 7, username: 'sam', nickName: 'Sam', email: 'sam@example.com',
       accessibleApplicants: [{ applicantId: 3, accessRole: 'OWNER', capabilities: ['VIEW_PROFILE'] }],
     })
     const res = await handler({} as never)
     expect(res).toEqual({
       authenticated: true,
-      user: { userId: 7, username: 'sam', nickName: 'Sam' },
+      user: { userId: 7, username: 'sam', nickName: 'Sam', email: 'sam@example.com' },
       applicants: [{ applicantId: 3, accessRole: 'OWNER', capabilities: ['VIEW_PROFILE'] }],
     })
   })
