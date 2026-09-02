@@ -157,9 +157,9 @@ same change. Report per step.
 
 | Step | Scope | Migration |
 | --- | --- | --- |
-| **0** | **This doc** + fix outright-wrong stale lines in `DOMAIN_MODEL` / `DATABASE_DESIGN`; add `docs/DOMAIN_EVENTS.md` stub. | — |
-| **1** | Public nav → `Home · Scholarships · Universities · About · Contact`; drop `/programs` + `/destinations` routes; onboarding → `/onboarding` + completion gate. Web only. | — |
-| **2** | University profile depth + ranking/highlight/gallery; admin detail sections; public university-detail DTO. | V10 |
+| **0 ✅** | **This doc** + fix outright-wrong stale lines in `DOMAIN_MODEL` / `DATABASE_DESIGN`; add `docs/DOMAIN_EVENTS.md` stub. | — |
+| **1 ✅** | Public nav → `Home · Scholarships · Universities · About · Contact`; drop `/programs` + `/destinations` routes; onboarding → `/onboarding` + completion gate. Web only. | — |
+| **2 ✅** | University profile depth (18 scalar cols) + `nad_university_ranking` / `nad_university_highlight`; admin sectioned drawer + detail; `PublicUniversityResponse` + `/api/public/universities` (published+active only); public `universities/[id]` page. Gallery deferred with the Document slice (Step 7). | V10 |
 | **3** | `nadoumi-program`: program type + majors + intake; Programs shown under the university (admin + public). | V11 |
 | **4** | `nadoumi-scholarship`: configurable aggregate + internal split + `v_scholarship_student`; staff CRUD (confidentiality DTOs); public list + detail. Confidentiality CI tests. | V12 |
 | **5** | `nad_outbox_event` + poller + `nadoumi-notification` (`nad_notification*` + templates + SSE). First event: `ScholarshipPublished`. | V13 |

@@ -2,28 +2,85 @@ import request from '@/utils/request'
 import type { Page } from './applicant'
 
 export type UniversityStatus = 'ACTIVE' | 'INACTIVE'
+export type PublishStatus = 'DRAFT' | 'PUBLISHED'
+export type UniversityType = 'PUBLIC' | 'PRIVATE'
+export type HighlightKind = 'HIGHLIGHT' | 'ADVANTAGE'
+
+export interface UniversityRanking {
+  id?: number
+  source: string
+  rankPosition: number | null
+  rankYear: number | null
+  note: string | null
+}
+
+export interface UniversityHighlight {
+  id?: number
+  kind: HighlightKind
+  text: string
+}
 
 export interface University {
   id: number
   name: string
+  nameCn: string | null
   country: string
+  type: UniversityType | null
   city: string | null
+  province: string | null
+  foundedYear: number | null
+  totalStudents: number | null
+  internationalStudents: number | null
+  facultyCount: number | null
   website: string | null
   rankingTier: string | null
+  introduction: string | null
+  history: string | null
+  campusInfo: string | null
+  accommodationInfo: string | null
+  nearbyInfo: string | null
+  admissionsEmail: string | null
+  officePhone: string | null
   logoDocumentId: number | null
+  bannerDocumentId: number | null
+  recommended: boolean
+  featured: boolean
   status: UniversityStatus
+  publishStatus: PublishStatus
+  remark: string | null
   createdAt: string | null
   updatedAt: string | null
+  rankings: UniversityRanking[]
+  highlights: UniversityHighlight[]
 }
 
 export interface UniversityInput {
   name: string
+  nameCn?: string | null
   country: string
+  type?: UniversityType | null
   city?: string | null
+  province?: string | null
+  foundedYear?: number | null
+  totalStudents?: number | null
+  internationalStudents?: number | null
+  facultyCount?: number | null
   website?: string | null
   rankingTier?: string | null
+  introduction?: string | null
+  history?: string | null
+  campusInfo?: string | null
+  accommodationInfo?: string | null
+  nearbyInfo?: string | null
+  admissionsEmail?: string | null
+  officePhone?: string | null
+  recommended: boolean
+  featured: boolean
   status: UniversityStatus
+  publishStatus: PublishStatus
   remark?: string | null
+  rankings: UniversityRanking[]
+  highlights: UniversityHighlight[]
 }
 
 const BASE = '/api/staff/universities'

@@ -136,6 +136,19 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   interim heuristic (core identity fields present) until the backend carries
   `onboarding_state` (Step 6).
 
+**UPDATE 2026-09-02 (PLATFORM_ARCHITECTURE Step 2):**
+- `app/pages/universities/[id].vue` — SSR public university profile from
+  `/api/public/universities/{id}` (`useApi().publicGet` → BFF `/api/public/**`
+  passthrough). Renders facts, prose sections (introduction / history / campus /
+  accommodation / nearby), grouped Highlights & Advantages, a rankings table, a
+  **Programmes** section (placeholder list until Step 3), and contact lines.
+  Missing / unpublished → "not available" state.
+- `app/pages/universities/index.vue` — richer cards (Chinese name, city/province,
+  type, Featured badge), Tailwind + `NContainer` (matches the marketing shell).
+- `types/catalog.ts` — `UniversityDetail` / `UniversityRanking` /
+  `UniversityHighlight`; `UniversitySummary` gains `nameCn` / `province` / `type`
+  / `featured`.
+
 **PLANNED — Revision 2 (plan Parts E/F/G):** *(historical; nav line superseded above)*
 - Navbar: ~~Home, Scholarships, Universities, Programs, Destinations, About,
   Contact~~ + `Sign in` / `Create account`, → account menu when authed.

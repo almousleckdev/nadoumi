@@ -95,6 +95,9 @@ or high-impact operations (see §5).
 Granted by `V9`: full set → `nadoumi_super_admin`, `ops_manager`,
 `partnerships_manager`; `view` + `list` only → `case_officer`, `content_editor`,
 `read_only_analyst`, `support_agent`. (`export` is defined but no endpoint yet.)
+`V10` (profile depth + ranking/highlight tables + `/api/public/universities`) adds
+**no new permission** — the profile fields, child lists and the anonymous public
+read are all covered by the existing set (public GET is `@Anonymous`).
 
 ### 2.6 `program`
 `nad:program:view` · `nad:program:list` · `nad:program:create` · `nad:program:edit` ·
