@@ -1,0 +1,6 @@
+Welcome to Nadoumi.
+
+Your email verification code is ${otp}.
+It expires in ${ttlMinutes} minutes and can be used once.
+
+If you did not start creating a Nadoumi account, you can ignore this message.

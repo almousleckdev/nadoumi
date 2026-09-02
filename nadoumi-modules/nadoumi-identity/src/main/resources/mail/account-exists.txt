@@ -1,0 +1,6 @@
+Someone entered this email address when creating a Nadoumi account.
+
+An account with this address already exists. If it was you, sign in at
+${loginUrl} - or use "Forgot password" to reset it.
+
+If this was not you, no action is needed.
