@@ -26,6 +26,25 @@ function toLogin() {
   }
 }
 
+// One toast per distinct message within a short window, so a single failed
+// request never stacks two identical error toasts.
+let lastMsg = ''
+let lastAt = 0
+function notifyError(msg: string) {
+  const now = Date.now()
+  if (msg === lastMsg && now - lastAt < 1500) return
+  lastMsg = msg
+  lastAt = now
+  ElMessage.error(msg)
+}
+
+function friendly(status: number | undefined, raw: string): string {
+  if (!status) return raw === 'Network Error' ? 'Cannot reach the server. Check your connection and try again.' : raw
+  if (status >= 500) return 'Something went wrong on the server. Please try again shortly.'
+  if (status === 429) return 'Too many attempts. Please wait a moment and try again.'
+  return raw
+}
+
 service.interceptors.response.use(
   (response) => {
     const data = response.data
@@ -36,20 +55,24 @@ service.interceptors.response.use(
         toLogin()
         return Promise.reject(new Error((data as any).msg || 'Not authenticated'))
       }
-      ElMessage.error((data as any).msg || 'Request failed')
-      return Promise.reject(new Error((data as any).msg || 'Request failed'))
+      const msg = (data as any).msg || 'Request failed'
+      notifyError(msg)
+      return Promise.reject(new Error(msg))
     }
     return data
   },
   (error) => {
     const res = error.response
-    let msg = error.message
+    let msg = error.message as string
     if (res) {
       const body = res.data || {}
-      msg = body.detail || body.title || body.msg || msg
+      msg = body.detail || body.title || body.msg || friendly(res.status, msg)
       if (res.status === 401) toLogin()
     }
-    ElMessage.error(msg || 'Network error')
+    else {
+      msg = friendly(undefined, msg)
+    }
+    notifyError(msg || 'Network error')
     return Promise.reject(error)
   },
 )

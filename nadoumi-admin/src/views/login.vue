@@ -34,7 +34,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage, type FormInstance } from 'element-plus'
+import { type FormInstance } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { getCaptcha } from '@/api/auth'
 import { useUserStore } from '@/stores/user'
@@ -74,8 +74,8 @@ async function submit() {
     await userStore.login({ ...form })
     const redirect = (route.query.redirect as string) || '/'
     router.replace(redirect)
-  } catch (e: any) {
-    ElMessage.error(e?.message || t('login.failed'))
+  } catch {
+    // the request interceptor already surfaced the error message; just recover state
     if (captchaEnabled.value) loadCaptcha()
   } finally {
     loading.value = false
