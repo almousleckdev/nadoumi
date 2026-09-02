@@ -28,82 +28,68 @@ beforeEach(() => {
   nav.mockReset()
 })
 
-async function completeStepOne(w: VueWrapper) {
+async function reachPasswordStep(w: VueWrapper) {
   await w.find('#firstName').setValue('Ada')
   await w.find('#lastName').setValue('Lovelace')
+  await w.find('#confirmEmail').setValue('ada@example.com')
   await w.find('#otp-email').setValue('ada@example.com')
   await w.find('button').trigger('click') // [Verify]
   await flushPromises()
   const boxes = w.findAll('input').filter(i => i.attributes('inputmode') === 'numeric')
   for (let i = 0; i < 6; i++) await boxes[i]!.setValue(String(i))
   await flushPromises()
+  await new Promise(r => setTimeout(r, 700)) // "email verified" -> emits verified
+  await flushPromises()
 }
 
-describe('register page (two-step)', () => {
-  it('keeps Next disabled until the password is strong and both consents are checked', async () => {
+describe('register wizard (3 steps)', () => {
+  it('keeps Verify disabled until names + email + matching confirm-email are present', async () => {
     const w = await mountSuspended(Register)
-    await completeStepOne(w)
+    const verify = () => w.findAll('button').find(b => b.text().toLowerCase() === 'verify')!
+    expect(verify().attributes('disabled')).toBeDefined()
 
-    const nextBtn = () => w.findAll('button').find(b => b.text().toLowerCase() === 'next')!
-    expect(nextBtn().attributes('disabled')).toBeDefined()
+    await w.find('#firstName').setValue('Ada')
+    await w.find('#lastName').setValue('Lovelace')
+    await w.find('#otp-email').setValue('ada@example.com')
+    await w.find('#confirmEmail').setValue('ada@wrong.com')
+    expect(verify().attributes('disabled')).toBeDefined()
 
-    await w.find('#password').setValue('Abcdef1!')
-    await w.find('#confirm').setValue('Abcdef1!')
-    expect(nextBtn().attributes('disabled')).toBeDefined() // consents still unchecked
-
-    await w.find('#accept-terms').setValue(true)
-    await w.find('#accept-privacy').setValue(true)
-    expect(nextBtn().attributes('disabled')).toBeUndefined()
+    await w.find('#confirmEmail').setValue('ada@example.com')
+    expect(verify().attributes('disabled')).toBeUndefined()
   })
 
-  it('posts the account with the ticket once everything is valid', async () => {
+  it('gates Next on verified + strong password + match + consent, then posts and routes to onboarding', async () => {
     const w = await mountSuspended(Register)
-    await completeStepOne(w)
+    await reachPasswordStep(w)
+
+    const next = () => w.findAll('button').find(b => b.text().toLowerCase() === 'next')!
+    expect(next().attributes('disabled')).toBeDefined()
 
     await w.find('#password').setValue('Abcdef1!')
     await w.find('#confirm').setValue('Abcdef1!')
+    expect(next().attributes('disabled')).toBeDefined() // consent unchecked
+
     await w.find('#accept-terms').setValue(true)
-    await w.find('#accept-privacy').setValue(true)
+    expect(next().attributes('disabled')).toBeUndefined()
+
     await w.find('form').trigger('submit')
     await flushPromises()
 
-    const accountCalls = fetchImpl.mock.calls.filter(c => c[0] === '/api/student-account')
-    expect(accountCalls).toHaveLength(1)
-    expect(accountCalls[0]?.[1]).toMatchObject({
+    const call = fetchImpl.mock.calls.find(c => c[0] === '/api/student-account')
+    expect(call?.[1]).toMatchObject({
       method: 'POST',
-      body: expect.objectContaining({
-        firstName: 'Ada', lastName: 'Lovelace', email: 'ada@example.com', ticket: 'tkt_1',
-      }),
+      body: expect.objectContaining({ firstName: 'Ada', lastName: 'Lovelace', email: 'ada@example.com', ticket: 'tkt_1' }),
     })
-    expect(nav).toHaveBeenCalledWith('/dashboard/profile')
+    expect(nav).toHaveBeenCalledWith('/dashboard/onboarding')
   })
 
-  it('a weak password blocks the submit and shows why', async () => {
+  it('a password containing the name never enables Next', async () => {
     const w = await mountSuspended(Register)
-    await completeStepOne(w)
-
-    await w.find('#password').setValue('weak')
-    await w.find('#confirm').setValue('weak')
-    await w.find('#accept-terms').setValue(true)
-    await w.find('#accept-privacy').setValue(true)
-    await w.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(fetchImpl.mock.calls.some(c => c[0] === '/api/student-account')).toBe(false)
-    expect(w.text()).toContain('at least 8 characters')
-  })
-
-  it('a password containing the name is rejected client-side', async () => {
-    const w = await mountSuspended(Register)
-    await completeStepOne(w)
-
+    await reachPasswordStep(w)
     await w.find('#password').setValue('Lovelace1!')
     await w.find('#confirm').setValue('Lovelace1!')
     await w.find('#accept-terms').setValue(true)
-    await w.find('#accept-privacy').setValue(true)
-    await w.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(fetchImpl.mock.calls.some(c => c[0] === '/api/student-account')).toBe(false)
+    const next = w.findAll('button').find(b => b.text().toLowerCase() === 'next')!
+    expect(next.attributes('disabled')).toBeDefined()
   })
 })

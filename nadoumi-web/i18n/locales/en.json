@@ -69,13 +69,12 @@
     "email_help": "Or email support{'@'}nadoumi.com"
   },
   "destinations": {
-    "title": "Destinations",
-    "subtitle": "Where Nadoumi students study.",
-    "chinaTitle": "China",
-    "chinaBody": "Government and university scholarships across a wide range of programmes and cities.",
-    "malaysiaTitle": "Malaysia",
-    "malaysiaBody": "English-taught degrees and competitive tuition at established universities.",
-    "more": "More destinations are being added."
+    "title": "Study destinations",
+    "intro": "Where Nadoumi students go. China and Malaysia are our priority destinations, with more added over time.",
+    "china": "Scholarships and degree programmes at Chinese partner and catalogue universities, across undergraduate, master and PhD levels.",
+    "malaysia": "English-taught programmes and scholarships at Malaysian institutions, a common first step for international study.",
+    "browse": "Browse scholarships",
+    "more": "More destinations are being added. Tell us where you want to study on the contact page."
   },
   "catalog": {
     "scholarshipsTitle": "Scholarships",
@@ -123,8 +122,14 @@
       "sent": "We sent a 6-digit code to {email}. Enter it below.",
       "resend": "Resend code",
       "resendIn": "Resend in {n}s",
-      "verified": "Verified",
-      "badCode": "That code is invalid or expired."
+      "verified": "Email verified",
+      "badCode": "That code is invalid or expired.",
+      "groupLabel": "Enter the {n}-digit verification code",
+      "digitLabel": "Digit {i} of {n}",
+      "editEmail": "Edit email",
+      "emailLabel": "Code sent to",
+      "attemptsLeft": "{n} attempts remaining",
+      "verifying": "Verifying…"
     },
     "reset": {
       "title": "Reset password",
@@ -138,7 +143,16 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "pwStrong": "Strong password",
-    "pwRequirements": "Your password needs:"
+    "pwRequirements": "Your password needs:",
+    "acceptBothShort": "I agree to the {terms} and the {privacy}",
+    "confirmEmail": "Confirm email",
+    "emailMismatch": "Email addresses do not match.",
+    "step3Title": "Set a password",
+    "registerStep": {
+      "personal": "Personal",
+      "verify": "Verify",
+      "password": "Password"
+    }
   },
   "dashboard": {
     "nav": {
@@ -239,5 +253,15 @@
     "captcha": "The captcha answer was incorrect. Please try again.",
     "registrationDisabled": "Registration is currently closed.",
     "invalidEmail": "Enter a valid email address."
+  },
+  "legal": {
+    "draftNote": "Draft — placeholder text pending legal review.",
+    "privacyTitle": "Privacy Policy",
+    "privacyIntro": "This page explains what personal data Nadoumi collects and how it is used.",
+    "privacyBody": "Nadoumi processes the information you provide to build your applicant profile and submit applications on your behalf. Data is stored securely and shared only with the universities and partners involved in your applications.",
+    "termsTitle": "Terms of Service",
+    "termsIntro": "These terms govern your use of the Nadoumi platform.",
+    "termsBody": "By creating an account you agree to provide accurate information and to use the platform only for legitimate education applications. Nadoumi may update these terms; material changes will be notified.",
+    "contactLine": "Questions? Reach us via the contact page."
   }
 }

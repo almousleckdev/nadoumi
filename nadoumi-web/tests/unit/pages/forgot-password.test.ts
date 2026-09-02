@@ -22,6 +22,8 @@ describe('forgot-password (real flow)', () => {
     const boxes = w.findAll('input').filter(i => i.attributes('inputmode') === 'numeric')
     for (let i = 0; i < 6; i++) await boxes[i]!.setValue(String(i))
     await flushPromises()
+    await new Promise(r => setTimeout(r, 700))
+    await flushPromises()
 
     await w.find('#reset-new').setValue('BrandNew1!')
     await w.find('#reset-confirm').setValue('BrandNew1!')
@@ -40,6 +42,8 @@ describe('forgot-password (real flow)', () => {
     await flushPromises()
     const boxes = w.findAll('input').filter(i => i.attributes('inputmode') === 'numeric')
     for (let i = 0; i < 6; i++) await boxes[i]!.setValue('1')
+    await flushPromises()
+    await new Promise(r => setTimeout(r, 700))
     await flushPromises()
 
     await w.find('#reset-new').setValue('weak')
