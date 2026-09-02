@@ -2,7 +2,7 @@
 export default defineEventHandler(async (event) => {
   const token = studentToken(event)
   if (token) {
-    await $fetch(`${backendBaseUrl(event)}/api/student/logout`, {
+    await $fetch<unknown>(`${backendBaseUrl(event)}/api/student/logout`, {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },
     }).catch(() => undefined)

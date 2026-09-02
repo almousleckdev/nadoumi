@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   }
   const body = await readBody(event)
   try {
-    return await $fetch(`${backendBaseUrl(event)}/api/student/password`, {
+    return await $fetch<unknown>(`${backendBaseUrl(event)}/api/student/password`, {
       method: 'POST',
       body,
       headers: { authorization: `Bearer ${token}` },

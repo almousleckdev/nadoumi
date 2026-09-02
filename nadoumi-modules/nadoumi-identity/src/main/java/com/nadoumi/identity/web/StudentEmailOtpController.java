@@ -47,13 +47,9 @@ public class StudentEmailOtpController {
         if (configService.selectCaptchaEnabled()) {
             loginService.validateCaptcha(req.email(), req.code(), req.uuid());
         }
-        if (req.purpose() == OtpPurpose.REGISTER && auth.studentEmailExists(req.email())) {
-            otp.sendAccountExists(req.email());
-        }
-        else {
-            otp.issue(req.email(), req.purpose());
-        }
-        return new OtpSentResponse(true);
+        boolean accountExists = req.purpose() == OtpPurpose.REGISTER && auth.studentEmailExists(req.email());
+        OtpService.IssueResult result = otp.issue(req.email(), req.purpose(), accountExists);
+        return new OtpSentResponse(true, !result.sent(), result.retryAfterSeconds());
     }
 
     @Anonymous

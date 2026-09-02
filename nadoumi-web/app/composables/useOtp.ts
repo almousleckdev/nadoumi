@@ -29,11 +29,20 @@ export function useOtp() {
 
   if (getCurrentScope()) onScopeDispose(stopTimer)
 
-  async function request(email: string, purpose: OtpPurpose): Promise<void> {
+  /**
+   * Ask the backend to email a code. The backend answers 200 whether or not a
+   * mail actually went out: `throttled` is true when the request fell inside the
+   * 60s resend window (no new mail), and `retryAfter` is the seconds until the
+   * next request is allowed — used to size the cooldown exactly.
+   */
+  async function request(email: string, purpose: OtpPurpose): Promise<{ throttled: boolean, retryAfter: number }> {
     busy.value = true
     try {
-      await $fetch('/api/student-email-otp', { method: 'POST', body: { email, purpose } })
-      startCooldown()
+      const res = await $fetch<{ sent: boolean, throttled?: boolean, retryAfter?: number }>(
+        '/api/student-email-otp', { method: 'POST', body: { email, purpose } })
+      const retryAfter = res.retryAfter && res.retryAfter > 0 ? res.retryAfter : 60
+      startCooldown(retryAfter)
+      return { throttled: Boolean(res.throttled), retryAfter }
     }
     finally {
       busy.value = false

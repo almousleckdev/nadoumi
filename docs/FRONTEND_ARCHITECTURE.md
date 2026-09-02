@@ -192,6 +192,11 @@ API-client package.
 A lean Vue 3 admin that follows the RuoYi backend contract without vendoring the
 RuoYi-Vue2/3 codebase.
 
+> **Port map (kills a recurring confusion):** `nadoumi-admin` = **`:8082`** (the
+> Nadoumi target); `ruoyi-ui` = **`:1024`** (stock RuoYi, reference-only, frozen,
+> not in the default environment "up"). Full comparison + recorded one-admin
+> decision: `ARCHITECTURE_GAP_ANALYSIS.md` §2 and `ADMIN_ARCHITECTURE.md` §1.0.
+
 - **Stack:** Vue 3 + Vite 5 + Element Plus + Pinia + Vue Router 4 + vue-i18n
   (default **en**, `zh` stub). `pnpm dev` on port **8082**, proxy `/dev-api` → `:8080`.
 - **Auth:** `POST /login` → token in a cookie; `GET /getInfo` (user/roles/permissions,

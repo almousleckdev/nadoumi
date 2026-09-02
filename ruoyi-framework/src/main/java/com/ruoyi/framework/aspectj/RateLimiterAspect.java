@@ -61,7 +61,7 @@ public class RateLimiterAspect
             {
                 throw new ServiceException("Too many requests, please try again shortly");
             }
-            log.info("rate limit '{}' exceeded, current '{}', cache key '{}'", count, number.intValue(), combineKey);
+            log.info("rate limit check: {}/{} within {}s for key '{}'", number.intValue(), count, time, combineKey);
         }
         catch (ServiceException e)
         {

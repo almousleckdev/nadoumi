@@ -3,7 +3,7 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   try {
-    return await $fetch(`${backendBaseUrl(event)}/api/student/email-otp`, { method: 'POST', body })
+    return await $fetch<unknown>(`${backendBaseUrl(event)}/api/student/email-otp`, { method: 'POST', body })
   }
   catch (err) {
     const e = err as { statusCode?: number; data?: unknown }

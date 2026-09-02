@@ -87,7 +87,17 @@ The Nuxt BFF holds the JWT only in an httpOnly + Secure + SameSite=Lax cookie
 `/api/student/register` gated by its own config flag, separate from
 `sys.account.registerUser`.
 
-### 4.2 Student email verification, OTP & password reset (PLANNED — Revision 2, spec §15)
+### 4.2 Student email verification, OTP & password reset (IMPLEMENTED — Revision 2, spec §15)
+
+**Chain status (verified 2026-09-02, `ARCHITECTURE_GAP_ANALYSIS.md` §1):** browser
+→ Nuxt BFF → Spring → `OtpService` → Redis → `MailSender` → SMTP/Mailpit works end
+to end. One open defect: a **resend inside the 60 s cooldown is a silent no-op
+that still returns `{ sent: true }`**. Fix in progress — `OtpService.issue()`
+returns `SENT | THROTTLED`; the controller emits
+`{ sent: true, throttled: <bool>, retryAfter: <sec> }` from the live cooldown TTL,
+and `<EmailVerifyStep>` distinguishes "new code sent" from "code already sent —
+check spam, retry in Ns". Covered by `OtpEndToEndTest` (full-context, Redis +
+`LoggingMailSender`).
 
 **Identity:** email-first. `sys_user.user_name` for `user_type='10'` is a
 server-generated handle; the verified `email` (new `sys_user.email_verified` column)
@@ -96,16 +106,19 @@ is the login key. Uniqueness among students is enforced in `StudentAuthService`;
 
 **OTP (Redis):** 6-digit numeric, `sha256`-stored, **TTL 600 s**, **single-use**
 (deleted on success), **≤5 verify attempts** then invalidated, **60 s** resend
-cooldown. `@RateLimiter` on `email-otp` (5/h/email, 20/h/IP) and
-`email-otp/verify` (10/10min/IP). Captcha (`sys.account.captchaEnabled`) additionally
-gates `email-otp`. A verified OTP mints an opaque **single-use ticket** (Redis, TTL
-600 s) consumed by `register` / `password/reset`. **No reset tokens in URLs; no
-JWT-in-link.**
+cooldown (one cooldown key per `purpose`+email, covering both the OTP and the
+"account exists" branch so the response never enumerates). `@RateLimiter`:
+`email-otp` **20/h/IP**, `email-otp/verify` **10/10 min/IP**. Captcha
+(`sys.account.captchaEnabled`) additionally gates `email-otp`. A verified OTP mints
+an opaque **single-use ticket** (Redis, TTL 600 s) consumed by `register` /
+`password/reset`. **No reset tokens in URLs; no JWT-in-link.**
 
-**Enumeration:** `email-otp` **always** returns `200 { sent: true }`. An
-already-registered email in a `REGISTER` request receives an "account exists" mail,
-not an OTP. `login` returns one generic error for both "unknown email" and "wrong
-password". `password/reset` with a valid ticket for a vanished account returns `204`.
+**Enumeration:** `email-otp` **always** returns `200 { sent: true }` (the new
+`throttled` flag does **not** vary by whether the address is registered — it only
+reflects the caller's own 60 s cooldown). An already-registered email in a
+`REGISTER` request receives an "account exists" mail, not an OTP. `login` returns
+one generic error for both "unknown email" and "wrong password". `password/reset`
+with a valid ticket for a vanished account returns `204`.
 
 **Password policy (`PasswordPolicy`, `ruoyi-common`; TS mirror in `nadoumi-web`):**
 8–32 chars; ≥1 upper, ≥1 lower, ≥1 digit, ≥1 special; **≠ current**. Enforced on

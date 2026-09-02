@@ -19,16 +19,21 @@ const MAX_ATTEMPTS = 5
 const stage = ref<'email' | 'otp' | 'done'>('email')
 const otp = ref('')
 const error = ref('')
+const notice = ref('')
 const verifying = ref(false)
 const attemptsLeft = ref(MAX_ATTEMPTS)
 
 async function sendCode() {
   error.value = ''
+  notice.value = ''
+  const wasFirstRequest = stage.value === 'email'
   try {
-    await request(props.email, props.purpose)
+    const { throttled } = await request(props.email, props.purpose)
     otp.value = ''
     attemptsLeft.value = MAX_ATTEMPTS
     stage.value = 'otp'
+    if (throttled) notice.value = t('auth.otp.throttledNote')
+    else if (!wasFirstRequest) notice.value = t('auth.otp.resentNote')
     emit('sent')
   }
   catch (e) {
@@ -38,6 +43,7 @@ async function sendCode() {
 
 async function submitCode(code: string) {
   error.value = ''
+  notice.value = ''
   verifying.value = true
   try {
     const ticket = await verify(props.email, props.purpose, code)
@@ -59,6 +65,7 @@ function editEmail() {
   stage.value = 'email'
   otp.value = ''
   error.value = ''
+  notice.value = ''
   attemptsLeft.value = MAX_ATTEMPTS
   emit('edit')
 }
@@ -106,6 +113,7 @@ function editEmail() {
         <p v-else-if="error && attemptsLeft < MAX_ATTEMPTS" class="text-xs text-slate-500">
           {{ t('auth.otp.attemptsLeft', { n: attemptsLeft }) }}
         </p>
+        <p v-if="notice && !error" class="text-xs text-slate-500">{{ notice }}</p>
         <button
           type="button"
           class="text-start text-sm font-medium text-brand-700 hover:underline disabled:text-slate-400 disabled:no-underline"
