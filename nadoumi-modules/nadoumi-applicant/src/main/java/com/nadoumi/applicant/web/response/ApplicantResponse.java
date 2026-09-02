@@ -15,7 +15,8 @@ public record ApplicantResponse(
         String passportNo,
         String email,
         String phone,
-        String status) {
+        String status,
+        String createdAt) {
 
     private static final String MASK = "••••";
 
@@ -29,7 +30,8 @@ public record ApplicantResponse(
                 includePii ? a.getPassportNo() : mask(a.getPassportNo()),
                 a.getEmail(),
                 a.getPhone(),
-                a.getStatus() == null ? null : a.getStatus().name());
+                a.getStatus() == null ? null : a.getStatus().name(),
+                str(a.getCreateTime()));
     }
 
     private static String str(Object v) {

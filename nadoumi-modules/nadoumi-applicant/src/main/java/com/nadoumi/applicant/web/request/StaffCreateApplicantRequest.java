@@ -11,12 +11,19 @@ import java.time.LocalDate;
  * (DOMAIN_MODEL §4.3).
  */
 public record StaffCreateApplicantRequest(
-        @NotBlank @Size(max = 100) String givenName,
-        @NotBlank @Size(max = 100) String familyName,
+        @NotBlank @Size(max = 100)
+        String givenName,
+        @NotBlank @Size(max = 100)
+        String familyName,
         LocalDate dob,
-        @Size(min = 2, max = 2) String nationality,
-        @Size(max = 64) String passportNo,
-        @Email @Size(max = 120) String email,
-        @Size(max = 32) String phone,
-        @NotBlank @Email @Size(max = 120) String invitedEmail) {
+        @Size(min = 2, max = 2)
+        String nationality,
+        @Size(max = 64)
+        String passportNo,
+        @Email @Size(max = 120)
+        String email,
+        @Size(max = 32)
+        String phone,
+        @NotBlank @Email @Size(max = 120)
+        String invitedEmail) {
 }

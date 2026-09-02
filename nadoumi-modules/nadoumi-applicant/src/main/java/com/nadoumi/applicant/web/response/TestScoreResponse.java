@@ -12,7 +12,9 @@ public record TestScoreResponse(
         LocalDate expiresOn) {
 
     public static TestScoreResponse of(ApplicantTestScore s) {
-        return new TestScoreResponse(s.getId(), s.getTestType(), s.getScore(), s.getSubScoresJson(),
+        return new TestScoreResponse(
+                s.getId(), s.getTestType(),
+                s.getScore(), s.getSubScoresJson(),
                 s.getTakenOn(), s.getExpiresOn());
     }
 }
