@@ -16,6 +16,18 @@ spring:
       host: localhost
       port: 6379
       password:
+  # outbound email — only needed if nadoumi.mail.transport=smtp (below).
+  # Default dev = Mailpit from docker-compose.yml (localhost:1025, no auth).
+#  mail:
+#    host: smtp.gmail.com
+#    port: 587
+#    username: you@gmail.com
+#    password: your-16-char-app-password
+#    properties: { mail: { smtp: { auth: true, starttls: { enable: true } } } }
+
+#nadoumi:
+#  mail:
+#    transport: smtp          # log | smtp
 
 # token:
 #   secret: <your own 64+ char secret>   # optional locally; a dev default ships in application.yml
