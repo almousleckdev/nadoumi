@@ -101,16 +101,15 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 | POST | `/api/staff/applicants` | `nad:applicant:create` | interim-owner + invite flow. `201`. |
 | PUT | `/api/staff/applicants/{id}` | `nad:applicant:edit` | |
 | DELETE | `/api/staff/applicants/{id}` | `nad:applicant:archive` | soft archive, `204`. |
-| GET / POST | `/api/staff/applicants/{id}/education` | view / edit | `POST` → `201`. |
-| DELETE | `/api/staff/applicants/{id}/education/{eduId}` | `nad:applicant:edit` | |
-| GET / POST | `/api/staff/applicants/{id}/test-scores` | view / edit | |
-| GET / POST | `/api/staff/applicants/{id}/contacts` | view / edit | |
+| GET / POST / PUT / DELETE | `/api/staff/applicants/{id}/education[/{eduId}]` | view / edit | `POST` → `201`; `PUT` → `200`; `DELETE` → `204`. Cross-applicant id → `404`. |
+| GET / POST / PUT / DELETE | `/api/staff/applicants/{id}/test-scores[/{scoreId}]` | view / edit | idem |
+| GET / POST / PUT / DELETE | `/api/staff/applicants/{id}/contacts[/{contactId}]` | view / edit | idem |
+| GET | `/api/staff/applicants/{applicantId}/access` | `nad:applicant:access:view` | `List<AccessGrantResponse>` — grantee `userId` / `invitedEmail`, role, status, interim flag, granted/expires, effective capabilities (`StaffApplicantAccessController`). |
+| POST / DELETE / POST `/transfer-ownership` | `/api/staff/applicants/{applicantId}/access[/{grantId}]` | `nad:applicant:access:manage` | delegate / revoke / transfer ownership. |
 
-**Admin (Phase A) uses:** the list + `GET {id}` + the three sub-resource `GET`s
-(read-only detail tabs). **Gaps for the next admin slice:**
-`GET /api/staff/applicants/{id}/access` (delegation view, `nad:applicant:access:view`)
-does not exist; `PUT` / full `DELETE` for education / test-scores / contacts are
-missing on the staff side.
+**Admin uses:** list + `GET {id}` + full CRUD on the three sub-resources + the
+access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a
+`sys_user` join so the access list shows a name rather than `User #id`.
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
