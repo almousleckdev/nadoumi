@@ -6,14 +6,14 @@ export default defineEventHandler(async (event): Promise<SessionDto> => {
 
   try {
     const me = await $fetch<{
-      userId: number; username: string; nickName: string | null
+      userId: number; username: string; nickName: string | null; email: string | null
       accessibleApplicants: { applicantId: number; accessRole: string; capabilities: string[] }[]
     }>(`${backendBaseUrl(event)}/api/student/me`, {
       headers: { authorization: `Bearer ${token}` },
     })
     return {
       authenticated: true,
-      user: { userId: me.userId, username: me.username, nickName: me.nickName },
+      user: { userId: me.userId, username: me.username, nickName: me.nickName, email: me.email },
       applicants: me.accessibleApplicants,
     }
   }

@@ -7,5 +7,6 @@ public record StudentIdentityResponse(
         Long userId,
         String username,
         String nickName,
+        String email,
         List<AccessibleApplicant> accessibleApplicants) {
 }
