@@ -11,6 +11,18 @@ let downloadLoadingInstance
 // 是否显示重新登录
 export let isRelogin = { show: false }
 
+// De-duplicate error toasts: an identical error message fired within a short
+// window (e.g. one response reaching more than one handler) is shown only once.
+let lastErrorMessage = ''
+let lastErrorAt = 0
+function showError(message, options = {}) {
+  const now = Date.now()
+  if (message === lastErrorMessage && now - lastErrorAt < 1500) return
+  lastErrorMessage = message
+  lastErrorAt = now
+  Message({ message, type: 'error', ...options })
+}
+
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 // 创建axios实例
 const service = axios.create({
@@ -96,7 +108,7 @@ service.interceptors.response.use(res => {
     }
       return Promise.reject('无效的会话，或者会话已过期，请重新登录。')
     } else if (code === 500) {
-      Message({ message: msg, type: 'error' })
+      showError(msg)
       return Promise.reject(new Error(msg))
     } else if (code === 601) {
       Message({ message: msg, type: 'warning' })
@@ -118,7 +130,7 @@ service.interceptors.response.use(res => {
     } else if (message.includes("Request failed with status code")) {
       message = "系统接口" + message.slice(-3) + "异常"
     }
-    Message({ message: message, type: 'error', duration: 5 * 1000 })
+    showError(message, { duration: 5 * 1000 })
     return Promise.reject(error)
   }
 )
