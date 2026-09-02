@@ -122,9 +122,23 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
 `ar` RTL. Dashboard screens: overview, `/dashboard/profile` (first-run create),
 `/dashboard/education` (full CRUD). Catalog pages render designed empty-states.
 
-**PLANNED — Revision 2 (plan Parts E/F/G):**
-- Navbar: **Home, Scholarships, Universities, Programs, Destinations, About,
-  Contact** + `Sign in` / `Create account`, → account menu when authed.
+**UPDATE 2026-09-02 (PLATFORM_ARCHITECTURE Step 1):**
+- Public navbar is **Home · Scholarships · Universities · About · Contact** +
+  `Sign in` / `Create account` (→ user menu when authed). **`Programs` and
+  `Destinations` are removed as top-level product areas** — programmes are
+  reached through a university detail page (`docs/PLATFORM_ARCHITECTURE.md` C1).
+  `app/pages/programs/` and `destinations/` deleted.
+- **Onboarding is not a dashboard.** It lives at `/onboarding` with its own
+  `layouts/onboarding.vue` (SiteHeader + centred content, no dashboard shell).
+  Post-registration redirects there. `middleware/onboarding.ts` + `useOnboarding`
+  gate: an incomplete profile is sent from `/dashboard/**` → `/onboarding`; a
+  completed one is sent from `/onboarding` → `/dashboard`. Completion is an
+  interim heuristic (core identity fields present) until the backend carries
+  `onboarding_state` (Step 6).
+
+**PLANNED — Revision 2 (plan Parts E/F/G):** *(historical; nav line superseded above)*
+- Navbar: ~~Home, Scholarships, Universities, Programs, Destinations, About,
+  Contact~~ + `Sign in` / `Create account`, → account menu when authed.
 - Two-step `/register` (name + email → emailed OTP → password/**Next**) and a real
   `/forgot-password` (email → OTP → new password → `/login`), sharing
   `OtpInput` / `EmailVerifyStep` / `useOtp`.

@@ -83,7 +83,7 @@ describe('register wizard (3 steps)', () => {
       method: 'POST',
       body: expect.objectContaining({ firstName: 'Ada', lastName: 'Lovelace', email: 'ada@example.com', ticket: 'tkt_1' }),
     })
-    expect(nav).toHaveBeenCalledWith('/dashboard/onboarding')
+    expect(nav).toHaveBeenCalledWith('/onboarding')
   })
 
   it('a password containing the name never enables Next', async () => {

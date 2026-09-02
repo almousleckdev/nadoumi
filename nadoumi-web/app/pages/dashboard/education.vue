@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { EducationDto } from '~/types/catalog'
 import type { EducationBody } from '~/composables/useApplicant'
-definePageMeta({ layout: 'dashboard', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t } = useI18n()
 const localePath = useLocalePath()

@@ -2,10 +2,11 @@
 import type { ApplicantDto, EducationDto } from '~/types/catalog'
 import type { SelfApplicantBody, EducationBody } from '~/composables/useApplicant'
 
-definePageMeta({ layout: 'dashboard', middleware: 'auth' })
+definePageMeta({ layout: 'onboarding', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { activeApplicantId, refresh } = useSession()
+const { invalidate: invalidateOnboarding } = useOnboarding()
 const {
   listMine, get, create, update,
   listEducation, addEducation, updateEducation, deleteEducation,
@@ -43,6 +44,7 @@ async function saveIdentity(body: SelfApplicantBody) {
   try {
     if (applicant.value) applicant.value = await update(applicant.value.id, body)
     else { applicant.value = await create(body); await refresh() }
+    invalidateOnboarding()
     notice.value = t('onboarding.saved')
   }
   catch (e) { error.value = problemMessage(e, t('auth.genericError')) }
@@ -67,6 +69,7 @@ function back() {
   if (current.value > 0) current.value--
 }
 async function finish() {
+  invalidateOnboarding()
   await navigateTo(localePath('/dashboard'))
 }
 

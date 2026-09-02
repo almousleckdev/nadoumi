@@ -5,12 +5,12 @@ const route = useRoute()
 const { status, user, signOut } = useSession()
 const open = ref(false)
 
+// Programs are discovered through a university, not as a top-level product area
+// (docs/PLATFORM_ARCHITECTURE.md §3, C1).
 const links = [
   { to: '/', key: 'nav.home' },
   { to: '/scholarships', key: 'nav.scholarships' },
   { to: '/universities', key: 'nav.universities' },
-  { to: '/programs', key: 'nav.programs' },
-  { to: '/destinations', key: 'nav.destinations' },
   { to: '/about', key: 'nav.about' },
   { to: '/contact', key: 'nav.contact' },
 ]
@@ -50,10 +50,13 @@ function isActive(to: string): boolean {
         <div class="flex items-center gap-3">
           <NLocaleSwitcher class="hidden sm:block" />
           <template v-if="status === 'authed'">
-            <NDropdown :label="user?.nickName ?? t('nav.dashboard')">
+            <NDropdown
+              :label="user?.nickName ?? t('nav.dashboard')"
+              trigger-test-id="user-menu"
+            >
               <NuxtLink :to="localePath('/dashboard')" class="block px-3 py-2 text-sm hover:bg-slate-50">{{ t('nav.dashboard') }}</NuxtLink>
               <NuxtLink :to="localePath('/dashboard/account')" class="block px-3 py-2 text-sm hover:bg-slate-50">{{ t('dashboard.nav.account') }}</NuxtLink>
-              <button type="button" class="block w-full px-3 py-2 text-start text-sm text-red-600 hover:bg-slate-50" @click="signOut">{{ t('common.signOut') }}</button>
+              <button type="button" data-test="sign-out" class="block w-full px-3 py-2 text-start text-sm text-red-600 hover:bg-slate-50" @click="signOut">{{ t('common.signOut') }}</button>
             </NDropdown>
           </template>
           <template v-else>

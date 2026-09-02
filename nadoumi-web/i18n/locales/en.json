@@ -3,8 +3,6 @@
     "home": "Home",
     "scholarships": "Scholarships",
     "universities": "Universities",
-    "programs": "Programs",
-    "destinations": "Destinations",
     "about": "About",
     "contact": "Contact",
     "signIn": "Sign in",
@@ -67,14 +65,6 @@
     "send": "Send",
     "sent": "Thanks — we'll be in touch.",
     "email_help": "Or email support{'@'}nadoumi.com"
-  },
-  "destinations": {
-    "title": "Study destinations",
-    "intro": "Where Nadoumi students go. China and Malaysia are our priority destinations, with more added over time.",
-    "china": "Scholarships and degree programmes at Chinese partner and catalogue universities, across undergraduate, master and PhD levels.",
-    "malaysia": "English-taught programmes and scholarships at Malaysian institutions, a common first step for international study.",
-    "browse": "Browse scholarships",
-    "more": "More destinations are being added. Tell us where you want to study on the contact page."
   },
   "catalog": {
     "scholarshipsTitle": "Scholarships",

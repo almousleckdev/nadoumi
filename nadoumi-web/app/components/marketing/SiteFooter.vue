@@ -17,8 +17,6 @@ const year = new Date().getFullYear()
           <p class="font-semibold text-slate-900">{{ t('footer.explore') }}</p>
           <NuxtLink :to="localePath('/scholarships')" class="text-slate-600 hover:text-slate-900">{{ t('nav.scholarships') }}</NuxtLink>
           <NuxtLink :to="localePath('/universities')" class="text-slate-600 hover:text-slate-900">{{ t('nav.universities') }}</NuxtLink>
-          <NuxtLink :to="localePath('/programs')" class="text-slate-600 hover:text-slate-900">{{ t('nav.programs') }}</NuxtLink>
-          <NuxtLink :to="localePath('/destinations')" class="text-slate-600 hover:text-slate-900">{{ t('nav.destinations') }}</NuxtLink>
         </div>
         <div class="grid content-start gap-2 text-sm">
           <p class="font-semibold text-slate-900">{{ t('footer.company') }}</p>

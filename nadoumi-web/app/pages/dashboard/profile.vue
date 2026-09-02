@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
 import type { SelfApplicantBody } from '~/composables/useApplicant'
-definePageMeta({ layout: 'dashboard', middleware: 'auth' })
+definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t } = useI18n()
 const { activeApplicantId, refresh } = useSession()
