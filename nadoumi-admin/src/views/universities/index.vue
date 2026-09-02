@@ -1,0 +1,236 @@
+<template>
+  <div class="nad-page">
+    <PageHeader
+      :title="t('university.title')"
+      :subtitle="t('university.subtitle')"
+    >
+      <template #actions>
+        <el-button
+          v-if="userStore.hasPerm('nad:university:create')"
+          type="primary"
+          :icon="Plus"
+          @click="openCreate"
+        >
+          {{ t('university.new') }}
+        </el-button>
+      </template>
+    </PageHeader>
+
+    <FilterBar
+      :dirty="dirty"
+      @clear="clearFilters"
+    >
+      <SearchInput
+        v-model="query.q"
+        :placeholder="t('university.searchPlaceholder')"
+        @search="applyFilters"
+      />
+      <el-input
+        v-model="query.country"
+        :placeholder="t('university.country')"
+        maxlength="2"
+        style="width: 120px"
+        @keyup.enter="applyFilters"
+      />
+      <el-select
+        v-model="query.status"
+        :placeholder="t('university.status')"
+        clearable
+        style="width: 150px"
+        @change="applyFilters"
+      >
+        <el-option
+          v-for="s in STATUSES"
+          :key="s"
+          :label="titleCase(s)"
+          :value="s"
+        />
+      </el-select>
+    </FilterBar>
+
+    <DataTable
+      :columns="columns"
+      :rows="rows"
+      :loading="loading"
+      :error="error"
+      :total="total"
+      :page="query.page"
+      :page-size="query.size"
+      clickable-rows
+      :empty-title="t('university.emptyTitle')"
+      :empty-description="t('university.emptyDesc')"
+      @update:page="(p: number) => { query.page = p; reload() }"
+      @retry="reload"
+      @row-click="(row) => router.push(`/universities/${row.id}`)"
+    >
+      <template #cell-country="{ value }">
+        <span class="mono">{{ value }}</span>
+      </template>
+      <template #cell-website="{ value }">
+        <a
+          v-if="value"
+          :href="value"
+          target="_blank"
+          rel="noopener"
+          class="link"
+          @click.stop
+        >{{ shortUrl(value) }}</a>
+        <span v-else>—</span>
+      </template>
+      <template #cell-status="{ value }">
+        <StatusBadge :status="value" />
+      </template>
+      <template #cell-actions="{ row }">
+        <el-button
+          v-if="userStore.hasPerm('nad:university:edit')"
+          link
+          size="small"
+          @click.stop="openEdit(row as University)"
+        >
+          {{ t('common.edit') }}
+        </el-button>
+        <el-button
+          v-if="userStore.hasPerm('nad:university:remove')"
+          link
+          size="small"
+          type="danger"
+          @click.stop="onDelete(row as University)"
+        >
+          {{ t('common.delete') }}
+        </el-button>
+      </template>
+    </DataTable>
+
+    <UniversityDrawer
+      v-model="drawerOpen"
+      :university="editing"
+      @saved="onSaved"
+    />
+  </div>
+</template>
+
+<script setup lang="ts">
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
+import {
+  listUniversities, deleteUniversity,
+  type University, type UniversityStatus,
+} from '@/api/university'
+import { useUserStore } from '@/stores/user'
+import { useConfirm } from '@/composables/useConfirm'
+import PageHeader from '@/components/PageHeader.vue'
+import FilterBar from '@/components/ui/FilterBar.vue'
+import SearchInput from '@/components/ui/SearchInput.vue'
+import DataTable from '@/components/ui/DataTable.vue'
+import StatusBadge from '@/components/ui/StatusBadge.vue'
+import type { DataTableColumn } from '@/components/ui/types'
+import UniversityDrawer from './UniversityDrawer.vue'
+
+const { t } = useI18n()
+const router = useRouter()
+const userStore = useUserStore()
+const { confirm } = useConfirm()
+
+const STATUSES: UniversityStatus[] = ['ACTIVE', 'INACTIVE']
+const columns: DataTableColumn[] = [
+  { prop: 'name', label: t('university.name'), minWidth: 240 },
+  { prop: 'country', label: t('university.country'), width: 100, align: 'center' },
+  { prop: 'city', label: t('university.city'), width: 150 },
+  { prop: 'website', label: t('university.website'), minWidth: 180 },
+  { prop: 'rankingTier', label: t('university.rankingTier'), width: 130 },
+  { prop: 'status', label: t('university.status'), width: 130 },
+  { prop: 'actions', label: '', width: 130, align: 'right' },
+]
+
+const loading = ref(false)
+const error = ref<string | null>(null)
+const rows = ref<University[]>([])
+const total = ref(0)
+const query = reactive({ q: '', country: '', status: '', page: 0, size: 20 })
+const dirty = computed(() => Boolean(query.q || query.country || query.status))
+
+function titleCase(s: string) {
+  return s.charAt(0) + s.slice(1).toLowerCase()
+}
+function shortUrl(u: string) {
+  return u.replace(/^https?:\/\//, '').replace(/\/$/, '')
+}
+
+async function reload() {
+  loading.value = true
+  error.value = null
+  try {
+    const res = await listUniversities({
+      q: query.q || undefined,
+      country: query.country || undefined,
+      status: query.status || undefined,
+      page: query.page,
+      size: query.size,
+    })
+    rows.value = res.content
+    total.value = res.totalElements
+  }
+  catch (e) {
+    error.value = (e as Error)?.message || t('state.errorTitle')
+  }
+  finally {
+    loading.value = false
+  }
+}
+function applyFilters() {
+  query.page = 0
+  reload()
+}
+function clearFilters() {
+  query.q = ''
+  query.country = ''
+  query.status = ''
+  applyFilters()
+}
+
+const drawerOpen = ref(false)
+const editing = ref<University | null>(null)
+function openCreate() {
+  editing.value = null
+  drawerOpen.value = true
+}
+function openEdit(u: University) {
+  editing.value = u
+  drawerOpen.value = true
+}
+function onSaved() {
+  reload()
+}
+
+async function onDelete(u: University) {
+  const ok = await confirm({
+    title: t('university.deleteTitle'),
+    message: t('university.deleteConfirm', { name: u.name }),
+    confirmText: t('common.delete'),
+    tone: 'danger',
+  })
+  if (!ok) return
+  await deleteUniversity(u.id)
+  ElMessage.success(t('common.deleted'))
+  reload()
+}
+
+onMounted(reload)
+</script>
+
+<style scoped>
+.mono {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+.link {
+  color: var(--nad-brand-700);
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
+</style>

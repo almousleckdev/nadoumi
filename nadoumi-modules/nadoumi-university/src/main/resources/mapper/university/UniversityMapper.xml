@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.university.mapper.UniversityMapper">
+
+    <resultMap id="university" type="com.nadoumi.university.domain.University">
+        <id     property="id"             column="id"/>
+        <result property="name"           column="name"/>
+        <result property="country"        column="country"/>
+        <result property="city"           column="city"/>
+        <result property="website"        column="website"/>
+        <result property="rankingTier"    column="ranking_tier"/>
+        <result property="logoDocumentId" column="logo_document_id"/>
+        <result property="status"         column="status"/>
+        <result property="createBy"       column="create_by"/>
+        <result property="createTime"     column="create_time"/>
+        <result property="updateBy"       column="update_by"/>
+        <result property="updateTime"     column="update_time"/>
+        <result property="remark"         column="remark"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, name, country, city, website, ranking_tier, logo_document_id, status,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="findById" resultMap="university">
+        select <include refid="cols"/> from nad_university where id = #{id}
+    </select>
+
+    <select id="search" resultMap="university">
+        select <include refid="cols"/> from nad_university
+        <where>
+            <if test="q != null and q != ''">
+                and (name like concat('%', #{q}, '%') or city like concat('%', #{q}, '%'))
+            </if>
+            <if test="country != null and country != ''">and country = #{country}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by name asc, id asc
+    </select>
+
+    <select id="findIdByNameAndCountry" resultType="java.lang.Long">
+        select id from nad_university where name = #{name} and country = #{country} limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.university.domain.University"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_university
+            (name, country, city, website, ranking_tier, logo_document_id, status,
+             create_by, create_time, remark)
+        values
+            (#{name}, #{country}, #{city}, #{website}, #{rankingTier}, #{logoDocumentId}, #{status},
+             #{createBy}, now(), #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.university.domain.University">
+        update nad_university set
+            name = #{name},
+            country = #{country},
+            city = #{city},
+            website = #{website},
+            ranking_tier = #{rankingTier},
+            logo_document_id = #{logoDocumentId},
+            status = #{status},
+            update_by = #{updateBy},
+            update_time = now(),
+            remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from nad_university where id = #{id}
+    </delete>
+
+</mapper>

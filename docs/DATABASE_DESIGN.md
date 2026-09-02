@@ -199,7 +199,7 @@ reporting read-model tables/views.
 | `V6__nadoumi_english_labels.sql` | **DONE (Cleanup).** English `sys_config` names / dict labels. | Cleanup ✅ |
 | `V7__nad_student_email_verified.sql` | **Revision 2.** `sys_user.email_verified` + `idx_sys_user_email` (email-first external identity, spec §15.3). | nadoumi-web build |
 | `V8__drop_initial_password_nag.sql` | **Revision 2.** `sys.account.initPasswordModify → 0`, `sys.account.passwordValidateDays → 90` (spec §17). | nadoumi-web build |
-| `V9__nad_university_program.sql` | `nad_university`, `nad_program`, `nad_program_intake`. (was planned as V6) | Phase 4 |
+| `V9__nad_university.sql` | **DONE.** `nad_university` + its `sys_menu` / role-grant seed (`nad:university:*`). Programmes deferred to a later migration. | Phase B |
 | `V10__nad_scholarship.sql` | `nad_scholarship`, `nad_scholarship_internal`, `nad_scholarship_program`, view `v_scholarship_student`. | Phase 4 |
 | `V11__nad_workflow.sql` | `nad_wf_definition/stage/transition/stage_task_template/instance`. | Phase 4 |
 | `V12__nad_application.sql` | `nad_application` + all children (§5.5). | Phase 4 |

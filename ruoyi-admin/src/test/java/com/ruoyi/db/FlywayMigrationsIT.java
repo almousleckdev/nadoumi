@@ -86,13 +86,18 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(8);
+        assertThat(applied).isEqualTo(9);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(tableExists(ds, "nad_applicant_education")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_dict_data WHERE dict_type = 'nad_user_type'")).isEqualTo("4");
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:applicant:%'")).isEqualTo("10");
+        // V9 — university catalog + its menu/permission set
+        assertThat(tableExists(ds, "nad_university")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:university:%'")).isEqualTo("6");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:university:%'")).isEqualTo("6");
         assertThat(single(ds, "SELECT extra FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_user_applicant_access' AND column_name = 'owner_guard'"))
                 .isEqualTo("STORED GENERATED");
@@ -125,7 +130,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(7); // V2..V8
+        assertThat(applied).isEqualTo(8); // V2..V9
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
