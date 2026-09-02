@@ -1,5 +1,7 @@
 # Nadoumi — Staff Permission Catalogue & Role Matrix
 
+> Read `docs/PLATFORM_ARCHITECTURE.md` first — the approved enterprise-platform direction this doc rolls up to (2026-09-02).
+
 Status: **BASELINE** (Phase 1, approved). Companion to `docs/SECURITY.md`,
 `docs/ADMIN_ARCHITECTURE.md`, `docs/DOMAIN_MODEL.md` §3–§4.
 

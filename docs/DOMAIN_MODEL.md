@@ -17,6 +17,17 @@ built · **OPEN** = still needs an explicit decision.
 > see `docs/PHASE_3_IDENTITY_APPLICANT.md`. Migrations `V2`–`V4`, modules
 > `nadoumi-identity` / `nadoumi-applicant`, the `@na` bean, and the `/api/student/*`
 > + `/api/staff/applicants/*` surface are live and covered by CI-blocking tests.
+>
+> **UPDATE 2026-09-02 — read `docs/PLATFORM_ARCHITECTURE.md` first.** The product
+> is an enterprise international-education platform (public site + student portal +
+> administration over one business platform). Implemented since Phase 3:
+> **Applicant** (education / test scores / contacts, staff CRUD), **University**
+> (`nad_university`, `V9`, staff CRUD). The §5–§6 scholarship / application
+> sketches below are **superseded** by `PLATFORM_ARCHITECTURE.md §3` for the
+> configurable scholarship aggregate and the application profile / requirement
+> **snapshot** rule; §7's `nad_scholarship`, `nad_application` shapes will be
+> re-derived per step, not taken verbatim. The confidentiality model (§6),
+> access model (§4) and identity model (§3) stand.
 
 ---
 

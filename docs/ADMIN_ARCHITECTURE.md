@@ -1,5 +1,7 @@
 # Nadoumi — Admin Architecture
 
+> Read `docs/PLATFORM_ARCHITECTURE.md` first — the approved enterprise-platform direction this doc rolls up to (2026-09-02).
+
 Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 
 The admin is Nadoumi's internal operations console. **Baseline UI = `RuoYi-Vue3`**

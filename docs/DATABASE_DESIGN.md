@@ -83,6 +83,16 @@ Reuse for Nadoumi **without modification**:
 
 ## 5. Nadoumi core tables — indicative sketch (BASELINE, **not DDL**)
 
+> **UPDATE 2026-09-02 — read `docs/PLATFORM_ARCHITECTURE.md` §3 first.** Live:
+> `nad_user_applicant_access` (`V3`), `nad_applicant` + education / test_score /
+> contact (`V4`), `nad_university` (`V9`). The **Scholarship** (§5.4) and
+> **Application** (§5.5) sketches below are **superseded**: Scholarship becomes a
+> configurable aggregate (category / funding_model / eligibility / typed fee
+> lines / stipend / intakes / document requirements); University (§5.3) gains the
+> full public profile; Application gains a **profile snapshot** + **requirement
+> snapshot** captured at submit. `nad_outbox_event` is added (§C7). Each domain's
+> real DDL is designed in its own step, not copied from here.
+
 Aligned with `docs/DOMAIN_MODEL.md` Rev 3 and realized (with FKs / generated guard
 columns / CHECK constraints) in `docs/ddl/nad_core.draft.sql`. `?` = nullable.
 Invariants marked **INV** are enforced in both the schema
