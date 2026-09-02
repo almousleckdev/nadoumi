@@ -5,10 +5,15 @@ test('register (2-step OTP) -> auto-login -> dashboard -> sign out', async ({ pa
   const email = uniqueEmail()
 
   await page.goto('/register')
+  await page.waitForLoadState('networkidle')
+
   await page.fill('#firstName', 'E2E')
   await page.fill('#lastName', 'Tester')
   await page.fill('#otp-email', email)
-  await page.getByRole('button', { name: /verify/i }).click()
+
+  const verify = page.getByRole('button', { name: /verify/i })
+  await expect(verify).toBeEnabled()
+  await verify.click()
 
   const code = await readOtp(email)
   const boxes = page.locator('input[inputmode="numeric"]')
@@ -18,7 +23,10 @@ test('register (2-step OTP) -> auto-login -> dashboard -> sign out', async ({ pa
   await page.fill('#confirm', 'Abcdef1!')
   await page.check('#accept-terms')
   await page.check('#accept-privacy')
-  await page.getByRole('button', { name: /next/i }).click()
+
+  const next = page.getByRole('button', { name: /next/i })
+  await expect(next).toBeEnabled()
+  await next.click()
 
   // server-side auto-login landed us in the dashboard
   await expect(page).toHaveURL(/\/dashboard\/profile/)

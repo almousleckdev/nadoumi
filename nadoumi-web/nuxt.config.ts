@@ -17,6 +17,10 @@ export default defineNuxtConfig({
     // dashboard/ chrome is referenced unprefixed too (<DashboardShell>,
     // <ApplicantSwitcher>, <SectionCard>), matching the ui/ and auth/ entries.
     { path: '~/components/dashboard', pathPrefix: false },
+    // marketing/ chrome (<SiteHeader>, <SiteFooter>, …) is referenced unprefixed
+    // by the layouts — without this it resolves to <MarketingSiteHeader> and
+    // silently renders nothing.
+    { path: '~/components/marketing', pathPrefix: false },
     '~/components',
   ],
   fonts: {
