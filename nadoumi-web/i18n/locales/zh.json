@@ -1,14 +1,89 @@
 {
-  "nav": {
-    "home": "Home",
-    "scholarships": "Scholarships",
-    "universities": "Universities",
-    "programs": "Programs",
-    "about": "About",
-    "contact": "Contact"
+  "nav": { "home": "Home", "scholarships": "Scholarships", "universities": "Universities", "programs": "Programs", "destinations": "Destinations", "about": "About", "contact": "Contact", "signIn": "Sign in", "getStarted": "Create profile", "dashboard": "Dashboard" },
+  "footer": {
+    "mission": "Nadoumi helps international students discover and secure study opportunities abroad.",
+    "explore": "Explore", "company": "Company", "getStarted": "Get started",
+    "privacy": "Privacy", "terms": "Terms", "contactEmail": "support{'@'}nadoumi.com",
+    "rights": "Nadoumi. International education platform."
+  },
+  "common": {
+    "loading": "Loading", "save": "Save", "cancel": "Cancel", "add": "Add", "remove": "Remove",
+    "edit": "Edit", "delete": "Delete", "confirm": "Confirm", "back": "Back", "search": "Search",
+    "none": "Nothing here yet", "retry": "Try again", "signOut": "Sign out"
   },
   "home": {
     "title": "Study abroad with Nadoumi",
-    "subtitle": "Discover universities, programmes and scholarships, then apply and track everything in one place."
+    "subtitle": "Discover universities, programmes and scholarships, then apply and track everything in one place.",
+    "ctaPrimary": "Create your profile", "ctaSecondary": "Browse scholarships",
+    "f1Title": "Discover", "f1Body": "Search scholarships and programmes by country, field and degree level.",
+    "f2Title": "Apply", "f2Body": "Build one applicant profile and reuse it across every application.",
+    "f3Title": "Track", "f3Body": "Follow each application's status, documents and decisions in your dashboard.",
+    "statsIntro": "Built for students heading to China, Malaysia and beyond.",
+    "ctaBandTitle": "Ready to start?", "ctaBandBody": "Create a free profile and explore your options."
+  },
+  "about": {
+    "title": "About Nadoumi", "subtitle": "An international education platform.",
+    "body": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle — profile, documents, submission, decisions and enrolment."
+  },
+  "contact": {
+    "title": "Contact", "subtitle": "We usually reply within two business days.",
+    "name": "Name", "email": "Email", "message": "Message", "send": "Send",
+    "sent": "Thanks — we'll be in touch.", "email_help": "Or email support{'@'}nadoumi.com"
+  },
+  "destinations": {
+    "title": "Destinations", "subtitle": "Where Nadoumi students study.",
+    "chinaTitle": "China", "chinaBody": "Government and university scholarships across a wide range of programmes and cities.",
+    "malaysiaTitle": "Malaysia", "malaysiaBody": "English-taught degrees and competitive tuition at established universities.",
+    "more": "More destinations are being added."
+  },
+  "catalog": {
+    "scholarshipsTitle": "Scholarships", "scholarshipsSubtitle": "Funding opportunities across our destination countries.",
+    "universitiesTitle": "Universities", "universitiesSubtitle": "Institutions in the Nadoumi catalogue.",
+    "programsTitle": "Programs", "programsSubtitle": "Degree programmes and intakes.",
+    "empty": "This catalogue isn't available yet. Check back soon.",
+    "emptyDetail": "We're still building this section.", "rollingDeadline": "Rolling deadline",
+    "deadline": "Deadline {date}", "backToList": "Back to list"
+  },
+  "auth": {
+    "loginTitle": "Sign in", "registerTitle": "Create your profile",
+    "fullName": "Full name", "username": "Username", "usernameHint": "2–20 characters, used to sign in",
+    "email": "Email", "password": "Password", "confirmPassword": "Confirm password",
+    "passwordHint": "5–20 characters", "captcha": "Enter the code shown", "captchaReload": "Reload image",
+    "acceptTerms": "I agree to the {terms} and {privacy}.",
+    "submitLogin": "Sign in", "submitRegister": "Create profile",
+    "toRegister": "New to Nadoumi? Create a profile", "toLogin": "Already have an account? Sign in",
+    "forgot": "Forgot your password?",
+    "forgotTitle": "Password help",
+    "forgotBody": "Password reset isn't self-service yet. Email support{'@'}nadoumi.com from your registered address and we'll help you back in.",
+    "genericError": "Something went wrong. Please check your details and try again.",
+    "passwordMismatch": "Passwords do not match."
+  },
+  "dashboard": {
+    "nav": { "overview": "Overview", "profile": "Profile", "education": "Education", "testScores": "Test scores", "contacts": "Contacts", "account": "Account" },
+    "welcome": "Welcome, {name}", "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
+    "completeness": "Profile completeness", "quickProfile": "Edit profile", "quickEducation": "Add education",
+    "applicantLabel": "Applicant", "switchApplicant": "Switch applicant",
+    "profileTitle": "Applicant profile", "createProfileTitle": "Create your applicant profile",
+    "createProfileBlurb": "Tell us who the application is about. You can edit this any time.",
+    "givenName": "Given name", "familyName": "Family name", "dob": "Date of birth", "nationality": "Nationality (ISO alpha-2)",
+    "passportNo": "Passport number", "phone": "Phone",
+    "eduTitle": "Education history", "eduEmpty": "No education entries yet.",
+    "institution": "Institution", "level": "Level", "field": "Field of study", "gpa": "GPA", "gpaScale": "GPA scale",
+    "startDate": "Start date", "endDate": "End date",
+    "testTitle": "Test scores", "testEmpty": "No test scores yet.",
+    "testType": "Test", "score": "Score", "takenOn": "Taken on", "expiresOn": "Expires on",
+    "contactsTitle": "Contacts", "contactsEmpty": "No contacts yet.",
+    "relation": "Relationship", "contactName": "Name",
+    "relationGUARDIAN": "Guardian", "relationEMERGENCY": "Emergency", "relationOTHER": "Other",
+    "accountTitle": "Account", "accountUser": "Signed in as", "passwordChange": "Password changes",
+    "passwordChangeBody": "To change your password, email support{'@'}nadoumi.com from your registered address.",
+    "savedOk": "Saved", "addedOk": "Added", "removedOk": "Removed", "removeConfirm": "Remove this entry?"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Enter a valid email address.",
+    "min": "Must be at least {n} characters.",
+    "max": "Must be at most {n} characters.",
+    "len2": "Use the 2-letter country code."
   }
 }
