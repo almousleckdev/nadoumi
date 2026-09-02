@@ -111,6 +111,19 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a
 `sys_user` join so the access list shows a name rather than `User #id`.
 
+### 4.4 Staff university endpoints (IMPLEMENTED — `nadoumi-university`)
+
+`/api/staff/universities` — `StaffUniversityController`. Public catalog data only;
+no partnership / commercial field is ever returned here.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/staff/universities` | `nad:university:list` | `q` (name/city), `country`, `status`, `page`, `size` → `PageResponse<UniversityResponse>`. |
+| GET | `/api/staff/universities/{id}` | `nad:university:view` | |
+| POST | `/api/staff/universities` | `nad:university:create` | `201`. Country normalised to upper-case; `(name, country)` must be unique → `400` otherwise. |
+| PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self). |
+| DELETE | `/api/staff/universities/{id}` | `nad:university:remove` | `204`. Hard delete — only while nothing references the row (FKs from programmes / partnerships will block it once those exist). |
+
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403

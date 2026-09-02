@@ -208,10 +208,11 @@ RuoYi-Vue2/3 codebase.
   `userStore.hasPerm(perm)`. `status: 'planned'` → a disabled row with a
   "Planned" tag — no route, **no placeholder page**. Groups: Operations /
   Business / Growth / Platform (`ADMIN_ARCHITECTURE.md` §2.2).
-- **Screens built:** login, dashboard (real applicant metrics + coming-soon for
-  unbuilt domains), `views/applicants/index.vue` (real — list / create / archive
-  against `/api/staff/applicants`), profile (change password). Planned modules
-  have no page at all.
+- **Screens built:** login · dashboard (real applicant metrics + coming-soon for
+  unbuilt domains) · **Applicants** list + detail (Overview/Education/Test
+  scores/Contacts/Access, full CRUD) · **Universities** list + detail + CRUD
+  (`/api/staff/universities`) · profile (change password). Planned modules have
+  no page at all.
 - **Shared UI:** `PageHeader`; dashboard primitives `DashboardGroup`, `StatCard`,
   `DonutStat` (SVG, no chart lib), `ComingSoonCard`, `RecentApplicants`. Vitest
   (`pnpm test`) covers the manifest, the composable and the primitives.

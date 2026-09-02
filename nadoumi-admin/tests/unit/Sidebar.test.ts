@@ -36,7 +36,7 @@ describe('Sidebar', () => {
     const w = mountSidebar()
 
     const hrefs = w.findAll('a.side__link').map(l => l.attributes('href'))
-    expect(hrefs.sort()).toEqual(['/applicants', '/dashboard'])
+    expect(hrefs.sort()).toEqual(['/applicants', '/dashboard', '/universities'])
     expect(w.text()).not.toMatch(/planned/i)
     expect(w.text()).not.toContain('Payroll')
   })

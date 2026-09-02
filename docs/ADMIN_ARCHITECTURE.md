@@ -82,7 +82,8 @@ in the nadoumi-web build**.
 | Applicant — profile edit | **IMPLEMENTED** | Drawer form → `PUT /api/staff/applicants/{id}` (`nad:applicant:edit`). PII fields hidden/locked without `nad:applicant:pii:view`. |
 | Applicant — education / test scores / contacts CRUD | **IMPLEMENTED** | Add / edit / remove via drawer forms; staff `POST` / `PUT` / `DELETE` on each sub-resource (`nad:applicant:edit`). |
 | Applicant — access / delegation | **IMPLEMENTED** (read) | Access tab lists grants from `GET /api/staff/applicants/{id}/access` (`nad:applicant:access:view`). Grant / revoke / transfer endpoints exist (`nad:applicant:access:manage`) — **CURRENT** to surface in the UI. Grantee name (vs `User #id`) needs a `sys_user` join — follow-up. |
-| Universities / Programs / Scholarships | **PLANNED** — Phase B | No backend. |
+| Universities — list + detail + CRUD | **IMPLEMENTED** | `nadoumi-university` module, `nad_university` (V9), `/api/staff/universities`, `nad:university:list/view/create/edit/remove`. Unique `(name, country)`. |
+| Programs / Scholarships | **CURRENT** — Phase B | No backend yet. Programs hang off `nad_university`. |
 | Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend. |
 | Partnerships / Employees / Roles & Permissions | **PLANNED** — Phase D | |
 | Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | |

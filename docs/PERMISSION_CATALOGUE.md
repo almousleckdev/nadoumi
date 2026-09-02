@@ -87,9 +87,12 @@ or high-impact operations (see §5).
 | `nad:workflow:definition:activate` | Publish a definition version (`ACTIVE`). » sensitive (change control) |
 | `nad:workflow:definition:retire` | Retire a definition version. » sensitive |
 
-### 2.5 `university`
+### 2.5 `university` — **IMPLEMENTED** (seed: Flyway `V9`)
 `nad:university:view` · `nad:university:list` · `nad:university:create` ·
 `nad:university:edit` · `nad:university:remove` · `nad:university:export`
+Granted by `V9`: full set → `nadoumi_super_admin`, `ops_manager`,
+`partnerships_manager`; `view` + `list` only → `case_officer`, `content_editor`,
+`read_only_analyst`, `support_agent`. (`export` is defined but no endpoint yet.)
 
 ### 2.6 `program`
 `nad:program:view` · `nad:program:list` · `nad:program:create` · `nad:program:edit` ·
