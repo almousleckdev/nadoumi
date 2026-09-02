@@ -14,6 +14,9 @@ export default defineNuxtConfig({
     // auth/ components keep their file name as the tag (<AuthCaptcha>), not the
     // default path-prefixed <AuthAuthCaptcha>.
     { path: '~/components/auth', pathPrefix: false },
+    // dashboard/ chrome is referenced unprefixed too (<DashboardShell>,
+    // <ApplicantSwitcher>, <SectionCard>), matching the ui/ and auth/ entries.
+    { path: '~/components/dashboard', pathPrefix: false },
     '~/components',
   ],
   fonts: {
