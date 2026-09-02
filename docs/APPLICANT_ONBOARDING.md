@@ -1,16 +1,27 @@
-# Nadoumi — Applicant Onboarding (PROPOSED)
+# Nadoumi — Applicant Onboarding
 
-Date: 2026-09-03
-Status: **PROPOSED — design only. Not implemented.**
+Date: 2026-09-03 (Revision 3)
 Depends on: Document slice + object storage (`docs/DOCUMENT_MANAGEMENT.md`),
 University/Program/Scholarship catalog (`docs/DOMAIN_MODEL.md` §2.1).
-Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md` §16
-(Revision 2, D-R2-4), `docs/DOMAIN_MODEL.md` §4, `docs/DATABASE_DESIGN.md` §5.2.
+Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md`
+(§16 / Revision 3 D-R3-3), `docs/DOMAIN_MODEL.md` §4, `docs/DATABASE_DESIGN.md` §5.2.
 
-> The nadoumi-web build keeps `/dashboard/profile` at its current scope
-> (given/family name, DOB, nationality, passport no, email, phone) plus the
-> education CRUD. This document is the **full target onboarding** — a dedicated
-> later phase. Every field, table, and endpoint below is **PROPOSED**.
+## Status legend
+
+| Tag | Meaning |
+| --- | --- |
+| **EXISTING** | Built and wired to a real backend endpoint today. |
+| **PLANNED** | Designed here; frontend may render it disabled/read-only with a "coming soon — not saved yet" note. Never faked as persisted. |
+| **REQUIRES BACKEND** | Needs a schema + endpoint that does not exist yet (this doc specifies it). |
+
+**Revision 3 build (`/dashboard/onboarding`):** a 7-step wizard shell —
+**Personal · Identity · Education · Interests · Location · Contact · Review** — with
+a persistent progress indicator. Steps backed by EXISTING endpoints save for real;
+PLANNED steps are visible but explicitly not saved. The `ProfilePhotoUploadCard` /
+`PassportUploadCard` / `DocumentPreview` / `ImageCropper` components are built
+**client-only** (crop/zoom/rotate/preview/validate); their upload action is disabled
+(REQUIRES BACKEND — Document slice). No OCR / face-match / passport-authenticity
+claims.
 
 ---
 
@@ -36,12 +47,37 @@ Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md` �
 
 ---
 
-## 2. UX flow
+## 2. UX flow (Revision 3 — 7 steps)
 
-After first successful login with no completed profile, the user lands on
-`/dashboard/onboarding` (a wizard). Each step is a route
-(`/dashboard/onboarding/<step>`); progress is persisted after every step so the user
-can leave and return. A persistent progress rail shows the 11 steps and % complete.
+After registration the student lands on `/dashboard/onboarding`. A persistent
+progress indicator shows the seven steps and % complete; content is centered,
+generously spaced, responsive, with reduced-motion-aware step transitions and
+loading/error/success states. Every field carries a **Required / Recommended /
+Optional** badge.
+
+| # | Step | Contents | Persistence |
+| --- | --- | --- | --- |
+| 1 | **Personal** | First name, last name (from registration; editable) | **EXISTING** — applicant `nickName` / given+family name |
+| 2 | **Identity** | Given name, family name, DOB, nationality, passport number, phone | **EXISTING** — `PUT /api/student/applicants/{id}` (current `/dashboard/profile` fields). *Gender, country of residence, passport expiry, preferred comms language* → **PLANNED / REQUIRES BACKEND** (§5); shown disabled with the coming-soon note. |
+| 3 | **Education** | Highest level, institution, field, GPA + scale, start/end dates (repeatable) | **EXISTING** — `/api/student/applicants/{id}/education`. *Other qualifications* → PLANNED. |
+| 4 | **Interests** | Desired degree, fields, majors, preferred countries/universities, scholarship interest, preferred intake | **PLANNED — REQUIRES BACKEND** (§5 `nad_applicant_interest*`). Rendered read-only + coming-soon. |
+| 5 | **Location** | *"Are you currently in China?"* Yes/No branch — Chinese city/address/WeChat/school/visa **or** country/city/WhatsApp/preferred contact; phone | **PLANNED — REQUIRES BACKEND** (§5 `nad_applicant_residence`). |
+| 6 | **Contact** | Guardian / emergency contact (relation, name, email, phone) | **EXISTING** — `/api/student/applicants/{id}/contacts`. |
+| 7 | **Review** | Summary of everything captured; **Finish** marks onboarding complete (client-side flag) → `/dashboard` | **EXISTING** (client-side completion flag; a server `onboarded_at` is PLANNED, §5). |
+
+**Profile photo & Passport** (their own sub-step under Identity, or a step 2b):
+`ProfilePhotoUploadCard` / `PassportUploadCard` — **PLANNED — REQUIRES BACKEND**
+(Document slice + object storage). Built client-only per §3.2/§3.3; the upload
+button is disabled with "Available once document storage is enabled".
+
+**Persistence rule (hard):** a PLANNED field is never sent to the server and never
+shows a fake success. It is visibly marked *not saved yet*.
+
+### 2.0 Historical 11-step design (superseded by the 7-step flow above)
+
+The rest of this document keeps the fuller field catalogue, domain model, schema
+and API design. The 7 Revision-3 steps group those fields; nothing below is
+removed, only re-sequenced.
 
 | # | Step | Route | Gate to advance |
 | --- | --- | --- | --- |
@@ -120,6 +156,21 @@ data (`docs/SECURITY.md` §6 masking + audit rules apply).
 
 `PassportUploadCard` is a shared component (also used later by staff review and by
 the application document checklist).
+
+### 3.3b Reusable document/image components (`app/components/onboarding/`)
+
+Built in Revision 3 as **client-only** (no upload endpoint yet — REQUIRES BACKEND,
+Document slice). Presentational + local image manipulation only.
+
+| Component | Responsibility |
+| --- | --- |
+| `ImageCropper` | `<canvas>`-based crop with zoom + rotate; emits a cropped `Blob`/`dataURL`. Aspect-ratio prop (`1` for photo, free for passport). Keyboard-nudgeable handles; `prefers-reduced-motion`. |
+| `DocumentPreview` | Large read-optimised viewer: pan, zoom (buttons + wheel/pinch), rotate 90°, fit/fill. Used to inspect a passport before continuing. |
+| `ProfilePhotoUploadCard` | Drop/select → validate (JPEG/PNG/WebP ≤ 5 MB, min 400×400) → `ImageCropper` (1:1) → preview; replace / remove; quality guidance (face centred, plain background, even light — guidance only). **Upload button disabled** with "Available once document storage is enabled". |
+| `PassportUploadCard` | Drop/select → validate (JPEG/PNG/PDF ≤ 10 MB) → `DocumentPreview` (large, zoom, rotate) + optional crop-to-page; "confirm the details are readable" checkbox; replace / remove; accepted-format/size guidance; upload-progress affordance (inert until backend). **Upload disabled**, same note. |
+
+All four are reused by staff document review and the application checklist later.
+None claims OCR, face match, or passport authenticity.
 
 ### 3.4 Education & history (step 4)
 

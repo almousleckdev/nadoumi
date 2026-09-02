@@ -1,8 +1,8 @@
 # nadoumi-web — Public Website + Student Experience — Design
 
 Date: 2026-09-02
-Revised: 2026-09-03 (Revision 2 — see below)
-Status: APPROVED (Revision 2)
+Revised: 2026-09-03 (Revisions 2 & 3 — see below)
+Status: APPROVED (Revision 3)
 Scope owner: nadoumi-web (Nuxt 3 app in this repo)
 
 ---
@@ -43,6 +43,77 @@ but not implemented* full onboarding design.
   responsive, accessible layouts with subtle motion (`prefers-reduced-motion`
   honoured).
 - Playwright auth tests stay hard CI gates — never `continue-on-error`.
+
+---
+
+## Revision 3 (2026-09-03) — registration UX, OTP component, onboarding
+
+Product review of the Revision 2 build. The auth flows work but the UX is not at
+enterprise quality yet. Revision 3 is UX + design depth on top of the same
+contracts (no new backend endpoints).
+
+### D-R3-1 — Registration is a 3-step wizard
+
+| Step | Fields / behaviour |
+| --- | --- |
+| **1 · Personal information** | First name, last name; helper line *"Enter your first and last name exactly as they appear on your passport."*; then **Email** + **Confirm email** (must match); `[Verify]`. **No password fields shown.** `[Verify]` is disabled until first name, last name, email and confirm-email are present and the two emails match. |
+| **2 · Email verification** | Shows `Email: <address>` with an **`Edit email`** control that returns to step 1 and clears the OTP cleanly. Below it, the refined OTP interface (D-R3-2). On success: an **`Email verified ✓`** confirmation, then auto-advance to step 3. |
+| **3 · Password** | Password + confirm (show/hide, strength indicator, live requirements list). A **single Terms & Privacy checkbox** ("I agree to the Terms and the Privacy Policy" with both links). The password must not contain the first name, last name, or the derived username (email local-part). **`Next` stays disabled until: email verified ∧ password valid ∧ passwords match ∧ Terms accepted.** |
+| → | On submit: one `POST /api/student-account` (unchanged contract). On success the student is authenticated (server-side, httpOnly cookie) and redirected to the **onboarding flow** (`/dashboard/onboarding`, D-R3-3), not straight to `/dashboard/profile`. |
+
+Change from Revision 2: two consent checkboxes → **one**; redirect target → the
+onboarding wizard; explicit `Edit email` round-trip; explicit "verified" state.
+
+### D-R3-2 — Refined `OtpInput` + `EmailVerifyStep` (one implementation)
+
+Replace the oversized generic boxes. `app/components/auth/OtpInput.vue` and
+`app/components/auth/EmailVerifyStep.vue` are the **only** OTP implementation, reused
+by registration, forgot-password, and any future email-verification flow.
+
+- `OtpInput`: 6 evenly-spaced boxes sized ~2.5rem, `text-lg`, subtle border that
+  strengthens on `:focus-visible`; a filled box gets a quiet brand tint. Auto-focus
+  advance, backspace-to-previous, full paste support, digits only. Wrapper
+  `role="group"` + `aria-label`; each box an explicit `aria-label` ("Digit N of 6").
+  Container `dir="ltr"` always. Transitions are ≤150 ms and disabled under
+  `prefers-reduced-motion`.
+- `EmailVerifyStep`: shows the target email + `Edit email` (emits `edit`); the
+  `OtpInput`; a `Resend code` control bound to the 60 s countdown ("Resend in {n}s"
+  while cooling down); a verifying/loading state on the boxes; explicit
+  invalid/expired and "N attempts left" feedback from the backend error; on success
+  an `Email verified ✓` line before it emits `verified(ticket)`.
+
+### D-R3-3 — Onboarding is a multi-step flow (design + partial build)
+
+Route `/dashboard/onboarding` with steps **Personal · Identity · Education ·
+Interests · Location · Contact · Review** and a persistent progress indicator.
+Centered, generously spaced, responsive, with loading/error/success states and
+smooth (reduced-motion-aware) step transitions. Every field carries a
+**Required / Recommended / Optional** badge.
+
+**Persistence rule (hard):** only fields the backend already stores are actually
+saved. Everything else is rendered and clearly marked **"Coming soon — not saved
+yet"**. No faked persistence.
+
+| Step | Status |
+| --- | --- |
+| Personal (first/last name) | **EXISTING** — writes `nickName` via the applicant record |
+| Identity (given/family name, DOB, nationality, passport no, phone) + Education (institution, level, field, GPA, dates) + Contact (guardian/emergency) | **EXISTING** — the current `/dashboard/profile` + `/dashboard/education` + `/dashboard/contacts` fields, surfaced inside the wizard |
+| Identity extras (gender, country of residence), Interests, Location ("Are you currently in China?" branch), languages, work, certifications | **PLANNED — REQUIRES BACKEND** (`docs/APPLICANT_ONBOARDING.md`); shown read-only / disabled with the "coming soon" note |
+| Profile photo, Passport | **PLANNED — REQUIRES BACKEND** (Document slice + object storage). The `ProfilePhotoUploadCard` / `PassportUploadCard` / `DocumentPreview` / `ImageCropper` components are built as **client-only** (crop / zoom / rotate / preview / validate) with a disabled "Upload isn't available yet" state — no network call, no fake success. No claim of automated face/passport verification. |
+| Review | **EXISTING** — summarises what was captured; "Finish" marks onboarding complete client-side and routes to `/dashboard` |
+
+Full domain / schema / API design for the PLANNED parts: `docs/APPLICANT_ONBOARDING.md`
+(updated to the 7-step structure with the EXISTING / PLANNED / REQUIRES BACKEND
+split), cross-referenced from `DOMAIN_MODEL.md`, `DATABASE_DESIGN.md`,
+`API_DESIGN.md`, `FRONTEND_ARCHITECTURE.md`.
+
+### D-R3-4 — Auth pages keep the Nadoumi header
+
+`layouts/auth.vue` renders the real `<SiteHeader>` + `<SiteFooter>` (same nav, same
+design system) around a vertically/horizontally centered form. **Fix carried in:**
+`nuxt.config` `components` must register `~/components/marketing` with
+`pathPrefix: false` or the layouts' `<SiteHeader>` / `<SiteFooter>` silently render
+nothing.
 
 ---
 

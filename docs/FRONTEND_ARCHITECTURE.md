@@ -138,6 +138,28 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
 - Backend it consumes: spec §15 (email/OTP/password endpoints), email-first login.
 - Two hard-gated Playwright journeys (register-OTP, forgot-password).
 
+**PLANNED — Revision 3 (plan F-12…F-16, spec D-R3-*):**
+- `layouts/auth.vue` — auth pages keep the real `<SiteHeader>` / `<SiteFooter>`
+  (same nav + design system), centered form. Requires `nuxt.config` to register
+  `~/components/marketing` with `pathPrefix: false` (otherwise `<SiteHeader>`
+  resolves to `<MarketingSiteHeader>` and renders nothing).
+- `/register` → **3-step wizard**: Personal (name + email + confirm email) →
+  Email verification (`Email: … [Edit email]`, refined `OtpInput`, `Email verified ✓`)
+  → Password (show/hide, strength, requirements, **single** Terms & Privacy checkbox).
+  `Next` disabled until *verified ∧ password valid ∧ match ∧ terms*. Success →
+  `/dashboard/onboarding`.
+- Refined `OtpInput` / `EmailVerifyStep` — tighter boxes, `role="group"` + per-box
+  `aria-label`, filled/verifying/error states, `Edit email`, reduced-motion. **One**
+  implementation, reused by register + forgot-password + future email verification.
+- `/dashboard/onboarding` — 7-step wizard shell (Personal · Identity · Education ·
+  Interests · Location · Contact · Review) with a persistent progress indicator.
+  **EXISTING** steps save via the applicant/education/contact endpoints; **PLANNED /
+  REQUIRES BACKEND** steps render disabled with "not saved yet" — no fake persistence.
+- `app/components/onboarding/` — `ImageCropper`, `DocumentPreview`,
+  `ProfilePhotoUploadCard`, `PassportUploadCard`: client-only crop/zoom/rotate/
+  preview/validate; upload disabled (REQUIRES BACKEND — Document slice). No OCR /
+  face-match claims.
+
 `useApi()` only ever calls the BFF, never Spring directly. CI: `pnpm lint` +
 `pnpm test` + `pnpm build` + the hard-gated E2E job.
 

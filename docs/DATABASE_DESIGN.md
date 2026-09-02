@@ -104,8 +104,11 @@ Invariants marked **INV** are enforced in both the schema
 | `nad_applicant_test_score` | `id`, `applicant_id`, `test_type`(dict: IELTS/TOEFL/GAOKAO/SAT/GRE/…), `score`, `sub_scores_json?`, `taken_on`, `expires_on?` | Index `(applicant_id, test_type)`. |
 | `nad_applicant_contact` | `id`, `applicant_id`, `relation`(GUARDIAN/EMERGENCY/OTHER), `name`, `email?`, `phone?` | **Not** a login identity; a login guardian is a `sys_user` + grant. |
 
-**PROPOSED — full onboarding expansion (later phase, `docs/APPLICANT_ONBOARDING.md`).**
-Not built in the nadoumi-web build. Adds scalar columns to `nad_applicant` (gender,
+**PLANNED / REQUIRES BACKEND — full onboarding expansion (`docs/APPLICANT_ONBOARDING.md`).**
+The Revision 3 `/dashboard/onboarding` wizard *shell* ships, but it writes **only**
+the EXISTING `nad_applicant` + child-table columns above. The new columns/tables
+below stay PLANNED and the wizard never fakes saving them.
+Adds scalar columns to `nad_applicant` (gender,
 country of residence, residence branch fields incl. the *"currently in China?"*
 split) and new child tables `nad_applicant_language`, `nad_applicant_interest`,
 `nad_applicant_work`, `nad_applicant_certification`. Profile photo + passport image
