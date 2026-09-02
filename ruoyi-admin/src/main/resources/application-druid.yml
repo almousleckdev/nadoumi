@@ -1,40 +1,50 @@
-# 数据源配置
+# datasource
 spring:
+    # Per-developer overrides. This import lives in the profile-active file so the
+    # values below can actually be overridden (a file imported from application.yml
+    # is out-ranked by this profile file). Tried from the repo root and the module dir.
+    config:
+        import:
+            - optional:file:./config/application-local.yml
+            - optional:file:../config/application-local.yml
+            - optional:file:../../config/application-local.yml
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         driverClassName: com.mysql.cj.jdbc.Driver
         druid:
-            # 主库数据源
+            # master datasource (externalize via SPRING_DATASOURCE_DRUID_MASTER_{URL,USERNAME,PASSWORD})
             master:
-                url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-                username: root
-                password: password
-            # 从库数据源
+                url: ${SPRING_DATASOURCE_DRUID_MASTER_URL:jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8}
+                username: ${SPRING_DATASOURCE_DRUID_MASTER_USERNAME:root}
+                # empty default so a passwordless local MySQL works with no extra config;
+                # every real environment sets SPRING_DATASOURCE_DRUID_MASTER_PASSWORD.
+                password: ${SPRING_DATASOURCE_DRUID_MASTER_PASSWORD:}
+            # slave datasource
             slave:
-                # 从数据源开关/默认关闭
+                # slave toggle (default off)
                 enabled: false
                 url: 
                 username: 
                 password: 
-            # 初始连接数
+            # initial pool size
             initialSize: 5
-            # 最小连接池数量
+            # min idle
             minIdle: 10
-            # 最大连接池数量
+            # max active
             maxActive: 20
-            # 配置获取连接等待超时的时间
+            # max wait for a connection (ms)
             maxWait: 60000
-            # 配置连接超时时间
+            # connect timeout (ms)
             connectTimeout: 30000
-            # 配置网络超时时间
+            # socket timeout (ms)
             socketTimeout: 60000
-            # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+            # eviction run interval (ms)
             timeBetweenEvictionRunsMillis: 60000
-            # 配置一个连接在池中最小生存的时间，单位是毫秒
+            # min idle time before eviction (ms)
             minEvictableIdleTimeMillis: 300000
-            # 配置一个连接在池中最大生存的时间，单位是毫秒
+            # max idle time before eviction (ms)
             maxEvictableIdleTimeMillis: 900000
-            # 配置检测连接是否有效
+            # validation query
             validationQuery: SELECT 1 FROM DUAL
             testWhileIdle: true
             testOnBorrow: false
@@ -43,16 +53,17 @@ spring:
                 enabled: true
             statViewServlet:
                 enabled: true
-                # 设置白名单，不填则允许所有访问
+                # allow-list; empty = allow all
                 allow:
                 url-pattern: /druid/*
-                # 控制台管理用户名和密码
-                login-username: ruoyi
-                login-password: 123456
+                # console credentials (externalize via DRUID_CONSOLE_USERNAME / DRUID_CONSOLE_PASSWORD;
+                # disable this servlet entirely in production — see docs/DEPLOYMENT.md §3)
+                login-username: ${DRUID_CONSOLE_USERNAME:ruoyi}
+                login-password: ${DRUID_CONSOLE_PASSWORD:123456}
             filter:
                 stat:
                     enabled: true
-                    # 慢SQL记录
+                    # log slow SQL
                     log-slow-sql: true
                     slow-sql-millis: 1000
                     merge-sql: true

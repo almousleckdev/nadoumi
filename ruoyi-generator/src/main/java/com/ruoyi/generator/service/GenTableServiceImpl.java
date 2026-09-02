@@ -194,7 +194,7 @@ public class GenTableServiceImpl implements IGenTableService
         }
         catch (Exception e)
         {
-            throw new ServiceException("导入失败：" + e.getMessage());
+            throw new ServiceException("Import failed: " + e.getMessage());
         }
     }
 
@@ -279,7 +279,7 @@ public class GenTableServiceImpl implements IGenTableService
                 }
                 catch (IOException e)
                 {
-                    throw new ServiceException("渲染模板失败，表名：" + table.getTableName());
+                    throw new ServiceException("Template rendering failed, table: " + table.getTableName());
                 }
             }
         }
@@ -301,7 +301,7 @@ public class GenTableServiceImpl implements IGenTableService
         List<GenTableColumn> dbTableColumns = genTableColumnMapper.selectDbTableColumnsByName(tableName);
         if (StringUtils.isEmpty(dbTableColumns))
         {
-            throw new ServiceException("同步数据失败，原表结构不存在");
+            throw new ServiceException("Sync failed: the source table structure does not exist");
         }
         List<String> dbTableColumnNames = dbTableColumns.stream().map(GenTableColumn::getColumnName).collect(Collectors.toList());
 
@@ -427,7 +427,7 @@ public class GenTableServiceImpl implements IGenTableService
         }
         catch (IOException e)
         {
-            log.error("写入ZIP文件失败，文件名: " + fileName, e);
+            log.error("failed to write ZIP entry, name: " + fileName, e);
         }
     }
 
@@ -445,26 +445,26 @@ public class GenTableServiceImpl implements IGenTableService
             JSONObject paramsObj = JSON.parseObject(options);
             if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_CODE)))
             {
-                throw new ServiceException("树编码字段不能为空");
+                throw new ServiceException("The tree code field must not be empty");
             }
             else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_PARENT_CODE)))
             {
-                throw new ServiceException("树父编码字段不能为空");
+                throw new ServiceException("The tree parent-code field must not be empty");
             }
             else if (StringUtils.isEmpty(paramsObj.getString(GenConstants.TREE_NAME)))
             {
-                throw new ServiceException("树名称字段不能为空");
+                throw new ServiceException("The tree name field must not be empty");
             }
         }
         else if (GenConstants.TPL_SUB.equals(genTable.getTplCategory()))
         {
             if (StringUtils.isEmpty(genTable.getSubTableName()))
             {
-                throw new ServiceException("关联子表的表名不能为空");
+                throw new ServiceException("The sub-table name must not be empty");
             }
             else if (StringUtils.isEmpty(genTable.getSubTableFkName()))
             {
-                throw new ServiceException("子表关联的外键名不能为空");
+                throw new ServiceException("The sub-table foreign key must not be empty");
             }
         }
     }

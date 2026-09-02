@@ -1,3 +1,9 @@
+-- =============================================================================
+-- REFERENCE ONLY — source of record for V1__ruoyi_baseline.sql.
+-- Do NOT run this file against any environment. Schema changes go through Flyway
+-- migrations in ruoyi-admin/src/main/resources/db/migration/ (see docs/DATABASE_DESIGN.md §6).
+-- =============================================================================
+
 DROP TABLE IF EXISTS QRTZ_FIRED_TRIGGERS;
 DROP TABLE IF EXISTS QRTZ_PAUSED_TRIGGER_GRPS;
 DROP TABLE IF EXISTS QRTZ_SCHEDULER_STATE;

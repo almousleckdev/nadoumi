@@ -336,7 +336,7 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("导入Excel异常{}", e.getMessage());
+            log.error("Excel import error {}", e.getMessage());
             throw new UtilException(e.getMessage());
         }
         finally
@@ -363,7 +363,7 @@ public class ExcelUtil<T>
         Sheet sheet = StringUtils.isNotEmpty(sheetName) ? wb.getSheet(sheetName) : wb.getSheetAt(0);
         if (sheet == null)
         {
-            throw new IOException("文件sheet不存在");
+            throw new IOException("The sheet does not exist in the file");
         }
         boolean isXSSFWorkbook = !(wb instanceof HSSFWorkbook);
         Map<String, List<PictureData>> pictures = null;
@@ -385,7 +385,7 @@ public class ExcelUtil<T>
             Row heard = sheet.getRow(titleNum);
             if (heard == null)
             {
-                throw new UtilException("文件标题行为空，请检查Excel文件格式");
+                throw new UtilException("The header row is empty; check the Excel file format");
             }
             for (int i = 0; i < heard.getLastCellNum(); i++)
             {
@@ -606,7 +606,7 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("多Sheet导出Excel异常{}", e.getMessage());
+            log.error("multi-sheet Excel export error {}", e.getMessage());
         }
         finally
         {
@@ -625,7 +625,7 @@ public class ExcelUtil<T>
     {
         if (sheets == null || sheets.isEmpty())
         {
-            return AjaxResult.error("导出数据不能为空");
+            return AjaxResult.error("No data to export");
         }
         SXSSFWorkbook wb = buildWorkbook(sheets);
         OutputStream out = null;
@@ -639,8 +639,8 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("多Sheet导出Excel异常{}", e.getMessage());
-            throw new UtilException("导出Excel失败，请联系网站管理员！");
+            log.error("multi-sheet Excel export error {}", e.getMessage());
+            throw new UtilException("Excel export failed, please contact an administrator");
         }
         finally
         {
@@ -760,7 +760,7 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("导出Excel异常{}", e.getMessage());
+            log.error("Excel export error {}", e.getMessage());
         }
         finally
         {
@@ -786,8 +786,8 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("导出Excel异常{}", e.getMessage());
-            throw new UtilException("导出Excel失败，请联系网站管理员！");
+            log.error("Excel export error {}", e.getMessage());
+            throw new UtilException("Excel export failed, please contact an administrator");
         }
         finally
         {
@@ -889,7 +889,7 @@ public class ExcelUtil<T>
                     }
                     catch (Exception e)
                     {
-                        log.error("填充集合数据失败", e);
+                        log.error("failed to populate collection data", e);
                     }
                 }
                 else
@@ -928,7 +928,7 @@ public class ExcelUtil<T>
                 }
                 catch (Exception e)
                 {
-                    log.error("获取集合大小失败", e);
+                    log.error("failed to read collection size", e);
                 }
             }
         }
@@ -1304,7 +1304,7 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("导出Excel失败{}", e);
+            log.error("Excel export failed {}", e);
         }
         return cell;
     }
@@ -1555,7 +1555,7 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("不能格式化数据 " + excel.handler(), e.getMessage());
+            log.error("cannot format value " + excel.handler(), e.getMessage());
         }
         return Convert.toStr(value);
     }
@@ -2060,7 +2060,7 @@ public class ExcelUtil<T>
         }
         catch (Exception e)
         {
-            log.error("获取对象异常{}", e.getMessage());
+            log.error("failed to read object {}", e.getMessage());
         }
         return method;
     }

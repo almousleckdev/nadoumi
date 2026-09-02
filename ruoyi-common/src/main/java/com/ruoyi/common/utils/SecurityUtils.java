@@ -32,7 +32,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Failed to resolve the user id", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -47,7 +47,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取部门ID异常", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Failed to resolve the department id", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -62,7 +62,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取用户账户异常", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Failed to resolve the user account", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -77,7 +77,7 @@ public class SecurityUtils
         }
         catch (Exception e)
         {
-            throw new ServiceException("获取用户信息异常", HttpStatus.UNAUTHORIZED);
+            throw new ServiceException("Failed to resolve the user", HttpStatus.UNAUTHORIZED);
         }
     }
 

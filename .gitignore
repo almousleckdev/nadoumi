@@ -25,6 +25,9 @@ target/
 *.iml
 *.ipr
 
+### VS Code ###
+.vscode/
+
 ### JRebel ###
 rebel.xml
 
@@ -37,6 +40,14 @@ nbdist/
 .nb-gradle/
 
 ######################################################################
+# Nadoumi
+/config/*
+!/config/application-local.yml.example
+nadoumi-web/.output/
+nadoumi-web/.nuxt/
+nadoumi-admin/dist/
+
+######################################################################
 # Others
 *.log
 *.xml.versionsBackup
@@ -45,3 +56,6 @@ nbdist/
 !*/build/*.java
 !*/build/*.html
 !*/build/*.xml
+nadoumi-web/node_modules/
+nadoumi-admin/node_modules/
+nadoumi-admin/dist/

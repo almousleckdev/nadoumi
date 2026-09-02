@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ruoyi</artifactId>
+        <groupId>com.ruoyi</groupId>
+        <version>3.9.2</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nadoumi</groupId>
+    <artifactId>nadoumi-modules</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        Nadoumi business modules (modular monolith). Phase 2 skeleton: shared SPIs
+        only, no business logic, no nad_* tables. See docs/DEVELOPMENT_GUIDELINES.md §3.
+    </description>
+
+    <modules>
+        <module>nadoumi-common</module>
+        <module>nadoumi-identity</module>
+        <module>nadoumi-applicant</module>
+    </modules>
+
+</project>

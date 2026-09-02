@@ -40,17 +40,17 @@ public class UserDetailsServiceImpl implements UserDetailsService
         SysUser user = userService.selectUserByUserName(username);
         if (StringUtils.isNull(user))
         {
-            log.info("登录用户：{} 不存在.", username);
+            log.info("login user {} does not exist.", username);
             throw new ServiceException(MessageUtils.message("user.not.exists"));
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
-            log.info("登录用户：{} 已被删除.", username);
+            log.info("login user {} has been deleted.", username);
             throw new ServiceException(MessageUtils.message("user.password.delete"));
         }
         else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
         {
-            log.info("登录用户：{} 已被停用.", username);
+            log.info("login user {} is disabled.", username);
             throw new ServiceException(MessageUtils.message("user.blocked"));
         }
 

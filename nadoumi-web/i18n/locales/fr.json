@@ -1,0 +1,14 @@
+{
+  "nav": {
+    "home": "Home",
+    "scholarships": "Scholarships",
+    "universities": "Universities",
+    "programs": "Programs",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "home": {
+    "title": "Study abroad with Nadoumi",
+    "subtitle": "Discover universities, programmes and scholarships, then apply and track everything in one place."
+  }
+}

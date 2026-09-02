@@ -44,7 +44,7 @@ public class SysLogininforController extends BaseController
         return getDataTable(list);
     }
 
-    @Log(title = "登录日志", businessType = BusinessType.EXPORT)
+    @Log(title = "Login log", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysLogininfor logininfor)
@@ -55,7 +55,7 @@ public class SysLogininforController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
-    @Log(title = "登录日志", businessType = BusinessType.DELETE)
+    @Log(title = "Login log", businessType = BusinessType.DELETE)
     @DeleteMapping("/{infoIds}")
     public AjaxResult remove(@PathVariable Long[] infoIds)
     {
@@ -63,7 +63,7 @@ public class SysLogininforController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:remove')")
-    @Log(title = "登录日志", businessType = BusinessType.CLEAN)
+    @Log(title = "Login log", businessType = BusinessType.CLEAN)
     @DeleteMapping("/clean")
     public AjaxResult clean()
     {
@@ -72,7 +72,7 @@ public class SysLogininforController extends BaseController
     }
 
     @PreAuthorize("@ss.hasPermi('monitor:logininfor:unlock')")
-    @Log(title = "账户解锁", businessType = BusinessType.OTHER)
+    @Log(title = "Account unlock", businessType = BusinessType.OTHER)
     @GetMapping("/unlock/{userName}")
     public AjaxResult unlock(@PathVariable("userName") String userName)
     {

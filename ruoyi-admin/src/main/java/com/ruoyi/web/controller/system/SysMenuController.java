@@ -82,21 +82,21 @@ public class SysMenuController extends BaseController
      * 新增菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:add')")
-    @Log(title = "菜单管理", businessType = BusinessType.INSERT)
+    @Log(title = "Menu management", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysMenu menu)
     {
         if (!menuService.checkMenuNameUnique(menu))
         {
-            return error("新增菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+            return error("Failed to add menu '" + menu.getMenuName() + "': the menu name already exists");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath()))
         {
-            return error("新增菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+            return error("Failed to add menu '" + menu.getMenuName() + "': the URL must start with http(s)://");
         }
         else if (!menuService.checkRouteConfigUnique(menu))
         {
-            return error("新增菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
+            return error("Failed to add menu '" + menu.getMenuName() + "': the route name or path already exists");
         }
         menu.setCreateBy(getUsername());
         return toAjax(menuService.insertMenu(menu));
@@ -106,25 +106,25 @@ public class SysMenuController extends BaseController
      * 修改菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
-    @Log(title = "菜单管理", businessType = BusinessType.UPDATE)
+    @Log(title = "Menu management", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysMenu menu)
     {
         if (!menuService.checkMenuNameUnique(menu))
         {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，菜单名称已存在");
+            return error("Failed to update menu '" + menu.getMenuName() + "': the menu name already exists");
         }
         else if (UserConstants.YES_FRAME.equals(menu.getIsFrame()) && !StringUtils.ishttp(menu.getPath()))
         {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，地址必须以http(s)://开头");
+            return error("Failed to update menu '" + menu.getMenuName() + "': the URL must start with http(s)://");
         }
         else if (menu.getMenuId().equals(menu.getParentId()))
         {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，上级菜单不能选择自己");
+            return error("Failed to update menu '" + menu.getMenuName() + "': a menu cannot be its own parent");
         }
         else if (!menuService.checkRouteConfigUnique(menu))
         {
-            return error("修改菜单'" + menu.getMenuName() + "'失败，路由名称或地址已存在");
+            return error("Failed to update menu '" + menu.getMenuName() + "': the route name or path already exists");
         }
         menu.setUpdateBy(getUsername());
         return toAjax(menuService.updateMenu(menu));
@@ -134,7 +134,7 @@ public class SysMenuController extends BaseController
      * 保存菜单排序
      */
     @PreAuthorize("@ss.hasPermi('system:menu:edit')")
-    @Log(title = "保存菜单排序", businessType = BusinessType.UPDATE)
+    @Log(title = "Save menu order", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
     public AjaxResult updateSort(@RequestBody Map<String, String> params)
     {
@@ -148,7 +148,7 @@ public class SysMenuController extends BaseController
      * 删除菜单
      */
     @PreAuthorize("@ss.hasPermi('system:menu:remove')")
-    @Log(title = "菜单管理", businessType = BusinessType.DELETE)
+    @Log(title = "Menu management", businessType = BusinessType.DELETE)
     @DeleteMapping("/{menuId}")
     public AjaxResult remove(@PathVariable("menuId") Long menuId)
     {

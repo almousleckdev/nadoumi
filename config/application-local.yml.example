@@ -1,0 +1,21 @@
+# Copy to  config/application-local.yml  (git-ignored) for per-developer overrides.
+# Loaded via  spring.config.import: optional:file:./config/application-local.yml
+# Real environments (CI / staging / prod) use environment variables instead — see
+# docs/DEPLOYMENT.md §4 for the full env-var contract.
+
+spring:
+  datasource:
+    druid:
+      master:
+        # local MySQL without TLS certs:
+        url: jdbc:mysql://localhost:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2B8
+        username: root
+        password:            # empty if your local root has no password
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+
+# token:
+#   secret: <your own 64+ char secret>   # optional locally; a dev default ships in application.yml

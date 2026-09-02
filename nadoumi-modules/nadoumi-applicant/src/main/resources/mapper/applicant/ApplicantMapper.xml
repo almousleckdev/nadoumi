@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.applicant.mapper.ApplicantMapper">
+
+    <resultMap id="applicant" type="com.nadoumi.applicant.domain.Applicant">
+        <id     property="id"          column="id"/>
+        <result property="givenName"   column="given_name"/>
+        <result property="familyName"  column="family_name"/>
+        <result property="dob"         column="dob"/>
+        <result property="nationality" column="nationality"/>
+        <result property="passportNo"  column="passport_no"/>
+        <result property="email"       column="email"/>
+        <result property="phone"       column="phone"/>
+        <result property="status"      column="status"/>
+        <result property="createBy"    column="create_by"/>
+        <result property="createTime"  column="create_time"/>
+        <result property="updateBy"    column="update_by"/>
+        <result property="updateTime"  column="update_time"/>
+        <result property="remark"      column="remark"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, given_name, family_name, dob, nationality, passport_no, email, phone, status,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="findById" resultMap="applicant">
+        select <include refid="cols"/> from nad_applicant where id = #{id}
+    </select>
+
+    <select id="search" resultMap="applicant">
+        select <include refid="cols"/> from nad_applicant
+        <where>
+            <if test="name != null and name != ''">
+                and (given_name like concat('%', #{name}, '%') or family_name like concat('%', #{name}, '%'))
+            </if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="nationality != null and nationality != ''">and nationality = #{nationality}</if>
+        </where>
+        order by family_name, given_name, id
+    </select>
+
+    <select id="findByIds" resultMap="applicant">
+        select <include refid="cols"/> from nad_applicant
+        where id in
+        <foreach collection="ids" item="x" open="(" separator="," close=")">#{x}</foreach>
+        order by family_name, given_name, id
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.applicant.domain.Applicant"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant
+            (given_name, family_name, dob, nationality, passport_no, email, phone, status, create_by, create_time, remark)
+        values
+            (#{givenName}, #{familyName}, #{dob}, #{nationality}, #{passportNo}, #{email}, #{phone},
+             #{status}, #{createBy}, now(), #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.applicant.domain.Applicant">
+        update nad_applicant set
+            given_name = #{givenName}, family_name = #{familyName}, dob = #{dob},
+            nationality = #{nationality}, passport_no = #{passportNo}, email = #{email}, phone = #{phone},
+            update_by = #{updateBy}, update_time = now(), remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update nad_applicant set status = #{status}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <!-- education -->
+    <resultMap id="education" type="com.nadoumi.applicant.domain.ApplicantEducation">
+        <id     property="id"          column="id"/>
+        <result property="applicantId" column="applicant_id"/>
+        <result property="institution" column="institution"/>
+        <result property="level"       column="level"/>
+        <result property="field"       column="field"/>
+        <result property="gpa"         column="gpa"/>
+        <result property="gpaScale"    column="gpa_scale"/>
+        <result property="startDate"   column="start_date"/>
+        <result property="endDate"     column="end_date"/>
+    </resultMap>
+
+    <select id="findEducation" resultMap="education">
+        select id, applicant_id, institution, level, field, gpa, gpa_scale, start_date, end_date
+        from nad_applicant_education where applicant_id = #{applicantId} order by end_date desc, id desc
+    </select>
+    <select id="findEducationById" resultMap="education">
+        select id, applicant_id, institution, level, field, gpa, gpa_scale, start_date, end_date
+        from nad_applicant_education where id = #{id}
+    </select>
+    <insert id="insertEducation" parameterType="com.nadoumi.applicant.domain.ApplicantEducation"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_education
+            (applicant_id, institution, level, field, gpa, gpa_scale, start_date, end_date, create_by, create_time)
+        values (#{applicantId}, #{institution}, #{level}, #{field}, #{gpa}, #{gpaScale}, #{startDate}, #{endDate}, '', now())
+    </insert>
+    <update id="updateEducation" parameterType="com.nadoumi.applicant.domain.ApplicantEducation">
+        update nad_applicant_education set
+            institution = #{institution}, level = #{level}, field = #{field}, gpa = #{gpa},
+            gpa_scale = #{gpaScale}, start_date = #{startDate}, end_date = #{endDate}, update_time = now()
+        where id = #{id} and applicant_id = #{applicantId}
+    </update>
+    <delete id="deleteEducation">
+        delete from nad_applicant_education where id = #{id} and applicant_id = #{applicantId}
+    </delete>
+
+    <!-- test scores -->
+    <resultMap id="testScore" type="com.nadoumi.applicant.domain.ApplicantTestScore">
+        <id     property="id"           column="id"/>
+        <result property="applicantId"  column="applicant_id"/>
+        <result property="testType"     column="test_type"/>
+        <result property="score"        column="score"/>
+        <result property="subScoresJson" column="sub_scores_json"/>
+        <result property="takenOn"      column="taken_on"/>
+        <result property="expiresOn"    column="expires_on"/>
+    </resultMap>
+
+    <select id="findTestScores" resultMap="testScore">
+        select id, applicant_id, test_type, score, sub_scores_json, taken_on, expires_on
+        from nad_applicant_test_score where applicant_id = #{applicantId} order by taken_on desc, id desc
+    </select>
+    <select id="findTestScoreById" resultMap="testScore">
+        select id, applicant_id, test_type, score, sub_scores_json, taken_on, expires_on
+        from nad_applicant_test_score where id = #{id}
+    </select>
+    <insert id="insertTestScore" parameterType="com.nadoumi.applicant.domain.ApplicantTestScore"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_test_score
+            (applicant_id, test_type, score, sub_scores_json, taken_on, expires_on, create_by, create_time)
+        values (#{applicantId}, #{testType}, #{score}, #{subScoresJson}, #{takenOn}, #{expiresOn}, '', now())
+    </insert>
+    <update id="updateTestScore" parameterType="com.nadoumi.applicant.domain.ApplicantTestScore">
+        update nad_applicant_test_score set
+            test_type = #{testType}, score = #{score}, sub_scores_json = #{subScoresJson},
+            taken_on = #{takenOn}, expires_on = #{expiresOn}, update_time = now()
+        where id = #{id} and applicant_id = #{applicantId}
+    </update>
+    <delete id="deleteTestScore">
+        delete from nad_applicant_test_score where id = #{id} and applicant_id = #{applicantId}
+    </delete>
+
+    <!-- contacts -->
+    <resultMap id="contact" type="com.nadoumi.applicant.domain.ApplicantContact">
+        <id     property="id"          column="id"/>
+        <result property="applicantId" column="applicant_id"/>
+        <result property="relation"    column="relation"/>
+        <result property="name"        column="name"/>
+        <result property="email"       column="email"/>
+        <result property="phone"       column="phone"/>
+    </resultMap>
+
+    <select id="findContacts" resultMap="contact">
+        select id, applicant_id, relation, name, email, phone
+        from nad_applicant_contact where applicant_id = #{applicantId} order by id
+    </select>
+    <select id="findContactById" resultMap="contact">
+        select id, applicant_id, relation, name, email, phone from nad_applicant_contact where id = #{id}
+    </select>
+    <insert id="insertContact" parameterType="com.nadoumi.applicant.domain.ApplicantContact"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_contact (applicant_id, relation, name, email, phone, create_by, create_time)
+        values (#{applicantId}, #{relation}, #{name}, #{email}, #{phone}, '', now())
+    </insert>
+    <update id="updateContact" parameterType="com.nadoumi.applicant.domain.ApplicantContact">
+        update nad_applicant_contact set
+            relation = #{relation}, name = #{name}, email = #{email}, phone = #{phone}, update_time = now()
+        where id = #{id} and applicant_id = #{applicantId}
+    </update>
+    <delete id="deleteContact">
+        delete from nad_applicant_contact where id = #{id} and applicant_id = #{applicantId}
+    </delete>
+</mapper>

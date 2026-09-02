@@ -73,13 +73,13 @@ public class SysDeptController extends BaseController
      * 新增部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:add')")
-    @Log(title = "部门管理", businessType = BusinessType.INSERT)
+    @Log(title = "Department management", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysDept dept)
     {
         if (!deptService.checkDeptNameUnique(dept))
         {
-            return error("新增部门'" + dept.getDeptName() + "'失败，部门名称已存在");
+            return error("Failed to add department '" + dept.getDeptName() + "': the department name already exists");
         }
         dept.setCreateBy(getUsername());
         return toAjax(deptService.insertDept(dept));
@@ -89,7 +89,7 @@ public class SysDeptController extends BaseController
      * 修改部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
-    @Log(title = "部门管理", businessType = BusinessType.UPDATE)
+    @Log(title = "Department management", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysDept dept)
     {
@@ -97,15 +97,15 @@ public class SysDeptController extends BaseController
         deptService.checkDeptDataScope(deptId);
         if (!deptService.checkDeptNameUnique(dept))
         {
-            return error("修改部门'" + dept.getDeptName() + "'失败，部门名称已存在");
+            return error("Failed to update department '" + dept.getDeptName() + "': the department name already exists");
         }
         else if (dept.getParentId().equals(deptId))
         {
-            return error("修改部门'" + dept.getDeptName() + "'失败，上级部门不能是自己");
+            return error("Failed to update department '" + dept.getDeptName() + "': a department cannot be its own parent");
         }
         else if (StringUtils.equals(UserConstants.DEPT_DISABLE, dept.getStatus()) && deptService.selectNormalChildrenDeptById(deptId) > 0)
         {
-            return error("该部门包含未停用的子部门！");
+            return error("The department has active sub-departments");
         }
         dept.setUpdateBy(getUsername());
         return toAjax(deptService.updateDept(dept));
@@ -115,7 +115,7 @@ public class SysDeptController extends BaseController
      * 保存部门排序
      */
     @PreAuthorize("@ss.hasPermi('system:dept:edit')")
-    @Log(title = "保存部门排序", businessType = BusinessType.UPDATE)
+    @Log(title = "Save department order", businessType = BusinessType.UPDATE)
     @PutMapping("/updateSort")
     public AjaxResult updateSort(@RequestBody Map<String, String> params)
     {
@@ -129,7 +129,7 @@ public class SysDeptController extends BaseController
      * 删除部门
      */
     @PreAuthorize("@ss.hasPermi('system:dept:remove')")
-    @Log(title = "部门管理", businessType = BusinessType.DELETE)
+    @Log(title = "Department management", businessType = BusinessType.DELETE)
     @DeleteMapping("/{deptId}")
     public AjaxResult remove(@PathVariable Long deptId)
     {

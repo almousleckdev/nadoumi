@@ -46,7 +46,7 @@ public class SysConfigController extends BaseController
         return getDataTable(list);
     }
 
-    @Log(title = "参数管理", businessType = BusinessType.EXPORT)
+    @Log(title = "Config parameter", businessType = BusinessType.EXPORT)
     @PreAuthorize("@ss.hasPermi('system:config:export')")
     @PostMapping("/export")
     public void export(HttpServletResponse response, SysConfig config)
@@ -79,13 +79,13 @@ public class SysConfigController extends BaseController
      * 新增参数配置
      */
     @PreAuthorize("@ss.hasPermi('system:config:add')")
-    @Log(title = "参数管理", businessType = BusinessType.INSERT)
+    @Log(title = "Config parameter", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@Validated @RequestBody SysConfig config)
     {
         if (!configService.checkConfigKeyUnique(config))
         {
-            return error("新增参数'" + config.getConfigName() + "'失败，参数键名已存在");
+            return error("Failed to add config parameter '" + config.getConfigName() + "': the parameter key already exists");
         }
         config.setCreateBy(getUsername());
         return toAjax(configService.insertConfig(config));
@@ -95,13 +95,13 @@ public class SysConfigController extends BaseController
      * 修改参数配置
      */
     @PreAuthorize("@ss.hasPermi('system:config:edit')")
-    @Log(title = "参数管理", businessType = BusinessType.UPDATE)
+    @Log(title = "Config parameter", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysConfig config)
     {
         if (!configService.checkConfigKeyUnique(config))
         {
-            return error("修改参数'" + config.getConfigName() + "'失败，参数键名已存在");
+            return error("Failed to update config parameter '" + config.getConfigName() + "': the parameter key already exists");
         }
         config.setUpdateBy(getUsername());
         return toAjax(configService.updateConfig(config));
@@ -111,7 +111,7 @@ public class SysConfigController extends BaseController
      * 删除参数配置
      */
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "参数管理", businessType = BusinessType.DELETE)
+    @Log(title = "Config parameter", businessType = BusinessType.DELETE)
     @DeleteMapping("/{configIds}")
     public AjaxResult remove(@PathVariable Long[] configIds)
     {
@@ -123,7 +123,7 @@ public class SysConfigController extends BaseController
      * 刷新参数缓存
      */
     @PreAuthorize("@ss.hasPermi('system:config:remove')")
-    @Log(title = "参数管理", businessType = BusinessType.CLEAN)
+    @Log(title = "Config parameter", businessType = BusinessType.CLEAN)
     @DeleteMapping("/refreshCache")
     public AjaxResult refreshCache()
     {
