@@ -3,6 +3,7 @@ package com.nadoumi.identity.service;
 import com.nadoumi.common.access.AccessCapabilityMatrix;
 import com.nadoumi.identity.access.CapabilityOverrides;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.identity.access.SessionRevoker;
 import com.nadoumi.identity.domain.UserApplicantAccess;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadForbiddenException;
@@ -10,6 +11,7 @@ import com.nadoumi.identity.mapper.NadIdentityMapper;
 import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
 import com.nadoumi.identity.service.otp.OtpPurpose;
 import com.nadoumi.identity.service.otp.TicketService;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.nadoumi.identity.web.request.StudentLoginRequest;
 import com.nadoumi.identity.web.request.StudentRegisterRequest;
 import com.nadoumi.identity.web.response.AccessibleApplicant;
@@ -53,11 +55,12 @@ public class StudentAuthService {
     private final UserApplicantAccessService grants;
     private final CurrentCaller caller;
     private final TicketService tickets;
+    private final SessionRevoker sessionRevoker;
 
     public StudentAuthService(ISysConfigService configService, ISysUserService userService,
             SysLoginService loginService, TokenService tokenService, NadIdentityMapper identityMapper,
             UserApplicantAccessMapper accessMapper, UserApplicantAccessService grants, CurrentCaller caller,
-            TicketService tickets) {
+            TicketService tickets, SessionRevoker sessionRevoker) {
         this.configService = configService;
         this.userService = userService;
         this.loginService = loginService;
@@ -67,6 +70,7 @@ public class StudentAuthService {
         this.grants = grants;
         this.caller = caller;
         this.tickets = tickets;
+        this.sessionRevoker = sessionRevoker;
     }
 
     @Transactional
@@ -115,6 +119,53 @@ public class StudentAuthService {
 
     public boolean studentEmailExists(String email) {
         return identityMapper.selectUserIdByEmailAndType(normalizeEmail(email), STUDENT_USER_TYPE) != null;
+    }
+
+    /**
+     * Complete a forgotten-password reset. Consumes the ticket, applies the policy,
+     * sets the new password, and revokes <em>every</em> session for the account.
+     * Issues no token and performs no login (spec §15.4).
+     */
+    @Transactional
+    public void resetPassword(String ticket, String newPassword) {
+        String email = tickets.consume(ticket, OtpPurpose.PASSWORD_RESET);
+        Long userId = identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE);
+        if (userId == null) {
+            // ticket was valid but the account is gone - nothing to do, reveal nothing
+            return;
+        }
+        PasswordPolicy.violation(newPassword, null)
+                .ifPresent(key -> { throw new NadBadRequestException(key); });
+        userService.resetUserPwd(userId, SecurityUtils.encryptPassword(newPassword));
+        identityMapper.touchPwdUpdateDate(userId);
+        sessionRevoker.revokeAll(userId, null);
+    }
+
+    /**
+     * Signed-in student changing their own password: verify the current one, apply
+     * the policy (including "different from current"), then revoke every session
+     * except the caller's and refresh the caller's cached credentials.
+     */
+    @Transactional
+    public void changePassword(HttpServletRequest request, String currentPassword, String newPassword) {
+        Long userId = caller.requireUserId();
+        SysUser user = userService.selectUserById(userId);
+        if (!SecurityUtils.matchesPassword(currentPassword, user.getPassword())) {
+            throw new NadBadRequestException("current password is incorrect");
+        }
+        PasswordPolicy.violation(newPassword, user.getPassword())
+                .ifPresent(key -> { throw new NadBadRequestException(key); });
+
+        String encoded = SecurityUtils.encryptPassword(newPassword);
+        userService.resetUserPwd(userId, encoded);
+        identityMapper.touchPwdUpdateDate(userId);
+
+        LoginUser me = tokenService.getLoginUser(request);
+        sessionRevoker.revokeAll(userId, me != null ? me.getToken() : null);
+        if (me != null) {
+            me.getUser().setPassword(encoded);
+            tokenService.setLoginUser(me);
+        }
     }
 
     public StudentIdentityResponse me() {
