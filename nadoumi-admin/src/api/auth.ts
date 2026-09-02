@@ -23,9 +23,6 @@ export const getInfo = () =>
     isPasswordExpired?: boolean
   }>('/getInfo')
 
-export const getRouters = () =>
-  request.get<any, { code: number; data: any[] }>('/getRouters')
-
 export const logout = () => request.post('/logout')
 
 export const updatePassword = (oldPassword: string, newPassword: string) =>

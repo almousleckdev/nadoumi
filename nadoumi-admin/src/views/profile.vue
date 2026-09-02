@@ -1,19 +1,53 @@
 <template>
   <div class="nad-page">
     <el-card style="max-width: 480px">
-      <template #header>{{ t('profile.changePassword') }}</template>
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="180px">
-        <el-form-item :label="t('profile.oldPassword')" prop="oldPassword">
-          <el-input v-model="form.oldPassword" type="password" show-password />
+      <template #header>
+        {{ t('profile.changePassword') }}
+      </template>
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        label-width="180px"
+      >
+        <el-form-item
+          :label="t('profile.oldPassword')"
+          prop="oldPassword"
+        >
+          <el-input
+            v-model="form.oldPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
-        <el-form-item :label="t('profile.newPassword')" prop="newPassword">
-          <el-input v-model="form.newPassword" type="password" show-password />
+        <el-form-item
+          :label="t('profile.newPassword')"
+          prop="newPassword"
+        >
+          <el-input
+            v-model="form.newPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
-        <el-form-item :label="t('profile.confirmPassword')" prop="confirmPassword">
-          <el-input v-model="form.confirmPassword" type="password" show-password />
+        <el-form-item
+          :label="t('profile.confirmPassword')"
+          prop="confirmPassword"
+        >
+          <el-input
+            v-model="form.confirmPassword"
+            type="password"
+            show-password
+          />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" :loading="loading" @click="submit">{{ t('common.save') }}</el-button>
+          <el-button
+            type="primary"
+            :loading="loading"
+            @click="submit"
+          >
+            {{ t('common.save') }}
+          </el-button>
         </el-form-item>
       </el-form>
     </el-card>

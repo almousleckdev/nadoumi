@@ -1,11 +1,24 @@
 <template>
   <div class="login">
     <el-card class="login__card">
-      <h1 class="login__title">{{ t('login.title') }}</h1>
-      <p class="login__subtitle">{{ t('login.subtitle') }}</p>
-      <el-form ref="formRef" :model="form" :rules="rules" @keyup.enter="submit">
+      <h1 class="login__title">
+        {{ t('login.title') }}
+      </h1>
+      <p class="login__subtitle">
+        {{ t('login.subtitle') }}
+      </p>
+      <el-form
+        ref="formRef"
+        :model="form"
+        :rules="rules"
+        @keyup.enter="submit"
+      >
         <el-form-item prop="username">
-          <el-input v-model="form.username" :placeholder="t('common.username')" :prefix-icon="User" />
+          <el-input
+            v-model="form.username"
+            :placeholder="t('common.username')"
+            :prefix-icon="User"
+          />
         </el-form-item>
         <el-form-item prop="password">
           <el-input
@@ -16,13 +29,28 @@
             :prefix-icon="Lock"
           />
         </el-form-item>
-        <el-form-item v-if="captchaEnabled" prop="code">
+        <el-form-item
+          v-if="captchaEnabled"
+          prop="code"
+        >
           <div class="login__captcha">
-            <el-input v-model="form.code" :placeholder="t('common.captcha')" />
-            <img :src="captchaImg" alt="captcha" @click="loadCaptcha" />
+            <el-input
+              v-model="form.code"
+              :placeholder="t('common.captcha')"
+            />
+            <img
+              :src="captchaImg"
+              alt="captcha"
+              @click="loadCaptcha"
+            >
           </div>
         </el-form-item>
-        <el-button type="primary" class="login__submit" :loading="loading" @click="submit">
+        <el-button
+          type="primary"
+          class="login__submit"
+          :loading="loading"
+          @click="submit"
+        >
           {{ t('common.signIn') }}
         </el-button>
       </el-form>

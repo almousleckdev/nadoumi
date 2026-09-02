@@ -116,28 +116,31 @@ Finance is the ledger / invoicing / expense / revenue view, Payroll is employee
 compensation. They integrate through explicit read models and domain events, not by
 sharing tables.
 
-### 2.2 Sidebar navigation — current vs target
+### 2.2 Sidebar navigation (EXISTING — Admin Phase 1)
 
-The sidebar is `sys_menu` rendered by `/getRouters`. It must present two clearly
-separated groups; Nadoumi branches are **new `sys_menu` rows with their own
-`nad:*` permission**, never renamed RuoYi entries, added in the same change as the
-screen they point to.
+The sidebar is a **static manifest in the frontend**, `nadoumi-admin/src/config/nav.ts`
+— the single source of truth for both the sidebar and the router (no
+`/getRouters`, no dynamic menu, no `placeholder.vue`). `/getInfo` is still called,
+only for the user's roles + permission tokens.
 
-**Platform (RuoYi infrastructure)** — Users · Roles · Menus · Departments ·
-Posts · Dictionaries · Config parameters · Notices · Operation log · Login log ·
-Online users · Scheduled jobs · Cache monitor · (dev-only) Code generator /
-Form builder / API docs.
-Current: seeded and English-labelled (`V6`); implemented in `ruoyi-ui`;
-`nadoumi-admin` → `placeholder.vue`. Port the operations-critical ones first
-(Users, Roles, Dictionaries, Config, Online users, Scheduled jobs, Cache).
+Each manifest item declares `{ key, path, icon, perm?, status }`:
 
-**Nadoumi business** — Dashboard · Applicants · Applications · Universities ·
-Programs · Scholarships · Documents · Partnerships · Employees · Finance ·
-Payroll · Payments · Marketing/CMS · Communication · Notifications ·
-Reports & Analytics.
-Current: only `Nadoumi → Applicants` is seeded (`V2`), plus the static
-`Dashboard`. Both are real in `nadoumi-admin`. Every other branch is **PLANNED**
-and unseeded — it appears when its screen is built.
+- `status: 'implemented'` → a real screen + route. Rendered as a link, gated by
+  `userStore.hasPerm(perm)`. Today: **Dashboard**, **Applicants**.
+- `status: 'planned'` → shown as a **disabled row with a "Planned" tag**, no route,
+  no page. It makes the roadmap visible without being a fake screen. Hidden
+  entirely from users whose token set could never include `perm`.
+
+Groups (headings): **Operations** (Applicants · Applications · Universities ·
+Programs · Scholarships · Documents · Partnerships) · **Business** (Employees ·
+Finance · Payroll · Payments) · **Growth** (Marketing/CMS · Communication ·
+Notifications · Reports & Analytics) · **Platform** (System). Dashboard sits
+above the groups.
+
+A planned item becomes implemented in the same change that adds its view — flip
+`status`, add the `routes` entry, ship the screen, add tests. `sys_menu` seeding
+(`V2`) stays only for the RuoYi console screens `ruoyi-ui` still serves; the
+Nadoumi admin does not read it.
 
 Placeholder count is **not** feature count. A status report lists a Nadoumi
 screen as delivered only when it has a real view, a `sys_menu` row, a `nad:*`
@@ -183,12 +186,18 @@ UI hiding is cosmetic; the backend enforces every token regardless (`SECURITY.md
 
 ## 4. Admin ↔ backend contract (BASELINE)
 
-- Existing RuoYi endpoints (`/system/**`, `/monitor/**`, `/tool/**`) stay unchanged —
-  the admin depends on them.
-- New Nadoumi admin calls go to **`/api/v1/staff/**`** — typed `record` DTOs, real
-  HTTP status codes, `problem+json` errors (`docs/API_DESIGN.md` §5). The RuoYi-Vue3
-  Axios interceptor gets a small adaptation: treat real 4xx/5xx as errors for
-  `/api/**` while keeping the `code`-in-body handling for legacy `/system` calls.
+- **Auth/session:** `POST /login` → JWT (cookie `nadoumi-admin-token`);
+  `GET /getInfo` → user + roles + permission tokens. `/getRouters` is **not used**
+  — navigation is the static `src/config/nav.ts` manifest (§2.2).
+- Existing RuoYi endpoints (`/system/**`, `/monitor/**`, `/tool/**`) stay unchanged;
+  `ruoyi-ui` depends on them until those screens are ported.
+- New Nadoumi admin calls go to **`/api/staff/**`** (Phase 1: `/api/staff/applicants`)
+  — typed `record` DTOs, real HTTP status codes, `problem+json` errors
+  (`docs/API_DESIGN.md` §5). `src/utils/request.ts` handles both shapes: `code`-in-body
+  for `/login`·`/getInfo`, real 4xx/5xx for `/api/**`.
+- **Dashboard data (Phase 1):** the Applicants widgets read `/api/staff/applicants`
+  directly (interim source, §6.1). No `/api/staff/dashboard` endpoint yet; that
+  arrives with the Reporting read models.
 
 ## 5. Decision status
 
@@ -229,28 +238,33 @@ Financial and HR widgets (`revenue`, `expenses`, `net earnings`, `outstanding
 payments`, `employee count`) are hidden entirely — not zeroed — for roles without
 the finance / HR report tokens.
 
-### 6.1 Current implementation status (EXISTING)
+### 6.1 Current implementation status (EXISTING — Admin Phase 1)
 
-The `nadoumi-admin` dashboard route ships now, composed from reusable widgets
-(`DashboardGroup`, `StatCard`, `ComingSoonCard`, `RecentApplicants`):
+Route `/dashboard`, visible to any signed-in staff user (no `nad:dashboard:view`
+token is seeded yet); each widget gates on its own data permission. Composed from
+reusable primitives — `PageHeader`, `DashboardGroup`, `StatCard`, `DonutStat`
+(hand-rolled SVG, **no chart library**), `ComingSoonCard`, `RecentApplicants` —
+with real loading (skeleton), error (retry banner) and empty states.
 
-- **Applicants group — live.** Total / new (30d) / active / incomplete-profile
-  counts and the recent-applicants list are read from the already-built
-  `GET /api/staff/applicants` staff endpoint (`nadoumi-applicant`). This is an
-  **interim source** until the Reporting slice (`rm_applicant_counts`,
-  `rm_application_recent`) exists; the widget contract and permission gates in
-  the table above remain the target. The endpoint gained a `createdAfter`
-  filter and a `createdAt` field on `ApplicantResponse` to support the counts.
-  Incomplete-profile is computed client-side over a bounded sample (200 rows)
-  and labelled as such — it is not a precise aggregate.
-- **Applications / Finance / Operations groups — coming-soon.** Every widget
-  whose bounded context (§7) is not built (Application, Finance, Payment,
-  Employee, Workflow, Reporting activity feed / alerts) renders a professional
-  `ComingSoonCard` with an em-dash value. No placeholder or fabricated numbers.
+**Real (from `GET /api/staff/applicants`, interim source until the Reporting
+slice — the widget contract + gates in the §6 table stay the target):**
 
-When the Reporting read models land, the Applicants group switches to
-`rm_*` sources and the coming-soon cards are replaced context-by-context; no
-dashboard-layout change is required.
+- Stat cards: Total applicants · New (last 30 d, via the `createdAfter` filter) ·
+  Incomplete profiles · Active applicants.
+- `DonutStat`: profile completion — complete vs incomplete over a bounded
+  200-row sample, labelled "of the latest N"; not a precise aggregate.
+- `RecentApplicants`: the eight most recent, with `createdAt` (added to
+  `ApplicantResponse` for this).
+
+**Not yet available (honest `ComingSoonCard`, em-dash value, never a number):**
+Applications · Revenue · Expenses · Net earnings · Payments · Employees ·
+Payroll · Notifications — each tagged with the bounded context (§7) that will
+supply it. Recent activity and Pending tasks are empty-state panels pending the
+Reporting event store / Workflow module.
+
+When the Reporting read models land, the real widgets switch to `rm_*` sources
+and each coming-soon card is replaced context-by-context; the layout does not
+change.
 
 ---
 

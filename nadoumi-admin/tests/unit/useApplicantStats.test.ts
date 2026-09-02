@@ -46,7 +46,8 @@ describe('useApplicantStats', () => {
     expect(loading.value).toBe(false)
     expect(error.value).toBeNull()
     expect(data.value).toMatchObject({
-      total: 123, new30d: 12, active: 40, draft: 8, incomplete: 2, sampled: false,
+      total: 123, new30d: 12, active: 40, draft: 8,
+      sampledCount: 5, incomplete: 2, complete: 3, sampled: false,
     })
     expect(data.value?.recent).toHaveLength(5)
   })
