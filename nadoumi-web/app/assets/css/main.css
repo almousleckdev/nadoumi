@@ -1,24 +1,21 @@
-:root {
-  --nad-bg: #ffffff;
-  --nad-fg: #12203a;
-  --nad-muted: #5b6b85;
-  --nad-accent: #0b5fff;
-  --nad-border: #e4e8f0;
-  --nad-max: 72rem;
+@import './tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { color: var(--text); background: var(--surface); }
+  body { @apply font-sans antialiased; }
+  h1, h2, h3, h4 { @apply font-display; text-wrap: balance; }
+  a { color: var(--brand-700); }
+  a:hover { text-decoration: underline; }
+  :where(button, a, input, select, textarea):focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+  html[lang="ar"] body { @apply font-arabic; }
 }
 
-* { box-sizing: border-box; }
-
-html, body {
-  margin: 0;
-  padding: 0;
-  color: var(--nad-fg);
-  background: var(--nad-bg);
-  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
-
-a { color: var(--nad-accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
-
-.nad-container { max-width: var(--nad-max); margin: 0 auto; padding: 0 1.25rem; }
-.nad-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }

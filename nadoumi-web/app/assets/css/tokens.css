@@ -1,0 +1,12 @@
+:root {
+  --brand-500: #f97316;
+  --brand-600: #ea580c;
+  --brand-700: #c2410c;
+  --text: #0f172a;          /* slate-900 */
+  --text-muted: #475569;    /* slate-600 */
+  --border: #e2e8f0;        /* slate-200 */
+  --surface: #ffffff;
+  --surface-subtle: #f8fafc; /* slate-50 */
+  --focus: #f97316;
+  --radius-md: 10px;
+}
