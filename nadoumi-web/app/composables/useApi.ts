@@ -18,3 +18,10 @@ export function useApi() {
 function stripLeadingSlash(p: string) {
   return p.replace(/^\/+/, '')
 }
+
+interface ProblemLike { data?: { detail?: string; title?: string }; message?: string }
+
+export function problemMessage(err: unknown, fallback: string): string {
+  const e = err as ProblemLike
+  return e?.data?.detail || e?.data?.title || e?.message || fallback
+}
