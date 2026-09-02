@@ -5,8 +5,16 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   future: { compatibilityVersion: 4 },
   ssr: true,
-  modules: ['@nuxt/eslint', '@nuxtjs/i18n'],
+  modules: ['@nuxt/eslint', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxtjs/i18n'],
   css: ['~/assets/css/main.css'],
+  fonts: {
+    families: [
+      { name: 'Plus Jakarta Sans', provider: 'google', weights: [600, 700] },
+      { name: 'Inter', provider: 'google', weights: [400, 500, 600] },
+      { name: 'Noto Sans Arabic', provider: 'google', weights: [400, 600] },
+    ],
+  },
+  tailwindcss: { cssPath: '~/assets/css/main.css' },
   runtimeConfig: {
     // server-only: where the BFF forwards /api/** calls.
     // Override at deploy time with NUXT_BACKEND_BASE_URL.
