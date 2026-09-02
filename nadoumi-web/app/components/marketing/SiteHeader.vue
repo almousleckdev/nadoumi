@@ -5,6 +5,7 @@ const { status, user, signOut } = useSession()
 const open = ref(false)
 
 const links = [
+  { to: '/', key: 'nav.home' },
   { to: '/scholarships', key: 'nav.scholarships' },
   { to: '/universities', key: 'nav.universities' },
   { to: '/programs', key: 'nav.programs' },
@@ -40,7 +41,7 @@ const links = [
           </template>
           <template v-else>
             <NuxtLink :to="localePath('/login')" class="text-sm font-medium text-slate-700 hover:text-slate-900">{{ t('nav.signIn') }}</NuxtLink>
-            <NButton :to="localePath('/register')" size="sm">{{ t('nav.getStarted') }}</NButton>
+            <NButton :to="localePath('/register')" size="sm">{{ t('nav.createAccount') }}</NButton>
           </template>
           <button
             type="button"
@@ -52,7 +53,7 @@ const links = [
         </div>
       </div>
 
-      <nav v-if="open" id="site-nav" class="grid gap-1 pb-3 md:hidden">
+      <nav v-show="open" id="site-nav" class="grid gap-1 pb-3 md:hidden">
         <NuxtLink v-for="l in links" :key="l.to" :to="localePath(l.to)" class="rounded px-2 py-2 text-sm text-slate-700 hover:bg-slate-50" @click="open = false">
           {{ t(l.key) }}
         </NuxtLink>
