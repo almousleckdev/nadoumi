@@ -113,18 +113,33 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a
 `sys_user` join so the access list shows a name rather than `User #id`.
 
-### 4.4 Staff university endpoints (IMPLEMENTED — `nadoumi-university`)
+### 4.4 University endpoints (IMPLEMENTED — `nadoumi-university`)
 
-`/api/staff/universities` — `StaffUniversityController`. Public catalog data only;
-no partnership / commercial field is ever returned here.
+**Staff** — `/api/staff/universities`, `StaffUniversityController`. Public catalog
+data only; no partnership / commercial field is ever returned here. The request
+body carries the full profile (§5.3 `nad_university` columns) plus two edited-whole
+child lists: `rankings[]` (`source`, `rankPosition`, `rankYear?`, `note?`) and
+`highlights[]` (`kind` = HIGHLIGHT|ADVANTAGE, `text`). A save replaces both child
+sets inside the scalar-update transaction. `recommended` / `featured` are optional
+booleans (default `false`). `UniversityResponse` additionally returns `status`,
+`publishStatus`, `remark`, audit timestamps.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| GET | `/api/staff/universities` | `nad:university:list` | `q` (name/city), `country`, `status`, `page`, `size` → `PageResponse<UniversityResponse>`. |
-| GET | `/api/staff/universities/{id}` | `nad:university:view` | |
+| GET | `/api/staff/universities` | `nad:university:list` | `q` (name EN/CN, city), `country`, `status`, `page`, `size` → `PageResponse<UniversityResponse>`. |
+| GET | `/api/staff/universities/{id}` | `nad:university:view` | assembles `rankings` + `highlights`. |
 | POST | `/api/staff/universities` | `nad:university:create` | `201`. Country normalised to upper-case; `(name, country)` must be unique → `400` otherwise. |
-| PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self). |
-| DELETE | `/api/staff/universities/{id}` | `nad:university:remove` | `204`. Hard delete — only while nothing references the row (FKs from programmes / partnerships will block it once those exist). |
+| PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self); replaces children. |
+| DELETE | `/api/staff/universities/{id}` | `nad:university:remove` | `204`. Hard delete — only while nothing references the row (FKs from programmes / partnerships will block it once those exist). Children go with `ON DELETE CASCADE`. |
+
+**Public** — `/api/public/universities`, `PublicUniversityController`, `@Anonymous`.
+Serves `PublicUniversityResponse` (no `status` / `publishStatus` / `remark` / audit)
+and **only** rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/public/universities` | anonymous | `q`, `country`, `page`, `size` (default 12) → `PageResponse<PublicUniversityResponse>`. |
+| GET | `/api/public/universities/{id}` | anonymous | `404` if the row is not PUBLISHED + ACTIVE. Consumed by `nadoumi-web` `universities/[id].vue`. |
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 

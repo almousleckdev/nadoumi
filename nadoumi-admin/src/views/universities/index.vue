@@ -63,19 +63,31 @@
       @retry="reload"
       @row-click="(row) => router.push(`/universities/${row.id}`)"
     >
+      <template #cell-name="{ row }">
+        <div class="uni-name">
+          <span>{{ row.name }}</span>
+          <el-tag
+            v-if="row.featured"
+            size="small"
+            type="warning"
+            effect="plain"
+            disable-transitions
+          >
+            {{ t('university.featured') }}
+          </el-tag>
+        </div>
+      </template>
       <template #cell-country="{ value }">
         <span class="mono">{{ value }}</span>
       </template>
-      <template #cell-website="{ value }">
-        <a
-          v-if="value"
-          :href="value"
-          target="_blank"
-          rel="noopener"
-          class="link"
-          @click.stop
-        >{{ shortUrl(value) }}</a>
-        <span v-else>—</span>
+      <template #cell-type="{ value }">
+        {{ value ? (value[0] + value.slice(1).toLowerCase()) : '—' }}
+      </template>
+      <template #cell-publishStatus="{ value }">
+        <StatusBadge
+          :status="value"
+          :map="{ PUBLISHED: 'success', DRAFT: 'neutral' }"
+        />
       </template>
       <template #cell-status="{ value }">
         <StatusBadge :status="value" />
@@ -137,11 +149,11 @@ const { confirm } = useConfirm()
 const STATUSES: UniversityStatus[] = ['ACTIVE', 'INACTIVE']
 const columns: DataTableColumn[] = [
   { prop: 'name', label: t('university.name'), minWidth: 240 },
-  { prop: 'country', label: t('university.country'), width: 100, align: 'center' },
-  { prop: 'city', label: t('university.city'), width: 150 },
-  { prop: 'website', label: t('university.website'), minWidth: 180 },
-  { prop: 'rankingTier', label: t('university.rankingTier'), width: 130 },
-  { prop: 'status', label: t('university.status'), width: 130 },
+  { prop: 'country', label: t('university.country'), width: 90, align: 'center' },
+  { prop: 'city', label: t('university.city'), width: 140 },
+  { prop: 'type', label: t('university.type'), width: 100 },
+  { prop: 'publishStatus', label: t('university.publishStatus'), width: 120 },
+  { prop: 'status', label: t('university.status'), width: 120 },
   { prop: 'actions', label: '', width: 130, align: 'right' },
 ]
 
@@ -154,9 +166,6 @@ const dirty = computed(() => Boolean(query.q || query.country || query.status))
 
 function titleCase(s: string) {
   return s.charAt(0) + s.slice(1).toLowerCase()
-}
-function shortUrl(u: string) {
-  return u.replace(/^https?:\/\//, '').replace(/\/$/, '')
 }
 
 async function reload() {
@@ -226,11 +235,9 @@ onMounted(reload)
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.03em;
 }
-.link {
-  color: var(--nad-brand-700);
-  text-decoration: none;
-}
-.link:hover {
-  text-decoration: underline;
+.uni-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>

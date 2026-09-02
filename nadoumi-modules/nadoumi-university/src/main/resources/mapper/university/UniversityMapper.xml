@@ -3,23 +3,45 @@
 <mapper namespace="com.nadoumi.university.mapper.UniversityMapper">
 
     <resultMap id="university" type="com.nadoumi.university.domain.University">
-        <id     property="id"             column="id"/>
-        <result property="name"           column="name"/>
-        <result property="country"        column="country"/>
-        <result property="city"           column="city"/>
-        <result property="website"        column="website"/>
-        <result property="rankingTier"    column="ranking_tier"/>
-        <result property="logoDocumentId" column="logo_document_id"/>
-        <result property="status"         column="status"/>
-        <result property="createBy"       column="create_by"/>
-        <result property="createTime"     column="create_time"/>
-        <result property="updateBy"       column="update_by"/>
-        <result property="updateTime"     column="update_time"/>
-        <result property="remark"         column="remark"/>
+        <id     property="id"                    column="id"/>
+        <result property="name"                  column="name"/>
+        <result property="nameCn"                column="name_cn"/>
+        <result property="country"               column="country"/>
+        <result property="type"                  column="type"/>
+        <result property="city"                  column="city"/>
+        <result property="province"              column="province"/>
+        <result property="foundedYear"           column="founded_year"/>
+        <result property="totalStudents"         column="total_students"/>
+        <result property="internationalStudents" column="international_students"/>
+        <result property="facultyCount"          column="faculty_count"/>
+        <result property="website"               column="website"/>
+        <result property="rankingTier"           column="ranking_tier"/>
+        <result property="introduction"          column="introduction"/>
+        <result property="history"               column="history"/>
+        <result property="campusInfo"            column="campus_info"/>
+        <result property="accommodationInfo"     column="accommodation_info"/>
+        <result property="nearbyInfo"            column="nearby_info"/>
+        <result property="admissionsEmail"       column="admissions_email"/>
+        <result property="officePhone"           column="office_phone"/>
+        <result property="logoDocumentId"        column="logo_document_id"/>
+        <result property="bannerDocumentId"      column="banner_document_id"/>
+        <result property="recommended"           column="is_recommended"/>
+        <result property="featured"              column="is_featured"/>
+        <result property="status"                column="status"/>
+        <result property="publishStatus"         column="publish_status"/>
+        <result property="createBy"              column="create_by"/>
+        <result property="createTime"            column="create_time"/>
+        <result property="updateBy"              column="update_by"/>
+        <result property="updateTime"            column="update_time"/>
+        <result property="remark"                column="remark"/>
     </resultMap>
 
     <sql id="cols">
-        id, name, country, city, website, ranking_tier, logo_document_id, status,
+        id, name, name_cn, country, type, city, province, founded_year,
+        total_students, international_students, faculty_count, website, ranking_tier,
+        introduction, history, campus_info, accommodation_info, nearby_info,
+        admissions_email, office_phone, logo_document_id, banner_document_id,
+        is_recommended, is_featured, status, publish_status,
         create_by, create_time, update_by, update_time, remark
     </sql>
 
@@ -31,12 +53,15 @@
         select <include refid="cols"/> from nad_university
         <where>
             <if test="q != null and q != ''">
-                and (name like concat('%', #{q}, '%') or city like concat('%', #{q}, '%'))
+                and (name like concat('%', #{q}, '%')
+                     or name_cn like concat('%', #{q}, '%')
+                     or city like concat('%', #{q}, '%'))
             </if>
             <if test="country != null and country != ''">and country = #{country}</if>
             <if test="status != null">and status = #{status}</if>
+            <if test="publishStatus != null">and publish_status = #{publishStatus}</if>
         </where>
-        order by name asc, id asc
+        order by is_featured desc, is_recommended desc, name asc, id asc
     </select>
 
     <select id="findIdByNameAndCountry" resultType="java.lang.Long">
@@ -46,30 +71,88 @@
     <insert id="insert" parameterType="com.nadoumi.university.domain.University"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_university
-            (name, country, city, website, ranking_tier, logo_document_id, status,
-             create_by, create_time, remark)
+            (name, name_cn, country, type, city, province, founded_year,
+             total_students, international_students, faculty_count, website, ranking_tier,
+             introduction, history, campus_info, accommodation_info, nearby_info,
+             admissions_email, office_phone, logo_document_id, banner_document_id,
+             is_recommended, is_featured, status, publish_status, create_by, create_time, remark)
         values
-            (#{name}, #{country}, #{city}, #{website}, #{rankingTier}, #{logoDocumentId}, #{status},
-             #{createBy}, now(), #{remark})
+            (#{name}, #{nameCn}, #{country}, #{type}, #{city}, #{province}, #{foundedYear},
+             #{totalStudents}, #{internationalStudents}, #{facultyCount}, #{website}, #{rankingTier},
+             #{introduction}, #{history}, #{campusInfo}, #{accommodationInfo}, #{nearbyInfo},
+             #{admissionsEmail}, #{officePhone}, #{logoDocumentId}, #{bannerDocumentId},
+             #{recommended}, #{featured}, #{status}, #{publishStatus}, #{createBy}, now(), #{remark})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.university.domain.University">
         update nad_university set
-            name = #{name},
-            country = #{country},
-            city = #{city},
-            website = #{website},
-            ranking_tier = #{rankingTier},
-            logo_document_id = #{logoDocumentId},
-            status = #{status},
-            update_by = #{updateBy},
-            update_time = now(),
-            remark = #{remark}
+            name = #{name}, name_cn = #{nameCn}, country = #{country}, type = #{type},
+            city = #{city}, province = #{province}, founded_year = #{foundedYear},
+            total_students = #{totalStudents}, international_students = #{internationalStudents},
+            faculty_count = #{facultyCount}, website = #{website}, ranking_tier = #{rankingTier},
+            introduction = #{introduction}, history = #{history}, campus_info = #{campusInfo},
+            accommodation_info = #{accommodationInfo}, nearby_info = #{nearbyInfo},
+            admissions_email = #{admissionsEmail}, office_phone = #{officePhone},
+            logo_document_id = #{logoDocumentId}, banner_document_id = #{bannerDocumentId},
+            is_recommended = #{recommended}, is_featured = #{featured},
+            status = #{status}, publish_status = #{publishStatus},
+            update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}
     </update>
 
     <delete id="delete">
         delete from nad_university where id = #{id}
     </delete>
+
+    <!-- ================= children ================= -->
+
+    <resultMap id="ranking" type="com.nadoumi.university.domain.UniversityRanking">
+        <id     property="id"           column="id"/>
+        <result property="universityId" column="university_id"/>
+        <result property="source"       column="source"/>
+        <result property="rankPosition" column="rank_position"/>
+        <result property="rankYear"     column="rank_year"/>
+        <result property="note"         column="note"/>
+    </resultMap>
+
+    <select id="findRankings" resultMap="ranking">
+        select id, university_id, source, rank_position, rank_year, note
+        from nad_university_ranking where university_id = #{universityId}
+        order by rank_year desc, rank_position asc, id asc
+    </select>
+
+    <delete id="deleteRankings">
+        delete from nad_university_ranking where university_id = #{universityId}
+    </delete>
+
+    <insert id="insertRanking" parameterType="com.nadoumi.university.domain.UniversityRanking"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_university_ranking (university_id, source, rank_position, rank_year, note)
+        values (#{universityId}, #{source}, #{rankPosition}, #{rankYear}, #{note})
+    </insert>
+
+    <resultMap id="highlight" type="com.nadoumi.university.domain.UniversityHighlight">
+        <id     property="id"           column="id"/>
+        <result property="universityId" column="university_id"/>
+        <result property="kind"         column="kind"/>
+        <result property="sortOrder"    column="sort_order"/>
+        <result property="text"         column="text"/>
+    </resultMap>
+
+    <select id="findHighlights" resultMap="highlight">
+        select id, university_id, kind, sort_order, text
+        from nad_university_highlight where university_id = #{universityId}
+        order by kind asc, sort_order asc, id asc
+    </select>
+
+    <delete id="deleteHighlights">
+        delete from nad_university_highlight where university_id = #{universityId}
+    </delete>
+
+    <insert id="insertHighlight" parameterType="com.nadoumi.university.domain.UniversityHighlight"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_university_highlight (university_id, kind, sort_order, text)
+        values (#{universityId}, #{kind}, #{sortOrder}, #{text})
+    </insert>
 
 </mapper>

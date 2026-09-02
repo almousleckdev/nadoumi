@@ -129,7 +129,9 @@ not on `nad_applicant`. Migration number assigned when the phase is scheduled.
 
 | Table | Key columns | Notes / invariants |
 | --- | --- | --- |
-| `nad_university` | `id`, `name`, `country`, `city?`, `website?`, `ranking_tier?`, `logo_document_id?`, `status`(ACTIVE/INACTIVE) | **PUBLIC.** No commercial column. Unique `(name, country)`. |
+| `nad_university` | `id`, `name`, `name_cn?`, `country`, `type?`(PUBLIC/PRIVATE), `city?`, `province?`, `founded_year?`, `total_students?`, `international_students?`, `faculty_count?`, `website?`, `ranking_tier?`, `introduction?`, `history?`, `campus_info?`, `accommodation_info?`, `nearby_info?`, `admissions_email?`, `office_phone?`, `logo_document_id?`, `banner_document_id?`, `is_recommended`, `is_featured`, `publish_status`(DRAFT/PUBLISHED), `status`(ACTIVE/INACTIVE) | **PUBLIC.** No commercial column — `is_partner` is derived from an ACTIVE `nad_partnership`, never stored. Unique `(name, country)`. `V10` added the profile columns. Public API (`/api/public/universities`) serves only `publish_status='PUBLISHED' AND status='ACTIVE'` and never `status` / `publish_status` / `remark` / audit. |
+| `nad_university_ranking` | `id`, `university_id`→`nad_university` (**ON DELETE CASCADE**), `source`, `rank_position`, `rank_year?`, `note?` | Owned child. One row per source (QS / THE / ARWU / national…). `rank_position` (not `rank`, MySQL reserved). |
+| `nad_university_highlight` | `id`, `university_id`→`nad_university` (**ON DELETE CASCADE**), `kind`(HIGHLIGHT/ADVANTAGE), `sort_order`, `text` | Owned child. Edited whole: a save replaces the set inside the scalar-update transaction. |
 | `nad_program` | `id`, `university_id`, `name`, `degree_level`(dict), `field`(dict), `language`(dict), `tuition_amount?`, `tuition_currency?`, `duration_months?`, `workflow_definition_code?`, `status` | **PUBLIC.** Index `(university_id)`, `(country via join)`, `(degree_level, field)`. `workflow_definition_code` null → default workflow. |
 | `nad_program_intake` | `id`, `program_id`, `term`, `application_open?`, `application_close?`, `status` | Index `(program_id, term)`. |
 | `nad_partnership` | `id`, `university_id`, `status`(DRAFT/ACTIVE/SUSPENDED/TERMINATED), `tier?`, `commission_model_json?`, `contract_start?`, `contract_end?`, `agreement_document_id?`, `internal_notes?` | **CONFIDENTIAL.** **INV4** partial-unique `(university_id)` where `status='ACTIVE'` → ≤ 1 active partnership/university. Never hard-deleted (history via `TERMINATED` + `nad_partnership_event`). |
@@ -210,10 +212,12 @@ reporting read-model tables/views.
 | `V7__nad_student_email_verified.sql` | **Revision 2.** `sys_user.email_verified` + `idx_sys_user_email` (email-first external identity, spec §15.3). | nadoumi-web build |
 | `V8__drop_initial_password_nag.sql` | **Revision 2.** `sys.account.initPasswordModify → 0`, `sys.account.passwordValidateDays → 90` (spec §17). | nadoumi-web build |
 | `V9__nad_university.sql` | **DONE.** `nad_university` + its `sys_menu` / role-grant seed (`nad:university:*`). Programmes deferred to a later migration. | Phase B |
-| `V10__nad_scholarship.sql` | `nad_scholarship`, `nad_scholarship_internal`, `nad_scholarship_program`, view `v_scholarship_student`. | Phase 4 |
-| `V11__nad_workflow.sql` | `nad_wf_definition/stage/transition/stage_task_template/instance`. | Phase 4 |
-| `V12__nad_application.sql` | `nad_application` + all children (§5.5). | Phase 4 |
-| `V13+__…` | document (+ object storage for onboarding photo/passport), applicant-onboarding expansion, communication, notification, partnership, payment, content, reporting. | Phase 5+ |
+| `V10__nad_university_profile.sql` | **DONE (Step 2).** Profile depth on `nad_university` (18 scalar cols: `name_cn`, `type`, `province`, `founded_year`, `total_students`, `international_students`, `faculty_count`, `introduction`, `history`, `campus_info`, `accommodation_info`, `nearby_info`, `admissions_email`, `office_phone`, `banner_document_id`, `is_recommended`, `is_featured`, `publish_status`) + `idx_university_publish` + `nad_university_ranking` + `nad_university_highlight` (both ON DELETE CASCADE). No new permissions (V9's `nad:university:*` cover it). | Step 2 ✅ |
+| `V11__nad_program.sql` | `nad_program` (`program_type` LANGUAGE/NON_DEGREE/DIPLOMA/BACHELOR/MASTER/PHD), `nad_program_major`, `nad_program_intake`. Programmes belong to a university; exposed only via the university experience. | Step 3 |
+| `V12__nad_scholarship.sql` | `nad_scholarship` aggregate + `nad_scholarship_eligibility` / `nad_scholarship_fee*` (typed line items, decimal money) / `nad_scholarship_stipend` / `nad_scholarship_intake*` / `nad_scholarship_document_requirement*` / `nad_scholarship_category`; `nad_scholarship_internal`; view `v_scholarship_student`. | Step 4 |
+| `V13__nad_outbox_and_notification.sql` | `nad_outbox_event` + `nad_notification*` + templates. First event: `ScholarshipPublished`. | Step 5 |
+| `V14–V15__nad_application*.sql` | `nad_application` (+ `@Version`) + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). | Step 6 |
+| `V16+__…` | document (+ object storage), communication, payment + finance, employee ops, content, reporting. | Step 7+ |
 
 - The **reviewed DDL draft** `docs/ddl/nad_core.draft.sql` is **not** under
   `db/migration` and Flyway never sees it. `V3`/`V4` were split out of it in Phase 3;

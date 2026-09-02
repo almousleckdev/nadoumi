@@ -15,8 +15,46 @@ export interface ScholarshipSummary {
 export interface UniversitySummary {
   id: number
   name: string
+  nameCn?: string | null
   country: string
-  city?: string
+  city?: string | null
+  province?: string | null
+  type?: 'PUBLIC' | 'PRIVATE' | null
+  featured?: boolean
+}
+
+export interface UniversityRanking {
+  id: number
+  source: string
+  rankPosition: number
+  rankYear?: number | null
+  note?: string | null
+}
+
+export interface UniversityHighlight {
+  id: number
+  kind: 'HIGHLIGHT' | 'ADVANTAGE'
+  text: string
+}
+
+/** `/api/public/universities/{id}` — published, active universities only. */
+export interface UniversityDetail extends UniversitySummary {
+  foundedYear?: number | null
+  totalStudents?: number | null
+  internationalStudents?: number | null
+  facultyCount?: number | null
+  website?: string | null
+  rankingTier?: string | null
+  introduction?: string | null
+  history?: string | null
+  campusInfo?: string | null
+  accommodationInfo?: string | null
+  nearbyInfo?: string | null
+  admissionsEmail?: string | null
+  officePhone?: string | null
+  recommended: boolean
+  rankings: UniversityRanking[]
+  highlights: UniversityHighlight[]
 }
 
 export interface ProgramSummary {

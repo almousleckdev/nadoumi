@@ -55,9 +55,12 @@ must be revocable *immediately* (applicant access grants) therefore cannot live 
 **Implemented Nadoumi domains** (see `docs/ADMIN_ARCHITECTURE.md §2.0` for the
 live status table): **Identity & Access** (§3, §4 — `nad_user_applicant_access`),
 **Applicant** (§4 — `nad_applicant` + education / test scores / contacts, staff
-CRUD), **University** (`nad_university`, public catalog, staff CRUD via
-`/api/staff/universities`, Flyway `V9`). Everything below this line that is not
-one of those is still **PLANNED / BASELINE**.
+CRUD), **University** (`nad_university` + profile depth + `nad_university_ranking`
+/ `nad_university_highlight`, Flyway `V9`+`V10`; staff CRUD via
+`/api/staff/universities` and an anonymous read via `/api/public/universities`
+that serves only PUBLISHED + ACTIVE rows through `PublicUniversityResponse`).
+Everything below this line that is not one of those is still **PLANNED /
+BASELINE**.
 
 ---
 
