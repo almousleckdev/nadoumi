@@ -126,6 +126,13 @@
             <artifactId>jakarta.servlet-api</artifactId>
         </dependency>
 
+        <!-- test only: unit tests for shared pure-logic utilities (e.g. PasswordPolicy) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
