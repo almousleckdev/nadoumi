@@ -37,7 +37,9 @@
     "none": "Nothing here yet",
     "retry": "Try again",
     "signOut": "Sign out",
-    "nothingYet": "Nothing here yet."
+    "nothingYet": "Nothing here yet.",
+    "yes": "Yes",
+    "no": "No"
   },
   "home": {
     "hero": {
@@ -119,6 +121,18 @@
       "body": "Create a free profile, explore your options, and apply with a team that runs the whole process.",
       "apply": "Apply now",
       "contact": "Contact us"
+    },
+    "newScholarships": {
+      "eyebrow": "Scholarships",
+      "title": "New scholarships",
+      "description": "The latest opportunities published on Nadoumi.",
+      "empty": "No scholarships are published yet."
+    },
+    "fundedScholarships": {
+      "eyebrow": "Fully funded",
+      "title": "Fully funded scholarships",
+      "description": "Tuition, accommodation and a stipend covered.",
+      "empty": "No fully funded scholarships are published yet."
     }
   },
   "about": {
@@ -517,5 +531,119 @@
     "website": "Official website",
     "admissionsEmail": "Admissions",
     "officePhone": "Phone"
+  },
+  "scholarships": {
+    "searchLabel": "Search scholarships",
+    "searchPlaceholder": "Scholarship name, field or country",
+    "sortLabel": "Sort",
+    "sortRelevance": "Most relevant",
+    "sortDeadline": "Deadline (soonest)",
+    "sortNewest": "Recently published",
+    "sortTitle": "Title (A–Z)",
+    "anyFunding": "Any funding",
+    "anyLanguage": "Any language",
+    "withStipend": "With stipend",
+    "moreFilters": "More filters — level and category",
+    "fLevel": "Education level",
+    "fCategory": "Category",
+    "colTitle": "Scholarship",
+    "colLevel": "Level",
+    "colLanguage": "Language",
+    "colIntake": "Next intake",
+    "colDeadline": "Deadline",
+    "colFunding": "Funding",
+    "colLocation": "Location",
+    "apply": "Apply",
+    "applyNow": "Apply now",
+    "applyNote": "Applying opens the guided application in your dashboard. Sign in or create a profile to start.",
+    "view": "View",
+    "viewAll": "View all scholarships",
+    "hot": "Hot",
+    "noneTitle": "No scholarships published yet",
+    "noneBody": "The catalogue is being populated. Check back soon, or create a profile to be ready.",
+    "notFound": "This scholarship is not available.",
+    "benefits": "Benefits",
+    "requirements": "Requirements",
+    "policy": "Policy & notes",
+    "eligibility": "Eligibility",
+    "fees": "Fees",
+    "documents": "Documents required",
+    "documentsNote": "Set by the scholarship — collected during the application.",
+    "stipend": "Stipend",
+    "stipendDuration": "Paid for {n} months",
+    "upfront": "Upfront fees",
+    "intakes": "Intakes",
+    "closes": "closes",
+    "required": "required",
+    "optional": "optional",
+    "level": {
+      "NON_DEGREE": "Non-degree",
+      "DIPLOMA": "Diploma",
+      "BACHELOR": "Bachelor's",
+      "MASTER": "Master's",
+      "PHD": "PhD"
+    },
+    "funding": {
+      "FULLY": "Fully funded",
+      "PARTIAL": "Partially funded",
+      "SELF": "Self-funded"
+    },
+    "lang": {
+      "ENGLISH": "English",
+      "CHINESE": "Chinese",
+      "BOTH": "English & Chinese"
+    },
+    "intake": {
+      "SPRING_MARCH": "Spring / March",
+      "AUTUMN_SEPTEMBER": "Autumn / September"
+    },
+    "freq": {
+      "MONTHLY": "month",
+      "YEARLY": "year",
+      "ONE_OFF": "one-off"
+    },
+    "category": {
+      "CSC": "CSC",
+      "CGS": "Chinese Government",
+      "GOVERNMENT": "Government",
+      "PROVINCIAL": "Provincial",
+      "UNIVERSITY": "University",
+      "PRESIDENTIAL": "Presidential",
+      "LANGUAGE": "Language",
+      "TYPE_A": "Type A",
+      "TYPE_B": "Type B",
+      "TYPE_C": "Type C",
+      "TYPE_D": "Type D"
+    },
+    "fee": {
+      "TUITION_BEFORE": "Tuition (before scholarship)",
+      "TUITION_AFTER": "Tuition (after scholarship)",
+      "ACCOMMODATION_BEFORE": "Accommodation (before)",
+      "ACCOMMODATION_AFTER": "Accommodation (after)",
+      "REGISTRATION": "Registration fee",
+      "APPLICATION": "Application fee",
+      "NADOUMI_APPLICATION": "Nadoumi application fee",
+      "NADOUMI_SERVICE": "Nadoumi service fee",
+      "INSURANCE": "Insurance",
+      "VISA": "Visa fee",
+      "OTHER": "Other fee"
+    },
+    "doc": {
+      "PASSPORT": "Passport",
+      "DEGREE": "Degree certificate",
+      "TRANSCRIPT": "Academic transcript",
+      "LANGUAGE_CERT": "Language certificate",
+      "VISA": "Visa",
+      "PHYSICAL_EXAM": "Physical examination",
+      "STUDY_PLAN": "Study plan",
+      "RECOMMENDATION_LETTER": "Recommendation letter",
+      "OTHER": "Other document"
+    },
+    "elig": {
+      "age": "Age",
+      "gpa": "GPA",
+      "inChina": "Currently in China",
+      "nationality": "Nationality"
+    }
   }
 }

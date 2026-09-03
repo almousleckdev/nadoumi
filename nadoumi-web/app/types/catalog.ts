@@ -3,13 +3,81 @@
  * wired to `/api/v1/**`. The **student** scholarship view can never carry a
  * university / partnership field (enforced server-side, docs/DOMAIN_MODEL.md §6).
  */
-export interface ScholarshipSummary {
+/** `/api/public/scholarships` — student-safe only; never a university/partnership field. */
+export interface Money {
+  amount: number
+  currency: string
+}
+
+export interface ScholarshipIntake {
+  term: string
+  applicationOpen?: string | null
+  applicationClose?: string | null
+}
+
+export interface ScholarshipCard {
   id: number
+  slug: string
   title: string
+  summary?: string | null
   country: string
-  degreeLevel?: string
-  field?: string
-  deadline?: string
+  province?: string | null
+  city?: string | null
+  field?: string | null
+  teachingLanguage?: 'ENGLISH' | 'CHINESE' | 'BOTH' | null
+  fundingModel: 'FULLY' | 'PARTIAL' | 'SELF'
+  hasStipend: boolean
+  deadline?: string | null
+  applicationFee?: Money | null
+  serviceFee?: Money | null
+  slots?: number | null
+  featured: boolean
+  recommended: boolean
+  hot: boolean
+  levels: string[]
+  categories: string[]
+  intakes: ScholarshipIntake[]
+}
+
+export interface ScholarshipDetail extends ScholarshipCard {
+  benefits?: string | null
+  requirements?: string | null
+  policy?: string | null
+  eligibility?: {
+    ageMin?: number | null
+    ageMax?: number | null
+    nationalityScope?: string | null
+    acceptedCountries?: string | null
+    inChina?: boolean | null
+    gpaMin?: number | null
+    ieltsMin?: number | null
+    toeflMin?: number | null
+    duolingoMin?: number | null
+    hskMin?: number | null
+    cscaMin?: number | null
+    notes?: string | null
+  } | null
+  fees: { kind: string, amount: number, currency: string, note?: string | null }[]
+  stipend?: {
+    amount: number
+    currency: string
+    frequency: string
+    durationMonths?: number | null
+    conditions?: string | null
+  } | null
+  documentRequirements: { docType: string, mandatory: boolean, note?: string | null }[]
+}
+
+export interface FacetBucket {
+  value: string
+  count: number
+}
+
+export interface ScholarshipFacets {
+  levels: FacetBucket[]
+  categories: FacetBucket[]
+  fundingModels: FacetBucket[]
+  teachingLanguages: FacetBucket[]
 }
 
 export interface UniversitySummary {

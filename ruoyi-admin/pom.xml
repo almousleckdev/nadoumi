@@ -79,6 +79,10 @@
             <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-university</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-scholarship</artifactId>
+        </dependency>
 
         <!-- 核心模块-->
         <dependency>

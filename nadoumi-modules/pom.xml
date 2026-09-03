@@ -23,6 +23,7 @@
         <module>nadoumi-identity</module>
         <module>nadoumi-applicant</module>
         <module>nadoumi-university</module>
+        <module>nadoumi-scholarship</module>
     </modules>
 
 </project>

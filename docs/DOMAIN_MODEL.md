@@ -58,9 +58,13 @@ live status table): **Identity & Access** (§3, §4 — `nad_user_applicant_acce
 CRUD), **University** (`nad_university` + profile depth + `nad_university_ranking`
 / `nad_university_highlight`, Flyway `V9`+`V10`; staff CRUD via
 `/api/staff/universities` and an anonymous read via `/api/public/universities`
-that serves only PUBLISHED + ACTIVE rows through `PublicUniversityResponse`).
-Everything below this line that is not one of those is still **PLANNED /
-BASELINE**.
+that serves only PUBLISHED + ACTIVE rows through `PublicUniversityResponse`),
+**Scholarship** (`nad_scholarship` + 8 student-safe child tables + confidential
+`nad_scholarship_internal` + `v_scholarship_student` view, Flyway `V16`+`V17`;
+anonymous faceted discovery via `/api/public/scholarships`, staff CRUD, and a
+`nad:scholarship:internal:*`-gated linkage sub-resource; confidentiality leak
+tests passing — §6.2). Everything below this line that is not one of those is
+still **PLANNED / BASELINE**.
 
 ---
 

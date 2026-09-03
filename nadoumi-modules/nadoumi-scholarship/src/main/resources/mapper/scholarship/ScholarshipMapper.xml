@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.scholarship.mapper.ScholarshipMapper">
+
+    <resultMap id="head" type="com.nadoumi.scholarship.domain.Scholarship">
+        <id     property="id"                     column="id"/>
+        <result property="slug"                   column="slug"/>
+        <result property="title"                  column="title"/>
+        <result property="summary"                column="summary"/>
+        <result property="country"                column="country"/>
+        <result property="province"               column="province"/>
+        <result property="city"                   column="city"/>
+        <result property="field"                  column="field"/>
+        <result property="teachingLanguage"       column="teaching_language"/>
+        <result property="fundingModel"           column="funding_model"/>
+        <result property="hasStipend"             column="has_stipend"/>
+        <result property="deadline"               column="deadline"/>
+        <result property="benefits"               column="benefits"/>
+        <result property="requirements"           column="requirements"/>
+        <result property="policy"                 column="policy"/>
+        <result property="applicationFeeAmount"   column="application_fee_amount"/>
+        <result property="applicationFeeCurrency" column="application_fee_currency"/>
+        <result property="serviceFeeAmount"       column="service_fee_amount"/>
+        <result property="serviceFeeCurrency"     column="service_fee_currency"/>
+        <result property="slots"                  column="slots"/>
+        <result property="featured"               column="is_featured"/>
+        <result property="recommended"            column="is_recommended"/>
+        <result property="hot"                    column="is_hot"/>
+        <result property="publishedAt"            column="published_at"/>
+        <result property="publishStatus"          column="publish_status"/>
+        <result property="status"                 column="status"/>
+        <result property="createBy"               column="create_by"/>
+        <result property="createTime"             column="create_time"/>
+        <result property="updateBy"               column="update_by"/>
+        <result property="updateTime"             column="update_time"/>
+        <result property="remark"                 column="remark"/>
+    </resultMap>
+
+    <sql id="viewCols">
+        v.id, v.slug, v.title, v.summary, v.country, v.province, v.city, v.field,
+        v.teaching_language, v.funding_model, v.has_stipend, v.deadline,
+        v.benefits, v.requirements, v.policy,
+        v.application_fee_amount, v.application_fee_currency,
+        v.service_fee_amount, v.service_fee_currency, v.slots,
+        v.is_featured, v.is_recommended, v.is_hot, v.published_at
+    </sql>
+
+    <sql id="baseCols">
+        s.id, s.slug, s.title, s.summary, s.country, s.province, s.city, s.field,
+        s.teaching_language, s.funding_model, s.has_stipend, s.deadline,
+        s.benefits, s.requirements, s.policy,
+        s.application_fee_amount, s.application_fee_currency,
+        s.service_fee_amount, s.service_fee_currency, s.slots,
+        s.is_featured, s.is_recommended, s.is_hot, s.published_at,
+        s.publish_status, s.status, s.create_by, s.create_time,
+        s.update_by, s.update_time, s.remark
+    </sql>
+
+    <sql id="publicFilter">
+        <if test="q != null and q != ''">
+            and (v.title like concat('%', #{q}, '%') or v.summary like concat('%', #{q}, '%')
+                 or v.field like concat('%', #{q}, '%'))
+        </if>
+        <if test="country != null and country != ''">and v.country = #{country}</if>
+        <if test="province != null and province != ''">and v.province = #{province}</if>
+        <if test="city != null and city != ''">and v.city = #{city}</if>
+        <if test="field != null and field != ''">and v.field = #{field}</if>
+        <if test="teachingLanguage != null">and v.teaching_language = #{teachingLanguage}</if>
+        <if test="fundingModel != null">and v.funding_model = #{fundingModel}</if>
+        <if test="hasStipend != null">and v.has_stipend = #{hasStipend}</if>
+        <if test="deadlineBefore != null">and v.deadline is not null and v.deadline &lt;= #{deadlineBefore}</if>
+        <if test="featured != null">and v.is_featured = #{featured}</if>
+        <if test="recommended != null">and v.is_recommended = #{recommended}</if>
+        <if test="hot != null">and v.is_hot = #{hot}</if>
+        <if test="levels != null and levels.size() > 0">
+            and exists (select 1 from nad_scholarship_level sl where sl.scholarship_id = v.id
+                        and sl.level in <foreach collection="levels" item="lv" open="(" separator="," close=")">#{lv}</foreach>)
+        </if>
+        <if test="categoryCodes != null and categoryCodes.size() > 0">
+            and exists (select 1 from nad_scholarship_category_link cl
+                        join nad_scholarship_category c on c.id = cl.category_id
+                        where cl.scholarship_id = v.id
+                        and c.code in <foreach collection="categoryCodes" item="cc" open="(" separator="," close=")">#{cc}</foreach>)
+        </if>
+        <if test="intakeTerms != null and intakeTerms.size() > 0">
+            and exists (select 1 from nad_scholarship_intake si where si.scholarship_id = v.id
+                        and si.term in <foreach collection="intakeTerms" item="it" open="(" separator="," close=")">#{it}</foreach>)
+        </if>
+    </sql>
+
+    <sql id="publicOrder">
+        <choose>
+            <when test="sort == 'deadline'">order by v.deadline is null, v.deadline asc, v.id desc</when>
+            <when test="sort == 'newest'">order by v.published_at desc, v.id desc</when>
+            <when test="sort == 'title'">order by v.title asc, v.id asc</when>
+            <otherwise>order by v.is_featured desc, v.is_hot desc, v.published_at desc, v.id desc</otherwise>
+        </choose>
+    </sql>
+
+    <select id="searchPublic" resultMap="head">
+        select <include refid="viewCols"/>
+        from v_scholarship_student v
+        <where><include refid="publicFilter"/></where>
+        <include refid="publicOrder"/>
+    </select>
+
+    <select id="findPublicBySlug" resultMap="head">
+        select <include refid="viewCols"/> from v_scholarship_student v where v.slug = #{slug}
+    </select>
+
+    <select id="findPublicById" resultMap="head">
+        select <include refid="viewCols"/> from v_scholarship_student v where v.id = #{id}
+    </select>
+
+    <select id="facetLevels" resultType="com.nadoumi.scholarship.mapper.ScholarshipFacetRow">
+        select sl.level as value, count(distinct v.id) as count
+        from v_scholarship_student v join nad_scholarship_level sl on sl.scholarship_id = v.id
+        <where><include refid="publicFilter"/></where>
+        group by sl.level order by count desc
+    </select>
+
+    <select id="facetCategories" resultType="com.nadoumi.scholarship.mapper.ScholarshipFacetRow">
+        select c.code as value, count(distinct v.id) as count
+        from v_scholarship_student v
+        join nad_scholarship_category_link cl on cl.scholarship_id = v.id
+        join nad_scholarship_category c on c.id = cl.category_id
+        <where><include refid="publicFilter"/></where>
+        group by c.code order by count desc
+    </select>
+
+    <select id="facetFundingModels" resultType="com.nadoumi.scholarship.mapper.ScholarshipFacetRow">
+        select v.funding_model as value, count(*) as count
+        from v_scholarship_student v
+        <where><include refid="publicFilter"/></where>
+        group by v.funding_model order by count desc
+    </select>
+
+    <select id="facetTeachingLanguages" resultType="com.nadoumi.scholarship.mapper.ScholarshipFacetRow">
+        select v.teaching_language as value, count(*) as count
+        from v_scholarship_student v
+        <where>v.teaching_language is not null <include refid="publicFilter"/></where>
+        group by v.teaching_language order by count desc
+    </select>
+
+    <select id="searchStaff" resultMap="head">
+        select <include refid="baseCols"/>
+        from nad_scholarship s
+        <where>
+            <if test="q != null and q != ''">
+                and (s.title like concat('%', #{q}, '%') or s.slug like concat('%', #{q}, '%'))
+            </if>
+            <if test="country != null and country != ''">and s.country = #{country}</if>
+            <if test="fundingModel != null">and s.funding_model = #{fundingModel}</if>
+            <if test="publishStatus != null">and s.publish_status = #{publishStatus}</if>
+            <if test="status != null">and s.status = #{status}</if>
+        </where>
+        order by s.is_featured desc, s.update_time desc, s.id desc
+    </select>
+
+    <select id="findById" resultMap="head">
+        select <include refid="baseCols"/> from nad_scholarship s where s.id = #{id}
+    </select>
+
+    <select id="findIdBySlug" resultType="java.lang.Long">
+        select id from nad_scholarship where slug = #{slug} limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.scholarship.domain.Scholarship"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_scholarship
+            (slug, title, summary, country, province, city, field, teaching_language, funding_model,
+             has_stipend, deadline, benefits, requirements, policy,
+             application_fee_amount, application_fee_currency, service_fee_amount, service_fee_currency,
+             slots, is_featured, is_recommended, is_hot, publish_status, published_at, status,
+             create_by, create_time, remark)
+        values
+            (#{slug}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
+             #{teachingLanguage}, #{fundingModel}, #{hasStipend}, #{deadline}, #{benefits},
+             #{requirements}, #{policy}, #{applicationFeeAmount}, #{applicationFeeCurrency},
+             #{serviceFeeAmount}, #{serviceFeeCurrency}, #{slots}, #{featured}, #{recommended},
+             #{hot}, #{publishStatus}, #{publishedAt}, #{status}, #{createBy}, now(), #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.scholarship.domain.Scholarship">
+        update nad_scholarship set
+            slug = #{slug}, title = #{title}, summary = #{summary}, country = #{country},
+            province = #{province}, city = #{city}, field = #{field},
+            teaching_language = #{teachingLanguage}, funding_model = #{fundingModel},
+            has_stipend = #{hasStipend}, deadline = #{deadline}, benefits = #{benefits},
+            requirements = #{requirements}, policy = #{policy},
+            application_fee_amount = #{applicationFeeAmount}, application_fee_currency = #{applicationFeeCurrency},
+            service_fee_amount = #{serviceFeeAmount}, service_fee_currency = #{serviceFeeCurrency},
+            slots = #{slots}, is_featured = #{featured}, is_recommended = #{recommended}, is_hot = #{hot},
+            publish_status = #{publishStatus}, status = #{status},
+            update_by = #{updateBy}, update_time = now(), remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <update id="markPublished">
+        update nad_scholarship set published_at = coalesce(published_at, now()) where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from nad_scholarship where id = #{id}
+    </delete>
+
+    <!-- child selects and writes -->
+
+    <select id="findLevels" resultType="java.lang.String">
+        select level from nad_scholarship_level where scholarship_id = #{scholarshipId} order by level
+    </select>
+
+    <select id="findCategories" resultType="com.nadoumi.scholarship.domain.ScholarshipCategory">
+        select c.id, c.code, c.name
+        from nad_scholarship_category_link cl join nad_scholarship_category c on c.id = cl.category_id
+        where cl.scholarship_id = #{scholarshipId} order by c.sort_order
+    </select>
+
+    <select id="findIntakes" resultType="com.nadoumi.scholarship.domain.ScholarshipIntake">
+        select term, application_open as applicationOpen, application_close as applicationClose
+        from nad_scholarship_intake where scholarship_id = #{scholarshipId} order by sort_order, id
+    </select>
+
+    <select id="findEligibility" resultType="com.nadoumi.scholarship.domain.ScholarshipEligibility">
+        select age_min as ageMin, age_max as ageMax, nationality_scope as nationalityScope,
+               accepted_countries as acceptedCountries, in_china as inChina,
+               gpa_min as gpaMin, ielts_min as ieltsMin, toefl_min as toeflMin,
+               duolingo_min as duolingoMin, hsk_min as hskMin, csca_min as cscaMin, notes
+        from nad_scholarship_eligibility where scholarship_id = #{scholarshipId}
+    </select>
+
+    <select id="findFees" resultType="com.nadoumi.scholarship.domain.ScholarshipFee">
+        select kind, amount, currency, note
+        from nad_scholarship_fee where scholarship_id = #{scholarshipId} order by sort_order, id
+    </select>
+
+    <select id="findStipend" resultType="com.nadoumi.scholarship.domain.ScholarshipStipend">
+        select amount, currency, frequency, duration_months as durationMonths, conditions
+        from nad_scholarship_stipend where scholarship_id = #{scholarshipId}
+    </select>
+
+    <select id="findDocumentRequirements" resultType="com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement">
+        select doc_type as docType, mandatory, note
+        from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId} order by sort_order, id
+    </select>
+
+    <delete id="deleteLevels">delete from nad_scholarship_level where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertLevel">
+        insert into nad_scholarship_level (scholarship_id, level) values (#{scholarshipId}, #{level})
+    </insert>
+
+    <delete id="deleteCategoryLinks">delete from nad_scholarship_category_link where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertCategoryLink">
+        insert into nad_scholarship_category_link (scholarship_id, category_id)
+        select #{scholarshipId}, id from nad_scholarship_category where code = #{code}
+    </insert>
+
+    <delete id="deleteIntakes">delete from nad_scholarship_intake where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertIntake">
+        insert into nad_scholarship_intake (scholarship_id, term, application_open, application_close, sort_order)
+        values (#{scholarshipId}, #{in.term}, #{in.applicationOpen}, #{in.applicationClose}, #{sortOrder})
+    </insert>
+
+    <delete id="deleteEligibility">delete from nad_scholarship_eligibility where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertEligibility">
+        insert into nad_scholarship_eligibility
+            (scholarship_id, age_min, age_max, nationality_scope, accepted_countries, in_china,
+             gpa_min, ielts_min, toefl_min, duolingo_min, hsk_min, csca_min, notes)
+        values
+            (#{scholarshipId}, #{e.ageMin}, #{e.ageMax}, #{e.nationalityScope}, #{e.acceptedCountries},
+             #{e.inChina}, #{e.gpaMin}, #{e.ieltsMin}, #{e.toeflMin}, #{e.duolingoMin}, #{e.hskMin},
+             #{e.cscaMin}, #{e.notes})
+    </insert>
+
+    <delete id="deleteFees">delete from nad_scholarship_fee where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertFee">
+        insert into nad_scholarship_fee (scholarship_id, kind, amount, currency, note, sort_order)
+        values (#{scholarshipId}, #{f.kind}, #{f.amount}, #{f.currency}, #{f.note}, #{sortOrder})
+    </insert>
+
+    <delete id="deleteStipend">delete from nad_scholarship_stipend where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertStipend">
+        insert into nad_scholarship_stipend
+            (scholarship_id, amount, currency, frequency, duration_months, conditions)
+        values (#{scholarshipId}, #{s.amount}, #{s.currency}, #{s.frequency}, #{s.durationMonths}, #{s.conditions})
+    </insert>
+
+    <delete id="deleteDocumentRequirements">delete from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertDocumentRequirement">
+        insert into nad_scholarship_document_requirement (scholarship_id, doc_type, mandatory, note, sort_order)
+        values (#{scholarshipId}, #{d.docType}, #{d.mandatory}, #{d.note}, #{sortOrder})
+    </insert>
+
+    <!-- confidential linkage -->
+
+    <select id="findInternal" resultType="com.nadoumi.scholarship.domain.ScholarshipInternal">
+        select university_id as universityId, partnership_id as partnershipId,
+               internal_status as internalStatus, operational_notes as operationalNotes,
+               confidential_terms as confidentialTerms, commission_model_json as commissionModelJson
+        from nad_scholarship_internal where scholarship_id = #{scholarshipId}
+    </select>
+
+    <insert id="upsertInternal">
+        insert into nad_scholarship_internal
+            (scholarship_id, university_id, partnership_id, internal_status, operational_notes,
+             confidential_terms, commission_model_json, create_by, create_time)
+        values
+            (#{scholarshipId}, #{i.universityId}, #{i.partnershipId},
+             coalesce(#{i.internalStatus}, 'DRAFT'), #{i.operationalNotes}, #{i.confidentialTerms},
+             #{i.commissionModelJson}, #{actor}, now())
+        on duplicate key update
+            university_id = values(university_id),
+            partnership_id = values(partnership_id),
+            internal_status = values(internal_status),
+            operational_notes = values(operational_notes),
+            confidential_terms = values(confidential_terms),
+            commission_model_json = values(commission_model_json),
+            update_by = #{actor}, update_time = now()
+    </insert>
+</mapper>

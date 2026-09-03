@@ -225,6 +225,35 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   - i18n: `about` + `contact` replaced wholesale; `catalog.*` + `university.*`
     added; parity across all four locales (429 keys).
 
+**UPDATE 2026-09-03 (public website redesign — R3, scholarships). See `docs/PUBLIC_WEBSITE_REDESIGN.md` §R3.**
+- Backend module `nadoumi-scholarship` (V16 DDL + V17 seed): `nad_scholarship`
+  aggregate + 8 student-safe child tables + confidential `nad_scholarship_internal`
+  + `v_scholarship_student` view. Public `/api/public/scholarships` (+ `/facets`,
+  `/{slugOrId}`), staff CRUD + gated `/{id}/internal`. Confidentiality leak
+  tests pass.
+- `types/catalog.ts` — `ScholarshipCard` / `ScholarshipDetail` / `ScholarshipFacets`
+  replace the old guessed `ScholarshipSummary`. `useDiscovery` gained no API
+  change (already supports `arrayKeys` for `level` / `category`).
+- **`/scholarships`** (`scholarships/index.vue`) rebuilt as a real search-and-filter
+  **table**: search + country + funding + language + stipend inline, a
+  `<details>` "More filters" panel with level + category checkboxes showing
+  **live facet counts** (a second `useAsyncData` on `/facets` keyed to the same
+  filter query), sort select, chips, `Pagination`, loading / empty / no-match /
+  error states, and a per-row **Apply** → `/scholarships/[slug]`.
+- **`/scholarships/[slug]`** (`scholarships/[slug].vue`) — dark hero, prose
+  sections, structured eligibility grid, fee table, stipend + upfront-fee +
+  intake sidebar, and a **document checklist rendered from
+  `documentRequirements`** (never hard-coded). **Apply now** routes to
+  `/register` (guest) or `/dashboard` (authed); the guided application is R5.
+- `marketing/ScholarshipCard.vue` — carousel card. Home "New scholarships" +
+  "Fully funded scholarships" `DiscoverySection`s are now real
+  (`?sort=newest` / `?funding=FULLY`); the programme placeholder stays (R2).
+- Dead `ContentCard.vue` deleted (last consumer removed).
+- i18n: `scholarships.*` namespace (table headers, filters, detail labels, and
+  enum-code label maps for level / funding / lang / intake / category / fee /
+  doc) + `home.newScholarships.*` / `home.fundedScholarships.*` + `common.yes/no`,
+  all four locales (533 keys).
+
 **PLANNED — Revision 2 (plan Parts E/F/G):** *(historical; nav line superseded above)*
 - Navbar: ~~Home, Scholarships, Universities, Programs, Destinations, About,
   Contact~~ + `Sign in` / `Create account`, → account menu when authed.

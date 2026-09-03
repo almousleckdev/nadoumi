@@ -103,17 +103,28 @@ read are all covered by the existing set (public GET is `@Anonymous`).
 `nad:program:view` · `nad:program:list` · `nad:program:create` · `nad:program:edit` ·
 `nad:program:remove` · `nad:program:intake:manage`
 
-### 2.7 `scholarship` (student-safe data)
+### 2.7 `scholarship` (student-safe data) — **IMPLEMENTED** (seed: Flyway `V17`)
 `nad:scholarship:view` · `nad:scholarship:list` · `nad:scholarship:create` ·
 `nad:scholarship:edit` · `nad:scholarship:remove` · `nad:scholarship:publish` ·
 `nad:scholarship:export`
+Granted by `V17`: full set → `nadoumi_super_admin`, `ops_manager`,
+`partnerships_manager`; `view` + `list` → `case_officer`, `read_only_analyst`,
+`content_editor`. (`publish` / `export` are defined; `publish` is applied via the
+PUT body's `publishStatus`, `export` has no endpoint yet.) Anonymous discovery
+needs no permission — `/api/public/scholarships*` is `@Anonymous` and reads only
+`v_scholarship_student`.
 
-### 2.8 `scholarship:internal` (operational linkage — NOT commercial terms)
+### 2.8 `scholarship:internal` (operational linkage — NOT commercial terms) — **IMPLEMENTED** (seed: `V17`)
 | Token | Grants |
 | --- | --- |
-| `nad:scholarship:internal:view` | See `nad_scholarship_internal`: which `university_id` / `partnership_id` a scholarship maps to, `internal_status`, `operational_notes`. Needed by case work. » sensitive |
-| `nad:scholarship:internal:edit` | Edit those fields. » sensitive |
-| `nad:scholarship:program:manage` | Manage `nad_scholarship_program` (allowed programmes for a `PROGRAM_BOUND` scholarship). » sensitive |
+| `nad:scholarship:internal:view` | See `nad_scholarship_internal`: which `university_id` / `partnership_id` a scholarship maps to, `internal_status`, `operational_notes`, `confidential_terms`. `GET /api/staff/scholarships/{id}/internal`. Needed by case work. » sensitive |
+| `nad:scholarship:internal:edit` | Edit those fields. `PUT …/internal`. » sensitive |
+| `nad:scholarship:program:manage` *(deferred)* | Manage `nad_scholarship_program` (allowed programmes for a `PROGRAM_BOUND` scholarship). Lands with `nadoumi-program`. » sensitive |
+
+`V17` grants `internal:view` + `internal:edit` to `nadoumi_super_admin`,
+`ops_manager`, `partnerships_manager`; `internal:view` only to `case_officer` and
+`read_only_analyst`. `StaffScholarshipTest` proves a `case_officer` gets `200` on
+GET `…/internal` and `403` on PUT.
 
 ### 2.9 `partnership` (confidential commercial relationship)
 | Token | Grants |
