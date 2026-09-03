@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.cloudinary.Cloudinary;
+import com.nadoumi.media.mapper.MediaAccessLogMapper;
 import com.nadoumi.media.mapper.MediaAssetMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,8 @@ class CloudinaryConfigTest {
 
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(MediaAutoConfiguration.class))
-            .withBean(MediaAssetMapper.class, () -> mock(MediaAssetMapper.class));
+            .withBean(MediaAssetMapper.class, () -> mock(MediaAssetMapper.class))
+            .withBean(MediaAccessLogMapper.class, () -> mock(MediaAccessLogMapper.class));
 
     @BeforeEach
     @AfterEach
