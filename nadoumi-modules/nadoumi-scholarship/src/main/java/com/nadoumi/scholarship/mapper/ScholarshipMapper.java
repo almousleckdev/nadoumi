@@ -59,6 +59,10 @@ public interface ScholarshipMapper {
 
     int markPublished(@Param("id") Long id);
 
+    int updateHeroMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
+    int updateCoverMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
     // ---- children (shared by public + staff assembly) ----
 
     List<String> findLevels(@Param("scholarshipId") Long scholarshipId);

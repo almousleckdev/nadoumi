@@ -58,6 +58,8 @@ public class Scholarship {
     private String remark;
     private String heroImageUrl;
     private String coverImageUrl;
+    private Long heroMediaId;
+    private Long coverMediaId;
 
     private List<String> levels = new ArrayList<>();
     private List<ScholarshipCategory> categories = new ArrayList<>();
@@ -153,6 +155,12 @@ public class Scholarship {
 
     public String getCoverImageUrl() { return coverImageUrl; }
     public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
+
+    public Long getHeroMediaId() { return heroMediaId; }
+    public void setHeroMediaId(Long heroMediaId) { this.heroMediaId = heroMediaId; }
+
+    public Long getCoverMediaId() { return coverMediaId; }
+    public void setCoverMediaId(Long coverMediaId) { this.coverMediaId = coverMediaId; }
 
     public List<String> getLevels() { return levels; }
     public void setLevels(List<String> levels) { this.levels = levels; }
