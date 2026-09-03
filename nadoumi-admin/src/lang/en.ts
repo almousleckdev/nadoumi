@@ -308,6 +308,7 @@ export default {
   table: {
     emptyTitle: 'Nothing to show',
     total: '{n} total',
+    columns: 'Columns',
   },
   filter: {
     clear: 'Clear filters',
