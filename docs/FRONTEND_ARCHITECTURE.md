@@ -157,6 +157,15 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   gallery grid in place of the former placeholder. `UniversityGalleryImage` added
   to `types/catalog.ts`.
 
+**UPDATE 2026-09-03 (scholarship terms — V23):**
+- `ScholarshipDetail` gains `coverage[]` (structured "what the award covers"),
+  `renewalConditions`; `ScholarshipCard` gains `studyDurationMonths`,
+  `applicationChannel`, `agencyNumber`, `requiresFinancialProof`,
+  `requiresFoundationYear`. `scholarships/[slug].vue` renders a coverage list, a
+  renewal section, the two requirement flags, and study-duration / channel in the
+  header meta. `scholarships.coverageKind.*` / `.channel.*` / `.coverage` /
+  `.renewal` i18n in all four locales.
+
 **UPDATE 2026-09-03 (scholarship config depth — V22):**
 - `types/catalog.ts` `Money` → `{ amountRmb, amountUsd, currency }`; `ScholarshipDetail`
   gains `stipends[]` (per level, replacing the single `stipend`), `accommodation[]`

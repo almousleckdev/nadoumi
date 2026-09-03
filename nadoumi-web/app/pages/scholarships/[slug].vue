@@ -88,6 +88,8 @@ const eligibilityRows = computed(() => {
             <div><dt class="inline text-slate-400">{{ t('scholarships.colLanguage') }}: </dt><dd class="inline">{{ langLabel(s.teachingLanguage) }}</dd></div>
             <div v-if="s.levels.length"><dt class="inline text-slate-400">{{ t('scholarships.colLevel') }}: </dt><dd class="inline">{{ s.levels.map(l => t(`scholarships.level.${l}`)).join(', ') }}</dd></div>
             <div v-if="s.nonDegreeDuration"><dt class="inline text-slate-400">{{ t('scholarships.nonDegreeDuration') }}: </dt><dd class="inline">{{ t(`scholarships.nonDegree.${s.nonDegreeDuration}`, s.nonDegreeDuration) }}</dd></div>
+            <div v-if="s.studyDurationMonths"><dt class="inline text-slate-400">{{ t('scholarships.studyDuration') }}: </dt><dd class="inline">{{ t('scholarships.stipendDuration', { n: s.studyDurationMonths }) }}</dd></div>
+            <div v-if="s.applicationChannel"><dt class="inline text-slate-400">{{ t('scholarships.applicationChannel') }}: </dt><dd class="inline">{{ t(`scholarships.channel.${s.applicationChannel}`, s.applicationChannel) }}<span v-if="s.agencyNumber"> ({{ s.agencyNumber }})</span></dd></div>
             <div v-if="[s.city, s.province, s.country].filter(Boolean).length"><dt class="inline text-slate-400">{{ t('scholarships.colLocation') }}: </dt><dd class="inline">{{ [s.city, s.province, s.country].filter(Boolean).join(', ') }}</dd></div>
           </dl>
           <div class="mt-7 flex flex-wrap gap-3">
@@ -129,6 +131,29 @@ const eligibilityRows = computed(() => {
               </tbody>
             </table>
           </section>
+
+          <section v-if="s.coverage.length">
+            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.coverage') }}</h2>
+            <ul class="mt-3 grid gap-2 sm:grid-cols-2">
+              <li v-for="(c, i) in s.coverage" :key="i" class="flex items-start gap-2 text-slate-700">
+                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />
+                <span>
+                  {{ t(`scholarships.coverageKind.${c.kind}`, c.kind) }}
+                  <span v-if="c.detail" class="block text-sm text-slate-500">{{ c.detail }}</span>
+                </span>
+              </li>
+            </ul>
+          </section>
+
+          <section v-if="s.renewalConditions">
+            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.renewal') }}</h2>
+            <p class="mt-2 whitespace-pre-line leading-7 text-slate-700">{{ s.renewalConditions }}</p>
+          </section>
+
+          <p v-if="s.requiresFinancialProof || s.requiresFoundationYear" class="text-sm text-slate-600">
+            <span v-if="s.requiresFinancialProof" class="mr-3">• {{ t('scholarships.requiresFinancialProof') }}</span>
+            <span v-if="s.requiresFoundationYear">• {{ t('scholarships.requiresFoundationYear') }}</span>
+          </p>
 
           <section v-if="s.accommodation.length">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.accommodation') }}</h2>

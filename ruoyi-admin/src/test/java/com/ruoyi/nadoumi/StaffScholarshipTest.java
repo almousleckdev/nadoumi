@@ -27,6 +27,11 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
              "deadline":"2026-03-31","benefits":"Tuition, accommodation, stipend, insurance.",
              "requirements":"Bachelor degree, IELTS 6.0.","status":"ACTIVE","publishStatus":"PUBLISHED",
              "heroImageUrl":"https://img.example/sch-hero.jpg","coverImageUrl":"https://img.example/sch-cover.jpg",
+             "renewalConditions":"Renewed annually on a GPA >= 3.0 review.",
+             "studyDurationMonths":36,"applicationChannel":"CSC_AGENCY","agencyNumber":"10559",
+             "requiresFinancialProof":true,"requiresFoundationYear":false,
+             "coverage":[{"kind":"TUITION","detail":"Full waiver"},
+                         {"kind":"ACCOMMODATION"},{"kind":"MEDICAL_INSURANCE"}],
              "levels":["MASTER","PHD"],"categoryCodes":["CSC","TYPE_A"],
              "intakes":[{"term":"AUTUMN_SEPTEMBER","applicationOpen":"2025-12-01","applicationClose":"2026-03-31"}],
              "eligibility":{"ageMin":18,"ageMax":35,"gpaMin":3.0,"ieltsMin":6.0,"nationalityScope":"ANY"},
@@ -73,6 +78,13 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.view.stipends[1].level").value("PHD"))
                 .andExpect(jsonPath("$.view.accommodation.length()").value(2))
                 .andExpect(jsonPath("$.view.accommodation[0].roomType").value("SINGLE"))
+                .andExpect(jsonPath("$.view.coverage.length()").value(3))
+                .andExpect(jsonPath("$.view.coverage[0].kind").value("TUITION"))
+                .andExpect(jsonPath("$.view.studyDurationMonths").value(36))
+                .andExpect(jsonPath("$.view.applicationChannel").value("CSC_AGENCY"))
+                .andExpect(jsonPath("$.view.agencyNumber").value("10559"))
+                .andExpect(jsonPath("$.view.requiresFinancialProof").value(true))
+                .andExpect(jsonPath("$.view.renewalConditions").value("Renewed annually on a GPA >= 3.0 review."))
                 .andExpect(jsonPath("$.view.documentRequirements.length()").value(3))
                 .andExpect(jsonPath("$.publishStatus").value("PUBLISHED"))
                 .andReturn().getResponse().getContentAsString();
@@ -163,6 +175,8 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.fees[0].amountUsd").value(100))
                 .andExpect(jsonPath("$.stipends.length()").value(2))
                 .andExpect(jsonPath("$.accommodation.length()").value(2))
+                .andExpect(jsonPath("$.coverage.length()").value(3))
+                .andExpect(jsonPath("$.renewalConditions").value("Renewed annually on a GPA >= 3.0 review."))
                 .andExpect(jsonPath("$.documentRequirements.length()").value(3))
                 .andExpect(jsonPath("$.universityId").doesNotExist())
                 .andExpect(jsonPath("$.partnership").doesNotExist())

@@ -27,8 +27,9 @@ const row = {
   view: {
     id: 7, slug: 'csc-master', title: 'CSC Master', country: 'CN', fundingModel: 'FULLY',
     hasStipend: true, featured: true, recommended: false, hot: false,
+    requiresFinancialProof: false, requiresFoundationYear: false,
     levels: ['MASTER'], categories: ['CSC'], intakes: [], fees: [],
-    stipends: [], accommodation: [], documentRequirements: [],
+    stipends: [], accommodation: [], coverage: [], documentRequirements: [],
   },
   status: 'ACTIVE', publishStatus: 'PUBLISHED',
 }

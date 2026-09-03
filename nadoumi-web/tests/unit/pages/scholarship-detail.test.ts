@@ -16,6 +16,12 @@ const dto: SDto = {
   fees: [{ kind: 'APPLICATION', amountRmb: 710, amountUsd: 100, currency: 'CNY', note: 'Non-refundable' }],
   stipends: [{ level: 'MASTER', amountRmb: 3500, amountUsd: 493, currency: 'CNY', frequency: 'MONTHLY', durationMonths: 36 }],
   accommodation: [{ roomType: 'SINGLE', amountRmb: 1200, amountUsd: 169, currency: 'CNY', note: 'AC, private bathroom' }],
+  coverage: [
+    { kind: 'TUITION', detail: 'Full waiver' },
+    { kind: 'MEDICAL_INSURANCE', detail: null },
+  ],
+  renewalConditions: 'Renewed annually on a GPA >= 3.0 review.',
+  requiresFinancialProof: true, requiresFoundationYear: false,
   documentRequirements: [
     { docType: 'PASSPORT', mandatory: true },
     { docType: 'STUDY_PLAN', mandatory: false, note: '1–2 pages' },
@@ -42,6 +48,9 @@ describe('scholarship detail page', () => {
     expect(text).toContain('¥3,500 · $493')
     expect(text).toContain('Accommodation')
     expect(text).toContain('Single room')
+    expect(text).toContain('What the award covers')
+    expect(text).toContain('Full waiver')
+    expect(text).toContain('Renewal & annual review')
     // document requirements come from config, not hard-coded
     expect(text).toContain('Passport')
     expect(text).toContain('Study plan')

@@ -18,7 +18,13 @@
         <result property="benefits"               column="benefits"/>
         <result property="requirements"           column="requirements"/>
         <result property="policy"                 column="policy"/>
+        <result property="renewalConditions"      column="renewal_conditions"/>
         <result property="nonDegreeDuration"      column="non_degree_duration"/>
+        <result property="studyDurationMonths"    column="study_duration_months"/>
+        <result property="applicationChannel"     column="application_channel"/>
+        <result property="agencyNumber"           column="agency_number"/>
+        <result property="requiresFinancialProof" column="requires_financial_proof"/>
+        <result property="requiresFoundationYear" column="requires_foundation_year"/>
         <result property="applicationFeeAmount"   column="application_fee_amount"/>
         <result property="applicationFeeCurrency" column="application_fee_currency"/>
         <result property="serviceFeeAmount"       column="service_fee_amount"/>
@@ -42,7 +48,10 @@
     <sql id="viewCols">
         v.id, v.slug, v.title, v.summary, v.country, v.province, v.city, v.field,
         v.teaching_language, v.funding_model, v.has_stipend, v.deadline,
-        v.benefits, v.requirements, v.policy, v.non_degree_duration,
+        v.benefits, v.requirements, v.policy, v.renewal_conditions,
+        v.non_degree_duration, v.study_duration_months,
+        v.application_channel, v.agency_number,
+        v.requires_financial_proof, v.requires_foundation_year,
         v.application_fee_amount, v.application_fee_currency,
         v.service_fee_amount, v.service_fee_currency, v.slots,
         v.hero_image_url, v.cover_image_url,
@@ -52,7 +61,10 @@
     <sql id="baseCols">
         s.id, s.slug, s.title, s.summary, s.country, s.province, s.city, s.field,
         s.teaching_language, s.funding_model, s.has_stipend, s.deadline,
-        s.benefits, s.requirements, s.policy, s.non_degree_duration,
+        s.benefits, s.requirements, s.policy, s.renewal_conditions,
+        s.non_degree_duration, s.study_duration_months,
+        s.application_channel, s.agency_number,
+        s.requires_financial_proof, s.requires_foundation_year,
         s.application_fee_amount, s.application_fee_currency,
         s.service_fee_amount, s.service_fee_currency, s.slots,
         s.hero_image_url, s.cover_image_url,
@@ -174,14 +186,18 @@
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_scholarship
             (slug, title, summary, country, province, city, field, teaching_language, funding_model,
-             has_stipend, deadline, benefits, requirements, policy, non_degree_duration,
+             has_stipend, deadline, benefits, requirements, policy, renewal_conditions,
+             non_degree_duration, study_duration_months, application_channel, agency_number,
+             requires_financial_proof, requires_foundation_year,
              application_fee_amount, application_fee_currency, service_fee_amount, service_fee_currency,
              slots, is_featured, is_recommended, is_hot, publish_status, published_at, status,
              create_by, create_time, remark, hero_image_url, cover_image_url)
         values
             (#{slug}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
              #{teachingLanguage}, #{fundingModel}, #{hasStipend}, #{deadline}, #{benefits},
-             #{requirements}, #{policy}, #{nonDegreeDuration},
+             #{requirements}, #{policy}, #{renewalConditions},
+             #{nonDegreeDuration}, #{studyDurationMonths}, #{applicationChannel}, #{agencyNumber},
+             #{requiresFinancialProof}, #{requiresFoundationYear},
              #{applicationFeeAmount}, #{applicationFeeCurrency},
              #{serviceFeeAmount}, #{serviceFeeCurrency}, #{slots}, #{featured}, #{recommended},
              #{hot}, #{publishStatus}, #{publishedAt}, #{status}, #{createBy}, now(), #{remark},
@@ -194,7 +210,10 @@
             province = #{province}, city = #{city}, field = #{field},
             teaching_language = #{teachingLanguage}, funding_model = #{fundingModel},
             has_stipend = #{hasStipend}, deadline = #{deadline}, benefits = #{benefits},
-            requirements = #{requirements}, policy = #{policy}, non_degree_duration = #{nonDegreeDuration},
+            requirements = #{requirements}, policy = #{policy}, renewal_conditions = #{renewalConditions},
+            non_degree_duration = #{nonDegreeDuration}, study_duration_months = #{studyDurationMonths},
+            application_channel = #{applicationChannel}, agency_number = #{agencyNumber},
+            requires_financial_proof = #{requiresFinancialProof}, requires_foundation_year = #{requiresFoundationYear},
             application_fee_amount = #{applicationFeeAmount}, application_fee_currency = #{applicationFeeCurrency},
             service_fee_amount = #{serviceFeeAmount}, service_fee_currency = #{serviceFeeCurrency},
             slots = #{slots}, is_featured = #{featured}, is_recommended = #{recommended}, is_hot = #{hot},
@@ -256,6 +275,11 @@
         from nad_scholarship_accommodation where scholarship_id = #{scholarshipId} order by sort_order, id
     </select>
 
+    <select id="findCoverage" resultType="com.nadoumi.scholarship.domain.ScholarshipCoverage">
+        select kind, detail
+        from nad_scholarship_coverage where scholarship_id = #{scholarshipId} order by sort_order, id
+    </select>
+
     <select id="findDocumentRequirements" resultType="com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement">
         select doc_type as docType, mandatory, note
         from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId} order by sort_order, id
@@ -308,6 +332,12 @@
         insert into nad_scholarship_accommodation
             (scholarship_id, room_type, amount, currency, note, sort_order)
         values (#{scholarshipId}, #{a.roomType}, #{a.amount}, #{a.currency}, #{a.note}, #{sortOrder})
+    </insert>
+
+    <delete id="deleteCoverage">delete from nad_scholarship_coverage where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertCoverage">
+        insert into nad_scholarship_coverage (scholarship_id, kind, detail, sort_order)
+        values (#{scholarshipId}, #{c.kind}, #{c.detail}, #{sortOrder})
     </insert>
 
     <delete id="deleteDocumentRequirements">delete from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId}</delete>

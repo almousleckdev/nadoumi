@@ -30,6 +30,11 @@ export interface ScholarshipCard {
   fundingModel: 'FULLY' | 'PARTIAL' | 'SELF'
   hasStipend: boolean
   nonDegreeDuration?: string | null
+  studyDurationMonths?: number | null
+  applicationChannel?: string | null
+  agencyNumber?: string | null
+  requiresFinancialProof?: boolean
+  requiresFoundationYear?: boolean
   deadline?: string | null
   applicationFee?: Money | null
   serviceFee?: Money | null
@@ -48,6 +53,7 @@ export interface ScholarshipDetail extends ScholarshipCard {
   benefits?: string | null
   requirements?: string | null
   policy?: string | null
+  renewalConditions?: string | null
   eligibility?: {
     ageMin?: number | null
     ageMax?: number | null
@@ -79,6 +85,7 @@ export interface ScholarshipDetail extends ScholarshipCard {
     currency: string
     note?: string | null
   }[]
+  coverage: { kind: string, detail?: string | null }[]
   documentRequirements: { docType: string, mandatory: boolean, note?: string | null }[]
 }
 

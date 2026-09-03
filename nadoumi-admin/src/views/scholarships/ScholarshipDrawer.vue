@@ -6,9 +6,11 @@ import { Plus, Delete } from '@element-plus/icons-vue'
 import {
   createScholarship, updateScholarship, listScholarshipCategories,
   EDUCATION_LEVELS, FEE_KINDS, DOC_TYPES, INTAKE_TERMS, ROOM_TYPES, NON_DEGREE_DURATIONS,
+  COVERAGE_KINDS, APPLICATION_CHANNELS,
   type Scholarship, type ScholarshipInput, type ScholarshipCategoryOption,
   type EducationLevel, type FeeKind, type NationalityScope,
   type RoomType, type NonDegreeDuration, type StipendFrequency,
+  type CoverageKind, type ApplicationChannel,
 } from '@/api/scholarship'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
@@ -47,12 +49,18 @@ function blankForm() {
     fundingModel: 'FULLY' as ScholarshipInput['fundingModel'],
     categoryCodes: [] as string[],
     levels: [] as EducationLevel[],
-    benefits: '', requirements: '', policy: '',
+    benefits: '', requirements: '', policy: '', renewalConditions: '',
     applicationFeeAmount: null as number | null, applicationFeeCurrency: 'CNY',
     serviceFeeAmount: null as number | null, serviceFeeCurrency: 'USD',
     slots: null as number | null,
     deadline: '' as string | null,
     nonDegreeDuration: null as NonDegreeDuration | null,
+    studyDurationMonths: null as number | null,
+    applicationChannel: null as ApplicationChannel | null,
+    agencyNumber: '',
+    requiresFinancialProof: false,
+    requiresFoundationYear: false,
+    coverage: [] as { kind: CoverageKind, detail: string }[],
     fees: [] as { kind: FeeKind, amount: number | null, currency: string, note: string }[],
     eligibility: blankEligibility(),
     levelStipends: [] as { level: EducationLevel, amount: number | null, currency: string, frequency: StipendFrequency, durationMonths: number | null, conditions: string }[],
@@ -91,7 +99,14 @@ watch(() => props.modelValue, (open) => {
     teachingLanguage: v.teachingLanguage ?? null, fundingModel: v.fundingModel,
     categoryCodes: [...v.categories], levels: [...v.levels] as EducationLevel[],
     benefits: v.benefits ?? '', requirements: v.requirements ?? '', policy: v.policy ?? '',
+    renewalConditions: v.renewalConditions ?? '',
     nonDegreeDuration: v.nonDegreeDuration ?? null,
+    studyDurationMonths: v.studyDurationMonths ?? null,
+    applicationChannel: v.applicationChannel ?? null,
+    agencyNumber: v.agencyNumber ?? '',
+    requiresFinancialProof: v.requiresFinancialProof,
+    requiresFoundationYear: v.requiresFoundationYear,
+    coverage: v.coverage.map(c => ({ kind: c.kind as CoverageKind, detail: c.detail ?? '' })),
     // amounts are re-populated from the RMB figure (see the Media/Fees note) in CNY
     applicationFeeAmount: v.applicationFee?.amountRmb ?? null, applicationFeeCurrency: 'CNY',
     serviceFeeAmount: v.serviceFee?.amountUsd ?? null, serviceFeeCurrency: 'USD',
@@ -153,10 +168,16 @@ function payload(): ScholarshipInput {
     fundingModel: form.fundingModel,
     hasStipend: form.levelStipends.some(st => st.amount != null),
     nonDegreeDuration: form.levels.includes('NON_DEGREE') ? form.nonDegreeDuration : null,
+    studyDurationMonths: n(form.studyDurationMonths),
+    applicationChannel: form.applicationChannel || null,
+    agencyNumber: form.applicationChannel === 'CSC_AGENCY' ? s(form.agencyNumber) : null,
+    requiresFinancialProof: form.requiresFinancialProof,
+    requiresFoundationYear: form.requiresFoundationYear,
     deadline: s(form.deadline ?? ''),
     benefits: s(form.benefits),
     requirements: s(form.requirements),
     policy: s(form.policy),
+    renewalConditions: s(form.renewalConditions),
     applicationFeeAmount: n(form.applicationFeeAmount),
     applicationFeeCurrency: form.applicationFeeAmount != null ? form.applicationFeeCurrency.toUpperCase() : null,
     serviceFeeAmount: n(form.serviceFeeAmount),
@@ -191,6 +212,7 @@ function payload(): ScholarshipInput {
     accommodations: form.accommodations.filter(a => a.roomType).map(a => ({
       roomType: a.roomType, amount: n(a.amount), currency: a.currency.toUpperCase(), note: s(a.note),
     })),
+    coverage: form.coverage.filter(c => c.kind).map(c => ({ kind: c.kind, detail: s(c.detail) })),
     documentRequirements: form.documentRequirements.filter(d => d.docType.trim()).map(d => ({
       docType: d.docType.trim().toUpperCase(), mandatory: d.mandatory, note: s(d.note),
     })),
@@ -777,6 +799,91 @@ async function save() {
       </FormSection>
 
       <FormSection
+        :title="t('scholarship.secCoverage')"
+        :description="t('scholarship.coverageHint')"
+      >
+        <div
+          v-for="(c, i) in form.coverage"
+          :key="i"
+          class="line"
+        >
+          <el-select
+            v-model="c.kind"
+            class="w-52"
+          >
+            <el-option
+              v-for="ck in COVERAGE_KINDS"
+              :key="ck"
+              :value="ck"
+              :label="t(`scholarship.coverageKind.${ck}`)"
+            />
+          </el-select>
+          <el-input
+            v-model="c.detail"
+            :placeholder="t('scholarship.coverageDetail')"
+            maxlength="300"
+          />
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            @click="form.coverage.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          :icon="Plus"
+          @click="form.coverage.push({ kind: 'TUITION', detail: '' })"
+        >
+          {{ t('scholarship.addCoverage') }}
+        </el-button>
+      </FormSection>
+
+      <FormSection :title="t('scholarship.secApplication')">
+        <div class="row">
+          <el-form-item :label="t('scholarship.studyDurationMonths')">
+            <el-input-number
+              v-model="form.studyDurationMonths"
+              :min="1"
+              :max="120"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.applicationChannel')">
+            <el-select
+              v-model="form.applicationChannel"
+              clearable
+            >
+              <el-option
+                v-for="ch in APPLICATION_CHANNELS"
+                :key="ch"
+                :value="ch"
+                :label="t(`scholarship.channel.${ch}`)"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            v-if="form.applicationChannel === 'CSC_AGENCY'"
+            :label="t('scholarship.agencyNumber')"
+          >
+            <el-input
+              v-model="form.agencyNumber"
+              maxlength="64"
+            />
+          </el-form-item>
+        </div>
+        <el-form-item>
+          <el-checkbox v-model="form.requiresFinancialProof">
+            {{ t('scholarship.requiresFinancialProof') }}
+          </el-checkbox>
+        </el-form-item>
+        <el-form-item>
+          <el-checkbox v-model="form.requiresFoundationYear">
+            {{ t('scholarship.requiresFoundationYear') }}
+          </el-checkbox>
+        </el-form-item>
+      </FormSection>
+
+      <FormSection
         :title="t('scholarship.secDocuments')"
         :description="t('scholarship.documentsHint')"
       >
@@ -841,6 +948,15 @@ async function save() {
             v-model="form.policy"
             type="textarea"
             :rows="2"
+          />
+        </el-form-item>
+        <el-form-item :label="t('scholarship.renewalConditions')">
+          <el-input
+            v-model="form.renewalConditions"
+            type="textarea"
+            :rows="2"
+            maxlength="2000"
+            :placeholder="t('scholarship.renewalConditionsHint')"
           />
         </el-form-item>
       </FormSection>

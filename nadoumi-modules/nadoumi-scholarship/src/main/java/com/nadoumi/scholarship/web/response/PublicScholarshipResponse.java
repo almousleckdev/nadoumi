@@ -31,6 +31,11 @@ public record PublicScholarshipResponse(
         String fundingModel,
         boolean hasStipend,
         String nonDegreeDuration,
+        Integer studyDurationMonths,
+        String applicationChannel,
+        String agencyNumber,
+        boolean requiresFinancialProof,
+        boolean requiresFoundationYear,
         LocalDate deadline,
         Money applicationFee,
         Money serviceFee,
@@ -47,10 +52,12 @@ public record PublicScholarshipResponse(
         String benefits,
         String requirements,
         String policy,
+        String renewalConditions,
         Eligibility eligibility,
         List<Fee> fees,
         List<LevelStipend> stipends,
         List<Accommodation> accommodation,
+        List<Coverage> coverage,
         List<DocumentRequirement> documentRequirements) {
 
     /** Fixed display rate — CNY per USD. Keep in sync with the admin's guidance. */
@@ -90,6 +97,9 @@ public record PublicScholarshipResponse(
             String currency, String note) {
     }
 
+    public record Coverage(String kind, String detail) {
+    }
+
     public record DocumentRequirement(String docType, boolean mandatory, String note) {
     }
 
@@ -107,7 +117,10 @@ public record PublicScholarshipResponse(
                 s.getCountry(), s.getProvince(), s.getCity(), s.getField(),
                 s.getTeachingLanguage() == null ? null : s.getTeachingLanguage().name(),
                 s.getFundingModel() == null ? null : s.getFundingModel().name(),
-                s.isHasStipend(), s.getNonDegreeDuration(), s.getDeadline(),
+                s.isHasStipend(), s.getNonDegreeDuration(), s.getStudyDurationMonths(),
+                s.getApplicationChannel(), s.getAgencyNumber(),
+                s.isRequiresFinancialProof(), s.isRequiresFoundationYear(),
+                s.getDeadline(),
                 Money.of(s.getApplicationFeeAmount(), s.getApplicationFeeCurrency()),
                 Money.of(s.getServiceFeeAmount(), s.getServiceFeeCurrency()),
                 s.getSlots(), s.isFeatured(), s.isRecommended(), s.isHot(),
@@ -119,6 +132,7 @@ public record PublicScholarshipResponse(
                 detail ? s.getBenefits() : null,
                 detail ? s.getRequirements() : null,
                 detail ? s.getPolicy() : null,
+                detail ? s.getRenewalConditions() : null,
                 detail ? eligibility(s) : null,
                 detail ? s.getFees().stream()
                         .map(f -> Fee.of(f.kind(), f.amount(), f.currency(), f.note())).toList() : null,
@@ -129,6 +143,8 @@ public record PublicScholarshipResponse(
                 detail ? s.getAccommodations().stream()
                         .map(a -> new Accommodation(a.roomType(), rmb(a.amount(), cur(a.currency())),
                                 usd(a.amount(), cur(a.currency())), cur(a.currency()), a.note())).toList() : null,
+                detail ? s.getCoverage().stream()
+                        .map(c -> new Coverage(c.kind(), c.detail())).toList() : null,
                 detail ? s.getDocumentRequirements().stream()
                         .map(d -> new DocumentRequirement(d.docType(), d.mandatory(), d.note())).toList() : null);
     }

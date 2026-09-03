@@ -32,7 +32,13 @@ public class Scholarship {
     private String benefits;
     private String requirements;
     private String policy;
+    private String renewalConditions;
     private String nonDegreeDuration;
+    private Integer studyDurationMonths;
+    private String applicationChannel;
+    private String agencyNumber;
+    private boolean requiresFinancialProof;
+    private boolean requiresFoundationYear;
     private BigDecimal applicationFeeAmount;
     private String applicationFeeCurrency;
     private BigDecimal serviceFeeAmount;
@@ -59,6 +65,7 @@ public class Scholarship {
     private List<ScholarshipFee> fees = new ArrayList<>();
     private List<ScholarshipLevelStipend> levelStipends = new ArrayList<>();
     private List<ScholarshipAccommodation> accommodations = new ArrayList<>();
+    private List<ScholarshipCoverage> coverage = new ArrayList<>();
     private List<ScholarshipDocumentRequirement> documentRequirements = new ArrayList<>();
 
     public Long getId() { return id; }
@@ -91,8 +98,20 @@ public class Scholarship {
     public void setRequirements(String requirements) { this.requirements = requirements; }
     public String getPolicy() { return policy; }
     public void setPolicy(String policy) { this.policy = policy; }
+    public String getRenewalConditions() { return renewalConditions; }
+    public void setRenewalConditions(String renewalConditions) { this.renewalConditions = renewalConditions; }
     public String getNonDegreeDuration() { return nonDegreeDuration; }
     public void setNonDegreeDuration(String nonDegreeDuration) { this.nonDegreeDuration = nonDegreeDuration; }
+    public Integer getStudyDurationMonths() { return studyDurationMonths; }
+    public void setStudyDurationMonths(Integer studyDurationMonths) { this.studyDurationMonths = studyDurationMonths; }
+    public String getApplicationChannel() { return applicationChannel; }
+    public void setApplicationChannel(String applicationChannel) { this.applicationChannel = applicationChannel; }
+    public String getAgencyNumber() { return agencyNumber; }
+    public void setAgencyNumber(String agencyNumber) { this.agencyNumber = agencyNumber; }
+    public boolean isRequiresFinancialProof() { return requiresFinancialProof; }
+    public void setRequiresFinancialProof(boolean requiresFinancialProof) { this.requiresFinancialProof = requiresFinancialProof; }
+    public boolean isRequiresFoundationYear() { return requiresFoundationYear; }
+    public void setRequiresFoundationYear(boolean requiresFoundationYear) { this.requiresFoundationYear = requiresFoundationYear; }
     public BigDecimal getApplicationFeeAmount() { return applicationFeeAmount; }
     public void setApplicationFeeAmount(BigDecimal v) { this.applicationFeeAmount = v; }
     public String getApplicationFeeCurrency() { return applicationFeeCurrency; }
@@ -146,6 +165,8 @@ public class Scholarship {
     public void setLevelStipends(List<ScholarshipLevelStipend> levelStipends) { this.levelStipends = levelStipends; }
     public List<ScholarshipAccommodation> getAccommodations() { return accommodations; }
     public void setAccommodations(List<ScholarshipAccommodation> accommodations) { this.accommodations = accommodations; }
+    public List<ScholarshipCoverage> getCoverage() { return coverage; }
+    public void setCoverage(List<ScholarshipCoverage> coverage) { this.coverage = coverage; }
     public List<ScholarshipDocumentRequirement> getDocumentRequirements() { return documentRequirements; }
     public void setDocumentRequirements(List<ScholarshipDocumentRequirement> v) { this.documentRequirements = v; }
 }

@@ -7,6 +7,7 @@ import com.nadoumi.scholarship.domain.ScholarshipEligibility;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
 import com.nadoumi.scholarship.domain.ScholarshipIntake;
 import com.nadoumi.scholarship.domain.ScholarshipAccommodation;
+import com.nadoumi.scholarship.domain.ScholarshipCoverage;
 import com.nadoumi.scholarship.domain.ScholarshipInternal;
 import com.nadoumi.scholarship.domain.ScholarshipLevelStipend;
 import java.util.List;
@@ -71,6 +72,8 @@ public interface ScholarshipMapper {
 
     List<ScholarshipAccommodation> findAccommodations(@Param("scholarshipId") Long scholarshipId);
 
+    List<ScholarshipCoverage> findCoverage(@Param("scholarshipId") Long scholarshipId);
+
     List<ScholarshipDocumentRequirement> findDocumentRequirements(@Param("scholarshipId") Long scholarshipId);
 
     // ---- child writes (staff) ----
@@ -105,6 +108,11 @@ public interface ScholarshipMapper {
 
     int insertAccommodation(@Param("scholarshipId") Long scholarshipId,
             @Param("a") ScholarshipAccommodation accommodation, @Param("sortOrder") int sortOrder);
+
+    int deleteCoverage(@Param("scholarshipId") Long scholarshipId);
+
+    int insertCoverage(@Param("scholarshipId") Long scholarshipId,
+            @Param("c") ScholarshipCoverage coverage, @Param("sortOrder") int sortOrder);
 
     int deleteDocumentRequirements(@Param("scholarshipId") Long scholarshipId);
 

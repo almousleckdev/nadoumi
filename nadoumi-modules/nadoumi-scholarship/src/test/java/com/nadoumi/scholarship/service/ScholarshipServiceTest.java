@@ -79,6 +79,9 @@ class ScholarshipServiceTest {
                 new ScholarshipFee("APPLICATION", new BigDecimal("710.00"), "CNY", null)));
         when(mapper.findLevelStipends(5L)).thenReturn(List.of());
         when(mapper.findAccommodations(5L)).thenReturn(List.of());
+        when(mapper.findCoverage(5L)).thenReturn(List.of(
+                new com.nadoumi.scholarship.domain.ScholarshipCoverage("TUITION", "Full waiver"),
+                new com.nadoumi.scholarship.domain.ScholarshipCoverage("MEDICAL_INSURANCE", null)));
         when(mapper.findDocumentRequirements(5L)).thenReturn(List.of());
 
         var detail = service.getPublic("5");
@@ -90,6 +93,7 @@ class ScholarshipServiceTest {
         assertThat(detail.fees().get(0).amountUsd()).isEqualByComparingTo("100");
         assertThat(detail.stipends()).isEmpty();
         assertThat(detail.accommodation()).isEmpty();
+        assertThat(detail.coverage()).extracting(c -> c.kind()).containsExactly("TUITION", "MEDICAL_INSURANCE");
     }
 
     @Test
