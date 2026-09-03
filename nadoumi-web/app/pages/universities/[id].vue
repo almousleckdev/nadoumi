@@ -69,7 +69,7 @@ const prose = computed(() => {
     <section class="relative isolate overflow-hidden bg-slate-900 text-white">
       <img
         v-if="u.coverImageUrl"
-        :src="u.coverImageUrl"
+        :src="mediaUrl(u.coverImageUrl)"
         alt=""
         class="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
       >
@@ -78,7 +78,7 @@ const prose = computed(() => {
         <div class="flex flex-col gap-5 py-12 sm:flex-row sm:items-center sm:py-16">
           <img
             v-if="u.logoImageUrl"
-            :src="u.logoImageUrl"
+            :src="mediaUrl(u.logoImageUrl)"
             alt=""
             class="h-20 w-20 shrink-0 rounded-2xl bg-white/95 object-contain p-2 ring-1 ring-white/20"
           >
@@ -156,7 +156,7 @@ const prose = computed(() => {
             <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
               <figure v-for="g in u.gallery" :key="g.id" class="overflow-hidden rounded-xl bg-slate-100">
                 <img
-                  :src="g.imageUrl"
+                  :src="mediaUrl(g.imageUrl)"
                   :alt="g.caption ?? ''"
                   loading="lazy"
                   decoding="async"

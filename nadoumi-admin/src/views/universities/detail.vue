@@ -59,7 +59,7 @@
         <div class="imgs">
           <figure v-if="u.logoImageUrl">
             <img
-              :src="u.logoImageUrl"
+              :src="assetUrl(u.logoImageUrl)"
               class="img-logo"
               alt=""
             >
@@ -67,7 +67,7 @@
           </figure>
           <figure v-if="u.coverImageUrl">
             <img
-              :src="u.coverImageUrl"
+              :src="assetUrl(u.coverImageUrl)"
               class="img-cover"
               alt=""
             >
@@ -194,7 +194,7 @@
             class="gal__item"
           >
             <img
-              :src="g.imageUrl"
+              :src="assetUrl(g.imageUrl)"
               :alt="g.caption ?? ''"
             >
             <figcaption v-if="g.caption">
@@ -324,6 +324,7 @@ import ErrorState from '@/components/ui/ErrorState.vue'
 import type { DescriptionItem } from '@/components/ui/types'
 import UniversityDrawer from './UniversityDrawer.vue'
 import ProgramDrawer from '@/views/programs/ProgramDrawer.vue'
+import { assetUrl } from '@/utils/asset'
 
 const { t } = useI18n()
 const route = useRoute()

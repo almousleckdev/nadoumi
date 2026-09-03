@@ -183,6 +183,14 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   shows a cover strip; `scholarships/[slug]` hero uses the hero/cover image.
   Admin uploads through RuoYi `/common/upload` (no object-storage slice yet).
 
+**FIX 2026-09-03 (portable image refs):** uploads now store the **path only**
+(`/profile/upload/…`, RuoYi's `fileName`), never its absolute
+`http://host:port` URL. Admin renders via `assetUrl()` (`src/utils/asset.ts`,
+prefixes the API base; passes through legacy absolute URLs). `nadoumi-web` adds a
+same-origin Nitro proxy `server/routes/media/[...path].ts` → `${backendBaseUrl}/…`
+and renders via `mediaUrl()` (`app/utils/media.ts`). Works in dev and prod
+without baking the backend host into the DB.
+
 **UPDATE 2026-09-03 (programmes — `nadoumi-program`, V19/V20):**
 - `ProgramCard` marketing component; `types/catalog.ts` gains `ProgramCard` /
   `ProgramDetail` / `ProgramMajor` / `ProgramIntake` (replacing the unused
