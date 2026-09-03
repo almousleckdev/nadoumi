@@ -177,7 +177,7 @@ empty/error/loading surface or confirm dialog.
 | Component | Responsibility |
 | --- | --- |
 | `PageHeader` (`components/`) | Title + subtitle + `#actions` slot. Every screen. |
-| `ui/DataTable` | `el-table` + pagination + built-in error / skeleton / empty states; `columns` prop, per-column `#cell-<prop>` slots, `row-click`. |
+| `ui/DataTable` | `el-table` + pagination + built-in error / skeleton / empty states; `columns` prop, per-column `#cell-<prop>` slots, `row-click`. A `storage-key` prop turns on the per-column show/hide dropdown ("Columns"), persisted to `localStorage` under `nad.dt.cols.<storage-key>`. Columns opt into header sorting with `sortable: true`; the table then emits a normalised `sort-change` `{ prop, order: 'asc' \| 'desc' \| null }` (dormant until a screen handles it). |
 | `ui/FilterBar` | Filter row layout + "Clear filters" affordance (`dirty` prop). |
 | `ui/SearchInput` | Debounced search field (`v-model` + `@search`). |
 | `ui/StatusBadge` | One status → tone vocabulary for the whole admin (`DEFAULT_MAP`). |

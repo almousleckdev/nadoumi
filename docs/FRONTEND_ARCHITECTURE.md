@@ -197,6 +197,15 @@ route by `slug` — `app/pages/universities/[slug].vue`, `app/pages/programs/[sl
 for the back-link. The public detail endpoints accept a numeric id or the slug.
 `UniversitySummary` / `ProgramCard` gain `slug` (and `ProgramCard.universitySlug`).
 
+**UPDATE 2026-09-03 (admin DataTable — column visibility):** the shared
+`nadoumi-admin` `ui/DataTable` gained a per-column show/hide dropdown, opt-in via a
+`storage-key` prop (persisted to `localStorage` as `nad.dt.cols.<key>`), plus
+sortable-header plumbing (`sortable: true` on a column → normalised `sort-change`
+emit, currently dormant). Wired on the universities, programs, scholarships and
+applicants lists. A full `@tanstack/vue-table` swap was deliberately not taken —
+Element Plus already covers sorting, tooltips and pagination — and remains an
+option if drag-reorder / pinning / virtualization is later needed.
+
 **FIX 2026-09-03 (portable image refs):** uploads now store the **path only**
 (`/profile/upload/…`, RuoYi's `fileName`), never its absolute
 `http://host:port` URL. Admin renders via `assetUrl()` (`src/utils/asset.ts`,
