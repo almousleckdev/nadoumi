@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(25);
+        assertThat(applied).isEqualTo(26);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -189,6 +189,11 @@ class FlywayMigrationsIT {
         // V28 — applicant profile photo media id
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_applicant' AND column_name = 'photo_media_id'")).isEqualTo("1");
+        // V29 — media reconciliation Quartz job, seeded paused
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
+                + "WHERE invoke_target = 'mediaReconciliationJob.run()'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT status FROM sys_job "
+                + "WHERE invoke_target = 'mediaReconciliationJob.run()'")).isEqualTo("1");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -218,7 +223,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(24); // V2..V28
+        assertThat(applied).isEqualTo(25); // V2..V29
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
