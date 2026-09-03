@@ -157,6 +157,22 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   gallery grid in place of the former placeholder. `UniversityGalleryImage` added
   to `types/catalog.ts`.
 
+**UPDATE 2026-09-03 (programmes — `nadoumi-program`, V19/V20):**
+- `ProgramCard` marketing component; `types/catalog.ts` gains `ProgramCard` /
+  `ProgramDetail` / `ProgramMajor` / `ProgramIntake` (replacing the unused
+  `ProgramSummary` stub).
+- `universities/[id].vue` — the Programmes section is now a real grid of
+  `ProgramCard`s from `/api/public/universities/{id}/programs`, with an honest
+  empty state (no more "arriving" placeholder).
+- `pages/index.vue` — the programme-discovery `SectionPlaceholder` is replaced by
+  a real "Hot programmes" `DiscoverySection` (`/api/public/programs?hot=true`).
+- `pages/programs/[id].vue` — new SSR programme detail page (hero, facts,
+  summary, majors, intakes, back-to-university link). Reached only from a
+  university or a carousel — **no `/programs` index, no nav item**.
+- i18n `program.*` namespace added to all four locales; `university.programmesEmpty`
+  replaces `programmesArriving` / `programmesBody`; `home.programDiscovery.empty`
+  added.
+
 **UPDATE 2026-09-02 (public website build-out):**
 - The five public pages are real, on the Tailwind + `NContainer` marketing shell.
   `PageHero.vue` / `ContentCard.vue` rebuilt on the real design tokens (the old

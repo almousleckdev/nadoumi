@@ -183,6 +183,36 @@ commission / internal field on any path (`StaffScholarshipTest` enforces this).
 | GET | `/api/staff/scholarships/{id}/internal` | `nad:scholarship:internal:view` | `ScholarshipInternalResponse` (`universityId`, `universityName` via `UniversityService`, `partnershipId`, `internalStatus`, operational / confidential fields). |
 | PUT | `/api/staff/scholarships/{id}/internal` | `nad:scholarship:internal:edit` | upsert; `universityId` validated via `UniversityService`. |
 
+### 4.7 Programme endpoints (IMPLEMENTED — `nadoumi-program`, R2)
+
+A **programme** belongs to exactly one university (`nad_program.university_id`
+→ `nad_university` ON DELETE RESTRICT). The owning university is **validated on
+write and its name resolved on read through `UniversityService`** — never a
+cross-module SQL join. No commercial data. `ProgramResponse` (staff) carries
+`status` / `publishStatus` / `remark` / audit + `universityName` + `majors` +
+`intakes`; `PublicProgramResponse` drops the operational fields, and list rows
+drop `majors` / `intakes` (the detail endpoint fills them).
+
+**Staff** — `/api/staff/programs`, `StaffProgramController`.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/staff/programs` | `nad:program:list` | `q` (name EN/CN, field), `universityId`, `type`, `language`, `field`, `status`, `page`, `size` → `PageResponse<ProgramResponse>`. |
+| GET | `/api/staff/programs/{id}` | `nad:program:view` | assembles `majors` + `intakes`. |
+| POST | `/api/staff/programs` | `nad:program:create` | `201`. `universityId` must resolve (`400` otherwise); `(university_id, name)` unique (`400` otherwise). Children replaced whole in one transaction. |
+| PUT | `/api/staff/programs/{id}` | `nad:program:edit` | idem. |
+| DELETE | `/api/staff/programs/{id}` | `nad:program:remove` | `204`. `majors` / `intakes` cascade. |
+
+**Public** — `PublicProgramController`, `@Anonymous`. A programme is visible only
+when **both** it and its university are `publish_status='PUBLISHED' AND
+status='ACTIVE'`.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/public/programs` | anonymous | `q`, `universityId`, `type`, `language`, `field`, `featured`, `hot`, `page`, `size` (default 12) → `PageResponse<PublicProgramResponse>` (cards; carries `universityId` + `universityName`). Programmes whose university has since been unpublished are dropped and the page count corrected. Consumed by the Home "Hot programmes" carousel. |
+| GET | `/api/public/programs/{id}` | anonymous | adds `majors` + `intakes`. `404` unless programme + university are both published/active. Consumed by `nadoumi-web` `programs/[id].vue`. |
+| GET | `/api/public/universities/{id}/programs` | anonymous | the published programmes for one published university → `List<PublicProgramResponse>` (cards). `404` if the university is not public. Consumed by `universities/[id].vue`. |
+
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Page, ScholarshipCard, UniversitySummary } from '~/types/catalog'
+import type { Page, ProgramCard, ScholarshipCard, UniversitySummary } from '~/types/catalog'
 import { imagery } from '~/data/imagery'
 
 const { t } = useI18n()
@@ -29,11 +29,17 @@ const { data: fundedSch, pending: fundedSchPending, error: fundedSchError } = us
   () => publicGet<Page<ScholarshipCard>>('scholarships', { funding: 'FULLY', size: 12 }),
   { default: () => null },
 )
+const { data: hotProg, pending: hotProgPending, error: hotProgError } = useLazyAsyncData(
+  'home-hot-programmes',
+  () => publicGet<Page<ProgramCard>>('programs', { hot: true, size: 12 }),
+  { default: () => null },
+)
 
 const featuredUnis = computed(() => featured.value?.content ?? [])
 const recommendedUnis = computed(() => recommended.value?.content ?? [])
 const newScholarships = computed(() => newSch.value?.content ?? [])
 const fundedScholarships = computed(() => fundedSch.value?.content ?? [])
+const hotProgrammes = computed(() => hotProg.value?.content ?? [])
 
 const journey = computed(() => [
   { title: t('home.journey.s1t'), body: t('home.journey.s1b') },
@@ -147,12 +153,25 @@ const journey = computed(() => [
     </NContainer>
 
     <NContainer>
-      <SectionPlaceholder
+      <DiscoverySection
         :eyebrow="t('home.programDiscovery.eyebrow')"
         :title="t('home.programDiscovery.title')"
         :description="t('home.programDiscovery.description')"
-        :arriving-with="t('home.arriving.programs')"
-      />
+        :carousel-label="t('home.programDiscovery.title')"
+        :view-all-to="localePath('/universities')"
+        :view-all-label="t('catalog.viewAllUniversities')"
+        :pending="hotProgPending"
+        :error="hotProgError ? t('errors.loadSection') : ''"
+        :empty="!hotProgrammes.length"
+        :empty-text="t('home.programDiscovery.empty')"
+      >
+        <ProgramCard
+          v-for="p in hotProgrammes"
+          :key="p.id"
+          :program="p"
+          variant="carousel"
+        />
+      </DiscoverySection>
     </NContainer>
 
     <NContainer>

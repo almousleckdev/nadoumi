@@ -132,13 +132,43 @@ export interface UniversityGalleryImage {
   caption?: string | null
 }
 
-export interface ProgramSummary {
+export type ProgramType = 'LANGUAGE' | 'NON_DEGREE' | 'DIPLOMA' | 'BACHELOR' | 'MASTER' | 'PHD'
+export type ProgramLanguage = 'ENGLISH' | 'CHINESE' | 'BILINGUAL'
+
+export interface ProgramMajor {
+  id: number
+  name: string
+  nameCn?: string | null
+}
+
+export interface ProgramIntake {
+  id: number
+  term: string
+  applicationOpen?: string | null
+  applicationClose?: string | null
+}
+
+/** `/api/public/programs` — student-safe; carries the owning university's name only. */
+export interface ProgramCard {
   id: number
   universityId: number
+  universityName: string | null
   name: string
-  degreeLevel: string
-  field?: string
-  language?: string
+  nameCn?: string | null
+  programType: ProgramType
+  field?: string | null
+  teachingLanguage?: ProgramLanguage | null
+  durationMonths?: number | null
+  tuitionAmount?: number | null
+  tuitionCurrency?: string | null
+  summary?: string | null
+  featured: boolean
+  hot: boolean
+}
+
+export interface ProgramDetail extends ProgramCard {
+  majors: ProgramMajor[]
+  intakes: ProgramIntake[]
 }
 
 export interface Page<T> {

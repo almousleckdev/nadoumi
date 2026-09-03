@@ -177,10 +177,103 @@
         </div>
       </div>
 
+      <div class="nad-card sec">
+        <div class="sec__head">
+          <h3 class="sec__title">
+            {{ t('program.sectionTitle') }}
+          </h3>
+          <el-button
+            v-if="userStore.hasPerm('nad:program:create')"
+            size="small"
+            :icon="Plus"
+            @click="openProgramCreate"
+          >
+            {{ t('program.addHere') }}
+          </el-button>
+        </div>
+        <p class="sec__hint">
+          {{ t('program.sectionHint') }}
+        </p>
+        <el-table
+          v-if="programs.length"
+          :data="programs"
+        >
+          <el-table-column
+            :label="t('program.name')"
+            prop="name"
+            min-width="200"
+          />
+          <el-table-column
+            :label="t('program.type')"
+            width="130"
+          >
+            <template #default="{ row }">
+              {{ t(`program.typeMap.${row.programType}`) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('program.language')"
+            width="120"
+          >
+            <template #default="{ row }">
+              {{ row.teachingLanguage ? t(`program.langMap.${row.teachingLanguage}`) : '—' }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('program.publishStatus')"
+            width="120"
+          >
+            <template #default="{ row }">
+              <StatusBadge
+                :status="row.publishStatus"
+                :map="{ PUBLISHED: 'success', DRAFT: 'neutral' }"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('common.actions')"
+            width="130"
+            align="right"
+          >
+            <template #default="{ row }">
+              <el-button
+                v-if="userStore.hasPerm('nad:program:edit')"
+                link
+                size="small"
+                @click="openProgramEdit(row as Program)"
+              >
+                {{ t('common.edit') }}
+              </el-button>
+              <el-button
+                v-if="userStore.hasPerm('nad:program:remove')"
+                link
+                size="small"
+                type="danger"
+                @click="onProgramDelete(row as Program)"
+              >
+                {{ t('common.delete') }}
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <p
+          v-else
+          class="muted"
+        >
+          {{ t('program.none') }}
+        </p>
+      </div>
+
       <UniversityDrawer
         v-model="drawerOpen"
         :university="u"
         @saved="load"
+      />
+      <ProgramDrawer
+        v-model="programDrawerOpen"
+        :program="editingProgram"
+        :locked-university="{ id: u.id, name: u.name }"
+        @saved="loadPrograms"
       />
     </template>
   </div>
@@ -190,9 +283,12 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowLeft, Edit } from '@element-plus/icons-vue'
+import { ArrowLeft, Edit, Plus } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import { getUniversity, type University, type HighlightKind } from '@/api/university'
+import { listPrograms, deleteProgram, type Program } from '@/api/program'
 import { useUserStore } from '@/stores/user'
+import { useConfirm } from '@/composables/useConfirm'
 import PageHeader from '@/components/PageHeader.vue'
 import DescriptionList from '@/components/ui/DescriptionList.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -200,17 +296,54 @@ import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import type { DescriptionItem } from '@/components/ui/types'
 import UniversityDrawer from './UniversityDrawer.vue'
+import ProgramDrawer from '@/views/programs/ProgramDrawer.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const { confirm } = useConfirm()
 
 const id = route.params.id as string
 const u = ref<University | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 const drawerOpen = ref(false)
+
+const programs = ref<Program[]>([])
+const programDrawerOpen = ref(false)
+const editingProgram = ref<Program | null>(null)
+
+async function loadPrograms() {
+  if (!u.value) return
+  try {
+    const res = await listPrograms({ universityId: u.value.id, page: 0, size: 100 })
+    programs.value = res.content
+  }
+  catch {
+    programs.value = []
+  }
+}
+function openProgramCreate() {
+  editingProgram.value = null
+  programDrawerOpen.value = true
+}
+function openProgramEdit(p: Program) {
+  editingProgram.value = p
+  programDrawerOpen.value = true
+}
+async function onProgramDelete(p: Program) {
+  const ok = await confirm({
+    title: t('program.deleteTitle'),
+    message: t('program.deleteConfirm', { name: p.name }),
+    confirmText: t('common.delete'),
+    tone: 'danger',
+  })
+  if (!ok) return
+  await deleteProgram(p.id)
+  ElMessage.success(t('common.deleted'))
+  loadPrograms()
+}
 
 function titleCase(s: string) {
   return s ? s.charAt(0) + s.slice(1).toLowerCase() : s
@@ -262,6 +395,7 @@ async function load() {
   error.value = null
   try {
     u.value = await getUniversity(id)
+    await loadPrograms()
   }
   catch (e) {
     error.value = (e as Error)?.message || t('state.errorTitle')
@@ -308,6 +442,19 @@ onMounted(load)
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--nad-ink-faint);
+}
+.sec__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sec__head .sec__title {
+  margin-bottom: 0;
+}
+.sec__hint {
+  margin: 6px 0 12px;
+  font-size: 12px;
+  color: var(--nad-ink-soft);
 }
 .prose {
   margin: 0;
