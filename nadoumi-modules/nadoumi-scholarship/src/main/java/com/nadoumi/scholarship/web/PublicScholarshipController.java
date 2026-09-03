@@ -1,6 +1,7 @@
 package com.nadoumi.scholarship.web;
 
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.scholarship.domain.ScholarshipCategory;
 import com.nadoumi.scholarship.domain.enums.FundingModel;
 import com.nadoumi.scholarship.domain.enums.TeachingLanguage;
 import com.nadoumi.scholarship.mapper.ScholarshipSearch;
@@ -76,6 +77,13 @@ public class PublicScholarshipController {
             @RequestParam(required = false) String intake) {
         return service.facets(filter(q, country, province, city, field, language, funding, hasStipend,
                 deadlineBefore, level, category, intake, null, null, null, null));
+    }
+
+    /** The extensible category reference — literal path, matched before {slugOrId}. */
+    @Anonymous
+    @GetMapping("/categories")
+    public List<ScholarshipCategory> categories() {
+        return service.categories();
     }
 
     @Anonymous

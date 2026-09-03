@@ -35,6 +35,9 @@ public interface ScholarshipMapper {
 
     List<ScholarshipFacetRow> facetTeachingLanguages(ScholarshipSearch filter);
 
+    /** The full extensible category reference, for filter UIs and the admin form. */
+    List<ScholarshipCategory> allCategories();
+
     // ---- staff (nad_scholarship base table) ----
 
     List<Scholarship> searchStaff(ScholarshipSearch filter);

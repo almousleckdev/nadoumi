@@ -1,0 +1,827 @@
+<script setup lang="ts">
+import { computed, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { ElMessage, type FormInstance } from 'element-plus'
+import { Plus, Delete } from '@element-plus/icons-vue'
+import {
+  createScholarship, updateScholarship, listScholarshipCategories,
+  EDUCATION_LEVELS, FEE_KINDS, DOC_TYPES, INTAKE_TERMS,
+  type Scholarship, type ScholarshipInput, type ScholarshipCategoryOption,
+  type EducationLevel, type FeeKind, type NationalityScope,
+} from '@/api/scholarship'
+import Drawer from '@/components/ui/Drawer.vue'
+import FormSection from '@/components/ui/FormSection.vue'
+
+const props = defineProps<{ modelValue: boolean, scholarship: Scholarship | null }>()
+const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [s: Scholarship] }>()
+
+const { t } = useI18n()
+const LANGS = ['ENGLISH', 'CHINESE', 'BOTH'] as const
+const FUNDING = ['FULLY', 'PARTIAL', 'SELF'] as const
+const SCOPES: NationalityScope[] = ['ANY', 'INCLUDE', 'EXCLUDE']
+const FREQ = ['MONTHLY', 'YEARLY', 'ONE_OFF'] as const
+const STATUSES = ['ACTIVE', 'INACTIVE'] as const
+const PUBLISH = ['DRAFT', 'PUBLISHED'] as const
+
+const formRef = ref<FormInstance>()
+const saving = ref(false)
+const categories = ref<ScholarshipCategoryOption[]>([])
+listScholarshipCategories().then(c => categories.value = c).catch(() => {})
+
+function blankEligibility() {
+  return {
+    ageMin: null as number | null, ageMax: null as number | null,
+    nationalityScope: 'ANY' as NationalityScope, acceptedCountries: '',
+    inChina: null as boolean | null,
+    gpaMin: null as number | null, ieltsMin: null as number | null, toeflMin: null as number | null,
+    duolingoMin: null as number | null, hskMin: null as number | null, cscaMin: null as number | null,
+    notes: '',
+  }
+}
+function blankForm() {
+  return {
+    title: '', slug: '', summary: '', country: '', province: '', city: '', field: '',
+    teachingLanguage: null as string | null,
+    fundingModel: 'FULLY' as ScholarshipInput['fundingModel'],
+    categoryCodes: [] as string[],
+    levels: [] as EducationLevel[],
+    benefits: '', requirements: '', policy: '',
+    applicationFeeAmount: null as number | null, applicationFeeCurrency: 'CNY',
+    serviceFeeAmount: null as number | null, serviceFeeCurrency: 'USD',
+    slots: null as number | null,
+    deadline: '' as string | null,
+    fees: [] as { kind: FeeKind, amount: number | null, currency: string, note: string }[],
+    eligibility: blankEligibility(),
+    hasStipend: false,
+    stipend: { amount: null as number | null, currency: 'CNY', frequency: 'MONTHLY' as const, durationMonths: null as number | null, conditions: '' },
+    intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
+    documentRequirements: [] as { docType: string, mandatory: boolean, note: string }[],
+    featured: false, recommended: false, hot: false,
+    status: 'ACTIVE' as ScholarshipInput['status'],
+    publishStatus: 'DRAFT' as ScholarshipInput['publishStatus'],
+    remark: '',
+  }
+}
+const form = reactive(blankForm())
+
+const rules = {
+  title: [{ required: true, trigger: 'blur', message: t('scholarship.required') }],
+  country: [
+    { required: true, trigger: 'blur', message: t('scholarship.required') },
+    { pattern: /^[A-Za-z]{2}$/, trigger: 'blur', message: t('scholarship.countryFormat') },
+  ],
+  fundingModel: [{ required: true, message: t('scholarship.required') }],
+  status: [{ required: true, message: t('scholarship.required') }],
+  publishStatus: [{ required: true, message: t('scholarship.required') }],
+}
+
+watch(() => props.modelValue, (open) => {
+  if (!open) return
+  Object.assign(form, blankForm())
+  const s = props.scholarship
+  if (!s) return
+  const v = s.view
+  Object.assign(form, {
+    title: v.title, slug: v.slug, summary: v.summary ?? '', country: v.country,
+    province: v.province ?? '', city: v.city ?? '', field: v.field ?? '',
+    teachingLanguage: v.teachingLanguage ?? null, fundingModel: v.fundingModel,
+    categoryCodes: [...v.categories], levels: [...v.levels] as EducationLevel[],
+    benefits: v.benefits ?? '', requirements: v.requirements ?? '', policy: v.policy ?? '',
+    applicationFeeAmount: v.applicationFee?.amount ?? null, applicationFeeCurrency: v.applicationFee?.currency ?? 'CNY',
+    serviceFeeAmount: v.serviceFee?.amount ?? null, serviceFeeCurrency: v.serviceFee?.currency ?? 'USD',
+    slots: v.slots ?? null, deadline: v.deadline ?? '',
+    fees: v.fees.map(f => ({ kind: f.kind as FeeKind, amount: f.amount, currency: f.currency, note: f.note ?? '' })),
+    eligibility: { ...blankEligibility(), ...(v.eligibility ?? {}), acceptedCountries: v.eligibility?.acceptedCountries ?? '', notes: v.eligibility?.notes ?? '', nationalityScope: (v.eligibility?.nationalityScope as NationalityScope) ?? 'ANY' },
+    hasStipend: v.hasStipend,
+    stipend: v.stipend
+      ? { amount: v.stipend.amount, currency: v.stipend.currency, frequency: v.stipend.frequency, durationMonths: v.stipend.durationMonths ?? null, conditions: v.stipend.conditions ?? '' }
+      : blankForm().stipend,
+    intakes: v.intakes.map(i => ({ term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null })),
+    documentRequirements: v.documentRequirements.map(d => ({ docType: d.docType, mandatory: d.mandatory, note: d.note ?? '' })),
+    featured: v.featured, recommended: v.recommended, hot: v.hot,
+    status: s.status, publishStatus: s.publishStatus, remark: s.remark ?? '',
+  })
+}, { immediate: true })
+
+const scopeHint = computed(() => {
+  if (form.eligibility.nationalityScope === 'INCLUDE') return t('scholarship.scopeIncludeHint')
+  if (form.eligibility.nationalityScope === 'EXCLUDE') return t('scholarship.scopeExcludeHint')
+  return t('scholarship.scopeAnyHint')
+})
+
+function n(v: unknown): number | null {
+  return v === '' || v === null || v === undefined ? null : Number(v)
+}
+function s(v: string): string | null {
+  return v.trim() === '' ? null : v.trim()
+}
+
+function payload(): ScholarshipInput {
+  const elig = form.eligibility
+  const anyElig = elig.ageMin != null || elig.ageMax != null || elig.gpaMin != null || elig.ieltsMin != null
+    || elig.toeflMin != null || elig.duolingoMin != null || elig.hskMin != null || elig.cscaMin != null
+    || elig.nationalityScope !== 'ANY' || s(elig.notes) != null
+  return {
+    slug: s(form.slug),
+    title: form.title.trim(),
+    summary: s(form.summary),
+    country: form.country.trim().toUpperCase(),
+    province: s(form.province),
+    city: s(form.city),
+    field: s(form.field),
+    teachingLanguage: (form.teachingLanguage as ScholarshipInput['teachingLanguage']) || null,
+    fundingModel: form.fundingModel,
+    hasStipend: form.hasStipend || (form.stipend.amount != null),
+    deadline: s(form.deadline ?? ''),
+    benefits: s(form.benefits),
+    requirements: s(form.requirements),
+    policy: s(form.policy),
+    applicationFeeAmount: n(form.applicationFeeAmount),
+    applicationFeeCurrency: form.applicationFeeAmount != null ? form.applicationFeeCurrency.toUpperCase() : null,
+    serviceFeeAmount: n(form.serviceFeeAmount),
+    serviceFeeCurrency: form.serviceFeeAmount != null ? form.serviceFeeCurrency.toUpperCase() : null,
+    slots: n(form.slots),
+    featured: form.featured, recommended: form.recommended, hot: form.hot,
+    status: form.status, publishStatus: form.publishStatus, remark: s(form.remark),
+    levels: [...form.levels],
+    categoryCodes: [...form.categoryCodes],
+    intakes: form.intakes.filter(i => i.term).map(i => ({
+      term: i.term, applicationOpen: i.applicationOpen || null, applicationClose: i.applicationClose || null,
+    })),
+    eligibility: anyElig
+      ? {
+          ageMin: n(elig.ageMin), ageMax: n(elig.ageMax),
+          nationalityScope: elig.nationalityScope,
+          acceptedCountries: elig.nationalityScope === 'ANY' ? null : s(elig.acceptedCountries),
+          inChina: elig.inChina,
+          gpaMin: n(elig.gpaMin), ieltsMin: n(elig.ieltsMin), toeflMin: n(elig.toeflMin),
+          duolingoMin: n(elig.duolingoMin), hskMin: n(elig.hskMin), cscaMin: n(elig.cscaMin),
+          notes: s(elig.notes),
+        }
+      : null,
+    fees: form.fees.filter(f => f.amount != null && f.kind).map(f => ({
+      kind: f.kind, amount: Number(f.amount), currency: f.currency.toUpperCase(), note: s(f.note),
+    })),
+    stipend: (form.hasStipend && form.stipend.amount != null)
+      ? {
+          amount: Number(form.stipend.amount), currency: form.stipend.currency.toUpperCase(),
+          frequency: form.stipend.frequency, durationMonths: n(form.stipend.durationMonths),
+          conditions: s(form.stipend.conditions),
+        }
+      : null,
+    documentRequirements: form.documentRequirements.filter(d => d.docType.trim()).map(d => ({
+      docType: d.docType.trim().toUpperCase(), mandatory: d.mandatory, note: s(d.note),
+    })),
+  }
+}
+
+async function save() {
+  await formRef.value?.validate()
+  if (!form.levels.length) {
+    ElMessage.warning(t('scholarship.needLevel'))
+    return
+  }
+  saving.value = true
+  try {
+    const saved = props.scholarship
+      ? await updateScholarship(props.scholarship.view.id, payload())
+      : await createScholarship(payload())
+    ElMessage.success(t('common.saved'))
+    emit('update:modelValue', false)
+    emit('saved', saved)
+  }
+  finally {
+    saving.value = false
+  }
+}
+</script>
+
+<template>
+  <Drawer
+    :model-value="modelValue"
+    :title="scholarship ? t('scholarship.edit') : t('scholarship.new')"
+    :saving="saving"
+    :size="640"
+    @update:model-value="v => emit('update:modelValue', v)"
+    @save="save"
+  >
+    <el-form
+      ref="formRef"
+      :model="form"
+      :rules="rules"
+      label-position="top"
+    >
+      <FormSection :title="t('scholarship.secIdentity')">
+        <el-form-item
+          :label="t('scholarship.title')"
+          prop="title"
+        >
+          <el-input
+            v-model="form.title"
+            maxlength="200"
+          />
+        </el-form-item>
+        <el-form-item :label="t('scholarship.slug')">
+          <el-input
+            v-model="form.slug"
+            :placeholder="t('scholarship.slugHint')"
+          />
+        </el-form-item>
+        <el-form-item :label="t('scholarship.summary')">
+          <el-input
+            v-model="form.summary"
+            type="textarea"
+            :rows="2"
+            maxlength="2000"
+          />
+        </el-form-item>
+        <div class="row">
+          <el-form-item
+            :label="t('scholarship.country')"
+            prop="country"
+            class="w-28"
+          >
+            <el-input
+              v-model="form.country"
+              maxlength="2"
+              style="text-transform:uppercase"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.province')">
+            <el-input
+              v-model="form.province"
+              maxlength="120"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.city')">
+            <el-input
+              v-model="form.city"
+              maxlength="120"
+            />
+          </el-form-item>
+        </div>
+        <el-form-item :label="t('scholarship.field')">
+          <el-input
+            v-model="form.field"
+            maxlength="120"
+          />
+        </el-form-item>
+      </FormSection>
+
+      <FormSection :title="t('scholarship.secClassification')">
+        <div class="row">
+          <el-form-item
+            :label="t('scholarship.fundingModel')"
+            prop="fundingModel"
+          >
+            <el-select v-model="form.fundingModel">
+              <el-option
+                v-for="f in FUNDING"
+                :key="f"
+                :value="f"
+                :label="t(`scholarship.funding.${f}`)"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="t('scholarship.teachingLanguage')">
+            <el-select
+              v-model="form.teachingLanguage"
+              clearable
+            >
+              <el-option
+                v-for="l in LANGS"
+                :key="l"
+                :value="l"
+                :label="t(`scholarship.lang.${l}`)"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+        <el-form-item :label="t('scholarship.categories')">
+          <el-select
+            v-model="form.categoryCodes"
+            multiple
+            filterable
+            :placeholder="t('scholarship.categoriesHint')"
+          >
+            <el-option
+              v-for="c in categories"
+              :key="c.code"
+              :value="c.code"
+              :label="c.name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          :label="t('scholarship.levels')"
+          :required="true"
+        >
+          <el-checkbox-group v-model="form.levels">
+            <el-checkbox
+              v-for="lv in EDUCATION_LEVELS"
+              :key="lv"
+              :value="lv"
+              :label="t(`scholarship.level.${lv}`)"
+            />
+          </el-checkbox-group>
+        </el-form-item>
+      </FormSection>
+
+      <FormSection
+        :title="t('scholarship.secIntakes')"
+        :description="t('scholarship.intakesHint')"
+      >
+        <div
+          v-for="(it, i) in form.intakes"
+          :key="i"
+          class="line"
+        >
+          <el-select
+            v-model="it.term"
+            class="w-44"
+          >
+            <el-option
+              v-for="term in INTAKE_TERMS"
+              :key="term"
+              :value="term"
+              :label="t(`scholarship.intake.${term}`)"
+            />
+          </el-select>
+          <el-date-picker
+            v-model="it.applicationOpen"
+            type="date"
+            value-format="YYYY-MM-DD"
+            :placeholder="t('scholarship.opens')"
+          />
+          <el-date-picker
+            v-model="it.applicationClose"
+            type="date"
+            value-format="YYYY-MM-DD"
+            :placeholder="t('scholarship.closes')"
+          />
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            @click="form.intakes.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          :icon="Plus"
+          @click="form.intakes.push({ term: 'AUTUMN_SEPTEMBER', applicationOpen: null, applicationClose: null })"
+        >
+          {{ t('scholarship.addIntake') }}
+        </el-button>
+      </FormSection>
+
+      <FormSection :title="t('scholarship.secEligibility')">
+        <div class="row">
+          <el-form-item
+            :label="t('scholarship.ageMin')"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.ageMin"
+              :min="0"
+              :max="120"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.ageMax')"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.ageMax"
+              :min="0"
+              :max="120"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.inChina')">
+            <el-select
+              v-model="form.eligibility.inChina"
+              clearable
+            >
+              <el-option
+                :value="true"
+                :label="t('common.yes')"
+              />
+              <el-option
+                :value="false"
+                :label="t('common.no')"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+        <el-form-item :label="t('scholarship.nationality')">
+          <el-radio-group v-model="form.eligibility.nationalityScope">
+            <el-radio
+              v-for="sc in SCOPES"
+              :key="sc"
+              :value="sc"
+            >
+              {{ t(`scholarship.scope.${sc}`) }}
+            </el-radio>
+          </el-radio-group>
+          <p class="hint">
+            {{ scopeHint }}
+          </p>
+        </el-form-item>
+        <el-form-item
+          v-if="form.eligibility.nationalityScope !== 'ANY'"
+          :label="t('scholarship.countryList')"
+        >
+          <el-input
+            v-model="form.eligibility.acceptedCountries"
+            :placeholder="t('scholarship.countryListHint')"
+          />
+        </el-form-item>
+        <div class="row">
+          <el-form-item
+            label="GPA min"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.gpaMin"
+              :min="0"
+              :max="5"
+              :step="0.1"
+              :precision="2"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            label="IELTS min"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.ieltsMin"
+              :min="0"
+              :max="9"
+              :step="0.5"
+              :precision="1"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            label="TOEFL min"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.toeflMin"
+              :min="0"
+              :max="120"
+              controls-position="right"
+            />
+          </el-form-item>
+        </div>
+        <div class="row">
+          <el-form-item
+            label="Duolingo min"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.duolingoMin"
+              :min="0"
+              :max="160"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            label="HSK min"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.hskMin"
+              :min="0"
+              :max="9"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            label="CSCA min"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.eligibility.cscaMin"
+              :min="0"
+              controls-position="right"
+            />
+          </el-form-item>
+        </div>
+        <el-form-item :label="t('scholarship.eligNotes')">
+          <el-input
+            v-model="form.eligibility.notes"
+            type="textarea"
+            :rows="2"
+            maxlength="2000"
+          />
+        </el-form-item>
+      </FormSection>
+
+      <FormSection
+        :title="t('scholarship.secFees')"
+        :description="t('scholarship.feesHint')"
+      >
+        <div class="row">
+          <el-form-item :label="t('scholarship.applicationFee')">
+            <el-input-number
+              v-model="form.applicationFeeAmount"
+              :min="0"
+              :precision="2"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.currency')"
+            class="w-24"
+          >
+            <el-input
+              v-model="form.applicationFeeCurrency"
+              maxlength="3"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.serviceFee')">
+            <el-input-number
+              v-model="form.serviceFeeAmount"
+              :min="0"
+              :precision="2"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.currency')"
+            class="w-24"
+          >
+            <el-input
+              v-model="form.serviceFeeCurrency"
+              maxlength="3"
+            />
+          </el-form-item>
+        </div>
+        <p class="hint">
+          {{ t('scholarship.feeLinesHint') }}
+        </p>
+        <div
+          v-for="(f, i) in form.fees"
+          :key="i"
+          class="line"
+        >
+          <el-select
+            v-model="f.kind"
+            class="w-56"
+            filterable
+          >
+            <el-option
+              v-for="k in FEE_KINDS"
+              :key="k"
+              :value="k"
+              :label="t(`scholarship.fee.${k}`)"
+            />
+          </el-select>
+          <el-input-number
+            v-model="f.amount"
+            :min="0"
+            :precision="2"
+            controls-position="right"
+          />
+          <el-input
+            v-model="f.currency"
+            maxlength="3"
+            class="w-20"
+            placeholder="CNY"
+          />
+          <el-input
+            v-model="f.note"
+            :placeholder="t('scholarship.note')"
+          />
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            @click="form.fees.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          :icon="Plus"
+          @click="form.fees.push({ kind: 'TUITION_AFTER', amount: null, currency: 'CNY', note: '' })"
+        >
+          {{ t('scholarship.addFee') }}
+        </el-button>
+      </FormSection>
+
+      <FormSection :title="t('scholarship.secStipend')">
+        <el-form-item>
+          <el-checkbox v-model="form.hasStipend">
+            {{ t('scholarship.hasStipend') }}
+          </el-checkbox>
+        </el-form-item>
+        <div
+          v-if="form.hasStipend"
+          class="row"
+        >
+          <el-form-item :label="t('scholarship.amount')">
+            <el-input-number
+              v-model="form.stipend.amount"
+              :min="0"
+              :precision="2"
+              controls-position="right"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.currency')"
+            class="w-24"
+          >
+            <el-input
+              v-model="form.stipend.currency"
+              maxlength="3"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.frequency')">
+            <el-select v-model="form.stipend.frequency">
+              <el-option
+                v-for="fr in FREQ"
+                :key="fr"
+                :value="fr"
+                :label="t(`scholarship.freq.${fr}`)"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.durationMonths')"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.stipend.durationMonths"
+              :min="0"
+              controls-position="right"
+            />
+          </el-form-item>
+        </div>
+        <el-form-item
+          v-if="form.hasStipend"
+          :label="t('scholarship.stipendConditions')"
+        >
+          <el-input
+            v-model="form.stipend.conditions"
+            type="textarea"
+            :rows="2"
+            maxlength="1000"
+          />
+        </el-form-item>
+      </FormSection>
+
+      <FormSection
+        :title="t('scholarship.secDocuments')"
+        :description="t('scholarship.documentsHint')"
+      >
+        <div
+          v-for="(d, i) in form.documentRequirements"
+          :key="i"
+          class="line"
+        >
+          <el-select
+            v-model="d.docType"
+            class="w-52"
+            filterable
+            allow-create
+            default-first-option
+          >
+            <el-option
+              v-for="dt in DOC_TYPES"
+              :key="dt"
+              :value="dt"
+              :label="t(`scholarship.doc.${dt}`, dt)"
+            />
+          </el-select>
+          <el-checkbox v-model="d.mandatory">
+            {{ t('scholarship.mandatory') }}
+          </el-checkbox>
+          <el-input
+            v-model="d.note"
+            :placeholder="t('scholarship.note')"
+          />
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            @click="form.documentRequirements.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          :icon="Plus"
+          @click="form.documentRequirements.push({ docType: 'PASSPORT', mandatory: true, note: '' })"
+        >
+          {{ t('scholarship.addDocument') }}
+        </el-button>
+      </FormSection>
+
+      <FormSection :title="t('scholarship.secContent')">
+        <el-form-item :label="t('scholarship.benefits')">
+          <el-input
+            v-model="form.benefits"
+            type="textarea"
+            :rows="3"
+          />
+        </el-form-item>
+        <el-form-item :label="t('scholarship.requirements')">
+          <el-input
+            v-model="form.requirements"
+            type="textarea"
+            :rows="3"
+          />
+        </el-form-item>
+        <el-form-item :label="t('scholarship.policy')">
+          <el-input
+            v-model="form.policy"
+            type="textarea"
+            :rows="2"
+          />
+        </el-form-item>
+      </FormSection>
+
+      <FormSection :title="t('scholarship.secPublication')">
+        <div class="row">
+          <el-form-item :label="t('scholarship.deadline')">
+            <el-date-picker
+              v-model="form.deadline"
+              type="date"
+              value-format="YYYY-MM-DD"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.slots')"
+            class="w-28"
+          >
+            <el-input-number
+              v-model="form.slots"
+              :min="0"
+              controls-position="right"
+            />
+          </el-form-item>
+        </div>
+        <el-form-item>
+          <el-checkbox v-model="form.featured">
+            {{ t('scholarship.featured') }}
+          </el-checkbox>
+          <el-checkbox v-model="form.recommended">
+            {{ t('scholarship.recommended') }}
+          </el-checkbox>
+          <el-checkbox v-model="form.hot">
+            {{ t('scholarship.hot') }}
+          </el-checkbox>
+        </el-form-item>
+        <div class="row">
+          <el-form-item
+            :label="t('scholarship.status')"
+            prop="status"
+          >
+            <el-select v-model="form.status">
+              <el-option
+                v-for="st in STATUSES"
+                :key="st"
+                :value="st"
+                :label="st"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item
+            :label="t('scholarship.publishStatus')"
+            prop="publishStatus"
+          >
+            <el-select v-model="form.publishStatus">
+              <el-option
+                v-for="p in PUBLISH"
+                :key="p"
+                :value="p"
+                :label="p"
+              />
+            </el-select>
+          </el-form-item>
+        </div>
+        <el-form-item :label="t('scholarship.remark')">
+          <el-input
+            v-model="form.remark"
+            type="textarea"
+            :rows="2"
+            maxlength="500"
+          />
+        </el-form-item>
+      </FormSection>
+    </el-form>
+  </Drawer>
+</template>
+
+<style scoped>
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 140px; }
+.row > .w-28 { flex: 0 0 7rem; min-width: 7rem; }
+.row > .w-24 { flex: 0 0 6rem; min-width: 6rem; }
+.line { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.line > .w-20 { flex: 0 0 5rem; }
+.line > .w-44 { flex: 0 0 11rem; }
+.line > .w-52 { flex: 0 0 13rem; }
+.line > .w-56 { flex: 0 0 14rem; }
+.hint { margin: 2px 0 8px; font-size: 12px; color: var(--nad-ink-soft); }
+</style>
