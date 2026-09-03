@@ -6,6 +6,7 @@ import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.university.domain.University;
+import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
 import com.nadoumi.university.domain.enums.PublishStatus;
@@ -112,6 +113,7 @@ public class UniversityService {
         University u = load(id);
         u.setRankings(mapper.findRankings(id));
         u.setHighlights(mapper.findHighlights(id));
+        u.setGallery(mapper.findGallery(id));
         return u;
     }
 
@@ -138,6 +140,18 @@ public class UniversityService {
                 h.setSortOrder(order++);
                 h.setText(in.text().trim());
                 mapper.insertHighlight(h);
+            }
+        }
+        mapper.deleteGallery(universityId);
+        if (req.gallery() != null) {
+            int order = 0;
+            for (UniversityRequest.GalleryInput in : req.gallery()) {
+                if (in.imageUrl() == null || in.imageUrl().isBlank()) {
+                    continue;
+                }
+                mapper.insertGalleryImage(universityId,
+                        new UniversityGalleryImage(null, in.imageUrl().trim(), blankToNull(in.caption())),
+                        order++);
             }
         }
     }

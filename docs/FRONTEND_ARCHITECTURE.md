@@ -146,8 +146,16 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
 - `app/pages/universities/index.vue` — richer cards (Chinese name, city/province,
   type, Featured badge), Tailwind + `NContainer` (matches the marketing shell).
 - `types/catalog.ts` — `UniversityDetail` / `UniversityRanking` /
-  `UniversityHighlight`; `UniversitySummary` gains `nameCn` / `province` / `type`
-  / `featured`.
+  `UniversityHighlight` / `UniversityGalleryImage`; `UniversitySummary` gains
+  `nameCn` / `province` / `type` / `featured`.
+
+**UPDATE 2026-09-03 (university gallery — V18):**
+- `nad_university_gallery` (≤ 6 images, `imageUrl` + `caption?`) added as a third
+  edited-whole child list on the staff + public university responses. Admin drawer
+  gains a Gallery `FormSection` (thumbnail + URL + caption rows, "Add image" hidden
+  at 6); admin detail renders a gallery grid. `universities/[id].vue` renders the
+  gallery grid in place of the former placeholder. `UniversityGalleryImage` added
+  to `types/catalog.ts`.
 
 **UPDATE 2026-09-02 (public website build-out):**
 - The five public pages are real, on the Tailwind + `NContainer` marketing shell.
@@ -209,8 +217,10 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   - **University detail** (`universities/[id].vue`) — dark hero header
     (monogram, name, meta, badges), facts strip, 2-column body (prose sections +
     sticky sidebar with rankings + official contact), grouped highlights /
-    advantages. **Programmes** and **Gallery** render as honest "arriving with …"
-    blocks (Step 3 / Document slice). i18n `university.*` namespace.
+    advantages, **Gallery** (up to 6 campus-life / dormitory / campus-view images
+    with captions, from `nad_university_gallery` / V18). **Programmes** still
+    renders as an honest "arriving with …" block (Step 3 / V19). i18n
+    `university.*` namespace.
   - **About** (`about.vue`) — image hero, who-we-are, mission + vision, four
     values (drawn from the platform's real design principles), how-we-help,
     **team / office / hours** as clearly-flagged "to be supplied by Nadoumi"

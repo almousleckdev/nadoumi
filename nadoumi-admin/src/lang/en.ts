@@ -210,6 +210,11 @@ export default {
     rankSource: 'Source',
     rankPosition: 'Rank',
     rankYear: 'Year',
+    secGallery: 'Gallery',
+    galleryHint: 'Up to 6 images shown on the public university page — campus, dormitory, campus life…',
+    galleryCaption: 'Caption',
+    addGalleryImage: 'Add image',
+    galleryMax: 'Maximum of 6 images.',
   },
   state: {
     loading: 'Loading…',

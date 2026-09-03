@@ -19,7 +19,9 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
              "introduction":"A leading research university.","status":"ACTIVE","publishStatus":"PUBLISHED",
              "rankings":[{"source":"QS","rankPosition":20,"rankYear":2026}],
              "highlights":[{"kind":"HIGHLIGHT","text":"C9 League member"},
-                           {"kind":"ADVANTAGE","text":"Strong engineering"}]}""";
+                           {"kind":"ADVANTAGE","text":"Strong engineering"}],
+             "gallery":[{"imageUrl":"https://img.example/campus.jpg","caption":"Main campus"},
+                        {"imageUrl":"https://img.example/dorm.jpg","caption":"Dormitory"}]}""";
 
     @Test
     void full_profile_crud_with_children() throws Exception {
@@ -36,20 +38,23 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.rankings.length()").value(1))
                 .andExpect(jsonPath("$.rankings[0].source").value("QS"))
                 .andExpect(jsonPath("$.highlights.length()").value(2))
+                .andExpect(jsonPath("$.gallery.length()").value(2))
+                .andExpect(jsonPath("$.gallery[0].caption").value("Main campus"))
                 .andReturn().getResponse().getContentAsString();
         long id = ((Number) JsonPath.read(created, "$.id")).longValue();
 
-        // edit: drop a ranking, keep one highlight, flip publish off
+        // edit: drop a ranking, keep one highlight, clear the gallery, flip publish off
         mvc.perform(put("/api/staff/universities/{id}", id).header("Authorization", bearer(token))
                         .contentType("application/json")
                         .content("""
                             {"name":"Tsinghua University","country":"CN","status":"ACTIVE",
                              "publishStatus":"DRAFT","rankings":[],
-                             "highlights":[{"kind":"HIGHLIGHT","text":"C9 League member"}]}"""))
+                             "highlights":[{"kind":"HIGHLIGHT","text":"C9 League member"}],"gallery":[]}"""))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.publishStatus").value("DRAFT"))
                 .andExpect(jsonPath("$.rankings.length()").value(0))
-                .andExpect(jsonPath("$.highlights.length()").value(1));
+                .andExpect(jsonPath("$.highlights.length()").value(1))
+                .andExpect(jsonPath("$.gallery.length()").value(0));
 
         mvc.perform(delete("/api/staff/universities/{id}", id).header("Authorization", bearer(token)))
                 .andExpect(status().isNoContent());

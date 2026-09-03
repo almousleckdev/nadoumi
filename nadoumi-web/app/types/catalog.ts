@@ -123,6 +123,13 @@ export interface UniversityDetail extends UniversitySummary {
   recommended: boolean
   rankings: UniversityRanking[]
   highlights: UniversityHighlight[]
+  gallery: UniversityGalleryImage[]
+}
+
+export interface UniversityGalleryImage {
+  id: number
+  imageUrl: string
+  caption?: string | null
 }
 
 export interface ProgramSummary {
