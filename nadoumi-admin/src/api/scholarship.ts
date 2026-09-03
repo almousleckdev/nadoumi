@@ -84,6 +84,8 @@ export interface ScholarshipView {
   featured: boolean
   recommended: boolean
   hot: boolean
+  heroImageUrl?: string | null
+  coverImageUrl?: string | null
   levels: string[]
   categories: string[]
   intakes: ScholarshipIntakeInput[]
@@ -137,6 +139,8 @@ export interface ScholarshipInput {
   status: ScholarshipStatus
   publishStatus: PublishStatus
   remark?: string | null
+  heroImageUrl?: string | null
+  coverImageUrl?: string | null
   levels: EducationLevel[]
   categoryCodes: string[]
   intakes: ScholarshipIntakeInput[]

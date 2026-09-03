@@ -164,6 +164,8 @@ public class ScholarshipAdminService {
         s.setStatus(req.status());
         s.setPublishStatus(req.publishStatus());
         s.setRemark(blankToNull(req.remark()));
+        s.setHeroImageUrl(blankToNull(req.heroImageUrl()));
+        s.setCoverImageUrl(blankToNull(req.coverImageUrl()));
     }
 
     private void replaceChildren(Long id, ScholarshipRequest req) {

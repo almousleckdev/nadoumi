@@ -49,6 +49,33 @@
         </template>
       </PageHeader>
 
+      <div
+        v-if="u.logoImageUrl || u.coverImageUrl"
+        class="nad-card sec"
+      >
+        <h3 class="sec__title">
+          {{ t('university.secImages') }}
+        </h3>
+        <div class="imgs">
+          <figure v-if="u.logoImageUrl">
+            <img
+              :src="u.logoImageUrl"
+              class="img-logo"
+              alt=""
+            >
+            <figcaption>{{ t('university.logoImage') }}</figcaption>
+          </figure>
+          <figure v-if="u.coverImageUrl">
+            <img
+              :src="u.coverImageUrl"
+              class="img-cover"
+              alt=""
+            >
+            <figcaption>{{ t('university.coverImage') }}</figcaption>
+          </figure>
+        </div>
+      </div>
+
       <div class="nad-card sec">
         <h3 class="sec__title">
           {{ t('university.secProfile') }}
@@ -413,6 +440,11 @@ onMounted(load)
 .gal__item { margin: 0; }
 .gal__item img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
 .gal__item figcaption { margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft); }
+.imgs { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+.imgs figure { margin: 0; }
+.imgs figcaption { margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft); }
+.img-logo { width: 96px; height: 96px; object-fit: contain; border-radius: 8px; background: #f4f4f5; border: 1px solid var(--nad-border, #e5e7eb); }
+.img-cover { width: 280px; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid var(--nad-border, #e5e7eb); }
 </style>
 <style scoped>
 .back {

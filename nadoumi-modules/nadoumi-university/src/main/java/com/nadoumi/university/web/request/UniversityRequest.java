@@ -34,6 +34,8 @@ public record UniversityRequest(
         @Size(max = 4000) String nearbyInfo,
         @Size(max = 120) String admissionsEmail,
         @Size(max = 32) String officePhone,
+        @Size(max = 500) String logoImageUrl,
+        @Size(max = 500) String coverImageUrl,
         Boolean recommended,
         Boolean featured,
         @NotNull UniversityStatus status,

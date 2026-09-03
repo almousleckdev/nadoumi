@@ -33,7 +33,7 @@ class UniversityServiceTest {
                 name, "清华大学", country, UniversityType.PUBLIC, "Beijing", "Beijing",
                 (short) 1911, 50_000, 6_000, 3_000, "https://x.edu", "T1",
                 "intro", "history", "campus", "accommodation", "nearby",
-                "adm@x.edu", "+86 10 0000", true, false,
+                "adm@x.edu", "+86 10 0000", null, null, true, false,
                 UniversityStatus.ACTIVE, PublishStatus.DRAFT, "note",
                 rankings, highlights, List.of());
     }

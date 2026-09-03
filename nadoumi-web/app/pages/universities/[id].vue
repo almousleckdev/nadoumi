@@ -67,10 +67,22 @@ const prose = computed(() => {
   <div v-if="u">
     <!-- hero header -->
     <section class="relative isolate overflow-hidden bg-slate-900 text-white">
-      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900 to-brand-900/60" aria-hidden="true" />
+      <img
+        v-if="u.coverImageUrl"
+        :src="u.coverImageUrl"
+        alt=""
+        class="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
+      >
+      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900/90 to-brand-900/60" aria-hidden="true" />
       <NContainer>
         <div class="flex flex-col gap-5 py-12 sm:flex-row sm:items-center sm:py-16">
-          <span class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/10 font-display text-3xl font-bold ring-1 ring-white/20">
+          <img
+            v-if="u.logoImageUrl"
+            :src="u.logoImageUrl"
+            alt=""
+            class="h-20 w-20 shrink-0 rounded-2xl bg-white/95 object-contain p-2 ring-1 ring-white/20"
+          >
+          <span v-else class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/10 font-display text-3xl font-bold ring-1 ring-white/20">
             {{ monogram }}
           </span>
           <div>

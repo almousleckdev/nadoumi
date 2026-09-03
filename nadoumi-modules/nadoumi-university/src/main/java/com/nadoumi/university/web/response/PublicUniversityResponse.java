@@ -30,6 +30,8 @@ public record PublicUniversityResponse(
         String officePhone,
         Long logoDocumentId,
         Long bannerDocumentId,
+        String logoImageUrl,
+        String coverImageUrl,
         boolean recommended,
         boolean featured,
         List<UniversityResponse.Ranking> rankings,
@@ -47,6 +49,7 @@ public record PublicUniversityResponse(
                 full.accommodationInfo(), full.nearbyInfo(),
                 full.admissionsEmail(), full.officePhone(),
                 full.logoDocumentId(), full.bannerDocumentId(),
+                full.logoImageUrl(), full.coverImageUrl(),
                 full.recommended(), full.featured(),
                 full.rankings(), full.highlights(), full.gallery());
     }

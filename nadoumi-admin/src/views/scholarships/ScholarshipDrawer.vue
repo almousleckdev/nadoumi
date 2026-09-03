@@ -11,6 +11,7 @@ import {
 } from '@/api/scholarship'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
+import ImageUpload from '@/components/ui/ImageUpload.vue'
 
 const props = defineProps<{ modelValue: boolean, scholarship: Scholarship | null }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [s: Scholarship] }>()
@@ -57,6 +58,7 @@ function blankForm() {
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
     documentRequirements: [] as { docType: string, mandatory: boolean, note: string }[],
     featured: false, recommended: false, hot: false,
+    heroImageUrl: null as string | null, coverImageUrl: null as string | null,
     status: 'ACTIVE' as ScholarshipInput['status'],
     publishStatus: 'DRAFT' as ScholarshipInput['publishStatus'],
     remark: '',
@@ -99,6 +101,7 @@ watch(() => props.modelValue, (open) => {
     intakes: v.intakes.map(i => ({ term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null })),
     documentRequirements: v.documentRequirements.map(d => ({ docType: d.docType, mandatory: d.mandatory, note: d.note ?? '' })),
     featured: v.featured, recommended: v.recommended, hot: v.hot,
+    heroImageUrl: v.heroImageUrl ?? null, coverImageUrl: v.coverImageUrl ?? null,
     status: s.status, publishStatus: s.publishStatus, remark: s.remark ?? '',
   })
 }, { immediate: true })
@@ -152,6 +155,7 @@ function payload(): ScholarshipInput {
     serviceFeeCurrency: form.serviceFeeAmount != null ? form.serviceFeeCurrency.toUpperCase() : null,
     slots: n(form.slots),
     featured: form.featured, recommended: form.recommended, hot: form.hot,
+    heroImageUrl: form.heroImageUrl, coverImageUrl: form.coverImageUrl,
     status: form.status, publishStatus: form.publishStatus, remark: s(form.remark),
     levels: [...form.levels],
     categoryCodes: [...form.categoryCodes],
@@ -754,6 +758,23 @@ async function save() {
         </el-form-item>
       </FormSection>
 
+      <FormSection :title="t('scholarship.secMedia')">
+        <div class="imgs">
+          <el-form-item :label="t('scholarship.heroImage')">
+            <ImageUpload
+              v-model="form.heroImageUrl"
+              aspect="wide"
+            />
+          </el-form-item>
+          <el-form-item :label="t('scholarship.coverImage')">
+            <ImageUpload
+              v-model="form.coverImageUrl"
+              aspect="wide"
+            />
+          </el-form-item>
+        </div>
+      </FormSection>
+
       <FormSection :title="t('scholarship.secPublication')">
         <div class="row">
           <el-form-item :label="t('scholarship.deadline')">
@@ -831,6 +852,7 @@ async function save() {
 .row > * { flex: 1; min-width: 140px; }
 .row > .w-28 { flex: 0 0 7rem; min-width: 7rem; }
 .row > .w-24 { flex: 0 0 6rem; min-width: 6rem; }
+.imgs { display: flex; gap: 24px; flex-wrap: wrap; }
 .line { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .line > .w-20 { flex: 0 0 5rem; }
 .line > .w-44 { flex: 0 0 11rem; }

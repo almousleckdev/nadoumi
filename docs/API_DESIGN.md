@@ -134,10 +134,14 @@ scalar-update transaction. `recommended` / `featured` are optional booleans
 | PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self); replaces children. |
 | DELETE | `/api/staff/universities/{id}` | `nad:university:remove` | `204`. Hard delete — only while nothing references the row (FKs from programmes / partnerships will block it once those exist). Children go with `ON DELETE CASCADE`. |
 
+Both responses also carry `logoImageUrl` / `coverImageUrl` (URL strings; the admin
+uploads through RuoYi `/common/upload`, migrating to `document_id` with the
+Document slice).
+
 **Public** — `/api/public/universities`, `PublicUniversityController`, `@Anonymous`.
 Serves `PublicUniversityResponse` (no `status` / `publishStatus` / `remark` / audit;
-the detail body carries `rankings[]`, `highlights[]` and `gallery[]`) and **only**
-rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
+the detail body carries `rankings[]`, `highlights[]`, `gallery[]`, `logoImageUrl`,
+`coverImageUrl`) and **only** rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
@@ -163,6 +167,11 @@ is logged, not surfaced. A filled honeypot (`website`) is accepted and dropped.
 from `v_scholarship_student` + the student-safe child tables. The response
 (`PublicScholarshipResponse`) carries **no** `universityId` / `partnership` /
 commission / internal field on any path (`StaffScholarshipTest` enforces this).
+It does carry `heroImageUrl` / `coverImageUrl` (student-safe imagery, URL strings)
+on both card and detail rows. The `slug` is always derived server-side from the
+title (kebab-case, lower-cased, de-duplicated); there is no client-supplied slug.
+Category applicability is enforced by funding model: `SELF` carries no categories,
+`PARTIAL` cannot carry CSC / CGS / government Type A–D.
 
 | Method | Path | Notes |
 | --- | --- | --- |
@@ -177,7 +186,7 @@ commission / internal field on any path (`StaffScholarshipTest` enforces this).
 | --- | --- | --- | --- |
 | GET | `/api/staff/scholarships` | `nad:scholarship:list` | `q`, `country`, `funding`, `publishStatus`, `status`, `page`, `size` → `PageResponse<ScholarshipResponse>` (`{ view, status, publishStatus, publishedAt, remark, … }`). |
 | GET | `/api/staff/scholarships/{id}` | `nad:scholarship:view` | assembles all children. |
-| POST | `/api/staff/scholarships` | `nad:scholarship:create` | `201`. Slug auto-derived from `title` (or the supplied kebab slug), de-duplicated. Children replaced whole in one transaction. |
+| POST | `/api/staff/scholarships` | `nad:scholarship:create` | `201`. Slug auto-derived from `title` (kebab-case, lower-cased), de-duplicated — no client slug field. Children replaced whole in one transaction; disallowed categories for the funding model are dropped. |
 | PUT | `/api/staff/scholarships/{id}` | `nad:scholarship:edit` | idem; `published_at` is set on the first transition to PUBLISHED and never rewritten. |
 | DELETE | `/api/staff/scholarships/{id}` | `nad:scholarship:remove` | `204`. Children + `nad_scholarship_internal` cascade. |
 | GET | `/api/staff/scholarships/{id}/internal` | `nad:scholarship:internal:view` | `ScholarshipInternalResponse` (`universityId`, `universityName` via `UniversityService`, `partnershipId`, `internalStatus`, operational / confidential fields). |

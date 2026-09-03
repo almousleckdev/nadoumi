@@ -36,6 +36,8 @@ public class University {
     private String officePhone;
     private Long logoDocumentId;
     private Long bannerDocumentId;
+    private String logoImageUrl;
+    private String coverImageUrl;
     private boolean recommended;
     private boolean featured;
     private UniversityStatus status;
@@ -115,6 +117,12 @@ public class University {
 
     public Long getBannerDocumentId() { return bannerDocumentId; }
     public void setBannerDocumentId(Long bannerDocumentId) { this.bannerDocumentId = bannerDocumentId; }
+
+    public String getLogoImageUrl() { return logoImageUrl; }
+    public void setLogoImageUrl(String logoImageUrl) { this.logoImageUrl = logoImageUrl; }
+
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
 
     public boolean isRecommended() { return recommended; }
     public void setRecommended(boolean recommended) { this.recommended = recommended; }

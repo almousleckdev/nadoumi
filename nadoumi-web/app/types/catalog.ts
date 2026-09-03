@@ -34,6 +34,8 @@ export interface ScholarshipCard {
   featured: boolean
   recommended: boolean
   hot: boolean
+  heroImageUrl?: string | null
+  coverImageUrl?: string | null
   levels: string[]
   categories: string[]
   intakes: ScholarshipIntake[]
@@ -89,6 +91,8 @@ export interface UniversitySummary {
   province?: string | null
   type?: 'PUBLIC' | 'PRIVATE' | null
   featured?: boolean
+  logoImageUrl?: string | null
+  coverImageUrl?: string | null
 }
 
 export interface UniversityRanking {

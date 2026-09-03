@@ -26,9 +26,24 @@ const typeLabel = computed(() => {
     class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[17rem] sm:w-[19rem]' : 'w-full'"
   >
-    <!-- No per-university cover art until the Document slice; branded monogram tile. -->
-    <div class="relative flex h-28 items-center justify-center bg-gradient-to-br from-brand-500 to-brand-700">
-      <span class="font-display text-3xl font-bold text-white/95">{{ monogram }}</span>
+    <div class="relative flex h-28 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-500 to-brand-700">
+      <img
+        v-if="university.coverImageUrl"
+        :src="university.coverImageUrl"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="absolute inset-0 h-full w-full object-cover"
+      >
+      <img
+        v-if="university.logoImageUrl"
+        :src="university.logoImageUrl"
+        alt=""
+        loading="lazy"
+        decoding="async"
+        class="relative h-14 w-14 rounded-lg bg-white/90 object-contain p-1.5 ring-1 ring-white/40"
+      >
+      <span v-else class="relative font-display text-3xl font-bold text-white/95">{{ monogram }}</span>
       <span
         v-if="university.featured"
         class="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[0.7rem] font-semibold text-brand-800"

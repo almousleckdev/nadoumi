@@ -32,6 +32,8 @@ public record PublicScholarshipResponse(
         boolean featured,
         boolean recommended,
         boolean hot,
+        String heroImageUrl,
+        String coverImageUrl,
         List<String> levels,
         List<String> categories,
         List<Intake> intakes,
@@ -87,6 +89,7 @@ public record PublicScholarshipResponse(
                 Money.of(s.getApplicationFeeAmount(), s.getApplicationFeeCurrency()),
                 Money.of(s.getServiceFeeAmount(), s.getServiceFeeCurrency()),
                 s.getSlots(), s.isFeatured(), s.isRecommended(), s.isHot(),
+                s.getHeroImageUrl(), s.getCoverImageUrl(),
                 List.copyOf(s.getLevels()),
                 s.getCategories().stream().map(ScholarshipCategory::code).toList(),
                 s.getIntakes().stream()

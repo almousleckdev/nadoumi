@@ -192,6 +192,8 @@ public class UniversityService {
         u.setNearbyInfo(blankToNull(req.nearbyInfo()));
         u.setAdmissionsEmail(blankToNull(req.admissionsEmail()));
         u.setOfficePhone(blankToNull(req.officePhone()));
+        u.setLogoImageUrl(blankToNull(req.logoImageUrl()));
+        u.setCoverImageUrl(blankToNull(req.coverImageUrl()));
         u.setRecommended(Boolean.TRUE.equals(req.recommended()));
         u.setFeatured(Boolean.TRUE.equals(req.featured()));
         u.setStatus(req.status());
