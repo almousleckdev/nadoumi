@@ -1,8 +1,10 @@
 package com.nadoumi.media.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 import com.cloudinary.Cloudinary;
+import com.nadoumi.media.mapper.MediaAssetMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +22,8 @@ class CloudinaryConfigTest {
     private static final String CLOUDINARY_URL = "CLOUDINARY_URL";
 
     private final ApplicationContextRunner runner = new ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(MediaAutoConfiguration.class));
+            .withConfiguration(AutoConfigurations.of(MediaAutoConfiguration.class))
+            .withBean(MediaAssetMapper.class, () -> mock(MediaAssetMapper.class));
 
     @BeforeEach
     @AfterEach

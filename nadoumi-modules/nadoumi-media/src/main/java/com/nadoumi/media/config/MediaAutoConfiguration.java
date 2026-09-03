@@ -2,6 +2,8 @@ package com.nadoumi.media.config;
 
 import com.cloudinary.Cloudinary;
 import com.nadoumi.common.media.MediaStorageService;
+import com.nadoumi.media.mapper.MediaAssetMapper;
+import com.nadoumi.media.spi.CloudinaryMediaStorage;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -54,5 +56,12 @@ public class MediaAutoConfiguration {
             throw new IllegalStateException(CLOUDINARY_URL_VAR + " is malformed: missing cloud name");
         }
         return cloudinary;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(MediaStorageService.class)
+    MediaStorageService cloudinaryMediaStorage(Cloudinary cloudinary, MediaAssetMapper assetMapper,
+            MediaProperties properties) {
+        return new CloudinaryMediaStorage(cloudinary, assetMapper, properties);
     }
 }
