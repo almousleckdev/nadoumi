@@ -19,6 +19,7 @@ public class Scholarship {
 
     private Long id;
     private String slug;
+    private String referenceCode;
     private String title;
     private String summary;
     private String country;
@@ -72,6 +73,8 @@ public class Scholarship {
     public void setId(Long id) { this.id = id; }
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
+    public String getReferenceCode() { return referenceCode; }
+    public void setReferenceCode(String referenceCode) { this.referenceCode = referenceCode; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getSummary() { return summary; }

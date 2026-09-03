@@ -371,6 +371,7 @@ export default {
     needLevel: 'Select at least one education level.',
     // fields
     slug: 'Slug', slugHint: 'Leave blank to auto-generate from the title',
+    referenceCode: 'Reference code', refPending: 'Assigned on first publish',
     summary: 'Summary', field: 'Field / discipline',
     country: 'Country', province: 'Province', city: 'City',
     fundingModel: 'Funding model', teachingLanguage: 'Teaching language',

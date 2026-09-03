@@ -94,6 +94,7 @@ export interface ScholarshipDocumentRequirementInput {
 export interface ScholarshipView {
   id: number
   slug: string
+  referenceCode?: string | null
   title: string
   summary?: string | null
   country: string

@@ -3,6 +3,7 @@ package com.ruoyi.nadoumi;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.Matchers.matchesRegex;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -63,6 +64,7 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.view.title").value("CSC Full Scholarship — Master"))
                 .andExpect(jsonPath("$.view.slug").value("csc-full-scholarship-master"))
+                .andExpect(jsonPath("$.view.referenceCode").value(matchesRegex("NAC-\\d{4}-0001")))
                 .andExpect(jsonPath("$.view.country").value("CN"))
                 .andExpect(jsonPath("$.view.heroImageUrl").value("https://img.example/sch-hero.jpg"))
                 .andExpect(jsonPath("$.view.coverImageUrl").value("https://img.example/sch-cover.jpg"))

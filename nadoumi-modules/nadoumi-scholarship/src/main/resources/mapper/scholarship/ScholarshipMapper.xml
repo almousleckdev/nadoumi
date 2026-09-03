@@ -5,6 +5,7 @@
     <resultMap id="head" type="com.nadoumi.scholarship.domain.Scholarship">
         <id     property="id"                     column="id"/>
         <result property="slug"                   column="slug"/>
+        <result property="referenceCode"          column="reference_code"/>
         <result property="title"                  column="title"/>
         <result property="summary"                column="summary"/>
         <result property="country"                column="country"/>
@@ -46,7 +47,7 @@
     </resultMap>
 
     <sql id="viewCols">
-        v.id, v.slug, v.title, v.summary, v.country, v.province, v.city, v.field,
+        v.id, v.slug, v.reference_code, v.title, v.summary, v.country, v.province, v.city, v.field,
         v.teaching_language, v.funding_model, v.has_stipend, v.deadline,
         v.benefits, v.requirements, v.policy, v.renewal_conditions,
         v.non_degree_duration, v.study_duration_months,
@@ -59,7 +60,7 @@
     </sql>
 
     <sql id="baseCols">
-        s.id, s.slug, s.title, s.summary, s.country, s.province, s.city, s.field,
+        s.id, s.slug, s.reference_code, s.title, s.summary, s.country, s.province, s.city, s.field,
         s.teaching_language, s.funding_model, s.has_stipend, s.deadline,
         s.benefits, s.requirements, s.policy, s.renewal_conditions,
         s.non_degree_duration, s.study_duration_months,
@@ -182,10 +183,15 @@
         select id from nad_scholarship where slug = #{slug} limit 1
     </select>
 
+    <select id="maxReferenceSeq" resultType="java.lang.Integer">
+        select coalesce(max(cast(substring(reference_code, char_length(#{prefix}) + 1) as unsigned)), 0)
+        from nad_scholarship where reference_code like concat(#{prefix}, '%')
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.scholarship.domain.Scholarship"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_scholarship
-            (slug, title, summary, country, province, city, field, teaching_language, funding_model,
+            (slug, reference_code, title, summary, country, province, city, field, teaching_language, funding_model,
              has_stipend, deadline, benefits, requirements, policy, renewal_conditions,
              non_degree_duration, study_duration_months, application_channel, agency_number,
              requires_financial_proof, requires_foundation_year,
@@ -193,7 +199,7 @@
              slots, is_featured, is_recommended, is_hot, publish_status, published_at, status,
              create_by, create_time, remark, hero_image_url, cover_image_url)
         values
-            (#{slug}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
+            (#{slug}, #{referenceCode}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
              #{teachingLanguage}, #{fundingModel}, #{hasStipend}, #{deadline}, #{benefits},
              #{requirements}, #{policy}, #{renewalConditions},
              #{nonDegreeDuration}, #{studyDurationMonths}, #{applicationChannel}, #{agencyNumber},
@@ -206,7 +212,7 @@
 
     <update id="update" parameterType="com.nadoumi.scholarship.domain.Scholarship">
         update nad_scholarship set
-            slug = #{slug}, title = #{title}, summary = #{summary}, country = #{country},
+            slug = #{slug}, reference_code = #{referenceCode}, title = #{title}, summary = #{summary}, country = #{country},
             province = #{province}, city = #{city}, field = #{field},
             teaching_language = #{teachingLanguage}, funding_model = #{fundingModel},
             has_stipend = #{hasStipend}, deadline = #{deadline}, benefits = #{benefits},

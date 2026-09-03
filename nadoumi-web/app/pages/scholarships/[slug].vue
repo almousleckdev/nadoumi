@@ -81,7 +81,8 @@ const eligibilityRows = computed(() => {
             <span v-if="s.hot" class="rounded-full bg-amber-400 px-2.5 py-0.5 text-amber-950">{{ t('scholarships.hot') }}</span>
             <span v-else-if="s.featured" class="rounded-full bg-brand-500 px-2.5 py-0.5">{{ t('catalog.featured') }}</span>
           </div>
-          <h1 class="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ s.title }}</h1>
+          <p v-if="s.referenceCode" class="mt-3 font-mono text-xs uppercase tracking-widest text-white/60">{{ s.referenceCode }}</p>
+          <h1 class="mt-1 font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ s.title }}</h1>
           <p v-if="s.summary" class="mt-3 text-lg text-slate-200">{{ s.summary }}</p>
           <dl class="mt-5 flex flex-wrap gap-x-8 gap-y-2 text-sm text-slate-300">
             <div><dt class="inline text-slate-400">{{ t('scholarships.colDeadline') }}: </dt><dd class="inline">{{ s.deadline ?? t('catalog.rollingDeadline') }}</dd></div>

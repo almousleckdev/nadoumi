@@ -20,6 +20,7 @@ export interface ScholarshipIntake {
 export interface ScholarshipCard {
   id: number
   slug: string
+  referenceCode?: string | null
   title: string
   summary?: string | null
   country: string

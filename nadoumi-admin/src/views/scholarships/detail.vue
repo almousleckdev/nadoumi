@@ -66,6 +66,7 @@
       <FormSection :title="t('scholarship.secIdentity')">
         <DescriptionList
           :items="[
+            { label: t('scholarship.referenceCode'), value: s.view.referenceCode || t('scholarship.refPending') },
             { label: t('scholarship.slug'), value: s.view.slug },
             { label: t('scholarship.field'), value: s.view.field || '—' },
             { label: t('scholarship.teachingLanguage'), value: s.view.teachingLanguage ? t(`scholarship.lang.${s.view.teachingLanguage}`) : '—' },

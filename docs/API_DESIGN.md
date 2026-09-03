@@ -170,6 +170,8 @@ commission / internal field on any path (`StaffScholarshipTest` enforces this).
 It does carry `heroImageUrl` / `coverImageUrl` (student-safe imagery, URL strings)
 on both card and detail rows. The `slug` is always derived server-side from the
 title (kebab-case, lower-cased, de-duplicated); there is no client-supplied slug.
+`referenceCode` (`NAC-<year>-NNNN`, V25) is assigned on first publish and shown in
+the public list + on the detail page; it is `null` while a scholarship is DRAFT.
 Category applicability is enforced by funding model: `SELF` carries no categories,
 `PARTIAL` cannot carry CSC / CGS / government Type A–D.
 

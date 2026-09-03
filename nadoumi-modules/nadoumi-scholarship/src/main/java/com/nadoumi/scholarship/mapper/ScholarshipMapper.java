@@ -48,6 +48,9 @@ public interface ScholarshipMapper {
 
     Long findIdBySlug(@Param("slug") String slug);
 
+    /** Highest numeric suffix used by a {@code <prefix>NNNN} reference code, or 0. */
+    Integer maxReferenceSeq(@Param("prefix") String prefix);
+
     int insert(Scholarship scholarship);
 
     int update(Scholarship scholarship);
