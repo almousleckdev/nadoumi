@@ -26,6 +26,7 @@ public record ProgramRequest(
         @PositiveOrZero BigDecimal tuitionAmount,
         @Size(min = 3, max = 3) String tuitionCurrency,
         @Size(max = 4000) String summary,
+        Long imageMediaId,
         Boolean featured,
         Boolean hot,
         @NotNull ProgramStatus status,

@@ -23,6 +23,8 @@ public record ProgramResponse(
         BigDecimal tuitionAmount,
         String tuitionCurrency,
         String summary,
+        Long imageMediaId,
+        String imageUrl,
         boolean featured,
         boolean hot,
         String status,
@@ -46,6 +48,10 @@ public record ProgramResponse(
     }
 
     public static ProgramResponse of(Program p) {
+        return of(p, null);
+    }
+
+    public static ProgramResponse of(Program p, String imageUrl) {
         return new ProgramResponse(
                 p.getId(), p.getUniversityId(), p.getUniversityName(), p.getUniversitySlug(),
                 p.getName(), p.getSlug(), p.getNameCn(),
@@ -53,7 +59,7 @@ public record ProgramResponse(
                 p.getField(),
                 p.getTeachingLanguage() == null ? null : p.getTeachingLanguage().name(),
                 p.getDurationMonths(), p.getTuitionAmount(), p.getTuitionCurrency(),
-                p.getSummary(), p.isFeatured(), p.isHot(),
+                p.getSummary(), p.getImageMediaId(), imageUrl, p.isFeatured(), p.isHot(),
                 p.getStatus() == null ? null : p.getStatus().name(),
                 p.getPublishStatus() == null ? null : p.getPublishStatus().name(),
                 p.getRemark(), str(p.getCreateTime()), str(p.getUpdateTime()),

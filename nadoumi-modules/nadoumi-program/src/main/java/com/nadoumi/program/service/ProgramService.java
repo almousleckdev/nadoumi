@@ -2,6 +2,11 @@ package com.nadoumi.program.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.media.MediaCategory;
+import com.nadoumi.common.media.MediaGateway;
+import com.nadoumi.common.media.MediaOwnerKind;
+import com.nadoumi.common.media.MediaOwnerRef;
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
@@ -20,11 +25,14 @@ import com.nadoumi.program.web.response.ProgramResponse;
 import com.nadoumi.program.web.response.PublicProgramResponse;
 import com.nadoumi.university.service.UniversityService;
 import com.ruoyi.common.utils.SecurityUtils;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Programme catalog. A programme belongs to exactly one university;
@@ -38,10 +46,12 @@ public class ProgramService {
 
     private final ProgramMapper mapper;
     private final UniversityService universityService;
+    private final MediaGateway media;
 
-    public ProgramService(ProgramMapper mapper, UniversityService universityService) {
+    public ProgramService(ProgramMapper mapper, UniversityService universityService, MediaGateway media) {
         this.mapper = mapper;
         this.universityService = universityService;
+        this.media = media;
     }
 
     // ---- staff ----
@@ -53,13 +63,13 @@ public class ProgramService {
         long total = new PageInfo<>(rows).getTotal();
         Map<Long, UniRef> refs = new HashMap<>();
         rows.forEach(p -> applyUniversity(p, staffUniversity(p.getUniversityId(), refs)));
-        return PageResponse.of(rows.stream().map(ProgramResponse::of).toList(), page, size, total);
+        return PageResponse.of(rows.stream().map(this::toResponse).toList(), page, size, total);
     }
 
     public ProgramResponse get(Long id) {
         Program p = loadWithChildren(id);
         applyUniversity(p, staffUniversity(p.getUniversityId(), new HashMap<>()));
-        return ProgramResponse.of(p);
+        return toResponse(p);
     }
 
     @Transactional
@@ -97,6 +107,24 @@ public class ProgramService {
         // children go with the row (ON DELETE CASCADE)
     }
 
+    // ---- media upload (staff, nad:program:edit) ----
+
+    @Transactional
+    public MediaUploadResult uploadImage(long id, MultipartFile file) {
+        load(id);
+        MediaUploadResult result;
+        try {
+            result = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+                    file.getSize(), MediaCategory.PROGRAM_IMAGE, null,
+                    new MediaOwnerRef(MediaOwnerKind.PROGRAM, id), currentUserId());
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("failed to read upload", e);
+        }
+        mapper.updateImageMediaId(id, result.mediaId());
+        return result;
+    }
+
     // ---- public (published + active programme of a published + active university) ----
 
     public PageResponse<PublicProgramResponse> publicList(String q, Long universityId, ProgramType type,
@@ -118,7 +146,7 @@ public class ProgramService {
                     applyUniversity(p, ref);
                     return ref != null;
                 })
-                .map(PublicProgramResponse::card)
+                .map(p -> PublicProgramResponse.card(p, imageUrl(p)))
                 .toList();
         long hiddenOnThisPage = rows.size() - items.size();
         return PageResponse.of(items, page, size, rawTotal - hiddenOnThisPage);
@@ -129,7 +157,7 @@ public class ProgramService {
         List<Program> rows = mapper.search(
                 ProgramSearch.publicCatalog(null, uni.id(), null, null, null, null, null));
         rows.forEach(p -> applyUniversity(p, new UniRef(uni.name(), uni.slug())));
-        return rows.stream().map(PublicProgramResponse::card).toList();
+        return rows.stream().map(p -> PublicProgramResponse.card(p, imageUrl(p))).toList();
     }
 
     public PublicProgramResponse publicGet(String idOrSlug) {
@@ -140,7 +168,7 @@ public class ProgramService {
         // the university must itself be public
         var uni = universityService.publicGet(String.valueOf(p.getUniversityId()));
         applyUniversity(p, new UniRef(uni.name(), uni.slug()));
-        return PublicProgramResponse.detail(p);
+        return PublicProgramResponse.detail(p, imageUrl(p));
     }
 
     private Long resolveId(String idOrSlug) {
@@ -269,6 +297,33 @@ public class ProgramService {
         }
     }
 
+    private static long currentUserId() {
+        try {
+            Long id = SecurityUtils.getUserId();
+            return id == null ? 0L : id;
+        }
+        catch (RuntimeException e) {
+            return 0L;
+        }
+    }
+
+    private ProgramResponse toResponse(Program p) {
+        return ProgramResponse.of(p, imageUrl(p));
+    }
+
+    /** Resolve {@code image_media_id} to a public delivery URL, or null when unset. */
+    private String imageUrl(Program p) {
+        if (p.getImageMediaId() == null) {
+            return null;
+        }
+        try {
+            return media.publicUrl(p.getImageMediaId());
+        }
+        catch (RuntimeException e) {
+            return null;
+        }
+    }
+
     private static void apply(Program p, ProgramRequest req) {
         p.setUniversityId(req.universityId());
         p.setName(req.name().trim());
@@ -280,6 +335,11 @@ public class ProgramService {
         p.setTuitionAmount(req.tuitionAmount());
         p.setTuitionCurrency(upperOrNull(req.tuitionCurrency()));
         p.setSummary(blankToNull(req.summary()));
+        // Primarily set through the dedicated upload endpoint; only overwrite from
+        // the request when the client actually sent a value.
+        if (req.imageMediaId() != null) {
+            p.setImageMediaId(req.imageMediaId());
+        }
         p.setFeatured(Boolean.TRUE.equals(req.featured()));
         p.setHot(Boolean.TRUE.equals(req.hot()));
         p.setStatus(req.status());

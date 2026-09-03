@@ -23,6 +23,8 @@ public interface ProgramMapper {
 
     int delete(@Param("id") Long id);
 
+    int updateImageMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
     Long findIdByUniversityAndName(@Param("universityId") Long universityId, @Param("name") String name);
 
     Long findIdBySlug(@Param("slug") String slug);

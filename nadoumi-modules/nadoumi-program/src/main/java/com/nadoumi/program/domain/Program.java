@@ -29,6 +29,7 @@ public class Program {
     private BigDecimal tuitionAmount;
     private String tuitionCurrency;
     private String summary;
+    private Long imageMediaId;
     private boolean featured;
     private boolean hot;
     private PublishStatus publishStatus;
@@ -80,6 +81,9 @@ public class Program {
 
     public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
+
+    public Long getImageMediaId() { return imageMediaId; }
+    public void setImageMediaId(Long imageMediaId) { this.imageMediaId = imageMediaId; }
 
     public boolean isFeatured() { return featured; }
     public void setFeatured(boolean featured) { this.featured = featured; }
