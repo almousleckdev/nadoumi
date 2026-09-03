@@ -387,9 +387,20 @@ export default {
     scopeAnyHint: 'Open to all international students.',
     scopeIncludeHint: 'Only students from the listed countries may apply.',
     scopeExcludeHint: 'All international students except those from the listed countries.',
-    // stipend
+    // stipend (one row per accepted level)
     hasStipend: 'This scholarship pays a stipend',
     frequency: 'Frequency', durationMonths: 'Duration (months)', stipendConditions: 'Stipend conditions',
+    stipendPerLevelHint: 'A stipend per accepted level — the PhD stipend usually differs from the Master’s.',
+    addStipend: 'Add level stipend',
+    // accommodation (room types, each priced)
+    secAccommodation: 'Accommodation',
+    accommodationHint: 'Room types offered, each with its price and amenities (AC, WiFi, private bathroom…).',
+    accommodationNote: 'Amenities / note',
+    addAccommodation: 'Add room type',
+    room: { SINGLE: 'Single room', DOUBLE: 'Double room', TRIPLE: 'Triple room', QUAD: 'Quad room', SHARED: 'Shared / dormitory' },
+    // non-degree duration
+    nonDegreeDuration: 'Non-degree duration',
+    nonDegree: { HALF_YEAR: 'Half year', ONE_YEAR: 'One year' },
     // documents
     mandatory: 'Mandatory', optionalDoc: 'Optional',
     addIntake: 'Add intake', addFee: 'Add fee line', addDocument: 'Add document',
@@ -409,7 +420,7 @@ export default {
     confidentialTerms: 'Confidential terms', commissionModelJson: 'Commission model (JSON)',
     // sections
     secIdentity: 'Identity', secClassification: 'Classification', secIntakes: 'Intakes',
-    secEligibility: 'Eligibility', secFees: 'Fees & funding', secStipend: 'Stipend',
+    secEligibility: 'Eligibility', secFees: 'Fees & funding', secStipend: 'Stipend by level',
     secDocuments: 'Required documents', secContent: 'Descriptive content', secPublication: 'Publication',
     secMedia: 'Media', heroImage: 'Hero image', coverImage: 'Cover image',
     opens: 'Opens', closes: 'closes',

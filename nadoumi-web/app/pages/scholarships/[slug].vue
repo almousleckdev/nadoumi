@@ -30,8 +30,12 @@ function langLabel(c?: string | null) {
 function feeLabel(kind: string) {
   return t(`scholarships.fee.${kind}`, kind)
 }
-function money(m?: { amount: number, currency: string } | null) {
-  return m ? `${m.amount.toLocaleString('en')} ${m.currency}` : null
+function dual(rmb?: number | null, usd?: number | null): string | null {
+  if (rmb == null && usd == null) return null
+  return `¥${(rmb ?? 0).toLocaleString('en')} · $${(usd ?? 0).toLocaleString('en')}`
+}
+function money(m?: { amountRmb: number, amountUsd: number } | null) {
+  return m ? dual(m.amountRmb, m.amountUsd) : null
 }
 
 const prose = computed(() => {
@@ -83,6 +87,7 @@ const eligibilityRows = computed(() => {
             <div><dt class="inline text-slate-400">{{ t('scholarships.colDeadline') }}: </dt><dd class="inline">{{ s.deadline ?? t('catalog.rollingDeadline') }}</dd></div>
             <div><dt class="inline text-slate-400">{{ t('scholarships.colLanguage') }}: </dt><dd class="inline">{{ langLabel(s.teachingLanguage) }}</dd></div>
             <div v-if="s.levels.length"><dt class="inline text-slate-400">{{ t('scholarships.colLevel') }}: </dt><dd class="inline">{{ s.levels.map(l => t(`scholarships.level.${l}`)).join(', ') }}</dd></div>
+            <div v-if="s.nonDegreeDuration"><dt class="inline text-slate-400">{{ t('scholarships.nonDegreeDuration') }}: </dt><dd class="inline">{{ t(`scholarships.nonDegree.${s.nonDegreeDuration}`, s.nonDegreeDuration) }}</dd></div>
             <div v-if="[s.city, s.province, s.country].filter(Boolean).length"><dt class="inline text-slate-400">{{ t('scholarships.colLocation') }}: </dt><dd class="inline">{{ [s.city, s.province, s.country].filter(Boolean).join(', ') }}</dd></div>
           </dl>
           <div class="mt-7 flex flex-wrap gap-3">
@@ -119,7 +124,22 @@ const eligibilityRows = computed(() => {
               <tbody class="divide-y divide-slate-100">
                 <tr v-for="(f, i) in s.fees" :key="i">
                   <td class="py-2 text-slate-600">{{ feeLabel(f.kind) }}<span v-if="f.note" class="text-slate-400"> · {{ f.note }}</span></td>
-                  <td class="py-2 text-right font-medium text-slate-900">{{ f.amount.toLocaleString('en') }} {{ f.currency }}</td>
+                  <td class="py-2 text-right font-medium text-slate-900">{{ dual(f.amountRmb, f.amountUsd) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section v-if="s.accommodation.length">
+            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.accommodation') }}</h2>
+            <table class="mt-3 w-full max-w-lg text-left text-sm">
+              <tbody class="divide-y divide-slate-100">
+                <tr v-for="(a, i) in s.accommodation" :key="i">
+                  <td class="py-2 text-slate-600">
+                    {{ t(`scholarships.room.${a.roomType}`, a.roomType) }}
+                    <span v-if="a.note" class="text-slate-400"> · {{ a.note }}</span>
+                  </td>
+                  <td class="py-2 text-right font-medium text-slate-900">{{ dual(a.amountRmb, a.amountUsd) ?? '—' }}</td>
                 </tr>
               </tbody>
             </table>
@@ -142,14 +162,19 @@ const eligibilityRows = computed(() => {
         </div>
 
         <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
-          <div v-if="s.stipend" class="rounded-xl border border-slate-200 bg-white p-5">
+          <div v-if="s.stipends.length" class="rounded-xl border border-slate-200 bg-white p-5">
             <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('scholarships.stipend') }}</h2>
-            <p class="mt-2 font-display text-lg font-semibold text-slate-900">
-              {{ s.stipend.amount.toLocaleString('en') }} {{ s.stipend.currency }}
-              <span class="text-sm font-normal text-slate-500">/ {{ t(`scholarships.freq.${s.stipend.frequency}`, s.stipend.frequency) }}</span>
-            </p>
-            <p v-if="s.stipend.durationMonths" class="text-sm text-slate-600">{{ t('scholarships.stipendDuration', { n: s.stipend.durationMonths }) }}</p>
-            <p v-if="s.stipend.conditions" class="mt-1 text-sm text-slate-500">{{ s.stipend.conditions }}</p>
+            <ul class="mt-2 space-y-3">
+              <li v-for="st in s.stipends" :key="st.level">
+                <p class="text-xs uppercase tracking-wide text-slate-400">{{ t(`scholarships.level.${st.level}`, st.level) }}</p>
+                <p class="font-display text-lg font-semibold text-slate-900">
+                  {{ dual(st.amountRmb, st.amountUsd) }}
+                  <span class="text-sm font-normal text-slate-500">/ {{ t(`scholarships.freq.${st.frequency}`, st.frequency) }}</span>
+                </p>
+                <p v-if="st.durationMonths" class="text-sm text-slate-600">{{ t('scholarships.stipendDuration', { n: st.durationMonths }) }}</p>
+                <p v-if="st.conditions" class="text-sm text-slate-500">{{ st.conditions }}</p>
+              </li>
+            </ul>
           </div>
 
           <div v-if="money(s.applicationFee) || money(s.serviceFee)" class="rounded-xl border border-slate-200 bg-white p-5 text-sm">

@@ -173,6 +173,22 @@ title (kebab-case, lower-cased, de-duplicated); there is no client-supplied slug
 Category applicability is enforced by funding model: `SELF` carries no categories,
 `PARTIAL` cannot carry CSC / CGS / government Type A–D.
 
+**Money (V22).** Every monetary value on the detail response is presented in both
+RMB and USD — `fees[]`, `applicationFee`, `serviceFee`, `stipends[]` and
+`accommodation[]` each carry `amountRmb` + `amountUsd` + `currency`. The stored
+figure is kept as entered; the other side is computed at a fixed display rate
+(`PublicScholarshipResponse.RMB_PER_USD`, 7.10), rounded to whole units — a
+display convenience, not an FX quote.
+
+**Stipend + accommodation + non-degree duration (V22).** `stipend` (single) is
+replaced by `stipends[]` — one entry per accepted education level (`level`,
+amounts, `frequency`, `durationMonths?`, `conditions?`). `accommodation[]` lists
+room types (`roomType` SINGLE/DOUBLE/TRIPLE/QUAD/SHARED, amounts, `note` for
+amenities). `nonDegreeDuration` (`HALF_YEAR` / `ONE_YEAR`) applies when NON_DEGREE
+is an accepted level. The staff request sends `levelStipends[]`, `accommodations[]`
+and `nonDegreeDuration`; fee/stipend/accommodation amounts are entered once with a
+currency.
+
 | Method | Path | Notes |
 | --- | --- | --- |
 | GET | `/api/public/scholarships` | `q`, `country`, `province`, `city`, `field`, `language`, `funding`, `hasStipend`, `deadlineBefore`, `level` (csv), `category` (csv), `intake` (csv), `featured`, `recommended`, `hot`, `sort` (`deadline`\|`newest`\|`title`), `page`, `size` (default 12) → `PageResponse<PublicScholarshipResponse>` (card rows: + `levels`, `categories`, `intakes`). |

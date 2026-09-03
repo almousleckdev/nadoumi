@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(18);
+        assertThat(applied).isEqualTo(19);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -143,6 +143,12 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'v_scholarship_student' AND column_name IN ('hero_image_url','cover_image_url')"))
                 .isEqualTo("2");
+        // V22 — stipend per level + accommodation room types + non-degree duration
+        assertThat(tableExists(ds, "nad_scholarship_level_stipend")).isTrue();
+        assertThat(tableExists(ds, "nad_scholarship_accommodation")).isTrue();
+        assertThat(tableExists(ds, "nad_scholarship_stipend")).isFalse();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_scholarship' AND column_name = 'non_degree_duration'")).isEqualTo("1");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -172,7 +178,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(17); // V2..V21
+        assertThat(applied).isEqualTo(18); // V2..V22
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

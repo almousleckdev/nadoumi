@@ -18,6 +18,7 @@
         <result property="benefits"               column="benefits"/>
         <result property="requirements"           column="requirements"/>
         <result property="policy"                 column="policy"/>
+        <result property="nonDegreeDuration"      column="non_degree_duration"/>
         <result property="applicationFeeAmount"   column="application_fee_amount"/>
         <result property="applicationFeeCurrency" column="application_fee_currency"/>
         <result property="serviceFeeAmount"       column="service_fee_amount"/>
@@ -41,7 +42,7 @@
     <sql id="viewCols">
         v.id, v.slug, v.title, v.summary, v.country, v.province, v.city, v.field,
         v.teaching_language, v.funding_model, v.has_stipend, v.deadline,
-        v.benefits, v.requirements, v.policy,
+        v.benefits, v.requirements, v.policy, v.non_degree_duration,
         v.application_fee_amount, v.application_fee_currency,
         v.service_fee_amount, v.service_fee_currency, v.slots,
         v.hero_image_url, v.cover_image_url,
@@ -51,7 +52,7 @@
     <sql id="baseCols">
         s.id, s.slug, s.title, s.summary, s.country, s.province, s.city, s.field,
         s.teaching_language, s.funding_model, s.has_stipend, s.deadline,
-        s.benefits, s.requirements, s.policy,
+        s.benefits, s.requirements, s.policy, s.non_degree_duration,
         s.application_fee_amount, s.application_fee_currency,
         s.service_fee_amount, s.service_fee_currency, s.slots,
         s.hero_image_url, s.cover_image_url,
@@ -173,14 +174,15 @@
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_scholarship
             (slug, title, summary, country, province, city, field, teaching_language, funding_model,
-             has_stipend, deadline, benefits, requirements, policy,
+             has_stipend, deadline, benefits, requirements, policy, non_degree_duration,
              application_fee_amount, application_fee_currency, service_fee_amount, service_fee_currency,
              slots, is_featured, is_recommended, is_hot, publish_status, published_at, status,
              create_by, create_time, remark, hero_image_url, cover_image_url)
         values
             (#{slug}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
              #{teachingLanguage}, #{fundingModel}, #{hasStipend}, #{deadline}, #{benefits},
-             #{requirements}, #{policy}, #{applicationFeeAmount}, #{applicationFeeCurrency},
+             #{requirements}, #{policy}, #{nonDegreeDuration},
+             #{applicationFeeAmount}, #{applicationFeeCurrency},
              #{serviceFeeAmount}, #{serviceFeeCurrency}, #{slots}, #{featured}, #{recommended},
              #{hot}, #{publishStatus}, #{publishedAt}, #{status}, #{createBy}, now(), #{remark},
              #{heroImageUrl}, #{coverImageUrl})
@@ -192,7 +194,7 @@
             province = #{province}, city = #{city}, field = #{field},
             teaching_language = #{teachingLanguage}, funding_model = #{fundingModel},
             has_stipend = #{hasStipend}, deadline = #{deadline}, benefits = #{benefits},
-            requirements = #{requirements}, policy = #{policy},
+            requirements = #{requirements}, policy = #{policy}, non_degree_duration = #{nonDegreeDuration},
             application_fee_amount = #{applicationFeeAmount}, application_fee_currency = #{applicationFeeCurrency},
             service_fee_amount = #{serviceFeeAmount}, service_fee_currency = #{serviceFeeCurrency},
             slots = #{slots}, is_featured = #{featured}, is_recommended = #{recommended}, is_hot = #{hot},
@@ -244,9 +246,14 @@
         from nad_scholarship_fee where scholarship_id = #{scholarshipId} order by sort_order, id
     </select>
 
-    <select id="findStipend" resultType="com.nadoumi.scholarship.domain.ScholarshipStipend">
-        select amount, currency, frequency, duration_months as durationMonths, conditions
-        from nad_scholarship_stipend where scholarship_id = #{scholarshipId}
+    <select id="findLevelStipends" resultType="com.nadoumi.scholarship.domain.ScholarshipLevelStipend">
+        select level, amount, currency, frequency, duration_months as durationMonths, conditions
+        from nad_scholarship_level_stipend where scholarship_id = #{scholarshipId} order by level
+    </select>
+
+    <select id="findAccommodations" resultType="com.nadoumi.scholarship.domain.ScholarshipAccommodation">
+        select room_type as roomType, amount, currency, note
+        from nad_scholarship_accommodation where scholarship_id = #{scholarshipId} order by sort_order, id
     </select>
 
     <select id="findDocumentRequirements" resultType="com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement">
@@ -288,11 +295,19 @@
         values (#{scholarshipId}, #{f.kind}, #{f.amount}, #{f.currency}, #{f.note}, #{sortOrder})
     </insert>
 
-    <delete id="deleteStipend">delete from nad_scholarship_stipend where scholarship_id = #{scholarshipId}</delete>
-    <insert id="insertStipend">
-        insert into nad_scholarship_stipend
-            (scholarship_id, amount, currency, frequency, duration_months, conditions)
-        values (#{scholarshipId}, #{s.amount}, #{s.currency}, #{s.frequency}, #{s.durationMonths}, #{s.conditions})
+    <delete id="deleteLevelStipends">delete from nad_scholarship_level_stipend where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertLevelStipend">
+        insert into nad_scholarship_level_stipend
+            (scholarship_id, level, amount, currency, frequency, duration_months, conditions)
+        values (#{scholarshipId}, #{s.level}, #{s.amount}, #{s.currency}, #{s.frequency},
+                #{s.durationMonths}, #{s.conditions})
+    </insert>
+
+    <delete id="deleteAccommodations">delete from nad_scholarship_accommodation where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertAccommodation">
+        insert into nad_scholarship_accommodation
+            (scholarship_id, room_type, amount, currency, note, sort_order)
+        values (#{scholarshipId}, #{a.roomType}, #{a.amount}, #{a.currency}, #{a.note}, #{sortOrder})
     </insert>
 
     <delete id="deleteDocumentRequirements">delete from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId}</delete>

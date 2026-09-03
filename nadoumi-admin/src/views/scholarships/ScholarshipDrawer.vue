@@ -5,9 +5,10 @@ import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import {
   createScholarship, updateScholarship, listScholarshipCategories,
-  EDUCATION_LEVELS, FEE_KINDS, DOC_TYPES, INTAKE_TERMS,
+  EDUCATION_LEVELS, FEE_KINDS, DOC_TYPES, INTAKE_TERMS, ROOM_TYPES, NON_DEGREE_DURATIONS,
   type Scholarship, type ScholarshipInput, type ScholarshipCategoryOption,
   type EducationLevel, type FeeKind, type NationalityScope,
+  type RoomType, type NonDegreeDuration, type StipendFrequency,
 } from '@/api/scholarship'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
@@ -51,10 +52,11 @@ function blankForm() {
     serviceFeeAmount: null as number | null, serviceFeeCurrency: 'USD',
     slots: null as number | null,
     deadline: '' as string | null,
+    nonDegreeDuration: null as NonDegreeDuration | null,
     fees: [] as { kind: FeeKind, amount: number | null, currency: string, note: string }[],
     eligibility: blankEligibility(),
-    hasStipend: false,
-    stipend: { amount: null as number | null, currency: 'CNY', frequency: 'MONTHLY' as const, durationMonths: null as number | null, conditions: '' },
+    levelStipends: [] as { level: EducationLevel, amount: number | null, currency: string, frequency: StipendFrequency, durationMonths: number | null, conditions: string }[],
+    accommodations: [] as { roomType: RoomType, amount: number | null, currency: string, note: string }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
     documentRequirements: [] as { docType: string, mandatory: boolean, note: string }[],
     featured: false, recommended: false, hot: false,
@@ -89,15 +91,20 @@ watch(() => props.modelValue, (open) => {
     teachingLanguage: v.teachingLanguage ?? null, fundingModel: v.fundingModel,
     categoryCodes: [...v.categories], levels: [...v.levels] as EducationLevel[],
     benefits: v.benefits ?? '', requirements: v.requirements ?? '', policy: v.policy ?? '',
-    applicationFeeAmount: v.applicationFee?.amount ?? null, applicationFeeCurrency: v.applicationFee?.currency ?? 'CNY',
-    serviceFeeAmount: v.serviceFee?.amount ?? null, serviceFeeCurrency: v.serviceFee?.currency ?? 'USD',
+    nonDegreeDuration: v.nonDegreeDuration ?? null,
+    // amounts are re-populated from the RMB figure (see the Media/Fees note) in CNY
+    applicationFeeAmount: v.applicationFee?.amountRmb ?? null, applicationFeeCurrency: 'CNY',
+    serviceFeeAmount: v.serviceFee?.amountUsd ?? null, serviceFeeCurrency: 'USD',
     slots: v.slots ?? null, deadline: v.deadline ?? '',
-    fees: v.fees.map(f => ({ kind: f.kind as FeeKind, amount: f.amount, currency: f.currency, note: f.note ?? '' })),
+    fees: v.fees.map(f => ({ kind: f.kind as FeeKind, amount: f.amountRmb, currency: 'CNY', note: f.note ?? '' })),
     eligibility: { ...blankEligibility(), ...(v.eligibility ?? {}), acceptedCountries: v.eligibility?.acceptedCountries ?? '', notes: v.eligibility?.notes ?? '', nationalityScope: (v.eligibility?.nationalityScope as NationalityScope) ?? 'ANY' },
-    hasStipend: v.hasStipend,
-    stipend: v.stipend
-      ? { amount: v.stipend.amount, currency: v.stipend.currency, frequency: v.stipend.frequency, durationMonths: v.stipend.durationMonths ?? null, conditions: v.stipend.conditions ?? '' }
-      : blankForm().stipend,
+    levelStipends: v.stipends.map(st => ({
+      level: st.level as EducationLevel, amount: st.amountRmb, currency: 'CNY',
+      frequency: st.frequency, durationMonths: st.durationMonths ?? null, conditions: st.conditions ?? '',
+    })),
+    accommodations: v.accommodation.map(a => ({
+      roomType: a.roomType as RoomType, amount: a.amountRmb ?? null, currency: 'CNY', note: a.note ?? '',
+    })),
     intakes: v.intakes.map(i => ({ term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null })),
     documentRequirements: v.documentRequirements.map(d => ({ docType: d.docType, mandatory: d.mandatory, note: d.note ?? '' })),
     featured: v.featured, recommended: v.recommended, hot: v.hot,
@@ -144,7 +151,8 @@ function payload(): ScholarshipInput {
     field: s(form.field),
     teachingLanguage: (form.teachingLanguage as ScholarshipInput['teachingLanguage']) || null,
     fundingModel: form.fundingModel,
-    hasStipend: form.hasStipend || (form.stipend.amount != null),
+    hasStipend: form.levelStipends.some(st => st.amount != null),
+    nonDegreeDuration: form.levels.includes('NON_DEGREE') ? form.nonDegreeDuration : null,
     deadline: s(form.deadline ?? ''),
     benefits: s(form.benefits),
     requirements: s(form.requirements),
@@ -176,13 +184,13 @@ function payload(): ScholarshipInput {
     fees: form.fees.filter(f => f.amount != null && f.kind).map(f => ({
       kind: f.kind, amount: Number(f.amount), currency: f.currency.toUpperCase(), note: s(f.note),
     })),
-    stipend: (form.hasStipend && form.stipend.amount != null)
-      ? {
-          amount: Number(form.stipend.amount), currency: form.stipend.currency.toUpperCase(),
-          frequency: form.stipend.frequency, durationMonths: n(form.stipend.durationMonths),
-          conditions: s(form.stipend.conditions),
-        }
-      : null,
+    levelStipends: form.levelStipends.filter(st => st.amount != null && st.level).map(st => ({
+      level: st.level, amount: Number(st.amount), currency: st.currency.toUpperCase(),
+      frequency: st.frequency, durationMonths: n(st.durationMonths), conditions: s(st.conditions),
+    })),
+    accommodations: form.accommodations.filter(a => a.roomType).map(a => ({
+      roomType: a.roomType, amount: n(a.amount), currency: a.currency.toUpperCase(), note: s(a.note),
+    })),
     documentRequirements: form.documentRequirements.filter(d => d.docType.trim()).map(d => ({
       docType: d.docType.trim().toUpperCase(), mandatory: d.mandatory, note: s(d.note),
     })),
@@ -341,6 +349,23 @@ async function save() {
               :label="t(`scholarship.level.${lv}`)"
             />
           </el-checkbox-group>
+        </el-form-item>
+        <el-form-item
+          v-if="form.levels.includes('NON_DEGREE')"
+          :label="t('scholarship.nonDegreeDuration')"
+        >
+          <el-select
+            v-model="form.nonDegreeDuration"
+            clearable
+            style="width: 220px"
+          >
+            <el-option
+              v-for="d in NON_DEGREE_DURATIONS"
+              :key="d"
+              :value="d"
+              :label="t(`scholarship.nonDegree.${d}`)"
+            />
+          </el-select>
         </el-form-item>
       </FormSection>
 
@@ -628,65 +653,127 @@ async function save() {
         </el-button>
       </FormSection>
 
-      <FormSection :title="t('scholarship.secStipend')">
-        <el-form-item>
-          <el-checkbox v-model="form.hasStipend">
-            {{ t('scholarship.hasStipend') }}
-          </el-checkbox>
-        </el-form-item>
+      <FormSection
+        :title="t('scholarship.secStipend')"
+        :description="t('scholarship.stipendPerLevelHint')"
+      >
         <div
-          v-if="form.hasStipend"
-          class="row"
+          v-for="(st, i) in form.levelStipends"
+          :key="i"
+          class="line"
         >
-          <el-form-item :label="t('scholarship.amount')">
-            <el-input-number
-              v-model="form.stipend.amount"
-              :min="0"
-              :precision="2"
-              controls-position="right"
-            />
-          </el-form-item>
-          <el-form-item
-            :label="t('scholarship.currency')"
-            class="w-24"
+          <el-select
+            v-model="st.level"
+            class="w-44"
           >
-            <el-input
-              v-model="form.stipend.currency"
-              maxlength="3"
+            <el-option
+              v-for="lv in form.levels.length ? form.levels : EDUCATION_LEVELS"
+              :key="lv"
+              :value="lv"
+              :label="t(`scholarship.level.${lv}`)"
             />
-          </el-form-item>
-          <el-form-item :label="t('scholarship.frequency')">
-            <el-select v-model="form.stipend.frequency">
-              <el-option
-                v-for="fr in FREQ"
-                :key="fr"
-                :value="fr"
-                :label="t(`scholarship.freq.${fr}`)"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item
-            :label="t('scholarship.durationMonths')"
-            class="w-28"
-          >
-            <el-input-number
-              v-model="form.stipend.durationMonths"
-              :min="0"
-              controls-position="right"
-            />
-          </el-form-item>
-        </div>
-        <el-form-item
-          v-if="form.hasStipend"
-          :label="t('scholarship.stipendConditions')"
-        >
-          <el-input
-            v-model="form.stipend.conditions"
-            type="textarea"
-            :rows="2"
-            maxlength="1000"
+          </el-select>
+          <el-input-number
+            v-model="st.amount"
+            :min="0"
+            :precision="2"
+            controls-position="right"
+            :placeholder="t('scholarship.amount')"
           />
-        </el-form-item>
+          <el-input
+            v-model="st.currency"
+            maxlength="3"
+            class="w-20"
+            style="text-transform:uppercase"
+          />
+          <el-select
+            v-model="st.frequency"
+            class="w-44"
+          >
+            <el-option
+              v-for="fr in FREQ"
+              :key="fr"
+              :value="fr"
+              :label="t(`scholarship.freq.${fr}`)"
+            />
+          </el-select>
+          <el-input-number
+            v-model="st.durationMonths"
+            :min="0"
+            controls-position="right"
+            :placeholder="t('scholarship.durationMonths')"
+            class="w-28"
+          />
+          <el-input
+            v-model="st.conditions"
+            :placeholder="t('scholarship.stipendConditions')"
+          />
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            @click="form.levelStipends.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          :icon="Plus"
+          @click="form.levelStipends.push({ level: (form.levels[0] ?? 'MASTER'), amount: null, currency: 'CNY', frequency: 'MONTHLY', durationMonths: null, conditions: '' })"
+        >
+          {{ t('scholarship.addStipend') }}
+        </el-button>
+      </FormSection>
+
+      <FormSection
+        :title="t('scholarship.secAccommodation')"
+        :description="t('scholarship.accommodationHint')"
+      >
+        <div
+          v-for="(a, i) in form.accommodations"
+          :key="i"
+          class="line"
+        >
+          <el-select
+            v-model="a.roomType"
+            class="w-44"
+          >
+            <el-option
+              v-for="rt in ROOM_TYPES"
+              :key="rt"
+              :value="rt"
+              :label="t(`scholarship.room.${rt}`)"
+            />
+          </el-select>
+          <el-input-number
+            v-model="a.amount"
+            :min="0"
+            :precision="2"
+            controls-position="right"
+            :placeholder="t('scholarship.amount')"
+          />
+          <el-input
+            v-model="a.currency"
+            maxlength="3"
+            class="w-20"
+            style="text-transform:uppercase"
+          />
+          <el-input
+            v-model="a.note"
+            :placeholder="t('scholarship.accommodationNote')"
+            maxlength="200"
+          />
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            @click="form.accommodations.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          :icon="Plus"
+          @click="form.accommodations.push({ roomType: 'SINGLE', amount: null, currency: 'CNY', note: '' })"
+        >
+          {{ t('scholarship.addAccommodation') }}
+        </el-button>
       </FormSection>
 
       <FormSection

@@ -13,8 +13,9 @@ const dto: SDto = {
   intakes: [{ term: 'AUTUMN_SEPTEMBER', applicationClose: '2026-03-31' }],
   benefits: 'Tuition, accommodation, stipend.', requirements: 'Bachelor + IELTS 6.0.', policy: null,
   eligibility: { ageMin: 18, ageMax: 35, gpaMin: 3, ieltsMin: 6, inChina: false, nationalityScope: 'ANY' },
-  fees: [{ kind: 'APPLICATION', amount: 800, currency: 'CNY', note: 'Non-refundable' }],
-  stipend: { amount: 3500, currency: 'CNY', frequency: 'MONTHLY', durationMonths: 36 },
+  fees: [{ kind: 'APPLICATION', amountRmb: 710, amountUsd: 100, currency: 'CNY', note: 'Non-refundable' }],
+  stipends: [{ level: 'MASTER', amountRmb: 3500, amountUsd: 493, currency: 'CNY', frequency: 'MONTHLY', durationMonths: 36 }],
+  accommodation: [{ roomType: 'SINGLE', amountRmb: 1200, amountUsd: 169, currency: 'CNY', note: 'AC, private bathroom' }],
   documentRequirements: [
     { docType: 'PASSPORT', mandatory: true },
     { docType: 'STUDY_PLAN', mandatory: false, note: '1–2 pages' },
@@ -37,8 +38,10 @@ describe('scholarship detail page', () => {
     expect(text).toContain('Fully funded')
     expect(text).toContain('Tuition, accommodation, stipend.')
     expect(text).toContain('Eligibility')
-    expect(text).toContain('800 CNY')
-    expect(text).toContain('3,500 CNY')
+    expect(text).toContain('¥710 · $100')
+    expect(text).toContain('¥3,500 · $493')
+    expect(text).toContain('Accommodation')
+    expect(text).toContain('Single room')
     // document requirements come from config, not hard-coded
     expect(text).toContain('Passport')
     expect(text).toContain('Study plan')

@@ -4,8 +4,10 @@
  * university / partnership field (enforced server-side, docs/DOMAIN_MODEL.md §6).
  */
 /** `/api/public/scholarships` — student-safe only; never a university/partnership field. */
+/** Every scholarship monetary value is shown in both RMB and USD (server-computed). */
 export interface Money {
-  amount: number
+  amountRmb: number
+  amountUsd: number
   currency: string
 }
 
@@ -27,6 +29,7 @@ export interface ScholarshipCard {
   teachingLanguage?: 'ENGLISH' | 'CHINESE' | 'BOTH' | null
   fundingModel: 'FULLY' | 'PARTIAL' | 'SELF'
   hasStipend: boolean
+  nonDegreeDuration?: string | null
   deadline?: string | null
   applicationFee?: Money | null
   serviceFee?: Money | null
@@ -59,14 +62,23 @@ export interface ScholarshipDetail extends ScholarshipCard {
     cscaMin?: number | null
     notes?: string | null
   } | null
-  fees: { kind: string, amount: number, currency: string, note?: string | null }[]
-  stipend?: {
-    amount: number
+  fees: { kind: string, amountRmb: number, amountUsd: number, currency: string, note?: string | null }[]
+  stipends: {
+    level: string
+    amountRmb: number
+    amountUsd: number
     currency: string
     frequency: string
     durationMonths?: number | null
     conditions?: string | null
-  } | null
+  }[]
+  accommodation: {
+    roomType: string
+    amountRmb?: number | null
+    amountUsd?: number | null
+    currency: string
+    note?: string | null
+  }[]
   documentRequirements: { docType: string, mandatory: boolean, note?: string | null }[]
 }
 

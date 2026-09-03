@@ -32,6 +32,7 @@ public class Scholarship {
     private String benefits;
     private String requirements;
     private String policy;
+    private String nonDegreeDuration;
     private BigDecimal applicationFeeAmount;
     private String applicationFeeCurrency;
     private BigDecimal serviceFeeAmount;
@@ -56,7 +57,8 @@ public class Scholarship {
     private List<ScholarshipIntake> intakes = new ArrayList<>();
     private ScholarshipEligibility eligibility;
     private List<ScholarshipFee> fees = new ArrayList<>();
-    private ScholarshipStipend stipend;
+    private List<ScholarshipLevelStipend> levelStipends = new ArrayList<>();
+    private List<ScholarshipAccommodation> accommodations = new ArrayList<>();
     private List<ScholarshipDocumentRequirement> documentRequirements = new ArrayList<>();
 
     public Long getId() { return id; }
@@ -89,6 +91,8 @@ public class Scholarship {
     public void setRequirements(String requirements) { this.requirements = requirements; }
     public String getPolicy() { return policy; }
     public void setPolicy(String policy) { this.policy = policy; }
+    public String getNonDegreeDuration() { return nonDegreeDuration; }
+    public void setNonDegreeDuration(String nonDegreeDuration) { this.nonDegreeDuration = nonDegreeDuration; }
     public BigDecimal getApplicationFeeAmount() { return applicationFeeAmount; }
     public void setApplicationFeeAmount(BigDecimal v) { this.applicationFeeAmount = v; }
     public String getApplicationFeeCurrency() { return applicationFeeCurrency; }
@@ -138,8 +142,10 @@ public class Scholarship {
     public void setEligibility(ScholarshipEligibility eligibility) { this.eligibility = eligibility; }
     public List<ScholarshipFee> getFees() { return fees; }
     public void setFees(List<ScholarshipFee> fees) { this.fees = fees; }
-    public ScholarshipStipend getStipend() { return stipend; }
-    public void setStipend(ScholarshipStipend stipend) { this.stipend = stipend; }
+    public List<ScholarshipLevelStipend> getLevelStipends() { return levelStipends; }
+    public void setLevelStipends(List<ScholarshipLevelStipend> levelStipends) { this.levelStipends = levelStipends; }
+    public List<ScholarshipAccommodation> getAccommodations() { return accommodations; }
+    public void setAccommodations(List<ScholarshipAccommodation> accommodations) { this.accommodations = accommodations; }
     public List<ScholarshipDocumentRequirement> getDocumentRequirements() { return documentRequirements; }
     public void setDocumentRequirements(List<ScholarshipDocumentRequirement> v) { this.documentRequirements = v; }
 }

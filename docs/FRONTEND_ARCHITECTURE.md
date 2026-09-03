@@ -157,6 +157,15 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   gallery grid in place of the former placeholder. `UniversityGalleryImage` added
   to `types/catalog.ts`.
 
+**UPDATE 2026-09-03 (scholarship config depth — V22):**
+- `types/catalog.ts` `Money` → `{ amountRmb, amountUsd, currency }`; `ScholarshipDetail`
+  gains `stipends[]` (per level, replacing the single `stipend`), `accommodation[]`
+  (room types), `nonDegreeDuration`; `fees[]` carry `amountRmb`/`amountUsd`.
+- `scholarships/[slug].vue` renders every amount as `¥… · $…`, a per-level stipend
+  list, an accommodation table, and the non-degree duration in the header meta.
+  `scholarships.room.*` / `scholarships.nonDegree.*` / `scholarships.accommodation`
+  i18n added to all four locales.
+
 **UPDATE 2026-09-03 (catalog imagery — V21):**
 - `UniversitySummary` / `UniversityDetail` gain `logoImageUrl` / `coverImageUrl`;
   `ScholarshipCard` gains `heroImageUrl` / `coverImageUrl` (all optional URL

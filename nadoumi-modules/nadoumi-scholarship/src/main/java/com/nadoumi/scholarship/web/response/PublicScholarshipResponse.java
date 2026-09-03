@@ -3,6 +3,7 @@ package com.nadoumi.scholarship.web.response;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.domain.ScholarshipCategory;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,6 +13,10 @@ import java.util.List;
  * itself assembled from {@code v_scholarship_student} and the student-safe child
  * tables. It carries no university / partnership / commission field on any path.
  * List rows leave the detail-only fields null.
+ *
+ * <p>Every monetary value is presented in both RMB and USD. The stored figure is
+ * kept as-is; the other side is computed at a fixed display rate ({@link #RMB_PER_USD}),
+ * rounded to whole currency units. This is a display convenience, not an FX quote.
  */
 public record PublicScholarshipResponse(
         Long id,
@@ -25,6 +30,7 @@ public record PublicScholarshipResponse(
         String teachingLanguage,
         String fundingModel,
         boolean hasStipend,
+        String nonDegreeDuration,
         LocalDate deadline,
         Money applicationFee,
         Money serviceFee,
@@ -43,12 +49,20 @@ public record PublicScholarshipResponse(
         String policy,
         Eligibility eligibility,
         List<Fee> fees,
-        Stipend stipend,
+        List<LevelStipend> stipends,
+        List<Accommodation> accommodation,
         List<DocumentRequirement> documentRequirements) {
 
-    public record Money(BigDecimal amount, String currency) {
+    /** Fixed display rate — CNY per USD. Keep in sync with the admin's guidance. */
+    static final BigDecimal RMB_PER_USD = new BigDecimal("7.10");
+
+    public record Money(BigDecimal amountRmb, BigDecimal amountUsd, String currency) {
         static Money of(BigDecimal amount, String currency) {
-            return amount == null ? null : new Money(amount, currency);
+            if (amount == null) {
+                return null;
+            }
+            String cur = currency == null ? "CNY" : currency.toUpperCase();
+            return new Money(rmb(amount, cur), usd(amount, cur), cur);
         }
     }
 
@@ -61,11 +75,19 @@ public record PublicScholarshipResponse(
             Integer duolingoMin, Integer hskMin, Integer cscaMin, String notes) {
     }
 
-    public record Fee(String kind, BigDecimal amount, String currency, String note) {
+    public record Fee(String kind, BigDecimal amountRmb, BigDecimal amountUsd, String currency, String note) {
+        static Fee of(String kind, BigDecimal amount, String currency, String note) {
+            String cur = currency == null ? "CNY" : currency.toUpperCase();
+            return new Fee(kind, rmb(amount, cur), usd(amount, cur), cur, note);
+        }
     }
 
-    public record Stipend(BigDecimal amount, String currency, String frequency,
-            Integer durationMonths, String conditions) {
+    public record LevelStipend(String level, BigDecimal amountRmb, BigDecimal amountUsd, String currency,
+            String frequency, Integer durationMonths, String conditions) {
+    }
+
+    public record Accommodation(String roomType, BigDecimal amountRmb, BigDecimal amountUsd,
+            String currency, String note) {
     }
 
     public record DocumentRequirement(String docType, boolean mandatory, String note) {
@@ -85,7 +107,7 @@ public record PublicScholarshipResponse(
                 s.getCountry(), s.getProvince(), s.getCity(), s.getField(),
                 s.getTeachingLanguage() == null ? null : s.getTeachingLanguage().name(),
                 s.getFundingModel() == null ? null : s.getFundingModel().name(),
-                s.isHasStipend(), s.getDeadline(),
+                s.isHasStipend(), s.getNonDegreeDuration(), s.getDeadline(),
                 Money.of(s.getApplicationFeeAmount(), s.getApplicationFeeCurrency()),
                 Money.of(s.getServiceFeeAmount(), s.getServiceFeeCurrency()),
                 s.getSlots(), s.isFeatured(), s.isRecommended(), s.isHot(),
@@ -99,8 +121,14 @@ public record PublicScholarshipResponse(
                 detail ? s.getPolicy() : null,
                 detail ? eligibility(s) : null,
                 detail ? s.getFees().stream()
-                        .map(f -> new Fee(f.kind(), f.amount(), f.currency(), f.note())).toList() : null,
-                detail ? stipend(s) : null,
+                        .map(f -> Fee.of(f.kind(), f.amount(), f.currency(), f.note())).toList() : null,
+                detail ? s.getLevelStipends().stream()
+                        .map(st -> new LevelStipend(st.level(), rmb(st.amount(), cur(st.currency())),
+                                usd(st.amount(), cur(st.currency())), cur(st.currency()),
+                                st.frequency(), st.durationMonths(), st.conditions())).toList() : null,
+                detail ? s.getAccommodations().stream()
+                        .map(a -> new Accommodation(a.roomType(), rmb(a.amount(), cur(a.currency())),
+                                usd(a.amount(), cur(a.currency())), cur(a.currency()), a.note())).toList() : null,
                 detail ? s.getDocumentRequirements().stream()
                         .map(d -> new DocumentRequirement(d.docType(), d.mandatory(), d.note())).toList() : null);
     }
@@ -112,9 +140,25 @@ public record PublicScholarshipResponse(
                 e.gpaMin(), e.ieltsMin(), e.toeflMin(), e.duolingoMin(), e.hskMin(), e.cscaMin(), e.notes());
     }
 
-    private static Stipend stipend(Scholarship s) {
-        var st = s.getStipend();
-        return st == null ? null : new Stipend(
-                st.amount(), st.currency(), st.frequency(), st.durationMonths(), st.conditions());
+    private static String cur(String currency) {
+        return currency == null ? "CNY" : currency.toUpperCase();
+    }
+
+    private static BigDecimal rmb(BigDecimal amount, String currency) {
+        if (amount == null) {
+            return null;
+        }
+        return "USD".equals(currency)
+                ? amount.multiply(RMB_PER_USD).setScale(0, RoundingMode.HALF_UP)
+                : amount.setScale(0, RoundingMode.HALF_UP);
+    }
+
+    private static BigDecimal usd(BigDecimal amount, String currency) {
+        if (amount == null) {
+            return null;
+        }
+        return "USD".equals(currency)
+                ? amount.setScale(0, RoundingMode.HALF_UP)
+                : amount.divide(RMB_PER_USD, 0, RoundingMode.HALF_UP);
     }
 }

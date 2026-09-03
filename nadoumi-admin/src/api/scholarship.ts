@@ -8,15 +8,21 @@ export type StipendFrequency = 'MONTHLY' | 'YEARLY' | 'ONE_OFF'
 export type PublishStatus = 'DRAFT' | 'PUBLISHED'
 export type ScholarshipStatus = 'ACTIVE' | 'INACTIVE'
 export type NationalityScope = 'ANY' | 'INCLUDE' | 'EXCLUDE'
+export type RoomType = 'SINGLE' | 'DOUBLE' | 'TRIPLE' | 'QUAD' | 'SHARED'
+export type NonDegreeDuration = 'HALF_YEAR' | 'ONE_YEAR'
 export type FeeKind =
-  | 'TUITION_BEFORE' | 'TUITION_AFTER' | 'ACCOMMODATION_BEFORE' | 'ACCOMMODATION_AFTER'
+  | 'TUITION_BEFORE' | 'TUITION_AFTER'
   | 'REGISTRATION' | 'APPLICATION' | 'NADOUMI_APPLICATION' | 'NADOUMI_SERVICE'
   | 'INSURANCE' | 'VISA' | 'OTHER'
 
+// ACCOMMODATION_BEFORE/AFTER are retired from the picker — accommodation is now
+// its own room-type section — but stay valid codes for historical rows.
 export const FEE_KINDS: FeeKind[] = [
-  'TUITION_BEFORE', 'TUITION_AFTER', 'ACCOMMODATION_BEFORE', 'ACCOMMODATION_AFTER',
+  'TUITION_BEFORE', 'TUITION_AFTER',
   'REGISTRATION', 'APPLICATION', 'NADOUMI_APPLICATION', 'NADOUMI_SERVICE', 'INSURANCE', 'VISA', 'OTHER',
 ]
+export const ROOM_TYPES: RoomType[] = ['SINGLE', 'DOUBLE', 'TRIPLE', 'QUAD', 'SHARED']
+export const NON_DEGREE_DURATIONS: NonDegreeDuration[] = ['HALF_YEAR', 'ONE_YEAR']
 export const EDUCATION_LEVELS: EducationLevel[] = ['NON_DEGREE', 'DIPLOMA', 'BACHELOR', 'MASTER', 'PHD']
 export const DOC_TYPES = [
   'PASSPORT', 'DEGREE', 'TRANSCRIPT', 'LANGUAGE_CERT', 'VISA', 'PHYSICAL_EXAM',
@@ -24,7 +30,7 @@ export const DOC_TYPES = [
 ]
 export const INTAKE_TERMS = ['SPRING_MARCH', 'AUTUMN_SEPTEMBER']
 
-export interface Money { amount: number, currency: string }
+export interface Money { amountRmb: number, amountUsd: number, currency: string }
 
 export interface ScholarshipIntakeInput {
   term: string
@@ -51,12 +57,19 @@ export interface ScholarshipEligibilityInput {
   cscaMin?: number | null
   notes?: string | null
 }
-export interface ScholarshipStipendInput {
+export interface ScholarshipLevelStipendInput {
+  level: EducationLevel
   amount: number | null
   currency: string
   frequency: StipendFrequency
   durationMonths?: number | null
   conditions?: string | null
+}
+export interface ScholarshipAccommodationInput {
+  roomType: RoomType
+  amount: number | null
+  currency: string
+  note?: string | null
 }
 export interface ScholarshipDocumentRequirementInput {
   docType: string
@@ -77,6 +90,7 @@ export interface ScholarshipView {
   teachingLanguage?: TeachingLanguage | null
   fundingModel: FundingModel
   hasStipend: boolean
+  nonDegreeDuration?: NonDegreeDuration | null
   deadline?: string | null
   applicationFee?: Money | null
   serviceFee?: Money | null
@@ -93,14 +107,23 @@ export interface ScholarshipView {
   requirements?: string | null
   policy?: string | null
   eligibility?: ScholarshipEligibilityInput | null
-  fees: { kind: string, amount: number, currency: string, note?: string | null }[]
-  stipend?: {
-    amount: number
+  fees: { kind: string, amountRmb: number, amountUsd: number, currency: string, note?: string | null }[]
+  stipends: {
+    level: string
+    amountRmb: number
+    amountUsd: number
     currency: string
     frequency: StipendFrequency
     durationMonths?: number | null
     conditions?: string | null
-  } | null
+  }[]
+  accommodation: {
+    roomType: string
+    amountRmb: number | null
+    amountUsd: number | null
+    currency: string
+    note?: string | null
+  }[]
   documentRequirements: ScholarshipDocumentRequirementInput[]
 }
 
@@ -124,6 +147,7 @@ export interface ScholarshipInput {
   teachingLanguage?: TeachingLanguage | null
   fundingModel: FundingModel
   hasStipend: boolean
+  nonDegreeDuration?: NonDegreeDuration | null
   deadline?: string | null
   benefits?: string | null
   requirements?: string | null
@@ -146,7 +170,8 @@ export interface ScholarshipInput {
   intakes: ScholarshipIntakeInput[]
   eligibility?: ScholarshipEligibilityInput | null
   fees: ScholarshipFeeInput[]
-  stipend?: ScholarshipStipendInput | null
+  levelStipends: ScholarshipLevelStipendInput[]
+  accommodations: ScholarshipAccommodationInput[]
   documentRequirements: ScholarshipDocumentRequirementInput[]
 }
 

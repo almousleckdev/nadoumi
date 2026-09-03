@@ -6,8 +6,9 @@ import com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
 import com.nadoumi.scholarship.domain.ScholarshipIntake;
+import com.nadoumi.scholarship.domain.ScholarshipAccommodation;
 import com.nadoumi.scholarship.domain.ScholarshipInternal;
-import com.nadoumi.scholarship.domain.ScholarshipStipend;
+import com.nadoumi.scholarship.domain.ScholarshipLevelStipend;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -66,7 +67,9 @@ public interface ScholarshipMapper {
 
     List<ScholarshipFee> findFees(@Param("scholarshipId") Long scholarshipId);
 
-    ScholarshipStipend findStipend(@Param("scholarshipId") Long scholarshipId);
+    List<ScholarshipLevelStipend> findLevelStipends(@Param("scholarshipId") Long scholarshipId);
+
+    List<ScholarshipAccommodation> findAccommodations(@Param("scholarshipId") Long scholarshipId);
 
     List<ScholarshipDocumentRequirement> findDocumentRequirements(@Param("scholarshipId") Long scholarshipId);
 
@@ -94,9 +97,14 @@ public interface ScholarshipMapper {
     int insertFee(@Param("scholarshipId") Long scholarshipId, @Param("f") ScholarshipFee fee,
             @Param("sortOrder") int sortOrder);
 
-    int deleteStipend(@Param("scholarshipId") Long scholarshipId);
+    int deleteLevelStipends(@Param("scholarshipId") Long scholarshipId);
 
-    int insertStipend(@Param("scholarshipId") Long scholarshipId, @Param("s") ScholarshipStipend stipend);
+    int insertLevelStipend(@Param("scholarshipId") Long scholarshipId, @Param("s") ScholarshipLevelStipend stipend);
+
+    int deleteAccommodations(@Param("scholarshipId") Long scholarshipId);
+
+    int insertAccommodation(@Param("scholarshipId") Long scholarshipId,
+            @Param("a") ScholarshipAccommodation accommodation, @Param("sortOrder") int sortOrder);
 
     int deleteDocumentRequirements(@Param("scholarshipId") Long scholarshipId);
 

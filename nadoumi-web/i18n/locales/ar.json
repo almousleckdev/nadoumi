@@ -612,6 +612,19 @@
     "stipend": "Stipend",
     "stipendDuration": "Paid for {n} months",
     "upfront": "Upfront fees",
+    "accommodation": "Accommodation",
+    "nonDegreeDuration": "Non-degree duration",
+    "room": {
+      "SINGLE": "Single room",
+      "DOUBLE": "Double room",
+      "TRIPLE": "Triple room",
+      "QUAD": "Quad room",
+      "SHARED": "Shared / dormitory"
+    },
+    "nonDegree": {
+      "HALF_YEAR": "Half year",
+      "ONE_YEAR": "One year"
+    },
     "intakes": "Intakes",
     "closes": "closes",
     "required": "required",
