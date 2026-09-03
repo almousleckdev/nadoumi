@@ -26,6 +26,8 @@ public interface UniversityMapper {
 
     Long findIdByNameAndCountry(@Param("name") String name, @Param("country") String country);
 
+    Long findIdBySlug(@Param("slug") String slug);
+
     // ---- children ----
 
     List<UniversityRanking> findRankings(@Param("universityId") Long universityId);

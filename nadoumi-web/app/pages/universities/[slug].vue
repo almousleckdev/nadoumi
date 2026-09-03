@@ -4,18 +4,18 @@ import type { ProgramCard, UniversityDetail, UniversityHighlight } from '~/types
 const route = useRoute()
 const { t } = useI18n()
 const localePath = useLocalePath()
-const id = computed(() => String(route.params.id))
+const slug = computed(() => String(route.params.slug))
 
 const { publicGet } = useApi()
 const { data: u } = await useAsyncData(
-  () => `university-${id.value}`,
-  () => publicGet<UniversityDetail>(`universities/${id.value}`).catch(() => null),
-  { watch: [id] },
+  () => `university-${slug.value}`,
+  () => publicGet<UniversityDetail>(`universities/${slug.value}`).catch(() => null),
+  { watch: [slug] },
 )
 const { data: programs } = await useAsyncData(
-  () => `university-${id.value}-programs`,
-  () => publicGet<ProgramCard[]>(`universities/${id.value}/programs`).catch(() => []),
-  { watch: [id], default: () => [] },
+  () => `university-${slug.value}-programs`,
+  () => publicGet<ProgramCard[]>(`universities/${slug.value}/programs`).catch(() => []),
+  { watch: [slug], default: () => [] },
 )
 
 useSeo(

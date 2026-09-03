@@ -2,6 +2,7 @@ package com.nadoumi.university.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
@@ -55,6 +56,7 @@ public class UniversityService {
         University u = new University();
         apply(u, req);
         requireUniqueName(u.getName(), u.getCountry(), null);
+        u.setSlug(uniqueSlug(u.getName(), null));
         u.setCreateBy(currentUser());
         mapper.insert(u);
         replaceChildren(u.getId(), req);
@@ -66,6 +68,7 @@ public class UniversityService {
         University u = load(id);
         apply(u, req);
         requireUniqueName(u.getName(), u.getCountry(), id);
+        u.setSlug(uniqueSlug(u.getName(), id));
         u.setUpdateBy(currentUser());
         mapper.update(u);
         replaceChildren(id, req);
@@ -91,12 +94,24 @@ public class UniversityService {
         return PageResponse.of(rows.stream().map(PublicUniversityResponse::of).toList(), page, size, total);
     }
 
-    public PublicUniversityResponse publicGet(Long id) {
-        University u = loadWithChildren(id);
+    public PublicUniversityResponse publicGet(String idOrSlug) {
+        University u = loadWithChildren(resolveId(idOrSlug));
         if (u.getStatus() != UniversityStatus.ACTIVE || u.getPublishStatus() != PublishStatus.PUBLISHED) {
             throw new NadNotFoundException("university not found");
         }
         return PublicUniversityResponse.of(u);
+    }
+
+    /** Resolve the {@code {idOrSlug}} path segment (public routes are slug-first). */
+    public Long resolveId(String idOrSlug) {
+        if (idOrSlug != null && idOrSlug.chars().allMatch(Character::isDigit)) {
+            return Long.valueOf(idOrSlug);
+        }
+        Long id = mapper.findIdBySlug(idOrSlug);
+        if (id == null) {
+            throw new NadNotFoundException("university not found");
+        }
+        return id;
     }
 
     // ---- internals ----
@@ -154,6 +169,10 @@ public class UniversityService {
                         order++);
             }
         }
+    }
+
+    private String uniqueSlug(String name, Long selfId) {
+        return Slugs.unique(Slugs.slugify(name), selfId, mapper::findIdBySlug);
     }
 
     private void requireUniqueName(String name, String country, Long selfId) {

@@ -6,6 +6,7 @@
         <id     property="id"               column="id"/>
         <result property="universityId"     column="university_id"/>
         <result property="name"             column="name"/>
+        <result property="slug"             column="slug"/>
         <result property="nameCn"           column="name_cn"/>
         <result property="programType"      column="program_type"/>
         <result property="field"            column="field"/>
@@ -26,7 +27,7 @@
     </resultMap>
 
     <sql id="cols">
-        id, university_id, name, name_cn, program_type, field, teaching_language,
+        id, university_id, name, name_cn, slug, program_type, field, teaching_language,
         duration_months, tuition_amount, tuition_currency, summary,
         is_featured, is_hot, publish_status, status,
         create_by, create_time, update_by, update_time, remark
@@ -60,21 +61,25 @@
         select id from nad_program where university_id = #{universityId} and name = #{name} limit 1
     </select>
 
+    <select id="findIdBySlug" resultType="java.lang.Long">
+        select id from nad_program where slug = #{slug} limit 1
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.program.domain.Program"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_program
-            (university_id, name, name_cn, program_type, field, teaching_language,
+            (university_id, name, name_cn, slug, program_type, field, teaching_language,
              duration_months, tuition_amount, tuition_currency, summary,
              is_featured, is_hot, publish_status, status, create_by, create_time, remark)
         values
-            (#{universityId}, #{name}, #{nameCn}, #{programType}, #{field}, #{teachingLanguage},
+            (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{teachingLanguage},
              #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary},
              #{featured}, #{hot}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.program.domain.Program">
         update nad_program set
-            university_id = #{universityId}, name = #{name}, name_cn = #{nameCn},
+            university_id = #{universityId}, name = #{name}, name_cn = #{nameCn}, slug = #{slug},
             program_type = #{programType}, field = #{field}, teaching_language = #{teachingLanguage},
             duration_months = #{durationMonths}, tuition_amount = #{tuitionAmount},
             tuition_currency = #{tuitionCurrency}, summary = #{summary},

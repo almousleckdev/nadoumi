@@ -12,7 +12,9 @@ public record ProgramResponse(
         Long id,
         Long universityId,
         String universityName,
+        String universitySlug,
         String name,
+        String slug,
         String nameCn,
         String programType,
         String field,
@@ -45,8 +47,8 @@ public record ProgramResponse(
 
     public static ProgramResponse of(Program p) {
         return new ProgramResponse(
-                p.getId(), p.getUniversityId(), p.getUniversityName(),
-                p.getName(), p.getNameCn(),
+                p.getId(), p.getUniversityId(), p.getUniversityName(), p.getUniversitySlug(),
+                p.getName(), p.getSlug(), p.getNameCn(),
                 p.getProgramType() == null ? null : p.getProgramType().name(),
                 p.getField(),
                 p.getTeachingLanguage() == null ? null : p.getTeachingLanguage().name(),

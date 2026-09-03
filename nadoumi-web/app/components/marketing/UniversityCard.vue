@@ -22,7 +22,7 @@ const typeLabel = computed(() => {
 
 <template>
   <NuxtLink
-    :to="localePath(`/universities/${university.id}`)"
+    :to="localePath(`/universities/${university.slug}`)"
     class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[17rem] sm:w-[19rem]' : 'w-full'"
   >

@@ -16,8 +16,8 @@ beforeEach(() => publicGet.mockReset())
 describe('universities discovery list', () => {
   it('renders cards + a result count from the real API and passes paging params', async () => {
     publicGet.mockResolvedValue(page([
-      { id: 1, name: 'Peking University', country: 'CN', city: 'Beijing' },
-      { id: 2, name: 'Fudan University', country: 'CN', city: 'Shanghai' },
+      { id: 1, slug: 'peking-university', name: 'Peking University', country: 'CN', city: 'Beijing' },
+      { id: 2, slug: 'fudan-university', name: 'Fudan University', country: 'CN', city: 'Shanghai' },
     ]))
     const w = await mountSuspended(UniversitiesList)
     await flushPromises()
@@ -29,7 +29,7 @@ describe('universities discovery list', () => {
   })
 
   it('re-queries with a filter and shows a removable chip', async () => {
-    publicGet.mockResolvedValue(page([{ id: 1, name: 'Peking University', country: 'CN' }]))
+    publicGet.mockResolvedValue(page([{ id: 1, slug: 'peking-university', name: 'Peking University', country: 'CN' }]))
     const w = await mountSuspended(UniversitiesList)
     await flushPromises()
 

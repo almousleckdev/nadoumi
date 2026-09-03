@@ -28,6 +28,7 @@ export interface UniversityGalleryImage {
 
 export interface University {
   id: number
+  slug: string
   name: string
   nameCn: string | null
   country: string

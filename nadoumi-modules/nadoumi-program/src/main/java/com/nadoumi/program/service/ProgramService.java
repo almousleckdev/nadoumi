@@ -2,6 +2,7 @@ package com.nadoumi.program.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
@@ -50,23 +51,24 @@ public class ProgramService {
         PageHelper.startPage(page + 1, size);
         List<Program> rows = mapper.search(ProgramSearch.staff(q, universityId, type, language, field, status));
         long total = new PageInfo<>(rows).getTotal();
-        Map<Long, String> names = new HashMap<>();
-        rows.forEach(p -> p.setUniversityName(staffUniversityName(p.getUniversityId(), names)));
+        Map<Long, UniRef> refs = new HashMap<>();
+        rows.forEach(p -> applyUniversity(p, staffUniversity(p.getUniversityId(), refs)));
         return PageResponse.of(rows.stream().map(ProgramResponse::of).toList(), page, size, total);
     }
 
     public ProgramResponse get(Long id) {
         Program p = loadWithChildren(id);
-        p.setUniversityName(staffUniversityName(p.getUniversityId(), new HashMap<>()));
+        applyUniversity(p, staffUniversity(p.getUniversityId(), new HashMap<>()));
         return ProgramResponse.of(p);
     }
 
     @Transactional
     public ProgramResponse create(ProgramRequest req) {
-        requireUniversity(req.universityId());
+        String universityName = requireUniversity(req.universityId());
         Program p = new Program();
         apply(p, req);
         requireUniqueName(p.getUniversityId(), p.getName(), null);
+        p.setSlug(uniqueSlug(universityName, p.getName(), null));
         p.setCreateBy(currentUser());
         mapper.insert(p);
         replaceChildren(p.getId(), req);
@@ -76,10 +78,11 @@ public class ProgramService {
     @Transactional
     public ProgramResponse update(Long id, ProgramRequest req) {
         Program p = load(id);
-        requireUniversity(req.universityId());
+        String universityName = requireUniversity(req.universityId());
         apply(p, req);
         p.setId(id);
         requireUniqueName(p.getUniversityId(), p.getName(), id);
+        p.setSlug(uniqueSlug(universityName, p.getName(), id));
         p.setUpdateBy(currentUser());
         mapper.update(p);
         replaceChildren(id, req);
@@ -99,7 +102,7 @@ public class ProgramService {
     public PageResponse<PublicProgramResponse> publicList(String q, Long universityId, ProgramType type,
             ProgramTeachingLanguage language, String field, Boolean featured, Boolean hot, int page, int size) {
         if (universityId != null) {
-            universityService.publicGet(universityId); // 404 if the university is not public
+            universityService.publicGet(String.valueOf(universityId)); // 404 if the university is not public
         }
         PageHelper.startPage(page + 1, size);
         List<Program> rows = mapper.search(
@@ -108,12 +111,12 @@ public class ProgramService {
         // A programme whose university has since been unpublished is a transient
         // state -- drop it here (the university publish check is UniversityService's,
         // never a cross-module join) and correct the count for this page.
-        Map<Long, String> publicNames = new HashMap<>();
+        Map<Long, UniRef> publicRefs = new HashMap<>();
         List<PublicProgramResponse> items = rows.stream()
                 .filter(p -> {
-                    String name = publicUniversityName(p.getUniversityId(), publicNames);
-                    p.setUniversityName(name);
-                    return name != null;
+                    UniRef ref = publicUniversity(p.getUniversityId(), publicRefs);
+                    applyUniversity(p, ref);
+                    return ref != null;
                 })
                 .map(PublicProgramResponse::card)
                 .toList();
@@ -121,22 +124,34 @@ public class ProgramService {
         return PageResponse.of(items, page, size, rawTotal - hiddenOnThisPage);
     }
 
-    public List<PublicProgramResponse> publicListForUniversity(Long universityId) {
-        String universityName = universityService.publicGet(universityId).name();
+    public List<PublicProgramResponse> publicListForUniversity(String universityIdOrSlug) {
+        var uni = universityService.publicGet(universityIdOrSlug); // 404 if not public
         List<Program> rows = mapper.search(
-                ProgramSearch.publicCatalog(null, universityId, null, null, null, null, null));
-        rows.forEach(p -> p.setUniversityName(universityName));
+                ProgramSearch.publicCatalog(null, uni.id(), null, null, null, null, null));
+        rows.forEach(p -> applyUniversity(p, new UniRef(uni.name(), uni.slug())));
         return rows.stream().map(PublicProgramResponse::card).toList();
     }
 
-    public PublicProgramResponse publicGet(Long id) {
-        Program p = loadWithChildren(id);
+    public PublicProgramResponse publicGet(String idOrSlug) {
+        Program p = loadWithChildren(resolveId(idOrSlug));
         if (p.getStatus() != ProgramStatus.ACTIVE || p.getPublishStatus() != PublishStatus.PUBLISHED) {
             throw new NadNotFoundException("programme not found");
         }
         // the university must itself be public
-        p.setUniversityName(universityService.publicGet(p.getUniversityId()).name());
+        var uni = universityService.publicGet(String.valueOf(p.getUniversityId()));
+        applyUniversity(p, new UniRef(uni.name(), uni.slug()));
         return PublicProgramResponse.detail(p);
+    }
+
+    private Long resolveId(String idOrSlug) {
+        if (idOrSlug != null && idOrSlug.chars().allMatch(Character::isDigit)) {
+            return Long.valueOf(idOrSlug);
+        }
+        Long id = mapper.findIdBySlug(idOrSlug);
+        if (id == null) {
+            throw new NadNotFoundException("programme not found");
+        }
+        return id;
     }
 
     // ---- internals ----
@@ -190,13 +205,19 @@ public class ProgramService {
         }
     }
 
-    private void requireUniversity(Long universityId) {
+    /** Validates the university exists and returns its name (for the slug). */
+    private String requireUniversity(Long universityId) {
         try {
-            universityService.get(universityId);
+            return universityService.get(universityId).name();
         }
         catch (NadNotFoundException e) {
             throw new NadBadRequestException("university not found: " + universityId);
         }
+    }
+
+    private String uniqueSlug(String universityName, String name, Long selfId) {
+        String base = Slugs.slugify((universityName == null ? "" : universityName + " ") + name);
+        return Slugs.unique(base, selfId, mapper::findIdBySlug);
     }
 
     private void requireUniqueName(Long universityId, String name, Long selfId) {
@@ -206,10 +227,20 @@ public class ProgramService {
         }
     }
 
-    private String staffUniversityName(Long universityId, Map<Long, String> cache) {
+    /** A university's public-facing name + slug, resolved via UniversityService. */
+    private record UniRef(String name, String slug) {
+    }
+
+    private static void applyUniversity(Program p, UniRef ref) {
+        p.setUniversityName(ref == null ? null : ref.name());
+        p.setUniversitySlug(ref == null ? null : ref.slug());
+    }
+
+    private UniRef staffUniversity(Long universityId, Map<Long, UniRef> cache) {
         return cache.computeIfAbsent(universityId, id -> {
             try {
-                return universityService.get(id).name();
+                var u = universityService.get(id);
+                return new UniRef(u.name(), u.slug());
             }
             catch (NadNotFoundException e) {
                 return null;
@@ -217,10 +248,11 @@ public class ProgramService {
         });
     }
 
-    private String publicUniversityName(Long universityId, Map<Long, String> cache) {
+    private UniRef publicUniversity(Long universityId, Map<Long, UniRef> cache) {
         return cache.computeIfAbsent(universityId, id -> {
             try {
-                return universityService.publicGet(id).name();
+                var u = universityService.publicGet(String.valueOf(id));
+                return new UniRef(u.name(), u.slug());
             }
             catch (NadNotFoundException e) {
                 return null;

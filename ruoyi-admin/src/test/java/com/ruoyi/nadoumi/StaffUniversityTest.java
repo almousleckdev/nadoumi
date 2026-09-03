@@ -33,6 +33,7 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
                         .contentType("application/json").content(BODY))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Tsinghua University"))
+                .andExpect(jsonPath("$.slug").value("tsinghua-university"))
                 .andExpect(jsonPath("$.country").value("CN"))
                 .andExpect(jsonPath("$.nameCn").value("清华大学"))
                 .andExpect(jsonPath("$.foundedYear").value(1911))
@@ -119,8 +120,14 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
         mvc.perform(get("/api/public/universities/{id}", pubId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.highlights.length()").value(2))
+                .andExpect(jsonPath("$.slug").value("tsinghua-university"))
                 .andExpect(jsonPath("$.logoImageUrl").value("https://img.example/logo.png"))
                 .andExpect(jsonPath("$.coverImageUrl").value("https://img.example/cover.jpg"));
+
+        // the public detail also resolves by slug
+        mvc.perform(get("/api/public/universities/{slug}", "tsinghua-university"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value((int) pubId));
     }
 
     @Test

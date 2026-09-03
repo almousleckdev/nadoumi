@@ -11,6 +11,7 @@ public record UniversityResponse(
         Long id,
         String name,
         String nameCn,
+        String slug,
         String country,
         String type,
         String city,
@@ -64,7 +65,7 @@ public record UniversityResponse(
 
     public static UniversityResponse of(University u) {
         return new UniversityResponse(
-                u.getId(), u.getName(), u.getNameCn(), u.getCountry(),
+                u.getId(), u.getName(), u.getNameCn(), u.getSlug(), u.getCountry(),
                 u.getType() == null ? null : u.getType().name(),
                 u.getCity(), u.getProvince(), u.getFoundedYear(),
                 u.getTotalStudents(), u.getInternationalStudents(), u.getFacultyCount(),

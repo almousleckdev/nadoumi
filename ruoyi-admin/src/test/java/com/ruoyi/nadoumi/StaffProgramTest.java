@@ -49,6 +49,7 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
                         .contentType("application/json").content(programBody(uni, "PUBLISHED")))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("MBA"))
+                .andExpect(jsonPath("$.slug").value("fudan-university-mba"))
                 .andExpect(jsonPath("$.universityId").value((int) uni))
                 .andExpect(jsonPath("$.universityName").value("Fudan University"))
                 .andExpect(jsonPath("$.tuitionCurrency").value("USD"))
@@ -157,10 +158,14 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
         mvc.perform(get("/api/public/universities/{id}/programs", draftUni))
                 .andExpect(status().isNotFound());
 
-        // detail with children
+        // detail with children — by id and by slug
         mvc.perform(get("/api/public/programs/{id}", pubId))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.slug").value("public-university-mba"))
                 .andExpect(jsonPath("$.majors.length()").value(2))
                 .andExpect(jsonPath("$.intakes.length()").value(1));
+        mvc.perform(get("/api/public/programs/{slug}", "public-university-mba"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value((int) pubId));
     }
 }

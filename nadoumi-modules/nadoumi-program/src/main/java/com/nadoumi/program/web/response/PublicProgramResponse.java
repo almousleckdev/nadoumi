@@ -15,7 +15,9 @@ public record PublicProgramResponse(
         Long id,
         Long universityId,
         String universityName,
+        String universitySlug,
         String name,
+        String slug,
         String nameCn,
         String programType,
         String field,
@@ -40,8 +42,8 @@ public record PublicProgramResponse(
     private static PublicProgramResponse build(Program p, boolean detail) {
         ProgramResponse full = ProgramResponse.of(p);
         return new PublicProgramResponse(
-                full.id(), full.universityId(), full.universityName(),
-                full.name(), full.nameCn(), full.programType(), full.field(),
+                full.id(), full.universityId(), full.universityName(), full.universitySlug(),
+                full.name(), full.slug(), full.nameCn(), full.programType(), full.field(),
                 full.teachingLanguage(), full.durationMonths(),
                 full.tuitionAmount(), full.tuitionCurrency(), full.summary(),
                 full.featured(), full.hot(),

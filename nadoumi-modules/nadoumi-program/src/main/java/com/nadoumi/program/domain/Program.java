@@ -21,6 +21,7 @@ public class Program {
     private Long universityId;
     private String name;
     private String nameCn;
+    private String slug;
     private ProgramType programType;
     private String field;
     private ProgramTeachingLanguage teachingLanguage;
@@ -39,6 +40,7 @@ public class Program {
     private String remark;
 
     private String universityName;
+    private String universitySlug;
 
     private List<ProgramMajor> majors = new ArrayList<>();
     private List<ProgramIntake> intakes = new ArrayList<>();
@@ -54,6 +56,9 @@ public class Program {
 
     public String getNameCn() { return nameCn; }
     public void setNameCn(String nameCn) { this.nameCn = nameCn; }
+
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
 
     public ProgramType getProgramType() { return programType; }
     public void setProgramType(ProgramType programType) { this.programType = programType; }
@@ -105,6 +110,9 @@ public class Program {
 
     public String getUniversityName() { return universityName; }
     public void setUniversityName(String universityName) { this.universityName = universityName; }
+
+    public String getUniversitySlug() { return universitySlug; }
+    public void setUniversitySlug(String universitySlug) { this.universitySlug = universitySlug; }
 
     public List<ProgramMajor> getMajors() { return majors; }
     public void setMajors(List<ProgramMajor> majors) { this.majors = majors; }

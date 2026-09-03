@@ -17,6 +17,7 @@ public class University {
     private Long id;
     private String name;
     private String nameCn;
+    private String slug;
     private String country;
     private UniversityType type;
     private String city;
@@ -60,6 +61,9 @@ public class University {
 
     public String getNameCn() { return nameCn; }
     public void setNameCn(String nameCn) { this.nameCn = nameCn; }
+
+    public String getSlug() { return slug; }
+    public void setSlug(String slug) { this.slug = slug; }
 
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }

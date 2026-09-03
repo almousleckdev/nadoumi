@@ -42,8 +42,8 @@ public class PublicUniversityController {
     }
 
     @Anonymous
-    @GetMapping("/{id}")
-    public PublicUniversityResponse get(@PathVariable Long id) {
-        return service.publicGet(id);
+    @GetMapping("/{idOrSlug}")
+    public PublicUniversityResponse get(@PathVariable String idOrSlug) {
+        return service.publicGet(idOrSlug);
     }
 }

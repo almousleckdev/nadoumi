@@ -242,9 +242,10 @@ reporting read-model tables/views.
 | `V20__nad_program_seed.sql` | **DONE (R2).** `Programmes` admin C-menu + `nad:program:list/view/create/edit/remove` + role grants (super_admin all; ops_manager + partnerships_manager full; case_officer / content_editor / read_only_analyst / support_agent read). | R2 ✅ |
 | `V21__nad_catalog_images.sql` | **DONE.** `nad_university` + `logo_image_url` / `cover_image_url`; `nad_scholarship` + `hero_image_url` / `cover_image_url` (all `varchar(500)`); `v_scholarship_student` recreated to expose the two scholarship image URLs. URL-based — the admin uploads through RuoYi's `/common/upload` (files under `RUOYI_PROFILE`, served from `/profile/**`). Migrates to `document_id` with the Document slice. | catalog imagery ✅ |
 | `V22__nad_scholarship_config.sql` | **DONE.** `nad_scholarship.non_degree_duration`; `nad_scholarship_level_stipend` (stipend per level, replaces the 1:1 `nad_scholarship_stipend`); `nad_scholarship_accommodation` (room types + price + amenities); `v_scholarship_student` recreated with `non_degree_duration`. | scholarship config ✅ |
-| `V24__nad_outbox_and_notification.sql` | `nad_outbox_event` + `nad_notification*` + templates. First event: `ScholarshipPublished`. | Step 5 |
-| `V25–V26__nad_application*.sql` | `nad_application` (+ `@Version`) + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). | Step 6 |
-| `V27+__…` | document (+ object storage), communication, payment + finance, employee ops, content, reporting. | Step 7+ |
+| `V24__nad_catalog_slug.sql` | **DONE.** `slug varchar(160) not null` unique on `nad_university` and `nad_program` (backfilled from `name`, de-duplicated). Public URLs route by slug (`/universities/fudan-university`), never a sequential id. Internal PKs stay `bigint`. | catalog slug ✅ |
+| `V25__nad_outbox_and_notification.sql` | `nad_outbox_event` + `nad_notification*` + templates. First event: `ScholarshipPublished`. | Step 5 |
+| `V26–V27__nad_application*.sql` | `nad_application` (+ `@Version`) + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). | Step 6 |
+| `V28+__…` | document (+ object storage), communication, payment + finance, employee ops, content, reporting. | Step 7+ |
 
 - The **reviewed DDL draft** `docs/ddl/nad_core.draft.sql` is **not** under
   `db/migration` and Flyway never sees it. `V3`/`V4` were split out of it in Phase 3;

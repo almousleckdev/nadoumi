@@ -160,6 +160,7 @@ export default {
     subtitle: 'Public university catalog. Programmes and partnerships attach to these records.',
     new: 'New university',
     edit: 'Edit university',
+    slug: 'Public URL slug',
     searchPlaceholder: 'Search name (EN / CN) or city…',
     name: 'Name',
     nameCn: 'Name (Chinese)',
