@@ -1,5 +1,6 @@
 package com.nadoumi.program.web;
 
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.program.domain.enums.ProgramStatus;
 import com.nadoumi.program.domain.enums.ProgramTeachingLanguage;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Staff programme catalog admin. A programme belongs to one university. */
 @RestController
@@ -75,5 +77,12 @@ public class StaffProgramController {
     @Log(title = "Programme", businessType = BusinessType.DELETE)
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @PostMapping("/{id}/image")
+    @PreAuthorize("@ss.hasPermi('nad:program:edit')")
+    @Log(title = "Programme media", businessType = BusinessType.UPDATE)
+    public MediaUploadResult uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadImage(id, file);
     }
 }

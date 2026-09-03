@@ -15,6 +15,7 @@
         <result property="tuitionAmount"    column="tuition_amount"/>
         <result property="tuitionCurrency"  column="tuition_currency"/>
         <result property="summary"          column="summary"/>
+        <result property="imageMediaId"     column="image_media_id"/>
         <result property="featured"         column="is_featured"/>
         <result property="hot"              column="is_hot"/>
         <result property="publishStatus"    column="publish_status"/>
@@ -28,7 +29,7 @@
 
     <sql id="cols">
         id, university_id, name, name_cn, slug, program_type, field, teaching_language,
-        duration_months, tuition_amount, tuition_currency, summary,
+        duration_months, tuition_amount, tuition_currency, summary, image_media_id,
         is_featured, is_hot, publish_status, status,
         create_by, create_time, update_by, update_time, remark
     </sql>
@@ -69,11 +70,11 @@
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_program
             (university_id, name, name_cn, slug, program_type, field, teaching_language,
-             duration_months, tuition_amount, tuition_currency, summary,
+             duration_months, tuition_amount, tuition_currency, summary, image_media_id,
              is_featured, is_hot, publish_status, status, create_by, create_time, remark)
         values
             (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{teachingLanguage},
-             #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary},
+             #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary}, #{imageMediaId},
              #{featured}, #{hot}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
     </insert>
 
@@ -83,10 +84,15 @@
             program_type = #{programType}, field = #{field}, teaching_language = #{teachingLanguage},
             duration_months = #{durationMonths}, tuition_amount = #{tuitionAmount},
             tuition_currency = #{tuitionCurrency}, summary = #{summary},
+            image_media_id = #{imageMediaId},
             is_featured = #{featured}, is_hot = #{hot},
             publish_status = #{publishStatus}, status = #{status},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}
+    </update>
+
+    <update id="updateImageMediaId">
+        update nad_program set image_media_id = #{mediaId}, update_time = now() where id = #{id}
     </update>
 
     <delete id="delete">

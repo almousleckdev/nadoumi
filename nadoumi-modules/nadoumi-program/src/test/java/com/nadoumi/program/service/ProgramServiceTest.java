@@ -9,6 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nadoumi.common.media.MediaGateway;
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.program.domain.Program;
@@ -29,13 +31,14 @@ class ProgramServiceTest {
 
     private final ProgramMapper mapper = mock(ProgramMapper.class);
     private final UniversityService universityService = mock(UniversityService.class);
-    private final ProgramService service = new ProgramService(mapper, universityService);
+    private final MediaGateway media = mock(MediaGateway.class);
+    private final ProgramService service = new ProgramService(mapper, universityService, media);
 
     private static ProgramRequest req(Long universityId, String name,
             List<ProgramRequest.MajorInput> majors, List<ProgramRequest.IntakeInput> intakes) {
         return new ProgramRequest(
                 universityId, name, "计算机科学", ProgramType.BACHELOR, "Engineering",
-                null, 48, null, "usd", "A four-year programme.",
+                null, 48, null, "usd", "A four-year programme.", null,
                 false, false, ProgramStatus.ACTIVE, PublishStatus.DRAFT, "note",
                 majors, intakes);
     }
@@ -147,6 +150,38 @@ class ProgramServiceTest {
 
         assertThatThrownBy(() -> service.publicListForUniversity("2"))
                 .isInstanceOf(NadNotFoundException.class);
+    }
+
+    @Test
+    void programImageResolvesUrl() {
+        Program p = newProgram(4L, 1L);
+        p.setImageMediaId(15L);
+        p.setStatus(ProgramStatus.ACTIVE);
+        p.setPublishStatus(PublishStatus.PUBLISHED);
+        when(mapper.findById(4L)).thenReturn(p);
+        when(mapper.findMajors(4L)).thenReturn(List.of());
+        when(mapper.findIntakes(4L)).thenReturn(List.of());
+        when(universityService.get(1L)).thenReturn(namedUniversity("Fudan University"));
+        when(media.publicUrl(15L)).thenReturn("https://res.cloudinary.com/x/prog.png");
+
+        var res = service.get(4L);
+
+        assertThat(res.imageMediaId()).isEqualTo(15L);
+        assertThat(res.imageUrl()).isEqualTo("https://res.cloudinary.com/x/prog.png");
+    }
+
+    @Test
+    void uploadImageStoresMediaId() {
+        when(mapper.findById(4L)).thenReturn(newProgram(4L, 1L));
+        when(media.upload(any(), any(), any(), org.mockito.ArgumentMatchers.anyLong(), any(), any(), any(),
+                org.mockito.ArgumentMatchers.anyLong()))
+                .thenReturn(new MediaUploadResult(88L, "https://res.cloudinary.com/x/p.png"));
+
+        var result = service.uploadImage(4L, new org.springframework.mock.web.MockMultipartFile(
+                "file", "p.png", "image/png", new byte[] { 1, 2, 3 }));
+
+        assertThat(result.mediaId()).isEqualTo(88L);
+        verify(mapper).updateImageMediaId(4L, 88L);
     }
 
     private static Program newProgram(Long id, Long universityId) {
