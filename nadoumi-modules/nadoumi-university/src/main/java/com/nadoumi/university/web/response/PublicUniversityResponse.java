@@ -33,14 +33,23 @@ public record PublicUniversityResponse(
         Long bannerDocumentId,
         String logoImageUrl,
         String coverImageUrl,
+        Long logoMediaId,
+        String logoUrl,
+        Long bannerMediaId,
+        String bannerUrl,
         boolean recommended,
         boolean featured,
         List<UniversityResponse.Ranking> rankings,
         List<UniversityResponse.Highlight> highlights,
         List<UniversityResponse.GalleryImage> gallery) {
 
+    /** Legacy factory — used where no MediaGateway resolution is available (e.g. cross-module tests). */
     public static PublicUniversityResponse of(University u) {
-        UniversityResponse full = UniversityResponse.of(u);
+        return of(UniversityResponse.of(u));
+    }
+
+    /** Projects an already media-resolved {@link UniversityResponse} down to the public shape. */
+    public static PublicUniversityResponse of(UniversityResponse full) {
         return new PublicUniversityResponse(
                 full.id(), full.name(), full.nameCn(), full.slug(), full.country(), full.type(),
                 full.city(), full.province(), full.foundedYear(),
@@ -51,6 +60,7 @@ public record PublicUniversityResponse(
                 full.admissionsEmail(), full.officePhone(),
                 full.logoDocumentId(), full.bannerDocumentId(),
                 full.logoImageUrl(), full.coverImageUrl(),
+                full.logoMediaId(), full.logoUrl(), full.bannerMediaId(), full.bannerUrl(),
                 full.recommended(), full.featured(),
                 full.rankings(), full.highlights(), full.gallery());
     }

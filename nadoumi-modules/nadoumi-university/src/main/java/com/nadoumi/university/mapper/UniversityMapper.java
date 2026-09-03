@@ -24,6 +24,10 @@ public interface UniversityMapper {
 
     int delete(@Param("id") Long id);
 
+    int updateLogoMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
+    int updateBannerMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
     Long findIdByNameAndCountry(@Param("name") String name, @Param("country") String country);
 
     Long findIdBySlug(@Param("slug") String slug);

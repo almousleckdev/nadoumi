@@ -5,6 +5,7 @@ import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
 import java.util.List;
+import java.util.function.Function;
 
 /** Full staff-side university view (public catalog fields only — no commercial data). */
 public record UniversityResponse(
@@ -33,6 +34,10 @@ public record UniversityResponse(
         Long bannerDocumentId,
         String logoImageUrl,
         String coverImageUrl,
+        Long logoMediaId,
+        String logoUrl,
+        Long bannerMediaId,
+        String bannerUrl,
         boolean recommended,
         boolean featured,
         String status,
@@ -44,9 +49,9 @@ public record UniversityResponse(
         List<Highlight> highlights,
         List<GalleryImage> gallery) {
 
-    public record GalleryImage(Long id, String imageUrl, String caption) {
-        static GalleryImage of(UniversityGalleryImage g) {
-            return new GalleryImage(g.id(), g.imageUrl(), g.caption());
+    public record GalleryImage(Long id, String imageUrl, Long mediaId, String url, String caption) {
+        static GalleryImage of(UniversityGalleryImage g, Function<UniversityGalleryImage, String> urlResolver) {
+            return new GalleryImage(g.id(), g.imageUrl(), g.mediaId(), urlResolver.apply(g), g.caption());
         }
     }
 
@@ -63,7 +68,14 @@ public record UniversityResponse(
         }
     }
 
+    /** Legacy factory — no media resolution, the {@code *_image_url} strings pass through unchanged. */
     public static UniversityResponse of(University u) {
+        return of(u, u.getLogoImageUrl(), u.getCoverImageUrl(), UniversityGalleryImage::imageUrl);
+    }
+
+    /** Full factory — the service resolves {@code logoUrl} / {@code bannerUrl} / gallery URLs via the MediaGateway. */
+    public static UniversityResponse of(University u, String logoUrl, String bannerUrl,
+            Function<UniversityGalleryImage, String> galleryUrl) {
         return new UniversityResponse(
                 u.getId(), u.getName(), u.getNameCn(), u.getSlug(), u.getCountry(),
                 u.getType() == null ? null : u.getType().name(),
@@ -75,13 +87,14 @@ public record UniversityResponse(
                 u.getAdmissionsEmail(), u.getOfficePhone(),
                 u.getLogoDocumentId(), u.getBannerDocumentId(),
                 u.getLogoImageUrl(), u.getCoverImageUrl(),
+                u.getLogoMediaId(), logoUrl, u.getBannerMediaId(), bannerUrl,
                 u.isRecommended(), u.isFeatured(),
                 u.getStatus() == null ? null : u.getStatus().name(),
                 u.getPublishStatus() == null ? null : u.getPublishStatus().name(),
                 u.getRemark(), str(u.getCreateTime()), str(u.getUpdateTime()),
                 u.getRankings().stream().map(Ranking::of).toList(),
                 u.getHighlights().stream().map(Highlight::of).toList(),
-                u.getGallery().stream().map(GalleryImage::of).toList());
+                u.getGallery().stream().map(g -> GalleryImage.of(g, galleryUrl)).toList());
     }
 
     private static String str(Object v) {

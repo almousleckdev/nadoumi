@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.university.domain.University;
@@ -18,13 +19,15 @@ import com.nadoumi.university.domain.enums.UniversityStatus;
 import com.nadoumi.university.domain.enums.UniversityType;
 import com.nadoumi.university.mapper.UniversityMapper;
 import com.nadoumi.university.web.request.UniversityRequest;
+import com.nadoumi.university.web.response.UniversityResponse;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class UniversityServiceTest {
 
     private final UniversityMapper mapper = mock(UniversityMapper.class);
-    private final UniversityService service = new UniversityService(mapper);
+    private final MediaGateway media = mock(MediaGateway.class);
+    private final UniversityService service = new UniversityService(mapper, media);
 
     private static UniversityRequest req(String name, String country,
             List<UniversityRequest.RankingInput> rankings,
@@ -33,13 +36,25 @@ class UniversityServiceTest {
                 name, "清华大学", country, UniversityType.PUBLIC, "Beijing", "Beijing",
                 (short) 1911, 50_000, 6_000, 3_000, "https://x.edu", "T1",
                 "intro", "history", "campus", "accommodation", "nearby",
-                "adm@x.edu", "+86 10 0000", null, null, true, false,
+                "adm@x.edu", "+86 10 0000", null, null, null, null, true, false,
                 UniversityStatus.ACTIVE, PublishStatus.DRAFT, "note",
                 rankings, highlights, List.of());
     }
 
     private static UniversityRequest req(String name, String country) {
         return req(name, country, List.of(), List.of());
+    }
+
+    private static UniversityRequest reqWithLogoMedia(String name, String country, Long logoMediaId) {
+        UniversityRequest base = req(name, country);
+        return new UniversityRequest(
+                base.name(), base.nameCn(), base.country(), base.type(), base.city(), base.province(),
+                base.foundedYear(), base.totalStudents(), base.internationalStudents(), base.facultyCount(),
+                base.website(), base.rankingTier(), base.introduction(), base.history(), base.campusInfo(),
+                base.accommodationInfo(), base.nearbyInfo(), base.admissionsEmail(), base.officePhone(),
+                base.logoImageUrl(), base.coverImageUrl(), logoMediaId, null, base.recommended(),
+                base.featured(), base.status(), base.publishStatus(), base.remark(),
+                base.rankings(), base.highlights(), base.gallery());
     }
 
     @Test
@@ -120,5 +135,70 @@ class UniversityServiceTest {
         service.get(5L);
         verify(mapper).findRankings(5L);
         verify(mapper).findHighlights(5L);
+    }
+
+    @Test
+    void createResolvesLogoUrlFromMediaId() {
+        when(mapper.findIdByNameAndCountry("Zhejiang University", "CN")).thenReturn(null);
+        University persisted = new University();
+        persisted.setId(1L);
+        persisted.setLogoMediaId(7L);
+        when(mapper.findById(any())).thenReturn(persisted);
+        when(media.publicUrl(7L)).thenReturn("https://res.cloudinary.com/x/logo.png");
+
+        UniversityResponse res = service.create(reqWithLogoMedia("Zhejiang University", "CN", 7L));
+
+        assertThat(res.logoMediaId()).isEqualTo(7L);
+        assertThat(res.logoUrl()).isEqualTo("https://res.cloudinary.com/x/logo.png");
+    }
+
+    @Test
+    void legacyImageUrlStillRenders() {
+        University row = new University();
+        row.setId(2L);
+        row.setLogoImageUrl("/profile/upload/logo.png");
+        when(mapper.findById(2L)).thenReturn(row);
+
+        UniversityResponse res = service.get(2L);
+
+        assertThat(res.logoMediaId()).isNull();
+        assertThat(res.logoUrl()).isEqualTo("/profile/upload/logo.png");
+        verify(media, never()).publicUrl(anyLong());
+    }
+
+    @Test
+    void galleryCapStillSix() {
+        University row = new University();
+        row.setId(3L);
+        when(mapper.findById(3L)).thenReturn(row);
+        when(mapper.findGallery(3L)).thenReturn(List.of(
+                gal(1), gal(2), gal(3), gal(4), gal(5), gal(6)));
+
+        assertThatThrownBy(() -> service.uploadGalleryImage(3L, upload()))
+                .isInstanceOf(NadBadRequestException.class);
+        verify(media, never()).upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong());
+    }
+
+    @Test
+    void uploadLogoStoresMediaIdAndReturnsUrl() {
+        University row = new University();
+        row.setId(4L);
+        when(mapper.findById(4L)).thenReturn(row);
+        when(media.upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong()))
+                .thenReturn(new com.nadoumi.common.media.MediaUploadResult(42L, "https://res.cloudinary.com/x/l.png"));
+
+        var result = service.uploadLogo(4L, upload());
+
+        assertThat(result.mediaId()).isEqualTo(42L);
+        verify(mapper).updateLogoMediaId(4L, 42L);
+    }
+
+    private static com.nadoumi.university.domain.UniversityGalleryImage gal(int n) {
+        return new com.nadoumi.university.domain.UniversityGalleryImage((long) n, "/g" + n + ".png", null, null);
+    }
+
+    private static org.springframework.web.multipart.MultipartFile upload() {
+        return new org.springframework.mock.web.MockMultipartFile(
+                "file", "logo.png", "image/png", new byte[] { 1, 2, 3 });
     }
 }

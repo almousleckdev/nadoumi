@@ -2,6 +2,11 @@ package com.nadoumi.university.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.media.MediaCategory;
+import com.nadoumi.common.media.MediaGateway;
+import com.nadoumi.common.media.MediaOwnerKind;
+import com.nadoumi.common.media.MediaOwnerRef;
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
@@ -19,9 +24,12 @@ import com.nadoumi.university.web.request.UniversityRequest;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.nadoumi.university.web.response.UniversityResponse;
 import com.ruoyi.common.utils.SecurityUtils;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * University catalog. {@code (name, country)} is unique. The rankings and
@@ -31,10 +39,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UniversityService {
 
-    private final UniversityMapper mapper;
+    private static final int MAX_GALLERY_IMAGES = 6;
 
-    public UniversityService(UniversityMapper mapper) {
+    private final UniversityMapper mapper;
+    private final MediaGateway media;
+
+    public UniversityService(UniversityMapper mapper, MediaGateway media) {
         this.mapper = mapper;
+        this.media = media;
     }
 
     // ---- staff ----
@@ -44,11 +56,11 @@ public class UniversityService {
         PageHelper.startPage(page + 1, size);
         List<University> rows = mapper.search(UniversitySearch.staff(q, country, province, city, type, status));
         long total = new PageInfo<>(rows).getTotal();
-        return PageResponse.of(rows.stream().map(UniversityResponse::of).toList(), page, size, total);
+        return PageResponse.of(rows.stream().map(this::toResponse).toList(), page, size, total);
     }
 
     public UniversityResponse get(Long id) {
-        return UniversityResponse.of(loadWithChildren(id));
+        return toResponse(loadWithChildren(id));
     }
 
     @Transactional
@@ -83,6 +95,48 @@ public class UniversityService {
         // children go with the row (ON DELETE CASCADE)
     }
 
+    // ---- media uploads (staff) ----
+
+    @Transactional
+    public MediaUploadResult uploadLogo(long id, MultipartFile file) {
+        load(id);
+        MediaUploadResult result = uploadFor(id, file, MediaCategory.UNIVERSITY_LOGO);
+        mapper.updateLogoMediaId(id, result.mediaId());
+        return result;
+    }
+
+    @Transactional
+    public MediaUploadResult uploadBanner(long id, MultipartFile file) {
+        load(id);
+        MediaUploadResult result = uploadFor(id, file, MediaCategory.UNIVERSITY_BANNER);
+        mapper.updateBannerMediaId(id, result.mediaId());
+        return result;
+    }
+
+    @Transactional
+    public MediaUploadResult uploadGalleryImage(long id, MultipartFile file) {
+        load(id);
+        List<UniversityGalleryImage> existing = mapper.findGallery(id);
+        if (existing.size() >= MAX_GALLERY_IMAGES) {
+            throw new NadBadRequestException("at most " + MAX_GALLERY_IMAGES + " gallery images");
+        }
+        MediaUploadResult result = uploadFor(id, file, MediaCategory.UNIVERSITY_GALLERY);
+        mapper.insertGalleryImage(id,
+                new UniversityGalleryImage(null, result.url(), result.mediaId(), null), existing.size());
+        return result;
+    }
+
+    private MediaUploadResult uploadFor(long universityId, MultipartFile file, MediaCategory category) {
+        try {
+            return media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+                    file.getSize(), category, null,
+                    new MediaOwnerRef(MediaOwnerKind.UNIVERSITY, universityId), currentUserId());
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("failed to read upload", e);
+        }
+    }
+
     // ---- public (published + active only) ----
 
     public PageResponse<PublicUniversityResponse> publicList(String q, String country, String province,
@@ -91,7 +145,8 @@ public class UniversityService {
         List<University> rows = mapper.search(
                 UniversitySearch.publicCatalog(q, country, province, city, type, featured, recommended));
         long total = new PageInfo<>(rows).getTotal();
-        return PageResponse.of(rows.stream().map(PublicUniversityResponse::of).toList(), page, size, total);
+        return PageResponse.of(
+                rows.stream().map(u -> PublicUniversityResponse.of(toResponse(u))).toList(), page, size, total);
     }
 
     public PublicUniversityResponse publicGet(String idOrSlug) {
@@ -99,7 +154,7 @@ public class UniversityService {
         if (u.getStatus() != UniversityStatus.ACTIVE || u.getPublishStatus() != PublishStatus.PUBLISHED) {
             throw new NadNotFoundException("university not found");
         }
-        return PublicUniversityResponse.of(u);
+        return PublicUniversityResponse.of(toResponse(u));
     }
 
     /** Resolve the {@code {idOrSlug}} path segment (public routes are slug-first). */
@@ -165,7 +220,8 @@ public class UniversityService {
                     continue;
                 }
                 mapper.insertGalleryImage(universityId,
-                        new UniversityGalleryImage(null, in.imageUrl().trim(), blankToNull(in.caption())),
+                        new UniversityGalleryImage(null, in.imageUrl().trim(), in.mediaId(),
+                                blankToNull(in.caption())),
                         order++);
             }
         }
@@ -191,6 +247,36 @@ public class UniversityService {
         }
     }
 
+    private static long currentUserId() {
+        try {
+            Long id = SecurityUtils.getUserId();
+            return id == null ? 0L : id;
+        }
+        catch (RuntimeException e) {
+            return 0L;
+        }
+    }
+
+    /** Media id wins; the legacy {@code *_image_url} string is the deprecation-window fallback. */
+    private UniversityResponse toResponse(University u) {
+        return UniversityResponse.of(u,
+                resolveUrl(u.getLogoMediaId(), u.getLogoImageUrl()),
+                resolveUrl(u.getBannerMediaId(), u.getCoverImageUrl()),
+                g -> resolveUrl(g.mediaId(), g.imageUrl()));
+    }
+
+    private String resolveUrl(Long mediaId, String legacy) {
+        if (mediaId == null) {
+            return legacy;
+        }
+        try {
+            return media.publicUrl(mediaId);
+        }
+        catch (RuntimeException e) {
+            return legacy;
+        }
+    }
+
     private static void apply(University u, UniversityRequest req) {
         u.setName(req.name().trim());
         u.setNameCn(blankToNull(req.nameCn()));
@@ -213,6 +299,14 @@ public class UniversityService {
         u.setOfficePhone(blankToNull(req.officePhone()));
         u.setLogoImageUrl(blankToNull(req.logoImageUrl()));
         u.setCoverImageUrl(blankToNull(req.coverImageUrl()));
+        // Media ids are primarily set through the dedicated upload endpoints; only
+        // overwrite from the request when the client actually sent a value.
+        if (req.logoMediaId() != null) {
+            u.setLogoMediaId(req.logoMediaId());
+        }
+        if (req.bannerMediaId() != null) {
+            u.setBannerMediaId(req.bannerMediaId());
+        }
         u.setRecommended(Boolean.TRUE.equals(req.recommended()));
         u.setFeatured(Boolean.TRUE.equals(req.featured()));
         u.setStatus(req.status());
