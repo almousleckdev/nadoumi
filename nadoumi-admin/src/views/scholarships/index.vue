@@ -65,6 +65,7 @@
     </FilterBar>
 
     <DataTable
+      storage-key="scholarships"
       :columns="columns"
       :rows="rows"
       :loading="loading"

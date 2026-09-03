@@ -71,6 +71,7 @@
     </FilterBar>
 
     <DataTable
+      storage-key="programs"
       :columns="columns"
       :rows="rows"
       :loading="loading"

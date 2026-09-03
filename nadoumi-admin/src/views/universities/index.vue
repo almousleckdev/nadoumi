@@ -49,6 +49,7 @@
     </FilterBar>
 
     <DataTable
+      storage-key="universities"
       :columns="columns"
       :rows="rows"
       :loading="loading"

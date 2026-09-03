@@ -49,6 +49,7 @@
     </FilterBar>
 
     <DataTable
+      storage-key="applicants"
       :columns="columns"
       :rows="rows"
       :loading="loading"
