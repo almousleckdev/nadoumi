@@ -37,7 +37,7 @@ function meta(s: ScholarshipSummary): string {
         <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('catalog.empty') }}</h2>
         <p class="mt-2 text-slate-600">{{ t('catalog.emptyDetail') }}</p>
         <NuxtLink :to="localePath('/universities')" class="mt-4 inline-block text-sm text-brand-600 underline">
-          {{ t('home.seeAll') }}
+          {{ t('catalog.viewAllUniversities') }}
         </NuxtLink>
       </div>
     </NContainer>

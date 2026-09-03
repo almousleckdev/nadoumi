@@ -3,8 +3,6 @@ package com.nadoumi.university.mapper;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
-import com.nadoumi.university.domain.enums.PublishStatus;
-import com.nadoumi.university.domain.enums.UniversityStatus;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -13,14 +11,11 @@ public interface UniversityMapper {
     University findById(@Param("id") Long id);
 
     /**
-     * Staff list, PageHelper-paged. All filters optional. When
-     * {@code publishStatus} is set the list is restricted to that visibility
-     * (used by the public endpoint together with {@code status = ACTIVE}).
+     * PageHelper-paged list. Every {@link UniversitySearch} field is optional; a
+     * null field is not applied. The service sets {@code status} /
+     * {@code publishStatus} (public reads force ACTIVE + PUBLISHED).
      */
-    List<University> search(@Param("q") String q,
-            @Param("country") String country,
-            @Param("status") UniversityStatus status,
-            @Param("publishStatus") PublishStatus publishStatus);
+    List<University> search(UniversitySearch filter);
 
     int insert(University university);
 

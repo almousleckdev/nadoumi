@@ -58,6 +58,11 @@
                      or city like concat('%', #{q}, '%'))
             </if>
             <if test="country != null and country != ''">and country = #{country}</if>
+            <if test="province != null and province != ''">and province = #{province}</if>
+            <if test="city != null and city != ''">and city = #{city}</if>
+            <if test="type != null">and type = #{type}</if>
+            <if test="featured != null">and is_featured = #{featured}</if>
+            <if test="recommended != null">and is_recommended = #{recommended}</if>
             <if test="status != null">and status = #{status}</if>
             <if test="publishStatus != null">and publish_status = #{publishStatus}</if>
         </where>

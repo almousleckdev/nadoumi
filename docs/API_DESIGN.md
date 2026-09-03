@@ -126,7 +126,7 @@ booleans (default `false`). `UniversityResponse` additionally returns `status`,
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| GET | `/api/staff/universities` | `nad:university:list` | `q` (name EN/CN, city), `country`, `status`, `page`, `size` → `PageResponse<UniversityResponse>`. |
+| GET | `/api/staff/universities` | `nad:university:list` | `q` (name EN/CN, city), `country`, `province`, `city`, `type`, `status`, `page`, `size` → `PageResponse<UniversityResponse>`. |
 | GET | `/api/staff/universities/{id}` | `nad:university:view` | assembles `rankings` + `highlights`. |
 | POST | `/api/staff/universities` | `nad:university:create` | `201`. Country normalised to upper-case; `(name, country)` must be unique → `400` otherwise. |
 | PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self); replaces children. |
@@ -138,8 +138,11 @@ and **only** rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| GET | `/api/public/universities` | anonymous | `q`, `country`, `page`, `size` (default 12) → `PageResponse<PublicUniversityResponse>`. |
+| GET | `/api/public/universities` | anonymous | `q`, `country`, `province`, `city`, `type` (PUBLIC/PRIVATE), `featured` (bool), `recommended` (bool), `page`, `size` (default 12) → `PageResponse<PublicUniversityResponse>`. Ordered featured → recommended → name. Consumed by the Home carousels + the `universities` list. |
 | GET | `/api/public/universities/{id}` | anonymous | `404` if the row is not PUBLISHED + ACTIVE. Consumed by `nadoumi-web` `universities/[id].vue`. |
+
+A `/api/public/universities/facets` (distinct province / city / type with counts) is
+planned with the Universities-list redesign (PR-2).
 
 ### 4.5 Public contact endpoint (IMPLEMENTED — `nadoumi-identity`)
 
