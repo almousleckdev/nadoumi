@@ -34,7 +34,7 @@
         <maven.surefire.version>3.5.2</maven.surefire.version>
         <springdoc.version>3.1.0</springdoc.version>
         <cloudinary.version>2.4.0</cloudinary.version>
-        <tika.version>4.0.0</tika.version>
+        <tika.version>2.9.4</tika.version>
     </properties>
 
     <!-- 依赖声明 -->
