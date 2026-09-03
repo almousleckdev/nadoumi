@@ -1,5 +1,6 @@
 package com.nadoumi.scholarship.web;
 
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.scholarship.domain.enums.FundingModel;
 import com.nadoumi.scholarship.domain.enums.PublishStatus;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Staff scholarship admin. Student-safe CRUD under {@code nad:scholarship:*};
@@ -84,6 +86,22 @@ public class StaffScholarshipController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    // ---- media uploads ----
+
+    @PostMapping("/{id}/hero")
+    @PreAuthorize("@ss.hasPermi('nad:scholarship:edit')")
+    @Log(title = "Scholarship media", businessType = BusinessType.UPDATE)
+    public MediaUploadResult uploadHero(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadHero(id, file);
+    }
+
+    @PostMapping("/{id}/cover")
+    @PreAuthorize("@ss.hasPermi('nad:scholarship:edit')")
+    @Log(title = "Scholarship media", businessType = BusinessType.UPDATE)
+    public MediaUploadResult uploadCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadCover(id, file);
     }
 
     // ---- confidential sub-resource ----

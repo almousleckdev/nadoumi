@@ -2,6 +2,11 @@ package com.nadoumi.scholarship.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.media.MediaCategory;
+import com.nadoumi.common.media.MediaGateway;
+import com.nadoumi.common.media.MediaOwnerKind;
+import com.nadoumi.common.media.MediaOwnerRef;
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
@@ -24,10 +29,13 @@ import com.nadoumi.scholarship.web.response.ScholarshipInternalResponse;
 import com.nadoumi.scholarship.web.response.ScholarshipResponse;
 import com.nadoumi.university.service.UniversityService;
 import com.ruoyi.common.utils.SecurityUtils;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Staff scholarship management: student-safe CRUD plus the confidential
@@ -40,10 +48,13 @@ public class ScholarshipAdminService {
 
     private final ScholarshipMapper mapper;
     private final UniversityService universityService;
+    private final MediaGateway media;
 
-    public ScholarshipAdminService(ScholarshipMapper mapper, UniversityService universityService) {
+    public ScholarshipAdminService(ScholarshipMapper mapper, UniversityService universityService,
+            MediaGateway media) {
         this.mapper = mapper;
         this.universityService = universityService;
+        this.media = media;
     }
 
     @Transactional(readOnly = true)
@@ -51,12 +62,12 @@ public class ScholarshipAdminService {
         PageHelper.startPage(page + 1, size);
         List<Scholarship> rows = mapper.searchStaff(filter);
         long total = new PageInfo<>(rows).getTotal();
-        return PageResponse.of(rows.stream().map(ScholarshipResponse::of).toList(), page, size, total);
+        return PageResponse.of(rows.stream().map(this::toResponse).toList(), page, size, total);
     }
 
     @Transactional(readOnly = true)
     public ScholarshipResponse get(Long id) {
-        return ScholarshipResponse.of(loadWithChildren(id));
+        return toResponse(loadWithChildren(id));
     }
 
     @Transactional
@@ -96,6 +107,53 @@ public class ScholarshipAdminService {
     public void delete(Long id) {
         if (mapper.delete(id) == 0) {
             throw new NadNotFoundException("scholarship not found");
+        }
+    }
+
+    // ---- media uploads (staff, nad:scholarship:edit) ----
+
+    @Transactional
+    public MediaUploadResult uploadHero(long id, MultipartFile file) {
+        load(id);
+        MediaUploadResult result = uploadFor(id, file, MediaCategory.SCHOLARSHIP_HERO);
+        mapper.updateHeroMediaId(id, result.mediaId());
+        return result;
+    }
+
+    @Transactional
+    public MediaUploadResult uploadCover(long id, MultipartFile file) {
+        load(id);
+        MediaUploadResult result = uploadFor(id, file, MediaCategory.SCHOLARSHIP_COVER);
+        mapper.updateCoverMediaId(id, result.mediaId());
+        return result;
+    }
+
+    private MediaUploadResult uploadFor(long scholarshipId, MultipartFile file, MediaCategory category) {
+        try {
+            return media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+                    file.getSize(), category, null,
+                    new MediaOwnerRef(MediaOwnerKind.SCHOLARSHIP, scholarshipId), currentUserId());
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("failed to read upload", e);
+        }
+    }
+
+    private ScholarshipResponse toResponse(Scholarship s) {
+        return ScholarshipResponse.of(s,
+                resolveUrl(s.getHeroMediaId(), s.getHeroImageUrl()),
+                resolveUrl(s.getCoverMediaId(), s.getCoverImageUrl()));
+    }
+
+    private String resolveUrl(Long mediaId, String legacy) {
+        if (mediaId == null) {
+            return legacy;
+        }
+        try {
+            return media.publicUrl(mediaId);
+        }
+        catch (RuntimeException e) {
+            return legacy;
         }
     }
 
@@ -181,6 +239,14 @@ public class ScholarshipAdminService {
         s.setRemark(blankToNull(req.remark()));
         s.setHeroImageUrl(blankToNull(req.heroImageUrl()));
         s.setCoverImageUrl(blankToNull(req.coverImageUrl()));
+        // Media ids are primarily set through the dedicated upload endpoints; only
+        // overwrite from the request when the client actually sent a value.
+        if (req.heroMediaId() != null) {
+            s.setHeroMediaId(req.heroMediaId());
+        }
+        if (req.coverMediaId() != null) {
+            s.setCoverMediaId(req.coverMediaId());
+        }
     }
 
     private void replaceChildren(Long id, ScholarshipRequest req) {
@@ -300,6 +366,16 @@ public class ScholarshipAdminService {
         }
         catch (RuntimeException e) {
             return "system";
+        }
+    }
+
+    private static long currentUserId() {
+        try {
+            Long id = SecurityUtils.getUserId();
+            return id == null ? 0L : id;
+        }
+        catch (RuntimeException e) {
+            return 0L;
         }
     }
 

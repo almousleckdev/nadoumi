@@ -17,8 +17,12 @@ public record ScholarshipResponse(
         String updatedAt) {
 
     public static ScholarshipResponse of(Scholarship s) {
+        return of(s, s.getHeroImageUrl(), s.getCoverImageUrl());
+    }
+
+    public static ScholarshipResponse of(Scholarship s, String heroUrl, String coverUrl) {
         return new ScholarshipResponse(
-                PublicScholarshipResponse.detail(s),
+                PublicScholarshipResponse.detail(s, heroUrl, coverUrl),
                 s.getStatus() == null ? null : s.getStatus().name(),
                 s.getPublishStatus() == null ? null : s.getPublishStatus().name(),
                 str(s.getPublishedAt()), s.getRemark(),

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
@@ -25,7 +26,8 @@ import org.junit.jupiter.api.Test;
 class ScholarshipServiceTest {
 
     private final ScholarshipMapper mapper = mock(ScholarshipMapper.class);
-    private final ScholarshipService service = new ScholarshipService(mapper);
+    private final MediaGateway media = mock(MediaGateway.class);
+    private final ScholarshipService service = new ScholarshipService(mapper, media);
 
     private static ScholarshipSearch anyFilter() {
         return new ScholarshipSearch(null, null, null, null, null, null, null, null, null,
@@ -94,6 +96,42 @@ class ScholarshipServiceTest {
         assertThat(detail.stipends()).isEmpty();
         assertThat(detail.accommodation()).isEmpty();
         assertThat(detail.coverage()).extracting(c -> c.kind()).containsExactly("TUITION", "MEDICAL_INSURANCE");
+    }
+
+    @Test
+    void getPublic_resolves_heroUrl_from_media_id_without_touching_a_confidential_field() {
+        Scholarship s = row(9);
+        s.setHeroMediaId(9L);
+        s.setHeroImageUrl("/profile/legacy-hero.png");
+        when(mapper.findPublicById(9L)).thenReturn(s);
+        when(mapper.findLevels(9L)).thenReturn(List.of());
+        when(mapper.findCategories(9L)).thenReturn(List.of());
+        when(mapper.findIntakes(9L)).thenReturn(List.of());
+        when(media.publicUrl(9L)).thenReturn("https://res.cloudinary.com/x/hero.png");
+
+        var detail = service.getPublic("9");
+
+        assertThat(detail.heroMediaId()).isEqualTo(9L);
+        assertThat(detail.heroUrl()).isEqualTo("https://res.cloudinary.com/x/hero.png");
+        // no confidential leak: the public shape carries no university / partnership / commission field
+        assertThat(java.util.Arrays.stream(detail.getClass().getRecordComponents()).map(c -> c.getName()))
+                .noneMatch(n -> n.toLowerCase().contains("university")
+                        || n.toLowerCase().contains("partnership")
+                        || n.toLowerCase().contains("commission"));
+    }
+
+    @Test
+    void getPublic_falls_back_to_the_legacy_hero_image_url_when_no_media_id() {
+        Scholarship s = row(11);
+        s.setHeroImageUrl("/profile/legacy-hero.png");
+        when(mapper.findPublicById(11L)).thenReturn(s);
+        when(mapper.findLevels(11L)).thenReturn(List.of());
+        when(mapper.findCategories(11L)).thenReturn(List.of());
+        when(mapper.findIntakes(11L)).thenReturn(List.of());
+
+        var detail = service.getPublic("11");
+
+        assertThat(detail.heroUrl()).isEqualTo("/profile/legacy-hero.png");
     }
 
     @Test

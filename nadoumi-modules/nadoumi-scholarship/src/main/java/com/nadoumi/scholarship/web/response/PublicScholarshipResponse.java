@@ -46,6 +46,10 @@ public record PublicScholarshipResponse(
         boolean hot,
         String heroImageUrl,
         String coverImageUrl,
+        Long heroMediaId,
+        String heroUrl,
+        Long coverMediaId,
+        String coverUrl,
         List<String> levels,
         List<String> categories,
         List<Intake> intakes,
@@ -104,15 +108,27 @@ public record PublicScholarshipResponse(
     public record DocumentRequirement(String docType, boolean mandatory, String note) {
     }
 
+    /** Legacy factory — the {@code *_image_url} strings pass through unchanged. */
     public static PublicScholarshipResponse card(Scholarship s) {
-        return build(s, false);
+        return build(s, false, s.getHeroImageUrl(), s.getCoverImageUrl());
     }
 
+    /** Legacy factory — the {@code *_image_url} strings pass through unchanged. */
     public static PublicScholarshipResponse detail(Scholarship s) {
-        return build(s, true);
+        return build(s, true, s.getHeroImageUrl(), s.getCoverImageUrl());
     }
 
-    private static PublicScholarshipResponse build(Scholarship s, boolean detail) {
+    /** The service resolves {@code heroUrl} / {@code coverUrl} via the MediaGateway (legacy fallback). */
+    public static PublicScholarshipResponse card(Scholarship s, String heroUrl, String coverUrl) {
+        return build(s, false, heroUrl, coverUrl);
+    }
+
+    /** The service resolves {@code heroUrl} / {@code coverUrl} via the MediaGateway (legacy fallback). */
+    public static PublicScholarshipResponse detail(Scholarship s, String heroUrl, String coverUrl) {
+        return build(s, true, heroUrl, coverUrl);
+    }
+
+    private static PublicScholarshipResponse build(Scholarship s, boolean detail, String heroUrl, String coverUrl) {
         return new PublicScholarshipResponse(
                 s.getId(), s.getSlug(), s.getReferenceCode(), s.getTitle(), s.getSummary(),
                 s.getCountry(), s.getProvince(), s.getCity(), s.getField(),
@@ -126,6 +142,7 @@ public record PublicScholarshipResponse(
                 Money.of(s.getServiceFeeAmount(), s.getServiceFeeCurrency()),
                 s.getSlots(), s.isFeatured(), s.isRecommended(), s.isHot(),
                 s.getHeroImageUrl(), s.getCoverImageUrl(),
+                s.getHeroMediaId(), heroUrl, s.getCoverMediaId(), coverUrl,
                 List.copyOf(s.getLevels()),
                 s.getCategories().stream().map(ScholarshipCategory::code).toList(),
                 s.getIntakes().stream()

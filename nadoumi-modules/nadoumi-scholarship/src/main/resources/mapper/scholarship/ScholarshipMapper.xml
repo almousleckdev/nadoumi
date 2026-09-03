@@ -44,6 +44,8 @@
         <result property="remark"                 column="remark"/>
         <result property="heroImageUrl"           column="hero_image_url"/>
         <result property="coverImageUrl"          column="cover_image_url"/>
+        <result property="heroMediaId"            column="hero_media_id"/>
+        <result property="coverMediaId"           column="cover_media_id"/>
     </resultMap>
 
     <sql id="viewCols">
@@ -55,7 +57,7 @@
         v.requires_financial_proof, v.requires_foundation_year,
         v.application_fee_amount, v.application_fee_currency,
         v.service_fee_amount, v.service_fee_currency, v.slots,
-        v.hero_image_url, v.cover_image_url,
+        v.hero_image_url, v.cover_image_url, v.hero_media_id, v.cover_media_id,
         v.is_featured, v.is_recommended, v.is_hot, v.published_at
     </sql>
 
@@ -68,7 +70,7 @@
         s.requires_financial_proof, s.requires_foundation_year,
         s.application_fee_amount, s.application_fee_currency,
         s.service_fee_amount, s.service_fee_currency, s.slots,
-        s.hero_image_url, s.cover_image_url,
+        s.hero_image_url, s.cover_image_url, s.hero_media_id, s.cover_media_id,
         s.is_featured, s.is_recommended, s.is_hot, s.published_at,
         s.publish_status, s.status, s.create_by, s.create_time,
         s.update_by, s.update_time, s.remark
@@ -197,7 +199,7 @@
              requires_financial_proof, requires_foundation_year,
              application_fee_amount, application_fee_currency, service_fee_amount, service_fee_currency,
              slots, is_featured, is_recommended, is_hot, publish_status, published_at, status,
-             create_by, create_time, remark, hero_image_url, cover_image_url)
+             create_by, create_time, remark, hero_image_url, cover_image_url, hero_media_id, cover_media_id)
         values
             (#{slug}, #{referenceCode}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
              #{teachingLanguage}, #{fundingModel}, #{hasStipend}, #{deadline}, #{benefits},
@@ -207,7 +209,7 @@
              #{applicationFeeAmount}, #{applicationFeeCurrency},
              #{serviceFeeAmount}, #{serviceFeeCurrency}, #{slots}, #{featured}, #{recommended},
              #{hot}, #{publishStatus}, #{publishedAt}, #{status}, #{createBy}, now(), #{remark},
-             #{heroImageUrl}, #{coverImageUrl})
+             #{heroImageUrl}, #{coverImageUrl}, #{heroMediaId}, #{coverMediaId})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.scholarship.domain.Scholarship">
@@ -225,8 +227,17 @@
             slots = #{slots}, is_featured = #{featured}, is_recommended = #{recommended}, is_hot = #{hot},
             publish_status = #{publishStatus}, status = #{status},
             hero_image_url = #{heroImageUrl}, cover_image_url = #{coverImageUrl},
+            hero_media_id = #{heroMediaId}, cover_media_id = #{coverMediaId},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}
+    </update>
+
+    <update id="updateHeroMediaId">
+        update nad_scholarship set hero_media_id = #{mediaId}, update_time = now() where id = #{id}
+    </update>
+
+    <update id="updateCoverMediaId">
+        update nad_scholarship set cover_media_id = #{mediaId}, update_time = now() where id = #{id}
     </update>
 
     <update id="markPublished">

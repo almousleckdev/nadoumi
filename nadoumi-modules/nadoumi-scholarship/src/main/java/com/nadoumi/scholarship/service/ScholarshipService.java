@@ -2,6 +2,7 @@ package com.nadoumi.scholarship.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
@@ -23,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class ScholarshipService {
 
     private final ScholarshipMapper mapper;
+    private final MediaGateway media;
 
-    public ScholarshipService(ScholarshipMapper mapper) {
+    public ScholarshipService(ScholarshipMapper mapper, MediaGateway media) {
         this.mapper = mapper;
+        this.media = media;
     }
 
     public PageResponse<PublicScholarshipResponse> list(ScholarshipSearch filter, int page, int size) {
@@ -33,7 +36,9 @@ public class ScholarshipService {
         List<Scholarship> rows = mapper.searchPublic(filter);
         long total = new PageInfo<>(rows).getTotal();
         rows.forEach(this::loadCardChildren);
-        return PageResponse.of(rows.stream().map(PublicScholarshipResponse::card).toList(), page, size, total);
+        return PageResponse.of(
+                rows.stream().map(s -> PublicScholarshipResponse.card(s, heroUrl(s), coverUrl(s))).toList(),
+                page, size, total);
     }
 
     public PublicScholarshipResponse getPublic(String slugOrId) {
@@ -48,7 +53,28 @@ public class ScholarshipService {
         s.setAccommodations(mapper.findAccommodations(s.getId()));
         s.setCoverage(mapper.findCoverage(s.getId()));
         s.setDocumentRequirements(mapper.findDocumentRequirements(s.getId()));
-        return PublicScholarshipResponse.detail(s);
+        return PublicScholarshipResponse.detail(s, heroUrl(s), coverUrl(s));
+    }
+
+    private String heroUrl(Scholarship s) {
+        return resolveUrl(s.getHeroMediaId(), s.getHeroImageUrl());
+    }
+
+    private String coverUrl(Scholarship s) {
+        return resolveUrl(s.getCoverMediaId(), s.getCoverImageUrl());
+    }
+
+    /** Media id wins; the legacy {@code *_image_url} string is the deprecation-window fallback. */
+    private String resolveUrl(Long mediaId, String legacy) {
+        if (mediaId == null) {
+            return legacy;
+        }
+        try {
+            return media.publicUrl(mediaId);
+        }
+        catch (RuntimeException e) {
+            return legacy;
+        }
     }
 
     public java.util.List<com.nadoumi.scholarship.domain.ScholarshipCategory> categories() {

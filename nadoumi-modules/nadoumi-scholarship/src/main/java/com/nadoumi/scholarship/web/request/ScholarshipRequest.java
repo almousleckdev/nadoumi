@@ -61,6 +61,8 @@ public record ScholarshipRequest(
         @Size(max = 500) String remark,
         @Size(max = 500) String heroImageUrl,
         @Size(max = 500) String coverImageUrl,
+        Long heroMediaId,
+        Long coverMediaId,
         List<@NotNull EducationLevel> levels,
         List<@NotBlank String> categoryCodes,
         @Valid List<IntakeInput> intakes,
