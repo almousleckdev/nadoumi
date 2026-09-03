@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(22);
+        assertThat(applied).isEqualTo(23);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -165,6 +165,13 @@ class FlywayMigrationsIT {
                 + "AND table_name = 'nad_scholarship' AND column_name = 'reference_code'")).isEqualTo("1");
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_scholarship' AND index_name = 'uk_scholarship_reference'")).isEqualTo("1");
+        // V26 — media asset registry + append-only access log
+        assertThat(tableExists(ds, "nad_media_asset")).isTrue();
+        assertThat(tableExists(ds, "nad_media_access_log")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_media_asset' AND column_name IN ('access_class','public_id')")).isEqualTo("2");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_media_asset' AND index_name = 'uk_media_provider_public_id'")).isEqualTo("1");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -194,7 +201,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(21); // V2..V25
+        assertThat(applied).isEqualTo(22); // V2..V26
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
