@@ -22,7 +22,7 @@ const place = computed(() =>
   >
     <img
       v-if="scholarship.coverImageUrl"
-      :src="scholarship.coverImageUrl"
+      :src="mediaUrl(scholarship.coverImageUrl)"
       alt=""
       loading="lazy"
       decoding="async"

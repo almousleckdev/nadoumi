@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, type UploadProps, type UploadRawFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { getToken } from '@/utils/auth'
+import { assetUrl } from '@/utils/asset'
 
 const props = withDefaults(defineProps<{
   modelValue: string | null
@@ -31,10 +32,13 @@ const beforeUpload: UploadProps['beforeUpload'] = (raw: UploadRawFile) => {
   return true
 }
 
-interface UploadResult { code: number, msg?: string, url?: string }
+interface UploadResult { code: number, msg?: string, url?: string, fileName?: string }
 function onSuccess(res: UploadResult) {
-  if (res.code === 200 && res.url) {
-    emit('update:modelValue', res.url)
+  // Store the path only (`/profile/upload/...`), never RuoYi's absolute URL, so
+  // the reference stays portable across environments. `fileName` is that path.
+  const ref = res.fileName || res.url
+  if (res.code === 200 && ref) {
+    emit('update:modelValue', ref)
   }
   else {
     ElMessage.error(res.msg || t('imageUpload.failed'))
@@ -58,7 +62,7 @@ function clear() {
       class="img-upload__preview"
     >
       <img
-        :src="modelValue"
+        :src="assetUrl(modelValue)"
         alt=""
       >
       <button

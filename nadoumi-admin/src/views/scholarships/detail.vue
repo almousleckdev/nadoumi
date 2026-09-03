@@ -48,14 +48,14 @@
         <div class="imgs">
           <figure v-if="s.view.heroImageUrl">
             <img
-              :src="s.view.heroImageUrl"
+              :src="assetUrl(s.view.heroImageUrl)"
               alt=""
             >
             <figcaption>{{ t('scholarship.heroImage') }}</figcaption>
           </figure>
           <figure v-if="s.view.coverImageUrl">
             <img
-              :src="s.view.coverImageUrl"
+              :src="assetUrl(s.view.coverImageUrl)"
               alt=""
             >
             <figcaption>{{ t('scholarship.coverImage') }}</figcaption>
@@ -381,6 +381,7 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import ScholarshipDrawer from './ScholarshipDrawer.vue'
+import { assetUrl } from '@/utils/asset'
 
 const { t } = useI18n()
 const route = useRoute()

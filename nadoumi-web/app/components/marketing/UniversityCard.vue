@@ -29,7 +29,7 @@ const typeLabel = computed(() => {
     <div class="relative flex h-28 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-500 to-brand-700">
       <img
         v-if="university.coverImageUrl"
-        :src="university.coverImageUrl"
+        :src="mediaUrl(university.coverImageUrl)"
         alt=""
         loading="lazy"
         decoding="async"
@@ -37,7 +37,7 @@ const typeLabel = computed(() => {
       >
       <img
         v-if="university.logoImageUrl"
-        :src="university.logoImageUrl"
+        :src="mediaUrl(university.logoImageUrl)"
         alt=""
         loading="lazy"
         decoding="async"
