@@ -30,5 +30,12 @@ public interface MediaAssetMapper {
     /** DELETED rows whose {@code deleted_at} is older than {@code before} — purge candidates. */
     List<MediaAsset> findStaleDeleted(@Param("before") LocalDateTime before);
 
+    /**
+     * Permanently remove a row once its provider object has been destroyed and
+     * nothing references it (spec §I.8). Referenced rows are kept as {@code PURGED}
+     * via {@link #updateStatus} instead.
+     */
+    int hardDelete(@Param("id") long id);
+
     List<MediaAsset> findByOwner(@Param("kind") String ownerKind, @Param("id") long ownerId);
 }

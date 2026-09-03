@@ -143,6 +143,22 @@ public class CloudinaryMediaStorage implements MediaStorageService {
         assetMapper.updateStatus(assetId, STATUS_DELETED, null, SYSTEM_ACTOR, actorUserId);
     }
 
+    @Override
+    public void purge(long assetId) {
+        MediaAsset row = require(assetId);
+        Map<?, ?> result;
+        try {
+            result = cloudinary.uploader().destroy(row.getPublicId(), ObjectUtils.asMap(
+                    "resource_type", row.getResourceType(),
+                    "type", row.getDeliveryType(),
+                    "invalidate", true));
+        } catch (IOException e) {
+            throw new UncheckedIOException("Cloudinary destroy failed for media asset " + assetId, e);
+        }
+        log.info("media asset purged from provider: id={} public_id={} result={}",
+                assetId, row.getPublicId(), ObjectUtils.asString(result.get("result"), "unknown"));
+    }
+
     // ---- internals ----
 
     private MediaAsset upload(MediaUploadCommand cmd, MediaAccessClass accessClass) {

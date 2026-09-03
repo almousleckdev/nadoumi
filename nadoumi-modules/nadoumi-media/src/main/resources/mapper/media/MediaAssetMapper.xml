@@ -84,4 +84,8 @@
         where id = #{id}
     </update>
 
+    <delete id="hardDelete">
+        delete from nad_media_asset where id = #{id}
+    </delete>
+
 </mapper>
