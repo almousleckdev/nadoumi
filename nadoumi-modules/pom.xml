@@ -20,6 +20,7 @@
 
     <modules>
         <module>nadoumi-common</module>
+        <module>nadoumi-media</module>
         <module>nadoumi-identity</module>
         <module>nadoumi-applicant</module>
         <module>nadoumi-university</module>

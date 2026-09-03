@@ -33,6 +33,8 @@
         <testcontainers.version>1.20.4</testcontainers.version>
         <maven.surefire.version>3.5.2</maven.surefire.version>
         <springdoc.version>3.1.0</springdoc.version>
+        <cloudinary.version>2.4.0</cloudinary.version>
+        <tika.version>4.0.0</tika.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -193,11 +195,36 @@
                 <version>${ruoyi.version}</version>
             </dependency>
 
+            <!-- Cloudinary upload/delivery client (nadoumi-media) -->
+            <dependency>
+                <groupId>com.cloudinary</groupId>
+                <artifactId>cloudinary-http5</artifactId>
+                <version>${cloudinary.version}</version>
+            </dependency>
+
+            <!-- Apache Tika core: server-side content-type detection (nadoumi-media) -->
+            <dependency>
+                <groupId>org.apache.tika</groupId>
+                <artifactId>tika-core</artifactId>
+                <version>${tika.version}</version>
+            </dependency>
+
             <!-- Nadoumi modules (Phase 2 skeleton) -->
             <dependency>
                 <groupId>com.nadoumi</groupId>
                 <artifactId>nadoumi-common</artifactId>
                 <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nadoumi</groupId>
+                <artifactId>nadoumi-media</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nadoumi</groupId>
+                <artifactId>nadoumi-media</artifactId>
+                <version>${ruoyi.version}</version>
+                <type>test-jar</type>
             </dependency>
             <dependency>
                 <groupId>com.nadoumi</groupId>
