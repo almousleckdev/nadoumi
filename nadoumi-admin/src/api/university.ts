@@ -49,6 +49,8 @@ export interface University {
   officePhone: string | null
   logoDocumentId: number | null
   bannerDocumentId: number | null
+  logoImageUrl: string | null
+  coverImageUrl: string | null
   recommended: boolean
   featured: boolean
   status: UniversityStatus
@@ -81,6 +83,8 @@ export interface UniversityInput {
   nearbyInfo?: string | null
   admissionsEmail?: string | null
   officePhone?: string | null
+  logoImageUrl?: string | null
+  coverImageUrl?: string | null
   recommended: boolean
   featured: boolean
   status: UniversityStatus

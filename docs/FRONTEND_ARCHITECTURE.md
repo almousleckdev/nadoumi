@@ -157,6 +157,14 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   gallery grid in place of the former placeholder. `UniversityGalleryImage` added
   to `types/catalog.ts`.
 
+**UPDATE 2026-09-03 (catalog imagery — V21):**
+- `UniversitySummary` / `UniversityDetail` gain `logoImageUrl` / `coverImageUrl`;
+  `ScholarshipCard` gains `heroImageUrl` / `coverImageUrl` (all optional URL
+  strings). `UniversityCard` shows the cover behind the logo; `universities/[id]`
+  hero uses the cover as a faded backdrop with the logo tile; `ScholarshipCard`
+  shows a cover strip; `scholarships/[slug]` hero uses the hero/cover image.
+  Admin uploads through RuoYi `/common/upload` (no object-storage slice yet).
+
 **UPDATE 2026-09-03 (programmes — `nadoumi-program`, V19/V20):**
 - `ProgramCard` marketing component; `types/catalog.ts` gains `ProgramCard` /
   `ProgramDetail` / `ProgramMajor` / `ProgramIntake` (replacing the unused

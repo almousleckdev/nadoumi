@@ -34,6 +34,8 @@
         <result property="updateBy"               column="update_by"/>
         <result property="updateTime"             column="update_time"/>
         <result property="remark"                 column="remark"/>
+        <result property="heroImageUrl"           column="hero_image_url"/>
+        <result property="coverImageUrl"          column="cover_image_url"/>
     </resultMap>
 
     <sql id="viewCols">
@@ -42,6 +44,7 @@
         v.benefits, v.requirements, v.policy,
         v.application_fee_amount, v.application_fee_currency,
         v.service_fee_amount, v.service_fee_currency, v.slots,
+        v.hero_image_url, v.cover_image_url,
         v.is_featured, v.is_recommended, v.is_hot, v.published_at
     </sql>
 
@@ -51,6 +54,7 @@
         s.benefits, s.requirements, s.policy,
         s.application_fee_amount, s.application_fee_currency,
         s.service_fee_amount, s.service_fee_currency, s.slots,
+        s.hero_image_url, s.cover_image_url,
         s.is_featured, s.is_recommended, s.is_hot, s.published_at,
         s.publish_status, s.status, s.create_by, s.create_time,
         s.update_by, s.update_time, s.remark
@@ -172,13 +176,14 @@
              has_stipend, deadline, benefits, requirements, policy,
              application_fee_amount, application_fee_currency, service_fee_amount, service_fee_currency,
              slots, is_featured, is_recommended, is_hot, publish_status, published_at, status,
-             create_by, create_time, remark)
+             create_by, create_time, remark, hero_image_url, cover_image_url)
         values
             (#{slug}, #{title}, #{summary}, #{country}, #{province}, #{city}, #{field},
              #{teachingLanguage}, #{fundingModel}, #{hasStipend}, #{deadline}, #{benefits},
              #{requirements}, #{policy}, #{applicationFeeAmount}, #{applicationFeeCurrency},
              #{serviceFeeAmount}, #{serviceFeeCurrency}, #{slots}, #{featured}, #{recommended},
-             #{hot}, #{publishStatus}, #{publishedAt}, #{status}, #{createBy}, now(), #{remark})
+             #{hot}, #{publishStatus}, #{publishedAt}, #{status}, #{createBy}, now(), #{remark},
+             #{heroImageUrl}, #{coverImageUrl})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.scholarship.domain.Scholarship">
@@ -192,6 +197,7 @@
             service_fee_amount = #{serviceFeeAmount}, service_fee_currency = #{serviceFeeCurrency},
             slots = #{slots}, is_featured = #{featured}, is_recommended = #{recommended}, is_hot = #{hot},
             publish_status = #{publishStatus}, status = #{status},
+            hero_image_url = #{heroImageUrl}, cover_image_url = #{coverImageUrl},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}
     </update>

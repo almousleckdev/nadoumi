@@ -62,7 +62,13 @@ const eligibilityRows = computed(() => {
 <template>
   <div v-if="s">
     <section class="relative isolate overflow-hidden bg-slate-900 text-white">
-      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900 to-brand-900/60" aria-hidden="true" />
+      <img
+        v-if="s.heroImageUrl || s.coverImageUrl"
+        :src="s.heroImageUrl ?? s.coverImageUrl ?? ''"
+        alt=""
+        class="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
+      >
+      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900/90 to-brand-900/60" aria-hidden="true" />
       <NContainer>
         <div class="max-w-3xl py-12 sm:py-16">
           <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">

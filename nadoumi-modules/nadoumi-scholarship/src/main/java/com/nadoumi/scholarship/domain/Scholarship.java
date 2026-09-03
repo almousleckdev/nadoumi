@@ -48,6 +48,8 @@ public class Scholarship {
     private String updateBy;
     private LocalDateTime updateTime;
     private String remark;
+    private String heroImageUrl;
+    private String coverImageUrl;
 
     private List<String> levels = new ArrayList<>();
     private List<ScholarshipCategory> categories = new ArrayList<>();
@@ -119,6 +121,12 @@ public class Scholarship {
     public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
+
+    public String getHeroImageUrl() { return heroImageUrl; }
+    public void setHeroImageUrl(String heroImageUrl) { this.heroImageUrl = heroImageUrl; }
+
+    public String getCoverImageUrl() { return coverImageUrl; }
+    public void setCoverImageUrl(String coverImageUrl) { this.coverImageUrl = coverImageUrl; }
 
     public List<String> getLevels() { return levels; }
     public void setLevels(List<String> levels) { this.levels = levels; }

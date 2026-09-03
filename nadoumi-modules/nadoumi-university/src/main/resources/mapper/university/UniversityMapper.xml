@@ -25,6 +25,8 @@
         <result property="officePhone"           column="office_phone"/>
         <result property="logoDocumentId"        column="logo_document_id"/>
         <result property="bannerDocumentId"      column="banner_document_id"/>
+        <result property="logoImageUrl"          column="logo_image_url"/>
+        <result property="coverImageUrl"         column="cover_image_url"/>
         <result property="recommended"           column="is_recommended"/>
         <result property="featured"              column="is_featured"/>
         <result property="status"                column="status"/>
@@ -41,6 +43,7 @@
         total_students, international_students, faculty_count, website, ranking_tier,
         introduction, history, campus_info, accommodation_info, nearby_info,
         admissions_email, office_phone, logo_document_id, banner_document_id,
+        logo_image_url, cover_image_url,
         is_recommended, is_featured, status, publish_status,
         create_by, create_time, update_by, update_time, remark
     </sql>
@@ -80,12 +83,14 @@
              total_students, international_students, faculty_count, website, ranking_tier,
              introduction, history, campus_info, accommodation_info, nearby_info,
              admissions_email, office_phone, logo_document_id, banner_document_id,
+             logo_image_url, cover_image_url,
              is_recommended, is_featured, status, publish_status, create_by, create_time, remark)
         values
             (#{name}, #{nameCn}, #{country}, #{type}, #{city}, #{province}, #{foundedYear},
              #{totalStudents}, #{internationalStudents}, #{facultyCount}, #{website}, #{rankingTier},
              #{introduction}, #{history}, #{campusInfo}, #{accommodationInfo}, #{nearbyInfo},
              #{admissionsEmail}, #{officePhone}, #{logoDocumentId}, #{bannerDocumentId},
+             #{logoImageUrl}, #{coverImageUrl},
              #{recommended}, #{featured}, #{status}, #{publishStatus}, #{createBy}, now(), #{remark})
     </insert>
 
@@ -99,6 +104,7 @@
             accommodation_info = #{accommodationInfo}, nearby_info = #{nearbyInfo},
             admissions_email = #{admissionsEmail}, office_phone = #{officePhone},
             logo_document_id = #{logoDocumentId}, banner_document_id = #{bannerDocumentId},
+            logo_image_url = #{logoImageUrl}, cover_image_url = #{coverImageUrl},
             is_recommended = #{recommended}, is_featured = #{featured},
             status = #{status}, publish_status = #{publishStatus},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}

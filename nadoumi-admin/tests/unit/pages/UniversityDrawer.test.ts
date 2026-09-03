@@ -18,6 +18,7 @@ const existing: University = {
   rankingTier: 'Top 50', introduction: 'A leading university.', history: null,
   campusInfo: null, accommodationInfo: null, nearbyInfo: null,
   admissionsEmail: null, officePhone: null, logoDocumentId: null, bannerDocumentId: null,
+  logoImageUrl: null, coverImageUrl: null,
   recommended: true, featured: false, status: 'ACTIVE', publishStatus: 'PUBLISHED',
   remark: null, createdAt: null, updatedAt: null,
   rankings: [{ id: 1, source: 'QS', rankPosition: 34, rankYear: 2026, note: null }],

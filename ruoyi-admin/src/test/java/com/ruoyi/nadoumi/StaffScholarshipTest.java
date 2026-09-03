@@ -26,6 +26,7 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
              "teachingLanguage":"ENGLISH","fundingModel":"FULLY","hasStipend":true,
              "deadline":"2026-03-31","benefits":"Tuition, accommodation, stipend, insurance.",
              "requirements":"Bachelor degree, IELTS 6.0.","status":"ACTIVE","publishStatus":"PUBLISHED",
+             "heroImageUrl":"https://img.example/sch-hero.jpg","coverImageUrl":"https://img.example/sch-cover.jpg",
              "levels":["MASTER","PHD"],"categoryCodes":["CSC","TYPE_A"],
              "intakes":[{"term":"AUTUMN_SEPTEMBER","applicationOpen":"2025-12-01","applicationClose":"2026-03-31"}],
              "eligibility":{"ageMin":18,"ageMax":35,"gpaMin":3.0,"ieltsMin":6.0,"nationalityScope":"ANY"},
@@ -55,6 +56,8 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.view.title").value("CSC Full Scholarship — Master"))
                 .andExpect(jsonPath("$.view.slug").value("csc-full-scholarship-master"))
                 .andExpect(jsonPath("$.view.country").value("CN"))
+                .andExpect(jsonPath("$.view.heroImageUrl").value("https://img.example/sch-hero.jpg"))
+                .andExpect(jsonPath("$.view.coverImageUrl").value("https://img.example/sch-cover.jpg"))
                 .andExpect(jsonPath("$.view.levels.length()").value(2))
                 .andExpect(jsonPath("$.view.categories.length()").value(2))
                 .andExpect(jsonPath("$.view.intakes.length()").value(1))

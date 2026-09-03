@@ -240,6 +240,23 @@
         </el-button>
       </FormSection>
 
+      <FormSection :title="t('university.secImages')">
+        <div class="imgs">
+          <el-form-item :label="t('university.logoImage')">
+            <ImageUpload
+              v-model="form.logoImageUrl"
+              aspect="square"
+            />
+          </el-form-item>
+          <el-form-item :label="t('university.coverImage')">
+            <ImageUpload
+              v-model="form.coverImageUrl"
+              aspect="wide"
+            />
+          </el-form-item>
+        </div>
+      </FormSection>
+
       <FormSection
         :title="t('university.secGallery')"
         :description="t('university.galleryHint')"
@@ -247,17 +264,11 @@
         <div
           v-for="(g, i) in form.gallery"
           :key="i"
-          class="repeat"
+          class="repeat gal-row"
         >
-          <img
-            v-if="g.imageUrl"
-            :src="g.imageUrl"
-            class="gal-thumb"
-            alt=""
-          >
-          <el-input
+          <ImageUpload
             v-model="g.imageUrl"
-            placeholder="https://…/campus.jpg"
+            aspect="wide"
           />
           <el-input
             v-model="g.caption"
@@ -360,6 +371,7 @@ import {
 } from '@/api/university'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
+import ImageUpload from '@/components/ui/ImageUpload.vue'
 
 const props = defineProps<{ modelValue: boolean, university: University | null }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [u: University] }>()
@@ -386,13 +398,14 @@ function blankForm() {
     facultyCount: null as number | null, website: '', rankingTier: '',
     introduction: '', history: '', campusInfo: '', accommodationInfo: '', nearbyInfo: '',
     admissionsEmail: '', officePhone: '',
+    logoImageUrl: null as string | null, coverImageUrl: null as string | null,
     recommended: false, featured: false,
     status: 'ACTIVE' as UniversityInput['status'],
     publishStatus: 'DRAFT' as UniversityInput['publishStatus'],
     remark: '',
     highlights: [] as University['highlights'],
     rankings: [] as University['rankings'],
-    gallery: [] as { imageUrl: string, caption: string | null }[],
+    gallery: [] as { imageUrl: string | null, caption: string | null }[],
   }
 }
 const form = reactive(blankForm())
@@ -420,6 +433,7 @@ watch(() => props.modelValue, (open) => {
     introduction: u.introduction ?? '', history: u.history ?? '', campusInfo: u.campusInfo ?? '',
     accommodationInfo: u.accommodationInfo ?? '', nearbyInfo: u.nearbyInfo ?? '',
     admissionsEmail: u.admissionsEmail ?? '', officePhone: u.officePhone ?? '',
+    logoImageUrl: u.logoImageUrl ?? null, coverImageUrl: u.coverImageUrl ?? null,
     recommended: u.recommended, featured: u.featured,
     status: u.status, publishStatus: u.publishStatus, remark: u.remark ?? '',
     highlights: u.highlights.map(h => ({ ...h })),
@@ -456,6 +470,8 @@ function payload(): UniversityInput {
     nearbyInfo: orNull(form.nearbyInfo),
     admissionsEmail: orNull(form.admissionsEmail),
     officePhone: orNull(form.officePhone),
+    logoImageUrl: form.logoImageUrl,
+    coverImageUrl: form.coverImageUrl,
     recommended: form.recommended,
     featured: form.featured,
     status: form.status,
@@ -468,7 +484,7 @@ function payload(): UniversityInput {
       .filter(r => r.source.trim() && r.rankPosition)
       .map(r => ({ source: r.source.trim(), rankPosition: Number(r.rankPosition), rankYear: orNum(r.rankYear), note: orNull(r.note ?? '') })),
     gallery: form.gallery
-      .filter(g => g.imageUrl.trim())
+      .filter((g): g is { imageUrl: string, caption: string | null } => Boolean(g.imageUrl?.trim()))
       .slice(0, 6)
       .map(g => ({ imageUrl: g.imageUrl.trim(), caption: orNull(g.caption ?? '') })),
   }
@@ -510,6 +526,14 @@ async function save() {
 }
 .repeat > .el-input {
   flex: 1;
+}
+.gal-row {
+  align-items: flex-start;
+}
+.imgs {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
 }
 .flags {
   display: flex;

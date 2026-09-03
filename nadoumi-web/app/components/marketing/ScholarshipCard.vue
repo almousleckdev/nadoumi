@@ -17,9 +17,18 @@ const place = computed(() =>
 <template>
   <NuxtLink
     :to="localePath(`/scholarships/${scholarship.slug}`)"
-    class="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 no-underline shadow-xs transition-shadow hover:shadow-md"
+    class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
+    <img
+      v-if="scholarship.coverImageUrl"
+      :src="scholarship.coverImageUrl"
+      alt=""
+      loading="lazy"
+      decoding="async"
+      class="h-32 w-full object-cover"
+    >
+    <div class="flex flex-1 flex-col p-5">
     <div class="flex items-center gap-2">
       <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
         {{ t(`scholarships.funding.${scholarship.fundingModel}`) }}
@@ -43,6 +52,7 @@ const place = computed(() =>
       <span class="inline-flex items-center gap-1 font-medium text-brand-700 group-hover:gap-2">
         {{ t('scholarships.view') }}<span aria-hidden="true">→</span>
       </span>
+    </div>
     </div>
   </NuxtLink>
 </template>

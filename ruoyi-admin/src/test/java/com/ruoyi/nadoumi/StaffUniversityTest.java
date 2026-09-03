@@ -17,6 +17,7 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
             {"name":"  Tsinghua University  ","nameCn":"清华大学","country":"cn","type":"PUBLIC",
              "city":"Beijing","province":"Beijing","foundedYear":1911,"totalStudents":50000,
              "introduction":"A leading research university.","status":"ACTIVE","publishStatus":"PUBLISHED",
+             "logoImageUrl":"https://img.example/logo.png","coverImageUrl":"https://img.example/cover.jpg",
              "rankings":[{"source":"QS","rankPosition":20,"rankYear":2026}],
              "highlights":[{"kind":"HIGHLIGHT","text":"C9 League member"},
                            {"kind":"ADVANTAGE","text":"Strong engineering"}],
@@ -40,6 +41,8 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.highlights.length()").value(2))
                 .andExpect(jsonPath("$.gallery.length()").value(2))
                 .andExpect(jsonPath("$.gallery[0].caption").value("Main campus"))
+                .andExpect(jsonPath("$.logoImageUrl").value("https://img.example/logo.png"))
+                .andExpect(jsonPath("$.coverImageUrl").value("https://img.example/cover.jpg"))
                 .andReturn().getResponse().getContentAsString();
         long id = ((Number) JsonPath.read(created, "$.id")).longValue();
 
@@ -115,7 +118,9 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
 
         mvc.perform(get("/api/public/universities/{id}", pubId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.highlights.length()").value(2));
+                .andExpect(jsonPath("$.highlights.length()").value(2))
+                .andExpect(jsonPath("$.logoImageUrl").value("https://img.example/logo.png"))
+                .andExpect(jsonPath("$.coverImageUrl").value("https://img.example/cover.jpg"));
     }
 
     @Test

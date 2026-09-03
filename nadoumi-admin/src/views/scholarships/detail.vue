@@ -41,6 +41,28 @@
         </template>
       </PageHeader>
 
+      <FormSection
+        v-if="s.view.heroImageUrl || s.view.coverImageUrl"
+        :title="t('scholarship.secMedia')"
+      >
+        <div class="imgs">
+          <figure v-if="s.view.heroImageUrl">
+            <img
+              :src="s.view.heroImageUrl"
+              alt=""
+            >
+            <figcaption>{{ t('scholarship.heroImage') }}</figcaption>
+          </figure>
+          <figure v-if="s.view.coverImageUrl">
+            <img
+              :src="s.view.coverImageUrl"
+              alt=""
+            >
+            <figcaption>{{ t('scholarship.coverImage') }}</figcaption>
+          </figure>
+        </div>
+      </FormSection>
+
       <FormSection :title="t('scholarship.secIdentity')">
         <DescriptionList
           :items="[
@@ -379,4 +401,8 @@ onMounted(load)
 .prose { margin: 8px 0 0; white-space: pre-line; line-height: 1.6; color: var(--nad-ink-soft); }
 .list { margin: 4px 0 0; padding-left: 18px; line-height: 1.9; }
 .muted { color: var(--nad-ink-faint); }
+.imgs { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+.imgs figure { margin: 0; }
+.imgs img { width: 280px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--nad-border, #e5e7eb); }
+.imgs figcaption { margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft); }
 </style>
