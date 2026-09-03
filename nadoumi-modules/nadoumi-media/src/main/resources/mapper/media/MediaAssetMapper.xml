@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.media.mapper.MediaAssetMapper">
+
+    <!-- mapUnderscoreToCamelCase is disabled project-wide: every column is mapped explicitly. -->
+    <resultMap id="mediaAsset" type="com.nadoumi.media.domain.MediaAsset">
+        <id     property="id"               column="id"/>
+        <result property="provider"         column="provider"/>
+        <result property="accessClass"      column="access_class"/>
+        <result property="category"         column="category"/>
+        <result property="resourceType"     column="resource_type"/>
+        <result property="deliveryType"     column="delivery_type"/>
+        <result property="publicId"         column="public_id"/>
+        <result property="assetId"          column="asset_id"/>
+        <result property="cloudVersion"     column="cloud_version"/>
+        <result property="secureUrl"        column="secure_url"/>
+        <result property="folder"           column="folder"/>
+        <result property="originalFilename" column="original_filename"/>
+        <result property="contentType"      column="content_type"/>
+        <result property="byteSize"         column="byte_size"/>
+        <result property="width"            column="width"/>
+        <result property="height"           column="height"/>
+        <result property="checksumSha256"   column="checksum_sha256"/>
+        <result property="uploadedBy"       column="uploaded_by"/>
+        <result property="ownerKind"        column="owner_kind"/>
+        <result property="ownerId"          column="owner_id"/>
+        <result property="status"           column="status"/>
+        <result property="supersededBy"     column="superseded_by"/>
+        <result property="createBy"         column="create_by"/>
+        <result property="createTime"       column="create_time"/>
+        <result property="updateBy"         column="update_by"/>
+        <result property="updateTime"       column="update_time"/>
+        <result property="deletedAt"        column="deleted_at"/>
+        <result property="deletedBy"        column="deleted_by"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, provider, access_class, category, resource_type, delivery_type,
+        public_id, asset_id, cloud_version, secure_url, folder, original_filename,
+        content_type, byte_size, width, height, checksum_sha256, uploaded_by,
+        owner_kind, owner_id, status, superseded_by,
+        create_by, create_time, update_by, update_time, deleted_at, deleted_by
+    </sql>
+
+    <select id="findById" resultMap="mediaAsset">
+        select <include refid="cols"/> from nad_media_asset where id = #{id}
+    </select>
+
+    <select id="findByOwner" resultMap="mediaAsset">
+        select <include refid="cols"/> from nad_media_asset
+        where owner_kind = #{kind} and owner_id = #{id}
+        order by id desc
+    </select>
+
+    <select id="findStaleDeleted" resultMap="mediaAsset">
+        select <include refid="cols"/> from nad_media_asset
+        where status = 'DELETED' and deleted_at is not null and deleted_at &lt; #{before}
+        order by deleted_at asc
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.media.domain.MediaAsset"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_media_asset
+            (provider, access_class, category, resource_type, delivery_type,
+             public_id, asset_id, cloud_version, secure_url, folder, original_filename,
+             content_type, byte_size, width, height, checksum_sha256, uploaded_by,
+             owner_kind, owner_id, status, superseded_by, create_by, create_time)
+        values
+            (#{provider}, #{accessClass}, #{category}, #{resourceType}, #{deliveryType},
+             #{publicId}, #{assetId}, #{cloudVersion}, #{secureUrl}, #{folder}, #{originalFilename},
+             #{contentType}, #{byteSize}, #{width}, #{height}, #{checksumSha256}, #{uploadedBy},
+             #{ownerKind}, #{ownerId}, #{status}, #{supersededBy}, #{createBy}, now())
+    </insert>
+
+    <update id="updateStatus">
+        update nad_media_asset
+        <set>
+            status = #{status},
+            update_by = #{by},
+            update_time = now(),
+            <if test="supersededBy != null">superseded_by = #{supersededBy},</if>
+            <if test="'DELETED'.equals(status)">deleted_at = now(), deleted_by = #{by},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+</mapper>
