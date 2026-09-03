@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.media.mapper.MediaAccessLogMapper">
+
+    <!--
+      Append-only audit table: insert is the only statement. No resultMap is
+      declared because nothing in this module reads the log back through MyBatis;
+      reporting reads go through dedicated staff endpoints in a later slice.
+    -->
+    <insert id="insert" parameterType="com.nadoumi.media.domain.MediaAccessLog"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_media_access_log
+            (media_asset_id, document_id, application_id, actor_user_id, actor_applicant_id,
+             access_kind, result, deny_reason, ttl_seconds, ip, user_agent, created_at)
+        values
+            (#{mediaAssetId}, #{documentId}, #{applicationId}, #{actorUserId}, #{actorApplicantId},
+             #{accessKind}, #{result}, #{denyReason}, #{ttlSeconds}, #{ip}, #{userAgent},
+             <choose>
+                 <when test="createdAt != null">#{createdAt}</when>
+                 <otherwise>now()</otherwise>
+             </choose>)
+    </insert>
+
+</mapper>
