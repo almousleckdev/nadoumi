@@ -5,7 +5,16 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-01',
   future: { compatibilityVersion: 4 },
   ssr: true,
-  modules: ['@nuxt/eslint', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxtjs/i18n'],
+  modules: ['@nuxt/eslint', '@nuxtjs/tailwindcss', '@nuxt/fonts', '@nuxtjs/i18n', '@nuxt/image'],
+  // Curated imagery is served straight from Unsplash's own CDN (resize params on
+  // the URL) — no IPX / sharp in the build. `<NuxtImg>` still gives us lazy
+  // loading, responsive `sizes`, aspect-ratio boxes and width/height.
+  image: {
+    provider: 'unsplash',
+    quality: 72,
+    screens: { xs: 360, sm: 640, md: 768, lg: 1024, xl: 1280, xxl: 1536 },
+    unsplash: { baseURL: 'https://images.unsplash.com' },
+  },
   css: ['~/assets/css/main.css'],
   // ui/ primitives are referenced unprefixed (e.g. <NDropdown>, <NSpinner>); keep
   // the directory flat in the component registry rather than the default Ui* prefix.

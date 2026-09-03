@@ -112,4 +112,29 @@ class StaffUniversityTest extends AbstractNadIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.highlights.length()").value(2));
     }
+
+    @Test
+    void the_public_list_filters_by_featured_and_province() throws Exception {
+        createStaff("uni_filter", "nadoumi_super_admin");
+        String token = staffToken("uni_filter");
+
+        mvc.perform(post("/api/staff/universities").header("Authorization", bearer(token))
+                .contentType("application/json").content("""
+                    {"name":"Featured Beijing U","country":"CN","province":"Beijing","type":"PUBLIC",
+                     "status":"ACTIVE","publishStatus":"PUBLISHED","featured":true}""")).andExpect(status().isCreated());
+        mvc.perform(post("/api/staff/universities").header("Authorization", bearer(token))
+                .contentType("application/json").content("""
+                    {"name":"Plain Shanghai U","country":"CN","province":"Shanghai","type":"PUBLIC",
+                     "status":"ACTIVE","publishStatus":"PUBLISHED","featured":false}""")).andExpect(status().isCreated());
+
+        mvc.perform(get("/api/public/universities").param("featured", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Featured Beijing U"));
+
+        mvc.perform(get("/api/public/universities").param("province", "Shanghai"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].name").value("Plain Shanghai U"));
+    }
 }

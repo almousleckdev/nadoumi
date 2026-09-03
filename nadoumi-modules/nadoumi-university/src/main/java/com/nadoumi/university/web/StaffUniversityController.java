@@ -2,6 +2,7 @@ package com.nadoumi.university.web;
 
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.university.domain.enums.UniversityStatus;
+import com.nadoumi.university.domain.enums.UniversityType;
 import com.nadoumi.university.service.UniversityService;
 import com.nadoumi.university.web.request.UniversityRequest;
 import com.nadoumi.university.web.response.UniversityResponse;
@@ -37,10 +38,13 @@ public class StaffUniversityController {
     public PageResponse<UniversityResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String country,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) UniversityType type,
             @RequestParam(required = false) UniversityStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return service.list(q, country, status, page, size);
+        return service.list(q, country, province, city, type, status, page, size);
     }
 
     @GetMapping("/{id}")

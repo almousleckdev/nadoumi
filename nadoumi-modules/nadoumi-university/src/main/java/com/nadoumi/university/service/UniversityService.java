@@ -10,7 +10,9 @@ import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
 import com.nadoumi.university.domain.enums.PublishStatus;
 import com.nadoumi.university.domain.enums.UniversityStatus;
+import com.nadoumi.university.domain.enums.UniversityType;
 import com.nadoumi.university.mapper.UniversityMapper;
+import com.nadoumi.university.mapper.UniversitySearch;
 import com.nadoumi.university.web.request.UniversityRequest;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.nadoumi.university.web.response.UniversityResponse;
@@ -35,10 +37,10 @@ public class UniversityService {
 
     // ---- staff ----
 
-    public PageResponse<UniversityResponse> list(String q, String country, UniversityStatus status,
-            int page, int size) {
+    public PageResponse<UniversityResponse> list(String q, String country, String province, String city,
+            UniversityType type, UniversityStatus status, int page, int size) {
         PageHelper.startPage(page + 1, size);
-        List<University> rows = mapper.search(q, country, status, null);
+        List<University> rows = mapper.search(UniversitySearch.staff(q, country, province, city, type, status));
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(UniversityResponse::of).toList(), page, size, total);
     }
@@ -79,9 +81,11 @@ public class UniversityService {
 
     // ---- public (published + active only) ----
 
-    public PageResponse<PublicUniversityResponse> publicList(String q, String country, int page, int size) {
+    public PageResponse<PublicUniversityResponse> publicList(String q, String country, String province,
+            String city, UniversityType type, Boolean featured, Boolean recommended, int page, int size) {
         PageHelper.startPage(page + 1, size);
-        List<University> rows = mapper.search(q, country, UniversityStatus.ACTIVE, PublishStatus.PUBLISHED);
+        List<University> rows = mapper.search(
+                UniversitySearch.publicCatalog(q, country, province, city, type, featured, recommended));
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(PublicUniversityResponse::of).toList(), page, size, total);
     }

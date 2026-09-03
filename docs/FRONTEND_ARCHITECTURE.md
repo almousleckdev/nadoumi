@@ -168,6 +168,36 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   **all four** locale files (English values in fr/ar/zh until translated — the
   `i18n-keys` parity test requires the identical key set).
 
+**UPDATE 2026-09-03 (public website redesign — R1 / PR-1). See `docs/PUBLIC_WEBSITE_REDESIGN.md`.**
+- **Imagery.** `@nuxt/image` with the `unsplash` provider (no IPX / sharp). Curated
+  set in `app/data/imagery.ts` (verified-resolving ids; alt text kept broad).
+- **New primitives** (`app/components/ui/`): `MediaFigure` (art-directed `<NuxtImg>`
+  + aspect box + overlay), `SectionHeading` (eyebrow / title / description +
+  `#actions`), `Carousel` (scroll-snap, keyboard, `prefers-reduced-motion`, edge
+  state, `defineExpose` scrollPrev/Next), `CarouselArrows`.
+  `app/components/marketing/`: `DiscoverySection` (heading + arrows + skeleton /
+  error / empty / carousel + "View all"), `SectionPlaceholder` (honest
+  "arriving with …" block — never fake cards), `UniversityCard` (shared, monogram
+  tile until per-university cover art exists), `HomeHero`, `StorySplit`,
+  `JourneyTimeline`, `CtaBand`.
+- **Shell.** `layouts/default.vue` is now container-less (each page owns its
+  rhythm). `SiteHeader` sticky + backdrop-blur + refined mobile sheet.
+  `SiteFooter` restructured (brand / Explore / Company / Contact + legal row).
+- **Home** (`index.vue`) rebuilt: `HomeHero` (headline, dual CTA, university
+  search) → **Featured universities** carousel (real: `?featured=true`) →
+  `StorySplit` → Scholarship-discovery `SectionPlaceholder` → `StorySplit` →
+  Programme-discovery `SectionPlaceholder` → **Recommended universities** carousel
+  (real: `?recommended=true`) → Partner-universities `SectionPlaceholder` →
+  `JourneyTimeline` (the 8-step student journey) → `CtaBand` (image bg, Apply now /
+  Contact us). No fake data anywhere; unbuilt sections are visibly labelled.
+- **Backend (no migration):** `/api/public/universities` +
+  `/api/staff/universities` gain `province` / `city` / `type` / `featured` /
+  `recommended` filter params (`UniversitySearch` record).
+- `home.*` i18n replaced wholesale (nested `hero` / `featuredUnis` / `journey` / …);
+  parity kept across all four locales. `useLazyAsyncData` for the Home carousels.
+- **PR-2 (next):** Universities list (filters / sort / paging / `useDiscovery` /
+  `ResultGrid` / `FilterDrawer`) + University detail redesign + About + Contact.
+
 **PLANNED — Revision 2 (plan Parts E/F/G):** *(historical; nav line superseded above)*
 - Navbar: ~~Home, Scholarships, Universities, Programs, Destinations, About,
   Contact~~ + `Sign in` / `Create account`, → account menu when authed.

@@ -1,6 +1,7 @@
 package com.nadoumi.university.web;
 
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.university.domain.enums.UniversityType;
 import com.nadoumi.university.service.UniversityService;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.ruoyi.common.annotation.Anonymous;
@@ -30,9 +31,14 @@ public class PublicUniversityController {
     public PageResponse<PublicUniversityResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String country,
+            @RequestParam(required = false) String province,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) UniversityType type,
+            @RequestParam(required = false) Boolean featured,
+            @RequestParam(required = false) Boolean recommended,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        return service.publicList(q, country, page, size);
+        return service.publicList(q, country, province, city, type, featured, recommended, page, size);
     }
 
     @Anonymous

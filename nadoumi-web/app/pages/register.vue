@@ -77,7 +77,7 @@ async function submit() {
   }
 }
 
-useSeo(t('auth.registerTitle'), t('home.subtitle'))
+useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
 </script>
 
 <template>

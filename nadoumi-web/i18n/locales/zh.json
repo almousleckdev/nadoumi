@@ -8,7 +8,8 @@
     "signIn": "Sign in",
     "getStarted": "Create profile",
     "createAccount": "Create account",
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "aria": "Primary navigation"
   },
   "footer": {
     "mission": "Nadoumi helps international students discover and secure study opportunities abroad.",
@@ -18,7 +19,9 @@
     "privacy": "Privacy",
     "terms": "Terms",
     "contactEmail": "support{'@'}nadoumi.com",
-    "rights": "Nadoumi. International education platform."
+    "rights": "Nadoumi. International education platform.",
+    "contactTitle": "Contact",
+    "contactForm": "Send a message"
   },
   "common": {
     "loading": "Loading",
@@ -37,32 +40,86 @@
     "nothingYet": "Nothing here yet."
   },
   "home": {
-    "title": "Study abroad with Nadoumi",
-    "subtitle": "Discover universities, programmes and scholarships, then apply and track everything in one place.",
-    "ctaPrimary": "Create your profile",
-    "ctaSecondary": "Browse scholarships",
-    "f1Title": "Discover",
-    "f1Body": "Search scholarships and programmes by country, field and degree level.",
-    "f2Title": "Apply",
-    "f2Body": "Build one applicant profile and reuse it across every application.",
-    "f3Title": "Track",
-    "f3Body": "Follow each application's status, documents and decisions in your dashboard.",
-    "statsIntro": "Built for students heading to China, Malaysia and beyond.",
-    "ctaBandTitle": "Ready to start?",
-    "ctaBandBody": "Create a free profile and explore your options.",
-    "valuesTitle": "Why Nadoumi",
-    "howTitle": "How it works",
-    "how1t": "Create your profile",
-    "how1b": "Add your details, education and documents once. Nadoumi reuses them for every application.",
-    "how2t": "Discover opportunities",
-    "how2b": "Browse universities and scholarships, and see the programmes each institution offers.",
-    "how3t": "Apply",
-    "how3b": "Start an application for yourself or a student you represent; Nadoumi pre-fills what it already knows.",
-    "how4t": "Track decisions",
-    "how4b": "Follow each application’s stage, requested documents and outcomes from your dashboard.",
-    "featuredTitle": "Featured universities",
-    "featuredEmpty": "Published universities will appear here as the catalogue grows.",
-    "seeAll": "See all"
+    "hero": {
+      "eyebrow": "International education platform",
+      "title": "Study abroad with a team that manages the whole journey",
+      "subtitle": "Discover universities and scholarships, build one applicant profile, and apply and track every step with Nadoumi.",
+      "ctaScholarships": "Explore scholarships",
+      "ctaUniversities": "Explore universities",
+      "searchLabel": "Search universities",
+      "searchPlaceholder": "Search a university by name or city",
+      "searchNote": "Searches the university catalogue. Scholarship search arrives with the Scholarship module."
+    },
+    "featuredUnis": {
+      "eyebrow": "Universities",
+      "title": "Featured universities",
+      "description": "Institutions Nadoumi is highlighting right now.",
+      "empty": "No featured universities are published yet."
+    },
+    "recommendedUnis": {
+      "eyebrow": "Recommended by Nadoumi",
+      "title": "Recommended universities",
+      "description": "Where our advisers see strong outcomes for international students.",
+      "empty": "No recommended universities are published yet."
+    },
+    "story1": {
+      "eyebrow": "Discover",
+      "title": "Study where the world comes together",
+      "body": "Nadoumi works with universities across China, Malaysia and beyond. Browse each institution’s profile, campus, rankings and the programmes it offers before you commit."
+    },
+    "story2": {
+      "eyebrow": "One profile, every application",
+      "title": "Built around your profile",
+      "body": "Add your details, education history and documents once. Nadoumi reuses them for every application, and each submission is kept as a historical record — later profile edits never rewrite it."
+    },
+    "scholarshipDiscovery": {
+      "eyebrow": "Scholarships",
+      "title": "New and featured scholarships",
+      "description": "Search and filter scholarships by level, category, teaching language, intake, funding and more."
+    },
+    "programDiscovery": {
+      "eyebrow": "Programmes",
+      "title": "Hot programmes and language courses",
+      "description": "Degree and language programmes, discovered through the university that offers them."
+    },
+    "partners": {
+      "eyebrow": "Partnerships",
+      "title": "Partner universities",
+      "description": "Institutions Nadoumi holds a direct working relationship with."
+    },
+    "arriving": {
+      "scholarships": "the Scholarship catalogue",
+      "programs": "the Programme catalogue",
+      "partnerships": "the Partnership module"
+    },
+    "journey": {
+      "eyebrow": "How it works",
+      "title": "Your journey with Nadoumi",
+      "description": "From your first application fee to your admission documents — here is what to expect.",
+      "s1t": "Pay the application fee",
+      "s1b": "Start your application and settle the application fee to begin processing.",
+      "s2t": "Primary review",
+      "s2b": "Nadoumi checks your profile and documents against the opportunity’s requirements.",
+      "s3t": "University assignment",
+      "s3b": "Your case is matched and submitted to the university.",
+      "s4t": "Admission issued",
+      "s4b": "The university confirms your place and issues your admission letter.",
+      "s5t": "Pay the project fee",
+      "s5b": "Settle the remaining project and service fees to move to enrolment.",
+      "s6t": "JW202 issued",
+      "s6b": "Your visa documentation (JW202 / JW201) is prepared and released.",
+      "s7t": "Documents delivered",
+      "s7b": "Your admission and visa documents are couriered to you.",
+      "s8t": "Application successful",
+      "s8b": "You’re ready to travel and enrol. Nadoumi stays available through arrival."
+    },
+    "cta": {
+      "eyebrow": "Ready when you are",
+      "title": "Start your international education with Nadoumi",
+      "body": "Create a free profile, explore your options, and apply with a team that runs the whole process.",
+      "apply": "Apply now",
+      "contact": "Contact us"
+    }
   },
   "about": {
     "title": "About Nadoumi",
@@ -111,7 +168,11 @@
     "rollingDeadline": "Rolling deadline",
     "deadline": "Deadline {date}",
     "backToList": "Back to list",
-    "featured": "Featured"
+    "featured": "Featured",
+    "typePublic": "Public",
+    "typePrivate": "Private",
+    "viewUniversity": "View university",
+    "viewAllUniversities": "View all universities"
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -276,7 +337,8 @@
     "otpEmailMismatch": "The verification doesn't match this email address.",
     "captcha": "The captcha answer was incorrect. Please try again.",
     "registrationDisabled": "Registration is currently closed.",
-    "invalidEmail": "Enter a valid email address."
+    "invalidEmail": "Enter a valid email address.",
+    "loadSection": "This section could not be loaded. Please refresh."
   },
   "legal": {
     "draftNote": "Draft — placeholder text pending legal review.",
