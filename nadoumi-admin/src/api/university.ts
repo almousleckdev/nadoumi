@@ -20,6 +20,12 @@ export interface UniversityHighlight {
   text: string
 }
 
+export interface UniversityGalleryImage {
+  id?: number
+  imageUrl: string
+  caption: string | null
+}
+
 export interface University {
   id: number
   name: string
@@ -52,6 +58,7 @@ export interface University {
   updatedAt: string | null
   rankings: UniversityRanking[]
   highlights: UniversityHighlight[]
+  gallery: UniversityGalleryImage[]
 }
 
 export interface UniversityInput {
@@ -81,6 +88,7 @@ export interface UniversityInput {
   remark?: string | null
   rankings: UniversityRanking[]
   highlights: UniversityHighlight[]
+  gallery: UniversityGalleryImage[]
 }
 
 const BASE = '/api/staff/universities'

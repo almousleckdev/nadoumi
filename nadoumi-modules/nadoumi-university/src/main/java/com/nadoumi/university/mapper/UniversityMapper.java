@@ -1,6 +1,7 @@
 package com.nadoumi.university.mapper;
 
 import com.nadoumi.university.domain.University;
+import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
 import java.util.List;
@@ -38,4 +39,11 @@ public interface UniversityMapper {
     int deleteHighlights(@Param("universityId") Long universityId);
 
     int insertHighlight(UniversityHighlight highlight);
+
+    List<UniversityGalleryImage> findGallery(@Param("universityId") Long universityId);
+
+    int deleteGallery(@Param("universityId") Long universityId);
+
+    int insertGalleryImage(@Param("universityId") Long universityId,
+            @Param("img") UniversityGalleryImage image, @Param("sortOrder") int sortOrder);
 }

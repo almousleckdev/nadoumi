@@ -117,24 +117,27 @@ access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a
 
 **Staff** — `/api/staff/universities`, `StaffUniversityController`. Public catalog
 data only; no partnership / commercial field is ever returned here. The request
-body carries the full profile (§5.3 `nad_university` columns) plus two edited-whole
-child lists: `rankings[]` (`source`, `rankPosition`, `rankYear?`, `note?`) and
-`highlights[]` (`kind` = HIGHLIGHT|ADVANTAGE, `text`). A save replaces both child
-sets inside the scalar-update transaction. `recommended` / `featured` are optional
-booleans (default `false`). `UniversityResponse` additionally returns `status`,
+body carries the full profile (§5.3 `nad_university` columns) plus three edited-whole
+child lists: `rankings[]` (`source`, `rankPosition`, `rankYear?`, `note?`),
+`highlights[]` (`kind` = HIGHLIGHT|ADVANTAGE, `text`) and `gallery[]` (`imageUrl`,
+`caption?` — campus life / dormitory / campus view, **≤ 6**, `@Size(max=6)` on the
+request, order preserved). A save replaces all three child sets inside the
+scalar-update transaction. `recommended` / `featured` are optional booleans
+(default `false`). `UniversityResponse` additionally returns `status`,
 `publishStatus`, `remark`, audit timestamps.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
 | GET | `/api/staff/universities` | `nad:university:list` | `q` (name EN/CN, city), `country`, `province`, `city`, `type`, `status`, `page`, `size` → `PageResponse<UniversityResponse>`. |
-| GET | `/api/staff/universities/{id}` | `nad:university:view` | assembles `rankings` + `highlights`. |
+| GET | `/api/staff/universities/{id}` | `nad:university:view` | assembles `rankings` + `highlights` + `gallery`. |
 | POST | `/api/staff/universities` | `nad:university:create` | `201`. Country normalised to upper-case; `(name, country)` must be unique → `400` otherwise. |
 | PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self); replaces children. |
 | DELETE | `/api/staff/universities/{id}` | `nad:university:remove` | `204`. Hard delete — only while nothing references the row (FKs from programmes / partnerships will block it once those exist). Children go with `ON DELETE CASCADE`. |
 
 **Public** — `/api/public/universities`, `PublicUniversityController`, `@Anonymous`.
-Serves `PublicUniversityResponse` (no `status` / `publishStatus` / `remark` / audit)
-and **only** rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
+Serves `PublicUniversityResponse` (no `status` / `publishStatus` / `remark` / audit;
+the detail body carries `rankings[]`, `highlights[]` and `gallery[]`) and **only**
+rows with `publish_status='PUBLISHED' AND status='ACTIVE'`.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |

@@ -240,6 +240,52 @@
         </el-button>
       </FormSection>
 
+      <FormSection
+        :title="t('university.secGallery')"
+        :description="t('university.galleryHint')"
+      >
+        <div
+          v-for="(g, i) in form.gallery"
+          :key="i"
+          class="repeat"
+        >
+          <img
+            v-if="g.imageUrl"
+            :src="g.imageUrl"
+            class="gal-thumb"
+            alt=""
+          >
+          <el-input
+            v-model="g.imageUrl"
+            placeholder="https://…/campus.jpg"
+          />
+          <el-input
+            v-model="g.caption"
+            :placeholder="t('university.galleryCaption')"
+            style="width: 180px"
+          />
+          <el-button
+            :icon="Delete"
+            text
+            @click="form.gallery.splice(i, 1)"
+          />
+        </div>
+        <el-button
+          v-if="form.gallery.length < 6"
+          size="small"
+          :icon="Plus"
+          @click="form.gallery.push({ imageUrl: '', caption: '' })"
+        >
+          {{ t('university.addGalleryImage') }}
+        </el-button>
+        <p
+          v-else
+          class="gal-max"
+        >
+          {{ t('university.galleryMax') }}
+        </p>
+      </FormSection>
+
       <FormSection :title="t('university.secPublication')">
         <div class="row2">
           <el-form-item
@@ -346,6 +392,7 @@ function blankForm() {
     remark: '',
     highlights: [] as University['highlights'],
     rankings: [] as University['rankings'],
+    gallery: [] as { imageUrl: string, caption: string | null }[],
   }
 }
 const form = reactive(blankForm())
@@ -377,6 +424,7 @@ watch(() => props.modelValue, (open) => {
     status: u.status, publishStatus: u.publishStatus, remark: u.remark ?? '',
     highlights: u.highlights.map(h => ({ ...h })),
     rankings: u.rankings.map(r => ({ ...r })),
+    gallery: (u.gallery ?? []).map(g => ({ imageUrl: g.imageUrl, caption: g.caption })),
   })
 }, { immediate: true })
 
@@ -419,6 +467,10 @@ function payload(): UniversityInput {
     rankings: form.rankings
       .filter(r => r.source.trim() && r.rankPosition)
       .map(r => ({ source: r.source.trim(), rankPosition: Number(r.rankPosition), rankYear: orNum(r.rankYear), note: orNull(r.note ?? '') })),
+    gallery: form.gallery
+      .filter(g => g.imageUrl.trim())
+      .slice(0, 6)
+      .map(g => ({ imageUrl: g.imageUrl.trim(), caption: orNull(g.caption ?? '') })),
   }
 }
 

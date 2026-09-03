@@ -1,6 +1,7 @@
 package com.nadoumi.university.web.response;
 
 import com.nadoumi.university.domain.University;
+import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
 import java.util.List;
@@ -37,7 +38,14 @@ public record UniversityResponse(
         String createdAt,
         String updatedAt,
         List<Ranking> rankings,
-        List<Highlight> highlights) {
+        List<Highlight> highlights,
+        List<GalleryImage> gallery) {
+
+    public record GalleryImage(Long id, String imageUrl, String caption) {
+        static GalleryImage of(UniversityGalleryImage g) {
+            return new GalleryImage(g.id(), g.imageUrl(), g.caption());
+        }
+    }
 
     public record Ranking(Long id, String source, Integer rankPosition, Short rankYear, String note) {
         static Ranking of(UniversityRanking r) {
@@ -68,7 +76,8 @@ public record UniversityResponse(
                 u.getPublishStatus() == null ? null : u.getPublishStatus().name(),
                 u.getRemark(), str(u.getCreateTime()), str(u.getUpdateTime()),
                 u.getRankings().stream().map(Ranking::of).toList(),
-                u.getHighlights().stream().map(Highlight::of).toList());
+                u.getHighlights().stream().map(Highlight::of).toList(),
+                u.getGallery().stream().map(GalleryImage::of).toList());
     }
 
     private static String str(Object v) {

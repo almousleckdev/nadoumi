@@ -40,7 +40,8 @@ public record UniversityRequest(
         @NotNull PublishStatus publishStatus,
         @Size(max = 500) String remark,
         @Valid List<RankingInput> rankings,
-        @Valid List<HighlightInput> highlights) {
+        @Valid List<HighlightInput> highlights,
+        @Valid @Size(max = 6, message = "at most 6 gallery images") List<GalleryInput> gallery) {
 
     public record RankingInput(
             @NotBlank @Size(max = 40) String source,
@@ -52,5 +53,10 @@ public record UniversityRequest(
     public record HighlightInput(
             @NotNull HighlightKind kind,
             @NotBlank @Size(max = 400) String text) {
+    }
+
+    public record GalleryInput(
+            @NotBlank @Size(max = 500) String imageUrl,
+            @Size(max = 200) String caption) {
     }
 }

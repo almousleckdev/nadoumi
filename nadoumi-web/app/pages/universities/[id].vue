@@ -129,13 +129,19 @@ const prose = computed(() => {
             </div>
           </section>
 
-          <section>
+          <section v-if="u.gallery.length">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.gallery') }}</h2>
-            <div class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
-              <p class="flex items-center gap-2 text-sm font-medium text-slate-500">
-                <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
-                {{ t('university.galleryArriving') }}
-              </p>
+            <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <figure v-for="g in u.gallery" :key="g.id" class="overflow-hidden rounded-xl bg-slate-100">
+                <img
+                  :src="g.imageUrl"
+                  :alt="g.caption ?? ''"
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-[4/3] w-full object-cover"
+                >
+                <figcaption v-if="g.caption" class="px-2 py-1.5 text-xs text-slate-500">{{ g.caption }}</figcaption>
+              </figure>
             </div>
           </section>
         </div>

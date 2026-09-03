@@ -33,7 +33,8 @@ public record PublicUniversityResponse(
         boolean recommended,
         boolean featured,
         List<UniversityResponse.Ranking> rankings,
-        List<UniversityResponse.Highlight> highlights) {
+        List<UniversityResponse.Highlight> highlights,
+        List<UniversityResponse.GalleryImage> gallery) {
 
     public static PublicUniversityResponse of(University u) {
         UniversityResponse full = UniversityResponse.of(u);
@@ -47,6 +48,6 @@ public record PublicUniversityResponse(
                 full.admissionsEmail(), full.officePhone(),
                 full.logoDocumentId(), full.bannerDocumentId(),
                 full.recommended(), full.featured(),
-                full.rankings(), full.highlights());
+                full.rankings(), full.highlights(), full.gallery());
     }
 }

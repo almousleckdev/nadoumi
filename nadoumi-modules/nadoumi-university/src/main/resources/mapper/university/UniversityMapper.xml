@@ -160,4 +160,18 @@
         values (#{universityId}, #{kind}, #{sortOrder}, #{text})
     </insert>
 
+    <select id="findGallery" resultType="com.nadoumi.university.domain.UniversityGalleryImage">
+        select id, image_url as imageUrl, caption
+        from nad_university_gallery where university_id = #{universityId} order by sort_order, id
+    </select>
+
+    <delete id="deleteGallery">
+        delete from nad_university_gallery where university_id = #{universityId}
+    </delete>
+
+    <insert id="insertGalleryImage">
+        insert into nad_university_gallery (university_id, image_url, caption, sort_order)
+        values (#{universityId}, #{img.imageUrl}, #{img.caption}, #{sortOrder})
+    </insert>
+
 </mapper>

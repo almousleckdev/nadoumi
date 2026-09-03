@@ -35,7 +35,7 @@ class UniversityServiceTest {
                 "intro", "history", "campus", "accommodation", "nearby",
                 "adm@x.edu", "+86 10 0000", true, false,
                 UniversityStatus.ACTIVE, PublishStatus.DRAFT, "note",
-                rankings, highlights);
+                rankings, highlights, List.of());
     }
 
     private static UniversityRequest req(String name, String country) {
@@ -100,6 +100,7 @@ class UniversityServiceTest {
         when(mapper.findById(3L)).thenReturn(draft);
         when(mapper.findRankings(anyLong())).thenReturn(List.of());
         when(mapper.findHighlights(anyLong())).thenReturn(List.of());
+        when(mapper.findGallery(anyLong())).thenReturn(List.of());
 
         assertThatThrownBy(() -> service.publicGet(3L)).isInstanceOf(NadNotFoundException.class);
 

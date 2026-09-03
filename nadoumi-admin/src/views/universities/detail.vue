@@ -153,6 +153,30 @@
         </el-table>
       </div>
 
+      <div
+        v-if="u.gallery.length"
+        class="nad-card sec"
+      >
+        <h3 class="sec__title">
+          {{ t('university.secGallery') }}
+        </h3>
+        <div class="gal">
+          <figure
+            v-for="g in u.gallery"
+            :key="g.id"
+            class="gal__item"
+          >
+            <img
+              :src="g.imageUrl"
+              :alt="g.caption ?? ''"
+            >
+            <figcaption v-if="g.caption">
+              {{ g.caption }}
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
       <UniversityDrawer
         v-model="drawerOpen"
         :university="u"
@@ -250,6 +274,12 @@ async function load() {
 onMounted(load)
 </script>
 
+<style scoped>
+.gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.gal__item { margin: 0; }
+.gal__item img { width: 100%; height: 120px; object-fit: cover; border-radius: 8px; }
+.gal__item figcaption { margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft); }
+</style>
 <style scoped>
 .back {
   display: inline-flex;

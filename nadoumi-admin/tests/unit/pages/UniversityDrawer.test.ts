@@ -22,6 +22,7 @@ const existing: University = {
   remark: null, createdAt: null, updatedAt: null,
   rankings: [{ id: 1, source: 'QS', rankPosition: 34, rankYear: 2026, note: null }],
   highlights: [{ id: 1, kind: 'HIGHLIGHT', text: 'C9 League member' }],
+  gallery: [{ id: 1, imageUrl: 'https://img.example/campus.jpg', caption: 'Main campus' }],
 }
 
 function mountDrawer(university: University | null) {

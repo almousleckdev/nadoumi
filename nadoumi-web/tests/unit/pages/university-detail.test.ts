@@ -32,6 +32,10 @@ const fudan: UDto = {
     { id: 1, kind: 'HIGHLIGHT', text: 'C9 League member' },
     { id: 2, kind: 'ADVANTAGE', text: 'Strong medical school' },
   ],
+  gallery: [
+    { id: 1, imageUrl: 'https://img.example/campus.jpg', caption: 'Main campus' },
+    { id: 2, imageUrl: 'https://img.example/dorm.jpg', caption: 'Dormitory' },
+  ],
 }
 
 const publicGet = vi.fn((path: string) =>
@@ -58,6 +62,9 @@ describe('public university detail page', () => {
     expect(text).toContain('#34')
     // programmes belong on the university page (Step 3 fills the list)
     expect(text).toContain('Programmes')
+    // gallery renders campus/dormitory imagery with captions
+    expect(text).toContain('Main campus')
+    expect(text).toContain('Dormitory')
   })
 
   it('shows a not-available message when the university is missing', async () => {
