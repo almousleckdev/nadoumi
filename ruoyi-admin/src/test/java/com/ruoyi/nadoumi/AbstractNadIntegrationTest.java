@@ -3,6 +3,7 @@ package com.ruoyi.nadoumi;
 import com.jayway.jsonpath.JsonPath;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.nadoumi.support.MediaTestConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
 import javax.sql.DataSource;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles({ "druid", "test" })
 @Testcontainers(disabledWithoutDocker = true)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Import(MediaTestConfig.class)
 public abstract class AbstractNadIntegrationTest {
 
     protected static final String PASSWORD = "nad-test-pass-1";
@@ -88,6 +91,15 @@ public abstract class AbstractNadIntegrationTest {
         jdbc = new JdbcTemplate(dataSource);
         jdbc.update("update sys_config set config_value = 'false' where config_key = 'sys.account.captchaEnabled'");
         configService.resetConfigCache(); // pull the captcha flag change through the Redis cache
+        // Media: null the *_media_id FKs (ON DELETE SET NULL, so ordering is lenient)
+        // then clear the media tables for clean per-test state.
+        jdbc.update("delete from nad_media_access_log");
+        jdbc.update("update nad_university set logo_media_id = null, banner_media_id = null");
+        jdbc.update("update nad_university_gallery set media_id = null");
+        jdbc.update("update nad_scholarship set hero_media_id = null, cover_media_id = null");
+        jdbc.update("update nad_program set image_media_id = null");
+        jdbc.update("update nad_applicant set photo_media_id = null");
+        jdbc.update("delete from nad_media_asset");
         jdbc.update("delete from nad_user_applicant_access");
         jdbc.update("delete from nad_applicant_education");
         jdbc.update("delete from nad_applicant_test_score");
