@@ -94,6 +94,7 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_applicant_contact");
         jdbc.update("delete from nad_applicant");
         jdbc.update("delete from nad_scholarship"); // cascades levels/categories/intakes/fees/stipend/docs/internal
+        jdbc.update("delete from nad_program"); // cascades majors/intakes; FK RESTRICT to nad_university
         jdbc.update("delete from nad_university");
         jdbc.update("delete from nad_contact_inquiry");
         jdbc.update("delete from sys_user_role where user_id > 3");

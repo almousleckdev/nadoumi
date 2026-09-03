@@ -24,6 +24,7 @@
         <module>nadoumi-applicant</module>
         <module>nadoumi-university</module>
         <module>nadoumi-scholarship</module>
+        <module>nadoumi-program</module>
     </modules>
 
 </project>

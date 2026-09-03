@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(15);
+        assertThat(applied).isEqualTo(17);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -129,6 +129,13 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:scholarship:%'")).isEqualTo("9");
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
                 + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:scholarship:%'")).isEqualTo("9");
+        // V19 — programme catalog; V20 — its menu/permission seed
+        assertThat(tableExists(ds, "nad_program")).isTrue();
+        assertThat(tableExists(ds, "nad_program_major")).isTrue();
+        assertThat(tableExists(ds, "nad_program_intake")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:program:%'")).isEqualTo("5");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:program:%'")).isEqualTo("5");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -158,7 +165,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(14); // V2..V18
+        assertThat(applied).isEqualTo(16); // V2..V20
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.program.mapper.ProgramMapper">
+
+    <resultMap id="program" type="com.nadoumi.program.domain.Program">
+        <id     property="id"               column="id"/>
+        <result property="universityId"     column="university_id"/>
+        <result property="name"             column="name"/>
+        <result property="nameCn"           column="name_cn"/>
+        <result property="programType"      column="program_type"/>
+        <result property="field"            column="field"/>
+        <result property="teachingLanguage" column="teaching_language"/>
+        <result property="durationMonths"   column="duration_months"/>
+        <result property="tuitionAmount"    column="tuition_amount"/>
+        <result property="tuitionCurrency"  column="tuition_currency"/>
+        <result property="summary"          column="summary"/>
+        <result property="featured"         column="is_featured"/>
+        <result property="hot"              column="is_hot"/>
+        <result property="publishStatus"    column="publish_status"/>
+        <result property="status"           column="status"/>
+        <result property="createBy"         column="create_by"/>
+        <result property="createTime"       column="create_time"/>
+        <result property="updateBy"         column="update_by"/>
+        <result property="updateTime"       column="update_time"/>
+        <result property="remark"           column="remark"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, university_id, name, name_cn, program_type, field, teaching_language,
+        duration_months, tuition_amount, tuition_currency, summary,
+        is_featured, is_hot, publish_status, status,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="findById" resultMap="program">
+        select <include refid="cols"/> from nad_program where id = #{id}
+    </select>
+
+    <select id="search" resultMap="program">
+        select <include refid="cols"/> from nad_program
+        <where>
+            <if test="q != null and q != ''">
+                and (name like concat('%', #{q}, '%')
+                     or name_cn like concat('%', #{q}, '%')
+                     or field like concat('%', #{q}, '%'))
+            </if>
+            <if test="universityId != null">and university_id = #{universityId}</if>
+            <if test="type != null">and program_type = #{type}</if>
+            <if test="language != null">and teaching_language = #{language}</if>
+            <if test="field != null and field != ''">and field = #{field}</if>
+            <if test="featured != null">and is_featured = #{featured}</if>
+            <if test="hot != null">and is_hot = #{hot}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="publishStatus != null">and publish_status = #{publishStatus}</if>
+        </where>
+        order by is_featured desc, is_hot desc, name asc, id asc
+    </select>
+
+    <select id="findIdByUniversityAndName" resultType="java.lang.Long">
+        select id from nad_program where university_id = #{universityId} and name = #{name} limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.program.domain.Program"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_program
+            (university_id, name, name_cn, program_type, field, teaching_language,
+             duration_months, tuition_amount, tuition_currency, summary,
+             is_featured, is_hot, publish_status, status, create_by, create_time, remark)
+        values
+            (#{universityId}, #{name}, #{nameCn}, #{programType}, #{field}, #{teachingLanguage},
+             #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary},
+             #{featured}, #{hot}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.program.domain.Program">
+        update nad_program set
+            university_id = #{universityId}, name = #{name}, name_cn = #{nameCn},
+            program_type = #{programType}, field = #{field}, teaching_language = #{teachingLanguage},
+            duration_months = #{durationMonths}, tuition_amount = #{tuitionAmount},
+            tuition_currency = #{tuitionCurrency}, summary = #{summary},
+            is_featured = #{featured}, is_hot = #{hot},
+            publish_status = #{publishStatus}, status = #{status},
+            update_by = #{updateBy}, update_time = now(), remark = #{remark}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from nad_program where id = #{id}
+    </delete>
+
+    <!-- child selects and writes -->
+
+    <resultMap id="major" type="com.nadoumi.program.domain.ProgramMajor">
+        <id     property="id"        column="id"/>
+        <result property="programId" column="program_id"/>
+        <result property="name"      column="name"/>
+        <result property="nameCn"    column="name_cn"/>
+        <result property="sortOrder" column="sort_order"/>
+    </resultMap>
+
+    <select id="findMajors" resultMap="major">
+        select id, program_id, name, name_cn, sort_order
+        from nad_program_major where program_id = #{programId}
+        order by sort_order asc, id asc
+    </select>
+
+    <delete id="deleteMajors">
+        delete from nad_program_major where program_id = #{programId}
+    </delete>
+
+    <insert id="insertMajor" parameterType="com.nadoumi.program.domain.ProgramMajor"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_program_major (program_id, name, name_cn, sort_order)
+        values (#{programId}, #{name}, #{nameCn}, #{sortOrder})
+    </insert>
+
+    <resultMap id="intake" type="com.nadoumi.program.domain.ProgramIntake">
+        <id     property="id"               column="id"/>
+        <result property="programId"        column="program_id"/>
+        <result property="term"             column="term"/>
+        <result property="applicationOpen"  column="application_open"/>
+        <result property="applicationClose" column="application_close"/>
+        <result property="sortOrder"        column="sort_order"/>
+    </resultMap>
+
+    <select id="findIntakes" resultMap="intake">
+        select id, program_id, term, application_open, application_close, sort_order
+        from nad_program_intake where program_id = #{programId}
+        order by sort_order asc, id asc
+    </select>
+
+    <delete id="deleteIntakes">
+        delete from nad_program_intake where program_id = #{programId}
+    </delete>
+
+    <insert id="insertIntake" parameterType="com.nadoumi.program.domain.ProgramIntake"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_program_intake (program_id, term, application_open, application_close, sort_order)
+        values (#{programId}, #{term}, #{applicationOpen}, #{applicationClose}, #{sortOrder})
+    </insert>
+
+</mapper>
