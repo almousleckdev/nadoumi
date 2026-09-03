@@ -23,8 +23,8 @@ class ContactServiceTest {
             mapper, mail, new MailTemplates(), "support@nadoumi.test");
 
     private static ContactRequest req(String website) {
-        return new ContactRequest("  Dana Ali  ", "dana@example.com", "  Programmes  ",
-                "  Do you support September intake?  ", "en", website);
+        return new ContactRequest("  Dana  ", "  Ali  ", "dana@example.com", " +212600000000 ",
+                "PROGRAMMES", "  Programmes  ", "  Do you support September intake?  ", "en", website);
     }
 
     @Test
@@ -36,6 +36,10 @@ class ContactServiceTest {
         ArgumentCaptor<ContactInquiry> saved = ArgumentCaptor.forClass(ContactInquiry.class);
         verify(mapper).insert(saved.capture());
         assertThat(saved.getValue().getName()).isEqualTo("Dana Ali");
+        assertThat(saved.getValue().getFirstName()).isEqualTo("Dana");
+        assertThat(saved.getValue().getLastName()).isEqualTo("Ali");
+        assertThat(saved.getValue().getPhone()).isEqualTo("+212600000000");
+        assertThat(saved.getValue().getCategory()).isEqualTo("PROGRAMMES");
         assertThat(saved.getValue().getSubject()).isEqualTo("Programmes");
         assertThat(saved.getValue().getMessage()).isEqualTo("Do you support September intake?");
         assertThat(saved.getValue().getIpAddress()).isEqualTo("203.0.113.7");

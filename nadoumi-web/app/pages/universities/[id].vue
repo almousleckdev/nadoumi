@@ -2,6 +2,8 @@
 import type { UniversityDetail, UniversityHighlight } from '~/types/catalog'
 
 const route = useRoute()
+const { t } = useI18n()
+const localePath = useLocalePath()
 const id = computed(() => String(route.params.id))
 
 const { publicGet } = useApi()
@@ -12,16 +14,18 @@ const { data: u } = await useAsyncData(
 )
 
 useSeo(
-  u.value?.name ?? 'University',
-  u.value?.introduction?.slice(0, 155) ?? 'University profile and the programmes it offers.',
+  u.value?.name ?? t('catalog.universityFallbackTitle'),
+  u.value?.introduction?.slice(0, 155) ?? t('catalog.universitiesSubtitle'),
 )
 
-function place(x: UniversityDetail): string {
-  return [x.city, x.province, x.country].filter(Boolean).join(', ')
-}
-function typeLabel(t: UniversityDetail['type']): string {
-  return t === 'PUBLIC' ? 'Public' : t === 'PRIVATE' ? 'Private' : ''
-}
+const monogram = computed(() => u.value?.name.trim().charAt(0).toUpperCase() ?? 'N')
+const place = computed(() => {
+  const x = u.value
+  return x ? [x.city, x.province, x.country].filter(Boolean).join(', ') : ''
+})
+const typeLabel = computed(() =>
+  u.value?.type === 'PUBLIC' ? t('catalog.typePublic') : u.value?.type === 'PRIVATE' ? t('catalog.typePrivate') : '',
+)
 function num(n?: number | null): string {
   return n == null ? '' : n.toLocaleString('en')
 }
@@ -33,11 +37,11 @@ const facts = computed(() => {
   const x = u.value
   if (!x) return [] as { label: string, value: string }[]
   return [
-    { label: 'Founded', value: x.foundedYear ? String(x.foundedYear) : '' },
-    { label: 'Students', value: num(x.totalStudents) },
-    { label: 'International students', value: num(x.internationalStudents) },
-    { label: 'Faculty', value: num(x.facultyCount) },
-    { label: 'Ranking tier', value: x.rankingTier ?? '' },
+    { label: t('university.founded'), value: x.foundedYear ? String(x.foundedYear) : '' },
+    { label: t('university.students'), value: num(x.totalStudents) },
+    { label: t('university.intlStudents'), value: num(x.internationalStudents) },
+    { label: t('university.faculty'), value: num(x.facultyCount) },
+    { label: t('university.rankingTier'), value: x.rankingTier ?? '' },
   ].filter(f => f.value)
 })
 
@@ -45,109 +49,134 @@ const prose = computed(() => {
   const x = u.value
   if (!x) return [] as { heading: string, body: string }[]
   return [
-    { heading: 'Introduction', body: x.introduction ?? '' },
-    { heading: 'History', body: x.history ?? '' },
-    { heading: 'Campus', body: x.campusInfo ?? '' },
-    { heading: 'Accommodation', body: x.accommodationInfo ?? '' },
-    { heading: 'Nearby', body: x.nearbyInfo ?? '' },
+    { heading: t('university.introduction'), body: x.introduction ?? '' },
+    { heading: t('university.history'), body: x.history ?? '' },
+    { heading: t('university.campus'), body: x.campusInfo ?? '' },
+    { heading: t('university.accommodation'), body: x.accommodationInfo ?? '' },
+    { heading: t('university.nearby'), body: x.nearbyInfo ?? '' },
   ].filter(p => p.body)
 })
 </script>
 
 <template>
-  <div>
-    <template v-if="u">
-      <PageHero :title="u.name">
-        <template #default>
-          <p v-if="u.nameCn" class="text-slate-500">{{ u.nameCn }}</p>
-          <p class="mt-1 text-slate-600">
-            <span v-if="typeLabel(u.type)">{{ typeLabel(u.type) }} · </span>{{ place(u) }}
-          </p>
-        </template>
-      </PageHero>
-
+  <div v-if="u">
+    <!-- hero header -->
+    <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+      <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900 to-brand-900/60" aria-hidden="true" />
       <NContainer>
-        <div class="space-y-10 py-6">
-          <dl v-if="facts.length" class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            <div v-for="f in facts" :key="f.label" class="rounded-xl border border-slate-200 p-4">
+        <div class="flex flex-col gap-5 py-12 sm:flex-row sm:items-center sm:py-16">
+          <span class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white/10 font-display text-3xl font-bold ring-1 ring-white/20">
+            {{ monogram }}
+          </span>
+          <div>
+            <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ u.name }}</h1>
+            <p v-if="u.nameCn" class="mt-1 text-lg text-white/70">{{ u.nameCn }}</p>
+            <p class="mt-2 text-white/80">{{ place }}</p>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+              <span v-if="typeLabel" class="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium ring-1 ring-white/20">{{ typeLabel }}</span>
+              <span v-if="u.recommended" class="rounded-full bg-brand-500/90 px-2.5 py-0.5 text-xs font-semibold">{{ t('catalog.recommendedShort') }}</span>
+              <span v-if="u.featured" class="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-brand-800">{{ t('catalog.featured') }}</span>
+            </div>
+          </div>
+        </div>
+      </NContainer>
+    </section>
+
+    <NContainer>
+      <div class="grid gap-10 py-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div class="min-w-0 space-y-12">
+          <dl v-if="facts.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div v-for="f in facts" :key="f.label" class="rounded-xl border border-slate-200 bg-white p-4">
               <dt class="text-xs uppercase tracking-wide text-slate-400">{{ f.label }}</dt>
               <dd class="mt-1 font-display text-lg font-semibold text-slate-900">{{ f.value }}</dd>
             </div>
           </dl>
 
-          <section
-            v-for="p in prose"
-            :key="p.heading"
-          >
+          <section v-for="p in prose" :key="p.heading">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ p.heading }}</h2>
-            <p class="mt-2 whitespace-pre-line text-slate-700">{{ p.body }}</p>
+            <p class="mt-2 whitespace-pre-line leading-7 text-slate-700">{{ p.body }}</p>
           </section>
 
           <section v-if="highlightsOf('HIGHLIGHT').length || highlightsOf('ADVANTAGE').length">
             <div class="grid gap-8 sm:grid-cols-2">
               <div v-if="highlightsOf('HIGHLIGHT').length">
-                <h2 class="font-display text-xl font-semibold text-slate-900">Highlights</h2>
-                <ul class="mt-2 list-disc space-y-1 ps-5 text-slate-700">
-                  <li v-for="h in highlightsOf('HIGHLIGHT')" :key="h.id">{{ h.text }}</li>
+                <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.highlights') }}</h2>
+                <ul class="mt-3 space-y-2">
+                  <li v-for="h in highlightsOf('HIGHLIGHT')" :key="h.id" class="flex gap-2 text-slate-700">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
+                  </li>
                 </ul>
               </div>
               <div v-if="highlightsOf('ADVANTAGE').length">
-                <h2 class="font-display text-xl font-semibold text-slate-900">Advantages</h2>
-                <ul class="mt-2 list-disc space-y-1 ps-5 text-slate-700">
-                  <li v-for="h in highlightsOf('ADVANTAGE')" :key="h.id">{{ h.text }}</li>
+                <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.advantages') }}</h2>
+                <ul class="mt-3 space-y-2">
+                  <li v-for="h in highlightsOf('ADVANTAGE')" :key="h.id" class="flex gap-2 text-slate-700">
+                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
+                  </li>
                 </ul>
               </div>
             </div>
           </section>
 
-          <section v-if="u.rankings.length">
-            <h2 class="font-display text-xl font-semibold text-slate-900">Rankings</h2>
-            <table class="mt-2 w-full max-w-md text-left text-sm">
-              <thead class="text-slate-400">
-                <tr>
-                  <th class="py-1 font-medium">Source</th>
-                  <th class="py-1 font-medium">Rank</th>
-                  <th class="py-1 font-medium">Year</th>
-                </tr>
-              </thead>
-              <tbody class="text-slate-700">
-                <tr v-for="r in u.rankings" :key="r.id" class="border-t border-slate-100">
-                  <td class="py-1.5">{{ r.source }}</td>
-                  <td class="py-1.5">#{{ r.rankPosition }}</td>
-                  <td class="py-1.5">{{ r.rankYear ?? '—' }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <section>
+            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.programmes') }}</h2>
+            <div class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+              <p class="flex items-center gap-2 text-sm font-medium text-slate-500">
+                <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
+                {{ t('university.programmesArriving') }}
+              </p>
+              <p class="mt-2 text-sm text-slate-600">{{ t('university.programmesBody') }}</p>
+            </div>
           </section>
 
           <section>
-            <h2 class="font-display text-xl font-semibold text-slate-900">Programmes</h2>
-            <p class="mt-2 text-slate-600">
-              This university's programmes — language, diploma, bachelor's, master's and PhD —
-              will be listed here.
-            </p>
+            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.gallery') }}</h2>
+            <div class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+              <p class="flex items-center gap-2 text-sm font-medium text-slate-500">
+                <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
+                {{ t('university.galleryArriving') }}
+              </p>
+            </div>
           </section>
-
-          <section v-if="u.website || u.admissionsEmail || u.officePhone" class="border-t border-slate-200 pt-6 text-sm text-slate-600">
-            <p v-if="u.website">
-              Website:
-              <a :href="u.website" target="_blank" rel="noopener" class="text-brand-600 underline">{{ u.website }}</a>
-            </p>
-            <p v-if="u.admissionsEmail">Admissions: {{ u.admissionsEmail }}</p>
-            <p v-if="u.officePhone">Phone: {{ u.officePhone }}</p>
-          </section>
-
-          <NuxtLink to="/universities" class="inline-block text-sm text-brand-600 underline">← All universities</NuxtLink>
         </div>
-      </NContainer>
-    </template>
 
-    <template v-else>
-      <PageHero title="University" />
-      <NContainer>
-        <p class="py-10 text-slate-600">This university is not available.</p>
-        <NuxtLink to="/universities" class="text-sm text-brand-600 underline">← All universities</NuxtLink>
-      </NContainer>
-    </template>
+        <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <div v-if="u.rankings.length" class="rounded-xl border border-slate-200 bg-white p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('university.rankings') }}</h2>
+            <ul class="mt-3 space-y-2 text-sm">
+              <li v-for="r in u.rankings" :key="r.id" class="flex items-baseline justify-between gap-3">
+                <span class="text-slate-700">{{ r.source }}<span v-if="r.rankYear" class="text-slate-400"> · {{ r.rankYear }}</span></span>
+                <span class="font-display font-semibold text-slate-900">#{{ r.rankPosition }}</span>
+              </li>
+            </ul>
+          </div>
+
+          <div v-if="u.website || u.admissionsEmail || u.officePhone" class="rounded-xl border border-slate-200 bg-white p-5 text-sm">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('university.contact') }}</h2>
+            <ul class="mt-3 space-y-2 text-slate-700">
+              <li v-if="u.website">
+                <a :href="u.website" target="_blank" rel="noopener" class="text-brand-700 hover:text-brand-800">{{ t('university.website') }} ↗</a>
+              </li>
+              <li v-if="u.admissionsEmail">{{ t('university.admissionsEmail') }}: {{ u.admissionsEmail }}</li>
+              <li v-if="u.officePhone">{{ t('university.officePhone') }}: {{ u.officePhone }}</li>
+            </ul>
+          </div>
+
+          <NuxtLink :to="localePath('/universities')" class="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800">
+            <span aria-hidden="true">←</span> {{ t('catalog.allUniversities') }}
+          </NuxtLink>
+        </aside>
+      </div>
+    </NContainer>
+  </div>
+
+  <div v-else>
+    <PageHero :title="t('catalog.universityFallbackTitle')" />
+    <NContainer>
+      <p class="py-10 text-slate-600">{{ t('catalog.universityUnavailable') }}</p>
+      <NuxtLink :to="localePath('/universities')" class="text-sm font-medium text-brand-700 hover:text-brand-800">
+        ← {{ t('catalog.allUniversities') }}
+      </NuxtLink>
+    </NContainer>
   </div>
 </template>

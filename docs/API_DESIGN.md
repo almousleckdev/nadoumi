@@ -152,7 +152,7 @@ is logged, not surfaced. A filled honeypot (`website`) is accepted and dropped.
 
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
-| POST | `/api/public/contact` | anonymous | body `{ name, email, subject?, message, locale?, website? }` → `202` no body. `400` (problem+json) on validation failure. Consumed by `nadoumi-web` `contact.vue` via the BFF `/api/public/**` passthrough. |
+| POST | `/api/public/contact` | anonymous | body `{ firstName, lastName, email, phone?, category?, subject?, message, locale?, website? }` → `202` no body. `400` (problem+json) on validation failure. `name` is composed server-side. Consumed by `nadoumi-web` `contact.vue` via the BFF `/api/public/**` passthrough. |
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 

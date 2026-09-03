@@ -11,8 +11,12 @@ import java.time.LocalDateTime;
 public class ContactInquiry {
 
     private Long id;
+    private String firstName;
+    private String lastName;
     private String name;
     private String email;
+    private String phone;
+    private String category;
     private String subject;
     private String message;
     private ContactInquiryStatus status = ContactInquiryStatus.NEW;
@@ -32,6 +36,22 @@ public class ContactInquiry {
         this.id = id;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public String getName() {
         return name;
     }
@@ -46,6 +66,22 @@ public class ContactInquiry {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getSubject() {

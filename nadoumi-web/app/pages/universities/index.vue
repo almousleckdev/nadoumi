@@ -1,52 +1,157 @@
 <script setup lang="ts">
-import type { Page, UniversitySummary } from '~/types/catalog'
+import type { UniversitySummary } from '~/types/catalog'
+import type { ActiveChip } from '~/composables/useDiscovery'
 
 const { t } = useI18n()
-const localePath = useLocalePath()
 useSeo(t('catalog.universitiesTitle'), t('catalog.universitiesSubtitle'))
 
-const { publicGet } = useApi()
-const { data } = await useAsyncData('universities', () =>
-  publicGet<Page<UniversitySummary>>('universities').catch(() => null),
-)
-const items = computed(() => data.value?.content ?? [])
+const d = useDiscovery<UniversitySummary>({
+  resource: 'universities',
+  filterKeys: ['q', 'country', 'province', 'city', 'type', 'featured', 'recommended'],
+  defaultSort: '',
+  pageSize: 12,
+})
 
-function place(u: UniversitySummary): string {
-  return [u.city, u.province, u.country].filter(Boolean).join(', ')
+// local-only search box (committed on submit, not per keystroke)
+const searchText = ref(typeof d.filters.q === 'string' ? d.filters.q : '')
+function submitSearch() {
+  d.setFilter('q', searchText.value.trim() || undefined)
 }
-function typeLabel(type: UniversitySummary['type']): string {
-  return type === 'PUBLIC' ? 'Public' : type === 'PRIVATE' ? 'Private' : ''
+
+const typeOptions = [
+  { value: '', label: t('catalog.anyType') },
+  { value: 'PUBLIC', label: t('catalog.typePublic') },
+  { value: 'PRIVATE', label: t('catalog.typePrivate') },
+]
+
+const chips = computed<ActiveChip[]>(() => {
+  const out: ActiveChip[] = []
+  const f = d.filters
+  if (typeof f.country === 'string' && f.country) out.push({ key: 'country', value: f.country, label: `${t('catalog.country')}: ${f.country.toUpperCase()}` })
+  if (typeof f.province === 'string' && f.province) out.push({ key: 'province', value: f.province, label: `${t('catalog.province')}: ${f.province}` })
+  if (typeof f.city === 'string' && f.city) out.push({ key: 'city', value: f.city, label: `${t('catalog.city')}: ${f.city}` })
+  if (f.type === 'PUBLIC' || f.type === 'PRIVATE') out.push({ key: 'type', value: f.type, label: f.type === 'PUBLIC' ? t('catalog.typePublic') : t('catalog.typePrivate') })
+  if (f.featured === 'true') out.push({ key: 'featured', value: 'true', label: t('catalog.featured') })
+  if (f.recommended === 'true') out.push({ key: 'recommended', value: 'true', label: t('catalog.recommendedShort') })
+  return out
+})
+function removeChip(chip: ActiveChip) {
+  d.setFilter(chip.key, undefined)
+  if (chip.key === 'q') searchText.value = ''
+}
+function clearAll() {
+  d.clearFilters()
+  searchText.value = ''
 }
 </script>
 
 <template>
   <div>
     <PageHero :title="t('catalog.universitiesTitle')" :subtitle="t('catalog.universitiesSubtitle')" />
+
     <NContainer>
-      <div v-if="items.length" class="grid gap-4 py-8 sm:grid-cols-2 lg:grid-cols-3">
-        <NuxtLink
-          v-for="u in items"
-          :key="u.id"
-          :to="localePath(`/universities/${u.id}`)"
-          class="block rounded-xl border border-slate-200 p-5 no-underline transition-colors hover:border-brand-500"
+      <div class="space-y-6 py-8">
+        <FilterBar
+          :count="d.total.value"
+          :results-pending="d.pending.value"
+          :count-label="t('catalog.resultCount', { n: d.total.value })"
         >
-          <div class="flex items-start justify-between gap-2">
-            <h3 class="font-display text-base font-semibold text-slate-900">{{ u.name }}</h3>
-            <span
-              v-if="u.featured"
-              class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800"
-            >{{ t('catalog.featured') }}</span>
-          </div>
-          <p v-if="u.nameCn" class="mt-0.5 text-sm text-slate-500">{{ u.nameCn }}</p>
-          <p class="mt-2 text-sm text-slate-600">{{ place(u) }}</p>
-          <p v-if="typeLabel(u.type)" class="mt-1 text-xs uppercase tracking-wide text-slate-400">
-            {{ typeLabel(u.type) }}
-          </p>
-        </NuxtLink>
-      </div>
-      <div v-else class="max-w-xl py-16">
-        <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('catalog.empty') }}</h2>
-        <p class="mt-2 text-slate-600">{{ t('catalog.emptyDetail') }}</p>
+          <template #search>
+            <form role="search" class="flex items-center gap-2" @submit.prevent="submitSearch">
+              <label for="uni-search" class="sr-only">{{ t('catalog.searchUniversities') }}</label>
+              <input
+                id="uni-search"
+                v-model="searchText"
+                type="search"
+                :placeholder="t('catalog.searchUniversitiesPlaceholder')"
+                class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus-visible:border-brand-500"
+              >
+              <NButton type="submit" size="sm">{{ t('common.search') }}</NButton>
+            </form>
+          </template>
+
+          <template #filters>
+            <input
+              :value="d.filters.country ?? ''"
+              type="text"
+              maxlength="2"
+              :placeholder="t('catalog.country')"
+              class="w-24 rounded-md border border-slate-300 px-2.5 py-2 text-sm uppercase outline-none focus-visible:border-brand-500"
+              @change="d.setFilter('country', ($event.target as HTMLInputElement).value.trim().toUpperCase() || undefined)"
+            >
+            <input
+              :value="d.filters.province ?? ''"
+              type="text"
+              :placeholder="t('catalog.province')"
+              class="w-32 rounded-md border border-slate-300 px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
+              @change="d.setFilter('province', ($event.target as HTMLInputElement).value.trim() || undefined)"
+            >
+            <input
+              :value="d.filters.city ?? ''"
+              type="text"
+              :placeholder="t('catalog.city')"
+              class="w-32 rounded-md border border-slate-300 px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
+              @change="d.setFilter('city', ($event.target as HTMLInputElement).value.trim() || undefined)"
+            >
+            <select
+              :value="d.filters.type ?? ''"
+              class="rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
+              :aria-label="t('catalog.anyType')"
+              @change="d.setFilter('type', ($event.target as HTMLSelectElement).value || undefined)"
+            >
+              <option v-for="o in typeOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
+            </select>
+            <label class="inline-flex items-center gap-1.5 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                :checked="d.filters.featured === 'true'"
+                class="rounded border-slate-300 text-brand-600 focus-visible:ring-brand-500"
+                @change="d.setFilter('featured', ($event.target as HTMLInputElement).checked ? 'true' : undefined)"
+              >
+              {{ t('catalog.featured') }}
+            </label>
+          </template>
+
+          <template #chips>
+            <FilterChips :chips="chips" :clear-label="t('catalog.clearFilters')" @remove="removeChip" @clear="clearAll" />
+          </template>
+        </FilterBar>
+
+        <ResultGrid
+          :pending="d.pending.value"
+          :error="Boolean(d.error.value)"
+          :is-empty="d.isEmpty.value"
+          @retry="d.refresh"
+        >
+          <template #empty>
+            <div class="rounded-xl border border-dashed border-slate-200 px-6 py-14 text-center">
+              <p class="font-display text-lg font-semibold text-slate-900">{{ t('catalog.noUniversitiesTitle') }}</p>
+              <p class="mt-1 text-sm text-slate-600">
+                {{ d.hasActiveFilters.value ? t('catalog.noResultsBody') : t('catalog.noUniversitiesBody') }}
+              </p>
+              <button
+                v-if="d.hasActiveFilters.value"
+                type="button"
+                class="mt-4 text-sm font-medium text-brand-700 hover:text-brand-800"
+                @click="clearAll"
+              >
+                {{ t('catalog.clearFilters') }}
+              </button>
+            </div>
+          </template>
+
+          <UniversityCard
+            v-for="u in d.items.value"
+            :key="u.id"
+            :university="u"
+          />
+        </ResultGrid>
+
+        <Pagination
+          :page="d.page.value"
+          :page-count="d.pageCount.value"
+          @update:page="d.setPage"
+        />
       </div>
     </NContainer>
   </div>

@@ -161,14 +161,15 @@ same change. Report per step.
 | **1 ✅** | Public nav → `Home · Scholarships · Universities · About · Contact`; drop `/programs` + `/destinations` routes; onboarding → `/onboarding` + completion gate. Web only. | — |
 | **2 ✅** | University profile depth (18 scalar cols) + `nad_university_ranking` / `nad_university_highlight`; admin sectioned drawer + detail; `PublicUniversityResponse` + `/api/public/universities` (published+active only); public `universities/[id]` page. Gallery deferred with the Document slice (Step 7). | V10 |
 | **2b ✅** | Public website build-out: real Home / Scholarships / Universities / About / Contact on the Tailwind marketing shell. Contact slice — `nad_contact_inquiry` + anonymous rate-limited `POST /api/public/contact` (persist + notify support inbox), in `nadoumi-identity` until `nadoumi-content` exists. | V11 |
-| **3** | `nadoumi-program`: program type + majors + intake; Programs shown under the university (admin + public). | V12 |
-| **4** | `nadoumi-scholarship`: configurable aggregate + internal split + `v_scholarship_student`; staff CRUD (confidentiality DTOs); public list + detail. Confidentiality CI tests. | V13 |
-| **5** | `nad_outbox_event` + poller + `nadoumi-notification` (`nad_notification*` + templates + SSE). First event: `ScholarshipPublished`. | V14 |
-| **6** | `nadoumi-application`: `nad_application` + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). Public **Apply Now** (self / other student, prefilled, review, submit→snapshot). Student portal: my applications. Admin: application workbench + status change → event → notify. | V15–V16 |
-| **7** | `nadoumi-document`: version/event/requirement + object storage; per-application checklist from the requirement snapshot; wires into onboarding + applications. | V17 |
-| **8** | `nadoumi-communication`: conversations + messages + attachments on an application; SSE. | V18 |
-| **9** | `nadoumi-payment` + `nadoumi-finance`: fee kinds + invoice + refund; application-fee gate on the workflow; real dashboard finance aggregates. | V19–V20 |
-| **10** | Employee ops + assignment surface → CMS (incl. `nad_contact_inquiry` triage, move to `nadoumi-content`) → Reporting depth. | V21+ |
+| **2c** | **Public website redesign** (`docs/PUBLIC_WEBSITE_REDESIGN.md`). R1: design-system layer + shell + Home (**PR-1 ✅**) then Universities list + detail + About + Contact (**PR-2 ✅**). Backend: university list filters (`UniversitySearch`); `nad_contact_inquiry` split-name + phone + category. | V14 |
+| **3 (R2)** | `nadoumi-program`: program type + majors + intake; Programs shown under the university (admin + public) + Home "Hot programmes" carousels. | V15 |
+| **4 (R3)** | `nadoumi-scholarship`: configurable aggregate + internal split + `v_scholarship_student`; staff CRUD (confidentiality DTOs); faceted public discovery (`/api/public/scholarships` + `/facets`); Scholarships discovery page + scholarship Home sections. Confidentiality CI tests. | V16 |
+| **5** | `nad_outbox_event` + poller + `nadoumi-notification` (`nad_notification*` + templates + SSE). First event: `ScholarshipPublished`. | V17 |
+| **6** | `nadoumi-application`: `nad_application` + profile/requirement snapshots + append-only children + `nad_wf_*` (one default definition). Public **Apply Now** (self / other student, prefilled, review, submit→snapshot). Student portal: my applications. Admin: application workbench + status change → event → notify. | V18–V19 |
+| **7** | `nadoumi-document`: version/event/requirement + object storage; per-application checklist from the requirement snapshot; wires into onboarding + applications. | V20 |
+| **8** | `nadoumi-communication`: conversations + messages + attachments on an application; SSE. | V21 |
+| **9** | `nadoumi-payment` + `nadoumi-finance`: fee kinds + invoice + refund; application-fee gate on the workflow; real dashboard finance aggregates. | V22–V23 |
+| **10** | Employee ops + assignment surface → CMS (incl. `nad_contact_inquiry` triage, move to `nadoumi-content`) → Reporting depth. | V24+ |
 
 Student Dashboard (workspace: profile completion, applications + pending actions,
 documents, notifications, communication, relevant opportunities, "My Students"

@@ -5,9 +5,10 @@
     <insert id="insert" parameterType="com.nadoumi.identity.contact.ContactInquiry"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_contact_inquiry
-            (name, email, subject, message, status, source, locale, ip_address, user_agent, created_at)
+            (first_name, last_name, name, email, phone, category, subject, message,
+             status, source, locale, ip_address, user_agent, created_at)
         values
-            (#{name}, #{email}, #{subject}, #{message}, #{status}, #{source}, #{locale},
-             #{ipAddress}, #{userAgent}, now())
+            (#{firstName}, #{lastName}, #{name}, #{email}, #{phone}, #{category}, #{subject}, #{message},
+             #{status}, #{source}, #{locale}, #{ipAddress}, #{userAgent}, now())
     </insert>
 </mapper>
