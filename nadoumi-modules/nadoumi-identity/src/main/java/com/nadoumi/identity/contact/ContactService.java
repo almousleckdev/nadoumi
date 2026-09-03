@@ -48,8 +48,12 @@ public class ContactService {
         }
 
         ContactInquiry inquiry = new ContactInquiry();
-        inquiry.setName(req.name().trim());
+        inquiry.setFirstName(req.firstName().trim());
+        inquiry.setLastName(req.lastName().trim());
+        inquiry.setName(req.fullName());
         inquiry.setEmail(req.email().trim());
+        inquiry.setPhone(blankToNull(req.phone()));
+        inquiry.setCategory(blankToNull(req.category()));
         inquiry.setSubject(blankToNull(req.subject()));
         inquiry.setMessage(req.message().trim());
         inquiry.setLocale(blankToNull(req.locale()));
@@ -66,8 +70,10 @@ public class ContactService {
         try {
             mail.send(new EmailMessage(supportInbox, "Website enquiry: " + subject,
                     templates.render("contact-inquiry", Map.of(
-                            "name", inquiry.getName(),
+                            "name", inquiry.getName() == null ? "" : inquiry.getName(),
                             "email", inquiry.getEmail(),
+                            "phone", inquiry.getPhone() == null ? "—" : inquiry.getPhone(),
+                            "category", inquiry.getCategory() == null ? "—" : inquiry.getCategory(),
                             "subject", subject,
                             "message", inquiry.getMessage()))));
         }

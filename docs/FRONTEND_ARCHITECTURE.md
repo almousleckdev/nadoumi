@@ -195,8 +195,35 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   `recommended` filter params (`UniversitySearch` record).
 - `home.*` i18n replaced wholesale (nested `hero` / `featuredUnis` / `journey` / …);
   parity kept across all four locales. `useLazyAsyncData` for the Home carousels.
-- **PR-2 (next):** Universities list (filters / sort / paging / `useDiscovery` /
-  `ResultGrid` / `FilterDrawer`) + University detail redesign + About + Contact.
+- **R1 / PR-2 ✅ (2026-09-03).**
+  - `useDiscovery<T>` — shared engine: filter + sort + page state, URL sync,
+    one-page fetch via `publicGet`, loading/empty/error machine. Every discovery
+    surface builds on it; pages never re-implement the fetch/paging loop.
+  - `ui/`: `ResultGrid` (skeleton / error+retry / empty slot / responsive grid),
+    `Pagination` (windowed), `FilterBar` (search + inline filters + mobile
+    disclosure + count + chips slot), `FilterChips`.
+  - **Universities list** (`universities/index.vue`) — `useDiscovery` +
+    `FilterBar` (search, country / province / city / type, Featured toggle) +
+    `FilterChips` + `ResultGrid` + `Pagination`. Real result count, empty vs.
+    no-match states, `?`-synced filters. `UniversityCard` reused.
+  - **University detail** (`universities/[id].vue`) — dark hero header
+    (monogram, name, meta, badges), facts strip, 2-column body (prose sections +
+    sticky sidebar with rankings + official contact), grouped highlights /
+    advantages. **Programmes** and **Gallery** render as honest "arriving with …"
+    blocks (Step 3 / Document slice). i18n `university.*` namespace.
+  - **About** (`about.vue`) — image hero, who-we-are, mission + vision, four
+    values (drawn from the platform's real design principles), how-we-help,
+    **team / office / hours** as clearly-flagged "to be supplied by Nadoumi"
+    blocks (nothing invented), `CtaBand`.
+  - **Contact** (`contact.vue`) — contact-info column (real email + flagged
+    office / hours) + full form: first / last name, email, phone, topic
+    (`NSelect`), subject, message. Client validation mirrors the backend;
+    loading / success / error / disabled states; honeypot.
+  - **Backend:** `nad_contact_inquiry` gains `first_name` / `last_name` /
+    `phone` / `category` (**V14**); `ContactRequest` switched to split name +
+    `phone` + `category`; `name` composed server-side.
+  - i18n: `about` + `contact` replaced wholesale; `catalog.*` + `university.*`
+    added; parity across all four locales (429 keys).
 
 **PLANNED — Revision 2 (plan Parts E/F/G):** *(historical; nav line superseded above)*
 - Navbar: ~~Home, Scholarships, Universities, Programs, Destinations, About,

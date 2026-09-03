@@ -1,44 +1,134 @@
 <script setup lang="ts">
-const { t } = useI18n()
-useSeo(t('about.title'), t('about.subtitle'))
+import { imagery } from '~/data/imagery'
 
-const lifecycle = computed(() => [
-  t('about.lc1'), t('about.lc2'), t('about.lc3'), t('about.lc4'), t('about.lc5'),
+const { t } = useI18n()
+const localePath = useLocalePath()
+useSeo(t('about.title'), t('about.lead'))
+
+const values = computed(() => [
+  { title: t('about.v1t'), body: t('about.v1b') },
+  { title: t('about.v2t'), body: t('about.v2b') },
+  { title: t('about.v3t'), body: t('about.v3b') },
+  { title: t('about.v4t'), body: t('about.v4b') },
+])
+const help = computed(() => [
+  t('about.h1'), t('about.h2'), t('about.h3'), t('about.h4'), t('about.h5'),
 ])
 </script>
 
 <template>
   <div>
-    <PageHero :title="t('about.title')" :subtitle="t('about.subtitle')" />
+    <!-- hero -->
+    <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+      <NuxtImg
+        :src="imagery.campusLife.src"
+        :alt="imagery.campusLife.alt"
+        sizes="100vw"
+        class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
+        :modifiers="{ fit: 'crop', auto: 'format' }"
+      />
+      <div class="absolute inset-0 -z-10 bg-slate-950/60" aria-hidden="true" />
+      <NContainer>
+        <div class="max-w-2xl py-20 sm:py-28">
+          <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-300">{{ t('about.eyebrow') }}</p>
+          <h1 class="mt-2 font-display text-4xl font-bold tracking-tight sm:text-5xl">{{ t('about.title') }}</h1>
+          <p class="mt-4 text-lg text-slate-200">{{ t('about.lead') }}</p>
+        </div>
+      </NContainer>
+    </section>
+
     <NContainer>
-      <div class="max-w-2xl space-y-12 py-12">
-        <p class="text-lg text-slate-700">{{ t('about.body') }}</p>
+      <!-- who we are -->
+      <section class="grid gap-10 py-14 lg:grid-cols-2 lg:gap-16 lg:py-20">
+        <div class="max-w-lg">
+          <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.whoTitle') }}</h2>
+          <p class="mt-3 leading-7 text-slate-700">{{ t('about.whoBody') }}</p>
+          <p class="mt-3 leading-7 text-slate-700">{{ t('about.whoBody2') }}</p>
+        </div>
+        <MediaFigure :src="imagery.advising.src" :alt="imagery.advising.alt" ratio="4/3" rounded="2xl" sizes="(min-width:1024px) 46vw, 100vw" />
+      </section>
 
-        <section>
-          <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('about.whoTitle') }}</h2>
-          <p class="mt-2 text-slate-700">{{ t('about.whoBody') }}</p>
-        </section>
+      <!-- mission + vision -->
+      <section class="grid gap-6 border-t border-slate-200 py-14 sm:grid-cols-2">
+        <div class="rounded-2xl border border-slate-200 bg-white p-7">
+          <h2 class="font-display text-lg font-semibold text-slate-900">{{ t('about.missionTitle') }}</h2>
+          <p class="mt-2 leading-7 text-slate-700">{{ t('about.missionBody') }}</p>
+        </div>
+        <div class="rounded-2xl border border-slate-200 bg-white p-7">
+          <h2 class="font-display text-lg font-semibold text-slate-900">{{ t('about.visionTitle') }}</h2>
+          <p class="mt-2 leading-7 text-slate-700">{{ t('about.visionBody') }}</p>
+        </div>
+      </section>
 
-        <section>
-          <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('about.destinationsTitle') }}</h2>
-          <p class="mt-2 text-slate-700">{{ t('about.destinationsBody') }}</p>
-        </section>
+      <!-- values -->
+      <section class="border-t border-slate-200 py-14">
+        <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.valuesTitle') }}</h2>
+        <div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div v-for="v in values" :key="v.title" class="rounded-xl border border-slate-200 p-5">
+            <h3 class="font-display text-base font-semibold text-slate-900">{{ v.title }}</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-600">{{ v.body }}</p>
+          </div>
+        </div>
+      </section>
 
-        <section>
-          <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('about.lifecycleTitle') }}</h2>
-          <ol class="mt-3 space-y-2">
-            <li v-for="(step, i) in lifecycle" :key="step" class="flex gap-3 text-slate-700">
+      <!-- how we help -->
+      <section class="grid gap-10 border-t border-slate-200 py-14 lg:grid-cols-2 lg:gap-16">
+        <MediaFigure :src="imagery.storyCollaboration.src" :alt="imagery.storyCollaboration.alt" ratio="4/3" rounded="2xl" sizes="(min-width:1024px) 46vw, 100vw" />
+        <div class="max-w-lg">
+          <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.helpTitle') }}</h2>
+          <ol class="mt-4 space-y-3">
+            <li v-for="(item, i) in help" :key="item" class="flex gap-3 text-slate-700">
               <span class="font-display text-sm font-bold text-brand-600">{{ i + 1 }}</span>
-              <span>{{ step }}</span>
+              <span>{{ item }}</span>
             </li>
           </ol>
-        </section>
+        </div>
+      </section>
 
-        <section>
-          <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('about.approachTitle') }}</h2>
-          <p class="mt-2 text-slate-700">{{ t('about.approachBody') }}</p>
-        </section>
-      </div>
+      <!-- team (content to be supplied) -->
+      <section class="border-t border-slate-200 py-14">
+        <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.teamTitle') }}</h2>
+        <p class="mt-2 max-w-xl text-slate-600">{{ t('about.teamIntro') }}</p>
+        <div class="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+          <p class="flex items-center gap-2 text-sm font-medium text-slate-500">
+            <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
+            {{ t('about.teamPending') }}
+          </p>
+        </div>
+      </section>
+
+      <!-- contact / location (details to be supplied) -->
+      <section class="grid gap-6 border-t border-slate-200 py-14 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
+          <h3 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('about.contactTitle') }}</h3>
+          <p class="mt-3 text-sm text-slate-700">
+            <a href="mailto:support@nadoumi.com" class="text-brand-700 hover:text-brand-800">support@nadoumi.com</a>
+          </p>
+          <NuxtLink :to="localePath('/contact')" class="mt-1 inline-block text-sm font-medium text-brand-700 hover:text-brand-800">
+            {{ t('about.contactCta') }} →
+          </NuxtLink>
+        </div>
+        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+          <h3 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('about.officeTitle') }}</h3>
+          <p class="mt-3 text-sm text-slate-500">{{ t('about.officePending') }}</p>
+        </div>
+        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+          <h3 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('about.hoursTitle') }}</h3>
+          <p class="mt-3 text-sm text-slate-500">{{ t('about.hoursPending') }}</p>
+        </div>
+      </section>
     </NContainer>
+
+    <CtaBand
+      :image="imagery.graduation"
+      :eyebrow="t('home.cta.eyebrow')"
+      :title="t('about.ctaTitle')"
+      :body="t('about.ctaBody')"
+    >
+      <template #actions>
+        <NButton :to="localePath('/register')" size="lg">{{ t('home.cta.apply') }}</NButton>
+        <NButton :to="localePath('/contact')" variant="secondary" size="lg">{{ t('home.cta.contact') }}</NButton>
+      </template>
+    </CtaBand>
   </div>
 </template>
