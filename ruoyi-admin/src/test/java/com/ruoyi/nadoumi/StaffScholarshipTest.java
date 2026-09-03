@@ -83,6 +83,14 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
     }
 
     @Test
+    void the_category_reference_is_available_anonymously_for_filter_uis() throws Exception {
+        mvc.perform(get("/api/public/scholarships/categories"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(12))
+                .andExpect(jsonPath("$[?(@.code == 'CSC')].name").exists());
+    }
+
+    @Test
     void read_only_staff_can_list_but_not_create() throws Exception {
         createStaff("sch_ro", "case_officer");
         String token = staffToken("sch_ro");

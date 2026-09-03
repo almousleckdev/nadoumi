@@ -49,6 +49,10 @@ public class ScholarshipService {
         return PublicScholarshipResponse.detail(s);
     }
 
+    public java.util.List<com.nadoumi.scholarship.domain.ScholarshipCategory> categories() {
+        return mapper.allCategories();
+    }
+
     public ScholarshipFacets facets(ScholarshipSearch filter) {
         return ScholarshipFacets.of(
                 mapper.facetLevels(filter),

@@ -6,7 +6,7 @@ const allItems: NavItem[] = NAV.flatMap(g => g.items)
 
 describe('nav manifest', () => {
   it('exposes exactly the built screens as implemented routes', () => {
-    expect(implementedPaths().sort()).toEqual(['/applicants', '/dashboard', '/universities'])
+    expect(implementedPaths().sort()).toEqual(['/applicants', '/dashboard', '/scholarships', '/universities'])
   })
 
   it('every item is implemented or planned, with a path and an icon', () => {

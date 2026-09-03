@@ -210,6 +210,10 @@
         select level from nad_scholarship_level where scholarship_id = #{scholarshipId} order by level
     </select>
 
+    <select id="allCategories" resultType="com.nadoumi.scholarship.domain.ScholarshipCategory">
+        select id, code, name from nad_scholarship_category order by sort_order, code
+    </select>
+
     <select id="findCategories" resultType="com.nadoumi.scholarship.domain.ScholarshipCategory">
         select c.id, c.code, c.name
         from nad_scholarship_category_link cl join nad_scholarship_category c on c.id = cl.category_id

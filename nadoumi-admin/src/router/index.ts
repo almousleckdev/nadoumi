@@ -43,6 +43,18 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.universities', i18n: true, perm: 'nad:university:view' },
       },
       {
+        path: 'scholarships',
+        name: 'Scholarships',
+        component: () => import('@/views/scholarships/index.vue'),
+        meta: { title: 'nav.items.scholarships', i18n: true, perm: 'nad:scholarship:list' },
+      },
+      {
+        path: 'scholarships/:id(\\d+)',
+        name: 'ScholarshipDetail',
+        component: () => import('@/views/scholarships/detail.vue'),
+        meta: { title: 'nav.items.scholarships', i18n: true, perm: 'nad:scholarship:view' },
+      },
+      {
         path: 'profile',
         name: 'Profile',
         component: () => import('@/views/profile.vue'),
