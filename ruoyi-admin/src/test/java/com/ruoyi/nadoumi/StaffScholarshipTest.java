@@ -30,9 +30,12 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
              "levels":["MASTER","PHD"],"categoryCodes":["CSC","TYPE_A"],
              "intakes":[{"term":"AUTUMN_SEPTEMBER","applicationOpen":"2025-12-01","applicationClose":"2026-03-31"}],
              "eligibility":{"ageMin":18,"ageMax":35,"gpaMin":3.0,"ieltsMin":6.0,"nationalityScope":"ANY"},
-             "fees":[{"kind":"APPLICATION","amount":800.00,"currency":"CNY","note":"Non-refundable"},
+             "fees":[{"kind":"APPLICATION","amount":710.00,"currency":"CNY","note":"Non-refundable"},
                      {"kind":"NADOUMI_SERVICE","amount":300.00,"currency":"USD"}],
-             "stipend":{"amount":3500.00,"currency":"CNY","frequency":"MONTHLY","durationMonths":36},
+             "levelStipends":[{"level":"MASTER","amount":3500.00,"currency":"CNY","frequency":"MONTHLY","durationMonths":36},
+                              {"level":"PHD","amount":4000.00,"currency":"CNY","frequency":"MONTHLY","durationMonths":48}],
+             "accommodations":[{"roomType":"SINGLE","amount":1200.00,"currency":"CNY","note":"AC, private bathroom"},
+                               {"roomType":"DOUBLE","amount":700.00,"currency":"CNY","note":"AC, shared bathroom, WiFi"}],
              "documentRequirements":[{"docType":"PASSPORT","mandatory":true},
                                      {"docType":"DEGREE","mandatory":true},
                                      {"docType":"STUDY_PLAN","mandatory":false,"note":"1–2 pages"}]}""";
@@ -62,7 +65,14 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.view.categories.length()").value(2))
                 .andExpect(jsonPath("$.view.intakes.length()").value(1))
                 .andExpect(jsonPath("$.view.fees.length()").value(2))
-                .andExpect(jsonPath("$.view.stipend.amount").value(3500.00))
+                // 710 CNY application fee -> 710 RMB / 100 USD at the fixed display rate
+                .andExpect(jsonPath("$.view.fees[0].amountRmb").value(710))
+                .andExpect(jsonPath("$.view.fees[0].amountUsd").value(100))
+                .andExpect(jsonPath("$.view.stipends.length()").value(2))
+                .andExpect(jsonPath("$.view.stipends[0].level").value("MASTER"))
+                .andExpect(jsonPath("$.view.stipends[1].level").value("PHD"))
+                .andExpect(jsonPath("$.view.accommodation.length()").value(2))
+                .andExpect(jsonPath("$.view.accommodation[0].roomType").value("SINGLE"))
                 .andExpect(jsonPath("$.view.documentRequirements.length()").value(3))
                 .andExpect(jsonPath("$.publishStatus").value("PUBLISHED"))
                 .andReturn().getResponse().getContentAsString();
@@ -149,6 +159,10 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
         String detailJson = mvc.perform(get("/api/public/scholarships/{slug}", "csc-full-scholarship-master"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fees.length()").value(2))
+                .andExpect(jsonPath("$.fees[0].amountRmb").value(710))
+                .andExpect(jsonPath("$.fees[0].amountUsd").value(100))
+                .andExpect(jsonPath("$.stipends.length()").value(2))
+                .andExpect(jsonPath("$.accommodation.length()").value(2))
                 .andExpect(jsonPath("$.documentRequirements.length()").value(3))
                 .andExpect(jsonPath("$.universityId").doesNotExist())
                 .andExpect(jsonPath("$.partnership").doesNotExist())

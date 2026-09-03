@@ -71,6 +71,7 @@
             { label: t('scholarship.teachingLanguage'), value: s.view.teachingLanguage ? t(`scholarship.lang.${s.view.teachingLanguage}`) : '—' },
             { label: t('scholarship.deadline'), value: s.view.deadline || t('scholarship.rolling') },
             { label: t('scholarship.levels'), value: s.view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '—' },
+            { label: t('scholarship.nonDegreeDuration'), value: s.view.nonDegreeDuration ? t(`scholarship.nonDegree.${s.view.nonDegreeDuration}`) : '—' },
             { label: t('scholarship.categories'), value: s.view.categories.join(', ') || '—' },
             { label: t('scholarship.slots'), value: s.view.slots ?? '—' },
           ]"
@@ -117,20 +118,75 @@
       </FormSection>
 
       <FormSection
-        v-if="s.view.stipend"
+        v-if="s.view.stipends.length"
         :title="t('scholarship.secStipend')"
       >
-        <p class="prose">
-          {{ s.view.stipend.amount.toLocaleString('en') }} {{ s.view.stipend.currency }}
-          / {{ t(`scholarship.freq.${s.view.stipend.frequency}`) }}
-          <span v-if="s.view.stipend.durationMonths"> · {{ s.view.stipend.durationMonths }} {{ t('scholarship.months') }}</span>
-        </p>
-        <p
-          v-if="s.view.stipend.conditions"
-          class="prose"
+        <el-table
+          :data="s.view.stipends"
+          size="small"
         >
-          {{ s.view.stipend.conditions }}
-        </p>
+          <el-table-column
+            :label="t('scholarship.level')"
+            width="120"
+          >
+            <template #default="{ row }">
+              {{ t(`scholarship.level.${row.level}`) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('scholarship.amount')"
+            align="right"
+          >
+            <template #default="{ row }">
+              {{ dual(row.amountRmb, row.amountUsd) }} / {{ t(`scholarship.freq.${row.frequency}`) }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('scholarship.durationMonths')"
+            width="120"
+            align="right"
+          >
+            <template #default="{ row }">
+              {{ row.durationMonths ?? '—' }}
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('scholarship.stipendConditions')"
+            prop="conditions"
+          />
+        </el-table>
+      </FormSection>
+
+      <FormSection
+        v-if="s.view.accommodation.length"
+        :title="t('scholarship.secAccommodation')"
+      >
+        <el-table
+          :data="s.view.accommodation"
+          size="small"
+        >
+          <el-table-column
+            :label="t('scholarship.accommodationNote')"
+            prop="note"
+          >
+            <template #default="{ row }">
+              <strong>{{ t(`scholarship.room.${row.roomType}`) }}</strong>
+              <span
+                v-if="row.note"
+                class="muted"
+              > — {{ row.note }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :label="t('scholarship.amount')"
+            align="right"
+            width="200"
+          >
+            <template #default="{ row }">
+              {{ dual(row.amountRmb, row.amountUsd) }}
+            </template>
+          </el-table-column>
+        </el-table>
       </FormSection>
 
       <FormSection
@@ -331,12 +387,16 @@ function nationalityText(e: NonNullable<Scholarship['view']['eligibility']>) {
   return t('scholarship.scope.ANY')
 }
 
+function dual(rmb: number | null | undefined, usd: number | null | undefined): string {
+  if (rmb == null && usd == null) return '—'
+  return `¥${(rmb ?? 0).toLocaleString('en')} · $${(usd ?? 0).toLocaleString('en')}`
+}
 const feeRows = computed(() => {
   const v = s.value?.view
   if (!v) return []
-  const rows = v.fees.map(f => ({ label: t(`scholarship.fee.${f.kind}`), amount: `${f.amount.toLocaleString('en')} ${f.currency}` }))
-  if (v.applicationFee) rows.unshift({ label: t('scholarship.fee.APPLICATION'), amount: `${v.applicationFee.amount.toLocaleString('en')} ${v.applicationFee.currency}` })
-  if (v.serviceFee) rows.push({ label: t('scholarship.fee.NADOUMI_SERVICE'), amount: `${v.serviceFee.amount.toLocaleString('en')} ${v.serviceFee.currency}` })
+  const rows = v.fees.map(f => ({ label: t(`scholarship.fee.${f.kind}`), amount: dual(f.amountRmb, f.amountUsd) }))
+  if (v.applicationFee) rows.unshift({ label: t('scholarship.fee.APPLICATION'), amount: dual(v.applicationFee.amountRmb, v.applicationFee.amountUsd) })
+  if (v.serviceFee) rows.push({ label: t('scholarship.fee.NADOUMI_SERVICE'), amount: dual(v.serviceFee.amountRmb, v.serviceFee.amountUsd) })
   return rows
 })
 const prose = computed(() => {

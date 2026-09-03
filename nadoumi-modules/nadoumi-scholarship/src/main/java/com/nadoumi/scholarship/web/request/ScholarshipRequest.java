@@ -3,7 +3,9 @@ package com.nadoumi.scholarship.web.request;
 import com.nadoumi.scholarship.domain.enums.EducationLevel;
 import com.nadoumi.scholarship.domain.enums.FeeKind;
 import com.nadoumi.scholarship.domain.enums.FundingModel;
+import com.nadoumi.scholarship.domain.enums.NonDegreeDuration;
 import com.nadoumi.scholarship.domain.enums.PublishStatus;
+import com.nadoumi.scholarship.domain.enums.RoomType;
 import com.nadoumi.scholarship.domain.enums.ScholarshipStatus;
 import com.nadoumi.scholarship.domain.enums.StipendFrequency;
 import com.nadoumi.scholarship.domain.enums.TeachingLanguage;
@@ -37,6 +39,7 @@ public record ScholarshipRequest(
         @Size(max = 20000) String benefits,
         @Size(max = 20000) String requirements,
         @Size(max = 20000) String policy,
+        NonDegreeDuration nonDegreeDuration,
         @PositiveOrZero BigDecimal applicationFeeAmount,
         @Size(min = 3, max = 3) String applicationFeeCurrency,
         @PositiveOrZero BigDecimal serviceFeeAmount,
@@ -55,7 +58,8 @@ public record ScholarshipRequest(
         @Valid List<IntakeInput> intakes,
         @Valid EligibilityInput eligibility,
         @Valid List<FeeInput> fees,
-        @Valid StipendInput stipend,
+        @Valid List<LevelStipendInput> levelStipends,
+        @Valid List<AccommodationInput> accommodations,
         @Valid List<DocumentRequirementInput> documentRequirements) {
 
     public record IntakeInput(@NotBlank @Size(max = 24) String term,
@@ -74,9 +78,15 @@ public record ScholarshipRequest(
             @NotBlank @Size(min = 3, max = 3) String currency, @Size(max = 200) String note) {
     }
 
-    public record StipendInput(@NotNull @PositiveOrZero BigDecimal amount,
+    public record LevelStipendInput(@NotNull EducationLevel level,
+            @NotNull @PositiveOrZero BigDecimal amount,
             @NotBlank @Size(min = 3, max = 3) String currency, @NotNull StipendFrequency frequency,
             Integer durationMonths, @Size(max = 1000) String conditions) {
+    }
+
+    public record AccommodationInput(@NotNull RoomType roomType,
+            @PositiveOrZero BigDecimal amount, @Size(min = 3, max = 3) String currency,
+            @Size(max = 200) String note) {
     }
 
     public record DocumentRequirementInput(@NotBlank @Size(max = 48) String docType,

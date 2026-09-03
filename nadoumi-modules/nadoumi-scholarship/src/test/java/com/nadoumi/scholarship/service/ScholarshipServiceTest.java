@@ -76,16 +76,20 @@ class ScholarshipServiceTest {
         when(mapper.findEligibility(5L)).thenReturn(new ScholarshipEligibility(
                 18, 35, "ANY", null, null, new BigDecimal("3.0"), null, null, null, null, null, null));
         when(mapper.findFees(5L)).thenReturn(List.of(
-                new ScholarshipFee("APPLICATION", new BigDecimal("800.00"), "CNY", null)));
-        when(mapper.findStipend(5L)).thenReturn(null);
+                new ScholarshipFee("APPLICATION", new BigDecimal("710.00"), "CNY", null)));
+        when(mapper.findLevelStipends(5L)).thenReturn(List.of());
+        when(mapper.findAccommodations(5L)).thenReturn(List.of());
         when(mapper.findDocumentRequirements(5L)).thenReturn(List.of());
 
         var detail = service.getPublic("5");
 
         assertThat(detail.eligibility().ageMin()).isEqualTo(18);
         assertThat(detail.fees()).hasSize(1);
-        assertThat(detail.fees().get(0).amount()).isEqualByComparingTo("800.00");
-        assertThat(detail.stipend()).isNull();
+        // 710 CNY -> 710 RMB, 100 USD at the fixed display rate
+        assertThat(detail.fees().get(0).amountRmb()).isEqualByComparingTo("710");
+        assertThat(detail.fees().get(0).amountUsd()).isEqualByComparingTo("100");
+        assertThat(detail.stipends()).isEmpty();
+        assertThat(detail.accommodation()).isEmpty();
     }
 
     @Test

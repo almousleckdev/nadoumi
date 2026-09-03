@@ -6,11 +6,12 @@ import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
+import com.nadoumi.scholarship.domain.ScholarshipAccommodation;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
 import com.nadoumi.scholarship.domain.ScholarshipInternal;
 import com.nadoumi.scholarship.domain.ScholarshipIntake;
-import com.nadoumi.scholarship.domain.ScholarshipStipend;
+import com.nadoumi.scholarship.domain.ScholarshipLevelStipend;
 import com.nadoumi.scholarship.domain.enums.FundingModel;
 import com.nadoumi.scholarship.domain.enums.PublishStatus;
 import com.nadoumi.scholarship.mapper.ScholarshipMapper;
@@ -134,7 +135,8 @@ public class ScholarshipAdminService {
         s.setIntakes(mapper.findIntakes(id));
         s.setEligibility(mapper.findEligibility(id));
         s.setFees(mapper.findFees(id));
-        s.setStipend(mapper.findStipend(id));
+        s.setLevelStipends(mapper.findLevelStipends(id));
+        s.setAccommodations(mapper.findAccommodations(id));
         s.setDocumentRequirements(mapper.findDocumentRequirements(id));
         return s;
     }
@@ -148,11 +150,12 @@ public class ScholarshipAdminService {
         s.setField(blankToNull(req.field()));
         s.setTeachingLanguage(req.teachingLanguage());
         s.setFundingModel(req.fundingModel());
-        s.setHasStipend(Boolean.TRUE.equals(req.hasStipend()) || req.stipend() != null);
+        s.setHasStipend(req.levelStipends() != null && !req.levelStipends().isEmpty());
         s.setDeadline(req.deadline());
         s.setBenefits(blankToNull(req.benefits()));
         s.setRequirements(blankToNull(req.requirements()));
         s.setPolicy(blankToNull(req.policy()));
+        s.setNonDegreeDuration(req.nonDegreeDuration() == null ? null : req.nonDegreeDuration().name());
         s.setApplicationFeeAmount(req.applicationFeeAmount());
         s.setApplicationFeeCurrency(upper(req.applicationFeeCurrency()));
         s.setServiceFeeAmount(req.serviceFeeAmount());
@@ -204,12 +207,22 @@ public class ScholarshipAdminService {
                         f.currency().toUpperCase(Locale.ROOT), blankToNull(f.note())), i++);
             }
         }
-        mapper.deleteStipend(id);
-        if (req.stipend() != null) {
-            var st = req.stipend();
-            mapper.insertStipend(id, new ScholarshipStipend(st.amount(),
-                    st.currency().toUpperCase(Locale.ROOT), st.frequency().name(),
-                    st.durationMonths(), blankToNull(st.conditions())));
+        mapper.deleteLevelStipends(id);
+        if (req.levelStipends() != null) {
+            for (ScholarshipRequest.LevelStipendInput st : req.levelStipends()) {
+                mapper.insertLevelStipend(id, new ScholarshipLevelStipend(st.level().name(), st.amount(),
+                        st.currency().toUpperCase(Locale.ROOT), st.frequency().name(),
+                        st.durationMonths(), blankToNull(st.conditions())));
+            }
+        }
+        mapper.deleteAccommodations(id);
+        if (req.accommodations() != null) {
+            int i = 0;
+            for (ScholarshipRequest.AccommodationInput a : req.accommodations()) {
+                mapper.insertAccommodation(id, new ScholarshipAccommodation(a.roomType().name(), a.amount(),
+                        a.currency() == null ? "CNY" : a.currency().toUpperCase(Locale.ROOT),
+                        blankToNull(a.note())), i++);
+            }
         }
         mapper.deleteDocumentRequirements(id);
         if (req.documentRequirements() != null) {
