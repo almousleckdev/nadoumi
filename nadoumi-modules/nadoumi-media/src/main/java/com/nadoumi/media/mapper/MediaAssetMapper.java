@@ -18,12 +18,14 @@ public interface MediaAssetMapper {
 
     /**
      * Move an asset to a new lifecycle {@code status} (ACTIVE | SUPERSEDED | DELETED),
-     * stamping {@code update_by} / {@code update_time}. When {@code supersededBy} is
-     * given it is written to {@code superseded_by}; when the new status is DELETED,
-     * {@code deleted_at} / {@code deleted_by} are also stamped.
+     * stamping {@code update_by} (RuoYi username) / {@code update_time}. When
+     * {@code supersededBy} is given it is written to {@code superseded_by}; when the
+     * new status is DELETED, {@code deleted_at = now()} and {@code deleted_by}
+     * (a {@code sys_user.user_id}) are also stamped.
      */
     int updateStatus(@Param("id") long id, @Param("status") String status,
-            @Param("supersededBy") Long supersededBy, @Param("by") String by);
+            @Param("supersededBy") Long supersededBy, @Param("updateBy") String updateBy,
+            @Param("deletedBy") Long deletedBy);
 
     /** DELETED rows whose {@code deleted_at} is older than {@code before} — purge candidates. */
     List<MediaAsset> findStaleDeleted(@Param("before") LocalDateTime before);

@@ -76,10 +76,10 @@
         update nad_media_asset
         <set>
             status = #{status},
-            update_by = #{by},
+            update_by = #{updateBy},
             update_time = now(),
             <if test="supersededBy != null">superseded_by = #{supersededBy},</if>
-            <if test="'DELETED'.equals(status)">deleted_at = now(), deleted_by = #{by},</if>
+            <if test="'DELETED'.equals(status)">deleted_at = now(), deleted_by = #{deletedBy},</if>
         </set>
         where id = #{id}
     </update>
