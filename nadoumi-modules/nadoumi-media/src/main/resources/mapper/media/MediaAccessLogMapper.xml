@@ -21,4 +21,8 @@
              </choose>)
     </insert>
 
+    <select id="countByAsset" resultType="int">
+        select count(*) from nad_media_access_log where media_asset_id = #{assetId}
+    </select>
+
 </mapper>

@@ -153,6 +153,11 @@ public class FakeMediaStorage implements MediaStorageService {
         }
     }
 
+    @Override
+    public void purge(long assetId) {
+        blobs.remove(assetId);
+    }
+
     private MediaAsset require(long assetId) {
         MediaAsset row = rows.get(assetId);
         if (row == null) {

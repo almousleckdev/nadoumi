@@ -41,4 +41,13 @@ public interface MediaStorageService {
 
     /** Soft-delete: row status=DELETED + deleted_at/by; provider destroy is async. */
     void softDelete(long assetId, long actorUserId);
+
+    /**
+     * Hard-destroy the provider object for an already soft-deleted asset (spec
+     * §I.8). The {@code nad_media_asset} row is left untouched — {@code
+     * MediaReconciliationJob} either keeps it for audit (status {@code PURGED})
+     * or hard-deletes it in a separate step. Safe to call again: a missing
+     * provider object is not an error.
+     */
+    void purge(long assetId);
 }

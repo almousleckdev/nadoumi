@@ -3,6 +3,7 @@ package com.nadoumi.media.config;
 import com.cloudinary.Cloudinary;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaStorageService;
+import com.nadoumi.media.job.MediaReconciliationJob;
 import com.nadoumi.media.mapper.MediaAccessLogMapper;
 import com.nadoumi.media.mapper.MediaAssetMapper;
 import com.nadoumi.media.service.MediaAccessLogWriter;
@@ -80,5 +81,17 @@ public class MediaAutoConfiguration {
     MediaGateway mediaService(MediaStorageService mediaStorageService, MediaAccessLogWriter accessLogWriter,
             MediaProperties properties) {
         return new MediaService(mediaStorageService, accessLogWriter, properties);
+    }
+
+    /**
+     * The media reconciliation Quartz job. Registered under the bean name
+     * {@code mediaReconciliationJob} so a {@code sys_job} row can invoke it as
+     * {@code mediaReconciliationJob.run()} (seeded, paused, by V29).
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    MediaReconciliationJob mediaReconciliationJob(MediaStorageService mediaStorageService,
+            MediaAssetMapper assetMapper, MediaAccessLogMapper accessLogMapper, MediaProperties properties) {
+        return new MediaReconciliationJob(assetMapper, accessLogMapper, mediaStorageService, properties);
     }
 }
