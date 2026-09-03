@@ -51,13 +51,13 @@ spring:
     basename: i18n/messages
   profiles:
     active: druid
-  # multipart upload
+  # multipart upload — hard ceiling for media uploads (spec §I.10, nadoumi-media)
   servlet:
     multipart:
       # per-file limit
-      max-file-size: 10MB
+      max-file-size: 20MB
       # total request limit
-      max-request-size: 20MB
+      max-request-size: 22MB
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
@@ -152,6 +152,15 @@ nadoumi:
   web:
     # used in transactional emails (e.g. the "account already exists" message)
     loginUrl: ${NADOUMI_WEB_LOGIN_URL:http://localhost:3000/login}
+  media:
+    # Cloudinary folder prefix so one cloud can host all envs without collision
+    env: ${NADOUMI_MEDIA_ENV:dev}
+    # signed-URL lifetime for PROTECTED assets; clamped to [60, 600] in code
+    signed-url-ttl-seconds: ${NADOUMI_MEDIA_SIGNED_URL_TTL_SECONDS:180}
+    # hard upload ceiling across all categories; mirrors spring.servlet.multipart
+    max-upload-mb: ${NADOUMI_MEDIA_MAX_UPLOAD_MB:20}
+    # grace period before the reconciliation job destroys a DELETED asset (Part I, Task 12)
+    reconcile-grace-days: ${NADOUMI_MEDIA_RECONCILE_GRACE_DAYS:30}
 
 # token
 token:
