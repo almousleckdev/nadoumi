@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(23);
+        assertThat(applied).isEqualTo(24);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -172,6 +172,20 @@ class FlywayMigrationsIT {
                 + "AND table_name = 'nad_media_asset' AND column_name IN ('access_class','public_id')")).isEqualTo("2");
         assertThat(single(ds, "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_media_asset' AND index_name = 'uk_media_provider_public_id'")).isEqualTo("1");
+        // V27 — catalog *_media_id FKs + the student view exposes hero/cover media ids
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_university' AND column_name IN ('logo_media_id','banner_media_id')")).isEqualTo("2");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_university_gallery' AND column_name = 'media_id'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_scholarship' AND column_name IN ('hero_media_id','cover_media_id')")).isEqualTo("2");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_program' AND column_name = 'image_media_id'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'v_scholarship_student' AND column_name = 'hero_media_id'")).isEqualTo("1");
+        // the student view still must not leak the confidential university association
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'v_scholarship_student' AND column_name = 'university_id'")).isEqualTo("0");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -201,7 +215,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(22); // V2..V26
+        assertThat(applied).isEqualTo(23); // V2..V27
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
