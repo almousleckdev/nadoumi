@@ -183,6 +183,13 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   shows a cover strip; `scholarships/[slug]` hero uses the hero/cover image.
   Admin uploads through RuoYi `/common/upload` (no object-storage slice yet).
 
+**UPDATE 2026-09-03 (scholarship reference code + table — V25):** the public
+`/scholarships` table gains a **Ref.** column (`NAC-<year>-NNNN`) and an **Upfront
+fee (¥·$)** column; column order is Ref · Title · Location · Level · Language ·
+Next intake · Funding · Fees · Deadline · Apply. `scholarships/[slug]` shows the
+reference code above the title. `ScholarshipCard` gains `referenceCode`; admin
+list + detail show it (`Assigned on first publish` while DRAFT).
+
 **UPDATE 2026-09-03 (slug URLs — V24):** public university + programme pages
 route by `slug` — `app/pages/universities/[slug].vue`, `app/pages/programs/[slug].vue`
 (renamed from `[id].vue`). `UniversityCard` / `ProgramCard` link to

@@ -67,6 +67,7 @@ public class ScholarshipAdminService {
         s.setCreateBy(currentUser());
         if (req.publishStatus() == PublishStatus.PUBLISHED) {
             s.setPublishedAt(java.time.LocalDateTime.now());
+            assignReferenceCode(s);
         }
         mapper.insert(s);
         replaceChildren(s.getId(), req);
@@ -79,6 +80,9 @@ public class ScholarshipAdminService {
         apply(existing, req);
         existing.setId(id);
         existing.setSlug(uniqueSlug(req.title(), id));
+        if (req.publishStatus() == PublishStatus.PUBLISHED) {
+            assignReferenceCode(existing);
+        }
         existing.setUpdateBy(currentUser());
         mapper.update(existing);
         if (req.publishStatus() == PublishStatus.PUBLISHED) {
@@ -249,6 +253,19 @@ public class ScholarshipAdminService {
                                 blankToNull(d.note())), i++);
             }
         }
+    }
+
+    /**
+     * Assign the human-facing reference code {@code NAC-<year>-NNNN} on first
+     * publish. Idempotent -- a scholarship keeps its code once it has one.
+     */
+    private void assignReferenceCode(Scholarship s) {
+        if (s.getReferenceCode() != null && !s.getReferenceCode().isBlank()) {
+            return;
+        }
+        String prefix = "NAC-" + java.time.Year.now().getValue() + "-";
+        Integer max = mapper.maxReferenceSeq(prefix);
+        s.setReferenceCode(prefix + String.format(Locale.ROOT, "%04d", (max == null ? 0 : max) + 1));
     }
 
     /** The slug is always derived from the title -- lower-case kebab, de-duplicated. */

@@ -79,6 +79,9 @@
       @retry="reload"
       @row-click="(row) => router.push(`/scholarships/${row.view.id}`)"
     >
+      <template #cell-referenceCode="{ row }">
+        <span class="s-ref">{{ (row as Scholarship).view.referenceCode || '—' }}</span>
+      </template>
       <template #cell-title="{ row }">
         <div class="s-title">
           <span>{{ (row as Scholarship).view.title }}</span>
@@ -173,7 +176,8 @@ const { confirm } = useConfirm()
 
 const FUNDING = ['FULLY', 'PARTIAL', 'SELF'] as const
 const columns: DataTableColumn[] = [
-  { prop: 'title', label: t('scholarship.title'), minWidth: 260 },
+  { prop: 'referenceCode', label: t('scholarship.referenceCode'), width: 130 },
+  { prop: 'title', label: t('scholarship.title'), minWidth: 240 },
   { prop: 'country', label: t('scholarship.country'), width: 80, align: 'center' },
   { prop: 'funding', label: t('scholarship.fundingModel'), width: 130 },
   { prop: 'levels', label: t('scholarship.levels'), width: 180 },
@@ -239,4 +243,5 @@ onMounted(reload)
 <style scoped>
 .mono { font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
 .s-title { display: flex; align-items: center; gap: 8px; }
+.s-ref { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--nad-ink-soft); }
 </style>

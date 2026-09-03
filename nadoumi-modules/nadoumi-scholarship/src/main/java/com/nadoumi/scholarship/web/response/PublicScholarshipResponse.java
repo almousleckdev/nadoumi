@@ -21,6 +21,7 @@ import java.util.List;
 public record PublicScholarshipResponse(
         Long id,
         String slug,
+        String referenceCode,
         String title,
         String summary,
         String country,
@@ -113,7 +114,7 @@ public record PublicScholarshipResponse(
 
     private static PublicScholarshipResponse build(Scholarship s, boolean detail) {
         return new PublicScholarshipResponse(
-                s.getId(), s.getSlug(), s.getTitle(), s.getSummary(),
+                s.getId(), s.getSlug(), s.getReferenceCode(), s.getTitle(), s.getSummary(),
                 s.getCountry(), s.getProvince(), s.getCity(), s.getField(),
                 s.getTeachingLanguage() == null ? null : s.getTeachingLanguage().name(),
                 s.getFundingModel() == null ? null : s.getFundingModel().name(),
