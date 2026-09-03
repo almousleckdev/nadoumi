@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UniversityDetail, UniversityHighlight } from '~/types/catalog'
+import type { ProgramCard, UniversityDetail, UniversityHighlight } from '~/types/catalog'
 
 const route = useRoute()
 const { t } = useI18n()
@@ -11,6 +11,11 @@ const { data: u } = await useAsyncData(
   () => `university-${id.value}`,
   () => publicGet<UniversityDetail>(`universities/${id.value}`).catch(() => null),
   { watch: [id] },
+)
+const { data: programs } = await useAsyncData(
+  () => `university-${id.value}-programs`,
+  () => publicGet<ProgramCard[]>(`universities/${id.value}/programs`).catch(() => []),
+  { watch: [id], default: () => [] },
 )
 
 useSeo(
@@ -120,13 +125,18 @@ const prose = computed(() => {
 
           <section>
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.programmes') }}</h2>
-            <div class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
-              <p class="flex items-center gap-2 text-sm font-medium text-slate-500">
-                <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
-                {{ t('university.programmesArriving') }}
-              </p>
-              <p class="mt-2 text-sm text-slate-600">{{ t('university.programmesBody') }}</p>
+            <p class="mt-1 text-sm text-slate-600">{{ t('program.sectionIntro') }}</p>
+            <div v-if="programs.length" class="mt-4 grid gap-4 sm:grid-cols-2">
+              <ProgramCard
+                v-for="p in programs"
+                :key="p.id"
+                :program="p"
+                :show-university="false"
+              />
             </div>
+            <p v-else class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-sm text-slate-500">
+              {{ t('university.programmesEmpty') }}
+            </p>
           </section>
 
           <section v-if="u.gallery.length">

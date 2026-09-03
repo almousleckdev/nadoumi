@@ -38,9 +38,19 @@ const fudan: UDto = {
   ],
 }
 
-const publicGet = vi.fn((path: string) =>
-  path === 'universities/7' ? Promise.resolve(fudan) : Promise.reject(new Error('404')),
-)
+const programs = [
+  {
+    id: 11, universityId: 7, universityName: 'Fudan University', name: 'MBA',
+    nameCn: null, programType: 'MASTER', field: 'Business', teachingLanguage: 'ENGLISH',
+    durationMonths: 24, tuitionAmount: 38000, tuitionCurrency: 'USD', summary: null,
+    featured: false, hot: true,
+  },
+]
+const publicGet = vi.fn((path: string) => {
+  if (path === 'universities/7') return Promise.resolve(fudan)
+  if (path === 'universities/7/programs') return Promise.resolve(programs)
+  return Promise.reject(new Error('404'))
+})
 mockNuxtImport('useApi', () => () => ({ publicGet, studentFetch: vi.fn() }))
 
 describe('public university detail page', () => {
@@ -60,8 +70,9 @@ describe('public university detail page', () => {
     expect(text).toContain('Strong medical school')
     expect(text).toContain('QS')
     expect(text).toContain('#34')
-    // programmes belong on the university page (Step 3 fills the list)
+    // programmes offered by the university render as real cards
     expect(text).toContain('Programmes')
+    expect(text).toContain('MBA')
     // gallery renders campus/dormitory imagery with captions
     expect(text).toContain('Main campus')
     expect(text).toContain('Dormitory')

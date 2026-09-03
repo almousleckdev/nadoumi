@@ -82,7 +82,8 @@
     "programDiscovery": {
       "eyebrow": "Programmes",
       "title": "Hot programmes and language courses",
-      "description": "Degree and language programmes, discovered through the university that offers them."
+      "description": "Degree and language programmes, discovered through the university that offers them.",
+      "empty": "No programmes are featured yet."
     },
     "partners": {
       "eyebrow": "Partnerships",
@@ -522,8 +523,7 @@
     "highlights": "Highlights",
     "advantages": "Advantages",
     "programmes": "Programmes",
-    "programmesArriving": "Arriving with the Programme catalogue",
-    "programmesBody": "This university’s programmes — language, diploma, bachelor’s, master’s and PhD — will be listed here, each with its intakes and majors.",
+    "programmesEmpty": "No programmes are listed for this university yet.",
     "gallery": "Gallery",
     "galleryArriving": "Arriving with document storage",
     "rankings": "Rankings",
@@ -531,6 +531,46 @@
     "website": "Official website",
     "admissionsEmail": "Admissions",
     "officePhone": "Phone"
+  },
+  "program": {
+    "fallbackTitle": "Programme",
+    "notAvailable": "This programme is not available.",
+    "offeredBy": "Offered by {university}",
+    "backToUniversity": "Back to {university}",
+    "view": "View programme",
+    "hot": "Hot",
+    "duration": "{months} months",
+    "durationLabel": "Duration",
+    "tuition": "Tuition",
+    "field": "Field of study",
+    "language": "Teaching language",
+    "majors": "Majors",
+    "intakes": "Intakes",
+    "applyWindow": "{open} – {close}",
+    "applyFrom": "Opens {open}",
+    "applyUntil": "Closes {close}",
+    "sectionTitle": "Programmes",
+    "sectionIntro": "Courses of study offered by this university, each with its intakes and majors.",
+    "level": {
+      "LANGUAGE": "Language",
+      "NON_DEGREE": "Non-degree",
+      "DIPLOMA": "Diploma",
+      "BACHELOR": "Bachelor’s",
+      "MASTER": "Master’s",
+      "PHD": "PhD"
+    },
+    "lang": {
+      "ENGLISH": "English",
+      "CHINESE": "Chinese",
+      "BILINGUAL": "Bilingual"
+    },
+    "intake": {
+      "SPRING_MARCH": "Spring (March)",
+      "AUTUMN_SEPTEMBER": "Autumn (September)",
+      "SUMMER": "Summer",
+      "WINTER": "Winter",
+      "ROLLING": "Rolling"
+    }
   },
   "scholarships": {
     "searchLabel": "Search scholarships",
