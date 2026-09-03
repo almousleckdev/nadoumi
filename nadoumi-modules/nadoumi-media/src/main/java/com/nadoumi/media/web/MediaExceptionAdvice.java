@@ -1,5 +1,6 @@
 package com.nadoumi.media.web;
 
+import com.nadoumi.media.NadMediaNotFoundException;
 import com.nadoumi.media.validation.MediaValidationException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -24,6 +25,13 @@ public class MediaExceptionAdvice {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.valueOf(e.reason().status()));
         pd.setDetail(e.getMessage());
         pd.setProperty("reason", e.reason().name());
+        return pd;
+    }
+
+    @ExceptionHandler(NadMediaNotFoundException.class)
+    public ProblemDetail mediaNotFound(NadMediaNotFoundException e) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+        pd.setDetail(e.getMessage());
         return pd;
     }
 }

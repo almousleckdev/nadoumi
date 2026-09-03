@@ -1,8 +1,12 @@
 package com.nadoumi.media.config;
 
 import com.cloudinary.Cloudinary;
+import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaStorageService;
+import com.nadoumi.media.mapper.MediaAccessLogMapper;
 import com.nadoumi.media.mapper.MediaAssetMapper;
+import com.nadoumi.media.service.MediaAccessLogWriter;
+import com.nadoumi.media.service.MediaService;
 import com.nadoumi.media.spi.CloudinaryMediaStorage;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -63,5 +67,18 @@ public class MediaAutoConfiguration {
     MediaStorageService cloudinaryMediaStorage(Cloudinary cloudinary, MediaAssetMapper assetMapper,
             MediaProperties properties) {
         return new CloudinaryMediaStorage(cloudinary, assetMapper, properties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    MediaAccessLogWriter mediaAccessLogWriter(MediaAccessLogMapper accessLogMapper) {
+        return new MediaAccessLogWriter(accessLogMapper);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(MediaGateway.class)
+    MediaGateway mediaService(MediaStorageService mediaStorageService, MediaAccessLogWriter accessLogWriter,
+            MediaProperties properties) {
+        return new MediaService(mediaStorageService, accessLogWriter, properties);
     }
 }
