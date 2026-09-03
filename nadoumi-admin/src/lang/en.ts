@@ -365,6 +365,7 @@ export default {
     country: 'Country', province: 'Province', city: 'City',
     fundingModel: 'Funding model', teachingLanguage: 'Teaching language',
     categories: 'Categories', categoriesHint: 'CSC, provincial, Type A…',
+    categoriesPartialHint: 'CSC, CGS and government Type A–D are fully-funded schemes and are not available for a partially-funded scholarship.',
     levels: 'Education levels',
     deadline: 'Application deadline', rolling: 'Rolling', slots: 'Available places',
     benefits: 'Benefits', requirements: 'Requirements', policy: 'Policy & notes',

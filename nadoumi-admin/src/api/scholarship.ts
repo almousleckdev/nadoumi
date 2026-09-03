@@ -113,7 +113,6 @@ export interface Scholarship {
 }
 
 export interface ScholarshipInput {
-  slug?: string | null
   title: string
   summary?: string | null
   country: string

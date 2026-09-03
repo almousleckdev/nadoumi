@@ -93,10 +93,14 @@
       </template>
     </DataTable>
 
-    <el-dialog
-      v-model="createOpen"
+    <Drawer
+      :model-value="createOpen"
       :title="t('applicant.new')"
-      width="480px"
+      :saving="creating"
+      :save-label="t('applicant.create')"
+      :size="480"
+      @update:model-value="createOpen = $event"
+      @save="submitCreate"
     >
       <el-form
         ref="createRef"
@@ -142,19 +146,7 @@
           />
         </el-form-item>
       </el-form>
-      <template #footer>
-        <el-button @click="createOpen = false">
-          {{ t('common.cancel') }}
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="creating"
-          @click="submitCreate"
-        >
-          {{ t('applicant.create') }}
-        </el-button>
-      </template>
-    </el-dialog>
+    </Drawer>
   </div>
 </template>
 
@@ -177,6 +169,7 @@ import DataTable from '@/components/ui/DataTable.vue'
 import type { DataTableColumn } from '@/components/ui/types'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import Avatar from '@/components/ui/Avatar.vue'
+import Drawer from '@/components/ui/Drawer.vue'
 
 const { t } = useI18n()
 const router = useRouter()
