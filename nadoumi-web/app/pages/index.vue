@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Page, UniversitySummary } from '~/types/catalog'
+import type { Page, ScholarshipCard, UniversitySummary } from '~/types/catalog'
 import { imagery } from '~/data/imagery'
 
 const { t } = useI18n()
@@ -19,8 +19,21 @@ const { data: recommended, pending: recommendedPending, error: recommendedError 
   { default: () => null },
 )
 
+const { data: newSch, pending: newSchPending, error: newSchError } = useLazyAsyncData(
+  'home-new-scholarships',
+  () => publicGet<Page<ScholarshipCard>>('scholarships', { sort: 'newest', size: 12 }),
+  { default: () => null },
+)
+const { data: fundedSch, pending: fundedSchPending, error: fundedSchError } = useLazyAsyncData(
+  'home-funded-scholarships',
+  () => publicGet<Page<ScholarshipCard>>('scholarships', { funding: 'FULLY', size: 12 }),
+  { default: () => null },
+)
+
 const featuredUnis = computed(() => featured.value?.content ?? [])
 const recommendedUnis = computed(() => recommended.value?.content ?? [])
+const newScholarships = computed(() => newSch.value?.content ?? [])
+const fundedScholarships = computed(() => fundedSch.value?.content ?? [])
 
 const journey = computed(() => [
   { title: t('home.journey.s1t'), body: t('home.journey.s1b') },
@@ -76,12 +89,25 @@ const journey = computed(() => [
     </NContainer>
 
     <NContainer>
-      <SectionPlaceholder
-        :eyebrow="t('home.scholarshipDiscovery.eyebrow')"
-        :title="t('home.scholarshipDiscovery.title')"
-        :description="t('home.scholarshipDiscovery.description')"
-        :arriving-with="t('home.arriving.scholarships')"
-      />
+      <DiscoverySection
+        :eyebrow="t('home.newScholarships.eyebrow')"
+        :title="t('home.newScholarships.title')"
+        :description="t('home.newScholarships.description')"
+        :carousel-label="t('home.newScholarships.title')"
+        :view-all-to="localePath('/scholarships')"
+        :view-all-label="t('scholarships.viewAll')"
+        :pending="newSchPending"
+        :error="newSchError ? t('errors.loadSection') : ''"
+        :empty="!newScholarships.length"
+        :empty-text="t('home.newScholarships.empty')"
+      >
+        <ScholarshipCard
+          v-for="sch in newScholarships"
+          :key="sch.id"
+          :scholarship="sch"
+          variant="carousel"
+        />
+      </DiscoverySection>
     </NContainer>
 
     <NContainer>
@@ -96,6 +122,28 @@ const journey = computed(() => [
           <NButton :to="localePath('/register')">{{ t('home.hero.ctaScholarships') }}</NButton>
         </template>
       </StorySplit>
+    </NContainer>
+
+    <NContainer>
+      <DiscoverySection
+        :eyebrow="t('home.fundedScholarships.eyebrow')"
+        :title="t('home.fundedScholarships.title')"
+        :description="t('home.fundedScholarships.description')"
+        :carousel-label="t('home.fundedScholarships.title')"
+        :view-all-to="localePath('/scholarships?funding=FULLY')"
+        :view-all-label="t('scholarships.viewAll')"
+        :pending="fundedSchPending"
+        :error="fundedSchError ? t('errors.loadSection') : ''"
+        :empty="!fundedScholarships.length"
+        :empty-text="t('home.fundedScholarships.empty')"
+      >
+        <ScholarshipCard
+          v-for="sch in fundedScholarships"
+          :key="sch.id"
+          :scholarship="sch"
+          variant="carousel"
+        />
+      </DiscoverySection>
     </NContainer>
 
     <NContainer>

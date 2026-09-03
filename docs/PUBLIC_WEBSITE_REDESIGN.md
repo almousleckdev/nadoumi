@@ -143,6 +143,80 @@ Public API:
 - Staff CRUD `POST/PUT/DELETE /api/staff/scholarships/**` + `/internal` (separate
   permission `nad:scholarship:internal:*`), admin screens in `nadoumi-admin`.
 
+### R3 — DELIVERED (2026-09-03, `nadoumi-scholarship`, V16 DDL + V17 seed)
+
+Fifth `nadoumi-modules/` module. Tables per §5 (10: `nad_scholarship`,
+`_level`, `_category` + `_category_link`, `_intake`, `_eligibility`, `_fee`,
+`_stipend`, `_document_requirement`, `_internal`) + the **`v_scholarship_student`**
+view. `FlywayMigrationsIT` asserts the view projects **no** confidential column.
+
+- Public: `GET /api/public/scholarships` (`q, country, province, city, field,
+  language, funding, hasStipend, deadlineBefore, level, category, intake,
+  featured, recommended, hot, sort, page, size`), `/facets` (level / category /
+  fundingModel / teachingLanguage buckets for the current filter set),
+  `/{slugOrId}`. All `@Anonymous`, all read `v_scholarship_student` +
+  student-safe child tables only — `PublicScholarshipResponse` (card + detail).
+- Staff: `/api/staff/scholarships` CRUD (`nad:scholarship:*`) with children
+  replaced whole in one transaction + slug auto-derivation; the confidential
+  linkage sub-resource `GET/PUT /{id}/internal` is gated by
+  `nad:scholarship:internal:view` / `:edit`. `ScholarshipAdminService` validates
+  `internal.universityId` via `UniversityService` (cross-module **service** call).
+- **Confidentiality tests (required, passing):** `StaffScholarshipTest` proves an
+  anonymous list + detail body contains no `universityId` / `partnership` /
+  `commission` / `internal*` string on any path even after the linkage is set,
+  and that `case_officer` (has `internal:view`, not `:edit`) is 200 on GET and
+  403 on PUT.
+- Web: `/scholarships` is a real **table** (search + funding/language/stipend +
+  a level/category "More filters" panel with live facet counts + sort + chips +
+  paging + states) with a per-row **Apply**; `/scholarships/[slug]` detail
+  (benefits/requirements prose, structured eligibility, fee table, stipend,
+  intakes, **document checklist from `nad_scholarship_document_requirement`** —
+  never hard-coded) with an **Apply now** CTA that routes to register/dashboard
+  (the guided application flow is R5). Home "New scholarships" +
+  "Fully funded scholarships" carousels are now real.
+
+---
+
+## 5a. `nadoumi-program` domain (next — migration V18)
+
+Fifth `nadoumi-modules/` module. A **programme** is offered by exactly one
+university; it owns its majors and intakes. No commercial data. Public reads are
+student-safe only.
+
+| Table | Columns | Notes |
+| --- | --- | --- |
+| `nad_program` | `id`, `university_id`→`nad_university` **ON DELETE RESTRICT**, `name`, `name_cn?`, `program_type` (LANGUAGE/NON_DEGREE/DIPLOMA/BACHELOR/MASTER/PHD), `field?`, `teaching_language?` (ENGLISH/CHINESE/BILINGUAL), `duration_months?`, `tuition_amount decimal(12,2)?`, `tuition_currency char(3)?`, `summary?`, `is_featured`, `is_hot`, `publish_status` (DRAFT/PUBLISHED), `status` (ACTIVE/INACTIVE), audit | Unique `(university_id, name)`. Indexes: `(university_id)`, `(publish_status, status)`, `(program_type)`, `(is_featured, is_hot)`. |
+| `nad_program_major` | `id`, `program_id`→`nad_program` **ON DELETE CASCADE**, `name`, `name_cn?`, `sort_order` | Owned child, edited whole. `idx (program_id, sort_order)`. |
+| `nad_program_intake` | `id`, `program_id`→`nad_program` **ON DELETE CASCADE**, `term` (SPRING_MARCH/AUTUMN_SEPTEMBER/…), `application_open?`, `application_close?`, `sort_order` | Owned child, edited whole. `idx (program_id, sort_order)`. |
+
+Menu / permission seed (in V15, mirrors V9): `Programmes` admin C-menu +
+`nad:program:list/view/create/edit/remove` F-menus; granted to
+`nadoumi_super_admin` (all), `ops_manager` + `partnerships_manager` (full),
+`case_officer` / `content_editor` / `read_only_analyst` / `support_agent` (read).
+
+APIs:
+- **Public** (`@Anonymous`, `PublicProgramResponse` — no status / publishStatus /
+  remark / audit; PUBLISHED + ACTIVE only, and only for a PUBLISHED + ACTIVE
+  university):
+  - `GET /api/public/universities/{id}/programs` — the programmes list for one
+    university (used by the redesigned university-detail page).
+  - `GET /api/public/programs` — `q`, `universityId`, `type`, `language`,
+    `field`, `featured`, `hot`, `page`, `size` → `PageResponse<PublicProgramResponse>`
+    (carries `universityId` + `universityName`, resolved via
+    `UniversityService`, **not** a cross-module SQL join). Used by the Home
+    "Hot programmes" / "Language programmes" carousels.
+  - `GET /api/public/programs/{id}` — adds majors + intakes.
+- **Staff** (`/api/staff/programs`, `nad:program:*`, mirrors
+  `StaffUniversityController`): list / get / create / update / delete; children
+  replaced whole in the same transaction; `create` / `update` validate the
+  `university_id` via `UniversityService.get(id)` (cross-module **service**
+  call, never its mapper).
+
+Frontend (R2): `ProgramCard`; the real Programmes section on
+`universities/[id].vue`; Home "Hot programmes" carousel (real, `?hot=true`);
+`app/pages/programs/[id].vue` detail page reached from the university and the
+carousels — **no `/programs` index, no nav item**.
+
 ---
 
 ## 6. Phased implementation sequence (PROPOSED)
@@ -156,8 +230,8 @@ owning doc section updated.
 | **R1 — foundations + shell + static surfaces** | Public design-system layer + honest Home + About + Contact + Universities redesign against **today's** backend. | **B0** contact fields (V14), **B1** university list filters + facets. | `@nuxt/image` (D1); rebuild `PageHero` + card family + `SectionHeader` + `Carousel` + `FilterBar`/`FilterDrawer`/`FilterChips` + `ResultGrid` + `Pagination` + `useDiscovery`; redesign `SiteHeader`/`SiteFooter`; **Home** …; **Universities** list + **detail**; **About**; **Contact**. |
 | &nbsp;&nbsp;↳ **R1 / PR-1 ✅** (2026-09-03) | Foundations + shell + Home. | `province`/`city`/`type`/`featured`/`recommended` params on `/api/public\|staff/universities` (`UniversitySearch` record, no migration). | `@nuxt/image` + `app/data/imagery.ts`; `MediaFigure` / `SectionHeading` / `Carousel` / `CarouselArrows` / `DiscoverySection` / `SectionPlaceholder` / `UniversityCard` / `HomeHero` / `StorySplit` / `JourneyTimeline` / `CtaBand`; container-less `layouts/default`; sticky `SiteHeader`; restructured `SiteFooter`; **Home** rebuilt (2 real university carousels + 3 honest placeholders + journey + image CTA). `home.*` i18n replaced (4 locales). `mvn verify` + admin + web lint/typecheck/test(133)/build green. |
 | &nbsp;&nbsp;↳ **R1 / PR-2 ✅** (2026-09-03) | Universities list + detail redesign, About, Contact. | `nad_contact_inquiry` split-name + `phone` + `category` (**V14**); `ContactRequest` reshaped. `/facets` still deferred (free-text province/city for now). | `useDiscovery` + `ResultGrid` + `FilterBar` + `FilterChips` + `Pagination`; Universities list (search + country/province/city/type/featured filters, chips, count, paging, empty vs. no-match, `?`-synced); University detail (dark hero, facts strip, 2-col body + sticky sidebar, grouped highlights, honest Programmes + Gallery blocks); About (hero, who/mission/vision/values/how-we-help + flagged team/office/hours); Contact (info column + first/last/email/phone/topic/subject/message form, all states). `mvn verify` + admin + web lint/typecheck/test(137)/build green; SSR-checked. |
-| **R2 — programs** | `nadoumi-program`. Programmes appear on the university detail page + Home "Hot Programs" / "Hot Language Programs" carousels + a programme detail page reached from the university. **No** top-level Programs nav. | **B2** module + **V12**. | `ProgramCard`, university-detail Programmes section (real), Home program carousels (real), `/universities/[id]/programs/[pid]`. |
-| **R3 — scholarships** | `nadoumi-scholarship` (§5) + confidentiality split + leak tests. | **B3** module + **V13**. | **Scholarships** discovery page (search, primary filters + "More filters" drawer, facet counts, chips, sort, paging, all states) using `useDiscovery` + `ResultGrid`; `ScholarshipCard`; scholarship **detail** page; Home "New Scholarships" / "Featured Scholarships" / "Self-Funded" carousels (real). |
+| **R3 — scholarships ✅** (2026-09-03, done before R2 at the user's request) | `nadoumi-scholarship` (§5, §R3) + `v_scholarship_student` view + confidentiality leak tests. | **V16** DDL + **V17** seed. | **Scholarships** discovery **table** (search, funding/language/stipend, level+category "More filters" with live facet counts, sort, chips, paging, states) via `useDiscovery`; per-row **Apply**; `/scholarships/[slug]` detail with the config-driven document checklist; `ScholarshipCard`; Home "New scholarships" + "Fully funded scholarships" carousels. |
+| **R2 — programs** | `nadoumi-program`. Programmes appear on the university detail page + Home "Hot Programs" / "Hot Language Programs" carousels + a programme detail page reached from the university. **No** top-level Programs nav. | **B2** module + **V18**. | `ProgramCard`, university-detail Programmes section (real), Home program carousels (real), `/programs/[id]`. |
 | **R4 — content flags + partner** | `is_hot` / `published_at` everywhere; partner-university derivation once a partnership context exists. | **B6**, **B5**. | "Recommended by Nadoumi", "Partner Universities" Home sections become real. |
 | **R5 — Apply Now + snapshots** | `nadoumi-application` + profile/requirement snapshots (Step 6). | Step 6 (V15–V16). | Apply Now on scholarship detail → "apply for myself / another student" → profile-prefill → scholarship-specific extra fields + document checklist from `nad_scholarship_document_requirement`. |
 

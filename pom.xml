@@ -214,6 +214,11 @@
                 <artifactId>nadoumi-university</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.nadoumi</groupId>
+                <artifactId>nadoumi-scholarship</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>

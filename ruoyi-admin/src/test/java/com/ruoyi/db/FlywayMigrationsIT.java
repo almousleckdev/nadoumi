@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(12);
+        assertThat(applied).isEqualTo(14);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -111,6 +111,22 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT extra FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_user_applicant_access' AND column_name = 'owner_guard'"))
                 .isEqualTo("STORED GENERATED");
+        // V16 — scholarship aggregate + the student-safe view + the confidential table
+        assertThat(tableExists(ds, "nad_scholarship")).isTrue();
+        assertThat(tableExists(ds, "nad_scholarship_internal")).isTrue();
+        assertThat(tableExists(ds, "nad_scholarship_fee")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.views WHERE table_schema = DATABASE() "
+                + "AND table_name = 'v_scholarship_student'")).isEqualTo("1");
+        // the view must not project any confidential column
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'v_scholarship_student' "
+                + "AND column_name IN ('university_id','partnership_id','operational_notes',"
+                + "'confidential_terms','commission_model_json','internal_status')")).isEqualTo("0");
+        // V17 — category reference + menu/permission seed
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_scholarship_category")).isEqualTo("12");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:scholarship:%'")).isEqualTo("9");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:scholarship:%'")).isEqualTo("9");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -140,7 +156,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(11); // V2..V14
+        assertThat(applied).isEqualTo(13); // V2..V17
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

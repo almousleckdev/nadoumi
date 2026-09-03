@@ -154,6 +154,32 @@ is logged, not surfaced. A filled honeypot (`website`) is accepted and dropped.
 | --- | --- | --- | --- |
 | POST | `/api/public/contact` | anonymous | body `{ firstName, lastName, email, phone?, category?, subject?, message, locale?, website? }` → `202` no body. `400` (problem+json) on validation failure. `name` is composed server-side. Consumed by `nadoumi-web` `contact.vue` via the BFF `/api/public/**` passthrough. |
 
+### 4.6 Scholarship endpoints (IMPLEMENTED — `nadoumi-scholarship`, R3)
+
+**Public** — `PublicScholarshipController`, `@Anonymous`. Every read is sourced
+from `v_scholarship_student` + the student-safe child tables. The response
+(`PublicScholarshipResponse`) carries **no** `universityId` / `partnership` /
+commission / internal field on any path (`StaffScholarshipTest` enforces this).
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| GET | `/api/public/scholarships` | `q`, `country`, `province`, `city`, `field`, `language`, `funding`, `hasStipend`, `deadlineBefore`, `level` (csv), `category` (csv), `intake` (csv), `featured`, `recommended`, `hot`, `sort` (`deadline`\|`newest`\|`title`), `page`, `size` (default 12) → `PageResponse<PublicScholarshipResponse>` (card rows: + `levels`, `categories`, `intakes`). |
+| GET | `/api/public/scholarships/facets` | same filters → `{ levels[], categories[], fundingModels[], teachingLanguages[] }` of `{ value, count }` — live counts for the current filter set. |
+| GET | `/api/public/scholarships/{slugOrId}` | `PublicScholarshipResponse` detail (+ `benefits`/`requirements`/`policy`, `eligibility`, `fees[]`, `stipend`, `documentRequirements[]`). `404` if not PUBLISHED+ACTIVE. |
+
+**Staff** — `StaffScholarshipController`. Student-safe CRUD under
+`nad:scholarship:*`; the confidential linkage sub-resource is gated separately.
+
+| Method | Path | Permission | Notes |
+| --- | --- | --- | --- |
+| GET | `/api/staff/scholarships` | `nad:scholarship:list` | `q`, `country`, `funding`, `publishStatus`, `status`, `page`, `size` → `PageResponse<ScholarshipResponse>` (`{ view, status, publishStatus, publishedAt, remark, … }`). |
+| GET | `/api/staff/scholarships/{id}` | `nad:scholarship:view` | assembles all children. |
+| POST | `/api/staff/scholarships` | `nad:scholarship:create` | `201`. Slug auto-derived from `title` (or the supplied kebab slug), de-duplicated. Children replaced whole in one transaction. |
+| PUT | `/api/staff/scholarships/{id}` | `nad:scholarship:edit` | idem; `published_at` is set on the first transition to PUBLISHED and never rewritten. |
+| DELETE | `/api/staff/scholarships/{id}` | `nad:scholarship:remove` | `204`. Children + `nad_scholarship_internal` cascade. |
+| GET | `/api/staff/scholarships/{id}/internal` | `nad:scholarship:internal:view` | `ScholarshipInternalResponse` (`universityId`, `universityName` via `UniversityService`, `partnershipId`, `internalStatus`, operational / confidential fields). |
+| PUT | `/api/staff/scholarships/{id}/internal` | `nad:scholarship:internal:edit` | upsert; `universityId` validated via `UniversityService`. |
+
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403

@@ -200,11 +200,21 @@ Externals get **no** `sys_role`/`sys_menu` rows, so a student/agent token fails 
   history). See `docs/DOCUMENT_MANAGEMENT.md` for the Nadoumi-grade replacement.
 - **`@RepeatSubmit`** AOP guards double submits; `@RateLimiter` (Redis) available.
 
-## 5. Scholarship / University / Partnership confidentiality (BASELINE)
+## 5. Scholarship / University / Partnership confidentiality (BASELINE — scholarship layer BUILT & TESTED, R3)
 
 Requirement (CLAUDE.md §8): a student must never learn which university/partnership a
-scholarship is tied to, nor which universities are partners. The full nine-layer
-enforcement model is in **`docs/DOMAIN_MODEL.md` §6.2**; summary:
+scholarship is tied to, nor which universities are partners. As of R3 the
+scholarship side is implemented: `nad_scholarship_internal` (PK=FK,
+`university_id`→`nad_university`, `commission_model_json`, operational/confidential
+notes) holds the linkage; **`v_scholarship_student`** is the only head-row object
+`PublicScholarshipController` / `ScholarshipService` read, and `FlywayMigrationsIT`
+asserts the view projects none of `university_id` / `partnership_id` /
+`operational_notes` / `confidential_terms` / `commission_model_json` /
+`internal_status`. `StaffScholarshipTest` proves an anonymous list + detail body
+contains no such string on any path even after `PUT …/internal` sets the linkage,
+and that `nad:scholarship:internal:*` gates the sub-resource (`case_officer` →
+`200` GET, `403` PUT). The full nine-layer enforcement model is in
+**`docs/DOMAIN_MODEL.md` §6.2**; summary:
 
 1. **Storage separation** — `nad_scholarship` (safe) vs `nad_scholarship_internal` vs
    `nad_partnership`.
