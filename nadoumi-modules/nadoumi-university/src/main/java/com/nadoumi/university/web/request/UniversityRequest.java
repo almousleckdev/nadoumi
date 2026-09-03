@@ -36,6 +36,8 @@ public record UniversityRequest(
         @Size(max = 32) String officePhone,
         @Size(max = 500) String logoImageUrl,
         @Size(max = 500) String coverImageUrl,
+        Long logoMediaId,
+        Long bannerMediaId,
         Boolean recommended,
         Boolean featured,
         @NotNull UniversityStatus status,
@@ -59,6 +61,7 @@ public record UniversityRequest(
 
     public record GalleryInput(
             @NotBlank @Size(max = 500) String imageUrl,
+            Long mediaId,
             @Size(max = 200) String caption) {
     }
 }

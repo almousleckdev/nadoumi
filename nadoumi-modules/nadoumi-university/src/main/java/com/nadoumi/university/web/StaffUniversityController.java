@@ -1,5 +1,6 @@
 package com.nadoumi.university.web;
 
+import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.university.domain.enums.UniversityStatus;
 import com.nadoumi.university.domain.enums.UniversityType;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Staff university catalog admin. Public data only — no partnership linkage here. */
 @RestController
@@ -74,5 +76,26 @@ public class StaffUniversityController {
     @Log(title = "University", businessType = BusinessType.DELETE)
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @PostMapping("/{id}/logo")
+    @PreAuthorize("@ss.hasPermi('nad:university:edit')")
+    @Log(title = "University media", businessType = BusinessType.UPDATE)
+    public MediaUploadResult uploadLogo(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadLogo(id, file);
+    }
+
+    @PostMapping("/{id}/banner")
+    @PreAuthorize("@ss.hasPermi('nad:university:edit')")
+    @Log(title = "University media", businessType = BusinessType.UPDATE)
+    public MediaUploadResult uploadBanner(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadBanner(id, file);
+    }
+
+    @PostMapping("/{id}/gallery")
+    @PreAuthorize("@ss.hasPermi('nad:university:edit')")
+    @Log(title = "University media", businessType = BusinessType.UPDATE)
+    public MediaUploadResult uploadGalleryImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return service.uploadGalleryImage(id, file);
     }
 }
