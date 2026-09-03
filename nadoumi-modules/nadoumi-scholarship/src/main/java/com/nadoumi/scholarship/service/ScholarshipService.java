@@ -46,6 +46,7 @@ public class ScholarshipService {
         s.setFees(mapper.findFees(s.getId()));
         s.setLevelStipends(mapper.findLevelStipends(s.getId()));
         s.setAccommodations(mapper.findAccommodations(s.getId()));
+        s.setCoverage(mapper.findCoverage(s.getId()));
         s.setDocumentRequirements(mapper.findDocumentRequirements(s.getId()));
         return PublicScholarshipResponse.detail(s);
     }

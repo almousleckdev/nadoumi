@@ -93,7 +93,7 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_applicant_test_score");
         jdbc.update("delete from nad_applicant_contact");
         jdbc.update("delete from nad_applicant");
-        jdbc.update("delete from nad_scholarship"); // cascades levels/categories/intakes/fees/stipends/accommodation/docs/internal
+        jdbc.update("delete from nad_scholarship"); // cascades levels/categories/intakes/fees/stipends/accommodation/coverage/docs/internal
         jdbc.update("delete from nad_program"); // cascades majors/intakes; FK RESTRICT to nad_university
         jdbc.update("delete from nad_university");
         jdbc.update("delete from nad_contact_inquiry");

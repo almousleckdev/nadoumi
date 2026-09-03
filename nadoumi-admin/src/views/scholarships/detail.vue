@@ -72,6 +72,11 @@
             { label: t('scholarship.deadline'), value: s.view.deadline || t('scholarship.rolling') },
             { label: t('scholarship.levels'), value: s.view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '—' },
             { label: t('scholarship.nonDegreeDuration'), value: s.view.nonDegreeDuration ? t(`scholarship.nonDegree.${s.view.nonDegreeDuration}`) : '—' },
+            { label: t('scholarship.studyDurationMonths'), value: s.view.studyDurationMonths ?? '—' },
+            { label: t('scholarship.applicationChannel'), value: s.view.applicationChannel ? t(`scholarship.channel.${s.view.applicationChannel}`) : '—' },
+            { label: t('scholarship.agencyNumber'), value: s.view.agencyNumber || '—' },
+            { label: t('scholarship.requiresFinancialProof'), value: s.view.requiresFinancialProof ? t('common.yes') : t('common.no') },
+            { label: t('scholarship.requiresFoundationYear'), value: s.view.requiresFoundationYear ? t('common.yes') : t('common.no') },
             { label: t('scholarship.categories'), value: s.view.categories.join(', ') || '—' },
             { label: t('scholarship.slots'), value: s.view.slots ?? '—' },
           ]"
@@ -187,6 +192,33 @@
             </template>
           </el-table-column>
         </el-table>
+      </FormSection>
+
+      <FormSection
+        v-if="s.view.coverage.length"
+        :title="t('scholarship.secCoverage')"
+      >
+        <ul class="list">
+          <li
+            v-for="(c, i) in s.view.coverage"
+            :key="i"
+          >
+            <strong>{{ t(`scholarship.coverageKind.${c.kind}`, c.kind) }}</strong>
+            <span
+              v-if="c.detail"
+              class="muted"
+            > — {{ c.detail }}</span>
+          </li>
+        </ul>
+      </FormSection>
+
+      <FormSection
+        v-if="s.view.renewalConditions"
+        :title="t('scholarship.renewalConditions')"
+      >
+        <p class="prose">
+          {{ s.view.renewalConditions }}
+        </p>
       </FormSection>
 
       <FormSection

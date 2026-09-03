@@ -1,5 +1,7 @@
 package com.nadoumi.scholarship.web.request;
 
+import com.nadoumi.scholarship.domain.enums.ApplicationChannel;
+import com.nadoumi.scholarship.domain.enums.CoverageKind;
 import com.nadoumi.scholarship.domain.enums.EducationLevel;
 import com.nadoumi.scholarship.domain.enums.FeeKind;
 import com.nadoumi.scholarship.domain.enums.FundingModel;
@@ -39,7 +41,13 @@ public record ScholarshipRequest(
         @Size(max = 20000) String benefits,
         @Size(max = 20000) String requirements,
         @Size(max = 20000) String policy,
+        @Size(max = 2000) String renewalConditions,
         NonDegreeDuration nonDegreeDuration,
+        @PositiveOrZero Integer studyDurationMonths,
+        ApplicationChannel applicationChannel,
+        @Size(max = 64) String agencyNumber,
+        Boolean requiresFinancialProof,
+        Boolean requiresFoundationYear,
         @PositiveOrZero BigDecimal applicationFeeAmount,
         @Size(min = 3, max = 3) String applicationFeeCurrency,
         @PositiveOrZero BigDecimal serviceFeeAmount,
@@ -60,6 +68,7 @@ public record ScholarshipRequest(
         @Valid List<FeeInput> fees,
         @Valid List<LevelStipendInput> levelStipends,
         @Valid List<AccommodationInput> accommodations,
+        @Valid List<CoverageInput> coverage,
         @Valid List<DocumentRequirementInput> documentRequirements) {
 
     public record IntakeInput(@NotBlank @Size(max = 24) String term,
@@ -87,6 +96,9 @@ public record ScholarshipRequest(
     public record AccommodationInput(@NotNull RoomType roomType,
             @PositiveOrZero BigDecimal amount, @Size(min = 3, max = 3) String currency,
             @Size(max = 200) String note) {
+    }
+
+    public record CoverageInput(@NotNull CoverageKind kind, @Size(max = 300) String detail) {
     }
 
     public record DocumentRequirementInput(@NotBlank @Size(max = 48) String docType,

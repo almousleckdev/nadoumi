@@ -189,6 +189,16 @@ is an accepted level. The staff request sends `levelStipends[]`, `accommodations
 and `nonDegreeDuration`; fee/stipend/accommodation amounts are entered once with a
 currency.
 
+**Terms (V23).** `coverage[]` (`kind` TUITION/ACCOMMODATION/STIPEND/
+MEDICAL_INSURANCE/SETTLEMENT_ALLOWANCE/TRAVEL/REGISTRATION_FEE/VISA_FEE/OTHER +
+`detail?`) is a structured list of what the award pays for, alongside the prose
+`benefits` — detail-only. `renewalConditions` (detail-only prose) is the annual
+review / renewal terms. `studyDurationMonths`, `applicationChannel`
+(DIRECT_UNIVERSITY/CSC_AGENCY/NADOUMI/OTHER), `agencyNumber`,
+`requiresFinancialProof`, `requiresFoundationYear` are on card + detail. The staff
+request sends `coverage[]` and these scalars; `agencyNumber` is kept only when the
+channel is `CSC_AGENCY`.
+
 | Method | Path | Notes |
 | --- | --- | --- |
 | GET | `/api/public/scholarships` | `q`, `country`, `province`, `city`, `field`, `language`, `funding`, `hasStipend`, `deadlineBefore`, `level` (csv), `category` (csv), `intake` (csv), `featured`, `recommended`, `hot`, `sort` (`deadline`\|`newest`\|`title`), `page`, `size` (default 12) → `PageResponse<PublicScholarshipResponse>` (card rows: + `levels`, `categories`, `intakes`). |

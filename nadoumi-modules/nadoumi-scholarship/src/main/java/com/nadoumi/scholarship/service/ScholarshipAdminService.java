@@ -7,6 +7,7 @@ import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.domain.ScholarshipAccommodation;
+import com.nadoumi.scholarship.domain.ScholarshipCoverage;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
 import com.nadoumi.scholarship.domain.ScholarshipInternal;
@@ -137,6 +138,7 @@ public class ScholarshipAdminService {
         s.setFees(mapper.findFees(id));
         s.setLevelStipends(mapper.findLevelStipends(id));
         s.setAccommodations(mapper.findAccommodations(id));
+        s.setCoverage(mapper.findCoverage(id));
         s.setDocumentRequirements(mapper.findDocumentRequirements(id));
         return s;
     }
@@ -155,7 +157,13 @@ public class ScholarshipAdminService {
         s.setBenefits(blankToNull(req.benefits()));
         s.setRequirements(blankToNull(req.requirements()));
         s.setPolicy(blankToNull(req.policy()));
+        s.setRenewalConditions(blankToNull(req.renewalConditions()));
         s.setNonDegreeDuration(req.nonDegreeDuration() == null ? null : req.nonDegreeDuration().name());
+        s.setStudyDurationMonths(req.studyDurationMonths());
+        s.setApplicationChannel(req.applicationChannel() == null ? null : req.applicationChannel().name());
+        s.setAgencyNumber(blankToNull(req.agencyNumber()));
+        s.setRequiresFinancialProof(Boolean.TRUE.equals(req.requiresFinancialProof()));
+        s.setRequiresFoundationYear(Boolean.TRUE.equals(req.requiresFoundationYear()));
         s.setApplicationFeeAmount(req.applicationFeeAmount());
         s.setApplicationFeeCurrency(upper(req.applicationFeeCurrency()));
         s.setServiceFeeAmount(req.serviceFeeAmount());
@@ -222,6 +230,13 @@ public class ScholarshipAdminService {
                 mapper.insertAccommodation(id, new ScholarshipAccommodation(a.roomType().name(), a.amount(),
                         a.currency() == null ? "CNY" : a.currency().toUpperCase(Locale.ROOT),
                         blankToNull(a.note())), i++);
+            }
+        }
+        mapper.deleteCoverage(id);
+        if (req.coverage() != null) {
+            int i = 0;
+            for (ScholarshipRequest.CoverageInput c : req.coverage()) {
+                mapper.insertCoverage(id, new ScholarshipCoverage(c.kind().name(), blankToNull(c.detail())), i++);
             }
         }
         mapper.deleteDocumentRequirements(id);

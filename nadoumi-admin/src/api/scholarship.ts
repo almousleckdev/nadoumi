@@ -10,6 +10,10 @@ export type ScholarshipStatus = 'ACTIVE' | 'INACTIVE'
 export type NationalityScope = 'ANY' | 'INCLUDE' | 'EXCLUDE'
 export type RoomType = 'SINGLE' | 'DOUBLE' | 'TRIPLE' | 'QUAD' | 'SHARED'
 export type NonDegreeDuration = 'HALF_YEAR' | 'ONE_YEAR'
+export type CoverageKind =
+  | 'TUITION' | 'ACCOMMODATION' | 'STIPEND' | 'MEDICAL_INSURANCE' | 'SETTLEMENT_ALLOWANCE'
+  | 'TRAVEL' | 'REGISTRATION_FEE' | 'VISA_FEE' | 'OTHER'
+export type ApplicationChannel = 'DIRECT_UNIVERSITY' | 'CSC_AGENCY' | 'NADOUMI' | 'OTHER'
 export type FeeKind =
   | 'TUITION_BEFORE' | 'TUITION_AFTER'
   | 'REGISTRATION' | 'APPLICATION' | 'NADOUMI_APPLICATION' | 'NADOUMI_SERVICE'
@@ -23,6 +27,11 @@ export const FEE_KINDS: FeeKind[] = [
 ]
 export const ROOM_TYPES: RoomType[] = ['SINGLE', 'DOUBLE', 'TRIPLE', 'QUAD', 'SHARED']
 export const NON_DEGREE_DURATIONS: NonDegreeDuration[] = ['HALF_YEAR', 'ONE_YEAR']
+export const COVERAGE_KINDS: CoverageKind[] = [
+  'TUITION', 'ACCOMMODATION', 'STIPEND', 'MEDICAL_INSURANCE', 'SETTLEMENT_ALLOWANCE',
+  'TRAVEL', 'REGISTRATION_FEE', 'VISA_FEE', 'OTHER',
+]
+export const APPLICATION_CHANNELS: ApplicationChannel[] = ['DIRECT_UNIVERSITY', 'CSC_AGENCY', 'NADOUMI', 'OTHER']
 export const EDUCATION_LEVELS: EducationLevel[] = ['NON_DEGREE', 'DIPLOMA', 'BACHELOR', 'MASTER', 'PHD']
 export const DOC_TYPES = [
   'PASSPORT', 'DEGREE', 'TRANSCRIPT', 'LANGUAGE_CERT', 'VISA', 'PHYSICAL_EXAM',
@@ -71,6 +80,10 @@ export interface ScholarshipAccommodationInput {
   currency: string
   note?: string | null
 }
+export interface ScholarshipCoverageInput {
+  kind: CoverageKind
+  detail?: string | null
+}
 export interface ScholarshipDocumentRequirementInput {
   docType: string
   mandatory: boolean
@@ -91,6 +104,11 @@ export interface ScholarshipView {
   fundingModel: FundingModel
   hasStipend: boolean
   nonDegreeDuration?: NonDegreeDuration | null
+  studyDurationMonths?: number | null
+  applicationChannel?: ApplicationChannel | null
+  agencyNumber?: string | null
+  requiresFinancialProof: boolean
+  requiresFoundationYear: boolean
   deadline?: string | null
   applicationFee?: Money | null
   serviceFee?: Money | null
@@ -106,6 +124,7 @@ export interface ScholarshipView {
   benefits?: string | null
   requirements?: string | null
   policy?: string | null
+  renewalConditions?: string | null
   eligibility?: ScholarshipEligibilityInput | null
   fees: { kind: string, amountRmb: number, amountUsd: number, currency: string, note?: string | null }[]
   stipends: {
@@ -124,6 +143,7 @@ export interface ScholarshipView {
     currency: string
     note?: string | null
   }[]
+  coverage: { kind: string, detail?: string | null }[]
   documentRequirements: ScholarshipDocumentRequirementInput[]
 }
 
@@ -148,10 +168,16 @@ export interface ScholarshipInput {
   fundingModel: FundingModel
   hasStipend: boolean
   nonDegreeDuration?: NonDegreeDuration | null
+  studyDurationMonths?: number | null
+  applicationChannel?: ApplicationChannel | null
+  agencyNumber?: string | null
+  requiresFinancialProof: boolean
+  requiresFoundationYear: boolean
   deadline?: string | null
   benefits?: string | null
   requirements?: string | null
   policy?: string | null
+  renewalConditions?: string | null
   applicationFeeAmount?: number | null
   applicationFeeCurrency?: string | null
   serviceFeeAmount?: number | null
@@ -172,6 +198,7 @@ export interface ScholarshipInput {
   fees: ScholarshipFeeInput[]
   levelStipends: ScholarshipLevelStipendInput[]
   accommodations: ScholarshipAccommodationInput[]
+  coverage: ScholarshipCoverageInput[]
   documentRequirements: ScholarshipDocumentRequirementInput[]
 }
 

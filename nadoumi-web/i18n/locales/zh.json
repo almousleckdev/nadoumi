@@ -613,6 +613,29 @@
     "stipendDuration": "Paid for {n} months",
     "upfront": "Upfront fees",
     "accommodation": "Accommodation",
+    "coverage": "What the award covers",
+    "renewal": "Renewal & annual review",
+    "studyDuration": "Study duration",
+    "applicationChannel": "Application channel",
+    "requiresFinancialProof": "Financial proof / a guarantor is required",
+    "requiresFoundationYear": "A foundation / preparatory year is required",
+    "coverageKind": {
+      "TUITION": "Tuition",
+      "ACCOMMODATION": "Accommodation",
+      "STIPEND": "Living stipend",
+      "MEDICAL_INSURANCE": "Comprehensive medical insurance",
+      "SETTLEMENT_ALLOWANCE": "One-off settlement allowance",
+      "TRAVEL": "Travel / airfare",
+      "REGISTRATION_FEE": "Registration fee",
+      "VISA_FEE": "Visa fee",
+      "OTHER": "Other"
+    },
+    "channel": {
+      "DIRECT_UNIVERSITY": "Direct to the university",
+      "CSC_AGENCY": "Via a CSC agency number",
+      "NADOUMI": "Through Nadoumi",
+      "OTHER": "Other"
+    },
     "nonDegreeDuration": "Non-degree duration",
     "room": {
       "SINGLE": "Single room",

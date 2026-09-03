@@ -401,6 +401,29 @@ export default {
     // non-degree duration
     nonDegreeDuration: 'Non-degree duration',
     nonDegree: { HALF_YEAR: 'Half year', ONE_YEAR: 'One year' },
+    // coverage — what the award actually pays for
+    secCoverage: 'What the award covers',
+    coverageHint: 'Structured list alongside the prose benefits — tuition, accommodation, insurance, settlement allowance…',
+    coverageDetail: 'Detail (optional)',
+    addCoverage: 'Add coverage item',
+    coverageKind: {
+      TUITION: 'Tuition', ACCOMMODATION: 'Accommodation', STIPEND: 'Living stipend',
+      MEDICAL_INSURANCE: 'Comprehensive medical insurance', SETTLEMENT_ALLOWANCE: 'One-off settlement allowance',
+      TRAVEL: 'Travel / airfare', REGISTRATION_FEE: 'Registration fee', VISA_FEE: 'Visa fee', OTHER: 'Other',
+    },
+    // application & terms
+    secApplication: 'Application & terms',
+    studyDurationMonths: 'Study duration (months)',
+    applicationChannel: 'Application channel',
+    channel: {
+      DIRECT_UNIVERSITY: 'Direct to the university', CSC_AGENCY: 'Via a CSC agency number',
+      NADOUMI: 'Through Nadoumi', OTHER: 'Other',
+    },
+    agencyNumber: 'CSC agency / application number',
+    requiresFinancialProof: 'Requires financial proof / a guarantor',
+    requiresFoundationYear: 'Requires a foundation / preparatory year',
+    renewalConditions: 'Renewal / annual review',
+    renewalConditionsHint: 'How the award is renewed each year (e.g. GPA threshold, progress review).',
     // documents
     mandatory: 'Mandatory', optionalDoc: 'Optional',
     addIntake: 'Add intake', addFee: 'Add fee line', addDocument: 'Add document',
