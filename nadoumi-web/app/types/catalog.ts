@@ -103,6 +103,7 @@ export interface ScholarshipFacets {
 
 export interface UniversitySummary {
   id: number
+  slug: string
   name: string
   nameCn?: string | null
   country: string
@@ -174,7 +175,9 @@ export interface ProgramIntake {
 /** `/api/public/programs` — student-safe; carries the owning university's name only. */
 export interface ProgramCard {
   id: number
+  slug: string
   universityId: number
+  universitySlug: string | null
   universityName: string | null
   name: string
   nameCn?: string | null

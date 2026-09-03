@@ -25,6 +25,8 @@ public interface ProgramMapper {
 
     Long findIdByUniversityAndName(@Param("universityId") Long universityId, @Param("name") String name);
 
+    Long findIdBySlug(@Param("slug") String slug);
+
     // ---- children ----
 
     List<ProgramMajor> findMajors(@Param("programId") Long programId);

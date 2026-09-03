@@ -11,6 +11,7 @@ public record PublicUniversityResponse(
         Long id,
         String name,
         String nameCn,
+        String slug,
         String country,
         String type,
         String city,
@@ -41,7 +42,7 @@ public record PublicUniversityResponse(
     public static PublicUniversityResponse of(University u) {
         UniversityResponse full = UniversityResponse.of(u);
         return new PublicUniversityResponse(
-                full.id(), full.name(), full.nameCn(), full.country(), full.type(),
+                full.id(), full.name(), full.nameCn(), full.slug(), full.country(), full.type(),
                 full.city(), full.province(), full.foundedYear(),
                 full.totalStudents(), full.internationalStudents(), full.facultyCount(),
                 full.website(), full.rankingTier(),

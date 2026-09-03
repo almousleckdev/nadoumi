@@ -183,6 +183,13 @@ middleware. i18n `en` authored, `fr`/`ar`/`zh` mirrored (`fallbackLocale: 'en'`)
   shows a cover strip; `scholarships/[slug]` hero uses the hero/cover image.
   Admin uploads through RuoYi `/common/upload` (no object-storage slice yet).
 
+**UPDATE 2026-09-03 (slug URLs — V24):** public university + programme pages
+route by `slug` — `app/pages/universities/[slug].vue`, `app/pages/programs/[slug].vue`
+(renamed from `[id].vue`). `UniversityCard` / `ProgramCard` link to
+`/universities/{slug}` / `/programs/{slug}`; `ProgramCard` carries `universitySlug`
+for the back-link. The public detail endpoints accept a numeric id or the slug.
+`UniversitySummary` / `ProgramCard` gain `slug` (and `ProgramCard.universitySlug`).
+
 **FIX 2026-09-03 (portable image refs):** uploads now store the **path only**
 (`/profile/upload/…`, RuoYi's `fileName`), never its absolute
 `http://host:port` URL. Admin renders via `assetUrl()` (`src/utils/asset.ts`,

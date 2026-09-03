@@ -1,12 +1,14 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import ProgramDetail from '~/pages/programs/[id].vue'
+import ProgramDetail from '~/pages/programs/[slug].vue'
 import type { ProgramDetail as PDto } from '~/types/catalog'
 
 const mba: PDto = {
   id: 11,
+  slug: 'fudan-university-mba',
   universityId: 7,
+  universitySlug: 'fudan-university',
   universityName: 'Fudan University',
   name: 'MBA',
   nameCn: '工商管理硕士',
@@ -29,13 +31,13 @@ const mba: PDto = {
 }
 
 const publicGet = vi.fn((path: string) =>
-  path === 'programs/11' ? Promise.resolve(mba) : Promise.reject(new Error('404')),
+  path === 'programs/fudan-university-mba' ? Promise.resolve(mba) : Promise.reject(new Error('404')),
 )
 mockNuxtImport('useApi', () => () => ({ publicGet, studentFetch: vi.fn() }))
 
 describe('public programme detail page', () => {
   it('renders the programme: name, university link, majors, intakes', async () => {
-    const w = await mountSuspended(ProgramDetail, { route: '/programs/11' })
+    const w = await mountSuspended(ProgramDetail, { route: '/programs/fudan-university-mba' })
     await flushPromises()
     const text = w.text()
 
@@ -49,7 +51,7 @@ describe('public programme detail page', () => {
   })
 
   it('shows a not-available message when the programme is missing', async () => {
-    const w = await mountSuspended(ProgramDetail, { route: '/programs/999' })
+    const w = await mountSuspended(ProgramDetail, { route: '/programs/ghost-mba' })
     await flushPromises()
     expect(w.text()).toContain('not available')
   })

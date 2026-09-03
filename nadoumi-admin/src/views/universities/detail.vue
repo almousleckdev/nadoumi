@@ -389,6 +389,7 @@ const profile = computed<DescriptionItem[]>(() => {
   const x = u.value
   if (!x) return []
   return [
+    { label: t('university.slug'), value: x.slug },
     { label: t('university.country'), value: x.country },
     { label: t('university.city'), value: x.city },
     { label: t('university.province'), value: x.province },

@@ -146,7 +146,7 @@ the detail body carries `rankings[]`, `highlights[]`, `gallery[]`, `logoImageUrl
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
 | GET | `/api/public/universities` | anonymous | `q`, `country`, `province`, `city`, `type` (PUBLIC/PRIVATE), `featured` (bool), `recommended` (bool), `page`, `size` (default 12) → `PageResponse<PublicUniversityResponse>`. Ordered featured → recommended → name. Consumed by the Home carousels + the `universities` list. |
-| GET | `/api/public/universities/{id}` | anonymous | `404` if the row is not PUBLISHED + ACTIVE. Consumed by `nadoumi-web` `universities/[id].vue`. |
+| GET | `/api/public/universities/{idOrSlug}` | anonymous | Resolves a numeric id **or** the `slug` (V24). `404` if the row is not PUBLISHED + ACTIVE. Consumed by `nadoumi-web` `universities/[slug].vue`. |
 
 A `/api/public/universities/facets` (distinct province / city / type with counts) is
 planned with the Universities-list redesign (PR-2).
@@ -245,8 +245,8 @@ status='ACTIVE'`.
 | Method | Path | Permission | Notes |
 | --- | --- | --- | --- |
 | GET | `/api/public/programs` | anonymous | `q`, `universityId`, `type`, `language`, `field`, `featured`, `hot`, `page`, `size` (default 12) → `PageResponse<PublicProgramResponse>` (cards; carries `universityId` + `universityName`). Programmes whose university has since been unpublished are dropped and the page count corrected. Consumed by the Home "Hot programmes" carousel. |
-| GET | `/api/public/programs/{id}` | anonymous | adds `majors` + `intakes`. `404` unless programme + university are both published/active. Consumed by `nadoumi-web` `programs/[id].vue`. |
-| GET | `/api/public/universities/{id}/programs` | anonymous | the published programmes for one published university → `List<PublicProgramResponse>` (cards). `404` if the university is not public. Consumed by `universities/[id].vue`. |
+| GET | `/api/public/programs/{idOrSlug}` | anonymous | id **or** `slug` (V24). Adds `majors` + `intakes`; carries `slug` + `universitySlug`. `404` unless programme + university are both published/active. Consumed by `nadoumi-web` `programs/[slug].vue`. |
+| GET | `/api/public/universities/{idOrSlug}/programs` | anonymous | id **or** university `slug`. The published programmes for one published university → `List<PublicProgramResponse>` (cards). `404` if the university is not public. Consumed by `universities/[slug].vue`. |
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 

@@ -102,14 +102,14 @@ class UniversityServiceTest {
         when(mapper.findHighlights(anyLong())).thenReturn(List.of());
         when(mapper.findGallery(anyLong())).thenReturn(List.of());
 
-        assertThatThrownBy(() -> service.publicGet(3L)).isInstanceOf(NadNotFoundException.class);
+        assertThatThrownBy(() -> service.publicGet("3")).isInstanceOf(NadNotFoundException.class);
 
         draft.setPublishStatus(PublishStatus.PUBLISHED);
         draft.setStatus(UniversityStatus.INACTIVE);
-        assertThatThrownBy(() -> service.publicGet(3L)).isInstanceOf(NadNotFoundException.class);
+        assertThatThrownBy(() -> service.publicGet("3")).isInstanceOf(NadNotFoundException.class);
 
         draft.setStatus(UniversityStatus.ACTIVE);
-        assertThat(service.publicGet(3L).id()).isEqualTo(3L);
+        assertThat(service.publicGet("3").id()).isEqualTo(3L);
     }
 
     @Test

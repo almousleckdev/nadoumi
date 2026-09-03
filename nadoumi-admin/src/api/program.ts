@@ -30,6 +30,7 @@ export interface Program {
   id: number
   universityId: number
   universityName: string | null
+  slug: string
   name: string
   nameCn: string | null
   programType: ProgramType

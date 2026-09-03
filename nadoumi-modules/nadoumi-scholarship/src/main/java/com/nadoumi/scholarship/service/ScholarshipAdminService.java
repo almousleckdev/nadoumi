@@ -2,6 +2,7 @@ package com.nadoumi.scholarship.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
@@ -23,7 +24,6 @@ import com.nadoumi.scholarship.web.response.ScholarshipInternalResponse;
 import com.nadoumi.scholarship.web.response.ScholarshipResponse;
 import com.nadoumi.university.service.UniversityService;
 import com.ruoyi.common.utils.SecurityUtils;
-import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Service;
@@ -253,27 +253,12 @@ public class ScholarshipAdminService {
 
     /** The slug is always derived from the title -- lower-case kebab, de-duplicated. */
     private String uniqueSlug(String title, Long selfId) {
-        String base = slugify(title);
-        String candidate = base;
-        for (int n = 2; ; n++) {
-            Long owner = mapper.findIdBySlug(candidate);
-            if (owner == null || owner.equals(selfId)) {
-                return candidate;
-            }
-            candidate = base + "-" + n;
+        try {
+            return Slugs.unique(Slugs.slugify(title), selfId, mapper::findIdBySlug);
         }
-    }
-
-    private static String slugify(String value) {
-        String s = Normalizer.normalize(value, Normalizer.Form.NFKD)
-                .replaceAll("[^\\p{ASCII}]", "")
-                .toLowerCase(Locale.ROOT)
-                .replaceAll("[^a-z0-9]+", "-")
-                .replaceAll("(^-|-$)", "");
-        if (s.isEmpty()) {
+        catch (IllegalArgumentException e) {
             throw new NadBadRequestException("could not derive a slug from the title");
         }
-        return s.length() > 150 ? s.substring(0, 150) : s;
     }
 
     /**

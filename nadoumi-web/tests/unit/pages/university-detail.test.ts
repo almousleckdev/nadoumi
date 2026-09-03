@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
-import UniversityDetail from '~/pages/universities/[id].vue'
+import UniversityDetail from '~/pages/universities/[slug].vue'
 import type { UniversityDetail as UDto } from '~/types/catalog'
 
 const fudan: UDto = {
   id: 7,
+  slug: 'fudan-university',
   name: 'Fudan University',
   nameCn: '复旦大学',
   country: 'CN',
@@ -40,22 +41,23 @@ const fudan: UDto = {
 
 const programs = [
   {
-    id: 11, universityId: 7, universityName: 'Fudan University', name: 'MBA',
+    id: 11, slug: 'fudan-university-mba', universityId: 7, universitySlug: 'fudan-university',
+    universityName: 'Fudan University', name: 'MBA',
     nameCn: null, programType: 'MASTER', field: 'Business', teachingLanguage: 'ENGLISH',
     durationMonths: 24, tuitionAmount: 38000, tuitionCurrency: 'USD', summary: null,
     featured: false, hot: true,
   },
 ]
 const publicGet = vi.fn((path: string) => {
-  if (path === 'universities/7') return Promise.resolve(fudan)
-  if (path === 'universities/7/programs') return Promise.resolve(programs)
+  if (path === 'universities/fudan-university') return Promise.resolve(fudan)
+  if (path === 'universities/fudan-university/programs') return Promise.resolve(programs)
   return Promise.reject(new Error('404'))
 })
 mockNuxtImport('useApi', () => () => ({ publicGet, studentFetch: vi.fn() }))
 
 describe('public university detail page', () => {
   it('renders the rich profile: facts, prose, highlights, advantages, rankings', async () => {
-    const w = await mountSuspended(UniversityDetail, { route: '/universities/7' })
+    const w = await mountSuspended(UniversityDetail, { route: '/universities/fudan-university' })
     await flushPromises()
     const text = w.text()
 
@@ -79,7 +81,7 @@ describe('public university detail page', () => {
   })
 
   it('shows a not-available message when the university is missing', async () => {
-    const w = await mountSuspended(UniversityDetail, { route: '/universities/999' })
+    const w = await mountSuspended(UniversityDetail, { route: '/universities/ghost-university' })
     await flushPromises()
     expect(w.text()).toContain('not available')
   })

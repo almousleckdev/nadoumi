@@ -4,13 +4,13 @@ import type { ProgramDetail } from '~/types/catalog'
 const route = useRoute()
 const { t } = useI18n()
 const localePath = useLocalePath()
-const id = computed(() => String(route.params.id))
+const slug = computed(() => String(route.params.slug))
 
 const { publicGet } = useApi()
 const { data: p } = await useAsyncData(
-  () => `program-${id.value}`,
-  () => publicGet<ProgramDetail>(`programs/${id.value}`).catch(() => null),
-  { watch: [id] },
+  () => `program-${slug.value}`,
+  () => publicGet<ProgramDetail>(`programs/${slug.value}`).catch(() => null),
+  { watch: [slug] },
 )
 
 useSeo(
@@ -64,7 +64,7 @@ function intakeWindow(open?: string | null, close?: string | null): string {
           <p v-if="p.nameCn" class="mt-1 text-lg text-white/70">{{ p.nameCn }}</p>
           <NuxtLink
             v-if="p.universityName"
-            :to="localePath(`/universities/${p.universityId}`)"
+            :to="localePath(`/universities/${p.universitySlug ?? p.universityId}`)"
             class="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-white/90 hover:text-white"
           >
             {{ t('program.offeredBy', { university: p.universityName }) }}
@@ -112,7 +112,7 @@ function intakeWindow(open?: string | null, close?: string | null): string {
         <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <NuxtLink
             v-if="p.universityName"
-            :to="localePath(`/universities/${p.universityId}`)"
+            :to="localePath(`/universities/${p.universitySlug ?? p.universityId}`)"
             class="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800"
           >
             <span aria-hidden="true">←</span> {{ t('program.backToUniversity', { university: p.universityName }) }}

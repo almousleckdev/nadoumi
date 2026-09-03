@@ -45,14 +45,14 @@ public class PublicProgramController {
     }
 
     @Anonymous
-    @GetMapping("/programs/{id}")
-    public PublicProgramResponse get(@PathVariable Long id) {
-        return service.publicGet(id);
+    @GetMapping("/programs/{idOrSlug}")
+    public PublicProgramResponse get(@PathVariable String idOrSlug) {
+        return service.publicGet(idOrSlug);
     }
 
     @Anonymous
-    @GetMapping("/universities/{universityId}/programs")
-    public List<PublicProgramResponse> forUniversity(@PathVariable Long universityId) {
-        return service.publicListForUniversity(universityId);
+    @GetMapping("/universities/{idOrSlug}/programs")
+    public List<PublicProgramResponse> forUniversity(@PathVariable String idOrSlug) {
+        return service.publicListForUniversity(idOrSlug);
     }
 }

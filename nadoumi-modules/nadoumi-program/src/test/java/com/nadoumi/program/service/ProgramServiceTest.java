@@ -128,24 +128,24 @@ class ProgramServiceTest {
         when(mapper.findById(3L)).thenReturn(draft);
         when(mapper.findMajors(anyLong())).thenReturn(List.of());
         when(mapper.findIntakes(anyLong())).thenReturn(List.of());
-        when(universityService.publicGet(1L)).thenReturn(publicUniversity("Fudan University"));
+        when(universityService.publicGet("1")).thenReturn(publicUniversity("Fudan University"));
 
-        assertThatThrownBy(() -> service.publicGet(3L)).isInstanceOf(NadNotFoundException.class);
+        assertThatThrownBy(() -> service.publicGet("3")).isInstanceOf(NadNotFoundException.class);
 
         draft.setPublishStatus(PublishStatus.PUBLISHED);
         draft.setStatus(ProgramStatus.INACTIVE);
-        assertThatThrownBy(() -> service.publicGet(3L)).isInstanceOf(NadNotFoundException.class);
+        assertThatThrownBy(() -> service.publicGet("3")).isInstanceOf(NadNotFoundException.class);
 
         draft.setStatus(ProgramStatus.ACTIVE);
-        assertThat(service.publicGet(3L).id()).isEqualTo(3L);
-        assertThat(service.publicGet(3L).universityName()).isEqualTo("Fudan University");
+        assertThat(service.publicGet("3").id()).isEqualTo(3L);
+        assertThat(service.publicGet("3").universityName()).isEqualTo("Fudan University");
     }
 
     @Test
     void publicListForUniversity_requires_a_public_university() {
-        when(universityService.publicGet(2L)).thenThrow(new NadNotFoundException("university not found"));
+        when(universityService.publicGet("2")).thenThrow(new NadNotFoundException("university not found"));
 
-        assertThatThrownBy(() -> service.publicListForUniversity(2L))
+        assertThatThrownBy(() -> service.publicListForUniversity("2"))
                 .isInstanceOf(NadNotFoundException.class);
     }
 

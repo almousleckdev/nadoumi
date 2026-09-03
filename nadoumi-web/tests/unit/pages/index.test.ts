@@ -8,14 +8,14 @@ function page<T>(content: T[]): Page<T> {
   return { content, page: 0, size: 12, totalElements: content.length, totalPages: 1 }
 }
 
-const uni: UniversitySummary = { id: 1, name: 'Peking University', country: 'CN', city: 'Beijing' }
+const uni: UniversitySummary = { id: 1, slug: 'peking-university', name: 'Peking University', country: 'CN', city: 'Beijing' }
 const sch: ScholarshipCard = {
   id: 9, slug: 'csc-master', title: 'CSC Master Scholarship', country: 'CN',
   fundingModel: 'FULLY', hasStipend: true, featured: false, recommended: false, hot: false,
   levels: ['MASTER'], categories: ['CSC'], intakes: [],
 }
 const prog: ProgramCard = {
-  id: 4, universityId: 1, universityName: 'Peking University', name: 'Chinese Language Programme',
+  id: 4, slug: 'peking-university-chinese-language-programme', universityId: 1, universitySlug: 'peking-university', universityName: 'Peking University', name: 'Chinese Language Programme',
   nameCn: null, programType: 'LANGUAGE', field: null, teachingLanguage: 'CHINESE',
   durationMonths: 12, tuitionAmount: null, tuitionCurrency: null, summary: null,
   featured: false, hot: true,

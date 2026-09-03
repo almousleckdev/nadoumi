@@ -20,7 +20,7 @@ const tuition = computed(() => {
 
 <template>
   <NuxtLink
-    :to="localePath(`/programs/${program.id}`)"
+    :to="localePath(`/programs/${program.slug}`)"
     class="group flex flex-col rounded-xl border border-slate-200 bg-white p-5 no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >

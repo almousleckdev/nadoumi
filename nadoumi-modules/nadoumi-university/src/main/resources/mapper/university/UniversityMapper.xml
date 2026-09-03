@@ -5,6 +5,7 @@
     <resultMap id="university" type="com.nadoumi.university.domain.University">
         <id     property="id"                    column="id"/>
         <result property="name"                  column="name"/>
+        <result property="slug"                  column="slug"/>
         <result property="nameCn"                column="name_cn"/>
         <result property="country"               column="country"/>
         <result property="type"                  column="type"/>
@@ -39,7 +40,7 @@
     </resultMap>
 
     <sql id="cols">
-        id, name, name_cn, country, type, city, province, founded_year,
+        id, name, name_cn, slug, country, type, city, province, founded_year,
         total_students, international_students, faculty_count, website, ranking_tier,
         introduction, history, campus_info, accommodation_info, nearby_info,
         admissions_email, office_phone, logo_document_id, banner_document_id,
@@ -76,17 +77,21 @@
         select id from nad_university where name = #{name} and country = #{country} limit 1
     </select>
 
+    <select id="findIdBySlug" resultType="java.lang.Long">
+        select id from nad_university where slug = #{slug} limit 1
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.university.domain.University"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_university
-            (name, name_cn, country, type, city, province, founded_year,
+            (name, name_cn, slug, country, type, city, province, founded_year,
              total_students, international_students, faculty_count, website, ranking_tier,
              introduction, history, campus_info, accommodation_info, nearby_info,
              admissions_email, office_phone, logo_document_id, banner_document_id,
              logo_image_url, cover_image_url,
              is_recommended, is_featured, status, publish_status, create_by, create_time, remark)
         values
-            (#{name}, #{nameCn}, #{country}, #{type}, #{city}, #{province}, #{foundedYear},
+            (#{name}, #{nameCn}, #{slug}, #{country}, #{type}, #{city}, #{province}, #{foundedYear},
              #{totalStudents}, #{internationalStudents}, #{facultyCount}, #{website}, #{rankingTier},
              #{introduction}, #{history}, #{campusInfo}, #{accommodationInfo}, #{nearbyInfo},
              #{admissionsEmail}, #{officePhone}, #{logoDocumentId}, #{bannerDocumentId},
@@ -96,7 +101,7 @@
 
     <update id="update" parameterType="com.nadoumi.university.domain.University">
         update nad_university set
-            name = #{name}, name_cn = #{nameCn}, country = #{country}, type = #{type},
+            name = #{name}, name_cn = #{nameCn}, slug = #{slug}, country = #{country}, type = #{type},
             city = #{city}, province = #{province}, founded_year = #{foundedYear},
             total_students = #{totalStudents}, international_students = #{internationalStudents},
             faculty_count = #{facultyCount}, website = #{website}, ranking_tier = #{rankingTier},
