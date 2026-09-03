@@ -40,7 +40,7 @@ function blankEligibility() {
 }
 function blankForm() {
   return {
-    title: '', slug: '', summary: '', country: '', province: '', city: '', field: '',
+    title: '', summary: '', country: '', province: '', city: '', field: '',
     teachingLanguage: null as string | null,
     fundingModel: 'FULLY' as ScholarshipInput['fundingModel'],
     categoryCodes: [] as string[],
@@ -82,7 +82,7 @@ watch(() => props.modelValue, (open) => {
   if (!s) return
   const v = s.view
   Object.assign(form, {
-    title: v.title, slug: v.slug, summary: v.summary ?? '', country: v.country,
+    title: v.title, summary: v.summary ?? '', country: v.country,
     province: v.province ?? '', city: v.city ?? '', field: v.field ?? '',
     teachingLanguage: v.teachingLanguage ?? null, fundingModel: v.fundingModel,
     categoryCodes: [...v.categories], levels: [...v.levels] as EducationLevel[],
@@ -103,6 +103,17 @@ watch(() => props.modelValue, (open) => {
   })
 }, { immediate: true })
 
+const PARTIAL_EXCLUDED = ['CSC', 'CGS', 'TYPE_A', 'TYPE_B', 'TYPE_C', 'TYPE_D']
+const allowedCategories = computed(() => {
+  if (form.fundingModel === 'SELF') return []
+  if (form.fundingModel === 'PARTIAL') return categories.value.filter(c => !PARTIAL_EXCLUDED.includes(c.code))
+  return categories.value
+})
+watch(() => form.fundingModel, () => {
+  const allowed = new Set(allowedCategories.value.map(c => c.code))
+  form.categoryCodes = form.categoryCodes.filter(c => allowed.has(c))
+})
+
 const scopeHint = computed(() => {
   if (form.eligibility.nationalityScope === 'INCLUDE') return t('scholarship.scopeIncludeHint')
   if (form.eligibility.nationalityScope === 'EXCLUDE') return t('scholarship.scopeExcludeHint')
@@ -122,7 +133,6 @@ function payload(): ScholarshipInput {
     || elig.toeflMin != null || elig.duolingoMin != null || elig.hskMin != null || elig.cscaMin != null
     || elig.nationalityScope !== 'ANY' || s(elig.notes) != null
   return {
-    slug: s(form.slug),
     title: form.title.trim(),
     summary: s(form.summary),
     country: form.country.trim().toUpperCase(),
@@ -221,12 +231,6 @@ async function save() {
             maxlength="200"
           />
         </el-form-item>
-        <el-form-item :label="t('scholarship.slug')">
-          <el-input
-            v-model="form.slug"
-            :placeholder="t('scholarship.slugHint')"
-          />
-        </el-form-item>
         <el-form-item :label="t('scholarship.summary')">
           <el-input
             v-model="form.summary"
@@ -297,7 +301,10 @@ async function save() {
             </el-select>
           </el-form-item>
         </div>
-        <el-form-item :label="t('scholarship.categories')">
+        <el-form-item
+          v-if="form.fundingModel !== 'SELF'"
+          :label="t('scholarship.categories')"
+        >
           <el-select
             v-model="form.categoryCodes"
             multiple
@@ -305,12 +312,18 @@ async function save() {
             :placeholder="t('scholarship.categoriesHint')"
           >
             <el-option
-              v-for="c in categories"
+              v-for="c in allowedCategories"
               :key="c.code"
               :value="c.code"
               :label="c.name"
             />
           </el-select>
+          <p
+            v-if="form.fundingModel === 'PARTIAL'"
+            class="hint"
+          >
+            {{ t('scholarship.categoriesPartialHint') }}
+          </p>
         </el-form-item>
         <el-form-item
           :label="t('scholarship.levels')"

@@ -11,6 +11,7 @@ import com.nadoumi.scholarship.domain.ScholarshipFee;
 import com.nadoumi.scholarship.domain.ScholarshipInternal;
 import com.nadoumi.scholarship.domain.ScholarshipIntake;
 import com.nadoumi.scholarship.domain.ScholarshipStipend;
+import com.nadoumi.scholarship.domain.enums.FundingModel;
 import com.nadoumi.scholarship.domain.enums.PublishStatus;
 import com.nadoumi.scholarship.mapper.ScholarshipMapper;
 import com.nadoumi.scholarship.mapper.ScholarshipSearch;
@@ -60,7 +61,7 @@ public class ScholarshipAdminService {
     public ScholarshipResponse create(ScholarshipRequest req) {
         Scholarship s = new Scholarship();
         apply(s, req);
-        s.setSlug(uniqueSlug(req.slug(), req.title(), null));
+        s.setSlug(uniqueSlug(req.title(), null));
         s.setCreateBy(currentUser());
         if (req.publishStatus() == PublishStatus.PUBLISHED) {
             s.setPublishedAt(java.time.LocalDateTime.now());
@@ -75,7 +76,7 @@ public class ScholarshipAdminService {
         Scholarship existing = load(id);
         apply(existing, req);
         existing.setId(id);
-        existing.setSlug(uniqueSlug(req.slug(), req.title(), id));
+        existing.setSlug(uniqueSlug(req.title(), id));
         existing.setUpdateBy(currentUser());
         mapper.update(existing);
         if (req.publishStatus() == PublishStatus.PUBLISHED) {
@@ -173,6 +174,7 @@ public class ScholarshipAdminService {
         mapper.deleteCategoryLinks(id);
         if (req.categoryCodes() != null) {
             req.categoryCodes().stream().map(c -> c.trim().toUpperCase(Locale.ROOT)).distinct()
+                    .filter(c -> categoryAllowed(c, req.fundingModel()))
                     .forEach(c -> mapper.insertCategoryLink(id, c));
         }
         mapper.deleteIntakes(id);
@@ -219,8 +221,9 @@ public class ScholarshipAdminService {
         }
     }
 
-    private String uniqueSlug(String requested, String title, Long selfId) {
-        String base = slugify(requested != null && !requested.isBlank() ? requested : title);
+    /** The slug is always derived from the title -- lower-case kebab, de-duplicated. */
+    private String uniqueSlug(String title, Long selfId) {
+        String base = slugify(title);
         String candidate = base;
         for (int n = 2; ; n++) {
             Long owner = mapper.findIdBySlug(candidate);
@@ -241,6 +244,22 @@ public class ScholarshipAdminService {
             throw new NadBadRequestException("could not derive a slug from the title");
         }
         return s.length() > 150 ? s.substring(0, 150) : s;
+    }
+
+    /**
+     * Category applicability by funding model: a self-funded scholarship has no
+     * categories at all, and a partially-funded one cannot be a CSC / CGS /
+     * government "Type" scholarship (those are fully-funded schemes).
+     */
+    private static final java.util.Set<String> PARTIAL_EXCLUDED =
+            java.util.Set.of("CSC", "CGS", "TYPE_A", "TYPE_B", "TYPE_C", "TYPE_D");
+
+    private static boolean categoryAllowed(String code, FundingModel funding) {
+        return switch (funding) {
+            case SELF -> false;
+            case PARTIAL -> !PARTIAL_EXCLUDED.contains(code);
+            case FULLY -> true;
+        };
     }
 
     private static String currentUser() {

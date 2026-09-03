@@ -73,6 +73,8 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.view.fundingModel").value("PARTIAL"))
                 .andExpect(jsonPath("$.view.levels.length()").value(1))
+                // CSC is a fully-funded scheme -> dropped for a PARTIAL scholarship
+                .andExpect(jsonPath("$.view.categories.length()").value(0))
                 .andExpect(jsonPath("$.view.fees.length()").value(0))
                 .andExpect(jsonPath("$.publishStatus").value("DRAFT"));
 

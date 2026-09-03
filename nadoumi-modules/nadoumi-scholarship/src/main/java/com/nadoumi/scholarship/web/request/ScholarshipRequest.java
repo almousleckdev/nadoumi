@@ -18,10 +18,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-/** Create / update body for {@code /api/staff/scholarships}. Student-safe fields only. */
+/**
+ * Create / update body for {@code /api/staff/scholarships}. Student-safe fields
+ * only. The slug is always derived server-side from {@code title}.
+ */
 public record ScholarshipRequest(
-        @Size(max = 160) @Pattern(regexp = "^$|^[a-z0-9-]+$", message = "slug must be kebab-case")
-        String slug,
         @NotBlank @Size(max = 200) String title,
         @Size(max = 2000) String summary,
         @NotBlank @Pattern(regexp = "[A-Za-z]{2}", message = "country must be an ISO alpha-2 code")
