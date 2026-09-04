@@ -134,9 +134,11 @@ scalar-update transaction. `recommended` / `featured` are optional booleans
 | PUT | `/api/staff/universities/{id}` | `nad:university:edit` | same unique guard (excluding self); replaces children. |
 | DELETE | `/api/staff/universities/{id}` | `nad:university:remove` | `204`. Hard delete — only while nothing references the row (FKs from programmes / partnerships will block it once those exist). Children go with `ON DELETE CASCADE`. |
 
-Both responses also carry `logoImageUrl` / `coverImageUrl` (URL strings; the admin
-uploads through RuoYi `/common/upload`, migrating to `document_id` with the
-Document slice).
+Both responses carry `logoUrl` / `coverUrl` (resolved via `MediaGateway.publicUrl`
+from `logo_media_id` / `banner_media_id` when set) with **fallback to the
+deprecated `logoImageUrl` / `coverImageUrl` string** for rows uploaded before P1
+(`docs/DATABASE_DESIGN.md` V21/V27; removal tracked for a follow-up release). New
+upload endpoint: `POST /api/staff/universities/{id}/logo|banner` — see §4.8.
 
 **Public** — `/api/public/universities`, `PublicUniversityController`, `@Anonymous`.
 Serves `PublicUniversityResponse` (no `status` / `publishStatus` / `remark` / audit;
@@ -167,8 +169,12 @@ is logged, not surfaced. A filled honeypot (`website`) is accepted and dropped.
 from `v_scholarship_student` + the student-safe child tables. The response
 (`PublicScholarshipResponse`) carries **no** `universityId` / `partnership` /
 commission / internal field on any path (`StaffScholarshipTest` enforces this).
-It does carry `heroImageUrl` / `coverImageUrl` (student-safe imagery, URL strings)
-on both card and detail rows. The `slug` is always derived server-side from the
+It does carry `heroImageUrl` / `coverImageUrl` (student-safe imagery; resolved
+via `MediaGateway.publicUrl` from `hero_media_id` / `cover_media_id` when set,
+falling back to the deprecated `hero_image_url` / `cover_image_url` string
+otherwise, `docs/DATABASE_DESIGN.md` V21/V27) on both card and detail rows. New
+upload endpoint: `POST /api/staff/scholarships/{id}/hero|cover` — see §4.8.
+The `slug` is always derived server-side from the
 title (kebab-case, lower-cased, de-duplicated); there is no client-supplied slug.
 `referenceCode` (`NAC-<year>-NNNN`, V25) is assigned on first publish and shown in
 the public list + on the detail page; it is `null` while a scholarship is DRAFT.
@@ -249,6 +255,52 @@ status='ACTIVE'`.
 | GET | `/api/public/programs` | anonymous | `q`, `universityId`, `type`, `language`, `field`, `featured`, `hot`, `page`, `size` (default 12) → `PageResponse<PublicProgramResponse>` (cards; carries `universityId` + `universityName`). Programmes whose university has since been unpublished are dropped and the page count corrected. Consumed by the Home "Hot programmes" carousel. |
 | GET | `/api/public/programs/{idOrSlug}` | anonymous | id **or** `slug` (V24). Adds `majors` + `intakes`; carries `slug` + `universitySlug`. `404` unless programme + university are both published/active. Consumed by `nadoumi-web` `programs/[slug].vue`. |
 | GET | `/api/public/universities/{idOrSlug}/programs` | anonymous | id **or** university `slug`. The published programmes for one published university → `List<PublicProgramResponse>` (cards). `404` if the university is not public. Consumed by `universities/[slug].vue`. |
+
+### 4.8 Media upload & delivery endpoints (IMPLEMENTED — `nadoumi-media`, P1)
+
+`docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md`
+Part I. Bytes are **server-side proxied** (DM6) — the client never talks to
+Cloudinary directly. Full validation pipeline + per-category limits:
+`docs/DOCUMENT_MANAGEMENT.md` §3.4; access-class model + delivery modes:
+`docs/DOCUMENT_MANAGEMENT.md` §3.2a; authorization + audit log:
+`docs/SECURITY.md` "File & document storage".
+
+**Upload contracts** — `multipart/form-data`, one `file` part:
+
+| Method | Path | Permission | Response |
+| --- | --- | --- | --- |
+| POST | `/api/staff/universities/{id}/logo` \| `/banner` | `nad:university:edit` | `201 { mediaId, url }` (PUBLIC) |
+| POST | `/api/staff/universities/{id}/gallery` | `nad:university:edit` | `201 { mediaId, url }` (PUBLIC) |
+| POST | `/api/staff/scholarships/{id}/hero` \| `/cover` | `nad:scholarship:edit` | `201 { mediaId, url }` (PUBLIC) |
+| POST | `/api/staff/programs/{id}/image` | `nad:program:edit` | `201 { mediaId, url }` (PUBLIC) |
+| POST | `/api/staff/applicants/{id}/photo` | `nad:applicant:edit` | `201 { mediaId }` — **no `url`** (PROTECTED; fetch via the delivery endpoint below) |
+
+**Delivery contracts:**
+
+| Method | Path | Auth | Behaviour |
+| --- | --- | --- | --- |
+| GET | `/api/media/{id}` | `@Anonymous` | PUBLIC asset → `302` to `secure_url`; anything else → `404`. Not logged. |
+| GET | `/api/staff/applicants/{id}/photo` | `nad:applicant:view` (**+ `VIEW_PROFILE`** for a non-staff/self caller path) | Grant → `302` to a fresh signed URL, or `200 { url, expiresAt }` for `Accept: application/json` / `?json=1`. Deny → `403` + `nad_media_access_log(result=DENIED)`. Every call (grant or deny) writes a `nad_media_access_log` row. |
+
+Document-content delivery endpoints
+(`GET /api/{student,staff}/applications/{id}/documents/{docId}/content`) are
+**PLANNED** — Step 7; they will follow the identical 302-signed (PROTECTED) /
+stream-proxy (SENSITIVE) shape.
+
+**Error codes (new, on any upload/delivery endpoint above):**
+
+| Status | Meaning |
+| --- | --- |
+| `413` | payload exceeds the category's / global max size |
+| `415` | declared `Content-Type` not in the category's allow-list |
+| `422` | declared type does not match the Tika-sniffed magic bytes, or the sniffed type is on the hard denylist |
+| `403` | authorization denied — always paired with a `nad_media_access_log(result=DENIED, deny_reason)` row for PROTECTED/SENSITIVE assets |
+| `404` | unknown/deleted asset, or a PUBLIC-only route hit with a non-PUBLIC asset |
+
+All are RFC 9457 `application/problem+json`, consistent with §5 below —
+`MediaExceptionAdvice` is a global `@RestControllerAdvice`
+(`@Order(HIGHEST_PRECEDENCE)`) so these codes apply uniformly across every
+upload controller, including the catalog controllers.
 
 ## 5. Conventions for `/api/**` endpoints (BASELINE)
 

@@ -214,6 +214,29 @@ same-origin Nitro proxy `server/routes/media/[...path].ts` → `${backendBaseUrl
 and renders via `mediaUrl()` (`app/utils/media.ts`). Works in dev and prod
 without baking the backend host into the DB.
 
+**UPDATE 2026-09-04 (Cloudinary media layer — P1). See
+`docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md`
+Part I, `docs/DOCUMENT_MANAGEMENT.md` §3.2.**
+- The interim "portable image refs" approach above (relative `/profile/...` paths
+  proxied same-origin) is **superseded** for catalog imagery: university
+  logo/banner/gallery, scholarship hero/cover, and programme image now resolve
+  to a Cloudinary **absolute `https://res.cloudinary.com/...` URL** —
+  `logoUrl`/`coverUrl`/`heroUrl`/`gallery[].url`/etc. — via the backend's
+  `MediaGateway.publicUrl(mediaId)`, with a **fallback to the deprecated
+  `*_image_url` string** for rows uploaded before P1
+  (`docs/DATABASE_DESIGN.md` V21/V27; removal tracked for a follow-up release).
+- `app/utils/media.ts` (`mediaUrl()`) is **reduced to a passthrough shim** —
+  it now only needs to handle the deprecated relative-path fallback case; a
+  resolved Cloudinary URL is rendered as-is. `server/routes/media/[...path].ts`
+  (the same-origin Nitro proxy) is **retained only for that legacy relative-path
+  case** — both are tracked for removal once the `*_image_url` deprecation
+  window (one release) closes.
+- Applicant profile photo (**new, PROTECTED access class**) does not use this
+  path at all — it is fetched on demand from
+  `GET /api/staff/applicants/{id}/photo` (a short-TTL signed URL or a `302`),
+  never stored as a plain `url` field, and never cached client-side beyond the
+  signed URL's own TTL.
+
 **UPDATE 2026-09-03 (programmes — `nadoumi-program`, V19/V20):**
 - `ProgramCard` marketing component; `types/catalog.ts` gains `ProgramCard` /
   `ProgramDetail` / `ProgramMajor` / `ProgramIntake` (replacing the unused

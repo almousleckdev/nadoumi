@@ -83,10 +83,11 @@ in the nadoumi-web build**.
 | Applicants — detail | **IMPLEMENTED** | Overview + Education + Test scores + Contacts + Access tabs. |
 | Applicant — profile edit | **IMPLEMENTED** | Drawer form → `PUT /api/staff/applicants/{id}` (`nad:applicant:edit`). PII fields hidden/locked without `nad:applicant:pii:view`. |
 | Applicant — education / test scores / contacts CRUD | **IMPLEMENTED** | Add / edit / remove via drawer forms; staff `POST` / `PUT` / `DELETE` on each sub-resource (`nad:applicant:edit`). |
+| Applicant — profile photo (**new, P1**) | **IMPLEMENTED** | `ImageUpload` posts `multipart/form-data` to `POST /api/staff/applicants/{id}/photo` (`nad:applicant:edit`) → `{ mediaId }` — **no `url`** (PROTECTED, Cloudinary `APPLICANT_PHOTO` category). The overview tab fetches the preview on load via `GET /api/staff/applicants/{id}/photo` (a short-TTL signed URL or `302`), never caching it beyond the signed URL's own TTL. |
 | Applicant — access / delegation | **IMPLEMENTED** (read) | Access tab lists grants from `GET /api/staff/applicants/{id}/access` (`nad:applicant:access:view`). Grant / revoke / transfer endpoints exist (`nad:applicant:access:manage`) — **CURRENT** to surface in the UI. Grantee name (vs `User #id`) needs a `sys_user` join — follow-up. |
-| Universities — list + detail + CRUD | **IMPLEMENTED** | `nadoumi-university` module, `nad_university` + full profile depth (V10) + `nad_university_ranking` / `nad_university_highlight` / `nad_university_gallery` (V18, ≤ 6 campus-life / dormitory / campus-view images with captions) + `logo_image_url` / `cover_image_url` (V21), `/api/staff/universities` (+ public `/api/public/universities`), `nad:university:list/view/create/edit/remove`. Unique `(name, country)`. Sectioned drawer (Identity / Profile / About / Highlights / Rankings / Logo & cover / Gallery / Publication); logo + cover + gallery images are **uploaded from disk** via the shared `ImageUpload` component → RuoYi `/common/upload`. Detail page renders every section + a `publish_status` badge. |
-| Scholarships — list + create/edit + detail | **IMPLEMENTED** | `nadoumi-scholarship` module (V16 / V17 + images V21 + config depth V22 + terms V23 + reference code V25). Sectioned drawer (Identity / Classification / Intakes / Eligibility / Fees / **Stipend by level** / **Accommodation** / **What the award covers** / **Application & terms** / Documents / Content [+ renewal] / Media / Publication); slug auto-derived (no field); `reference_code` `NAC-<year>-NNNN` assigned on first publish, shown in the list + detail; category options filter by funding model (SELF none; PARTIAL excludes CSC/CGS/Type A–D); NON_DEGREE shows a Half-year / One-year duration; stipend is one row per accepted level; accommodation is repeatable room types with price + amenity note; every amount shows as **¥ · $** on the detail page. Hero + cover images uploaded from disk (`ImageUpload`). Confidential university/partnership linkage sub-form behind `nad:scholarship:internal:view` / `:edit`. `nad:scholarship:list/view/create/edit/remove/publish`. |
-| Programmes — list + create/edit + on-university management | **IMPLEMENTED** | `nadoumi-program` module (V19 DDL + V20 menu/perm seed). A programme belongs to exactly one university; the owning university is validated / resolved through `UniversityService`. `/programs` flat list (search + university / level / status filters) + `ProgramDrawer` (Identity / Classification / Majors / Intakes / Publication); the University detail screen carries a Programmes table + inline add/edit with the university locked. `nad:program:list/view/create/edit/remove`. |
+| Universities — list + detail + CRUD | **IMPLEMENTED** | `nadoumi-university` module, `nad_university` + full profile depth (V10) + `nad_university_ranking` / `nad_university_highlight` / `nad_university_gallery` (V18, ≤ 6 campus-life / dormitory / campus-view images with captions) + `logo_media_id` / `banner_media_id` (V27, **Cloudinary — supersedes the V21 `logo_image_url` / `cover_image_url` fallback**), `/api/staff/universities` (+ public `/api/public/universities`), `nad:university:list/view/create/edit/remove`. Unique `(name, country)`. Sectioned drawer (Identity / Profile / About / Highlights / Rankings / Logo & cover / Gallery / Publication); logo + cover + gallery images are **uploaded via the shared `ImageUpload` component, now `multipart/form-data` to `POST /api/staff/universities/{id}/logo|banner|gallery`** (§2.4), binding the returned `mediaId`. Detail page renders every section + a `publish_status` badge. |
+| Scholarships — list + create/edit + detail | **IMPLEMENTED** | `nadoumi-scholarship` module (V16 / V17 + images V21 + config depth V22 + terms V23 + reference code V25). Sectioned drawer (Identity / Classification / Intakes / Eligibility / Fees / **Stipend by level** / **Accommodation** / **What the award covers** / **Application & terms** / Documents / Content [+ renewal] / Media / Publication); slug auto-derived (no field); `reference_code` `NAC-<year>-NNNN` assigned on first publish, shown in the list + detail; category options filter by funding model (SELF none; PARTIAL excludes CSC/CGS/Type A–D); NON_DEGREE shows a Half-year / One-year duration; stipend is one row per accepted level; accommodation is repeatable room types with price + amenity note; every amount shows as **¥ · $** on the detail page. Hero + cover images uploaded via `ImageUpload` → `POST /api/staff/scholarships/{id}/hero|cover` (§2.4, Cloudinary `hero_media_id`/`cover_media_id`, V27, supersedes the V21 URL fallback). Confidential university/partnership linkage sub-form behind `nad:scholarship:internal:view` / `:edit`. `nad:scholarship:list/view/create/edit/remove/publish`. |
+| Programmes — list + create/edit + on-university management | **IMPLEMENTED** | `nadoumi-program` module (V19 DDL + V20 menu/perm seed). A programme belongs to exactly one university; the owning university is validated / resolved through `UniversityService`. `/programs` flat list (search + university / level / status filters) + `ProgramDrawer` (Identity / Classification / Majors / Intakes / Publication); the University detail screen carries a Programmes table + inline add/edit with the university locked. `nad:program:list/view/create/edit/remove`. `image_media_id` (V27, P1) — a **new capability**, programmes had no image field before — uploaded via `ImageUpload` → `POST /api/staff/programs/{id}/image`. |
 | Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend. |
 | Partnerships / Employees / Roles & Permissions | **PLANNED** — Phase D | |
 | Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | |
@@ -198,6 +199,29 @@ not duplication); no bespoke `FormField`. `FormSection` handles grouping.
 Shared prop types live in `ui/types.ts`. Dashboard widgets (`StatCard`,
 `DonutStat`, `ComingSoonCard`, `DashboardGroup`, `RecentApplicants`) build on the
 same primitives.
+
+### 2.4 Media upload widget — `ImageUpload.vue` (EXISTING — P1, Cloudinary)
+
+`docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md`
+Part I. `src/components/ui/ImageUpload.vue` now posts `multipart/form-data`
+directly to the owning module's per-slot upload endpoint (§4.8 of
+`docs/API_DESIGN.md`), e.g. `POST /api/staff/universities/{id}/logo`, with the
+auth header — **not** RuoYi's `/common/upload`. It emits the returned `mediaId`
+and binds it onto the parent form's `*MediaId` field; preview renders from the
+response's `url` (PUBLIC categories) or, for the applicant photo (PROTECTED, no
+`url`), a follow-up `GET .../photo` fetch for a signed preview URL.
+
+- **Image widgets are disabled until the record has an id.** A university /
+  scholarship / programme / applicant must exist (post-create) before its
+  logo/hero/cover/gallery/image/photo slot can be uploaded to, since the upload
+  endpoint is scoped to `{id}`. The drawer disables each `ImageUpload` slot on
+  the create step and enables it once the initial save returns an id.
+- `src/utils/asset.ts` (`assetUrl()`) is **reduced to a passthrough** for
+  absolute URLs (Cloudinary always returns `https://res.cloudinary.com/...`) —
+  it no longer prefixes a relative `/profile/...` path against the API base
+  except for the deprecated `*_image_url` fallback rows (V21, one-release
+  window, `docs/DATABASE_DESIGN.md`). Tracked for deletion once no caller needs
+  the fallback branch.
 
 ### Roles (BASELINE — `sys_role` + `sys_role_menu`; data scope via `sys_role.data_scope`)
 
