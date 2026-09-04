@@ -1,24 +1,54 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type UploadProps, type UploadRawFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { getToken } from '@/utils/auth'
 import { assetUrl } from '@/utils/asset'
 
+/**
+ * Uploads one image to a module media endpoint (e.g. `/api/staff/universities/12/logo`)
+ * and binds the returned media id via `v-model`. The preview is drawn from the
+ * fresh upload response `url` when present, otherwise from `previewUrl` (the
+ * resolved URL the parent already holds for a stored media id).
+ */
 const props = withDefaults(defineProps<{
-  modelValue: string | null
-  /** square logo vs wide banner framing */
+  /** The stored media id, or null when nothing is attached yet. */
+  modelValue: number | null
+  /** Module upload path from the API root — e.g. `/api/staff/universities/12/logo`. */
+  action: string
+  /** Resolved URL to show when `modelValue` is set and no fresh upload response is held. */
+  previewUrl?: string | null
+  /** Square logo vs wide banner framing. */
   aspect?: 'square' | 'wide'
   maxMb?: number
-}>(), { aspect: 'wide', maxMb: 5 })
+  accept?: string
+  /** Disable uploading (e.g. the parent record has no id yet). */
+  disabled?: boolean
+  /** Message shown in place of the dropzone while disabled. */
+  disabledHint?: string
+}>(), {
+  previewUrl: null,
+  aspect: 'wide',
+  maxMb: 5,
+  accept: 'image/*',
+  disabled: false,
+  disabledHint: '',
+})
 
-const emit = defineEmits<{ 'update:modelValue': [v: string | null] }>()
+const emit = defineEmits<{ 'update:modelValue': [v: number | null] }>()
 
 const { t } = useI18n()
 
-const action = `${import.meta.env.VITE_APP_BASE_API || '/dev-api'}/common/upload`
+const uploadUrl = computed(
+  () => `${import.meta.env.VITE_APP_BASE_API || '/dev-api'}${props.action}`,
+)
 const headers = computed(() => ({ Authorization: `Bearer ${getToken() ?? ''}` }))
+
+// URL from the most recent successful upload on this instance; takes precedence
+// over `previewUrl` so the picture updates the moment an upload lands.
+const freshUrl = ref<string | null>(null)
+const previewSrc = computed(() => assetUrl(freshUrl.value || props.previewUrl || ''))
 
 const beforeUpload: UploadProps['beforeUpload'] = (raw: UploadRawFile) => {
   if (!raw.type.startsWith('image/')) {
@@ -32,24 +62,48 @@ const beforeUpload: UploadProps['beforeUpload'] = (raw: UploadRawFile) => {
   return true
 }
 
-interface UploadResult { code: number, msg?: string, url?: string, fileName?: string }
+/** Nadoumi module endpoints return the record raw: `{ mediaId, url? }`. */
+interface UploadResult {
+  mediaId?: number
+  url?: string | null
+  // problem+json fields, surfaced defensively if a 2xx ever carries them
+  msg?: string
+  detail?: string
+  title?: string
+}
 function onSuccess(res: UploadResult) {
-  // Store the path only (`/profile/upload/...`), never RuoYi's absolute URL, so
-  // the reference stays portable across environments. `fileName` is that path.
-  const ref = res.fileName || res.url
-  if (res.code === 200 && ref) {
-    emit('update:modelValue', ref)
+  if (typeof res?.mediaId !== 'number') {
+    ElMessage.error(res?.detail || res?.title || res?.msg || t('imageUpload.failed'))
+    return
   }
-  else {
-    ElMessage.error(res.msg || t('imageUpload.failed'))
+  freshUrl.value = res.url ?? null
+  emit('update:modelValue', res.mediaId)
+}
+
+/** el-upload hands `onError` an Error whose `message` is the raw response body. */
+function onError(err: Error & { status?: number }) {
+  let message = ''
+  try {
+    const body = JSON.parse(err?.message ?? '') as UploadResult
+    message = body.detail || body.title || body.msg || ''
   }
+  catch {
+    // not JSON — fall through to a status-based message
+  }
+  if (!message) {
+    if (err?.status === 413) message = t('imageUpload.tooBig', { mb: props.maxMb })
+    else if (err?.status === 415 || err?.status === 422) message = t('imageUpload.badType')
+    else message = t('imageUpload.failed')
+  }
+  ElMessage.error(message)
 }
-function onError() {
-  ElMessage.error(t('imageUpload.failed'))
-}
+
 function clear() {
+  freshUrl.value = null
   emit('update:modelValue', null)
 }
+
+defineExpose({ onSuccess, onError, clear })
 </script>
 
 <template>
@@ -58,14 +112,15 @@ function clear() {
     :class="aspect"
   >
     <div
-      v-if="modelValue"
+      v-if="previewSrc"
       class="img-upload__preview"
     >
       <img
-        :src="assetUrl(modelValue)"
+        :src="previewSrc"
         alt=""
       >
       <button
+        v-if="!disabled"
         type="button"
         class="img-upload__remove"
         :title="t('common.delete')"
@@ -74,12 +129,19 @@ function clear() {
         <el-icon><Delete /></el-icon>
       </button>
     </div>
+    <div
+      v-else-if="disabled"
+      class="img-upload__disabled"
+    >
+      {{ disabledHint || t('imageUpload.saveFirst') }}
+    </div>
     <el-upload
       v-else
-      :action="action"
+      :action="uploadUrl"
       :headers="headers"
       :show-file-list="false"
-      accept="image/*"
+      name="file"
+      :accept="accept"
       :before-upload="beforeUpload"
       :on-success="onSuccess"
       :on-error="onError"
@@ -116,6 +178,26 @@ function clear() {
 }
 .wide .img-upload__preview img,
 .wide :deep(.el-upload-dragger) {
+  width: 280px;
+  height: 140px;
+}
+.img-upload__disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--nad-ink-soft, #6b7280);
+  border: 1px dashed var(--nad-border, #e5e7eb);
+  border-radius: 8px;
+}
+.square .img-upload__disabled {
+  width: 120px;
+  height: 120px;
+}
+.wide .img-upload__disabled {
   width: 280px;
   height: 140px;
 }

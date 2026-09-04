@@ -42,20 +42,20 @@
       </PageHeader>
 
       <FormSection
-        v-if="s.view.heroImageUrl || s.view.coverImageUrl"
+        v-if="heroSrc || coverSrc"
         :title="t('scholarship.secMedia')"
       >
         <div class="imgs">
-          <figure v-if="s.view.heroImageUrl">
+          <figure v-if="heroSrc">
             <img
-              :src="assetUrl(s.view.heroImageUrl)"
+              :src="heroSrc"
               alt=""
             >
             <figcaption>{{ t('scholarship.heroImage') }}</figcaption>
           </figure>
-          <figure v-if="s.view.coverImageUrl">
+          <figure v-if="coverSrc">
             <img
-              :src="assetUrl(s.view.coverImageUrl)"
+              :src="coverSrc"
               alt=""
             >
             <figcaption>{{ t('scholarship.coverImage') }}</figcaption>
@@ -396,6 +396,9 @@ const s = ref<Scholarship | null>(null)
 const internal = ref<ScholarshipInternal | null>(null)
 const drawerOpen = ref(false)
 const internalOpen = ref(false)
+
+const heroSrc = computed(() => assetUrl(s.value?.view.heroUrl ?? s.value?.view.heroImageUrl))
+const coverSrc = computed(() => assetUrl(s.value?.view.coverUrl ?? s.value?.view.coverImageUrl))
 const savingInternal = ref(false)
 const internalForm = reactive({
   universityId: null as number | null, internalStatus: '', operationalNotes: '',

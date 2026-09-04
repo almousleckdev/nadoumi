@@ -50,24 +50,24 @@
       </PageHeader>
 
       <div
-        v-if="u.logoImageUrl || u.coverImageUrl"
+        v-if="logoSrc || coverSrc"
         class="nad-card sec"
       >
         <h3 class="sec__title">
           {{ t('university.secImages') }}
         </h3>
         <div class="imgs">
-          <figure v-if="u.logoImageUrl">
+          <figure v-if="logoSrc">
             <img
-              :src="assetUrl(u.logoImageUrl)"
+              :src="logoSrc"
               class="img-logo"
               alt=""
             >
             <figcaption>{{ t('university.logoImage') }}</figcaption>
           </figure>
-          <figure v-if="u.coverImageUrl">
+          <figure v-if="coverSrc">
             <img
-              :src="assetUrl(u.coverImageUrl)"
+              :src="coverSrc"
               class="img-cover"
               alt=""
             >
@@ -194,7 +194,7 @@
             class="gal__item"
           >
             <img
-              :src="assetUrl(g.imageUrl)"
+              :src="assetUrl(g.url ?? g.imageUrl)"
               :alt="g.caption ?? ''"
             >
             <figcaption v-if="g.caption">
@@ -341,6 +341,9 @@ const drawerOpen = ref(false)
 const programs = ref<Program[]>([])
 const programDrawerOpen = ref(false)
 const editingProgram = ref<Program | null>(null)
+
+const logoSrc = computed(() => assetUrl(u.value?.logoUrl ?? u.value?.logoImageUrl))
+const coverSrc = computed(() => assetUrl(u.value?.bannerUrl ?? u.value?.coverImageUrl))
 
 async function loadPrograms() {
   if (!u.value) return

@@ -68,7 +68,9 @@ function blankForm() {
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
     documentRequirements: [] as { docType: string, mandatory: boolean, note: string }[],
     featured: false, recommended: false, hot: false,
+    id: undefined as number | undefined,
     heroImageUrl: null as string | null, coverImageUrl: null as string | null,
+    heroMediaId: null as number | null, coverMediaId: null as number | null,
     status: 'ACTIVE' as ScholarshipInput['status'],
     publishStatus: 'DRAFT' as ScholarshipInput['publishStatus'],
     remark: '',
@@ -123,7 +125,9 @@ watch(() => props.modelValue, (open) => {
     intakes: v.intakes.map(i => ({ term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null })),
     documentRequirements: v.documentRequirements.map(d => ({ docType: d.docType, mandatory: d.mandatory, note: d.note ?? '' })),
     featured: v.featured, recommended: v.recommended, hot: v.hot,
+    id: v.id,
     heroImageUrl: v.heroImageUrl ?? null, coverImageUrl: v.coverImageUrl ?? null,
+    heroMediaId: v.heroMediaId ?? null, coverMediaId: v.coverMediaId ?? null,
     status: s.status, publishStatus: s.publishStatus, remark: s.remark ?? '',
   })
 }, { immediate: true })
@@ -185,6 +189,7 @@ function payload(): ScholarshipInput {
     slots: n(form.slots),
     featured: form.featured, recommended: form.recommended, hot: form.hot,
     heroImageUrl: form.heroImageUrl, coverImageUrl: form.coverImageUrl,
+    heroMediaId: form.heroMediaId, coverMediaId: form.coverMediaId,
     status: form.status, publishStatus: form.publishStatus, remark: s(form.remark),
     levels: [...form.levels],
     categoryCodes: [...form.categoryCodes],
@@ -965,14 +970,22 @@ async function save() {
         <div class="imgs">
           <el-form-item :label="t('scholarship.heroImage')">
             <ImageUpload
-              v-model="form.heroImageUrl"
+              v-model="form.heroMediaId"
+              :action="`/api/staff/scholarships/${form.id}/hero`"
+              :preview-url="scholarship?.view.heroUrl ?? scholarship?.view.heroImageUrl"
               aspect="wide"
+              :disabled="!form.id"
+              :disabled-hint="t('imageUpload.saveFirst')"
             />
           </el-form-item>
           <el-form-item :label="t('scholarship.coverImage')">
             <ImageUpload
-              v-model="form.coverImageUrl"
+              v-model="form.coverMediaId"
+              :action="`/api/staff/scholarships/${form.id}/cover`"
+              :preview-url="scholarship?.view.coverUrl ?? scholarship?.view.coverImageUrl"
               aspect="wide"
+              :disabled="!form.id"
+              :disabled-hint="t('imageUpload.saveFirst')"
             />
           </el-form-item>
         </div>

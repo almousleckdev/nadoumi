@@ -244,14 +244,22 @@
         <div class="imgs">
           <el-form-item :label="t('university.logoImage')">
             <ImageUpload
-              v-model="form.logoImageUrl"
+              v-model="form.logoMediaId"
+              :action="`/api/staff/universities/${form.id}/logo`"
+              :preview-url="university?.logoUrl ?? university?.logoImageUrl"
               aspect="square"
+              :disabled="!form.id"
+              :disabled-hint="t('imageUpload.saveFirst')"
             />
           </el-form-item>
           <el-form-item :label="t('university.coverImage')">
             <ImageUpload
-              v-model="form.coverImageUrl"
+              v-model="form.bannerMediaId"
+              :action="`/api/staff/universities/${form.id}/banner`"
+              :preview-url="university?.bannerUrl ?? university?.coverImageUrl"
               aspect="wide"
+              :disabled="!form.id"
+              :disabled-hint="t('imageUpload.saveFirst')"
             />
           </el-form-item>
         </div>
@@ -267,8 +275,12 @@
           class="repeat gal-row"
         >
           <ImageUpload
-            v-model="g.imageUrl"
+            v-model="g.mediaId"
+            :action="`/api/staff/universities/${form.id}/gallery`"
+            :preview-url="g.url ?? g.imageUrl"
             aspect="wide"
+            :disabled="!form.id"
+            :disabled-hint="t('imageUpload.saveFirst')"
           />
           <el-input
             v-model="g.caption"
@@ -285,7 +297,7 @@
           v-if="form.gallery.length < 6"
           size="small"
           :icon="Plus"
-          @click="form.gallery.push({ imageUrl: '', caption: '' })"
+          @click="form.gallery.push({ imageUrl: null, mediaId: null, url: null, caption: null })"
         >
           {{ t('university.addGalleryImage') }}
         </el-button>
@@ -390,8 +402,11 @@ function titleCase(s: string) {
 const formRef = ref<FormInstance>()
 const saving = ref(false)
 
+type GalleryRow = { imageUrl: string | null, mediaId: number | null, url: string | null, caption: string | null }
+
 function blankForm() {
   return {
+    id: undefined as number | undefined,
     name: '', nameCn: '', country: '', type: null as string | null,
     city: '', province: '', foundedYear: null as number | null,
     totalStudents: null as number | null, internationalStudents: null as number | null,
@@ -399,13 +414,14 @@ function blankForm() {
     introduction: '', history: '', campusInfo: '', accommodationInfo: '', nearbyInfo: '',
     admissionsEmail: '', officePhone: '',
     logoImageUrl: null as string | null, coverImageUrl: null as string | null,
+    logoMediaId: null as number | null, bannerMediaId: null as number | null,
     recommended: false, featured: false,
     status: 'ACTIVE' as UniversityInput['status'],
     publishStatus: 'DRAFT' as UniversityInput['publishStatus'],
     remark: '',
     highlights: [] as University['highlights'],
     rankings: [] as University['rankings'],
-    gallery: [] as { imageUrl: string | null, caption: string | null }[],
+    gallery: [] as GalleryRow[],
   }
 }
 const form = reactive(blankForm())
@@ -426,6 +442,7 @@ watch(() => props.modelValue, (open) => {
   const u = props.university
   if (!u) return
   Object.assign(form, {
+    id: u.id,
     name: u.name, nameCn: u.nameCn ?? '', country: u.country, type: u.type,
     city: u.city ?? '', province: u.province ?? '', foundedYear: u.foundedYear,
     totalStudents: u.totalStudents, internationalStudents: u.internationalStudents,
@@ -434,11 +451,14 @@ watch(() => props.modelValue, (open) => {
     accommodationInfo: u.accommodationInfo ?? '', nearbyInfo: u.nearbyInfo ?? '',
     admissionsEmail: u.admissionsEmail ?? '', officePhone: u.officePhone ?? '',
     logoImageUrl: u.logoImageUrl ?? null, coverImageUrl: u.coverImageUrl ?? null,
+    logoMediaId: u.logoMediaId ?? null, bannerMediaId: u.bannerMediaId ?? null,
     recommended: u.recommended, featured: u.featured,
     status: u.status, publishStatus: u.publishStatus, remark: u.remark ?? '',
     highlights: u.highlights.map(h => ({ ...h })),
     rankings: u.rankings.map(r => ({ ...r })),
-    gallery: (u.gallery ?? []).map(g => ({ imageUrl: g.imageUrl, caption: g.caption })),
+    gallery: (u.gallery ?? []).map(g => ({
+      imageUrl: g.imageUrl ?? null, mediaId: g.mediaId ?? null, url: g.url ?? null, caption: g.caption,
+    })),
   })
 }, { immediate: true })
 
@@ -472,6 +492,8 @@ function payload(): UniversityInput {
     officePhone: orNull(form.officePhone),
     logoImageUrl: form.logoImageUrl,
     coverImageUrl: form.coverImageUrl,
+    logoMediaId: form.logoMediaId,
+    bannerMediaId: form.bannerMediaId,
     recommended: form.recommended,
     featured: form.featured,
     status: form.status,
@@ -484,9 +506,13 @@ function payload(): UniversityInput {
       .filter(r => r.source.trim() && r.rankPosition)
       .map(r => ({ source: r.source.trim(), rankPosition: Number(r.rankPosition), rankYear: orNum(r.rankYear), note: orNull(r.note ?? '') })),
     gallery: form.gallery
-      .filter((g): g is { imageUrl: string, caption: string | null } => Boolean(g.imageUrl?.trim()))
+      .filter(g => g.mediaId != null || Boolean(g.imageUrl?.trim()))
       .slice(0, 6)
-      .map(g => ({ imageUrl: g.imageUrl.trim(), caption: orNull(g.caption ?? '') })),
+      .map(g => ({
+        mediaId: g.mediaId ?? null,
+        imageUrl: g.imageUrl?.trim() || undefined,
+        caption: orNull(g.caption ?? ''),
+      })),
   }
 }
 

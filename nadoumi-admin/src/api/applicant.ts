@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { uploadMedia } from './media'
 
 export type ApplicantStatus = 'DRAFT' | 'ACTIVE' | 'UNLINKED' | 'ARCHIVED'
 
@@ -170,3 +171,18 @@ export const deleteContact = (id: number | string, contactId: number) =>
 // ---- access / delegation ----
 export const listAccess = (id: number | string) =>
   request.get<unknown, AccessGrant[]>(`${BASE}/${id}/access`)
+
+// ---- photo (protected asset) ----
+/** Short-lived signed URL for displaying the applicant photo. Re-fetch on reload. */
+export interface ApplicantPhotoUrl {
+  url: string
+  expiresAt: string
+}
+
+/** Upload the applicant photo. Protected — the response carries `mediaId` but no URL. */
+export const uploadApplicantPhoto = (id: number | string, file: File): Promise<{ mediaId: number }> =>
+  uploadMedia(`${BASE}/${id}/photo`, file).then(r => ({ mediaId: r.mediaId }))
+
+/** Resolve a short-lived signed URL to display the applicant photo. */
+export const getApplicantPhotoUrl = (id: number | string) =>
+  request.get<unknown, ApplicantPhotoUrl>(`${BASE}/${id}/photo`, { params: { json: 1 } })

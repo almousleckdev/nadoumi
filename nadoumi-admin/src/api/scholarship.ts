@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { uploadMedia, type MediaUploadResult } from './media'
 import type { Page } from './applicant'
 
 export type TeachingLanguage = 'ENGLISH' | 'CHINESE' | 'BOTH'
@@ -117,8 +118,16 @@ export interface ScholarshipView {
   featured: boolean
   recommended: boolean
   hot: boolean
+  /** @deprecated legacy URL string; use `heroUrl`. */
   heroImageUrl?: string | null
+  /** @deprecated legacy URL string; use `coverUrl`. */
   coverImageUrl?: string | null
+  heroMediaId?: number | null
+  coverMediaId?: number | null
+  /** Resolved absolute URL, or the legacy `heroImageUrl` fallback. */
+  heroUrl?: string | null
+  /** Resolved absolute URL, or the legacy `coverImageUrl` fallback. */
+  coverUrl?: string | null
   levels: string[]
   categories: string[]
   intakes: ScholarshipIntakeInput[]
@@ -190,8 +199,12 @@ export interface ScholarshipInput {
   status: ScholarshipStatus
   publishStatus: PublishStatus
   remark?: string | null
+  /** @deprecated still accepted by the backend; new uploads set `heroMediaId`. */
   heroImageUrl?: string | null
+  /** @deprecated still accepted by the backend; new uploads set `coverMediaId`. */
   coverImageUrl?: string | null
+  heroMediaId?: number | null
+  coverMediaId?: number | null
   levels: EducationLevel[]
   categoryCodes: string[]
   intakes: ScholarshipIntakeInput[]
@@ -250,3 +263,9 @@ export const putScholarshipInternal = (id: number | string, body: ScholarshipInt
 
 export const listScholarshipCategories = () =>
   request.get<unknown, ScholarshipCategoryOption[]>('/api/public/scholarships/categories')
+
+// ---- media uploads (multipart, field `file`) ----
+export const uploadScholarshipHero = (id: number | string, file: File): Promise<MediaUploadResult> =>
+  uploadMedia(`${BASE}/${id}/hero`, file)
+export const uploadScholarshipCover = (id: number | string, file: File): Promise<MediaUploadResult> =>
+  uploadMedia(`${BASE}/${id}/cover`, file)
