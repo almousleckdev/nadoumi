@@ -20,6 +20,19 @@
       </el-button>
     </div>
 
+    <div class="ov__photo">
+      <span class="ov__photo-label">{{ t('applicant.photo') }}</span>
+      <ImageUpload
+        v-model="photoMediaId"
+        :action="`/api/staff/applicants/${props.applicant.id}/photo`"
+        :preview-url="photoUrl"
+        aspect="square"
+        :disabled="!canEdit"
+        :disabled-hint="t('applicant.photoReadOnly')"
+        @update:model-value="refreshPhoto"
+      />
+    </div>
+
     <DescriptionList :items="items" />
 
     <Drawer
@@ -87,13 +100,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { Edit } from '@element-plus/icons-vue'
-import { updateApplicant, type Applicant, type ApplicantProfileInput } from '@/api/applicant'
+import {
+  getApplicantPhotoUrl, updateApplicant,
+  type Applicant, type ApplicantProfileInput,
+} from '@/api/applicant'
 import DescriptionList from '@/components/ui/DescriptionList.vue'
 import Drawer from '@/components/ui/Drawer.vue'
+import ImageUpload from '@/components/ui/ImageUpload.vue'
 import type { DescriptionItem } from '@/components/ui/types'
 
 const props = defineProps<{ applicant: Applicant, canEdit: boolean }>()
@@ -129,6 +146,22 @@ const items = computed<DescriptionItem[]>(() => {
     { label: t('applicant.registered'), value: fmtDate(a.createdAt) },
   ]
 })
+
+// The photo is a protected asset: display it through a short-lived signed URL
+// fetched on load (and re-fetched after an upload). `photoMediaId` only drives
+// the upload widget — it is not persisted through this tab.
+const photoUrl = ref<string | null>(null)
+const photoMediaId = ref<number | null>(null)
+
+async function refreshPhoto() {
+  try {
+    photoUrl.value = (await getApplicantPhotoUrl(props.applicant.id)).url
+  }
+  catch {
+    photoUrl.value = null
+  }
+}
+onMounted(refreshPhoto)
 
 const open = ref(false)
 const saving = ref(false)
@@ -198,5 +231,16 @@ async function save() {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+.ov__photo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.ov__photo-label {
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--nad-ink-soft);
 }
 </style>

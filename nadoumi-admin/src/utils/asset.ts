@@ -1,12 +1,9 @@
-const API_BASE = import.meta.env.VITE_APP_BASE_API || '/dev-api'
-
 /**
- * Resolve a stored asset reference to a URL the admin can load.
- * New uploads store a path only (`/profile/upload/...`); older rows may still
- * carry an absolute `http(s)://…` URL — pass those through unchanged.
+ * Passthrough shim. Media references are now absolute URLs — Cloudinary
+ * `secure_url` for public catalog imagery, short-lived signed URLs for protected
+ * assets — so there is nothing left to resolve. Kept as a one-liner so existing
+ * imports keep working; remove once every caller is gone.
  */
 export function assetUrl(ref: string | null | undefined): string {
-  if (!ref) return ''
-  if (/^https?:\/\//i.test(ref) || ref.startsWith('data:')) return ref
-  return `${API_BASE}${ref.startsWith('/') ? '' : '/'}${ref}`
+  return ref ?? ''
 }

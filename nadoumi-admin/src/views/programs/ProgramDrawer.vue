@@ -11,6 +11,7 @@ import {
 import { listUniversities, type University } from '@/api/university'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
+import ImageUpload from '@/components/ui/ImageUpload.vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -36,6 +37,7 @@ function loadUniversities() {
 
 function blankForm() {
   return {
+    id: undefined as number | undefined,
     universityId: props.lockedUniversity?.id ?? (null as number | null),
     name: '', nameCn: '',
     programType: 'BACHELOR' as ProgramInput['programType'],
@@ -45,6 +47,7 @@ function blankForm() {
     tuitionAmount: null as number | null,
     tuitionCurrency: 'USD',
     summary: '',
+    imageMediaId: null as number | null,
     majors: [] as { name: string, nameCn: string | null }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
     featured: false, hot: false,
@@ -70,6 +73,7 @@ watch(() => props.modelValue, (open) => {
   const p = props.program
   if (!p) return
   Object.assign(form, {
+    id: p.id,
     universityId: p.universityId,
     name: p.name, nameCn: p.nameCn ?? '',
     programType: p.programType, field: p.field ?? '',
@@ -78,6 +82,7 @@ watch(() => props.modelValue, (open) => {
     tuitionAmount: p.tuitionAmount ?? null,
     tuitionCurrency: p.tuitionCurrency ?? 'USD',
     summary: p.summary ?? '',
+    imageMediaId: p.imageMediaId ?? null,
     majors: p.majors.map(m => ({ name: m.name, nameCn: m.nameCn ?? null })),
     intakes: p.intakes.map(i => ({
       term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null,
@@ -106,6 +111,7 @@ function payload(): ProgramInput {
     tuitionAmount: n(form.tuitionAmount),
     tuitionCurrency: form.tuitionAmount != null ? form.tuitionCurrency.toUpperCase() : null,
     summary: s(form.summary),
+    imageMediaId: form.imageMediaId,
     featured: form.featured, hot: form.hot,
     status: form.status, publishStatus: form.publishStatus, remark: s(form.remark),
     majors: form.majors.filter(m => m.name.trim()).map(m => ({ name: m.name.trim(), nameCn: s(m.nameCn ?? '') })),
@@ -353,6 +359,19 @@ defineExpose({ form, save, rules })
         >
           {{ t('program.addIntake') }}
         </el-button>
+      </FormSection>
+
+      <FormSection :title="t('program.secImage')">
+        <el-form-item :label="t('program.image')">
+          <ImageUpload
+            v-model="form.imageMediaId"
+            :action="`/api/staff/programs/${form.id}/image`"
+            :preview-url="program?.imageUrl"
+            aspect="wide"
+            :disabled="!form.id"
+            :disabled-hint="t('imageUpload.saveFirst')"
+          />
+        </el-form-item>
       </FormSection>
 
       <FormSection :title="t('program.secPublication')">

@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { uploadMedia, type MediaUploadResult } from './media'
 import type { Page } from './applicant'
 
 export type UniversityStatus = 'ACTIVE' | 'INACTIVE'
@@ -22,7 +23,12 @@ export interface UniversityHighlight {
 
 export interface UniversityGalleryImage {
   id?: number
-  imageUrl: string
+  /** @deprecated legacy URL string; new rows carry `mediaId` and resolve to `url`. */
+  imageUrl?: string
+  /** New media FK; null on legacy rows that still carry only `imageUrl`. */
+  mediaId?: number | null
+  /** Resolved absolute URL (Cloudinary), falling back to `imageUrl` server-side. */
+  url?: string | null
   caption: string | null
 }
 
@@ -50,8 +56,16 @@ export interface University {
   officePhone: string | null
   logoDocumentId: number | null
   bannerDocumentId: number | null
+  /** @deprecated legacy URL string; use `logoUrl`. Kept for one release. */
   logoImageUrl: string | null
+  /** @deprecated legacy URL string; use `bannerUrl`. Kept for one release. */
   coverImageUrl: string | null
+  logoMediaId?: number | null
+  bannerMediaId?: number | null
+  /** Resolved absolute URL, or the legacy `logoImageUrl` fallback. */
+  logoUrl?: string | null
+  /** Resolved absolute URL, or the legacy `coverImageUrl` fallback. */
+  bannerUrl?: string | null
   recommended: boolean
   featured: boolean
   status: UniversityStatus
@@ -84,8 +98,12 @@ export interface UniversityInput {
   nearbyInfo?: string | null
   admissionsEmail?: string | null
   officePhone?: string | null
+  /** @deprecated still accepted by the backend; new uploads set `logoMediaId`. */
   logoImageUrl?: string | null
+  /** @deprecated still accepted by the backend; new uploads set `bannerMediaId`. */
   coverImageUrl?: string | null
+  logoMediaId?: number | null
+  bannerMediaId?: number | null
   recommended: boolean
   featured: boolean
   status: UniversityStatus
@@ -117,3 +135,11 @@ export const updateUniversity = (id: number | string, body: UniversityInput) =>
 
 export const deleteUniversity = (id: number | string) =>
   request.delete(`${BASE}/${id}`)
+
+// ---- media uploads (multipart, field `file`) ----
+export const uploadUniversityLogo = (id: number | string, file: File): Promise<MediaUploadResult> =>
+  uploadMedia(`${BASE}/${id}/logo`, file)
+export const uploadUniversityBanner = (id: number | string, file: File): Promise<MediaUploadResult> =>
+  uploadMedia(`${BASE}/${id}/banner`, file)
+export const uploadUniversityGalleryImage = (id: number | string, file: File): Promise<MediaUploadResult> =>
+  uploadMedia(`${BASE}/${id}/gallery`, file)

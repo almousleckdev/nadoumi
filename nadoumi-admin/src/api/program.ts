@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+import { uploadMedia, type MediaUploadResult } from './media'
 import type { Page } from './applicant'
 import type { PublishStatus } from './university'
 
@@ -47,6 +48,9 @@ export interface Program {
   remark: string | null
   createdAt: string | null
   updatedAt: string | null
+  imageMediaId?: number | null
+  /** Resolved absolute URL for the programme image, when one is set. */
+  imageUrl?: string | null
   majors: ProgramMajor[]
   intakes: ProgramIntake[]
 }
@@ -67,6 +71,7 @@ export interface ProgramInput {
   status: ProgramStatus
   publishStatus: PublishStatus
   remark?: string | null
+  imageMediaId?: number | null
   majors: ProgramMajor[]
   intakes: ProgramIntake[]
 }
@@ -95,3 +100,7 @@ export const updateProgram = (id: number | string, body: ProgramInput) =>
 
 export const deleteProgram = (id: number | string) =>
   request.delete(`${BASE}/${id}`)
+
+// ---- media upload (multipart, field `file`) ----
+export const uploadProgramImage = (id: number | string, file: File): Promise<MediaUploadResult> =>
+  uploadMedia(`${BASE}/${id}/image`, file)

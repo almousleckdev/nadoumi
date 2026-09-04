@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { mountOpts } from '../../helpers'
+import ImageUpload from '@/components/ui/ImageUpload.vue'
 import type { University } from '@/api/university'
 
 const api = vi.hoisted(() => ({
@@ -19,11 +20,16 @@ const existing: University = {
   campusInfo: null, accommodationInfo: null, nearbyInfo: null,
   admissionsEmail: null, officePhone: null, logoDocumentId: null, bannerDocumentId: null,
   logoImageUrl: null, coverImageUrl: null,
+  logoMediaId: 101, bannerMediaId: 102,
+  logoUrl: 'https://res.cloudinary.com/logo.png', bannerUrl: 'https://res.cloudinary.com/banner.png',
   recommended: true, featured: false, status: 'ACTIVE', publishStatus: 'PUBLISHED',
   remark: null, createdAt: null, updatedAt: null,
   rankings: [{ id: 1, source: 'QS', rankPosition: 34, rankYear: 2026, note: null }],
   highlights: [{ id: 1, kind: 'HIGHLIGHT', text: 'C9 League member' }],
-  gallery: [{ id: 1, imageUrl: 'https://img.example/campus.jpg', caption: 'Main campus' }],
+  gallery: [{
+    id: 1, imageUrl: 'https://img.example/campus.jpg', mediaId: 103,
+    url: 'https://res.cloudinary.com/campus.jpg', caption: 'Main campus',
+  }],
 }
 
 function mountDrawer(university: University | null) {
@@ -79,6 +85,21 @@ describe('UniversityDrawer', () => {
     await flushPromises()
     const body = api.updateUniversity.mock.calls[0]![1]
     expect(body.rankings[0].note).toBe('Asia #5')
+  })
+
+  it('disables every image upload until the record has an id', async () => {
+    const creating = mountDrawer(null)
+    await flushPromises()
+    const uploads = creating.findAllComponents(ImageUpload)
+    expect(uploads.length).toBeGreaterThan(0)
+    expect(uploads.every(u => u.props('disabled') === true)).toBe(true)
+
+    const editing = mountDrawer(existing)
+    await flushPromises()
+    const editUploads = editing.findAllComponents(ImageUpload)
+    expect(editUploads.every(u => u.props('disabled') === false)).toBe(true)
+    // logo preview comes from the resolved URL, not the legacy field
+    expect(editUploads[0]!.props('previewUrl')).toBe('https://res.cloudinary.com/logo.png')
   })
 
   it('declares required fields incl. the publication status', () => {

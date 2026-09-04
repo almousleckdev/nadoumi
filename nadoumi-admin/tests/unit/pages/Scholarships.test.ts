@@ -21,13 +21,18 @@ const confirm = vi.hoisted(() => vi.fn())
 vi.mock('@/composables/useConfirm', () => ({ useConfirm: () => ({ confirm }) }))
 
 import Scholarships from '@/views/scholarships/index.vue'
+import ScholarshipDrawer from '@/views/scholarships/ScholarshipDrawer.vue'
+import ImageUpload from '@/components/ui/ImageUpload.vue'
 import { useUserStore } from '@/stores/user'
+import type { Scholarship } from '@/api/scholarship'
 
 const row = {
   view: {
     id: 7, slug: 'csc-master', title: 'CSC Master', country: 'CN', fundingModel: 'FULLY',
     hasStipend: true, featured: true, recommended: false, hot: false,
     requiresFinancialProof: false, requiresFoundationYear: false,
+    heroMediaId: 201, coverMediaId: 202,
+    heroUrl: 'https://res.cloudinary.com/hero.png', coverUrl: 'https://res.cloudinary.com/cover.png',
     levels: ['MASTER'], categories: ['CSC'], intakes: [], fees: [],
     stipends: [], accommodation: [], coverage: [], documentRequirements: [],
   },
@@ -89,5 +94,27 @@ describe('Scholarships list', () => {
     await vm.onDelete(row)
     await flushPromises()
     expect(api.deleteScholarship).toHaveBeenCalledWith(7)
+  })
+})
+
+describe('ScholarshipDrawer media uploads', () => {
+  beforeEach(() => setActivePinia(createPinia()))
+
+  function mountDrawer(scholarship: Scholarship | null) {
+    return mount(ScholarshipDrawer, { props: { modelValue: true, scholarship }, ...mountOpts() })
+  }
+
+  it('disables the hero/cover uploads until the scholarship has an id', async () => {
+    const creating = mountDrawer(null)
+    await flushPromises()
+    const uploads = creating.findAllComponents(ImageUpload)
+    expect(uploads.length).toBe(2)
+    expect(uploads.every(u => u.props('disabled') === true)).toBe(true)
+
+    const editing = mountDrawer(row as unknown as Scholarship)
+    await flushPromises()
+    const editUploads = editing.findAllComponents(ImageUpload)
+    expect(editUploads.every(u => u.props('disabled') === false)).toBe(true)
+    expect(editUploads[0]!.props('previewUrl')).toBe('https://res.cloudinary.com/hero.png')
   })
 })
