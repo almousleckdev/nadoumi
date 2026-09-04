@@ -240,6 +240,74 @@ Staff visibility is role-gated (`docs/PERMISSION_CATALOGUE.md` §5), **but no st
 role or combination ever causes a confidential field onto a `/api/public|student`
 response** — the student boundary is structural and role-independent.
 
+## 5a. File & document storage (BASELINE — EXISTING, P1)
+
+`docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md`
+Part I (**DM1–DM8**). Provider: **Cloudinary**, behind the `MediaStorageService`
+SPI (+ `MediaGateway` façade) in `nadoumi-common`, implemented by
+`CloudinaryMediaStorage` in the new foundational `nadoumi-media` module. This
+supersedes `ARCHITECTURE.md` D5's provider choice; D5's SPI *principle* is kept.
+Full model: `docs/DOCUMENT_MANAGEMENT.md` §3.2–§3.4a;
+`docs/DATABASE_DESIGN.md` §5.6a.
+
+**Authorization before access, every request.** No file is served on the
+strength of URL possession, a frontend guard, or a prior grant. Every
+PROTECTED/SENSITIVE request re-resolves the caller's authorization from source
+(`NadoumiAccessService`, `sys_user_role`) — never a cached decision — before any
+bytes or URL are returned.
+
+**No permanent public URLs for private assets.** `nad_media_asset.secure_url` is
+populated **only** when `access_class='PUBLIC'`. PROTECTED and SENSITIVE assets
+never have a stored URL:
+- **PROTECTED** — a fresh, single-purpose, short-TTL signed URL is issued
+  per-request after authorization succeeds (`nadoumi.media.signed-url-ttl-seconds`,
+  default **180s**, clamped **[60, 600]**). It expires and is not embeddable in a
+  cacheable page.
+- **SENSITIVE** — no URL is ever generated for the client. The Nadoumi backend
+  fetches the object from Cloudinary server-side and streams it through the
+  response (bounded buffer, `Cache-Control: no-store`,
+  `X-Content-Type-Options: nosniff`, `Content-Disposition: attachment`).
+  Reserved today for `JW202` and the Step 7 doc-type overrides `PASSPORT` /
+  `VISA` / `FINANCIAL_PROOF` / `TRANSCRIPT` / `POLICE_CLEARANCE`.
+
+**Every PROTECTED/SENSITIVE access is logged.** `nad_media_access_log`
+(append-only, `REQUIRES_NEW` write so a later `403` cannot roll it back):
+`access_kind` (`SIGNED_URL_ISSUED` / `STREAM_PROXY` / `METADATA`), `result`
+(`GRANTED` / `DENIED`), `deny_reason`, `ttl_seconds`, actor, IP, user agent. A
+public `GET /api/media/{id}` redirect for a PUBLIC asset is **not** logged.
+
+**Revocation is immediate.** A signed URL already handed out has at most `TTL`
+seconds of residual validity; SENSITIVE media has no residual window at all —
+every byte re-checks authorization. Deactivating a `nad_user_applicant_access`
+grant, changing a role, or archiving an applicant takes effect on the affected
+user's next call, exactly as for every other resource grant (§2 above).
+
+**Upload validation** (`MediaValidation`, boundary pipeline, before any
+Cloudinary call — full detail `docs/DOCUMENT_MANAGEMENT.md` §3.4):
+
+| Control | Rule |
+| --- | --- |
+| MIME allow-list | per `MediaCategory`, declared `Content-Type` must match |
+| Magic-byte sniff | Apache Tika on the first 8 KiB; sniffed type must be in the allow-list **and** family-match the declared type (image↔image, pdf↔pdf) — mismatch → `422` |
+| Size cap | per category (4–20 MB) + a global `NADOUMI_MEDIA_MAX_UPLOAD_MB` (default 20) ceiling; also `spring.servlet.multipart.max-file-size`/`max-request-size` |
+| Filename sanitisation | strip path separators/control chars/leading dots; collapse to `[A-Za-z0-9._-]`; max 100 chars; empty → generated `upload-<uuid>` |
+| Hard denylist (every category) | `text/html`, `image/svg+xml`, `application/xhtml+xml`, `application/x-msdownload`, `application/x-sh`, zip, java-archive — never accepted regardless of declared/sniffed MIME |
+| Checksum | SHA-256, streamed, for document-shaped categories (dedupe + tamper evidence) |
+
+**`CLOUDINARY_URL` handling.** Env var only — `cloudinary://<key>:<secret>@<cloud>`.
+No `application.yml` default; `CloudinaryMediaStorage`'s constructor **fails fast**
+at startup if the value is absent or malformed. Never logged — `CloudinaryMediaStorage`
+logs `public_id` + byte size + owner, never the URL for PROTECTED/SENSITIVE assets
+and never the API secret. Rotate via the secret manager (§7).
+
+**Scholarship confidentiality cross-reference (§5 above).** PUBLIC catalog
+imagery (university logo/banner/gallery, scholarship hero/cover, programme
+image) is unrelated to the confidentiality boundary — it's meant to be public.
+`v_scholarship_student` (recreated `V27` to expose `hero_media_id` /
+`cover_media_id`) still projects **no** confidential column and involves **no**
+join to `nad_scholarship_internal` or `nad_university` — `CatalogImageRetrofitTest`
+re-asserts this alongside the existing `FlywayMigrationsIT` view-shape assertion.
+
 ## 6. PII & data protection
 
 - PII inventory: applicant name, DOB, nationality, passport number, contact details,

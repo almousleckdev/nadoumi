@@ -73,6 +73,18 @@ entities, endpoints, or frontend screens. `docs/` contained empty placeholder fi
 **PROPOSED** target adds a sibling aggregator `nadoumi-modules/` (see
 `docs/DEVELOPMENT_GUIDELINES.md` §"Module strategy"). No microservices — modular monolith.
 
+**EXISTING (P1).** `nadoumi-modules/` now contains, alongside the domain modules
+(`nadoumi-identity`, `nadoumi-applicant`, `nadoumi-university`, `nadoumi-scholarship`,
+`nadoumi-program`, …), one **foundational infrastructure module**:
+`nadoumi-media` — a peer of `nadoumi-identity`, not itself a CLAUDE.md §7 business
+domain. It provides the `MediaStorageService` implementation
+(`CloudinaryMediaStorage`) and the `MediaGateway` façade that every domain module
+depends on for image/document storage (DM8, spec
+`docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md`
+§I.2). `ruoyi-admin` depends on it so the beans are on the runtime classpath;
+catalog/applicant modules depend only on the `MediaStorageService`/`MediaGateway`
+interfaces in `nadoumi-common`.
+
 ## 4. Layering conventions (EXISTING, inherited)
 
 `Controller (extends BaseController)` → `IService` / `ServiceImpl` → `Mapper` (MyBatis XML)
@@ -125,7 +137,7 @@ listed at the end do **not** block Phase 2.
 | **D2** | Public / student experience | **Separate Nuxt 3 app at `nadoumi-web/`** (this repo). SSR for catalog/content; consumes `/api/public` + `/api/student`. Auth via `/api/student/login`; the JWT is held **only** in an httpOnly + Secure + SameSite=Lax cookie set by Nuxt server routes (a thin BFF) — the browser JS never sees the raw token. | FRONTEND_ARCHITECTURE |
 | **D3** | Upstream tracking | **Maintained fork.** `origin` → Nadoumi repo; add remote `upstream` → `yangzongzhuan/RuoYi-Vue`; monthly upstream review, security fixes cherry-picked; keep Nadoumi's own frontend line. | DEPLOYMENT, DEVELOPMENT_GUIDELINES |
 | **D4** | Workflow engine | **Data-driven config tables + `WorkflowService`.** Guards are a **fixed predicate set** (`ALL_MANDATORY_TASKS_DONE`, `ALL_REQUIRED_DOCUMENTS_VERIFIED`, `DECISION_RECORDED(type)`, `PAYMENT_SETTLED(kind)`, `FIELD_SET(name)`) — **no** SpEL / expression language in v1. Instances pin `definition_version`; no auto-migration. | APPLICATION_WORKFLOW |
-| **D5** | Document object storage | **S3-compatible via a `DocumentStorage` SPI**: `local` impl (hardened) for dev, `s3` impl for MinIO (staging) / AWS S3 (prod). Bytes never in MySQL. All downloads via an authorized API endpoint (stream or short-TTL pre-signed URL). | DOCUMENT_MANAGEMENT |
+| **D5** | Document object storage | **SUPERSEDED by DM1 (P1, media/file-storage spec).** Original decision was an S3-compatible `DocumentStorage` SPI (`local` dev / MinIO staging / AWS S3 prod). **Built instead: Cloudinary** is the sole managed storage provider, behind the `MediaStorageService` SPI (+ `MediaGateway` façade) in `nadoumi-common`, implemented by `CloudinaryMediaStorage` in the new `nadoumi-media` module. D5's *principle* — provider-agnostic SPI, bytes never in MySQL, downloads only through an authorized API (signed URL or stream-proxy) — is retained; the provider choice and the `local`/`s3` impl split are dropped. The `DocumentStorage` SPI stub in `nadoumi-common` was deleted. | DOCUMENT_MANAGEMENT, §7.1 below |
 | **D6** | Realtime + notification channels | **SSE** for v1 (`/api/{student,staff}/stream`) for notification + "new message" pings; polling fallback; WebSocket deferred. `NotificationChannel` SPI with **IN_APP + EMAIL only** built in v1 (email via an SMTP abstraction, provider chosen at deploy time). SMS / WhatsApp / PUSH: enum kept, no impl. Multi-instance fan-out via **Redis pub/sub** from day one. | COMMUNICATION_AND_NOTIFICATIONS |
 | **D7** | `User ↔ Applicant` access model | **As specified in DOMAIN_MODEL §4**: `nad_user_applicant_access` grant, roles OWNER/AGENT/GUARDIAN/VIEWER + capability matrix, `capability_overrides_json`, PENDING email invites, one-active-OWNER invariant, per-application scoping, **live** (non-cached) revocation. Guardian default = no submit (staff override possible). Staff-created applicant = interim staff OWNER (`is_interim`, 30-day expiry) + PENDING invite; non-acceptance → applicant `UNLINKED`. | DOMAIN_MODEL §4, SECURITY §2 |
 | **D8** | DB name + credentials | Secrets via **env vars** + optional git-ignored `config/application-local.yml` (`spring.config.import`). Committed default stays `ry-vue`/`root`/`password`; local dev DB renamed `ry_vue`→`ry-vue`. | DEPLOYMENT, DATABASE_DESIGN, DEVELOPMENT_GUIDELINES |
@@ -141,6 +153,37 @@ destination country; API response-envelope + versioning final confirmation
 (recommendation: bare bodies + `problem+json` + URI `/api/v1`); PII column-encryption
 scope + data-residency; concrete email/SMS/WhatsApp vendors; runtime target
 (Compose / ECS / K8s); `nad_partnership_program`; per-environment CORS origins.
+
+### 7.1 Media & document access flow (EXISTING — DM1–DM8, P1)
+
+Every protected or sensitive media/document access — applicant photo today,
+verification documents once `nadoumi-document` (Step 7) lands — goes through the
+same shape, never a stored Cloudinary URL:
+
+```
+Student / Admin request
+        │
+        ▼
+Nadoumi authN (JWT / session)
+        │
+        ▼
+Nadoumi authorization (ownership · grant · staff role · app visibility)
+        │  deny ──► 403 + nad_media_access_log(result=DENIED, deny_reason)
+        │ grant
+        ▼
+Media access service (MediaGateway, nadoumi-media)
+        │  nad_media_access_log(result=GRANTED)
+        ▼
+Cloudinary (MediaStorageService: CloudinaryMediaStorage)
+        │
+        ├─ PROTECTED  → short-TTL signed URL  → 302 / {url, expiresAt}
+        └─ SENSITIVE  → Nadoumi backend proxy → bytes streamed, no URL to client
+```
+
+PUBLIC assets (catalog imagery) skip the authorization/log step and are served
+directly from Cloudinary's CDN (`secure_url`) or via the `GET /api/media/{id}`
+redirect. Full model: `docs/DOCUMENT_MANAGEMENT.md` §3.2–§3.3,
+`docs/SECURITY.md` "File & document storage".
 
 ## 8. Identity & authorization architecture (BASELINE · D10 APPROVED)
 

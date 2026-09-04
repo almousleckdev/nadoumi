@@ -49,16 +49,29 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 - **Redis** — required (token store, captcha, dict/config cache, **and the SSE
   fan-out bus**, D6). **BASELINE:** AUTH + TLS in every non-local environment
   (`SPRING_DATA_REDIS_PASSWORD`, `ssl.enabled=true`).
-- **Object storage (S3-compatible)** — **BASELINE (D5)**: MinIO (staging) / AWS S3
-  (prod) for documents + chat attachments; `local` filesystem impl for dev only. No
-  anonymous `/profile/**`.
+- **Media / file storage — Cloudinary** — **DONE (P1, supersedes D5's provider
+  choice — DM1).** All Nadoumi-owned uploaded media (catalog imagery, applicant
+  photo; documents once Step 7 lands) is stored in **Cloudinary**, the sole
+  managed storage provider in every environment including dev and test — there is
+  **no local-filesystem production path** and no MinIO/AWS S3. Nadoumi code talks
+  to it only through the `MediaStorageService` SPI (+ `MediaGateway` façade) in
+  `nadoumi-common`, implemented by `CloudinaryMediaStorage` in the new
+  `nadoumi-media` module. Auth: `CLOUDINARY_URL` env var (§4.1). Folder prefix per
+  environment (`NADOUMI_MEDIA_ENV`) keeps `dev`/`staging`/`prod` from colliding in
+  one Cloudinary cloud. No anonymous `/profile/**`. Tests that must run offline use
+  the in-memory `FakeMediaStorage` test double — never a real filesystem impl.
+  Details: `docs/DOCUMENT_MANAGEMENT.md`, `docs/SECURITY.md` "File & document
+  storage".
 - **Quartz** — **DONE (Phase 2):** `spring.quartz.job-store-type=jdbc` +
   `LocalDataSourceJobStore`, `isClustered=true`, `tablePrefix=QRTZ_`,
   `jdbc.initialize-schema=never` (tables come from `V1`). Verified: jobs written to
   `QRTZ_JOB_DETAILS` survive an app restart. RuoYi's commented-out
   `ScheduleConfig.java` stays disabled (config is now via `spring.quartz.*`).
 - **Local filesystem** — `ruoyi.profile` must be a valid per-host path
-  (`RUOYI_PROFILE` env); only used by the future `local` document-storage impl.
+  (`RUOYI_PROFILE` env); used only by RuoYi's own legacy `/common/upload` (admin
+  avatar etc., out of scope). **No** Nadoumi media/document storage uses local
+  filesystem in any environment — no `local`/filesystem `MediaStorageService`
+  bean exists (DM3).
 
 ### CI/CD
 - **DONE (Phase 2):** `.github/workflows/ci.yml` — JDK 21 (temurin), `mvn -B verify`
@@ -72,7 +85,7 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 | G1 | Secrets baked into the jar in plaintext. | **DONE (Phase 2)** — all of DB URL/user/password, Redis host/port/password/SSL, `token.secret`, `token.kid`, Druid console creds are `${ENV_VAR:dev-default}` placeholders. `config/application-local.yml` (git-ignored) via `spring.config.import` for non-datasource local tweaks. |
 | G2 | No `dev`/`staging`/`prod` profile separation. | **PARTIAL** — env-var contract in place (§4); dedicated `application-<profile>.yml` files deferred to the containerization work. |
 | G3 | No containerization / IaC / deploy pipeline. | CI added (Phase 2). Dockerfile + deploy + IaC still **OPEN** (runtime target undecided). |
-| G4 | `ruoyi.profile` path; no object storage. | D5 — `DocumentStorage` SPI interface added (`nadoumi-common`); impls **Phase 4**. |
+| G4 | `ruoyi.profile` path; no object storage. | **DONE (P1)** — superseded by DM1: Cloudinary via `MediaStorageService`/`MediaGateway` (`nadoumi-common` SPI, `nadoumi-media` module `CloudinaryMediaStorage` impl). The original `DocumentStorage` SPI stub was deleted. |
 | G5 | Quartz `RAMJobStore`. | **DONE (Phase 2)** — JDBC clustered store, restart-persistence verified. |
 | G6 | Swagger UI + Druid stat servlet on by default. | Druid console creds now env-driven; full prod-hardening switches (§3) still **PLANNED**. |
 | G7 | Single-instance assumptions. | Quartz clustered store now enabled; SSE/Redis fan-out is **Phase 4**. |
@@ -101,7 +114,8 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
                                           │
                                           ▼
                                   ┌──────────────────────┐
-                                  │ Object storage (S3)  │  documents, attachments
+                                  │ Cloudinary           │  media + documents
+                                  │ (managed, all envs)  │  (public + protected/sensitive)
                                   └──────────────────────┘
 ```
 
@@ -122,7 +136,8 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 - **Hardening for prod:** `springdoc.swagger-ui.enabled=false`,
   `spring.datasource.druid.stat-view-servlet.enabled=false` (or auth+IP allow-list),
   `referer.enabled=true` with real domains, real CORS origins.
-- **Storage:** MinIO/S3 for documents; drop local-filesystem uploads outside dev.
+- **Storage:** Cloudinary for all media/documents (DM1) — no local-filesystem
+  uploads in any environment, dev included.
 - **Frontends:** build `ruoyi-ui`/`nadoumi-web` in CI, ship as static/SSR containers;
   do **not** rely on copying `dist/` into the jar for production.
 - **Observability:** ship logs (JSON encoder) to a central store; dashboards +
@@ -167,11 +182,22 @@ zero-config start working.
 | `SPRING_MAIL_HOST` / `_PORT` | `localhost` / `1025` | dev = Mailpit (`docker-compose.yml`); staging/prod = `smtp.gmail.com` / `587` |
 | `SPRING_MAIL_USERNAME` / `_PASSWORD` | *(empty)* | Gmail: account + 16-char **App Password** |
 | `SPRING_MAIL_SMTP_AUTH` / `SPRING_MAIL_SMTP_STARTTLS` | `false` / `false` | `true` / `true` for Gmail |
-| `NAD_STORAGE_*` | — | reserved for the Document slice (S3 / object storage) |
+| `CLOUDINARY_URL` | *(none)* | `cloudinary://<key>:<secret>@<cloud>` — the only storage credential. **Required at startup**; `MediaStorageService` bean init fails fast if absent/malformed. Never logged. **DONE (P1)**, supersedes the reserved `NAD_STORAGE_*` placeholder. |
+| `NADOUMI_MEDIA_ENV` | `dev` | `dev` \| `staging` \| `prod` — Cloudinary folder prefix, so one cloud hosts all envs without collision. |
+| `NADOUMI_MEDIA_SIGNED_URL_TTL_SECONDS` | `180` | PROTECTED-asset signed URL lifetime; clamped `[60, 600]`. |
+| `NADOUMI_MEDIA_MAX_UPLOAD_MB` | `20` | Hard upload ceiling across all categories; also sets `spring.servlet.multipart.max-file-size` (20MB) / `max-request-size` (22MB). |
 
 **Local dev:** repo-root `docker-compose.yml` provides `mysql`, `redis`, and
 `mailpit` (SMTP `:1025`, web UI `:8025`). `cp .env.example .env && docker compose up -d`.
 `.env` is git-ignored; `docker compose` and the exported shell env both read it.
+
+**Data retention — `nad_media_access_log` (P1):** append-only, never mutated or
+deleted by application code. Retained per the platform data-retention policy
+(**OPEN** — concrete retention period is a legal/ops decision, tracked alongside
+the PII retention/erasure item in `docs/SECURITY.md` §6); a scheduled purge job is
+not yet built. `nad_media_asset` rows follow the P1 spec's replace/soft-delete/
+reconciliation lifecycle (`docs/DOCUMENT_MANAGEMENT.md` — replacement/versioning
+rules), independent of the access-log retention question.
 
 ## 5. Phase 2 status — what landed
 
