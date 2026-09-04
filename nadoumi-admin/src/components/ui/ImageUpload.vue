@@ -40,9 +40,10 @@ const emit = defineEmits<{ 'update:modelValue': [v: number | null] }>()
 
 const { t } = useI18n()
 
-const uploadUrl = computed(
-  () => `${import.meta.env.VITE_APP_BASE_API || '/dev-api'}${props.action}`,
-)
+const uploadUrl = computed(() => {
+  const base = (import.meta.env.VITE_APP_BASE_API || '/dev-api').replace(/\/$/, '')
+  return `${base}${props.action}`
+})
 const headers = computed(() => ({ Authorization: `Bearer ${getToken() ?? ''}` }))
 
 // URL from the most recent successful upload on this instance; takes precedence

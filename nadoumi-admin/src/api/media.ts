@@ -14,7 +14,7 @@ export interface MediaUploadResult {
 export function uploadMedia(action: string, file: File): Promise<MediaUploadResult> {
   const body = new FormData()
   body.append('file', file)
-  return request.post<unknown, MediaUploadResult>(action, body, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  })
+  // No explicit Content-Type: the browser must set `multipart/form-data` itself
+  // so it can append the `boundary=…` the server needs to parse the parts.
+  return request.post<unknown, MediaUploadResult>(action, body)
 }
