@@ -16,7 +16,11 @@ beforeEach(() => publicGet.mockReset())
 describe('universities discovery list', () => {
   it('renders cards + a result count from the real API and passes paging params', async () => {
     publicGet.mockResolvedValue(page([
-      { id: 1, slug: 'peking-university', name: 'Peking University', country: 'CN', city: 'Beijing' },
+      {
+        id: 1, slug: 'peking-university', name: 'Peking University', country: 'CN', city: 'Beijing',
+        logoImageUrl: '/profile/upload/pku-logo.png',
+        logoUrl: 'https://res.cloudinary.com/demo/image/upload/v1/pku-logo.jpg',
+      },
       { id: 2, slug: 'fudan-university', name: 'Fudan University', country: 'CN', city: 'Shanghai' },
     ]))
     const w = await mountSuspended(UniversitiesList)
@@ -26,6 +30,11 @@ describe('universities discovery list', () => {
     expect(w.text()).toContain('Peking University')
     expect(w.text()).toContain('Fudan University')
     expect(w.text()).toContain('2 results')
+
+    // the card uses the resolved (absolute) logo URL verbatim, not the /media proxy
+    const srcs = w.findAll('img').map(i => i.attributes('src'))
+    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/pku-logo.jpg')
+    expect(srcs.some(s => s?.startsWith('/media/'))).toBe(false)
   })
 
   it('re-queries with a filter and shows a removable chip', async () => {

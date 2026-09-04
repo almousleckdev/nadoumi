@@ -43,8 +43,12 @@ export interface ScholarshipCard {
   featured: boolean
   recommended: boolean
   hot: boolean
+  /** Legacy raw ref (may be a relative `/profile/...` path); kept for one release. */
   heroImageUrl?: string | null
   coverImageUrl?: string | null
+  /** Resolved URL — absolute (Cloudinary) when a media id is set, else the legacy string. */
+  heroUrl?: string | null
+  coverUrl?: string | null
   levels: string[]
   categories: string[]
   intakes: ScholarshipIntake[]
@@ -112,8 +116,12 @@ export interface UniversitySummary {
   province?: string | null
   type?: 'PUBLIC' | 'PRIVATE' | null
   featured?: boolean
+  /** Legacy raw refs (may be relative `/profile/...` paths); kept for one release. */
   logoImageUrl?: string | null
   coverImageUrl?: string | null
+  /** Resolved URLs — absolute (Cloudinary) when a media id is set, else the legacy string. */
+  logoUrl?: string | null
+  bannerUrl?: string | null
 }
 
 export interface UniversityRanking {
@@ -153,7 +161,10 @@ export interface UniversityDetail extends UniversitySummary {
 
 export interface UniversityGalleryImage {
   id: number
+  /** Legacy raw ref (may be a relative `/profile/...` path); kept for one release. */
   imageUrl: string
+  /** Resolved URL — absolute (Cloudinary) when a media id is set, else the legacy string. */
+  url?: string | null
   caption?: string | null
 }
 
@@ -191,6 +202,8 @@ export interface ProgramCard {
   summary?: string | null
   featured: boolean
   hot: boolean
+  /** Resolved image URL — absolute (Cloudinary) when set, else `null` (programmes may have no image). */
+  imageUrl?: string | null
 }
 
 export interface ProgramDetail extends ProgramCard {

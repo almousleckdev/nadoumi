@@ -21,8 +21,8 @@ const place = computed(() =>
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
     <img
-      v-if="scholarship.coverImageUrl"
-      :src="mediaUrl(scholarship.coverImageUrl)"
+      v-if="scholarship.coverUrl ?? scholarship.coverImageUrl"
+      :src="mediaUrl(scholarship.coverUrl ?? scholarship.coverImageUrl)"
       alt=""
       loading="lazy"
       decoding="async"

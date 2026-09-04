@@ -21,6 +21,7 @@ const mba: PDto = {
   summary: 'A two-year MBA taught in English.',
   featured: false,
   hot: true,
+  imageUrl: 'https://res.cloudinary.com/demo/image/upload/v1/mba.jpg',
   majors: [
     { id: 1, name: 'Finance', nameCn: null },
     { id: 2, name: 'Marketing', nameCn: null },
@@ -48,6 +49,11 @@ describe('public programme detail page', () => {
     expect(text).toContain('Finance')
     expect(text).toContain('Marketing')
     expect(text).toContain('Autumn (September)')
+
+    // the resolved (absolute) programme image is used verbatim — not routed through /media
+    const srcs = w.findAll('img').map(i => i.attributes('src'))
+    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/mba.jpg')
+    expect(srcs.some(s => s?.startsWith('/media/'))).toBe(false)
   })
 
   it('shows a not-available message when the programme is missing', async () => {
