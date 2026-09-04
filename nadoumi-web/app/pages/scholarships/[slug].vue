@@ -67,8 +67,8 @@ const eligibilityRows = computed(() => {
   <div v-if="s">
     <section class="relative isolate overflow-hidden bg-slate-900 text-white">
       <img
-        v-if="s.heroImageUrl || s.coverImageUrl"
-        :src="mediaUrl(s.heroImageUrl ?? s.coverImageUrl)"
+        v-if="s.heroUrl ?? s.heroImageUrl ?? s.coverUrl ?? s.coverImageUrl"
+        :src="mediaUrl(s.heroUrl ?? s.heroImageUrl ?? s.coverUrl ?? s.coverImageUrl)"
         alt=""
         class="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
       >

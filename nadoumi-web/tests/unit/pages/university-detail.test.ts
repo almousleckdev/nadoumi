@@ -14,6 +14,10 @@ const fudan: UDto = {
   province: 'Shanghai',
   type: 'PUBLIC',
   featured: true,
+  logoImageUrl: '/profile/upload/fudan-logo.png',
+  coverImageUrl: '/profile/upload/fudan-cover.png',
+  logoUrl: 'https://res.cloudinary.com/demo/image/upload/v1/fudan-logo.jpg',
+  bannerUrl: 'https://res.cloudinary.com/demo/image/upload/v1/fudan-banner.jpg',
   foundedYear: 1905,
   totalStudents: 35000,
   internationalStudents: 4000,
@@ -34,8 +38,8 @@ const fudan: UDto = {
     { id: 2, kind: 'ADVANTAGE', text: 'Strong medical school' },
   ],
   gallery: [
-    { id: 1, imageUrl: 'https://img.example/campus.jpg', caption: 'Main campus' },
-    { id: 2, imageUrl: 'https://img.example/dorm.jpg', caption: 'Dormitory' },
+    { id: 1, imageUrl: '/profile/upload/campus.png', url: 'https://res.cloudinary.com/demo/image/upload/v1/campus.jpg', caption: 'Main campus' },
+    { id: 2, imageUrl: '/profile/upload/dorm.png', url: 'https://res.cloudinary.com/demo/image/upload/v1/dorm.jpg', caption: 'Dormitory' },
   ],
 }
 
@@ -78,6 +82,29 @@ describe('public university detail page', () => {
     // gallery renders campus/dormitory imagery with captions
     expect(text).toContain('Main campus')
     expect(text).toContain('Dormitory')
+
+    // resolved (absolute) media URLs are used verbatim — not routed through /media
+    const srcs = w.findAll('img').map(i => i.attributes('src'))
+    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/fudan-logo.jpg')
+    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/fudan-banner.jpg')
+    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/campus.jpg')
+    expect(srcs.some(s => s?.startsWith('/media/'))).toBe(false)
+  })
+
+  it('falls back to the legacy relative ref through the /media proxy when the resolved URL is null', async () => {
+    const legacy: UDto = {
+      ...fudan,
+      logoUrl: null,
+      bannerUrl: null,
+      logoImageUrl: '/profile/upload/x.png',
+      coverImageUrl: null,
+      gallery: [],
+    }
+    publicGet.mockImplementationOnce((): Promise<UDto> => Promise.resolve(legacy))
+    const w = await mountSuspended(UniversityDetail, { route: '/universities/fudan-university' })
+    await flushPromises()
+    const srcs = w.findAll('img').map(i => i.attributes('src'))
+    expect(srcs).toContain('/media/profile/upload/x.png')
   })
 
   it('shows a not-available message when the university is missing', async () => {

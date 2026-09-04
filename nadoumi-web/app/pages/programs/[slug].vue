@@ -46,6 +46,12 @@ function intakeWindow(open?: string | null, close?: string | null): string {
 <template>
   <div v-if="p">
     <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+      <img
+        v-if="p.imageUrl"
+        :src="mediaUrl(p.imageUrl)"
+        alt=""
+        class="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
+      >
       <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900 to-brand-900/60" aria-hidden="true" />
       <NContainer>
         <div class="py-12 sm:py-16">

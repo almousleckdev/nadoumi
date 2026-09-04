@@ -9,6 +9,9 @@ const dto: SDto = {
   summary: 'A fully funded route to a master’s in China.', country: 'CN', city: 'Beijing',
   fundingModel: 'FULLY', hasStipend: true, deadline: '2026-03-31',
   featured: true, recommended: false, hot: false,
+  heroImageUrl: '/profile/upload/csc-hero.png', coverImageUrl: '/profile/upload/csc-cover.png',
+  heroUrl: 'https://res.cloudinary.com/demo/image/upload/v1/csc-hero.jpg',
+  coverUrl: 'https://res.cloudinary.com/demo/image/upload/v1/csc-cover.jpg',
   levels: ['MASTER'], categories: ['CSC'],
   intakes: [{ term: 'AUTUMN_SEPTEMBER', applicationClose: '2026-03-31' }],
   benefits: 'Tuition, accommodation, stipend.', requirements: 'Bachelor + IELTS 6.0.', policy: null,
@@ -56,6 +59,11 @@ describe('scholarship detail page', () => {
     expect(text).toContain('Study plan')
     // guest Apply routes to register
     expect(w.findAll('a').some(a => a.text() === 'Apply now' && a.attributes('href') === '/register')).toBe(true)
+
+    // the resolved (absolute) hero URL is used verbatim — not routed through /media
+    const srcs = w.findAll('img').map(i => i.attributes('src'))
+    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/csc-hero.jpg')
+    expect(srcs.some(s => s?.startsWith('/media/'))).toBe(false)
   })
 
   it('shows a not-available state for an unknown slug', async () => {
