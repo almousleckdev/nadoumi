@@ -26,6 +26,8 @@ public interface ApplicantMapper {
 
     int update(Applicant applicant);
 
+    int updatePhotoMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
     int updateStatus(
             @Param("id") Long id,
             @Param("status") ApplicantStatus status,

@@ -19,17 +19,28 @@ import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.common.access.ApplicantCapability;
+import com.nadoumi.common.media.MediaAccessLogContext;
+import com.nadoumi.common.media.MediaCategory;
+import com.nadoumi.common.media.MediaGateway;
+import com.nadoumi.common.media.MediaOwnerKind;
+import com.nadoumi.common.media.MediaOwnerRef;
+import com.nadoumi.common.media.MediaUploadResult;
+import com.nadoumi.common.media.SignedUrl;
 import com.nadoumi.identity.access.CurrentCaller;
 import com.nadoumi.identity.access.NadoumiAccessServiceImpl;
+import com.nadoumi.identity.exception.NadForbiddenException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Applicant profile + education / test scores / contacts. Every applicant-scoped
@@ -45,14 +56,17 @@ public class ApplicantService {
     private final UserApplicantAccessService grants;
     private final CurrentCaller caller;
     private final PermissionService rbac;
+    private final MediaGateway media;
 
     public ApplicantService(ApplicantMapper mapper, NadoumiAccessServiceImpl access,
-            UserApplicantAccessService grants, CurrentCaller caller, PermissionService rbac) {
+            UserApplicantAccessService grants, CurrentCaller caller, PermissionService rbac,
+            MediaGateway media) {
         this.mapper = mapper;
         this.access = access;
         this.grants = grants;
         this.caller = caller;
         this.rbac = rbac;
+        this.media = media;
     }
 
     @Transactional
@@ -123,6 +137,52 @@ public class ApplicantService {
             return List.of();
         }
         return mapper.findByIds(ids).stream().map(a -> ApplicantResponse.of(a, true)).toList();
+    }
+
+    // ---- profile photo (PROTECTED — signed URL, never a public URL) ----
+
+    /**
+     * Store the applicant's profile photo as a PROTECTED media asset and point
+     * {@code photo_media_id} at it. Returns the new media id (no URL — PROTECTED
+     * bytes are served only through {@link #photoUrl}).
+     */
+    @Transactional
+    public long uploadPhoto(long applicantId, MultipartFile file) {
+        requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
+        MediaUploadResult result;
+        try {
+            result = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+                    file.getSize(), MediaCategory.APPLICANT_PHOTO, null,
+                    new MediaOwnerRef(MediaOwnerKind.APPLICANT, applicantId), currentUserId());
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("failed to read upload", e);
+        }
+        mapper.updatePhotoMediaId(applicantId, result.mediaId());
+        return result.mediaId();
+    }
+
+    /**
+     * Issue a short-TTL signed URL for the applicant's photo, writing a
+     * {@code nad_media_access_log} entry. A caller without {@code VIEW_PROFILE}
+     * gets a logged denial and a 403.
+     */
+    public SignedUrl photoUrl(long applicantId, MediaAccessLogContext ctx) {
+        Applicant a = load(applicantId);
+        Long photoMediaId = a.getPhotoMediaId();
+        try {
+            requireCapability(applicantId, ApplicantCapability.VIEW_PROFILE);
+        }
+        catch (AccessDeniedException e) {
+            if (photoMediaId != null) {
+                media.denyAndLog(photoMediaId, ctx, "NO_APPLICANT_GRANT");
+            }
+            throw new NadForbiddenException("missing VIEW_PROFILE on applicant " + applicantId);
+        }
+        if (photoMediaId == null) {
+            throw new NadNotFoundException("applicant has no photo");
+        }
+        return media.issueSignedUrl(photoMediaId, ctx);
     }
 
     // ---- education ----
@@ -280,6 +340,16 @@ public class ApplicantService {
 
     private boolean includePii() {
         return caller.isExternal() || rbac.hasPermi("nad:applicant:pii:view");
+    }
+
+    private long currentUserId() {
+        try {
+            Long id = caller.requireUserId();
+            return id == null ? 0L : id;
+        }
+        catch (RuntimeException e) {
+            return 0L;
+        }
     }
 
     private static void apply(

@@ -11,6 +11,7 @@
         <result property="passportNo"  column="passport_no"/>
         <result property="email"       column="email"/>
         <result property="phone"       column="phone"/>
+        <result property="photoMediaId" column="photo_media_id"/>
         <result property="status"      column="status"/>
         <result property="createBy"    column="create_by"/>
         <result property="createTime"  column="create_time"/>
@@ -20,7 +21,7 @@
     </resultMap>
 
     <sql id="cols">
-        id, given_name, family_name, dob, nationality, passport_no, email, phone, status,
+        id, given_name, family_name, dob, nationality, passport_no, email, phone, photo_media_id, status,
         create_by, create_time, update_by, update_time, remark
     </sql>
 
@@ -61,8 +62,13 @@
         update nad_applicant set
             given_name = #{givenName}, family_name = #{familyName}, dob = #{dob},
             nationality = #{nationality}, passport_no = #{passportNo}, email = #{email}, phone = #{phone},
+            photo_media_id = #{photoMediaId},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}
+    </update>
+
+    <update id="updatePhotoMediaId">
+        update nad_applicant set photo_media_id = #{mediaId}, update_time = now() where id = #{id}
     </update>
 
     <update id="updateStatus">

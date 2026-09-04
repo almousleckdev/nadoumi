@@ -11,11 +11,17 @@ import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
 import com.nadoumi.applicant.web.request.TestScoreRequest;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
+import com.nadoumi.common.media.MediaAccessLogContext;
+import com.nadoumi.common.media.SignedUrl;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
+import com.ruoyi.common.utils.SecurityUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/staff/applicants")
@@ -80,6 +87,50 @@ public class StaffApplicantController {
     @Log(title = "Applicant", businessType = BusinessType.UPDATE)
     public void archive(@PathVariable Long id) {
         service.archive(id);
+    }
+
+    // ---- profile photo (PROTECTED) ----
+
+    @PostMapping("/{id}/photo")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
+    @Log(title = "Applicant photo", businessType = BusinessType.UPDATE)
+    public PhotoUploaded uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return new PhotoUploaded(service.uploadPhoto(id, file));
+    }
+
+    @GetMapping("/{id}/photo")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
+    public ResponseEntity<PhotoUrl> photo(@PathVariable Long id,
+            @RequestParam(name = "json", required = false) String json,
+            HttpServletRequest request) {
+        MediaAccessLogContext ctx = new MediaAccessLogContext(
+                actorUserId(), null, null, null,
+                request.getRemoteAddr(), request.getHeader("User-Agent"));
+        SignedUrl signed = service.photoUrl(id, ctx);
+        String accept = request.getHeader("Accept");
+        boolean wantsJson = "1".equals(json) || (accept != null && accept.contains("application/json"));
+        if (wantsJson) {
+            return ResponseEntity.ok(new PhotoUrl(signed.url(), signed.expiresAt().toString()));
+        }
+        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(signed.url())).build();
+    }
+
+    private static long actorUserId() {
+        try {
+            Long id = SecurityUtils.getUserId();
+            return id == null ? 0L : id;
+        }
+        catch (RuntimeException e) {
+            return 0L;
+        }
+    }
+
+    /** {@code POST .../photo} result — the new media id only; PROTECTED bytes carry no URL here. */
+    public record PhotoUploaded(long mediaId) {
+    }
+
+    /** {@code GET .../photo?json=1} result. */
+    public record PhotoUrl(String url, String expiresAt) {
     }
 
     @GetMapping("/{id}/education")
