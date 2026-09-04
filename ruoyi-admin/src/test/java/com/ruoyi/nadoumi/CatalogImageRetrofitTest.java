@@ -16,9 +16,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * stores a {@code nad_media_asset} row, points the owning table's {@code *_media_id}
  * at it, and the read models resolve the delivery URL through the MediaGateway
  * (here the {@code FakeMediaStorage}, so the URL is a deterministic
- * {@code https://fake.local/public/...} string). Also covers the two upload
- * boundary rejections that matter most for images: the per-category size cap and
- * a content-type spoof.
+ * {@code https://fake.local/public/...} string). Also covers the upload boundary
+ * rejections (spec §I.5): the per-category size cap ({@code 413}), a denylisted
+ * sniffed type ({@code 415}) and a declared/sniffed family mismatch ({@code 422}),
+ * each an RFC 9457 {@code problem+json} with nothing persisted.
  */
 class CatalogImageRetrofitTest extends AbstractNadIntegrationTest {
 
@@ -135,20 +136,12 @@ class CatalogImageRetrofitTest extends AbstractNadIntegrationTest {
         byte[] tooBig = new byte[4 * 1024 * 1024 + 1];
         var part = new org.springframework.mock.web.MockMultipartFile("file", "logo.png", "image/png", tooBig);
 
-        // The upload boundary (MediaValidation) rejects the file before any provider
-        // call: no mediaId in the response, and nothing persisted.
-        //
-        // KNOWN GAP (task-17): spec §I.5 wants HTTP 413 here, but a
-        // MediaValidationException thrown from StaffUniversityController
-        // (com.nadoumi.university.web) is not mapped —
-        // MediaExceptionAdvice is @RestControllerAdvice(basePackages = "com.nadoumi.media")
-        // and NadApiExceptionHandler has no handler for it — so RuoYi's
-        // GlobalExceptionHandler renders it as a 200 {code:500,msg:...} envelope.
-        // Fix: widen MediaExceptionAdvice to basePackages = "com.nadoumi" (or add
-        // @ExceptionHandler(MediaValidationException) to NadApiExceptionHandler), then
-        // assert status().isPayloadTooLarge() here.
+        // spec §I.5: too large -> 413 problem+json; MediaValidation rejects before any
+        // provider call, so nothing is persisted.
         mvc.perform(multipart("/api/staff/universities/{id}/logo", uniId)
                         .file(part).header("Authorization", bearer(token)))
+                .andExpect(status().isPayloadTooLarge())
+                .andExpect(jsonPath("$.reason").value("TOO_LARGE"))
                 .andExpect(jsonPath("$.mediaId").doesNotExist());
 
         assertThat(jdbc.queryForObject("select count(*) from nad_media_asset", Integer.class)).isZero();
@@ -165,15 +158,32 @@ class CatalogImageRetrofitTest extends AbstractNadIntegrationTest {
         var part = new org.springframework.mock.web.MockMultipartFile("file", "x.png", "image/png",
                 "<html><body><script>alert(1)</script></body></html>".getBytes());
 
-        // Tika sniffs text/html — on the hard denylist AND not an image-family match
-        // for the declared image/png — so MediaValidation rejects it before any
-        // provider call: no mediaId, nothing persisted.
-        //
-        // KNOWN GAP (task-17): spec §I.5 wants HTTP 415/422 here; see the note on
-        // oversizeLogoRejected — the same unmapped MediaValidationException currently
-        // surfaces as a 200 {code:500,msg:...} envelope from RuoYi's handler.
+        // Tika sniffs text/html, which is on MediaValidation's hard denylist
+        // (spec §I.5 step 6) -> DISALLOWED_TYPE -> 415 problem+json. Nothing persisted.
         mvc.perform(multipart("/api/staff/universities/{id}/logo", uniId)
                         .file(part).header("Authorization", bearer(token)))
+                .andExpect(status().isUnsupportedMediaType())
+                .andExpect(jsonPath("$.reason").value("DISALLOWED_TYPE"))
+                .andExpect(jsonPath("$.mediaId").doesNotExist());
+
+        assertThat(jdbc.queryForObject("select count(*) from nad_media_asset", Integer.class)).isZero();
+    }
+
+    @Test
+    void pdfDisguisedAsPngRejected_andNothingPersisted() throws Exception {
+        createStaff("retro_pdf", "ops_manager");
+        String token = staffToken("retro_pdf");
+        long uniId = createUniversity(token, "Mismatch University");
+
+        byte[] pdf = "%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n".getBytes();
+        var part = new org.springframework.mock.web.MockMultipartFile("file", "x.png", "image/png", pdf);
+
+        // Declared image/png but sniffed application/pdf — a declared/sniffed family
+        // mismatch (spec §I.5 step 5) -> TYPE_MISMATCH -> 422 problem+json.
+        mvc.perform(multipart("/api/staff/universities/{id}/logo", uniId)
+                        .file(part).header("Authorization", bearer(token)))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(jsonPath("$.reason").value("TYPE_MISMATCH"))
                 .andExpect(jsonPath("$.mediaId").doesNotExist());
 
         assertThat(jdbc.queryForObject("select count(*) from nad_media_asset", Integer.class)).isZero();
