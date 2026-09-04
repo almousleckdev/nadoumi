@@ -15,6 +15,7 @@ public class Applicant {
     private String passportNo;
     private String email;
     private String phone;
+    private Long photoMediaId;
     private ApplicantStatus status;
     private String createBy;
     private LocalDateTime createTime;
@@ -45,6 +46,10 @@ public class Applicant {
 
     public String getPhone() { return phone; }
     public void setPhone(String phone) { this.phone = phone; }
+
+    /** {@code nad_applicant.photo_media_id} — a PROTECTED media asset; never a public URL. */
+    public Long getPhotoMediaId() { return photoMediaId; }
+    public void setPhotoMediaId(Long photoMediaId) { this.photoMediaId = photoMediaId; }
 
     public ApplicantStatus getStatus() { return status; }
     public void setStatus(ApplicantStatus status) { this.status = status; }
