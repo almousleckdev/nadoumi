@@ -79,39 +79,50 @@
       :total="total"
       :page="query.page"
       :page-size="query.size"
+      :clickable-rows="userStore.hasPerm('nad:program:edit')"
       :empty-title="t('program.emptyTitle')"
       :empty-description="t('program.emptyDesc')"
       @update:page="(p: number) => { query.page = p; reload() }"
+      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
+      @row-click="(row) => openEdit(row as Program)"
       @retry="reload"
     >
       <template #cell-name="{ row }">
         <div class="p-name">
-          <span>{{ row.name }}</span>
-          <el-tag
-            v-if="row.hot"
-            size="small"
-            type="danger"
-            effect="plain"
-            disable-transitions
-          >
-            {{ t('program.hot') }}
-          </el-tag>
-          <el-tag
-            v-if="row.featured"
-            size="small"
-            type="warning"
-            effect="plain"
-            disable-transitions
-          >
-            {{ t('program.featured') }}
-          </el-tag>
+          <div class="p-name__top">
+            <span class="p-name__title">{{ row.name }}</span>
+            <el-tag
+              v-if="row.hot"
+              size="small"
+              type="danger"
+              effect="plain"
+              disable-transitions
+            >
+              {{ t('program.hot') }}
+            </el-tag>
+            <el-tag
+              v-if="row.featured"
+              size="small"
+              type="warning"
+              effect="plain"
+              disable-transitions
+            >
+              {{ t('program.featured') }}
+            </el-tag>
+          </div>
+          <span class="p-name__ref">#{{ row.id }} · {{ row.slug }}</span>
         </div>
       </template>
-      <template #cell-programType="{ value }">
-        {{ t(`program.typeMap.${value}`) }}
+      <template #cell-programType="{ row }">
+        {{ (row as Program).programType === 'DEGREE' && (row as Program).levels?.length
+          ? (row as Program).levels.map(l => t(`program.levelMap.${l}`)).join(', ')
+          : t(`program.typeMap.${(row as Program).programType}`) }}
       </template>
       <template #cell-teachingLanguage="{ value }">
-        {{ value ? t(`program.langMap.${value}`) : '—' }}
+        {{ value ? t(`program.langMap.${value}`) : '' }}
+      </template>
+      <template #cell-tuition="{ row }">
+        {{ dualMoney(row.tuitionAmount, row.tuitionAmountUsd) }}
       </template>
       <template #cell-publishStatus="{ value }">
         <StatusBadge
@@ -161,6 +172,7 @@ import {
   type Program, type ProgramStatus,
 } from '@/api/program'
 import { listUniversities, type University } from '@/api/university'
+import { dualMoney } from '@/utils/money'
 import { useUserStore } from '@/stores/user'
 import { useConfirm } from '@/composables/useConfirm'
 import PageHeader from '@/components/PageHeader.vue'
@@ -177,13 +189,14 @@ const { confirm } = useConfirm()
 
 const STATUSES: ProgramStatus[] = ['ACTIVE', 'INACTIVE']
 const columns: DataTableColumn[] = [
-  { prop: 'name', label: t('program.name'), minWidth: 240 },
-  { prop: 'universityName', label: t('program.university'), minWidth: 180 },
-  { prop: 'programType', label: t('program.type'), width: 130 },
-  { prop: 'teachingLanguage', label: t('program.language'), width: 120 },
-  { prop: 'publishStatus', label: t('program.publishStatus'), width: 120 },
-  { prop: 'status', label: t('program.status'), width: 110 },
-  { prop: 'actions', label: '', width: 130, align: 'right' },
+  { prop: 'name', label: t('program.name'), minWidth: 220 },
+  { prop: 'universityName', label: t('program.university'), minWidth: 150 },
+  { prop: 'programType', label: t('program.type'), minWidth: 130 },
+  { prop: 'teachingLanguage', label: t('program.language'), width: 110 },
+  { prop: 'tuition', label: t('program.tuitionAmount'), width: 140 },
+  { prop: 'publishStatus', label: t('program.publishStatus'), width: 110 },
+  { prop: 'status', label: t('program.status'), width: 100 },
+  { prop: 'actions', label: t('common.actions'), width: 120, align: 'right' },
 ]
 
 const loading = ref(false)
@@ -268,7 +281,23 @@ onMounted(reload)
 <style scoped>
 .p-name {
   display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.p-name__top {
+  display: flex;
   align-items: center;
   gap: 8px;
+}
+.p-name__title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.p-name__ref {
+  font-size: 12px;
+  color: var(--nad-ink-soft, #64748b);
+  font-variant-numeric: tabular-nums;
 }
 </style>

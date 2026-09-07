@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import {
-  createScholarship, updateScholarship, listScholarshipCategories,
+  createScholarship, updateScholarship, getScholarship, listScholarshipCategories,
   EDUCATION_LEVELS, FEE_KINDS, DOC_TYPES, INTAKE_TERMS, ROOM_TYPES, NON_DEGREE_DURATIONS,
   COVERAGE_KINDS, APPLICATION_CHANNELS,
   type Scholarship, type ScholarshipInput, type ScholarshipCategoryOption,
@@ -12,6 +12,8 @@ import {
   type RoomType, type NonDegreeDuration, type StipendFrequency,
   type CoverageKind, type ApplicationChannel,
 } from '@/api/scholarship'
+import { cnyToUsdRate } from '@/api/fx'
+import { usd } from '@/utils/money'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
 import ImageUpload from '@/components/ui/ImageUpload.vue'
@@ -29,8 +31,18 @@ const PUBLISH = ['DRAFT', 'PUBLISHED'] as const
 
 const formRef = ref<FormInstance>()
 const saving = ref(false)
+// create mode holds hero/cover until the scholarship row exists
+const heroUp = ref<InstanceType<typeof ImageUpload>>()
+const coverUp = ref<InstanceType<typeof ImageUpload>>()
 const categories = ref<ScholarshipCategoryOption[]>([])
 listScholarshipCategories().then(c => categories.value = c).catch(() => {})
+
+// live RMB → USD preview; every amount is entered in RMB
+const fxRate = ref(0.1381)
+cnyToUsdRate().then(r => fxRate.value = r).catch(() => {})
+function usdHint(amount: number | null): string {
+  return amount ? `≈ ${usd(amount * fxRate.value)}` : ''
+}
 
 function blankEligibility() {
   return {
@@ -51,7 +63,7 @@ function blankForm() {
     levels: [] as EducationLevel[],
     benefits: '', requirements: '', policy: '', renewalConditions: '',
     applicationFeeAmount: null as number | null, applicationFeeCurrency: 'CNY',
-    serviceFeeAmount: null as number | null, serviceFeeCurrency: 'USD',
+    serviceFeeAmount: null as number | null, serviceFeeCurrency: 'CNY',
     slots: null as number | null,
     deadline: '' as string | null,
     nonDegreeDuration: null as NonDegreeDuration | null,
@@ -89,11 +101,19 @@ const rules = {
   publishStatus: [{ required: true, message: t('scholarship.required') }],
 }
 
-watch(() => props.modelValue, (open) => {
+watch(() => props.modelValue, async (open) => {
   if (!open) return
   Object.assign(form, blankForm())
-  const s = props.scholarship
+  let s = props.scholarship
   if (!s) return
+  // the list row carries no child collections (fees / stipends / accommodation /
+  // coverage / documents / eligibility); fetch the full aggregate so Edit shows
+  // and preserves everything.
+  try {
+    const full = await getScholarship(s.view.id)
+    if (full?.view) s = full
+  }
+  catch { /* fall back to the row we already have */ }
   const v = s.view
   Object.assign(form, {
     title: v.title, summary: v.summary ?? '', country: v.country,
@@ -111,7 +131,7 @@ watch(() => props.modelValue, (open) => {
     coverage: v.coverage.map(c => ({ kind: c.kind as CoverageKind, detail: c.detail ?? '' })),
     // amounts are re-populated from the RMB figure (see the Media/Fees note) in CNY
     applicationFeeAmount: v.applicationFee?.amountRmb ?? null, applicationFeeCurrency: 'CNY',
-    serviceFeeAmount: v.serviceFee?.amountUsd ?? null, serviceFeeCurrency: 'USD',
+    serviceFeeAmount: v.serviceFee?.amountRmb ?? null, serviceFeeCurrency: 'CNY',
     slots: v.slots ?? null, deadline: v.deadline ?? '',
     fees: v.fees.map(f => ({ kind: f.kind as FeeKind, amount: f.amountRmb, currency: 'CNY', note: f.note ?? '' })),
     eligibility: { ...blankEligibility(), ...(v.eligibility ?? {}), acceptedCountries: v.eligibility?.acceptedCountries ?? '', notes: v.eligibility?.notes ?? '', nationalityScope: (v.eligibility?.nationalityScope as NationalityScope) ?? 'ANY' },
@@ -183,9 +203,9 @@ function payload(): ScholarshipInput {
     policy: s(form.policy),
     renewalConditions: s(form.renewalConditions),
     applicationFeeAmount: n(form.applicationFeeAmount),
-    applicationFeeCurrency: form.applicationFeeAmount != null ? form.applicationFeeCurrency.toUpperCase() : null,
+    applicationFeeCurrency: form.applicationFeeAmount != null ? 'CNY' : null,
     serviceFeeAmount: n(form.serviceFeeAmount),
-    serviceFeeCurrency: form.serviceFeeAmount != null ? form.serviceFeeCurrency.toUpperCase() : null,
+    serviceFeeCurrency: form.serviceFeeAmount != null ? 'CNY' : null,
     slots: n(form.slots),
     featured: form.featured, recommended: form.recommended, hot: form.hot,
     heroImageUrl: form.heroImageUrl, coverImageUrl: form.coverImageUrl,
@@ -208,14 +228,14 @@ function payload(): ScholarshipInput {
         }
       : null,
     fees: form.fees.filter(f => f.amount != null && f.kind).map(f => ({
-      kind: f.kind, amount: Number(f.amount), currency: f.currency.toUpperCase(), note: s(f.note),
+      kind: f.kind, amount: Number(f.amount), currency: 'CNY', note: s(f.note),
     })),
     levelStipends: form.levelStipends.filter(st => st.amount != null && st.level).map(st => ({
-      level: st.level, amount: Number(st.amount), currency: st.currency.toUpperCase(),
+      level: st.level, amount: Number(st.amount), currency: 'CNY',
       frequency: st.frequency, durationMonths: n(st.durationMonths), conditions: s(st.conditions),
     })),
     accommodations: form.accommodations.filter(a => a.roomType).map(a => ({
-      roomType: a.roomType, amount: n(a.amount), currency: a.currency.toUpperCase(), note: s(a.note),
+      roomType: a.roomType, amount: n(a.amount), currency: 'CNY', note: s(a.note),
     })),
     coverage: form.coverage.filter(c => c.kind).map(c => ({ kind: c.kind, detail: s(c.detail) })),
     documentRequirements: form.documentRequirements.filter(d => d.docType.trim()).map(d => ({
@@ -235,6 +255,9 @@ async function save() {
     const saved = props.scholarship
       ? await updateScholarship(props.scholarship.view.id, payload())
       : await createScholarship(payload())
+    if (!props.scholarship) {
+      await Promise.all([heroUp.value?.flush(saved.view.id), coverUp.value?.flush(saved.view.id)])
+    }
     ElMessage.success(t('common.saved'))
     emit('update:modelValue', false)
     emit('saved', saved)
@@ -307,7 +330,11 @@ async function save() {
           <el-input
             v-model="form.field"
             maxlength="120"
+            :placeholder="t('scholarship.fieldHint')"
           />
+          <p class="hint">
+            {{ t('scholarship.fieldNote') }}
+          </p>
         </el-form-item>
       </FormSection>
 
@@ -471,18 +498,22 @@ async function save() {
             <el-select
               v-model="form.eligibility.inChina"
               clearable
+              :placeholder="t('scholarship.inChinaEither')"
             >
               <el-option
                 :value="true"
-                :label="t('common.yes')"
+                :label="t('scholarship.inChinaYes')"
               />
               <el-option
                 :value="false"
-                :label="t('common.no')"
+                :label="t('scholarship.inChinaNo')"
               />
             </el-select>
           </el-form-item>
         </div>
+        <p class="hint">
+          {{ t('scholarship.inChinaHint') }}
+        </p>
         <el-form-item :label="t('scholarship.nationality')">
           <el-radio-group v-model="form.eligibility.nationalityScope">
             <el-radio
@@ -594,39 +625,27 @@ async function save() {
         :description="t('scholarship.feesHint')"
       >
         <div class="row">
-          <el-form-item :label="t('scholarship.applicationFee')">
+          <el-form-item :label="t('scholarship.applicationFeeRmb')">
             <el-input-number
               v-model="form.applicationFeeAmount"
               :min="0"
               :precision="2"
+              :step="100"
               controls-position="right"
+              style="width: 100%"
             />
+            <span class="usd">{{ usdHint(form.applicationFeeAmount) }}</span>
           </el-form-item>
-          <el-form-item
-            :label="t('scholarship.currency')"
-            class="w-24"
-          >
-            <el-input
-              v-model="form.applicationFeeCurrency"
-              maxlength="3"
-            />
-          </el-form-item>
-          <el-form-item :label="t('scholarship.serviceFee')">
+          <el-form-item :label="t('scholarship.serviceFeeRmb')">
             <el-input-number
               v-model="form.serviceFeeAmount"
               :min="0"
               :precision="2"
+              :step="100"
               controls-position="right"
+              style="width: 100%"
             />
-          </el-form-item>
-          <el-form-item
-            :label="t('scholarship.currency')"
-            class="w-24"
-          >
-            <el-input
-              v-model="form.serviceFeeCurrency"
-              maxlength="3"
-            />
+            <span class="usd">{{ usdHint(form.serviceFeeAmount) }}</span>
           </el-form-item>
         </div>
         <p class="hint">
@@ -653,14 +672,10 @@ async function save() {
             v-model="f.amount"
             :min="0"
             :precision="2"
+            :step="1000"
             controls-position="right"
           />
-          <el-input
-            v-model="f.currency"
-            maxlength="3"
-            class="w-20"
-            placeholder="CNY"
-          />
+          <span class="usd">{{ usdHint(f.amount) }}</span>
           <el-input
             v-model="f.note"
             :placeholder="t('scholarship.note')"
@@ -704,15 +719,11 @@ async function save() {
             v-model="st.amount"
             :min="0"
             :precision="2"
+            :step="1000"
             controls-position="right"
-            :placeholder="t('scholarship.amount')"
+            :placeholder="t('scholarship.amountRmb')"
           />
-          <el-input
-            v-model="st.currency"
-            maxlength="3"
-            class="w-20"
-            style="text-transform:uppercase"
-          />
+          <span class="usd">{{ usdHint(st.amount) }}</span>
           <el-select
             v-model="st.frequency"
             class="w-44"
@@ -774,15 +785,11 @@ async function save() {
             v-model="a.amount"
             :min="0"
             :precision="2"
+            :step="500"
             controls-position="right"
-            :placeholder="t('scholarship.amount')"
+            :placeholder="t('scholarship.amountRmb')"
           />
-          <el-input
-            v-model="a.currency"
-            maxlength="3"
-            class="w-20"
-            style="text-transform:uppercase"
-          />
+          <span class="usd">{{ usdHint(a.amount) }}</span>
           <el-input
             v-model="a.note"
             :placeholder="t('scholarship.accommodationNote')"
@@ -970,22 +977,24 @@ async function save() {
         <div class="imgs">
           <el-form-item :label="t('scholarship.heroImage')">
             <ImageUpload
+              ref="heroUp"
               v-model="form.heroMediaId"
               :action="`/api/staff/scholarships/${form.id}/hero`"
+              :resolve-action="(id) => `/api/staff/scholarships/${id}/hero`"
+              :deferred="!form.id"
               :preview-url="scholarship?.view.heroUrl ?? scholarship?.view.heroImageUrl"
               aspect="wide"
-              :disabled="!form.id"
-              :disabled-hint="t('imageUpload.saveFirst')"
             />
           </el-form-item>
           <el-form-item :label="t('scholarship.coverImage')">
             <ImageUpload
+              ref="coverUp"
               v-model="form.coverMediaId"
               :action="`/api/staff/scholarships/${form.id}/cover`"
+              :resolve-action="(id) => `/api/staff/scholarships/${id}/cover`"
+              :deferred="!form.id"
               :preview-url="scholarship?.view.coverUrl ?? scholarship?.view.coverImageUrl"
               aspect="wide"
-              :disabled="!form.id"
-              :disabled-hint="t('imageUpload.saveFirst')"
             />
           </el-form-item>
         </div>
@@ -1069,7 +1078,8 @@ async function save() {
 .row > .w-28 { flex: 0 0 7rem; min-width: 7rem; }
 .row > .w-24 { flex: 0 0 6rem; min-width: 6rem; }
 .imgs { display: flex; gap: 24px; flex-wrap: wrap; }
-.line { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.usd { font-size: 12px; color: var(--nad-ink-soft); font-variant-numeric: tabular-nums; min-width: 4rem; }
 .line > .w-20 { flex: 0 0 5rem; }
 .line > .w-44 { flex: 0 0 11rem; }
 .line > .w-52 { flex: 0 0 13rem; }

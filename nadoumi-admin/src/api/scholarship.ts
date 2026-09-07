@@ -219,6 +219,8 @@ export interface ScholarshipInput {
 export interface ScholarshipInternal {
   universityId?: number | null
   universityName?: string | null
+  /** Confidential: the specific programme this award funds. */
+  programId?: number | null
   partnershipId?: number | null
   internalStatus?: string | null
   operationalNotes?: string | null
@@ -227,6 +229,7 @@ export interface ScholarshipInternal {
 }
 export interface ScholarshipInternalInput {
   universityId?: number | null
+  programId?: number | null
   partnershipId?: number | null
   internalStatus?: string | null
   operationalNotes?: string | null

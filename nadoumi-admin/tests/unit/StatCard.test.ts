@@ -9,9 +9,9 @@ describe('StatCard', () => {
     expect(w.find('.stat-card__value').text()).toBe(new Intl.NumberFormat().format(12345))
   })
 
-  it('renders an em-dash for a null value', () => {
+  it('renders an empty value (no placeholder glyph) for a null value', () => {
     const w = mount(StatCard, { props: { label: 'Total', value: null }, ...mountOpts() })
-    expect(w.find('.stat-card__value').text()).toBe('—')
+    expect(w.find('.stat-card__value').text()).toBe('')
   })
 
   it('passes a string value through unchanged', () => {

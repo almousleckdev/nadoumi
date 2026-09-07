@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import logoUrl from '~/assets/images/logo.jpg'
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 const year = new Date().getFullYear()
@@ -22,10 +24,7 @@ const legal = [
     <NContainer>
       <div class="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div class="max-w-xs">
-          <div class="flex items-center gap-2">
-            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 font-display text-base font-bold text-white">N</span>
-            <span class="font-display text-lg font-bold tracking-tight text-slate-900">Nadoumi</span>
-          </div>
+          <img :src="logoUrl" alt="Nadoumi" class="h-10 w-auto" width="160" height="40">
           <p class="mt-3 text-sm text-slate-600">{{ t('footer.mission') }}</p>
           <div class="mt-4">
             <NLocaleSwitcher />

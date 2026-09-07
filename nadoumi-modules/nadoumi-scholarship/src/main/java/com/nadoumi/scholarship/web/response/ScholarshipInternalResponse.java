@@ -10,6 +10,7 @@ import com.nadoumi.scholarship.domain.ScholarshipInternal;
 public record ScholarshipInternalResponse(
         Long universityId,
         String universityName,
+        Long programId,
         Long partnershipId,
         String internalStatus,
         String operationalNotes,
@@ -18,10 +19,10 @@ public record ScholarshipInternalResponse(
 
     public static ScholarshipInternalResponse of(ScholarshipInternal i, String universityName) {
         if (i == null) {
-            return new ScholarshipInternalResponse(null, null, null, "DRAFT", null, null, null);
+            return new ScholarshipInternalResponse(null, null, null, null, "DRAFT", null, null, null);
         }
         return new ScholarshipInternalResponse(
-                i.universityId(), universityName, i.partnershipId(), i.internalStatus(),
+                i.universityId(), universityName, i.programId(), i.partnershipId(), i.internalStatus(),
                 i.operationalNotes(), i.confidentialTerms(), i.commissionModelJson());
     }
 }

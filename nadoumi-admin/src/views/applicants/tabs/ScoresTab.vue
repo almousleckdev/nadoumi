@@ -148,7 +148,7 @@ watch(list.items, v => emit('count', v.length))
 onMounted(list.load)
 
 function fmtDate(v: string | null): string {
-  return v ? new Date(v).toLocaleDateString() : '—'
+  return v ? new Date(v).toLocaleDateString() : ''
 }
 
 const open = ref(false)

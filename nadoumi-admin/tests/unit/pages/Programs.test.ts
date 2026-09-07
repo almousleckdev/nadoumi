@@ -17,6 +17,7 @@ vi.mock('@/api/program', async (orig) => ({
 }))
 vi.mock('@/api/university', () => ({
   listUniversities: vi.fn().mockResolvedValue({ content: [], page: 0, size: 200, totalElements: 0, totalPages: 0 }),
+  listDepartments: vi.fn().mockResolvedValue([]),
 }))
 
 const confirm = vi.hoisted(() => vi.fn())
@@ -30,7 +31,7 @@ import type { Program } from '@/api/program'
 
 const row = {
   id: 4, universityId: 7, universityName: 'Fudan University', name: 'MBA', nameCn: null,
-  programType: 'MASTER', field: 'Business', teachingLanguage: 'ENGLISH', durationMonths: 24,
+  programType: 'DEGREE', levels: ['MASTER'], field: 'Business', teachingLanguage: 'ENGLISH', durationMonths: 24,
   tuitionAmount: 38000, tuitionCurrency: 'USD', summary: null, featured: false, hot: true,
   status: 'ACTIVE', publishStatus: 'PUBLISHED', remark: null, createdAt: null, updatedAt: null,
   imageMediaId: 301, imageUrl: 'https://res.cloudinary.com/program.png',
@@ -103,17 +104,17 @@ describe('ProgramDrawer image upload', () => {
     return mount(ProgramDrawer, { props: { modelValue: true, program }, ...mountOpts() })
   }
 
-  it('disables the programme image upload until the programme has an id', async () => {
+  it('defers the programme image upload until the programme has an id', async () => {
     const creating = mountDrawer(null)
     await flushPromises()
     const uploads = creating.findAllComponents(ImageUpload)
     expect(uploads.length).toBe(1)
-    expect(uploads[0]!.props('disabled')).toBe(true)
+    expect(uploads[0]!.props('deferred')).toBe(true)
 
     const editing = mountDrawer(row as unknown as Program)
     await flushPromises()
     const editUpload = editing.findComponent(ImageUpload)
-    expect(editUpload.props('disabled')).toBe(false)
+    expect(editUpload.props('deferred')).toBe(false)
     expect(editUpload.props('previewUrl')).toBe('https://res.cloudinary.com/program.png')
   })
 })

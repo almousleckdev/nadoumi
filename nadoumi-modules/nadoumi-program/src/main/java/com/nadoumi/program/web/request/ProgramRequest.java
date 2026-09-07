@@ -19,8 +19,13 @@ public record ProgramRequest(
         @NotNull Long universityId,
         @NotBlank @Size(max = 200) String name,
         @Size(max = 200) String nameCn,
+        /** DEGREE | LANGUAGE | NON_DEGREE — the kind of programme. */
         @NotNull ProgramType programType,
+        /** DIPLOMA / BACHELOR / MASTER / PHD — one or more; DEGREE programmes only. */
+        List<String> levels,
         @Size(max = 120) String field,
+        /** ONE_SEMESTER | ONE_YEAR — LANGUAGE / NON_DEGREE only; ignored for degree types. */
+        @Size(max = 16) String termLength,
         ProgramTeachingLanguage teachingLanguage,
         @Positive Integer durationMonths,
         @PositiveOrZero BigDecimal tuitionAmount,
@@ -37,7 +42,11 @@ public record ProgramRequest(
 
     public record MajorInput(
             @NotBlank @Size(max = 200) String name,
-            @Size(max = 200) String nameCn) {
+            @Size(max = 200) String nameCn,
+            /** nad_department.id — must belong to the programme's university (degree types only). */
+            Long departmentId,
+            /** DIPLOMA / BACHELOR / MASTER / PHD — must be one of the programme's levels. */
+            @Size(max = 16) String level) {
     }
 
     public record IntakeInput(

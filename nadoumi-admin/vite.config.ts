@@ -29,6 +29,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (p) => p.replace(new RegExp('^' + (env.VITE_APP_BASE_API || '/dev-api')), ''),
         },
+        // RuoYi-served static assets (avatars, local-fallback media) keep their path
+        '/profile': {
+          target: env.VITE_BACKEND_URL || 'http://localhost:8080',
+          changeOrigin: true,
+        },
       },
     },
   }

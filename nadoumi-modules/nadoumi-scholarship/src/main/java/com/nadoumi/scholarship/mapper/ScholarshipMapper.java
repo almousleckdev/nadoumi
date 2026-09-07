@@ -126,6 +126,17 @@ public interface ScholarshipMapper {
     int insertDocumentRequirement(@Param("scholarshipId") Long scholarshipId,
             @Param("d") ScholarshipDocumentRequirement requirement, @Param("sortOrder") int sortOrder);
 
+    // ---- deadline reminders ----
+
+    /**
+     * Published + active scholarships whose {@code deadline} is in the future and
+     * within {@code withinDays}, and which have no {@code nad_scholarship_deadline_reminder}
+     * row yet. Each carries id / slug / referenceCode / title / deadline only.
+     */
+    List<Scholarship> findDueForDeadlineReminder(@Param("withinDays") int withinDays);
+
+    int insertDeadlineReminder(@Param("id") long scholarshipId);
+
     // ---- confidential (nad_scholarship_internal) — staff, permission-checked ----
 
     ScholarshipInternal findInternal(@Param("scholarshipId") Long scholarshipId);

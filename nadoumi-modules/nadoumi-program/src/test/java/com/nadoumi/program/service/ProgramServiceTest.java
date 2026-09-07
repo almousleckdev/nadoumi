@@ -13,6 +13,7 @@ import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.identity.money.FxRates;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.enums.ProgramStatus;
 import com.nadoumi.program.domain.enums.ProgramType;
@@ -21,6 +22,7 @@ import com.nadoumi.program.mapper.ProgramMapper;
 import com.nadoumi.program.web.request.ProgramRequest;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.enums.UniversityStatus;
+import com.nadoumi.university.service.DepartmentService;
 import com.nadoumi.university.service.UniversityService;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.nadoumi.university.web.response.UniversityResponse;
@@ -31,13 +33,17 @@ class ProgramServiceTest {
 
     private final ProgramMapper mapper = mock(ProgramMapper.class);
     private final UniversityService universityService = mock(UniversityService.class);
+    private final DepartmentService departmentService = mock(DepartmentService.class);
     private final MediaGateway media = mock(MediaGateway.class);
-    private final ProgramService service = new ProgramService(mapper, universityService, media);
+    private final FxRates fx = mock(FxRates.class);
+    private final com.nadoumi.common.outbox.OutboxWriter outbox = mock(com.nadoumi.common.outbox.OutboxWriter.class);
+    private final ProgramService service =
+            new ProgramService(mapper, universityService, departmentService, media, fx, outbox);
 
     private static ProgramRequest req(Long universityId, String name,
             List<ProgramRequest.MajorInput> majors, List<ProgramRequest.IntakeInput> intakes) {
         return new ProgramRequest(
-                universityId, name, "计算机科学", ProgramType.BACHELOR, "Engineering",
+                universityId, name, "计算机科学", ProgramType.DEGREE, List.of("BACHELOR"), "Engineering", null,
                 null, 48, null, "usd", "A four-year programme.", null,
                 false, false, ProgramStatus.ACTIVE, PublishStatus.DRAFT, "note",
                 majors, intakes);
@@ -71,7 +77,7 @@ class ProgramServiceTest {
         when(mapper.findById(any())).thenReturn(newProgram(9L, 1L));
 
         service.create(req(1L, "  MBA  ",
-                List.of(new ProgramRequest.MajorInput("Finance", null)),
+                List.of(new ProgramRequest.MajorInput("Finance", null, null, null)),
                 List.of(new ProgramRequest.IntakeInput("AUTUMN_SEPTEMBER", null, null))));
 
         verify(mapper).insert(any(Program.class));
@@ -189,7 +195,8 @@ class ProgramServiceTest {
         p.setId(id);
         p.setUniversityId(universityId);
         p.setName("MBA");
-        p.setProgramType(ProgramType.MASTER);
+        p.setProgramType(ProgramType.DEGREE);
+        p.setLevels(new java.util.ArrayList<>(List.of("MASTER")));
         return p;
     }
 }

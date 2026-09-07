@@ -7,6 +7,8 @@ import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
 import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.MediaUploadResult;
+import com.nadoumi.common.outbox.OutboxEventTypes;
+import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
@@ -43,10 +45,12 @@ public class UniversityService {
 
     private final UniversityMapper mapper;
     private final MediaGateway media;
+    private final OutboxWriter outbox;
 
-    public UniversityService(UniversityMapper mapper, MediaGateway media) {
+    public UniversityService(UniversityMapper mapper, MediaGateway media, OutboxWriter outbox) {
         this.mapper = mapper;
         this.media = media;
+        this.outbox = outbox;
     }
 
     // ---- staff ----
@@ -69,22 +73,41 @@ public class UniversityService {
         apply(u, req);
         requireUniqueName(u.getName(), u.getCountry(), null);
         u.setSlug(uniqueSlug(u.getName(), null));
+        u.setReferenceCode(nextReferenceCode());
         u.setCreateBy(currentUser());
         mapper.insert(u);
         replaceChildren(u.getId(), req);
+        if (u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED) {
+            emitPublished(u);
+        }
         return get(u.getId());
     }
 
     @Transactional
     public UniversityResponse update(Long id, UniversityRequest req) {
         University u = load(id);
+        boolean wasLive = u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED;
         apply(u, req);
         requireUniqueName(u.getName(), u.getCountry(), id);
         u.setSlug(uniqueSlug(u.getName(), id));
         u.setUpdateBy(currentUser());
         mapper.update(u);
         replaceChildren(id, req);
+        boolean nowLive = u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED;
+        if (nowLive && !wasLive) {
+            emitPublished(u);
+        }
         return get(id);
+    }
+
+    /** Announce a newly public university to staff + registered students (safe scalars only). */
+    private void emitPublished(University u) {
+        com.alibaba.fastjson2.JSONObject payload = new com.alibaba.fastjson2.JSONObject();
+        payload.put("universityId", u.getId());
+        payload.put("universityName", u.getName());
+        payload.put("universitySlug", u.getSlug() == null ? "" : u.getSlug());
+        payload.put("country", u.getCountry() == null ? "" : u.getCountry());
+        outbox.write("university", u.getId(), OutboxEventTypes.UNIVERSITY_PUBLISHED, payload.toJSONString());
     }
 
     @Transactional
@@ -140,10 +163,11 @@ public class UniversityService {
     // ---- public (published + active only) ----
 
     public PageResponse<PublicUniversityResponse> publicList(String q, String country, String province,
-            String city, UniversityType type, Boolean featured, Boolean recommended, int page, int size) {
+            String city, UniversityType type, Boolean featured, Boolean recommended, Boolean publicPartner,
+            int page, int size) {
         PageHelper.startPage(page + 1, size);
         List<University> rows = mapper.search(
-                UniversitySearch.publicCatalog(q, country, province, city, type, featured, recommended));
+                UniversitySearch.publicCatalog(q, country, province, city, type, featured, recommended, publicPartner));
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(
                 rows.stream().map(u -> PublicUniversityResponse.of(toResponse(u))).toList(), page, size, total);
@@ -309,9 +333,33 @@ public class UniversityService {
         }
         u.setRecommended(Boolean.TRUE.equals(req.recommended()));
         u.setFeatured(Boolean.TRUE.equals(req.featured()));
+        u.setPublicPartner(Boolean.TRUE.equals(req.publicPartner()));
+        u.setPartnerStatus(normalizePartnerStatus(req.partnerStatus()));
         u.setStatus(req.status());
         u.setPublishStatus(req.publishStatus());
         u.setRemark(blankToNull(req.remark()));
+    }
+
+    private static final java.util.Set<String> PARTNER_STATUSES =
+            java.util.Set.of("NONE", "PROSPECT", "PARTNER");
+
+    /** INTERNAL flag: NONE (catalog only) / PROSPECT (talking) / PARTNER (active relationship). */
+    private static String normalizePartnerStatus(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "NONE";
+        }
+        String v = raw.trim().toUpperCase();
+        if (!PARTNER_STATUSES.contains(v)) {
+            throw new NadBadRequestException("partner status must be NONE, PROSPECT or PARTNER");
+        }
+        return v;
+    }
+
+    private static final String REFERENCE_PREFIX = "NAD-UNI-";
+
+    private String nextReferenceCode() {
+        Integer max = mapper.maxReferenceSeq(REFERENCE_PREFIX);
+        return REFERENCE_PREFIX + String.format(java.util.Locale.ROOT, "%04d", (max == null ? 0 : max) + 1);
     }
 
     private static String blankToNull(String s) {

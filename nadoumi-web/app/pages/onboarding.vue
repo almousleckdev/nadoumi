@@ -138,7 +138,7 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
         :blurb="t('onboarding.location.blurb')"
         planned
       >
-        <p class="text-sm text-slate-500">Are you currently in China? — Yes / No</p>
+        <p class="text-sm text-slate-500">Are you currently in China? Yes or No</p>
       </OnboardingStep>
 
       <OnboardingStep
@@ -154,11 +154,11 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
         <dl class="grid gap-2 text-sm">
           <div class="flex justify-between gap-4">
             <dt class="text-slate-500">{{ t('dashboard.givenName') }}</dt>
-            <dd class="font-medium">{{ applicant?.givenName ?? '—' }} {{ applicant?.familyName ?? '' }}</dd>
+            <dd class="font-medium">{{ applicant?.givenName ?? '' }} {{ applicant?.familyName ?? '' }}</dd>
           </div>
           <div class="flex justify-between gap-4">
             <dt class="text-slate-500">{{ t('dashboard.nationality') }}</dt>
-            <dd class="font-medium">{{ applicant?.nationality ?? '—' }}</dd>
+            <dd class="font-medium">{{ applicant?.nationality ?? '' }}</dd>
           </div>
           <div class="flex justify-between gap-4">
             <dt class="text-slate-500">{{ t('onboarding.steps.education') }}</dt>

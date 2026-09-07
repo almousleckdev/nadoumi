@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Page, ProgramCard, ScholarshipCard, UniversitySummary } from '~/types/catalog'
 import { imagery } from '~/data/imagery'
+import profileImage from '~/assets/images/image1.png'
+import discoverImage from '~/assets/images/image.png'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -34,8 +36,14 @@ const { data: hotProg, pending: hotProgPending, error: hotProgError } = useLazyA
   () => publicGet<Page<ProgramCard>>('programs', { hot: true, size: 12 }),
   { default: () => null },
 )
+const { data: partners, pending: partnersPending } = useLazyAsyncData(
+  'home-partner-universities',
+  () => publicGet<Page<UniversitySummary>>('universities', { publicPartner: true, size: 24 }),
+  { default: () => null },
+)
 
 const featuredUnis = computed(() => featured.value?.content ?? [])
+const partnerUnis = computed(() => partners.value?.content ?? [])
 const recommendedUnis = computed(() => recommended.value?.content ?? [])
 const newScholarships = computed(() => newSch.value?.content ?? [])
 const fundedScholarships = computed(() => fundedSch.value?.content ?? [])
@@ -81,7 +89,8 @@ const journey = computed(() => [
 
     <NContainer>
       <StorySplit
-        :image="imagery.storyOutdoors"
+        :image="{ src: discoverImage, alt: t('home.story1.title') }"
+        image-local
         :eyebrow="t('home.story1.eyebrow')"
         :title="t('home.story1.title')"
         :body="t('home.story1.body')"
@@ -118,7 +127,8 @@ const journey = computed(() => [
 
     <NContainer>
       <StorySplit
-        :image="imagery.storyStudy"
+        :image="{ src: profileImage, alt: t('home.story2.eyebrow') }"
+        image-local
         :eyebrow="t('home.story2.eyebrow')"
         :title="t('home.story2.title')"
         :body="t('home.story2.body')"
@@ -197,12 +207,41 @@ const journey = computed(() => [
     </NContainer>
 
     <NContainer>
-      <SectionPlaceholder
-        :eyebrow="t('home.partners.eyebrow')"
-        :title="t('home.partners.title')"
-        :description="t('home.partners.description')"
-        :arriving-with="t('home.arriving.partnerships')"
-      />
+      <section
+        v-if="partnersPending || partnerUnis.length"
+        class="py-12 sm:py-16"
+      >
+        <SectionHeading
+          :eyebrow="t('home.partners.eyebrow')"
+          :title="t('home.partners.title')"
+          :description="t('home.partners.description')"
+        />
+        <ul class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <li
+            v-for="u in partnerUnis"
+            :key="u.id"
+          >
+            <NuxtLink
+              :to="localePath(`/universities/${u.slug}`)"
+              class="flex h-28 items-center justify-center rounded-xl border border-slate-200 bg-white p-5 no-underline transition-shadow hover:shadow-md"
+              :title="u.name"
+            >
+              <img
+                v-if="u.logoUrl || u.logoImageUrl"
+                :src="(u.logoUrl || u.logoImageUrl) as string"
+                :alt="u.name"
+                loading="lazy"
+                decoding="async"
+                class="max-h-16 max-w-full object-contain"
+              >
+              <span
+                v-else
+                class="text-center text-sm font-semibold text-slate-700"
+              >{{ u.name }}</span>
+            </NuxtLink>
+          </li>
+        </ul>
+      </section>
     </NContainer>
 
     <section class="border-t border-slate-200 bg-slate-50">

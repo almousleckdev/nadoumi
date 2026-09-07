@@ -14,7 +14,7 @@
           :value="item.value"
         >
           <span :class="{ 'dl__value--empty': isEmpty(item.value) }">
-            {{ isEmpty(item.value) ? '—' : item.value }}
+            {{ isEmpty(item.value) ? '' : item.value }}
           </span>
         </slot>
       </dd>

@@ -67,7 +67,7 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 
           <SectionCard :title="t('dashboard.onboardingProgress')">
             <p class="text-sm text-slate-600">
-              {{ completeness(primary) }}% — {{ t('dashboard.overviewBlurb') }}
+              {{ completeness(primary) }}% · {{ t('dashboard.overviewBlurb') }}
             </p>
             <div class="mt-3 flex gap-2">
               <NButton size="sm" :to="localePath('/dashboard/profile')">{{ t('dashboard.quickProfile') }}</NButton>

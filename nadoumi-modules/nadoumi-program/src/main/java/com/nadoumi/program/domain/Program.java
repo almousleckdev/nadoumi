@@ -24,6 +24,7 @@ public class Program {
     private String slug;
     private ProgramType programType;
     private String field;
+    private String termLength;
     private ProgramTeachingLanguage teachingLanguage;
     private Integer durationMonths;
     private BigDecimal tuitionAmount;
@@ -43,6 +44,7 @@ public class Program {
     private String universityName;
     private String universitySlug;
 
+    private List<String> levels = new ArrayList<>();
     private List<ProgramMajor> majors = new ArrayList<>();
     private List<ProgramIntake> intakes = new ArrayList<>();
 
@@ -66,6 +68,9 @@ public class Program {
 
     public String getField() { return field; }
     public void setField(String field) { this.field = field; }
+
+    public String getTermLength() { return termLength; }
+    public void setTermLength(String termLength) { this.termLength = termLength; }
 
     public ProgramTeachingLanguage getTeachingLanguage() { return teachingLanguage; }
     public void setTeachingLanguage(ProgramTeachingLanguage teachingLanguage) { this.teachingLanguage = teachingLanguage; }
@@ -117,6 +122,9 @@ public class Program {
 
     public String getUniversitySlug() { return universitySlug; }
     public void setUniversitySlug(String universitySlug) { this.universitySlug = universitySlug; }
+
+    public List<String> getLevels() { return levels; }
+    public void setLevels(List<String> levels) { this.levels = levels; }
 
     public List<ProgramMajor> getMajors() { return majors; }
     public void setMajors(List<ProgramMajor> majors) { this.majors = majors; }

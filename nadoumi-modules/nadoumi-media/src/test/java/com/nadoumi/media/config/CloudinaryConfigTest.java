@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 import com.cloudinary.Cloudinary;
+import com.nadoumi.common.media.MediaStorageService;
 import com.nadoumi.media.mapper.MediaAccessLogMapper;
 import com.nadoumi.media.mapper.MediaAssetMapper;
+import com.nadoumi.media.spi.LocalFilesystemMediaStorage;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,11 +36,11 @@ class CloudinaryConfigTest {
     }
 
     @Test
-    void contextFailsWhenCloudinaryUrlMissing() {
-        runner.run(context -> assertThat(context)
-                .hasFailed()
-                .getFailure()
-                .hasMessageContaining(CLOUDINARY_URL));
+    void fallsBackToLocalStorageWhenCloudinaryUrlMissing() {
+        runner.run(context -> {
+            assertThat(context).hasNotFailed().doesNotHaveBean(Cloudinary.class);
+            assertThat(context).getBean(MediaStorageService.class).isInstanceOf(LocalFilesystemMediaStorage.class);
+        });
     }
 
     @Test

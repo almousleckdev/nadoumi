@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.university.mapper.DepartmentMapper">
+
+    <resultMap id="dept" type="com.nadoumi.university.domain.Department">
+        <id property="id" column="id"/>
+        <result property="universityId" column="university_id"/>
+        <result property="name" column="name"/>
+        <result property="nameCn" column="name_cn"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="programCount" column="program_count"/>
+    </resultMap>
+
+    <select id="findByUniversity" resultMap="dept">
+        select d.*,
+               (select count(*) from nad_program_major m where m.department_id = d.id) as program_count
+        from nad_department d
+        where d.university_id = #{universityId}
+        order by d.sort_order, d.name
+    </select>
+
+    <select id="findById" resultMap="dept">
+        select d.*,
+               (select count(*) from nad_program_major m where m.department_id = d.id) as program_count
+        from nad_department d where d.id = #{id}
+    </select>
+
+    <select id="findIdByUniversityAndName" resultType="java.lang.Long">
+        select id from nad_department
+        where university_id = #{universityId} and lower(name) = lower(#{name}) limit 1
+    </select>
+
+    <select id="countMajorsUsing" resultType="int">
+        select count(*) from nad_program_major where department_id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_department (university_id, name, name_cn, sort_order, create_by, create_time)
+        values (#{universityId}, #{name}, #{nameCn}, #{sortOrder}, #{createBy}, now())
+    </insert>
+
+    <update id="update">
+        update nad_department
+        set name = #{name}, name_cn = #{nameCn}, sort_order = #{sortOrder},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        delete from nad_department where id = #{id}
+    </delete>
+
+</mapper>

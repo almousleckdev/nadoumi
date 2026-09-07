@@ -7,6 +7,12 @@ import type { University } from '@/api/university'
 const api = vi.hoisted(() => ({
   createUniversity: vi.fn(),
   updateUniversity: vi.fn(),
+  getUniversity: vi.fn().mockRejectedValue(new Error('not mocked; drawer falls back to the row')),
+  listDepartments: vi.fn().mockResolvedValue([]),
+  createDepartment: vi.fn(),
+  updateDepartment: vi.fn(),
+  deleteDepartment: vi.fn(),
+  PARTNER_STATUSES: ['NONE', 'PROSPECT', 'PARTNER'],
 }))
 vi.mock('@/api/university', () => api)
 
@@ -87,17 +93,17 @@ describe('UniversityDrawer', () => {
     expect(body.rankings[0].note).toBe('Asia #5')
   })
 
-  it('disables every image upload until the record has an id', async () => {
+  it('defers every image upload until the record has an id', async () => {
     const creating = mountDrawer(null)
     await flushPromises()
     const uploads = creating.findAllComponents(ImageUpload)
     expect(uploads.length).toBeGreaterThan(0)
-    expect(uploads.every(u => u.props('disabled') === true)).toBe(true)
+    expect(uploads.every(u => u.props('deferred') === true)).toBe(true)
 
     const editing = mountDrawer(existing)
     await flushPromises()
     const editUploads = editing.findAllComponents(ImageUpload)
-    expect(editUploads.every(u => u.props('disabled') === false)).toBe(true)
+    expect(editUploads.every(u => u.props('deferred') === false)).toBe(true)
     // logo preview comes from the resolved URL, not the legacy field
     expect(editUploads[0]!.props('previewUrl')).toBe('https://res.cloudinary.com/logo.png')
   })

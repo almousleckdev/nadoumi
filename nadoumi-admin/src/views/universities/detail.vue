@@ -92,7 +92,7 @@
             <span
               v-else
               class="muted"
-            >—</span>
+            >{{ t('common.notSet') }}</span>
           </template>
         </DescriptionList>
       </div>
@@ -204,6 +204,11 @@
         </div>
       </div>
 
+      <DepartmentSection
+        v-if="userStore.hasPerm('nad:department:list') || userStore.hasPerm('nad:university:edit')"
+        :university-id="u.id"
+      />
+
       <div class="nad-card sec">
         <div class="sec__head">
           <h3 class="sec__title">
@@ -232,10 +237,12 @@
           />
           <el-table-column
             :label="t('program.type')"
-            width="130"
+            min-width="160"
           >
             <template #default="{ row }">
-              {{ t(`program.typeMap.${row.programType}`) }}
+              {{ row.programType === 'DEGREE' && row.levels?.length
+                ? row.levels.map((l: string) => t(`program.levelMap.${l}`)).join(', ')
+                : t(`program.typeMap.${row.programType}`) }}
             </template>
           </el-table-column>
           <el-table-column
@@ -243,7 +250,7 @@
             width="120"
           >
             <template #default="{ row }">
-              {{ row.teachingLanguage ? t(`program.langMap.${row.teachingLanguage}`) : '—' }}
+              {{ row.teachingLanguage ? t(`program.langMap.${row.teachingLanguage}`) : '' }}
             </template>
           </el-table-column>
           <el-table-column
@@ -323,6 +330,7 @@ import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import type { DescriptionItem } from '@/components/ui/types'
 import UniversityDrawer from './UniversityDrawer.vue'
+import DepartmentSection from './DepartmentSection.vue'
 import ProgramDrawer from '@/views/programs/ProgramDrawer.vue'
 import { assetUrl } from '@/utils/asset'
 
@@ -380,7 +388,7 @@ function titleCase(s: string) {
   return s ? s.charAt(0) + s.slice(1).toLowerCase() : s
 }
 function fmtDate(v: string | null): string {
-  if (!v) return '—'
+  if (!v) return ''
   const d = new Date(v.replace(' ', 'T'))
   return Number.isNaN(d.getTime()) ? v : d.toLocaleString()
 }

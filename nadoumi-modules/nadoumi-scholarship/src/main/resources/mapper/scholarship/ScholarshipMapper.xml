@@ -366,7 +366,7 @@
     <!-- confidential linkage -->
 
     <select id="findInternal" resultType="com.nadoumi.scholarship.domain.ScholarshipInternal">
-        select university_id as universityId, partnership_id as partnershipId,
+        select university_id as universityId, program_id as programId, partnership_id as partnershipId,
                internal_status as internalStatus, operational_notes as operationalNotes,
                confidential_terms as confidentialTerms, commission_model_json as commissionModelJson
         from nad_scholarship_internal where scholarship_id = #{scholarshipId}
@@ -374,19 +374,40 @@
 
     <insert id="upsertInternal">
         insert into nad_scholarship_internal
-            (scholarship_id, university_id, partnership_id, internal_status, operational_notes,
+            (scholarship_id, university_id, program_id, partnership_id, internal_status, operational_notes,
              confidential_terms, commission_model_json, create_by, create_time)
         values
-            (#{scholarshipId}, #{i.universityId}, #{i.partnershipId},
+            (#{scholarshipId}, #{i.universityId}, #{i.programId}, #{i.partnershipId},
              coalesce(#{i.internalStatus}, 'DRAFT'), #{i.operationalNotes}, #{i.confidentialTerms},
              #{i.commissionModelJson}, #{actor}, now())
         on duplicate key update
             university_id = values(university_id),
+            program_id = values(program_id),
             partnership_id = values(partnership_id),
             internal_status = values(internal_status),
             operational_notes = values(operational_notes),
             confidential_terms = values(confidential_terms),
             commission_model_json = values(commission_model_json),
             update_by = #{actor}, update_time = now()
+    </insert>
+
+    <!-- ===== deadline reminders ===== -->
+    <select id="findDueForDeadlineReminder" resultType="com.nadoumi.scholarship.domain.Scholarship">
+        select s.id, s.slug, s.reference_code, s.title, s.deadline
+        from nad_scholarship s
+        where s.publish_status = 'PUBLISHED' and s.status = 'ACTIVE'
+          and s.deadline is not null
+          and s.deadline &gt; current_date
+          and s.deadline &lt;= date_add(current_date, interval #{withinDays} day)
+          and not exists (
+              select 1 from nad_scholarship_deadline_reminder r where r.scholarship_id = s.id
+          )
+        order by s.deadline asc
+    </select>
+
+    <insert id="insertDeadlineReminder">
+        insert into nad_scholarship_deadline_reminder (scholarship_id, reminded_at)
+        values (#{id}, now())
+        on duplicate key update reminded_at = now()
     </insert>
 </mapper>

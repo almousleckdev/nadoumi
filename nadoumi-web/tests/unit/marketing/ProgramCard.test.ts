@@ -12,6 +12,7 @@ const base: PCard = {
   name: 'Chinese Language Programme',
   nameCn: null,
   programType: 'LANGUAGE',
+  levels: [],
   field: null,
   teachingLanguage: 'CHINESE',
   durationMonths: 12,

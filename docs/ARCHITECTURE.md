@@ -85,6 +85,14 @@ depends on for image/document storage (DM8, spec
 catalog/applicant modules depend only on the `MediaStorageService`/`MediaGateway`
 interfaces in `nadoumi-common`.
 
+**EXISTING (Step 5, slice 1).** A second infrastructure module,
+`nadoumi-notification`, owns the transactional outbox (`nad_outbox_event`), its
+Quartz poller, and — in later slices — the `nad_notification*` model, per-locale
+templates, channel dispatch (IN_APP + EMAIL) and the SSE stream. Same dependency
+shape as `nadoumi-media`: producers depend only on the
+`com.nadoumi.common.outbox.OutboxWriter` interface in `nadoumi-common`;
+`ruoyi-admin` carries the implementation on the runtime classpath.
+
 ## 4. Layering conventions (EXISTING, inherited)
 
 `Controller (extends BaseController)` → `IService` / `ServiceImpl` → `Mapper` (MyBatis XML)

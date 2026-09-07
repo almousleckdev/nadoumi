@@ -11,16 +11,28 @@ withDefaults(defineProps<{
   eager?: boolean
   /** Dim the image so overlaid text stays readable. */
   overlay?: boolean
+  /**
+   * `src` is a bundled local asset URL (import from `~/assets/...`), not an
+   * Unsplash path — render a plain <img> instead of <NuxtImg>.
+   */
+  local?: boolean
+  /** Which part of the image to keep when it is cropped to the ratio box. */
+  position?: 'center' | 'top' | 'bottom'
 }>(), {
   ratio: '16/9',
   sizes: '100vw',
   rounded: 'lg',
   eager: false,
   overlay: false,
+  local: false,
+  position: 'center',
 })
 
 const radius = {
   none: '', md: 'rounded-md', lg: 'rounded-lg', xl: 'rounded-xl', '2xl': 'rounded-2xl',
+}
+const objectPos = {
+  center: 'object-center', top: 'object-top', bottom: 'object-bottom',
 }
 </script>
 
@@ -30,7 +42,18 @@ const radius = {
     :class="radius[rounded]"
     :style="{ aspectRatio: ratio }"
   >
+    <img
+      v-if="local"
+      :src="src"
+      :alt="alt"
+      :loading="eager ? 'eager' : 'lazy'"
+      :fetchpriority="eager ? 'high' : 'auto'"
+      decoding="async"
+      class="absolute inset-0 h-full w-full object-cover"
+      :class="objectPos[position]"
+    >
     <NuxtImg
+      v-else
       :src="src"
       :alt="alt"
       :sizes="sizes"
@@ -38,6 +61,7 @@ const radius = {
       :fetchpriority="eager ? 'high' : 'auto'"
       decoding="async"
       class="absolute inset-0 h-full w-full object-cover"
+      :class="objectPos[position]"
       :modifiers="{ fit: 'crop', auto: 'format' }"
     />
     <div

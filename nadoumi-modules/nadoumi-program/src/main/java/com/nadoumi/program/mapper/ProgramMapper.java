@@ -31,6 +31,13 @@ public interface ProgramMapper {
 
     // ---- children ----
 
+    List<String> findLevels(@Param("programId") Long programId);
+
+    int deleteLevels(@Param("programId") Long programId);
+
+    int insertLevel(@Param("programId") Long programId, @Param("level") String level,
+            @Param("sortOrder") int sortOrder);
+
     List<ProgramMajor> findMajors(@Param("programId") Long programId);
 
     int deleteMajors(@Param("programId") Long programId);

@@ -72,9 +72,9 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.view.categories.length()").value(2))
                 .andExpect(jsonPath("$.view.intakes.length()").value(1))
                 .andExpect(jsonPath("$.view.fees.length()").value(2))
-                // 710 CNY application fee -> 710 RMB / 100 USD at the fixed display rate
+                // 710 CNY application fee -> 710 RMB / ~98 USD at the editable nadoumi.fx.cny_usd rate (0.1381)
                 .andExpect(jsonPath("$.view.fees[0].amountRmb").value(710))
-                .andExpect(jsonPath("$.view.fees[0].amountUsd").value(100))
+                .andExpect(jsonPath("$.view.fees[0].amountUsd").value(98))
                 .andExpect(jsonPath("$.view.stipends.length()").value(2))
                 .andExpect(jsonPath("$.view.stipends[0].level").value("MASTER"))
                 .andExpect(jsonPath("$.view.stipends[1].level").value("PHD"))
@@ -174,7 +174,7 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.fees.length()").value(2))
                 .andExpect(jsonPath("$.fees[0].amountRmb").value(710))
-                .andExpect(jsonPath("$.fees[0].amountUsd").value(100))
+                .andExpect(jsonPath("$.fees[0].amountUsd").value(98))
                 .andExpect(jsonPath("$.stipends.length()").value(2))
                 .andExpect(jsonPath("$.accommodation.length()").value(2))
                 .andExpect(jsonPath("$.coverage.length()").value(3))
@@ -214,6 +214,7 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
     private static void assertNoConfidentialKeys(String json) {
         for (String needle : new String[] {
                 "universityId", "university_id", "partnershipId", "partnership",
+                "programId", "program_id",
                 "operationalNotes", "confidentialTerms", "commission", "internalStatus", "internal" }) {
             org.assertj.core.api.Assertions.assertThat(json)
                     .as("public scholarship JSON must not contain '%s'", needle)

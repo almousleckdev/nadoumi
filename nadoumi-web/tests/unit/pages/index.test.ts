@@ -20,7 +20,7 @@ const sch: ScholarshipCard = {
 }
 const prog: ProgramCard = {
   id: 4, slug: 'peking-university-chinese-language-programme', universityId: 1, universitySlug: 'peking-university', universityName: 'Peking University', name: 'Chinese Language Programme',
-  nameCn: null, programType: 'LANGUAGE', field: null, teachingLanguage: 'CHINESE',
+  nameCn: null, programType: 'LANGUAGE', levels: [], field: null, teachingLanguage: 'CHINESE',
   durationMonths: 12, tuitionAmount: null, tuitionCurrency: null, summary: null,
   featured: false, hot: true,
   imageUrl: 'https://res.cloudinary.com/demo/image/upload/v1/clp.jpg',

@@ -22,10 +22,10 @@ useSeo(
 const applyTo = computed(() => localePath(status.value === 'authed' ? '/dashboard' : '/register'))
 
 function fundingLabel(m?: string) {
-  return m ? t(`scholarships.funding.${m}`) : '—'
+  return m ? t(`scholarships.funding.${m}`) : ''
 }
 function langLabel(c?: string | null) {
-  return c ? t(`scholarships.lang.${c}`) : '—'
+  return c ? t(`scholarships.lang.${c}`) : ''
 }
 function feeLabel(kind: string) {
   return t(`scholarships.fee.${kind}`, kind)
@@ -37,6 +37,23 @@ function dual(rmb?: number | null, usd?: number | null): string | null {
 function money(m?: { amountRmb: number, amountUsd: number } | null) {
   return m ? dual(m.amountRmb, m.amountUsd) : null
 }
+
+const deadlineInfo = computed(() => {
+  const raw = s.value?.deadline
+  if (!raw) return { rolling: true, tone: 'ok' as const, days: null as number | null, date: '' }
+  const end = new Date(`${raw}T23:59:59`).getTime()
+  const days = Math.ceil((end - Date.now()) / 86_400_000)
+  // red once 10 days or fewer remain
+  const tone = days < 0 ? 'passed' : days <= 10 ? 'urgent' : days <= 45 ? 'soon' : 'ok'
+  return { rolling: false, tone, days, date: raw }
+})
+const deadlineText = computed(() => {
+  const d = deadlineInfo.value
+  if (d.rolling) return t('scholarships.deadlineRolling')
+  if (d.days! < 0) return t('scholarships.deadlinePassed')
+  if (d.days === 0) return t('scholarships.deadlineToday')
+  return t('scholarships.deadlineDays', { n: d.days })
+})
 
 const prose = computed(() => {
   const x = s.value
@@ -52,7 +69,7 @@ const eligibilityRows = computed(() => {
   const e = s.value?.eligibility
   if (!e) return [] as { label: string, value: string }[]
   const rows: { label: string, value: string }[] = []
-  if (e.ageMin != null || e.ageMax != null) rows.push({ label: t('scholarships.elig.age'), value: `${e.ageMin ?? '—'}–${e.ageMax ?? '—'}` })
+  if (e.ageMin != null || e.ageMax != null) rows.push({ label: t('scholarships.elig.age'), value: `${e.ageMin ?? ''} to ${e.ageMax ?? ''}`.trim() })
   if (e.gpaMin != null) rows.push({ label: t('scholarships.elig.gpa'), value: `≥ ${e.gpaMin}` })
   if (e.ieltsMin != null) rows.push({ label: 'IELTS', value: `≥ ${e.ieltsMin}` })
   if (e.toeflMin != null) rows.push({ label: 'TOEFL', value: `≥ ${e.toeflMin}` })
@@ -123,14 +140,25 @@ const eligibilityRows = computed(() => {
 
           <section v-if="s.fees.length">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.fees') }}</h2>
-            <table class="mt-3 w-full max-w-lg text-left text-sm">
-              <tbody class="divide-y divide-slate-100">
-                <tr v-for="(f, i) in s.fees" :key="i">
-                  <td class="py-2 text-slate-600">{{ feeLabel(f.kind) }}<span v-if="f.note" class="text-slate-400"> · {{ f.note }}</span></td>
-                  <td class="py-2 text-right font-medium text-slate-900">{{ dual(f.amountRmb, f.amountUsd) }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full min-w-[28rem] overflow-hidden rounded-xl border border-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th class="px-4 py-2.5">{{ t('scholarships.colDetails') }}</th>
+                    <th class="px-4 py-2.5 text-right">{{ t('scholarships.colPrice') }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr v-for="(f, i) in s.fees" :key="i" class="odd:bg-white even:bg-slate-50/40">
+                    <td class="px-4 py-3 text-slate-700">
+                      {{ feeLabel(f.kind) }}
+                      <span v-if="f.note" class="block text-xs text-slate-400">{{ f.note }}</span>
+                    </td>
+                    <td class="px-4 py-3 text-right font-semibold tabular-nums text-red-600">{{ dual(f.amountRmb, f.amountUsd) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section v-if="s.coverage.length">
@@ -158,32 +186,56 @@ const eligibilityRows = computed(() => {
 
           <section v-if="s.accommodation.length">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.accommodation') }}</h2>
-            <table class="mt-3 w-full max-w-lg text-left text-sm">
-              <tbody class="divide-y divide-slate-100">
-                <tr v-for="(a, i) in s.accommodation" :key="i">
-                  <td class="py-2 text-slate-600">
-                    {{ t(`scholarships.room.${a.roomType}`, a.roomType) }}
-                    <span v-if="a.note" class="text-slate-400"> · {{ a.note }}</span>
-                  </td>
-                  <td class="py-2 text-right font-medium text-slate-900">{{ dual(a.amountRmb, a.amountUsd) ?? '—' }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full min-w-[34rem] overflow-hidden rounded-xl border border-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th class="px-4 py-2.5">{{ t('scholarships.colRoom') }}</th>
+                    <th class="px-4 py-2.5">{{ t('scholarships.colDetails') }}</th>
+                    <th class="px-4 py-2.5 text-right">{{ t('scholarships.colPrice') }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr v-for="(a, i) in s.accommodation" :key="i" class="odd:bg-white even:bg-slate-50/40">
+                    <td class="px-4 py-3 font-medium text-slate-900">{{ t(`scholarships.room.${a.roomType}`, a.roomType) }}</td>
+                    <td class="px-4 py-3 text-slate-600">{{ a.note || '' }}</td>
+                    <td class="px-4 py-3 text-right font-semibold tabular-nums text-red-600">
+                      {{ dual(a.amountRmb, a.amountUsd) ?? t('scholarships.free') }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
 
           <section v-if="s.documentRequirements.length">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('scholarships.documents') }}</h2>
             <p class="mt-1 text-sm text-slate-500">{{ t('scholarships.documentsNote') }}</p>
-            <ul class="mt-3 space-y-2">
-              <li v-for="d in s.documentRequirements" :key="d.docType" class="flex items-start gap-2 text-slate-700">
-                <span class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" :class="d.mandatory ? 'bg-brand-500' : 'bg-slate-300'" aria-hidden="true" />
-                <span>
-                  {{ t(`scholarships.doc.${d.docType}`, d.docType) }}
-                  <span class="text-xs text-slate-400">{{ d.mandatory ? t('scholarships.required') : t('scholarships.optional') }}</span>
-                  <span v-if="d.note" class="block text-sm text-slate-500">{{ d.note }}</span>
-                </span>
-              </li>
-            </ul>
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full min-w-[36rem] overflow-hidden rounded-xl border border-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
+                  <tr>
+                    <th class="px-4 py-2.5">{{ t('scholarships.colDoc') }}</th>
+                    <th class="px-4 py-2.5">{{ t('scholarships.colRequirement') }}</th>
+                    <th class="px-4 py-2.5">{{ t('scholarships.colNotes') }}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr v-for="d in s.documentRequirements" :key="d.docType" class="odd:bg-white even:bg-slate-50/40">
+                    <td class="px-4 py-3 font-medium text-slate-900">{{ t(`scholarships.doc.${d.docType}`, d.docType) }}</td>
+                    <td class="px-4 py-3">
+                      <span
+                        class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold"
+                        :class="d.mandatory ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'"
+                      >
+                        {{ d.mandatory ? t('scholarships.required') : t('scholarships.optional') }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-slate-600">{{ d.note || '' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </section>
         </div>
 
@@ -220,6 +272,34 @@ const eligibilityRows = computed(() => {
               </li>
             </ul>
           </div>
+
+          <!-- animated deadline card — sits below Upfront fee + Intakes -->
+          <div
+            class="deadline-banner relative overflow-hidden rounded-xl border p-5"
+            :class="{
+              'border-red-200 bg-red-50 text-red-900': deadlineInfo.tone === 'urgent' || deadlineInfo.tone === 'passed',
+              'border-amber-200 bg-amber-50 text-amber-900': deadlineInfo.tone === 'soon',
+              'border-emerald-200 bg-emerald-50 text-emerald-900': deadlineInfo.tone === 'ok',
+            }"
+          >
+            <span class="deadline-banner__glow" aria-hidden="true" />
+            <div class="relative">
+              <div class="flex items-center gap-2">
+                <span
+                  class="deadline-banner__pulse inline-block h-2.5 w-2.5 rounded-full"
+                  :class="{
+                    'bg-red-500': deadlineInfo.tone === 'urgent' || deadlineInfo.tone === 'passed',
+                    'bg-amber-500': deadlineInfo.tone === 'soon',
+                    'bg-emerald-500': deadlineInfo.tone === 'ok',
+                  }"
+                  aria-hidden="true"
+                />
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] opacity-70">{{ t('scholarships.deadlineLabel') }}</p>
+              </div>
+              <p class="mt-1.5 font-display text-2xl font-bold tracking-tight">{{ deadlineText }}</p>
+              <p v-if="!deadlineInfo.rolling" class="mt-0.5 text-sm tabular-nums opacity-70">{{ deadlineInfo.date }}</p>
+            </div>
+          </div>
         </aside>
       </div>
     </NContainer>
@@ -233,3 +313,28 @@ const eligibilityRows = computed(() => {
     </NContainer>
   </div>
 </template>
+
+<style scoped>
+.deadline-banner__glow {
+  position: absolute;
+  inset: -40% -10%;
+  background: radial-gradient(60% 60% at 20% 30%, rgba(255, 255, 255, 0.55), transparent 70%);
+  transform: translateX(-30%);
+  animation: deadline-sweep 6s ease-in-out infinite;
+}
+.deadline-banner__pulse {
+  animation: deadline-pulse 1.8s ease-in-out infinite;
+}
+@keyframes deadline-sweep {
+  0%, 100% { transform: translateX(-30%); opacity: 0.6; }
+  50% { transform: translateX(30%); opacity: 1; }
+}
+@keyframes deadline-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+  50% { transform: scale(1.35); opacity: 0.75; box-shadow: 0 0 0 6px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .deadline-banner__glow,
+  .deadline-banner__pulse { animation: none; }
+}
+</style>

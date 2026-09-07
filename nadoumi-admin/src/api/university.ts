@@ -32,9 +32,16 @@ export interface UniversityGalleryImage {
   caption: string | null
 }
 
+export type PartnerStatus = 'NONE' | 'PROSPECT' | 'PARTNER'
+export const PARTNER_STATUSES: PartnerStatus[] = ['NONE', 'PROSPECT', 'PARTNER']
+
 export interface University {
   id: number
   slug: string
+  /** Human reference, e.g. NAD-UNI-0007. Assigned on create. */
+  referenceCode: string | null
+  /** INTERNAL: catalog-only / talking / active relationship. */
+  partnerStatus: PartnerStatus
   name: string
   nameCn: string | null
   country: string
@@ -68,6 +75,8 @@ export interface University {
   bannerUrl?: string | null
   recommended: boolean
   featured: boolean
+  /** Curated: shown in the public Partners showcase. Separate from partnerStatus. */
+  publicPartner: boolean
   status: UniversityStatus
   publishStatus: PublishStatus
   remark: string | null
@@ -106,6 +115,8 @@ export interface UniversityInput {
   bannerMediaId?: number | null
   recommended: boolean
   featured: boolean
+  publicPartner?: boolean
+  partnerStatus?: PartnerStatus
   status: UniversityStatus
   publishStatus: PublishStatus
   remark?: string | null
@@ -143,3 +154,30 @@ export const uploadUniversityBanner = (id: number | string, file: File): Promise
   uploadMedia(`${BASE}/${id}/banner`, file)
 export const uploadUniversityGalleryImage = (id: number | string, file: File): Promise<MediaUploadResult> =>
   uploadMedia(`${BASE}/${id}/gallery`, file)
+
+// ---- academic departments (nested under a university) ----
+export interface Department {
+  id: number
+  universityId: number
+  name: string
+  nameCn: string | null
+  sortOrder: number
+  /** majors that currently reference this department */
+  programCount: number
+}
+export interface DepartmentInput {
+  name: string
+  nameCn?: string | null
+  sortOrder?: number | null
+}
+
+const deptBase = (universityId: number | string) => `${BASE}/${universityId}/departments`
+
+export const listDepartments = (universityId: number | string) =>
+  request.get<unknown, Department[]>(deptBase(universityId))
+export const createDepartment = (universityId: number | string, body: DepartmentInput) =>
+  request.post<unknown, Department>(deptBase(universityId), body)
+export const updateDepartment = (universityId: number | string, id: number, body: DepartmentInput) =>
+  request.put<unknown, Department>(`${deptBase(universityId)}/${id}`, body)
+export const deleteDepartment = (universityId: number | string, id: number) =>
+  request.delete(`${deptBase(universityId)}/${id}`)

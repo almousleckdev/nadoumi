@@ -10,6 +10,7 @@
         <result property="nameCn"           column="name_cn"/>
         <result property="programType"      column="program_type"/>
         <result property="field"            column="field"/>
+        <result property="termLength"       column="term_length"/>
         <result property="teachingLanguage" column="teaching_language"/>
         <result property="durationMonths"   column="duration_months"/>
         <result property="tuitionAmount"    column="tuition_amount"/>
@@ -28,7 +29,7 @@
     </resultMap>
 
     <sql id="cols">
-        id, university_id, name, name_cn, slug, program_type, field, teaching_language,
+        id, university_id, name, name_cn, slug, program_type, field, term_length, teaching_language,
         duration_months, tuition_amount, tuition_currency, summary, image_media_id,
         is_featured, is_hot, publish_status, status,
         create_by, create_time, update_by, update_time, remark
@@ -69,11 +70,11 @@
     <insert id="insert" parameterType="com.nadoumi.program.domain.Program"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_program
-            (university_id, name, name_cn, slug, program_type, field, teaching_language,
+            (university_id, name, name_cn, slug, program_type, field, term_length, teaching_language,
              duration_months, tuition_amount, tuition_currency, summary, image_media_id,
              is_featured, is_hot, publish_status, status, create_by, create_time, remark)
         values
-            (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{teachingLanguage},
+            (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{termLength}, #{teachingLanguage},
              #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary}, #{imageMediaId},
              #{featured}, #{hot}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
     </insert>
@@ -81,7 +82,8 @@
     <update id="update" parameterType="com.nadoumi.program.domain.Program">
         update nad_program set
             university_id = #{universityId}, name = #{name}, name_cn = #{nameCn}, slug = #{slug},
-            program_type = #{programType}, field = #{field}, teaching_language = #{teachingLanguage},
+            program_type = #{programType}, field = #{field}, term_length = #{termLength},
+            teaching_language = #{teachingLanguage},
             duration_months = #{durationMonths}, tuition_amount = #{tuitionAmount},
             tuition_currency = #{tuitionCurrency}, summary = #{summary},
             image_media_id = #{imageMediaId},
@@ -102,17 +104,23 @@
     <!-- child selects and writes -->
 
     <resultMap id="major" type="com.nadoumi.program.domain.ProgramMajor">
-        <id     property="id"        column="id"/>
-        <result property="programId" column="program_id"/>
-        <result property="name"      column="name"/>
-        <result property="nameCn"    column="name_cn"/>
-        <result property="sortOrder" column="sort_order"/>
+        <id     property="id"             column="id"/>
+        <result property="programId"      column="program_id"/>
+        <result property="departmentId"   column="department_id"/>
+        <result property="departmentName" column="department_name"/>
+        <result property="level"          column="level"/>
+        <result property="name"           column="name"/>
+        <result property="nameCn"         column="name_cn"/>
+        <result property="sortOrder"      column="sort_order"/>
     </resultMap>
 
     <select id="findMajors" resultMap="major">
-        select id, program_id, name, name_cn, sort_order
-        from nad_program_major where program_id = #{programId}
-        order by sort_order asc, id asc
+        select m.id, m.program_id, m.department_id, d.name as department_name, m.level,
+               m.name, m.name_cn, m.sort_order
+        from nad_program_major m
+        left join nad_department d on d.id = m.department_id
+        where m.program_id = #{programId}
+        order by m.sort_order asc, m.id asc
     </select>
 
     <delete id="deleteMajors">
@@ -121,8 +129,21 @@
 
     <insert id="insertMajor" parameterType="com.nadoumi.program.domain.ProgramMajor"
             useGeneratedKeys="true" keyProperty="id">
-        insert into nad_program_major (program_id, name, name_cn, sort_order)
-        values (#{programId}, #{name}, #{nameCn}, #{sortOrder})
+        insert into nad_program_major (program_id, department_id, level, name, name_cn, sort_order)
+        values (#{programId}, #{departmentId}, #{level}, #{name}, #{nameCn}, #{sortOrder})
+    </insert>
+
+    <select id="findLevels" resultType="java.lang.String">
+        select level from nad_program_level where program_id = #{programId} order by sort_order asc, id asc
+    </select>
+
+    <delete id="deleteLevels">
+        delete from nad_program_level where program_id = #{programId}
+    </delete>
+
+    <insert id="insertLevel">
+        insert into nad_program_level (program_id, level, sort_order)
+        values (#{programId}, #{level}, #{sortOrder})
     </insert>
 
     <resultMap id="intake" type="com.nadoumi.program.domain.ProgramIntake">

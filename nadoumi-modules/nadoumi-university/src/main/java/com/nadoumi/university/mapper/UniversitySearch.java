@@ -17,17 +17,18 @@ public record UniversitySearch(
         UniversityType type,
         Boolean featured,
         Boolean recommended,
+        Boolean publicPartner,
         UniversityStatus status,
         PublishStatus publishStatus) {
 
     public static UniversitySearch staff(String q, String country, String province, String city,
             UniversityType type, UniversityStatus status) {
-        return new UniversitySearch(q, country, province, city, type, null, null, status, null);
+        return new UniversitySearch(q, country, province, city, type, null, null, null, status, null);
     }
 
     public static UniversitySearch publicCatalog(String q, String country, String province, String city,
-            UniversityType type, Boolean featured, Boolean recommended) {
-        return new UniversitySearch(q, country, province, city, type, featured, recommended,
+            UniversityType type, Boolean featured, Boolean recommended, Boolean publicPartner) {
+        return new UniversitySearch(q, country, province, city, type, featured, recommended, publicPartner,
                 UniversityStatus.ACTIVE, PublishStatus.PUBLISHED);
     }
 }

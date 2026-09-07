@@ -36,9 +36,10 @@ public class PublicUniversityController {
             @RequestParam(required = false) UniversityType type,
             @RequestParam(required = false) Boolean featured,
             @RequestParam(required = false) Boolean recommended,
+            @RequestParam(required = false) Boolean publicPartner,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        return service.publicList(q, country, province, city, type, featured, recommended, page, size);
+        return service.publicList(q, country, province, city, type, featured, recommended, publicPartner, page, size);
     }
 
     @Anonymous

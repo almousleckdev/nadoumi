@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.finance.mapper.RevenueMapper">
+
+    <resultMap id="revenue" type="com.nadoumi.finance.domain.Revenue">
+        <id     property="id"            column="id"/>
+        <result property="source"        column="source"/>
+        <result property="title"         column="title"/>
+        <result property="description"   column="description"/>
+        <result property="amount"        column="amount"/>
+        <result property="currency"      column="currency"/>
+        <result property="receivedOn"    column="received_on"/>
+        <result property="reference"     column="reference"/>
+        <result property="relatedType"   column="related_type"/>
+        <result property="relatedId"     column="related_id"/>
+        <result property="recordedBy"    column="recorded_by"/>
+        <result property="notes"         column="notes"/>
+        <result property="createBy"      column="create_by"/>
+        <result property="createTime"    column="create_time"/>
+        <result property="updateBy"      column="update_by"/>
+        <result property="updateTime"    column="update_time"/>
+        <result property="recordedByName" column="rec_name"/>
+    </resultMap>
+
+    <sql id="cols">
+        r.id, r.source, r.title, r.description, r.amount, r.currency, r.received_on, r.reference,
+        r.related_type, r.related_id, r.recorded_by, r.notes,
+        r.create_by, r.create_time, r.update_by, r.update_time, u.nick_name as rec_name
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.finance.domain.Revenue" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_revenue
+            (source, title, description, amount, currency, received_on, reference,
+             related_type, related_id, recorded_by, notes, create_by, create_time)
+        values
+            (#{source}, #{title}, #{description}, #{amount}, #{currency}, #{receivedOn}, #{reference},
+             #{relatedType}, #{relatedId}, #{recordedBy}, #{notes}, #{createBy}, now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.finance.domain.Revenue">
+        update nad_revenue set
+            source = #{source}, title = #{title}, description = #{description}, amount = #{amount},
+            currency = #{currency}, received_on = #{receivedOn}, reference = #{reference},
+            related_type = #{relatedType}, related_id = #{relatedId}, notes = #{notes},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <select id="findById" resultMap="revenue">
+        select <include refid="cols"/> from nad_revenue r left join sys_user u on u.user_id = r.recorded_by
+        where r.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from nad_revenue where id = #{id}
+    </delete>
+
+    <select id="search" resultMap="revenue">
+        select <include refid="cols"/> from nad_revenue r left join sys_user u on u.user_id = r.recorded_by
+        <where>
+            <if test="q != null and q != ''"> and (r.title like concat('%', #{q}, '%') or r.reference like concat('%', #{q}, '%')) </if>
+            <if test="source != null and source != ''"> and r.source = #{source} </if>
+            <if test="from != null"> and r.received_on &gt;= #{from} </if>
+            <if test="to != null"> and r.received_on &lt;= #{to} </if>
+        </where>
+        order by r.received_on desc, r.id desc
+    </select>
+
+    <select id="totalsByCurrency" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select currency, sum(amount) as total, count(*) as count from nad_revenue
+        <where>
+            <if test="from != null"> and received_on &gt;= #{from} </if>
+            <if test="to != null"> and received_on &lt;= #{to} </if>
+        </where>
+        group by currency
+    </select>
+
+    <select id="totalsBySource" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select source as bucket, currency, sum(amount) as total, count(*) as count from nad_revenue
+        <where>
+            <if test="from != null"> and received_on &gt;= #{from} </if>
+            <if test="to != null"> and received_on &lt;= #{to} </if>
+        </where>
+        group by source, currency
+        order by total desc
+    </select>
+
+</mapper>

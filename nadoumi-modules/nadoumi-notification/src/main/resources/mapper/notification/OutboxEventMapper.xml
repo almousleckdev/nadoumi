@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.notification.mapper.OutboxEventMapper">
+
+    <!-- mapUnderscoreToCamelCase is disabled project-wide: every column is mapped explicitly. -->
+    <resultMap id="outboxEvent" type="com.nadoumi.notification.domain.OutboxEvent">
+        <id     property="id"            column="id"/>
+        <result property="aggregateType" column="aggregate_type"/>
+        <result property="aggregateId"   column="aggregate_id"/>
+        <result property="type"          column="type"/>
+        <result property="payloadJson"   column="payload_json"/>
+        <result property="status"        column="status"/>
+        <result property="retryCount"    column="retry_count"/>
+        <result property="lastError"     column="last_error"/>
+        <result property="createdAt"     column="created_at"/>
+        <result property="nextAttemptAt" column="next_attempt_at"/>
+        <result property="processedAt"   column="processed_at"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, aggregate_type, aggregate_id, type, payload_json, status,
+        retry_count, last_error, created_at, next_attempt_at, processed_at
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.notification.domain.OutboxEvent"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_outbox_event
+            (aggregate_type, aggregate_id, type, payload_json, status, retry_count,
+             created_at, next_attempt_at)
+        values
+            (#{aggregateType}, #{aggregateId}, #{type}, #{payloadJson}, 'PENDING', 0,
+             now(), now())
+    </insert>
+
+    <select id="findById" resultMap="outboxEvent">
+        select <include refid="cols"/> from nad_outbox_event where id = #{id}
+    </select>
+
+    <select id="findDispatchable" resultMap="outboxEvent">
+        select <include refid="cols"/> from nad_outbox_event
+        where status = 'PENDING' and next_attempt_at &lt;= now()
+        order by next_attempt_at asc, id asc
+        limit #{limit}
+    </select>
+
+    <update id="markDone">
+        update nad_outbox_event
+        set status = 'DONE', processed_at = #{processedAt}, last_error = null
+        where id = #{id}
+    </update>
+
+    <update id="recordFailure">
+        update nad_outbox_event
+        set retry_count = retry_count + 1,
+            last_error = #{lastError},
+            status = #{status},
+            next_attempt_at = #{nextAttemptAt}
+        where id = #{id}
+    </update>
+
+    <select id="countByStatus" resultType="long">
+        select count(*) from nad_outbox_event where status = #{status}
+    </select>
+
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.hr.mapper.EmployeeMapper">
+
+    <resultMap id="employee" type="com.nadoumi.hr.domain.Employee">
+        <id     property="id"                column="id"/>
+        <result property="userId"            column="user_id"/>
+        <result property="employeeNo"        column="employee_no"/>
+        <result property="positionId"        column="position_id"/>
+        <result property="positionTitle"     column="position_title"/>
+        <result property="deptId"            column="dept_id"/>
+        <result property="managerUserId"     column="manager_user_id"/>
+        <result property="employmentType"    column="employment_type"/>
+        <result property="employmentStatus"  column="employment_status"/>
+        <result property="startDate"         column="start_date"/>
+        <result property="probationEndDate"  column="probation_end_date"/>
+        <result property="endDate"           column="end_date"/>
+        <result property="workLocation"      column="work_location"/>
+        <result property="salaryAmount"      column="salary_amount"/>
+        <result property="salaryCurrency"    column="salary_currency"/>
+        <result property="payFrequency"      column="pay_frequency"/>
+        <result property="emergencyContact"  column="emergency_contact"/>
+        <result property="emergencyContactRelationship" column="emergency_contact_relationship"/>
+        <result property="emergencyContactPhone"        column="emergency_contact_phone"/>
+        <result property="emergencyContactEmail"        column="emergency_contact_email"/>
+        <result property="notes"             column="notes"/>
+        <result property="createBy"          column="create_by"/>
+        <result property="createTime"        column="create_time"/>
+        <result property="updateBy"          column="update_by"/>
+        <result property="updateTime"        column="update_time"/>
+        <result property="userName"          column="u_user_name"/>
+        <result property="nickName"          column="u_nick_name"/>
+        <result property="email"             column="u_email"/>
+        <result property="phonenumber"       column="u_phone"/>
+        <result property="userStatus"        column="u_status"/>
+        <result property="deptName"          column="d_dept_name"/>
+        <result property="managerName"       column="m_nick_name"/>
+    </resultMap>
+
+    <sql id="cols">
+        e.id, e.user_id, e.employee_no, e.position_id,
+        coalesce(e.position_title, p.post_name) as position_title,
+        e.dept_id, e.manager_user_id, e.employment_type, e.employment_status,
+        e.start_date, e.probation_end_date, e.end_date, e.work_location,
+        e.salary_amount, e.salary_currency, e.pay_frequency, e.emergency_contact,
+        e.emergency_contact_relationship, e.emergency_contact_phone, e.emergency_contact_email, e.notes,
+        e.create_by, e.create_time, e.update_by, e.update_time,
+        u.user_name as u_user_name, u.nick_name as u_nick_name, u.email as u_email,
+        u.phonenumber as u_phone, u.status as u_status,
+        d.dept_name as d_dept_name, m.nick_name as m_nick_name
+    </sql>
+
+    <sql id="joins">
+        from nad_employee e
+        join sys_user u on u.user_id = e.user_id
+        left join sys_post p on p.post_id = e.position_id
+        left join sys_dept d on d.dept_id = e.dept_id
+        left join sys_user m on m.user_id = e.manager_user_id
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.hr.domain.Employee" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_employee
+            (user_id, employee_no, position_id, position_title, dept_id, manager_user_id,
+             employment_type, employment_status, start_date, probation_end_date, end_date,
+             work_location, salary_amount, salary_currency, pay_frequency, emergency_contact,
+             emergency_contact_relationship, emergency_contact_phone, emergency_contact_email, notes,
+             create_by, create_time)
+        values
+            (#{userId}, #{employeeNo}, #{positionId}, #{positionTitle}, #{deptId}, #{managerUserId},
+             #{employmentType}, #{employmentStatus}, #{startDate}, #{probationEndDate}, #{endDate},
+             #{workLocation}, #{salaryAmount}, #{salaryCurrency}, #{payFrequency}, #{emergencyContact},
+             #{emergencyContactRelationship}, #{emergencyContactPhone}, #{emergencyContactEmail}, #{notes},
+             #{createBy}, now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.hr.domain.Employee">
+        update nad_employee set
+            employee_no = #{employeeNo}, position_id = #{positionId}, position_title = #{positionTitle},
+            dept_id = #{deptId}, manager_user_id = #{managerUserId},
+            employment_type = #{employmentType}, employment_status = #{employmentStatus},
+            start_date = #{startDate}, probation_end_date = #{probationEndDate}, end_date = #{endDate},
+            work_location = #{workLocation}, salary_amount = #{salaryAmount}, salary_currency = #{salaryCurrency},
+            pay_frequency = #{payFrequency}, emergency_contact = #{emergencyContact},
+            emergency_contact_relationship = #{emergencyContactRelationship},
+            emergency_contact_phone = #{emergencyContactPhone},
+            emergency_contact_email = #{emergencyContactEmail}, notes = #{notes},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <select id="findById" resultMap="employee">
+        select <include refid="cols"/> <include refid="joins"/> where e.id = #{id}
+    </select>
+
+    <select id="findByUserId" resultMap="employee">
+        select <include refid="cols"/> <include refid="joins"/> where e.user_id = #{userId}
+    </select>
+
+    <delete id="deleteById">
+        delete from nad_employee where id = #{id}
+    </delete>
+
+    <select id="search" resultMap="employee">
+        select <include refid="cols"/> <include refid="joins"/>
+        <where>
+            <if test="q != null and q != ''">
+                and (u.user_name like concat('%', #{q}, '%')
+                     or u.nick_name like concat('%', #{q}, '%')
+                     or u.email like concat('%', #{q}, '%')
+                     or e.employee_no like concat('%', #{q}, '%'))
+            </if>
+            <if test="deptId != null"> and e.dept_id = #{deptId} </if>
+            <if test="employmentStatus != null and employmentStatus != ''"> and e.employment_status = #{employmentStatus} </if>
+        </where>
+        order by e.id desc
+    </select>
+
+    <!-- Payroll: employees with a recorded salary who are not terminated. -->
+    <select id="payrollRows" resultMap="employee">
+        select <include refid="cols"/> <include refid="joins"/>
+        where e.salary_amount is not null
+          and e.employment_status &lt;&gt; 'TERMINATED'
+        order by e.salary_currency, e.salary_amount desc
+    </select>
+
+    <select id="maxEmployeeSeq" resultType="java.lang.Integer">
+        select max(cast(substring(employee_no, char_length(#{prefix}) + 1) as unsigned))
+        from nad_employee where employee_no like concat(#{prefix}, '%')
+    </select>
+
+</mapper>

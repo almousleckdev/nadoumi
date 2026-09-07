@@ -68,18 +68,18 @@
           :items="[
             { label: t('scholarship.referenceCode'), value: s.view.referenceCode || t('scholarship.refPending') },
             { label: t('scholarship.slug'), value: s.view.slug },
-            { label: t('scholarship.field'), value: s.view.field || '—' },
-            { label: t('scholarship.teachingLanguage'), value: s.view.teachingLanguage ? t(`scholarship.lang.${s.view.teachingLanguage}`) : '—' },
+            { label: t('scholarship.field'), value: s.view.field || '' },
+            { label: t('scholarship.teachingLanguage'), value: s.view.teachingLanguage ? t(`scholarship.lang.${s.view.teachingLanguage}`) : '' },
             { label: t('scholarship.deadline'), value: s.view.deadline || t('scholarship.rolling') },
-            { label: t('scholarship.levels'), value: s.view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '—' },
-            { label: t('scholarship.nonDegreeDuration'), value: s.view.nonDegreeDuration ? t(`scholarship.nonDegree.${s.view.nonDegreeDuration}`) : '—' },
-            { label: t('scholarship.studyDurationMonths'), value: s.view.studyDurationMonths ?? '—' },
-            { label: t('scholarship.applicationChannel'), value: s.view.applicationChannel ? t(`scholarship.channel.${s.view.applicationChannel}`) : '—' },
-            { label: t('scholarship.agencyNumber'), value: s.view.agencyNumber || '—' },
+            { label: t('scholarship.levels'), value: s.view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '' },
+            { label: t('scholarship.nonDegreeDuration'), value: s.view.nonDegreeDuration ? t(`scholarship.nonDegree.${s.view.nonDegreeDuration}`) : '' },
+            { label: t('scholarship.studyDurationMonths'), value: s.view.studyDurationMonths ?? '' },
+            { label: t('scholarship.applicationChannel'), value: s.view.applicationChannel ? t(`scholarship.channel.${s.view.applicationChannel}`) : '' },
+            { label: t('scholarship.agencyNumber'), value: s.view.agencyNumber || '' },
             { label: t('scholarship.requiresFinancialProof'), value: s.view.requiresFinancialProof ? t('common.yes') : t('common.no') },
             { label: t('scholarship.requiresFoundationYear'), value: s.view.requiresFoundationYear ? t('common.yes') : t('common.no') },
-            { label: t('scholarship.categories'), value: s.view.categories.join(', ') || '—' },
-            { label: t('scholarship.slots'), value: s.view.slots ?? '—' },
+            { label: t('scholarship.categories'), value: s.view.categories.join(', ') || '' },
+            { label: t('scholarship.slots'), value: s.view.slots ?? '' },
           ]"
         />
         <p
@@ -153,7 +153,7 @@
             align="right"
           >
             <template #default="{ row }">
-              {{ row.durationMonths ?? '—' }}
+              {{ row.durationMonths ?? '' }}
             </template>
           </el-table-column>
           <el-table-column
@@ -180,7 +180,7 @@
               <span
                 v-if="row.note"
                 class="muted"
-              > — {{ row.note }}</span>
+              > · {{ row.note }}</span>
             </template>
           </el-table-column>
           <el-table-column
@@ -208,7 +208,7 @@
             <span
               v-if="c.detail"
               class="muted"
-            > — {{ c.detail }}</span>
+            > · {{ c.detail }}</span>
           </li>
         </ul>
       </FormSection>
@@ -260,7 +260,7 @@
             <span
               v-if="d.note"
               class="muted"
-            > — {{ d.note }}</span>
+            > · {{ d.note }}</span>
           </li>
         </ul>
       </FormSection>
@@ -282,10 +282,11 @@
       >
         <DescriptionList
           :items="[
-            { label: t('scholarship.partnerUniversity'), value: internal?.universityName || (internal?.universityId ? `#${internal.universityId}` : '—') },
+            { label: t('scholarship.partnerUniversity'), value: internal?.universityName || (internal?.universityId ? `#${internal.universityId}` : '') },
+            { label: t('scholarship.linkedProgram'), value: linkedProgramLabel },
             { label: t('scholarship.internalStatus'), value: internal?.internalStatus || 'DRAFT' },
-            { label: t('scholarship.operationalNotes'), value: internal?.operationalNotes || '—' },
-            { label: t('scholarship.confidentialTerms'), value: internal?.confidentialTerms || '—' },
+            { label: t('scholarship.operationalNotes'), value: internal?.operationalNotes || '' },
+            { label: t('scholarship.confidentialTerms'), value: internal?.confidentialTerms || '' },
           ]"
         />
         <el-button
@@ -317,7 +318,25 @@
             v-model="internalForm.universityId"
             :min="1"
             controls-position="right"
+            @change="onInternalUniversityChange"
           />
+        </el-form-item>
+        <el-form-item :label="t('scholarship.linkedProgram')">
+          <el-select
+            v-model="internalForm.programId"
+            clearable
+            filterable
+            :disabled="!internalForm.universityId"
+            :placeholder="internalForm.universityId ? t('scholarship.linkedProgramPlaceholder') : t('scholarship.linkedProgramNeedsUniversity')"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="p in programOptions"
+              :key="p.id"
+              :value="p.id"
+              :label="p.name"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item :label="t('scholarship.internalStatus')">
           <el-input
@@ -374,6 +393,7 @@ import {
   getScholarship, getScholarshipInternal, putScholarshipInternal,
   type Scholarship, type ScholarshipInternal,
 } from '@/api/scholarship'
+import { listPrograms } from '@/api/program'
 import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
 import DescriptionList from '@/components/ui/DescriptionList.vue'
@@ -401,15 +421,34 @@ const heroSrc = computed(() => assetUrl(s.value?.view.heroUrl ?? s.value?.view.h
 const coverSrc = computed(() => assetUrl(s.value?.view.coverUrl ?? s.value?.view.coverImageUrl))
 const savingInternal = ref(false)
 const internalForm = reactive({
-  universityId: null as number | null, internalStatus: '', operationalNotes: '',
-  confidentialTerms: '', commissionModelJson: '',
+  universityId: null as number | null, programId: null as number | null, internalStatus: '',
+  operationalNotes: '', confidentialTerms: '', commissionModelJson: '',
+})
+// programmes of the linked university, for the confidential programme picker
+const programOptions = ref<{ id: number, name: string }[]>([])
+async function loadProgramOptions(universityId: number | null) {
+  if (!universityId) { programOptions.value = []; return }
+  try {
+    const res = await listPrograms({ universityId, page: 0, size: 200 })
+    programOptions.value = res.content.map(p => ({ id: p.id, name: p.name }))
+  }
+  catch { programOptions.value = [] }
+}
+function onInternalUniversityChange() {
+  internalForm.programId = null
+  loadProgramOptions(internalForm.universityId)
+}
+const linkedProgramLabel = computed(() => {
+  if (!internal.value?.programId) return ''
+  const hit = programOptions.value.find(p => p.id === internal.value?.programId)
+  return hit ? hit.name : `#${internal.value.programId}`
 })
 
 const eligibilityItems = computed(() => {
   const e = s.value?.view.eligibility
   if (!e) return []
   const items: { label: string, value: string | number }[] = []
-  if (e.ageMin != null || e.ageMax != null) items.push({ label: t('scholarship.age'), value: `${e.ageMin ?? '—'}–${e.ageMax ?? '—'}` })
+  if (e.ageMin != null || e.ageMax != null) items.push({ label: t('scholarship.age'), value: `${e.ageMin ?? ''} to ${e.ageMax ?? ''}`.trim() })
   items.push({ label: t('scholarship.nationality'), value: nationalityText(e) })
   if (e.inChina != null) items.push({ label: t('scholarship.inChina'), value: e.inChina ? t('common.yes') : t('common.no') })
   if (e.gpaMin != null) items.push({ label: 'GPA', value: `≥ ${e.gpaMin}` })
@@ -419,13 +458,13 @@ const eligibilityItems = computed(() => {
   return items
 })
 function nationalityText(e: NonNullable<Scholarship['view']['eligibility']>) {
-  if (e.nationalityScope === 'INCLUDE') return `${t('scholarship.scope.INCLUDE')}: ${e.acceptedCountries || '—'}`
-  if (e.nationalityScope === 'EXCLUDE') return `${t('scholarship.scope.EXCLUDE')}: ${e.acceptedCountries || '—'}`
+  if (e.nationalityScope === 'INCLUDE') return `${t('scholarship.scope.INCLUDE')}: ${e.acceptedCountries || ''}`
+  if (e.nationalityScope === 'EXCLUDE') return `${t('scholarship.scope.EXCLUDE')}: ${e.acceptedCountries || ''}`
   return t('scholarship.scope.ANY')
 }
 
 function dual(rmb: number | null | undefined, usd: number | null | undefined): string {
-  if (rmb == null && usd == null) return '—'
+  if (rmb == null && usd == null) return ''
   return `¥${(rmb ?? 0).toLocaleString('en')} · $${(usd ?? 0).toLocaleString('en')}`
 }
 const feeRows = computed(() => {
@@ -453,6 +492,7 @@ async function load() {
     s.value = await getScholarship(id.value)
     if (userStore.hasPerm('nad:scholarship:internal:view')) {
       internal.value = await getScholarshipInternal(id.value).catch(() => null)
+      if (internal.value?.programId) await loadProgramOptions(internal.value.universityId ?? null)
     }
   }
   catch (e) {
@@ -467,16 +507,19 @@ function onSaved() { load() }
 watch(internalOpen, (open) => {
   if (!open) return
   internalForm.universityId = internal.value?.universityId ?? null
+  internalForm.programId = internal.value?.programId ?? null
   internalForm.internalStatus = internal.value?.internalStatus ?? ''
   internalForm.operationalNotes = internal.value?.operationalNotes ?? ''
   internalForm.confidentialTerms = internal.value?.confidentialTerms ?? ''
   internalForm.commissionModelJson = internal.value?.commissionModelJson ?? ''
+  loadProgramOptions(internalForm.universityId)
 })
 async function saveInternal() {
   savingInternal.value = true
   try {
     internal.value = await putScholarshipInternal(id.value, {
       universityId: internalForm.universityId,
+      programId: internalForm.universityId ? internalForm.programId : null,
       internalStatus: internalForm.internalStatus || null,
       operationalNotes: internalForm.operationalNotes || null,
       confidentialTerms: internalForm.confidentialTerms || null,

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.notification.mapper.NotificationDeliveryMapper">
+
+    <resultMap id="delivery" type="com.nadoumi.notification.domain.NotificationDelivery">
+        <id     property="id"                column="id"/>
+        <result property="notificationId"    column="notification_id"/>
+        <result property="channel"           column="channel"/>
+        <result property="provider"          column="provider"/>
+        <result property="providerMessageId" column="provider_message_id"/>
+        <result property="status"            column="status"/>
+        <result property="attempts"          column="attempts"/>
+        <result property="lastError"         column="last_error"/>
+        <result property="nextAttemptAt"     column="next_attempt_at"/>
+        <result property="sentAt"            column="sent_at"/>
+        <result property="createdAt"         column="created_at"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, notification_id, channel, provider, provider_message_id, status,
+        attempts, last_error, next_attempt_at, sent_at, created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.notification.domain.NotificationDelivery"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_notification_delivery
+            (notification_id, channel, provider, provider_message_id, status,
+             attempts, next_attempt_at, sent_at, created_at)
+        values
+            (#{notificationId}, #{channel}, #{provider}, #{providerMessageId}, #{status},
+             0, now(), #{sentAt}, now())
+    </insert>
+
+    <select id="findByNotification" resultMap="delivery">
+        select <include refid="cols"/> from nad_notification_delivery
+        where notification_id = #{notificationId}
+        order by id asc
+    </select>
+
+    <select id="findDispatchable" resultMap="delivery">
+        select <include refid="cols"/> from nad_notification_delivery
+        where status = 'PENDING' and next_attempt_at &lt;= now()
+        order by next_attempt_at asc, id asc
+        limit #{limit}
+    </select>
+
+    <update id="markSent">
+        update nad_notification_delivery
+        set status = 'SENT', attempts = attempts + 1, provider = #{provider},
+            provider_message_id = #{providerMessageId}, sent_at = #{sentAt}, last_error = null
+        where id = #{id}
+    </update>
+
+    <update id="recordFailure">
+        update nad_notification_delivery
+        set status = #{status}, attempts = attempts + 1,
+            last_error = #{lastError}, next_attempt_at = #{nextAttemptAt}
+        where id = #{id}
+    </update>
+
+    <select id="countByStatus" resultType="long">
+        select count(*) from nad_notification_delivery where status = #{status}
+    </select>
+
+</mapper>

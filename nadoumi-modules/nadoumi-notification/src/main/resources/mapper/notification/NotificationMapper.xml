@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.notification.mapper.NotificationMapper">
+
+    <resultMap id="notification" type="com.nadoumi.notification.domain.Notification">
+        <id     property="id"              column="id"/>
+        <result property="recipientUserId" column="recipient_user_id"/>
+        <result property="type"            column="type"/>
+        <result property="title"           column="title"/>
+        <result property="body"            column="body"/>
+        <result property="dataJson"        column="data_json"/>
+        <result property="sourceRef"       column="source_ref"/>
+        <result property="applicationId"   column="application_id"/>
+        <result property="conversationId"  column="conversation_id"/>
+        <result property="messageId"       column="message_id"/>
+        <result property="createdAt"       column="created_at"/>
+        <result property="readAt"          column="read_at"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, recipient_user_id, type, title, body, data_json, source_ref,
+        application_id, conversation_id, message_id, created_at, read_at
+    </sql>
+
+    <!-- INSERT IGNORE: a repeated (recipient_user_id, source_ref) is a no-op so the
+         outbox poller's at-least-once redelivery cannot double-notify. -->
+    <insert id="insert" parameterType="com.nadoumi.notification.domain.Notification"
+            useGeneratedKeys="true" keyProperty="id">
+        insert ignore into nad_notification
+            (recipient_user_id, type, title, body, data_json, source_ref,
+             application_id, conversation_id, message_id, created_at)
+        values
+            (#{recipientUserId}, #{type}, #{title}, #{body}, #{dataJson}, #{sourceRef},
+             #{applicationId}, #{conversationId}, #{messageId}, now())
+    </insert>
+
+    <select id="findByRecipient" resultMap="notification">
+        select <include refid="cols"/> from nad_notification
+        where recipient_user_id = #{recipientUserId}
+        <if test="unreadOnly"> and read_at is null </if>
+        order by id desc
+    </select>
+
+    <select id="countUnread" resultType="long">
+        select count(*) from nad_notification
+        where recipient_user_id = #{recipientUserId} and read_at is null
+    </select>
+
+    <select id="findByIdForRecipient" resultMap="notification">
+        select <include refid="cols"/> from nad_notification
+        where id = #{id} and recipient_user_id = #{recipientUserId}
+    </select>
+
+    <update id="markRead">
+        update nad_notification set read_at = now()
+        where id = #{id} and recipient_user_id = #{recipientUserId} and read_at is null
+    </update>
+
+    <update id="markAllRead">
+        update nad_notification set read_at = now()
+        where recipient_user_id = #{recipientUserId} and read_at is null
+    </update>
+
+    <select id="search" resultMap="notification">
+        select <include refid="cols"/> from nad_notification
+        <where>
+            <if test="recipientUserId != null"> and recipient_user_id = #{recipientUserId} </if>
+            <if test="type != null and type != ''"> and type = #{type} </if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="findById" resultMap="notification">
+        select <include refid="cols"/> from nad_notification where id = #{id}
+    </select>
+
+</mapper>

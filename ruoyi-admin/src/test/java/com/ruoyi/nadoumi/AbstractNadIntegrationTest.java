@@ -1,11 +1,14 @@
 package com.ruoyi.nadoumi;
 
 import com.jayway.jsonpath.JsonPath;
+import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.nadoumi.support.MediaTestConfig;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+import java.util.Collection;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
@@ -82,6 +85,7 @@ public abstract class AbstractNadIntegrationTest {
     @Autowired protected MockMvc mvc;
     @Autowired protected ISysUserService userService;
     @Autowired private ISysConfigService configService;
+    @Autowired private RedisCache redisCache;
     @Autowired private DataSource dataSource;
 
     protected JdbcTemplate jdbc;
@@ -91,6 +95,13 @@ public abstract class AbstractNadIntegrationTest {
         jdbc = new JdbcTemplate(dataSource);
         jdbc.update("update sys_config set config_value = 'false' where config_key = 'sys.account.captchaEnabled'");
         configService.resetConfigCache(); // pull the captcha flag change through the Redis cache
+        // The @RateLimiter on the auth endpoints is a suite-wide counter in Redis
+        // (default limitType, no IP scoping) — every test shares one MockMvc client,
+        // so without this reset a test-heavy run trips "Too many requests".
+        Collection<String> rateLimitKeys = redisCache.keys(CacheConstants.RATE_LIMIT_KEY + "*");
+        if (rateLimitKeys != null && !rateLimitKeys.isEmpty()) {
+            redisCache.deleteObject(rateLimitKeys);
+        }
         // Media: null the *_media_id FKs (ON DELETE SET NULL, so ordering is lenient)
         // then clear the media tables for clean per-test state.
         jdbc.update("delete from nad_media_access_log");
@@ -106,9 +117,16 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_applicant_contact");
         jdbc.update("delete from nad_applicant");
         jdbc.update("delete from nad_scholarship"); // cascades levels/categories/intakes/fees/stipends/accommodation/coverage/docs/internal
-        jdbc.update("delete from nad_program"); // cascades majors/intakes; FK RESTRICT to nad_university
+        jdbc.update("delete from nad_program"); // cascades majors/intakes/levels; FK RESTRICT to nad_university
+        jdbc.update("delete from nad_department"); // cascades from nad_university too, but be explicit
         jdbc.update("delete from nad_university");
         jdbc.update("delete from nad_contact_inquiry");
+        jdbc.update("delete from nad_outbox_event");
+        jdbc.update("delete from nad_notification"); // cascades nad_notification_delivery
+        jdbc.update("delete from nad_task"); // cascades nad_task_event
+        jdbc.update("delete from nad_employee");
+        jdbc.update("delete from nad_expense");
+        jdbc.update("delete from nad_revenue");
         jdbc.update("delete from sys_user_role where user_id > 3");
         jdbc.update("delete from sys_user where user_id > 3");
     }

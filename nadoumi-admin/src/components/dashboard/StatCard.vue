@@ -50,7 +50,7 @@ const { t } = useI18n()
 
 const formatted = computed(() => {
   const v = props.value
-  if (v === null || v === undefined || v === '') return '—'
+  if (v === null || v === undefined || v === '') return ''
   return typeof v === 'number' ? new Intl.NumberFormat().format(v) : v
 })
 </script>

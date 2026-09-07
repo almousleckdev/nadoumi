@@ -61,6 +61,7 @@
       :empty-title="t('applicant.emptyTitle')"
       :empty-description="t('applicant.emptyDesc')"
       @update:page="(p: number) => { query.page = p; reload() }"
+      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
       @retry="reload"
       @row-click="(row) => goToDetail(Number(row.id))"
     >
@@ -74,7 +75,7 @@
         </div>
       </template>
       <template #cell-passportNo="{ value }">
-        <span :class="{ masked: value === MASK }">{{ value ?? '—' }}</span>
+        <span :class="{ masked: value === MASK }">{{ value ?? '' }}</span>
       </template>
       <template #cell-status="{ value }">
         <StatusBadge :status="value" />
@@ -202,7 +203,7 @@ function titleCase(s: string) {
   return s.charAt(0) + s.slice(1).toLowerCase()
 }
 function fmtDate(v: string | null): string {
-  if (!v) return '—'
+  if (!v) return ''
   const d = new Date(v.replace(' ', 'T'))
   return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString()
 }

@@ -30,7 +30,7 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
 
     private static String programBody(long universityId, String publishStatus) {
         return """
-                {"universityId":%d,"name":"  MBA  ","nameCn":"工商管理硕士","programType":"MASTER",
+                {"universityId":%d,"name":"  MBA  ","nameCn":"工商管理硕士","programType":"DEGREE","levels":["MASTER"],
                  "field":"Business","teachingLanguage":"ENGLISH","durationMonths":24,
                  "tuitionAmount":38000.00,"tuitionCurrency":"usd","summary":"A two-year MBA.",
                  "status":"ACTIVE","publishStatus":"%s",
@@ -54,6 +54,8 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.universityName").value("Fudan University"))
                 .andExpect(jsonPath("$.tuitionCurrency").value("USD"))
                 .andExpect(jsonPath("$.majors.length()").value(2))
+                .andExpect(jsonPath("$.programType").value("DEGREE"))
+                .andExpect(jsonPath("$.levels[0]").value("MASTER"))
                 .andExpect(jsonPath("$.intakes.length()").value(1))
                 .andExpect(jsonPath("$.intakes[0].term").value("AUTUMN_SEPTEMBER"))
                 .andReturn().getResponse().getContentAsString();
@@ -63,7 +65,7 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
         mvc.perform(put("/api/staff/programs/{id}", id).header("Authorization", bearer(token))
                         .contentType("application/json")
                         .content("""
-                            {"universityId":%d,"name":"MBA","programType":"MASTER","status":"ACTIVE",
+                            {"universityId":%d,"name":"MBA","programType":"DEGREE","levels":["MASTER"],"status":"ACTIVE",
                              "publishStatus":"DRAFT","majors":[{"name":"Finance"}],"intakes":[]}""".formatted(uni)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.publishStatus").value("DRAFT"))
@@ -127,14 +129,14 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
         // draft programme under the same published university -> hidden
         mvc.perform(post("/api/staff/programs").header("Authorization", bearer(token))
                 .contentType("application/json").content("""
-                    {"universityId":%d,"name":"Hidden Programme","programType":"BACHELOR",
+                    {"universityId":%d,"name":"Hidden Programme","programType":"DEGREE","levels":["BACHELOR"],
                      "status":"ACTIVE","publishStatus":"DRAFT"}""".formatted(publicUni)))
                 .andExpect(status().isCreated());
 
         // published programme under a DRAFT university -> hidden
         mvc.perform(post("/api/staff/programs").header("Authorization", bearer(token))
                 .contentType("application/json").content("""
-                    {"universityId":%d,"name":"Orphan Programme","programType":"BACHELOR",
+                    {"universityId":%d,"name":"Orphan Programme","programType":"DEGREE","levels":["BACHELOR"],
                      "status":"ACTIVE","publishStatus":"PUBLISHED"}""".formatted(draftUni)))
                 .andExpect(status().isCreated());
 

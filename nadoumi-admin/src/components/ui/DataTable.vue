@@ -87,19 +87,14 @@
         <slot name="columns" />
       </el-table>
 
-      <div
-        v-if="total > pageSize"
-        class="dt__footer"
-      >
-        <span class="dt__count">{{ t('table.total', { n: total }) }}</span>
-        <el-pagination
-          layout="prev, pager, next"
-          :total="total"
-          :page-size="pageSize"
-          :current-page="page + 1"
-          @current-change="(p: number) => emit('update:page', p - 1)"
-        />
-      </div>
+      <Pagination
+        v-if="total > 0"
+        :page="page + 1"
+        :size="pageSize"
+        :total="total"
+        @update:page="(p: number) => emit('update:page', p - 1)"
+        @update:size="(s: number) => emit('update:page-size', s)"
+      />
     </template>
   </div>
 </template>
@@ -111,6 +106,7 @@ import { Operation } from '@element-plus/icons-vue'
 import ErrorState from './ErrorState.vue'
 import LoadingState from './LoadingState.vue'
 import EmptyState from './EmptyState.vue'
+import Pagination from './Pagination.vue'
 import type { DataTableColumn } from './types'
 
 /** A generic table shell — rows are untyped here; each screen keeps its own typed array. */
@@ -145,6 +141,7 @@ const props = withDefaults(defineProps<{
 
 const emit = defineEmits<{
   'update:page': [page: number]
+  'update:page-size': [size: number]
   'retry': []
   'row-click': [row: Row]
   'sort-change': [sort: { prop: string, order: 'asc' | 'desc' | null }]
@@ -197,7 +194,7 @@ function onSortChange(e: { prop: string | null, order: 'ascending' | 'descending
 }
 
 function format(v: unknown): string {
-  if (v === null || v === undefined || v === '') return '—'
+  if (v === null || v === undefined || v === '') return ''
   return String(v)
 }
 </script>
@@ -210,16 +207,6 @@ function format(v: unknown): string {
 }
 .dt__table {
   width: 100%;
-}
-.dt__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 14px;
-}
-.dt__count {
-  font-size: 13px;
-  color: var(--nad-ink-faint);
 }
 :deep(.dt__row--clickable) {
   cursor: pointer;

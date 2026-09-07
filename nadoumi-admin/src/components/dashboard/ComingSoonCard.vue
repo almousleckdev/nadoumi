@@ -16,7 +16,7 @@
       </el-tag>
     </div>
     <div class="cs-card__value">
-      —
+      N/A
     </div>
     <div class="cs-card__note">
       {{ note || t('dashboard.comingSoonNote', { domain }) }}

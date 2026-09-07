@@ -3,9 +3,11 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import SiteHeader from '~/components/marketing/SiteHeader.vue'
 
 describe('SiteHeader', () => {
-  it('shows the wordmark and the primary nav set (no Programs/Destinations top-level)', async () => {
+  it('shows the brand logo and the primary nav set (no Programs/Destinations top-level)', async () => {
     const w = await mountSuspended(SiteHeader)
-    expect(w.find('.site-brand').text()).toBe('Nadoumi')
+    const logo = w.find('img[alt="Nadoumi"]')
+    expect(logo.exists()).toBe(true)
+    expect(logo.attributes('src')).toBeTruthy()
     for (const label of ['Home', 'Scholarships', 'Universities', 'About', 'Contact']) {
       expect(w.text()).toContain(label)
     }

@@ -40,6 +40,10 @@ public record UniversityRequest(
         Long bannerMediaId,
         Boolean recommended,
         Boolean featured,
+        /** Curated: feature in the public Partners showcase. Editorial, not the confidential partnerStatus. */
+        Boolean publicPartner,
+        /** INTERNAL: NONE | PROSPECT | PARTNER — never exposed on a public endpoint. */
+        @Size(max = 12) String partnerStatus,
         @NotNull UniversityStatus status,
         @NotNull PublishStatus publishStatus,
         @Size(max = 500) String remark,

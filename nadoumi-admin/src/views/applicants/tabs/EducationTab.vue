@@ -41,7 +41,7 @@
           width="110"
         >
           <template #default="{ row }">
-            {{ row.gpa != null ? `${row.gpa}${row.gpaScale ? ' / ' + row.gpaScale : ''}` : '—' }}
+            {{ row.gpa != null ? `${row.gpa}${row.gpaScale ? ' / ' + row.gpaScale : ''}` : '' }}
           </template>
         </el-table-column>
         <el-table-column
@@ -173,9 +173,9 @@ watch(list.items, v => emit('count', v.length))
 onMounted(list.load)
 
 function period(a: string | null, b: string | null): string {
-  if (!a && !b) return '—'
+  if (!a && !b) return ''
   const f = (d: string) => new Date(d).toLocaleDateString()
-  return `${a ? f(a) : '…'} – ${b ? f(b) : t('applicant.present')}`
+  return `${a ? f(a) : '…'} to ${b ? f(b) : t('applicant.present')}`
 }
 
 const open = ref(false)

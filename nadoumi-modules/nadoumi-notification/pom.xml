@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.nadoumi</groupId>
+        <artifactId>nadoumi-modules</artifactId>
+        <version>3.9.2</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>nadoumi-notification</artifactId>
+    <packaging>jar</packaging>
+
+    <description>
+        Notification &amp; realtime slice: owns the transactional outbox
+        (nad_outbox_event) + its poller, the nad_notification* model, per-locale
+        templates, channel dispatch (IN_APP + EMAIL in v1), and the SSE stream.
+        Domain modules depend on the com.nadoumi.common.outbox.OutboxWriter SPI,
+        never on this module's mappers.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-common</artifactId>
+        </dependency>
+        <!-- cross-module: the MailSender port + EmailMessage for the EMAIL channel -->
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-identity</artifactId>
+        </dependency>
+
+        <!-- RuoYi types: @Anonymous, SecurityUtils, @Log, page helpers -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

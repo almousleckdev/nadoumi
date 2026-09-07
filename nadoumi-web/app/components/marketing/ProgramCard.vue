@@ -16,6 +16,13 @@ const tuition = computed(() => {
     ? `${p.tuitionCurrency ?? ''} ${p.tuitionAmount.toLocaleString('en')}`.trim()
     : ''
 })
+
+const levelLabel = computed(() => {
+  const p = props.program
+  return p.programType === 'DEGREE' && p.levels?.length
+    ? p.levels.map(l => t(`program.level.${l}`)).join(' · ')
+    : t(`program.level.${p.programType}`)
+})
 </script>
 
 <template>
@@ -35,7 +42,7 @@ const tuition = computed(() => {
     <div class="flex flex-1 flex-col p-5">
       <div class="flex flex-wrap items-center gap-2">
         <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-          {{ t(`program.level.${program.programType}`) }}
+          {{ levelLabel }}
         </span>
         <span
           v-if="program.teachingLanguage"

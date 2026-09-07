@@ -89,6 +89,18 @@
         </dependency>
         <dependency>
             <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-notification</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-hr</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-finance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-media</artifactId>
         </dependency>
         <dependency>

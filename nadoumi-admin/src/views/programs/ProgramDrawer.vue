@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import {
   createProgram, updateProgram,
-  PROGRAM_TYPES, PROGRAM_LANGUAGES, INTAKE_TERMS,
-  type Program, type ProgramInput,
+  PROGRAM_TYPES, PROGRAM_LANGUAGES, INTAKE_TERMS, TERM_LENGTHS, DEGREE_LEVELS,
+  isDegree as isDegreeKind,
+  type Program, type ProgramInput, type TermLength, type DegreeLevel,
 } from '@/api/program'
-import { listUniversities, type University } from '@/api/university'
+import { cnyToUsdRate } from '@/api/fx'
+import { usd } from '@/utils/money'
+import { listUniversities, listDepartments, type University, type Department } from '@/api/university'
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
 import ImageUpload from '@/components/ui/ImageUpload.vue'
@@ -26,7 +29,13 @@ const PUBLISH = ['DRAFT', 'PUBLISHED'] as const
 
 const formRef = ref<FormInstance>()
 const saving = ref(false)
+// create mode holds the image until the program row exists
+const imageUp = ref<InstanceType<typeof ImageUpload>>()
 const universities = ref<{ id: number, name: string }[]>([])
+
+// live "≈ $" preview for the RMB tuition; saved rows carry the server value
+const fxRate = ref(0.1381)
+onMounted(async () => { fxRate.value = await cnyToUsdRate() })
 
 function loadUniversities() {
   if (props.lockedUniversity || universities.value.length) return
@@ -35,20 +44,32 @@ function loadUniversities() {
     .catch(() => {})
 }
 
+// academic departments of the selected university, for the majors picker
+const departments = ref<Department[]>([])
+async function loadDepartments(universityId: number | null) {
+  if (!universityId) { departments.value = []; return }
+  try {
+    departments.value = await listDepartments(universityId)
+  }
+  catch { departments.value = [] }
+}
+
 function blankForm() {
   return {
     id: undefined as number | undefined,
     universityId: props.lockedUniversity?.id ?? (null as number | null),
     name: '', nameCn: '',
-    programType: 'BACHELOR' as ProgramInput['programType'],
+    programType: 'DEGREE' as ProgramInput['programType'],
+    levels: [] as DegreeLevel[],
     field: '',
+    termLength: null as TermLength | null,
     teachingLanguage: null as ProgramInput['teachingLanguage'],
     durationMonths: null as number | null,
     tuitionAmount: null as number | null,
-    tuitionCurrency: 'USD',
+    tuitionCurrency: 'CNY',
     summary: '',
     imageMediaId: null as number | null,
-    majors: [] as { name: string, nameCn: string | null }[],
+    majors: [] as { name: string, nameCn: string | null, departmentId: number | null, level: DegreeLevel | null }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
     featured: false, hot: false,
     status: 'ACTIVE' as ProgramInput['status'],
@@ -57,6 +78,22 @@ function blankForm() {
   }
 }
 const form = reactive(blankForm())
+const tuitionUsdPreview = computed(() =>
+  form.tuitionAmount == null ? '' : `≈ ${usd(form.tuitionAmount * fxRate.value)}`)
+const isDegree = computed(() => isDegreeKind(form.programType))
+
+// user picked a different university — its departments no longer apply
+async function onUniversityChange() {
+  form.majors.forEach(m => { m.departmentId = null })
+  await loadDepartments(form.universityId)
+}
+
+// dropping a level detaches any major that was assigned to it
+watch(() => [...form.levels], (levels) => {
+  form.majors.forEach(m => {
+    if (m.level && !levels.includes(m.level)) m.level = null
+  })
+})
 
 const rules = {
   universityId: [{ required: true, message: t('program.required') }],
@@ -71,25 +108,34 @@ watch(() => props.modelValue, (open) => {
   loadUniversities()
   Object.assign(form, blankForm())
   const p = props.program
-  if (!p) return
+  if (!p) {
+    loadDepartments(form.universityId)
+    return
+  }
   Object.assign(form, {
     id: p.id,
     universityId: p.universityId,
     name: p.name, nameCn: p.nameCn ?? '',
-    programType: p.programType, field: p.field ?? '',
+    programType: p.programType,
+    levels: [...(p.levels ?? [])],
+    field: p.field ?? '',
+    termLength: p.termLength ?? null,
     teachingLanguage: p.teachingLanguage ?? null,
     durationMonths: p.durationMonths ?? null,
     tuitionAmount: p.tuitionAmount ?? null,
-    tuitionCurrency: p.tuitionCurrency ?? 'USD',
+    tuitionCurrency: p.tuitionCurrency ?? 'CNY',
     summary: p.summary ?? '',
     imageMediaId: p.imageMediaId ?? null,
-    majors: p.majors.map(m => ({ name: m.name, nameCn: m.nameCn ?? null })),
+    majors: p.majors.map(m => ({
+      name: m.name, nameCn: m.nameCn ?? null, departmentId: m.departmentId ?? null, level: m.level ?? null,
+    })),
     intakes: p.intakes.map(i => ({
       term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null,
     })),
     featured: p.featured, hot: p.hot,
     status: p.status, publishStatus: p.publishStatus, remark: p.remark ?? '',
   })
+  loadDepartments(p.universityId)
 }, { immediate: true })
 
 function n(v: unknown): number | null {
@@ -105,16 +151,23 @@ function payload(): ProgramInput {
     name: form.name.trim(),
     nameCn: s(form.nameCn),
     programType: form.programType,
+    levels: isDegree.value ? [...form.levels] : [],
     field: s(form.field),
+    termLength: isDegree.value ? null : (form.termLength || null),
     teachingLanguage: form.teachingLanguage || null,
     durationMonths: n(form.durationMonths),
     tuitionAmount: n(form.tuitionAmount),
-    tuitionCurrency: form.tuitionAmount != null ? form.tuitionCurrency.toUpperCase() : null,
+    tuitionCurrency: form.tuitionAmount != null ? 'CNY' : null,
     summary: s(form.summary),
     imageMediaId: form.imageMediaId,
     featured: form.featured, hot: form.hot,
     status: form.status, publishStatus: form.publishStatus, remark: s(form.remark),
-    majors: form.majors.filter(m => m.name.trim()).map(m => ({ name: m.name.trim(), nameCn: s(m.nameCn ?? '') })),
+    majors: isDegree.value
+      ? form.majors.filter(m => m.name.trim()).map(m => ({
+          name: m.name.trim(), nameCn: s(m.nameCn ?? ''), departmentId: m.departmentId ?? null,
+          level: m.level ?? null,
+        }))
+      : [],
     intakes: form.intakes.filter(i => i.term).map(i => ({
       term: i.term, applicationOpen: i.applicationOpen || null, applicationClose: i.applicationClose || null,
     })),
@@ -123,11 +176,16 @@ function payload(): ProgramInput {
 
 async function save() {
   await formRef.value?.validate()
+  if (isDegree.value && !form.levels.length) {
+    ElMessage.warning(t('program.levelsRequired'))
+    return
+  }
   saving.value = true
   try {
     const saved = props.program
       ? await updateProgram(props.program.id, payload())
       : await createProgram(payload())
+    if (!props.program) await imageUp.value?.flush(saved.id)
     ElMessage.success(t('common.saved'))
     emit('update:modelValue', false)
     emit('saved', saved)
@@ -171,6 +229,7 @@ defineExpose({ form, save, rules })
             filterable
             :placeholder="t('program.universityPlaceholder')"
             style="width: 100%"
+            @change="onUniversityChange"
           >
             <el-option
               v-for="u in universities"
@@ -240,13 +299,23 @@ defineExpose({ form, save, rules })
             </el-select>
           </el-form-item>
         </div>
-        <div class="row">
-          <el-form-item :label="t('program.field')">
-            <el-input
-              v-model="form.field"
-              maxlength="120"
+        <el-form-item
+          v-if="isDegree"
+          :label="t('program.levels')"
+        >
+          <el-checkbox-group v-model="form.levels">
+            <el-checkbox
+              v-for="lv in DEGREE_LEVELS"
+              :key="lv"
+              :value="lv"
+              :label="t(`program.levelMap.${lv}`)"
             />
-          </el-form-item>
+          </el-checkbox-group>
+          <p class="fx-note">
+            {{ t('program.levelsHint') }}
+          </p>
+        </el-form-item>
+        <div class="row">
           <el-form-item :label="t('program.durationMonths')">
             <el-input-number
               v-model="form.durationMonths"
@@ -256,39 +325,91 @@ defineExpose({ form, save, rules })
               style="width: 100%"
             />
           </el-form-item>
+          <el-form-item
+            v-if="!isDegree"
+            :label="t('program.termLength')"
+          >
+            <el-select
+              v-model="form.termLength"
+              clearable
+              style="width: 100%"
+              :placeholder="t('program.termLengthPlaceholder')"
+            >
+              <el-option
+                v-for="tl in TERM_LENGTHS"
+                :key="tl"
+                :value="tl"
+                :label="t(`program.termLengthMap.${tl}`)"
+              />
+            </el-select>
+          </el-form-item>
         </div>
         <div class="row">
           <el-form-item
-            :label="t('program.tuitionAmount')"
+            :label="t('program.tuitionAmountRmb')"
             class="w-40"
           >
             <el-input-number
               v-model="form.tuitionAmount"
               :min="0"
               :precision="2"
+              :step="1000"
               controls-position="right"
               style="width: 100%"
             />
           </el-form-item>
-          <el-form-item :label="t('program.tuitionCurrency')">
-            <el-input
-              v-model="form.tuitionCurrency"
-              maxlength="3"
-              style="text-transform:uppercase"
-            />
+          <el-form-item :label="t('program.tuitionUsd')">
+            <span class="tuition-usd">{{ tuitionUsdPreview }}</span>
           </el-form-item>
         </div>
+        <p class="fx-note">
+          {{ t('program.tuitionFxNote') }}
+        </p>
       </FormSection>
 
       <FormSection
+        v-if="isDegree"
         :title="t('program.secMajors')"
         :description="t('program.majorsHint')"
       >
+        <p
+          v-if="!departments.length"
+          class="fx-note"
+        >
+          {{ form.universityId ? t('program.noDepartments') : t('program.pickUniversityFirst') }}
+        </p>
         <div
           v-for="(m, i) in form.majors"
           :key="i"
-          class="line"
+          class="line line--major"
         >
+          <el-select
+            v-model="m.level"
+            :placeholder="t('program.majorLevel')"
+            clearable
+            class="w-32"
+          >
+            <el-option
+              v-for="lv in form.levels"
+              :key="lv"
+              :value="lv"
+              :label="t(`program.levelMap.${lv}`)"
+            />
+          </el-select>
+          <el-select
+            v-model="m.departmentId"
+            :placeholder="t('program.majorDepartment')"
+            clearable
+            filterable
+            class="w-44"
+          >
+            <el-option
+              v-for="d in departments"
+              :key="d.id"
+              :value="d.id"
+              :label="d.name"
+            />
+          </el-select>
           <el-input
             v-model="m.name"
             :placeholder="t('program.majorName')"
@@ -308,7 +429,7 @@ defineExpose({ form, save, rules })
         </div>
         <el-button
           :icon="Plus"
-          @click="form.majors.push({ name: '', nameCn: null })"
+          @click="form.majors.push({ name: '', nameCn: null, departmentId: null, level: form.levels[0] ?? null })"
         >
           {{ t('program.addMajor') }}
         </el-button>
@@ -364,12 +485,13 @@ defineExpose({ form, save, rules })
       <FormSection :title="t('program.secImage')">
         <el-form-item :label="t('program.image')">
           <ImageUpload
+            ref="imageUp"
             v-model="form.imageMediaId"
             :action="`/api/staff/programs/${form.id}/image`"
+            :resolve-action="(id) => `/api/staff/programs/${id}/image`"
+            :deferred="!form.id"
             :preview-url="program?.imageUrl"
             aspect="wide"
-            :disabled="!form.id"
-            :disabled-hint="t('imageUpload.saveFirst')"
           />
         </el-form-item>
       </FormSection>
@@ -436,4 +558,7 @@ defineExpose({ form, save, rules })
 .row > .w-40 { flex: 0 0 10rem; min-width: 10rem; }
 .line { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .line > .w-44 { flex: 0 0 11rem; }
+.line > .w-32 { flex: 0 0 8rem; }
+.tuition-usd { color: var(--nad-ink-soft, #64748b); font-variant-numeric: tabular-nums; }
+.fx-note { margin: 4px 0 0; font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }
 </style>

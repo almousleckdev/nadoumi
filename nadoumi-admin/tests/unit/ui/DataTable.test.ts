@@ -41,12 +41,19 @@ describe('DataTable', () => {
     expect(w.findAllComponents({ name: 'ElTableColumn' }).length).toBe(columns.length)
   })
 
-  it('hides pagination when total <= pageSize and shows it otherwise', () => {
-    const few = mount(DataTable, { props: { columns, rows, total: 2, pageSize: 20 }, ...mountOpts() })
-    expect(few.findComponent({ name: 'ElPagination' }).exists()).toBe(false)
+  it('shows the shared pagination bar whenever there are rows, hides it when empty', () => {
+    // every list screen uses the same always-visible pager (with a page-size selector)
+    const withRows = mount(DataTable, { props: { columns, rows, total: 2, pageSize: 20 }, ...mountOpts() })
+    expect(withRows.findComponent({ name: 'ElPagination' }).exists()).toBe(true)
 
-    const many = mount(DataTable, { props: { columns, rows, total: 50, pageSize: 20 }, ...mountOpts() })
-    expect(many.findComponent({ name: 'ElPagination' }).exists()).toBe(true)
+    const empty = mount(DataTable, { props: { columns, rows: [], total: 0, pageSize: 20 }, ...mountOpts() })
+    expect(empty.findComponent({ name: 'ElPagination' }).exists()).toBe(false)
+  })
+
+  it('re-emits update:page-size from the pagination bar', () => {
+    const w = mount(DataTable, { props: { columns, rows, total: 50, pageSize: 20 }, ...mountOpts() })
+    w.findComponent({ name: 'ElPagination' }).vm.$emit('update:page-size', 50)
+    expect(w.emitted('update:page-size')?.[0]).toEqual([50])
   })
 
   it('emits row-click only when clickableRows is set', async () => {
