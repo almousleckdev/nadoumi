@@ -116,6 +116,8 @@ export interface UniversitySummary {
   province?: string | null
   type?: 'PUBLIC' | 'PRIVATE' | null
   featured?: boolean
+  /** Curated editorial flag — shown in the public Partners showcase. */
+  publicPartner?: boolean
   /** Legacy raw refs (may be relative `/profile/...` paths); kept for one release. */
   logoImageUrl?: string | null
   coverImageUrl?: string | null
@@ -168,13 +170,17 @@ export interface UniversityGalleryImage {
   caption?: string | null
 }
 
-export type ProgramType = 'LANGUAGE' | 'NON_DEGREE' | 'DIPLOMA' | 'BACHELOR' | 'MASTER' | 'PHD'
+export type ProgramType = 'DEGREE' | 'LANGUAGE' | 'NON_DEGREE'
+export type DegreeLevel = 'DIPLOMA' | 'BACHELOR' | 'MASTER' | 'PHD'
 export type ProgramLanguage = 'ENGLISH' | 'CHINESE' | 'BILINGUAL'
 
 export interface ProgramMajor {
   id: number
   name: string
   nameCn?: string | null
+  departmentName?: string | null
+  /** One of the programme's levels (DEGREE only). */
+  level?: DegreeLevel | null
 }
 
 export interface ProgramIntake {
@@ -194,11 +200,15 @@ export interface ProgramCard {
   name: string
   nameCn?: string | null
   programType: ProgramType
+  /** DEGREE only — levels the programme spans, DIPLOMA→PHD order. Empty for LANGUAGE / NON_DEGREE. */
+  levels: DegreeLevel[]
   field?: string | null
   teachingLanguage?: ProgramLanguage | null
   durationMonths?: number | null
   tuitionAmount?: number | null
   tuitionCurrency?: string | null
+  /** Server-computed from the editable CNY→USD rate; null unless tuition is in CNY. */
+  tuitionAmountUsd?: number | null
   summary?: string | null
   featured: boolean
   hot: boolean

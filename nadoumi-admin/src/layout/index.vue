@@ -11,11 +11,11 @@
 
     <aside class="shell__aside">
       <div class="shell__brand">
-        <span class="shell__brand-mark">N</span>
-        <span
-          v-show="!collapsed"
-          class="shell__brand-word"
-        >Nadoumi</span>
+        <img
+          class="shell__brand-logo"
+          src="/logo/logo.jpg"
+          alt="Nadoumi"
+        >
       </div>
       <Sidebar
         :collapsed="collapsed"
@@ -94,29 +94,32 @@ watch(collapsed, (v) => {
   border-right: 1px solid rgba(255, 255, 255, 0.04);
 }
 .shell__brand {
-  height: var(--nad-header-h);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 18px;
+  justify-content: center;
+  padding: 18px 16px;
   flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
-.shell__brand-mark {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  color: #fff;
-  background: linear-gradient(135deg, var(--nad-brand-500), var(--nad-brand-600));
-  flex-shrink: 0;
+.shell__brand-logo {
+  display: block;
+  height: 60px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #fff;
+  padding: 8px 14px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
-.shell__brand-word {
-  font-weight: 700;
-  font-size: 17px;
-  color: #fff;
-  letter-spacing: 0.2px;
+.shell--collapsed .shell__brand {
+  padding: 14px 8px;
+}
+.shell--collapsed .shell__brand-logo {
+  height: 44px;
+  width: 44px;
+  padding: 5px;
+  object-fit: contain;
 }
 .shell__body {
   display: flex;

@@ -72,7 +72,7 @@
     "story2": {
       "eyebrow": "One profile, every application",
       "title": "Built around your profile",
-      "body": "Add your details, education history and documents once. Nadoumi reuses them for every application, and each submission is kept as a historical record — later profile edits never rewrite it."
+      "body": "Add your details, education history and documents once. Nadoumi reuses them for every application, and each submission is kept as a historical record. Later profile edits never rewrite it."
     },
     "scholarshipDiscovery": {
       "eyebrow": "Scholarships",
@@ -98,7 +98,7 @@
     "journey": {
       "eyebrow": "How it works",
       "title": "Your journey with Nadoumi",
-      "description": "From your first application fee to your admission documents — here is what to expect.",
+      "description": "From your first application fee to your admission documents. Here is what to expect.",
       "s1t": "Pay the application fee",
       "s1b": "Start your application and settle the application fee to begin processing.",
       "s2t": "Primary review",
@@ -141,25 +141,25 @@
     "title": "The team that runs your study-abroad journey",
     "lead": "Nadoumi is an international education platform. We help students discover universities and scholarships, and we manage the application process end to end.",
     "whoTitle": "Who we are",
-    "whoBody": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle — profile, documents, submission, decisions and enrolment.",
+    "whoBody": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle: profile, documents, submission, decisions and enrolment.",
     "whoBody2": "An account holder can manage applications for more than one student, so parents, relatives and advisers can work alongside the student they support.",
     "missionTitle": "Our mission",
     "missionBody": "Make international study accessible: help students find opportunities that fit, and carry the operational load of applying so they can focus on their studies.",
     "visionTitle": "Our vision",
-    "visionBody": "A single trusted place where any student can discover, apply for and track an international education — with universities and partners on the other side of the same platform.",
+    "visionBody": "A single trusted place where any student can discover, apply for and track an international education, with universities and partners on the other side of the same platform.",
     "valuesTitle": "What we stand for",
     "v1t": "Clarity for students",
     "v1b": "Students see the information that matters to them. Internal partner and operational data never leaks into public views.",
     "v2t": "Historical accuracy",
     "v2b": "An application is a record of what was submitted, when. Later profile edits never rewrite a past submission.",
     "v3t": "No invented data",
-    "v3b": "Numbers, universities, scholarships and rankings are shown only when they come from real records — never mocked to fill space.",
+    "v3b": "Numbers, universities, scholarships and rankings are shown only when they come from real records. Never mocked to fill space.",
     "v4t": "One reusable profile",
     "v4b": "Enter your details once. Nadoumi reuses them across every application and keeps you in control of them.",
     "helpTitle": "How Nadoumi helps",
     "h1": "Build a reusable applicant profile with your details, education and documents.",
     "h2": "Discover universities, programmes and scholarships that fit your goals.",
-    "h3": "Apply for yourself or a student you represent — Nadoumi pre-fills what it knows.",
+    "h3": "Apply for yourself or a student you represent. Nadoumi pre-fills what it knows.",
     "h4": "Provide and track the documents each opportunity requires.",
     "h5": "Receive decisions, complete payments and prepare for enrolment.",
     "teamTitle": "The team behind Nadoumi",
@@ -172,7 +172,15 @@
     "hoursTitle": "Working hours",
     "hoursPending": "Working hours to be supplied by Nadoumi.",
     "ctaTitle": "Start your international education with Nadoumi",
-    "ctaBody": "Create a free profile and explore your options, or reach out with a question."
+    "ctaBody": "Create a free profile and explore your options, or reach out with a question.",
+    "team1name": "",
+    "team1role": "Founder & CEO",
+    "team2name": "",
+    "team2role": "Head of Partnerships",
+    "team3name": "",
+    "team3role": "Head of Student Success",
+    "team4name": "",
+    "team4role": "Software Engineer"
   },
   "contact": {
     "title": "Contact",
@@ -203,7 +211,7 @@
     "submit": "Send message",
     "sending": "Sending…",
     "successTitle": "Message sent",
-    "sent": "Thanks — we’ll be in touch.",
+    "sent": "Thanks, we’ll be in touch.",
     "errorTitle": "Message not sent",
     "errorBody": "Something went wrong sending your message. Please try again in a moment."
   },
@@ -283,7 +291,7 @@
       "attemptsLeft": "{n} attempts remaining",
       "verifying": "Verifying…",
       "resentNote": "A new code is on its way.",
-      "throttledNote": "We already sent a code — check your inbox and spam. You can request another shortly."
+      "throttledNote": "We already sent a code. Check your inbox and spam. You can request another shortly."
     },
     "reset": {
       "title": "Reset password",
@@ -408,7 +416,7 @@
     "loadSection": "This section could not be loaded. Please refresh."
   },
   "legal": {
-    "draftNote": "Draft — placeholder text pending legal review.",
+    "draftNote": "Draft. Placeholder text pending legal review.",
     "privacyTitle": "Privacy Policy",
     "privacyIntro": "This page explains what personal data Nadoumi collects and how it is used.",
     "privacyBody": "Nadoumi processes the information you provide to build your applicant profile and submit applications on your behalf. Data is stored securely and shared only with the universities and partners involved in your applications.",
@@ -430,7 +438,7 @@
     "legendRequired": "Required",
     "legendRecommended": "Recommended",
     "legendOptional": "Optional",
-    "comingSoon": "Coming soon — this section is shown for reference and is not saved yet.",
+    "comingSoon": "Coming soon. This section is shown for reference and is not saved yet.",
     "steps": {
       "personal": "Personal",
       "identity": "Identity",
@@ -459,7 +467,7 @@
     },
     "location": {
       "title": "Current location",
-      "blurb": "Where you are now — this affects visa and logistics guidance."
+      "blurb": "Where you are now. This affects visa and logistics guidance."
     },
     "contact": {
       "title": "Guardian / emergency contact",
@@ -546,12 +554,13 @@
     "language": "Teaching language",
     "majors": "Majors",
     "intakes": "Intakes",
-    "applyWindow": "{open} – {close}",
+    "applyWindow": "{open} to {close}",
     "applyFrom": "Opens {open}",
     "applyUntil": "Closes {close}",
     "sectionTitle": "Programmes",
     "sectionIntro": "Courses of study offered by this university, each with its intakes and majors.",
     "level": {
+      "DEGREE": "شهادة",
       "LANGUAGE": "Language",
       "NON_DEGREE": "Non-degree",
       "DIPLOMA": "Diploma",
@@ -570,7 +579,17 @@
       "SUMMER": "Summer",
       "WINTER": "Winter",
       "ROLLING": "Rolling"
-    }
+    },
+    "applyNow": "Apply for this programme",
+    "applyVia": "Applications for this programme are handled through {university}. Create a profile to start.",
+    "term": "Intake",
+    "opens": "Opens",
+    "closes": "Closes",
+    "rolling": "Rolling",
+    "noMajors": "Majors for this programme will be listed soon.",
+    "majorsIntro": "Fields of study you can specialise in within this programme.",
+    "tuitionNote": "Set by the university. The USD figure is indicative.",
+    "universityLabel": "University"
   },
   "scholarships": {
     "searchLabel": "Search scholarships",
@@ -583,7 +602,7 @@
     "anyFunding": "Any funding",
     "anyLanguage": "Any language",
     "withStipend": "With stipend",
-    "moreFilters": "More filters — level and category",
+    "moreFilters": "More filters: level and category",
     "fLevel": "Education level",
     "fCategory": "Category",
     "colRef": "Ref.",
@@ -611,7 +630,7 @@
     "eligibility": "Eligibility",
     "fees": "Fees",
     "documents": "Documents required",
-    "documentsNote": "Set by the scholarship — collected during the application.",
+    "documentsNote": "Set by the scholarship, collected during the application.",
     "stipend": "Stipend",
     "stipendDuration": "Paid for {n} months",
     "upfront": "Upfront fees",
@@ -723,6 +742,18 @@
       "gpa": "GPA",
       "inChina": "Currently in China",
       "nationality": "Nationality"
-    }
+    },
+    "deadlineLabel": "Application deadline",
+    "deadlineDays": "{n} days left",
+    "deadlineToday": "Closes today",
+    "deadlinePassed": "Deadline has passed",
+    "deadlineRolling": "Rolling admissions",
+    "free": "Included",
+    "colRoom": "Room type",
+    "colDetails": "Details",
+    "colPrice": "Price",
+    "colDoc": "Document",
+    "colRequirement": "Requirement",
+    "colNotes": "Notes"
   }
 }

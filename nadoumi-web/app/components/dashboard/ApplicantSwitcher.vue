@@ -4,7 +4,7 @@ const { applicants, activeApplicantId, setActiveApplicant } = useSession()
 </script>
 
 <template>
-  <NDropdown :label="`${t('dashboard.applicantLabel')} #${activeApplicantId ?? '—'}`">
+  <NDropdown :label="`${t('dashboard.applicantLabel')} #${activeApplicantId ?? ''}`">
     <button
       v-for="a in applicants"
       :key="a.applicantId"

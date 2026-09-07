@@ -8,7 +8,9 @@ withDefaults(defineProps<{
   body: string
   /** put the image on the left instead of the right */
   reverse?: boolean
-}>(), { eyebrow: undefined, reverse: false })
+  /** `image.src` is a bundled local asset, not an Unsplash path */
+  imageLocal?: boolean
+}>(), { eyebrow: undefined, reverse: false, imageLocal: false })
 </script>
 
 <template>
@@ -20,6 +22,7 @@ withDefaults(defineProps<{
       <MediaFigure
         :src="image.src"
         :alt="image.alt"
+        :local="imageLocal"
         ratio="4/3"
         rounded="2xl"
         sizes="(min-width: 1024px) 46vw, 100vw"

@@ -17,11 +17,14 @@ public record ProgramResponse(
         String slug,
         String nameCn,
         String programType,
+        List<String> levels,
         String field,
+        String termLength,
         String teachingLanguage,
         Integer durationMonths,
         BigDecimal tuitionAmount,
         String tuitionCurrency,
+        BigDecimal tuitionAmountUsd,
         String summary,
         Long imageMediaId,
         String imageUrl,
@@ -35,9 +38,9 @@ public record ProgramResponse(
         List<Major> majors,
         List<Intake> intakes) {
 
-    public record Major(Long id, String name, String nameCn) {
+    public record Major(Long id, String name, String nameCn, Long departmentId, String departmentName, String level) {
         static Major of(ProgramMajor m) {
-            return new Major(m.getId(), m.getName(), m.getNameCn());
+            return new Major(m.getId(), m.getName(), m.getNameCn(), m.getDepartmentId(), m.getDepartmentName(), m.getLevel());
         }
     }
 
@@ -48,17 +51,24 @@ public record ProgramResponse(
     }
 
     public static ProgramResponse of(Program p) {
-        return of(p, null);
+        return of(p, null, null);
     }
 
     public static ProgramResponse of(Program p, String imageUrl) {
+        return of(p, imageUrl, null);
+    }
+
+    /** {@code tuitionAmountUsd} is computed by the service from the editable FX rate. */
+    public static ProgramResponse of(Program p, String imageUrl, BigDecimal tuitionAmountUsd) {
         return new ProgramResponse(
                 p.getId(), p.getUniversityId(), p.getUniversityName(), p.getUniversitySlug(),
                 p.getName(), p.getSlug(), p.getNameCn(),
                 p.getProgramType() == null ? null : p.getProgramType().name(),
+                p.getLevels() == null ? java.util.List.of() : java.util.List.copyOf(p.getLevels()),
                 p.getField(),
+                p.getTermLength(),
                 p.getTeachingLanguage() == null ? null : p.getTeachingLanguage().name(),
-                p.getDurationMonths(), p.getTuitionAmount(), p.getTuitionCurrency(),
+                p.getDurationMonths(), p.getTuitionAmount(), p.getTuitionCurrency(), tuitionAmountUsd,
                 p.getSummary(), p.getImageMediaId(), imageUrl, p.isFeatured(), p.isHot(),
                 p.getStatus() == null ? null : p.getStatus().name(),
                 p.getPublishStatus() == null ? null : p.getPublishStatus().name(),

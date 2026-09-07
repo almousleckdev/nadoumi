@@ -41,7 +41,7 @@ const typeLabel = computed(() => {
         alt=""
         loading="lazy"
         decoding="async"
-        class="relative h-14 w-14 rounded-lg bg-white/90 object-contain p-1.5 ring-1 ring-white/40"
+        class="absolute bottom-2 right-2 h-12 w-12 rounded-lg bg-white/95 object-contain p-1 shadow-md ring-1 ring-white/40"
       >
       <span v-else class="relative font-display text-3xl font-bold text-white/95">{{ monogram }}</span>
       <span

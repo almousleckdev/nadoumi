@@ -5,19 +5,30 @@ import type { PublishStatus } from './university'
 
 export type { PublishStatus }
 export type ProgramStatus = 'ACTIVE' | 'INACTIVE'
-export type ProgramType = 'LANGUAGE' | 'NON_DEGREE' | 'DIPLOMA' | 'BACHELOR' | 'MASTER' | 'PHD'
+/** The kind of programme. DEGREE carries one or more levels + majors; LANGUAGE / NON_DEGREE carry a term length. */
+export type ProgramType = 'DEGREE' | 'LANGUAGE' | 'NON_DEGREE'
 export type ProgramTeachingLanguage = 'ENGLISH' | 'CHINESE' | 'BILINGUAL'
 
-export const PROGRAM_TYPES: ProgramType[] = [
-  'LANGUAGE', 'NON_DEGREE', 'DIPLOMA', 'BACHELOR', 'MASTER', 'PHD',
-]
+export const PROGRAM_TYPES: ProgramType[] = ['DEGREE', 'LANGUAGE', 'NON_DEGREE']
 export const PROGRAM_LANGUAGES: ProgramTeachingLanguage[] = ['ENGLISH', 'CHINESE', 'BILINGUAL']
 export const INTAKE_TERMS = ['SPRING_MARCH', 'AUTUMN_SEPTEMBER', 'SUMMER', 'WINTER', 'ROLLING']
+
+/** Academic levels a DEGREE programme can span; each major is tied to one of these. */
+export type DegreeLevel = 'DIPLOMA' | 'BACHELOR' | 'MASTER' | 'PHD'
+export const DEGREE_LEVELS: DegreeLevel[] = ['DIPLOMA', 'BACHELOR', 'MASTER', 'PHD']
+
+export type TermLength = 'ONE_SEMESTER' | 'ONE_YEAR'
+export const TERM_LENGTHS: TermLength[] = ['ONE_SEMESTER', 'ONE_YEAR']
+export const isDegree = (t: ProgramType) => t === 'DEGREE'
 
 export interface ProgramMajor {
   id?: number
   name: string
   nameCn: string | null
+  departmentId?: number | null
+  departmentName?: string | null
+  /** One of the programme's levels (DEGREE only); null otherwise. */
+  level?: DegreeLevel | null
 }
 
 export interface ProgramIntake {
@@ -35,11 +46,16 @@ export interface Program {
   name: string
   nameCn: string | null
   programType: ProgramType
+  /** DEGREE only — the levels the programme spans, in DIPLOMA→PHD order. */
+  levels: DegreeLevel[]
   field: string | null
+  termLength: TermLength | null
   teachingLanguage: ProgramTeachingLanguage | null
   durationMonths: number | null
   tuitionAmount: number | null
   tuitionCurrency: string | null
+  /** Computed on the server from the editable CNY→USD rate; null unless tuition is in CNY. */
+  tuitionAmountUsd: number | null
   summary: string | null
   featured: boolean
   hot: boolean
@@ -60,7 +76,9 @@ export interface ProgramInput {
   name: string
   nameCn?: string | null
   programType: ProgramType
+  levels?: DegreeLevel[]
   field?: string | null
+  termLength?: TermLength | null
   teachingLanguage?: ProgramTeachingLanguage | null
   durationMonths?: number | null
   tuitionAmount?: number | null

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import logoUrl from '~/assets/images/logo.jpg'
+
 const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
@@ -28,9 +30,8 @@ watch(() => route.fullPath, () => { open.value = false })
   <header class="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
     <NContainer>
       <div class="flex h-16 items-center justify-between gap-4">
-        <NuxtLink :to="localePath('/')" class="flex items-center gap-2 no-underline">
-          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 font-display text-base font-bold text-white">N</span>
-          <span class="site-brand font-display text-lg font-bold tracking-tight text-slate-900">Nadoumi</span>
+        <NuxtLink :to="localePath('/')" class="flex items-center no-underline" aria-label="Nadoumi">
+          <img :src="logoUrl" alt="Nadoumi" class="h-10 w-auto" width="160" height="40">
         </NuxtLink>
 
         <nav class="hidden items-center gap-7 md:flex" :aria-label="t('nav.aria')">

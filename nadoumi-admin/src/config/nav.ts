@@ -57,18 +57,22 @@ export const NAV: NavGroup[] = [
   {
     key: 'people',
     items: [
-      { key: 'employees', path: '/employees', icon: 'UserFilled', perm: 'nad:employee:view', status: 'planned' },
-      { key: 'roles', path: '/roles', icon: 'Lock', perm: 'system:role:list', status: 'planned' },
+      { key: 'employees', path: '/employees', icon: 'UserFilled', perm: 'nad:employee:list', status: 'implemented' },
+      { key: 'tasks', path: '/tasks', icon: 'Tickets', perm: 'nad:task:list', status: 'implemented' },
+      { key: 'students', path: '/students', icon: 'User', perm: 'system:user:list', status: 'implemented' },
+      { key: 'roles', path: '/roles', icon: 'Lock', perm: 'system:role:list', status: 'implemented' },
+      { key: 'departments', path: '/departments', icon: 'OfficeBuilding', perm: 'system:dept:list', status: 'implemented' },
+      { key: 'posts', path: '/posts', icon: 'Postcard', perm: 'system:post:list', status: 'implemented' },
     ],
   },
   {
     key: 'finance',
     items: [
+      { key: 'earnings', path: '/finance', icon: 'TrendCharts', perm: 'nad:finance:view', status: 'implemented' },
+      { key: 'revenue', path: '/revenue', icon: 'Money', perm: 'nad:revenue:list', status: 'implemented' },
+      { key: 'expenses', path: '/expenses', icon: 'Wallet', perm: 'nad:expense:list', status: 'implemented' },
+      { key: 'payroll', path: '/payroll', icon: 'Coin', perm: 'nad:payroll:view', status: 'implemented' },
       { key: 'payments', path: '/payments', icon: 'CreditCard', perm: 'nad:payment:view', status: 'planned' },
-      { key: 'invoices', path: '/invoices', icon: 'Document', perm: 'nad:payment:view', status: 'planned' },
-      { key: 'revenue', path: '/revenue', icon: 'Money', perm: 'nad:report:finance:view', status: 'planned' },
-      { key: 'expenses', path: '/expenses', icon: 'Wallet', perm: 'nad:report:finance:view', status: 'planned' },
-      { key: 'payroll', path: '/payroll', icon: 'Coin', perm: 'nad:payroll:view', status: 'planned' },
     ],
   },
   {
@@ -81,7 +85,7 @@ export const NAV: NavGroup[] = [
     key: 'communication',
     items: [
       { key: 'conversations', path: '/conversations', icon: 'ChatDotRound', perm: 'nad:conversation:view', status: 'planned' },
-      { key: 'notifications', path: '/notifications', icon: 'Bell', perm: 'nad:notification:view', status: 'planned' },
+      { key: 'notifications', path: '/notifications', icon: 'Bell', status: 'implemented' },
     ],
   },
   {
@@ -92,8 +96,12 @@ export const NAV: NavGroup[] = [
   {
     key: 'system',
     items: [
-      { key: 'configuration', path: '/system/config', icon: 'Setting', perm: 'system:config:list', status: 'planned' },
-      { key: 'audit', path: '/system/audit', icon: 'List', perm: 'monitor:operlog:list', status: 'planned' },
+      { key: 'menus', path: '/menus', icon: 'Menu', perm: 'system:menu:list', status: 'implemented' },
+      { key: 'dict', path: '/dict', icon: 'Collection', perm: 'system:dict:list', status: 'implemented' },
+      { key: 'configuration', path: '/config', icon: 'Setting', perm: 'system:config:list', status: 'implemented' },
+      { key: 'jobs', path: '/jobs', icon: 'Timer', perm: 'monitor:job:list', status: 'implemented' },
+      { key: 'audit', path: '/audit', icon: 'List', perm: 'monitor:operlog:list', status: 'implemented' },
+      { key: 'loginlog', path: '/loginlog', icon: 'Key', perm: 'monitor:logininfor:list', status: 'implemented' },
     ],
   },
 ]

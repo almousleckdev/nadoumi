@@ -18,6 +18,9 @@ public interface UniversityMapper {
      */
     List<University> search(UniversitySearch filter);
 
+    /** Highest {@code NAD-UNI-NNNN} sequence in use, for the next reference code. */
+    Integer maxReferenceSeq(@org.apache.ibatis.annotations.Param("prefix") String prefix);
+
     int insert(University university);
 
     int update(University university);

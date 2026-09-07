@@ -32,6 +32,14 @@ public class SysUser extends BaseEntity
     @Excel(name = "部门编号", type = Type.IMPORT)
     private Long deptId;
 
+    /**
+     * Nadoumi account class: {@code 00} = internal staff, {@code 10} = student.
+     * Additive to RuoYi — the {@code sys_user.user_type} column is created by the
+     * Nadoumi migrations (see {@code docs/DATABASE_DESIGN.md}). Kept nullable so
+     * stock RuoYi flows that never set it are unaffected.
+     */
+    private String userType;
+
     /** 用户账号 */
     @Excel(name = "登录名称")
     private String userName;
@@ -129,6 +137,16 @@ public class SysUser extends BaseEntity
     public void setDeptId(Long deptId)
     {
         this.deptId = deptId;
+    }
+
+    public String getUserType()
+    {
+        return userType;
+    }
+
+    public void setUserType(String userType)
+    {
+        this.userType = userType;
     }
 
     @Xss(message = "用户昵称不能包含脚本字符")

@@ -101,7 +101,7 @@ const fmt = (n: number) => nf.format(n)
 const total = computed(() => props.segments.reduce((s, x) => s + Math.max(0, x.value), 0))
 
 const centerValue = computed(() =>
-  props.centerValue ?? (total.value > 0 ? fmt(total.value) : '—'))
+  props.centerValue ?? (total.value > 0 ? fmt(total.value) : ''))
 const centerCaption = computed(() => props.centerCaption ?? '')
 
 const arcs = computed(() => {

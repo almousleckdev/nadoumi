@@ -39,6 +39,8 @@ public record PublicUniversityResponse(
         String bannerUrl,
         boolean recommended,
         boolean featured,
+        /** Curated editorial flag — this university is shown in the public Partners showcase. */
+        boolean publicPartner,
         List<UniversityResponse.Ranking> rankings,
         List<UniversityResponse.Highlight> highlights,
         List<UniversityResponse.GalleryImage> gallery) {
@@ -61,7 +63,7 @@ public record PublicUniversityResponse(
                 full.logoDocumentId(), full.bannerDocumentId(),
                 full.logoImageUrl(), full.coverImageUrl(),
                 full.logoMediaId(), full.logoUrl(), full.bannerMediaId(), full.bannerUrl(),
-                full.recommended(), full.featured(),
+                full.recommended(), full.featured(), full.publicPartner(),
                 full.rankings(), full.highlights(), full.gallery());
     }
 }

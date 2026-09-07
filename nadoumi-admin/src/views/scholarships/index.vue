@@ -77,11 +77,12 @@
       :empty-title="t('scholarship.emptyTitle')"
       :empty-description="t('scholarship.emptyDesc')"
       @update:page="(p: number) => { query.page = p; reload() }"
+      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
       @retry="reload"
       @row-click="(row) => router.push(`/scholarships/${row.view.id}`)"
     >
       <template #cell-referenceCode="{ row }">
-        <span class="s-ref">{{ (row as Scholarship).view.referenceCode || '—' }}</span>
+        <span class="s-ref">{{ (row as Scholarship).view.referenceCode || '' }}</span>
       </template>
       <template #cell-title="{ row }">
         <div class="s-title">
@@ -113,10 +114,10 @@
         {{ t(`scholarship.funding.${(row as Scholarship).view.fundingModel}`) }}
       </template>
       <template #cell-levels="{ row }">
-        {{ (row as Scholarship).view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '—' }}
+        {{ (row as Scholarship).view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '' }}
       </template>
       <template #cell-categories="{ row }">
-        {{ (row as Scholarship).view.categories.join(', ') || '—' }}
+        {{ (row as Scholarship).view.categories.join(', ') || '' }}
       </template>
       <template #cell-publishStatus="{ row }">
         <StatusBadge

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.notification.mapper.NotificationTemplateMapper">
+
+    <resultMap id="template" type="com.nadoumi.notification.domain.NotificationTemplate">
+        <id     property="id"         column="id"/>
+        <result property="type"       column="type"/>
+        <result property="channel"    column="channel"/>
+        <result property="locale"     column="locale"/>
+        <result property="subjectTpl" column="subject_tpl"/>
+        <result property="bodyTpl"    column="body_tpl"/>
+        <result property="createBy"   column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy"   column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, type, channel, locale, subject_tpl, body_tpl,
+        create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="find" resultMap="template">
+        select <include refid="cols"/> from nad_notification_template
+        where type = #{type} and channel = #{channel} and locale = #{locale}
+    </select>
+
+    <select id="findAll" resultMap="template">
+        select <include refid="cols"/> from nad_notification_template
+        order by type, channel, locale
+    </select>
+
+    <select id="findById" resultMap="template">
+        select <include refid="cols"/> from nad_notification_template where id = #{id}
+    </select>
+
+    <update id="update" parameterType="com.nadoumi.notification.domain.NotificationTemplate">
+        update nad_notification_template
+        set subject_tpl = #{subjectTpl}, body_tpl = #{bodyTpl},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+</mapper>

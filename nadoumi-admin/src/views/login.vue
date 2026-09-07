@@ -115,14 +115,23 @@ onMounted(loadCaptcha)
 
 <style scoped>
 .login {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
-  background: linear-gradient(160deg, #0b5fff 0%, #1f2a44 100%);
+  background: #1f2a44 url('/logo/background.png') center / cover no-repeat;
+}
+.login::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(11, 95, 255, 0.55) 0%, rgba(31, 42, 68, 0.82) 100%);
 }
 .login__card {
+  position: relative;
   width: 360px;
+  backdrop-filter: blur(2px);
 }
 .login__title {
   margin: 0 0 4px;

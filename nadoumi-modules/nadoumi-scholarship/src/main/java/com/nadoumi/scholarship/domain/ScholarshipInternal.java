@@ -6,6 +6,6 @@ package com.nadoumi.scholarship.domain;
  * student code path; only {@code nad:scholarship:internal:*} holders.
  */
 public record ScholarshipInternal(
-        Long universityId, Long partnershipId, String internalStatus,
+        Long universityId, Long programId, Long partnershipId, String internalStatus,
         String operationalNotes, String confidentialTerms, String commissionModelJson) {
 }

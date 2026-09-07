@@ -18,6 +18,8 @@ public class University {
     private String name;
     private String nameCn;
     private String slug;
+    private String referenceCode;
+    private String partnerStatus;
     private String country;
     private UniversityType type;
     private String city;
@@ -43,6 +45,7 @@ public class University {
     private Long bannerMediaId;
     private boolean recommended;
     private boolean featured;
+    private boolean publicPartner;
     private UniversityStatus status;
     private PublishStatus publishStatus;
     private String createBy;
@@ -66,6 +69,12 @@ public class University {
 
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
+
+    public String getReferenceCode() { return referenceCode; }
+    public void setReferenceCode(String referenceCode) { this.referenceCode = referenceCode; }
+
+    public String getPartnerStatus() { return partnerStatus; }
+    public void setPartnerStatus(String partnerStatus) { this.partnerStatus = partnerStatus; }
 
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }
@@ -141,6 +150,9 @@ public class University {
 
     public boolean isFeatured() { return featured; }
     public void setFeatured(boolean featured) { this.featured = featured; }
+
+    public boolean isPublicPartner() { return publicPartner; }
+    public void setPublicPartner(boolean publicPartner) { this.publicPartner = publicPartner; }
 
     public UniversityStatus getStatus() { return status; }
     public void setStatus(UniversityStatus status) { this.status = status; }

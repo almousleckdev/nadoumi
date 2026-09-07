@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.nadoumi</groupId>
+        <artifactId>nadoumi-modules</artifactId>
+        <version>3.9.2</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>nadoumi-hr</artifactId>
+    <packaging>jar</packaging>
+
+    <description>
+        Workforce / people-ops slice: nad_employee (HR records for staff accounts)
+        and nad_task / nad_task_event (task assignment + progress tracking with an
+        append-only event log). Task progress emits a domain event into the outbox
+        so the creator, assignee and admins are notified.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-identity</artifactId>
+        </dependency>
+
+        <!-- RuoYi: SecurityUtils, @Log, page helpers, ISysUserService for staff accounts -->
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-system</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

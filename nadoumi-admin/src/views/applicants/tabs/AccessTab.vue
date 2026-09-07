@@ -71,7 +71,7 @@
         min-width="240"
       >
         <template #default="{ row }">
-          <span class="caps">{{ row.effectiveCapabilities.join(', ') || '—' }}</span>
+          <span class="caps">{{ row.effectiveCapabilities.join(', ') || '' }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -99,7 +99,7 @@ function titleCase(s: string) {
   return s ? s.charAt(0) + s.slice(1).toLowerCase() : s
 }
 function fmtDate(v: string | null): string {
-  return v ? new Date(v).toLocaleDateString() : '—'
+  return v ? new Date(v).toLocaleDateString() : ''
 }
 </script>
 

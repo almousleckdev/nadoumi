@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(26);
+        assertThat(applied).isEqualTo(50);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -194,6 +194,139 @@ class FlywayMigrationsIT {
                 + "WHERE invoke_target = 'mediaReconciliationJob.run()'")).isEqualTo("1");
         assertThat(single(ds, "SELECT status FROM sys_job "
                 + "WHERE invoke_target = 'mediaReconciliationJob.run()'")).isEqualTo("1");
+        // V30 — transactional outbox
+        assertThat(tableExists(ds, "nad_outbox_event")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_outbox_event' AND column_name IN ('type','payload_json','next_attempt_at')"))
+                .isEqualTo("3");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics "
+                + "WHERE table_schema = DATABASE() AND table_name = 'nad_outbox_event' "
+                + "AND index_name = 'idx_outbox_ready'")).isEqualTo("1");
+        // V31 — outbox poller Quartz job, seeded active
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
+                + "WHERE invoke_target = 'outboxPollerJob.run()'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT status FROM sys_job "
+                + "WHERE invoke_target = 'outboxPollerJob.run()'")).isEqualTo("0");
+        // V32 — notification model
+        assertThat(tableExists(ds, "nad_notification")).isTrue();
+        assertThat(tableExists(ds, "nad_notification_delivery")).isTrue();
+        assertThat(tableExists(ds, "nad_notification_preference")).isTrue();
+        assertThat(tableExists(ds, "nad_notification_template")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics "
+                + "WHERE table_schema = DATABASE() AND table_name = 'nad_notification_delivery' "
+                + "AND index_name = 'uk_notif_delivery_channel'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_notification' AND column_name = 'source_ref'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics "
+                + "WHERE table_schema = DATABASE() AND table_name = 'nad_notification' "
+                + "AND index_name = 'uk_notif_source'")).isEqualTo("1");
+        // V33 — notification menu/permissions + default en templates
+        // one C-menu (perms nad:notification:list) + three F-menus
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:notification:%'")).isEqualTo("4");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:notification:%'")).isEqualTo("4");
+        // 4 from V33 + 2 from V37 (TASK_PROGRESS) + 4 from V51 (UNIVERSITY/PROGRAM published)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("12");
+        // V34 — notification dispatch Quartz job, seeded active
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
+                + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT status FROM sys_job "
+                + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("0");
+        // V35 — employee (HR) records
+        assertThat(tableExists(ds, "nad_employee")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_employee' AND column_name IN ('salary_amount','start_date','position_id')"))
+                .isEqualTo("3");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT index_name) FROM information_schema.statistics "
+                + "WHERE table_schema = DATABASE() AND table_name = 'nad_employee' "
+                + "AND index_name = 'uk_employee_user'")).isEqualTo("1");
+        // V36 — tasks + append-only event log
+        assertThat(tableExists(ds, "nad_task")).isTrue();
+        assertThat(tableExists(ds, "nad_task_event")).isTrue();
+        // V37 — HR menu/permissions + TASK_PROGRESS templates
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:employee:%'")).isEqualTo("6");
+        // 6 from V37 + nad:task:progress from V49
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:task:%'")).isEqualTo("7");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND (m.perms LIKE 'nad:employee:%' OR m.perms LIKE 'nad:task:%')")).isEqualTo("13");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE type = 'TASK_PROGRESS'")).isEqualTo("2");
+        // V38 — finance
+        assertThat(tableExists(ds, "nad_expense")).isTrue();
+        assertThat(tableExists(ds, "nad_revenue")).isTrue();
+        assertThat(tableExists(ds, "nad_expense_category")).isTrue();
+        // V39 — categories + finance menu/permissions
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_expense_category")).isEqualTo("9");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:expense:%'")).isEqualTo("6");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:revenue:%'")).isEqualTo("5");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND (m.perms LIKE 'nad:finance:%' OR m.perms LIKE 'nad:expense:%' "
+                + "OR m.perms LIKE 'nad:revenue:%')")).isEqualTo("12");
+
+        // V40 — editable CNY->USD display rate
+        assertThat(single(ds, "SELECT config_value FROM sys_config WHERE config_key = 'nadoumi.fx.cny_usd'"))
+                .isEqualTo("0.1381");
+        // V41 — confidential scholarship -> programme link
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_scholarship_internal' AND column_name = 'program_id'")).isEqualTo("1");
+        // V42 — baseline "staff" role for rank-and-file employees (re-scoped by V49)
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key = 'staff'")).isEqualTo("1");
+        // V49 revoked staff's system:post:* / system:role:list / system:dept:* / nad:task:add|edit
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "JOIN sys_role r ON r.role_id = rm.role_id "
+                + "WHERE r.role_key = 'staff' AND m.perms LIKE 'system:post:%'")).isEqualTo("0");
+        // V43 — academic departments + programme term length
+        assertThat(tableExists(ds, "nad_department")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_program_major' AND column_name = 'department_id'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_program' AND column_name = 'term_length'")).isEqualTo("1");
+        // V44 — nad:department:* perms under the Universities menu
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:department:%'")).isEqualTo("4");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:department:%'")).isEqualTo("4");
+        // V45 — read-only payroll menu + perm
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms = 'nad:payroll:view'")).isEqualTo("1");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE rm.role_id = 3 AND m.perms = 'nad:payroll:view'")).isEqualTo("1");
+        // V46 — university reference code + internal partner flag
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_university' AND column_name IN ('reference_code','partner_status')"))
+                .isEqualTo("2");
+        // V47 — structured employee emergency contact
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_employee' AND column_name IN "
+                + "('emergency_contact_relationship','emergency_contact_phone','emergency_contact_email')")).isEqualTo("3");
+        // V48 — multi-level programmes
+        assertThat(tableExists(ds, "nad_program_level")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_program_major' AND column_name = 'level'")).isEqualTo("1");
+        // V49 — staff role re-scoped: new nad:task:progress perm; staff keeps only task view + progress
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms = 'nad:task:progress'")).isEqualTo("1");
+        // still denied after V49/V50: role admin, adding depts/posts, editing/creating tasks
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_role r ON r.role_id = rm.role_id "
+                + "JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE r.role_key = 'staff' AND m.perms IN "
+                + "('system:role:list','system:dept:add','system:dept:edit','system:dept:remove','system:post:list',"
+                + "'nad:task:add','nad:task:edit','nad:university:remove','nad:program:remove','nad:scholarship:remove',"
+                + "'nad:applicant:edit','nad:applicant:archive','nad:scholarship:publish')")).isEqualTo("0");
+        // V50 — staff can now read the catalog and add / edit (not delete) universities / programmes / scholarships
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_role r ON r.role_id = rm.role_id "
+                + "JOIN sys_menu m ON m.menu_id = rm.menu_id "
+                + "WHERE r.role_key = 'staff' AND m.perms IN "
+                + "('nad:applicant:list','nad:university:list','nad:university:create','nad:university:edit',"
+                + "'nad:program:create','nad:scholarship:create','system:user:list','system:dept:list')")).isEqualTo("8");
+        // V51 — catalog-published notification templates
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template "
+                + "WHERE type IN ('UNIVERSITY_PUBLISHED','PROGRAM_PUBLISHED')")).isEqualTo("4");
+        // V52 — public Partners showcase flag (separate from the confidential partner_status)
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_university' AND column_name = 'public_partner'")).isEqualTo("1");
+        // V53 — scholarship deadline reminders (table + 2 templates + daily Quartz job)
+        assertThat(tableExists(ds, "nad_scholarship_deadline_reminder")).isTrue();
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template "
+                + "WHERE type = 'SCHOLARSHIP_DEADLINE_REMINDER'")).isEqualTo("2");
+        assertThat(single(ds, "SELECT status FROM sys_job "
+                + "WHERE invoke_target = 'scholarshipDeadlineReminderJob.run()'")).isEqualTo("0");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -223,7 +356,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(25); // V2..V29
+        assertThat(applied).isEqualTo(49); // V2..V53
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

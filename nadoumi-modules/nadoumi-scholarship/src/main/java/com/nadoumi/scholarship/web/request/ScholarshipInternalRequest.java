@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
  */
 public record ScholarshipInternalRequest(
         Long universityId,
+        Long programId,
         Long partnershipId,
         @Size(max = 24) String internalStatus,
         @Size(max = 20000) String operationalNotes,

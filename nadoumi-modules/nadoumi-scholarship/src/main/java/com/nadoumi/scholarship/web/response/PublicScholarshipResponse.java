@@ -15,7 +15,7 @@ import java.util.List;
  * List rows leave the detail-only fields null.
  *
  * <p>Every monetary value is presented in both RMB and USD. The stored figure is
- * kept as-is; the other side is computed at a fixed display rate ({@link #RMB_PER_USD}),
+ * kept as-is; the other side is computed at a fixed display rate (seeded from the editable {@code nadoumi.fx.cny_usd} setting),
  * rounded to whole currency units. This is a display convenience, not an FX quote.
  */
 public record PublicScholarshipResponse(
@@ -66,7 +66,19 @@ public record PublicScholarshipResponse(
         List<DocumentRequirement> documentRequirements) {
 
     /** Fixed display rate — CNY per USD. Keep in sync with the admin's guidance. */
-    static final BigDecimal RMB_PER_USD = new BigDecimal("7.10");
+    /**
+     * CNY per USD for the display-only conversion. Seeded from the editable
+     * {@code nadoumi.fx.cny_usd} setting at startup (see {@code ScholarshipFxInitializer});
+     * a rate change takes effect on the next restart.
+     */
+    private static volatile BigDecimal rmbPerUsd = new BigDecimal("7.10");
+
+    /** Called once at boot from the editable FX rate. */
+    public static void setRmbPerUsd(BigDecimal value) {
+        if (value != null && value.signum() > 0) {
+            rmbPerUsd = value;
+        }
+    }
 
     public record Money(BigDecimal amountRmb, BigDecimal amountUsd, String currency) {
         static Money of(BigDecimal amount, String currency) {
@@ -183,7 +195,7 @@ public record PublicScholarshipResponse(
             return null;
         }
         return "USD".equals(currency)
-                ? amount.multiply(RMB_PER_USD).setScale(0, RoundingMode.HALF_UP)
+                ? amount.multiply(rmbPerUsd).setScale(0, RoundingMode.HALF_UP)
                 : amount.setScale(0, RoundingMode.HALF_UP);
     }
 
@@ -193,6 +205,6 @@ public record PublicScholarshipResponse(
         }
         return "USD".equals(currency)
                 ? amount.setScale(0, RoundingMode.HALF_UP)
-                : amount.divide(RMB_PER_USD, 0, RoundingMode.HALF_UP);
+                : amount.divide(rmbPerUsd, 0, RoundingMode.HALF_UP);
     }
 }

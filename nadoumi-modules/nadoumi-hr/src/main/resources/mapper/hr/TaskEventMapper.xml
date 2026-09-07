@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.hr.mapper.TaskEventMapper">
+
+    <resultMap id="taskEvent" type="com.nadoumi.hr.domain.TaskEvent">
+        <id     property="id"          column="id"/>
+        <result property="taskId"      column="task_id"/>
+        <result property="eventType"   column="event_type"/>
+        <result property="fromStatus"  column="from_status"/>
+        <result property="toStatus"    column="to_status"/>
+        <result property="actorUserId" column="actor_user_id"/>
+        <result property="note"        column="note"/>
+        <result property="createdAt"   column="created_at"/>
+        <result property="actorName"   column="actor_name"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.nadoumi.hr.domain.TaskEvent" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_task_event
+            (task_id, event_type, from_status, to_status, actor_user_id, note, created_at)
+        values
+            (#{taskId}, #{eventType}, #{fromStatus}, #{toStatus}, #{actorUserId}, #{note}, now())
+    </insert>
+
+    <select id="findByTask" resultMap="taskEvent">
+        select ev.id, ev.task_id, ev.event_type, ev.from_status, ev.to_status,
+               ev.actor_user_id, ev.note, ev.created_at, su.nick_name as actor_name
+        from nad_task_event ev
+        left join sys_user su on su.user_id = ev.actor_user_id
+        where ev.task_id = #{taskId}
+        order by ev.id asc
+    </select>
+
+</mapper>

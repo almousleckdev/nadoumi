@@ -27,7 +27,8 @@ class UniversityServiceTest {
 
     private final UniversityMapper mapper = mock(UniversityMapper.class);
     private final MediaGateway media = mock(MediaGateway.class);
-    private final UniversityService service = new UniversityService(mapper, media);
+    private final com.nadoumi.common.outbox.OutboxWriter outbox = mock(com.nadoumi.common.outbox.OutboxWriter.class);
+    private final UniversityService service = new UniversityService(mapper, media, outbox);
 
     private static UniversityRequest req(String name, String country,
             List<UniversityRequest.RankingInput> rankings,
@@ -36,7 +37,7 @@ class UniversityServiceTest {
                 name, "清华大学", country, UniversityType.PUBLIC, "Beijing", "Beijing",
                 (short) 1911, 50_000, 6_000, 3_000, "https://x.edu", "T1",
                 "intro", "history", "campus", "accommodation", "nearby",
-                "adm@x.edu", "+86 10 0000", null, null, null, null, true, false,
+                "adm@x.edu", "+86 10 0000", null, null, null, null, true, false, true, "PARTNER",
                 UniversityStatus.ACTIVE, PublishStatus.DRAFT, "note",
                 rankings, highlights, List.of());
     }
@@ -53,7 +54,7 @@ class UniversityServiceTest {
                 base.website(), base.rankingTier(), base.introduction(), base.history(), base.campusInfo(),
                 base.accommodationInfo(), base.nearbyInfo(), base.admissionsEmail(), base.officePhone(),
                 base.logoImageUrl(), base.coverImageUrl(), logoMediaId, null, base.recommended(),
-                base.featured(), base.status(), base.publishStatus(), base.remark(),
+                base.featured(), base.publicPartner(), base.partnerStatus(), base.status(), base.publishStatus(), base.remark(),
                 base.rankings(), base.highlights(), base.gallery());
     }
 

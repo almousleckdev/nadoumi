@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.hr.mapper.TaskMapper">
+
+    <resultMap id="task" type="com.nadoumi.hr.domain.Task">
+        <id     property="id"                column="id"/>
+        <result property="title"             column="title"/>
+        <result property="description"       column="description"/>
+        <result property="priority"          column="priority"/>
+        <result property="status"            column="status"/>
+        <result property="assigneeUserId"    column="assignee_user_id"/>
+        <result property="createdByUserId"   column="created_by_user_id"/>
+        <result property="dueDate"           column="due_date"/>
+        <result property="startedAt"         column="started_at"/>
+        <result property="completedAt"       column="completed_at"/>
+        <result property="approvedByUserId"  column="approved_by_user_id"/>
+        <result property="approvedAt"        column="approved_at"/>
+        <result property="relatedType"       column="related_type"/>
+        <result property="relatedId"         column="related_id"/>
+        <result property="createBy"          column="create_by"/>
+        <result property="createTime"        column="create_time"/>
+        <result property="updateBy"          column="update_by"/>
+        <result property="updateTime"        column="update_time"/>
+        <result property="assigneeName"      column="a_name"/>
+        <result property="createdByName"     column="c_name"/>
+        <result property="approvedByName"    column="p_name"/>
+    </resultMap>
+
+    <sql id="cols">
+        t.id, t.title, t.description, t.priority, t.status, t.assignee_user_id, t.created_by_user_id,
+        t.due_date, t.started_at, t.completed_at, t.approved_by_user_id, t.approved_at,
+        t.related_type, t.related_id, t.create_by, t.create_time, t.update_by, t.update_time,
+        a.nick_name as a_name, c.nick_name as c_name, p.nick_name as p_name
+    </sql>
+
+    <sql id="joins">
+        from nad_task t
+        left join sys_user a on a.user_id = t.assignee_user_id
+        left join sys_user c on c.user_id = t.created_by_user_id
+        left join sys_user p on p.user_id = t.approved_by_user_id
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.hr.domain.Task" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_task
+            (title, description, priority, status, assignee_user_id, created_by_user_id,
+             due_date, started_at, completed_at, approved_by_user_id, approved_at,
+             related_type, related_id, create_by, create_time)
+        values
+            (#{title}, #{description}, #{priority}, #{status}, #{assigneeUserId}, #{createdByUserId},
+             #{dueDate}, #{startedAt}, #{completedAt}, #{approvedByUserId}, #{approvedAt},
+             #{relatedType}, #{relatedId}, #{createBy}, now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.hr.domain.Task">
+        update nad_task set
+            title = #{title}, description = #{description}, priority = #{priority}, status = #{status},
+            assignee_user_id = #{assigneeUserId}, due_date = #{dueDate},
+            started_at = #{startedAt}, completed_at = #{completedAt},
+            approved_by_user_id = #{approvedByUserId}, approved_at = #{approvedAt},
+            related_type = #{relatedType}, related_id = #{relatedId},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <select id="findById" resultMap="task">
+        select <include refid="cols"/> <include refid="joins"/> where t.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from nad_task where id = #{id}
+    </delete>
+
+    <select id="search" resultMap="task">
+        select <include refid="cols"/> <include refid="joins"/>
+        <where>
+            <if test="q != null and q != ''"> and t.title like concat('%', #{q}, '%') </if>
+            <if test="status != null and status != ''"> and t.status = #{status} </if>
+            <if test="priority != null and priority != ''"> and t.priority = #{priority} </if>
+            <if test="assigneeUserId != null"> and t.assignee_user_id = #{assigneeUserId} </if>
+            <if test="createdByUserId != null"> and t.created_by_user_id = #{createdByUserId} </if>
+            <if test="ownedByUserId != null">
+                and (t.assignee_user_id = #{ownedByUserId} or t.created_by_user_id = #{ownedByUserId})
+            </if>
+        </where>
+        order by
+            field(t.status, 'IN_PROGRESS', 'PENDING', 'COMPLETED', 'APPROVED', 'CANCELLED'),
+            field(t.priority, 'HIGH', 'MEDIUM', 'LOW'),
+            (t.due_date is null), t.due_date asc, t.id desc
+    </select>
+
+</mapper>

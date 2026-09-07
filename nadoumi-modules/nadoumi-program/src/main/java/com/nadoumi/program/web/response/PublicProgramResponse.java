@@ -20,11 +20,14 @@ public record PublicProgramResponse(
         String slug,
         String nameCn,
         String programType,
+        List<String> levels,
         String field,
+        String termLength,
         String teachingLanguage,
         Integer durationMonths,
         BigDecimal tuitionAmount,
         String tuitionCurrency,
+        BigDecimal tuitionAmountUsd,
         String summary,
         Long imageMediaId,
         String imageUrl,
@@ -34,30 +37,41 @@ public record PublicProgramResponse(
         List<ProgramResponse.Intake> intakes) {
 
     public static PublicProgramResponse card(Program p) {
-        return build(p, false, null);
+        return build(p, false, null, null);
     }
 
     public static PublicProgramResponse detail(Program p) {
-        return build(p, true, null);
+        return build(p, true, null, null);
     }
 
     /** The service resolves {@code imageUrl} from {@code image_media_id} via the MediaGateway. */
     public static PublicProgramResponse card(Program p, String imageUrl) {
-        return build(p, false, imageUrl);
+        return build(p, false, imageUrl, null);
     }
 
     /** The service resolves {@code imageUrl} from {@code image_media_id} via the MediaGateway. */
     public static PublicProgramResponse detail(Program p, String imageUrl) {
-        return build(p, true, imageUrl);
+        return build(p, true, imageUrl, null);
     }
 
-    private static PublicProgramResponse build(Program p, boolean detail, String imageUrl) {
-        ProgramResponse full = ProgramResponse.of(p, imageUrl);
+    /** {@code tuitionAmountUsd} is computed by the service from the editable FX rate. */
+    public static PublicProgramResponse card(Program p, String imageUrl, BigDecimal tuitionAmountUsd) {
+        return build(p, false, imageUrl, tuitionAmountUsd);
+    }
+
+    /** {@code tuitionAmountUsd} is computed by the service from the editable FX rate. */
+    public static PublicProgramResponse detail(Program p, String imageUrl, BigDecimal tuitionAmountUsd) {
+        return build(p, true, imageUrl, tuitionAmountUsd);
+    }
+
+    private static PublicProgramResponse build(Program p, boolean detail, String imageUrl,
+            BigDecimal tuitionAmountUsd) {
+        ProgramResponse full = ProgramResponse.of(p, imageUrl, tuitionAmountUsd);
         return new PublicProgramResponse(
                 full.id(), full.universityId(), full.universityName(), full.universitySlug(),
-                full.name(), full.slug(), full.nameCn(), full.programType(), full.field(),
-                full.teachingLanguage(), full.durationMonths(),
-                full.tuitionAmount(), full.tuitionCurrency(), full.summary(),
+                full.name(), full.slug(), full.nameCn(), full.programType(), full.levels(), full.field(),
+                full.termLength(), full.teachingLanguage(), full.durationMonths(),
+                full.tuitionAmount(), full.tuitionCurrency(), full.tuitionAmountUsd(), full.summary(),
                 full.imageMediaId(), full.imageUrl(),
                 full.featured(), full.hot(),
                 detail ? full.majors() : null,

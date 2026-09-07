@@ -26,11 +26,18 @@
     <div class="topbar__spacer" />
 
     <button
-      class="topbar__locale"
+      class="topbar__icon-btn"
       type="button"
-      @click="toggleLocale"
+      :aria-label="t('notifications.mine')"
+      @click="goNotifications"
     >
-      {{ locale === 'en' ? '中文' : 'EN' }}
+      <el-badge
+        :value="unread"
+        :hidden="unread === 0"
+        :max="99"
+      >
+        <el-icon><Bell /></el-icon>
+      </el-badge>
     </button>
 
     <el-dropdown
@@ -41,7 +48,16 @@
         class="topbar__user"
         type="button"
       >
-        <span class="topbar__avatar">{{ initial }}</span>
+        <img
+          v-if="userStore.avatar"
+          :src="userStore.avatar"
+          class="topbar__avatar topbar__avatar--img"
+          alt=""
+        >
+        <span
+          v-else
+          class="topbar__avatar"
+        >{{ initial }}</span>
         <span class="topbar__name">{{ userStore.nickName || userStore.name }}</span>
         <el-icon class="topbar__caret">
           <ArrowDown />
@@ -71,19 +87,46 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
-import { setLocale } from '@/lang'
+import { myUnreadCount } from '@/api/notification'
+import { useConfirm } from '@/composables/useConfirm'
 
 defineProps<{ collapsed?: boolean }>()
 const emit = defineEmits<{ 'toggle-collapse': []; 'toggle-mobile': [] }>()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const { confirm } = useConfirm()
+
+const unread = ref(0)
+const POLL_MS = 60_000
+let timer: ReturnType<typeof setInterval> | undefined
+
+async function refreshUnread() {
+  try {
+    unread.value = (await myUnreadCount()).count
+  }
+  catch {
+    /* silent — the bell is non-critical */
+  }
+}
+function goNotifications() {
+  router.push('/notifications')
+  unread.value = 0
+}
+
+onMounted(() => {
+  refreshUnread()
+  timer = setInterval(refreshUnread, POLL_MS)
+})
+onBeforeUnmount(() => {
+  if (timer) clearInterval(timer)
+})
 
 const pageTitle = computed(() => {
   const m = route.meta as { title?: string, i18n?: boolean }
@@ -94,15 +137,16 @@ const pageTitle = computed(() => {
 const initial = computed(() =>
   (userStore.nickName || userStore.name || '?').trim().charAt(0).toUpperCase())
 
-function toggleLocale() {
-  setLocale(locale.value === 'en' ? 'zh' : 'en')
-}
-
 async function onCommand(cmd: string) {
   if (cmd === 'profile') {
     router.push('/profile')
   }
   else if (cmd === 'logout') {
+    if (!(await confirm({
+      title: t('nav.logoutTitle'),
+      message: t('nav.logoutConfirm'),
+      confirmText: t('common.signOut'),
+    }))) return
     await userStore.logout()
     router.push('/login')
   }
@@ -145,22 +189,6 @@ async function onCommand(cmd: string) {
 .topbar__spacer {
   flex: 1;
 }
-.topbar__locale {
-  border: 1px solid var(--nad-line);
-  background: var(--nad-surface);
-  color: var(--nad-ink-soft);
-  border-radius: 8px;
-  height: 32px;
-  padding: 0 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 0.14s ease, color 0.14s ease;
-}
-.topbar__locale:hover {
-  border-color: var(--nad-brand-300);
-  color: var(--nad-brand-700);
-}
 .topbar__user {
   display: flex;
   align-items: center;
@@ -185,6 +213,10 @@ async function onCommand(cmd: string) {
   font-weight: 700;
   color: #fff;
   background: linear-gradient(135deg, var(--nad-brand-500), var(--nad-brand-600));
+}
+.topbar__avatar--img {
+  object-fit: cover;
+  background: none;
 }
 .topbar__name {
   font-size: 14px;

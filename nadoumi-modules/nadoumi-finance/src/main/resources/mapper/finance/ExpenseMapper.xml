@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.finance.mapper.ExpenseMapper">
+
+    <resultMap id="expense" type="com.nadoumi.finance.domain.Expense">
+        <id     property="id"              column="id"/>
+        <result property="receiptNo"       column="receipt_no"/>
+        <result property="categoryId"      column="category_id"/>
+        <result property="title"           column="title"/>
+        <result property="description"     column="description"/>
+        <result property="amount"          column="amount"/>
+        <result property="currency"        column="currency"/>
+        <result property="spentOn"         column="spent_on"/>
+        <result property="vendor"          column="vendor"/>
+        <result property="paymentMethod"   column="payment_method"/>
+        <result property="status"          column="status"/>
+        <result property="submittedBy"     column="submitted_by"/>
+        <result property="approvedBy"      column="approved_by"/>
+        <result property="approvedAt"      column="approved_at"/>
+        <result property="paidAt"          column="paid_at"/>
+        <result property="notes"           column="notes"/>
+        <result property="createBy"        column="create_by"/>
+        <result property="createTime"      column="create_time"/>
+        <result property="updateBy"        column="update_by"/>
+        <result property="updateTime"      column="update_time"/>
+        <result property="categoryName"    column="cat_name"/>
+        <result property="submittedByName" column="sub_name"/>
+        <result property="approvedByName"  column="app_name"/>
+    </resultMap>
+
+    <sql id="cols">
+        e.id, e.receipt_no, e.category_id, e.title, e.description, e.amount, e.currency, e.spent_on,
+        e.vendor, e.payment_method, e.status, e.submitted_by, e.approved_by, e.approved_at, e.paid_at,
+        e.notes, e.create_by, e.create_time, e.update_by, e.update_time,
+        c.name as cat_name, s.nick_name as sub_name, a.nick_name as app_name
+    </sql>
+    <sql id="joins">
+        from nad_expense e
+        left join nad_expense_category c on c.id = e.category_id
+        left join sys_user s on s.user_id = e.submitted_by
+        left join sys_user a on a.user_id = e.approved_by
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.finance.domain.Expense" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_expense
+            (receipt_no, category_id, title, description, amount, currency, spent_on, vendor,
+             payment_method, status, submitted_by, approved_by, approved_at, paid_at, notes,
+             create_by, create_time)
+        values
+            (#{receiptNo}, #{categoryId}, #{title}, #{description}, #{amount}, #{currency}, #{spentOn}, #{vendor},
+             #{paymentMethod}, #{status}, #{submittedBy}, #{approvedBy}, #{approvedAt}, #{paidAt}, #{notes},
+             #{createBy}, now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.finance.domain.Expense">
+        update nad_expense set
+            receipt_no = #{receiptNo}, category_id = #{categoryId}, title = #{title},
+            description = #{description}, amount = #{amount}, currency = #{currency}, spent_on = #{spentOn},
+            vendor = #{vendor}, payment_method = #{paymentMethod}, status = #{status},
+            approved_by = #{approvedBy}, approved_at = #{approvedAt}, paid_at = #{paidAt}, notes = #{notes},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <select id="findById" resultMap="expense">
+        select <include refid="cols"/> <include refid="joins"/> where e.id = #{id}
+    </select>
+
+    <delete id="deleteById">
+        delete from nad_expense where id = #{id}
+    </delete>
+
+    <select id="search" resultMap="expense">
+        select <include refid="cols"/> <include refid="joins"/>
+        <where>
+            <if test="q != null and q != ''"> and (e.title like concat('%', #{q}, '%') or e.vendor like concat('%', #{q}, '%') or e.receipt_no like concat('%', #{q}, '%')) </if>
+            <if test="status != null and status != ''"> and e.status = #{status} </if>
+            <if test="categoryId != null"> and e.category_id = #{categoryId} </if>
+            <if test="from != null"> and e.spent_on &gt;= #{from} </if>
+            <if test="to != null"> and e.spent_on &lt;= #{to} </if>
+        </where>
+        order by e.spent_on desc, e.id desc
+    </select>
+
+    <select id="maxReceiptSeq" resultType="java.lang.Integer">
+        select max(cast(substring_index(receipt_no, '-', -1) as unsigned))
+        from nad_expense where receipt_no like concat(#{prefix}, '%')
+    </select>
+
+    <select id="totalsByCurrency" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select currency, sum(amount) as total, count(*) as count
+        from nad_expense
+        where status in ('APPROVED', 'PAID')
+        <if test="from != null"> and spent_on &gt;= #{from} </if>
+        <if test="to != null"> and spent_on &lt;= #{to} </if>
+        group by currency
+    </select>
+
+    <select id="totalsByCategory" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select coalesce(c.name, 'Uncategorised') as bucket, e.currency as currency,
+               sum(e.amount) as total, count(*) as count
+        from nad_expense e left join nad_expense_category c on c.id = e.category_id
+        where e.status in ('APPROVED', 'PAID')
+        <if test="from != null"> and e.spent_on &gt;= #{from} </if>
+        <if test="to != null"> and e.spent_on &lt;= #{to} </if>
+        group by bucket, e.currency
+        order by total desc
+    </select>
+
+    <select id="listCategories" resultType="com.nadoumi.finance.domain.ExpenseCategory">
+        select id, code, name, sort_order as sortOrder, active
+        from nad_expense_category where active = 1 order by sort_order, name
+    </select>
+
+    <select id="findCategoryIdByName" resultType="java.lang.Long">
+        select id from nad_expense_category where lower(name) = lower(#{name}) limit 1
+    </select>
+
+    <insert id="insertCategory" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_expense_category (code, name, sort_order, active)
+        values (#{code}, #{name}, coalesce((select s.m from (select max(sort_order) + 1 as m
+                from nad_expense_category) s), 100), 1)
+    </insert>
+
+</mapper>

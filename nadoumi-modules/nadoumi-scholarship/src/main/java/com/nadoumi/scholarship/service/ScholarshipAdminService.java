@@ -7,6 +7,8 @@ import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
 import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.MediaUploadResult;
+import com.nadoumi.common.outbox.OutboxEventTypes;
+import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
@@ -49,12 +51,14 @@ public class ScholarshipAdminService {
     private final ScholarshipMapper mapper;
     private final UniversityService universityService;
     private final MediaGateway media;
+    private final OutboxWriter outboxWriter;
 
     public ScholarshipAdminService(ScholarshipMapper mapper, UniversityService universityService,
-            MediaGateway media) {
+            MediaGateway media, OutboxWriter outboxWriter) {
         this.mapper = mapper;
         this.universityService = universityService;
         this.media = media;
+        this.outboxWriter = outboxWriter;
     }
 
     @Transactional(readOnly = true)
@@ -76,31 +80,55 @@ public class ScholarshipAdminService {
         apply(s, req);
         s.setSlug(uniqueSlug(req.title(), null));
         s.setCreateBy(currentUser());
-        if (req.publishStatus() == PublishStatus.PUBLISHED) {
+        boolean publishing = req.publishStatus() == PublishStatus.PUBLISHED;
+        if (publishing) {
             s.setPublishedAt(java.time.LocalDateTime.now());
             assignReferenceCode(s);
         }
         mapper.insert(s);
         replaceChildren(s.getId(), req);
+        if (publishing) {
+            emitPublished(s);
+        }
         return get(s.getId());
     }
 
     @Transactional
     public ScholarshipResponse update(Long id, ScholarshipRequest req) {
         Scholarship existing = load(id);
+        boolean wasPublished = existing.getPublishStatus() == PublishStatus.PUBLISHED;
         apply(existing, req);
         existing.setId(id);
         existing.setSlug(uniqueSlug(req.title(), id));
-        if (req.publishStatus() == PublishStatus.PUBLISHED) {
+        boolean publishing = req.publishStatus() == PublishStatus.PUBLISHED;
+        if (publishing) {
             assignReferenceCode(existing);
         }
         existing.setUpdateBy(currentUser());
         mapper.update(existing);
-        if (req.publishStatus() == PublishStatus.PUBLISHED) {
+        if (publishing) {
             mapper.markPublished(id);
         }
         replaceChildren(id, req);
+        if (publishing && !wasPublished) {
+            emitPublished(existing);
+        }
         return get(id);
+    }
+
+    /**
+     * Write {@code ScholarshipPublished} to the outbox in this transaction — the
+     * notification pipeline picks it up. Payload is safe scalars only; the
+     * confidential linkage never leaves the aggregate.
+     */
+    private void emitPublished(Scholarship s) {
+        com.alibaba.fastjson2.JSONObject payload = new com.alibaba.fastjson2.JSONObject();
+        payload.put("scholarshipId", s.getId());
+        payload.put("scholarshipTitle", s.getTitle());
+        payload.put("scholarshipSlug", s.getSlug() == null ? "" : s.getSlug());
+        payload.put("scholarshipReference", s.getReferenceCode() == null ? "" : s.getReferenceCode());
+        outboxWriter.write("scholarship", s.getId(),
+                OutboxEventTypes.SCHOLARSHIP_PUBLISHED, payload.toJSONString());
     }
 
     @Transactional
@@ -175,7 +203,7 @@ public class ScholarshipAdminService {
             universityService.get(req.universityId()); // 404 if it does not exist
         }
         mapper.upsertInternal(scholarshipId, new ScholarshipInternal(
-                req.universityId(), req.partnershipId(),
+                req.universityId(), req.programId(), req.partnershipId(),
                 req.internalStatus() == null ? "DRAFT" : req.internalStatus(),
                 req.operationalNotes(), req.confidentialTerms(), req.commissionModelJson()), currentUser());
         return getInternal(scholarshipId);

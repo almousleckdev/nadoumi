@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.notification.mapper.NotificationPreferenceMapper">
+
+    <resultMap id="preference" type="com.nadoumi.notification.domain.NotificationPreference">
+        <id     property="id"      column="id"/>
+        <result property="userId"  column="user_id"/>
+        <result property="type"    column="type"/>
+        <result property="channel" column="channel"/>
+        <result property="enabled" column="enabled"/>
+    </resultMap>
+
+    <select id="findEnabled" resultType="java.lang.Boolean">
+        select enabled from nad_notification_preference
+        where user_id = #{userId} and type = #{type} and channel = #{channel}
+    </select>
+
+    <select id="findByUser" resultMap="preference">
+        select id, user_id, type, channel, enabled from nad_notification_preference
+        where user_id = #{userId}
+        order by type, channel
+    </select>
+
+    <insert id="upsert">
+        insert into nad_notification_preference (user_id, type, channel, enabled)
+        values (#{userId}, #{type}, #{channel}, #{enabled})
+        on duplicate key update enabled = values(enabled)
+    </insert>
+
+</mapper>

@@ -6,7 +6,8 @@ export default defineEventHandler(async (event) => {
   if (!token) {
     throw createError({ statusCode: 401, statusMessage: 'Not signed in' })
   }
-  const target = `${backendBaseUrl(event)}/api/student/${path}`
+  const search = getRequestURL(event).search
+  const target = `${backendBaseUrl(event)}/api/student/${path}${search}`
   return proxyRequest(event, target, {
     headers: { authorization: `Bearer ${token}` },
   })

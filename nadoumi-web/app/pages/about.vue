@@ -1,9 +1,22 @@
 <script setup lang="ts">
 import { imagery } from '~/data/imagery'
+import whoImage from '~/assets/images/ceo.jpeg'
+import helpImage from '~/assets/images/apply.png'
+import ceoPhoto from '~/assets/team/ceo.jpeg'
+import team6Photo from '~/assets/team/team6.jpg'
+import femmePhoto from '~/assets/team/femme.jpg'
+import engineerPhoto from '~/assets/team/atalibag.jpeg'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
 useSeo(t('about.title'), t('about.lead'))
+
+const team = computed(() => [
+  { photo: ceoPhoto, name: t('about.team1name'), role: t('about.team1role') },
+  { photo: team6Photo, name: t('about.team2name'), role: t('about.team2role') },
+  { photo: femmePhoto, name: t('about.team3name'), role: t('about.team3role') },
+  { photo: engineerPhoto, name: t('about.team4name'), role: t('about.team4role') },
+])
 
 const values = computed(() => [
   { title: t('about.v1t'), body: t('about.v1b') },
@@ -45,7 +58,7 @@ const help = computed(() => [
           <p class="mt-3 leading-7 text-slate-700">{{ t('about.whoBody') }}</p>
           <p class="mt-3 leading-7 text-slate-700">{{ t('about.whoBody2') }}</p>
         </div>
-        <MediaFigure :src="imagery.advising.src" :alt="imagery.advising.alt" ratio="4/3" rounded="2xl" sizes="(min-width:1024px) 46vw, 100vw" />
+        <MediaFigure :src="whoImage" :alt="t('about.whoTitle')" local ratio="4/5" position="top" rounded="2xl" class="mx-auto w-full max-w-sm lg:max-w-none" />
       </section>
 
       <!-- mission + vision -->
@@ -73,7 +86,7 @@ const help = computed(() => [
 
       <!-- how we help -->
       <section class="grid gap-10 border-t border-slate-200 py-14 lg:grid-cols-2 lg:gap-16">
-        <MediaFigure :src="imagery.storyCollaboration.src" :alt="imagery.storyCollaboration.alt" ratio="4/3" rounded="2xl" sizes="(min-width:1024px) 46vw, 100vw" />
+        <MediaFigure :src="helpImage" :alt="t('about.helpTitle')" local ratio="4/3" rounded="2xl" />
         <div class="max-w-lg">
           <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.helpTitle') }}</h2>
           <ol class="mt-4 space-y-3">
@@ -85,16 +98,31 @@ const help = computed(() => [
         </div>
       </section>
 
-      <!-- team (content to be supplied) -->
+      <!-- team -->
       <section class="border-t border-slate-200 py-14">
         <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.teamTitle') }}</h2>
         <p class="mt-2 max-w-xl text-slate-600">{{ t('about.teamIntro') }}</p>
-        <div class="mt-6 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
-          <p class="flex items-center gap-2 text-sm font-medium text-slate-500">
-            <span class="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
-            {{ t('about.teamPending') }}
-          </p>
-        </div>
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <li
+            v-for="m in team"
+            :key="m.role"
+            class="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow hover:shadow-md"
+          >
+            <div class="aspect-square overflow-hidden bg-slate-100">
+              <img
+                :src="m.photo"
+                :alt="m.name || m.role"
+                loading="lazy"
+                decoding="async"
+                class="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-[1.03]"
+              >
+            </div>
+            <div class="p-4">
+              <p v-if="m.name" class="font-display text-base font-semibold text-slate-900">{{ m.name }}</p>
+              <p class="text-sm text-brand-700">{{ m.role }}</p>
+            </div>
+          </li>
+        </ul>
       </section>
 
       <!-- contact / location (details to be supplied) -->

@@ -116,7 +116,7 @@ const tabs = computed<Tab[]>(() => {
 })
 
 function fmtDate(v: string | null): string {
-  if (!v) return '—'
+  if (!v) return ''
   const d = new Date(v.replace(' ', 'T'))
   return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString()
 }

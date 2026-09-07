@@ -88,10 +88,25 @@ in the nadoumi-web build**.
 | Universities — list + detail + CRUD | **IMPLEMENTED** | `nadoumi-university` module, `nad_university` + full profile depth (V10) + `nad_university_ranking` / `nad_university_highlight` / `nad_university_gallery` (V18, ≤ 6 campus-life / dormitory / campus-view images with captions) + `logo_media_id` / `banner_media_id` (V27, **Cloudinary — supersedes the V21 `logo_image_url` / `cover_image_url` fallback**), `/api/staff/universities` (+ public `/api/public/universities`), `nad:university:list/view/create/edit/remove`. Unique `(name, country)`. Sectioned drawer (Identity / Profile / About / Highlights / Rankings / Logo & cover / Gallery / Publication); logo + cover + gallery images are **uploaded via the shared `ImageUpload` component, now `multipart/form-data` to `POST /api/staff/universities/{id}/logo|banner|gallery`** (§2.4), binding the returned `mediaId`. Detail page renders every section + a `publish_status` badge. |
 | Scholarships — list + create/edit + detail | **IMPLEMENTED** | `nadoumi-scholarship` module (V16 / V17 + images V21 + config depth V22 + terms V23 + reference code V25). Sectioned drawer (Identity / Classification / Intakes / Eligibility / Fees / **Stipend by level** / **Accommodation** / **What the award covers** / **Application & terms** / Documents / Content [+ renewal] / Media / Publication); slug auto-derived (no field); `reference_code` `NAC-<year>-NNNN` assigned on first publish, shown in the list + detail; category options filter by funding model (SELF none; PARTIAL excludes CSC/CGS/Type A–D); NON_DEGREE shows a Half-year / One-year duration; stipend is one row per accepted level; accommodation is repeatable room types with price + amenity note; every amount shows as **¥ · $** on the detail page. Hero + cover images uploaded via `ImageUpload` → `POST /api/staff/scholarships/{id}/hero|cover` (§2.4, Cloudinary `hero_media_id`/`cover_media_id`, V27, supersedes the V21 URL fallback). Confidential university/partnership linkage sub-form behind `nad:scholarship:internal:view` / `:edit`. `nad:scholarship:list/view/create/edit/remove/publish`. |
 | Programmes — list + create/edit + on-university management | **IMPLEMENTED** | `nadoumi-program` module (V19 DDL + V20 menu/perm seed). A programme belongs to exactly one university; the owning university is validated / resolved through `UniversityService`. `/programs` flat list (search + university / level / status filters) + `ProgramDrawer` (Identity / Classification / Majors / Intakes / Publication); the University detail screen carries a Programmes table + inline add/edit with the university locked. `nad:program:list/view/create/edit/remove`. `image_media_id` (V27, P1) — a **new capability**, programmes had no image field before — uploaded via `ImageUpload` → `POST /api/staff/programs/{id}/image`. |
-| Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend. |
-| Partnerships / Employees / Roles & Permissions | **PLANNED** — Phase D | |
-| Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | |
-| Marketing-CMS / Communication / Notifications / Reports / System-Audit | **PLANNED** — Phase F | |
+| My profile | **IMPLEMENTED** (2026-09-06) | `views/profile.vue` — avatar upload, editable display name / phone / email / gender, password change. `GET/PUT /system/user/profile`, `POST /system/user/profile/avatar`, `PUT /system/user/profile/updatePwd`. Was password-only before. |
+| Employees (HR) | **IMPLEMENTED** (2026-09-06) | `views/employees/index.vue` + `EmployeeDrawer.vue` at `/employees` — the staff account **and** the employment record in one flow: position (`sys_post`), title, department, reports-to, employment type/status, start / probation / end dates, salary + currency + pay frequency (section hidden unless `nad:employee:compensation:view`), work location, emergency contact, notes, roles. Backend `nadoumi-hr` module — `nad_employee` (V35), `/api/staff/employees` (`nad:employee:*`). The old `/staff` account-only screen is kept as a hidden route. |
+| Tasks | **IMPLEMENTED** (2026-09-06) | `views/tasks/index.vue` + `TaskDrawer.vue` at `/tasks` — create/assign, filter by status/priority/mine, a detail drawer with the activity timeline and status-transition buttons. Lifecycle `PENDING → IN_PROGRESS → COMPLETED → APPROVED` (approve needs `nad:task:approve`); `CANCELLED` from any live state. Priority colours per spec: LOW = orange, MEDIUM = blue, HIGH = green. Every change writes `nad_task_event` and emits `TaskProgressChanged` → the creator, assignee and task admins are notified (in-app + email). Backend `nadoumi-hr` — `nad_task` / `nad_task_event` (V36), `/api/staff/tasks` (`nad:task:*`). |
+| Students | **IMPLEMENTED** (2026-09-06) | `views/users/index.vue` at `/students` (`meta.userType='10'`). List + create/edit drawer + delete + reset-password + status toggle. Serves RuoYi `/system/user/*` filtered by `user_type` (additive `userType` filter on `SysUserMapper` + field on `SysUser`, see `DATABASE_DESIGN.md`). |
+| Pagination | **IMPLEMENTED** (2026-09-06) | Shared `components/ui/Pagination.vue` — `total, sizes, prev, pager, next, jumper` with page-size options `[10, 20, 50, 100, 150, 200]`; retrofitted onto every paged list screen. |
+| Roles | **IMPLEMENTED** (2026-09-06) | `views/roles/index.vue` — CRUD + status toggle + permission (menu-tree) assignment + data scope. `/system/role/*` + `/system/menu/roleMenuTreeselect`. Built-in roles are read-only in the UI. |
+| Menus & Permissions | **IMPLEMENTED** (2026-09-06) | `views/menus/index.vue` — tree table + drawer (directory / menu / button), parent picker, `perms` token editor. `/system/menu/*`. |
+| Departments | **IMPLEMENTED** (2026-09-06) | `views/departments/index.vue` — tree table + drawer. `/system/dept/*`. |
+| Posts | **IMPLEMENTED** (2026-09-06) | `views/posts/index.vue` — list + drawer. `/system/post/*`. |
+| Dictionaries | **IMPLEMENTED** (2026-09-06) | `views/dict/index.vue` — split pane: types on the left, the selected type's entries on the right, both with CRUD drawers. `/system/dict/type/*` + `/system/dict/data/*`. |
+| Configuration | **IMPLEMENTED** (2026-09-06) | `views/config/index.vue` — list + drawer + "refresh cache". `/system/config/*`. Built-in parameters cannot be deleted. |
+| Scheduled jobs | **IMPLEMENTED** (2026-09-06) | `views/jobs/index.vue` — list + drawer (cron / invoke-target / misfire / concurrency), status toggle, run-once, delete. `/monitor/job/*`. Surfaces the outbox poller, notification dispatch and media reconciliation jobs. |
+| Operation logs | **IMPLEMENTED** (2026-09-06) | `views/logs/operlog.vue` — read-only table + detail dialog + clear-all. `/monitor/operlog/*`. |
+| Sign-in logs | **IMPLEMENTED** (2026-09-06) | `views/logs/logininfor.vue` — read-only table + clear-all. `/monitor/logininfor/*`. |
+| Notifications | **IMPLEMENTED** (2026-09-06) | `views/notifications/index.vue` — staff oversight of `GET /api/staff/notifications` (+ `/{id}` with per-channel delivery status), filter by type. Personal feed via the navbar bell (polls `GET /api/notifications/unread-count`, links to `/notifications`). |
+| Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend (Step 6). |
+| Partnerships | **PLANNED** — Phase D | No backend. |
+| Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | Greenfield modules (`nadoumi-payment` + `nadoumi-finance`, Step 9) — backend does not exist. |
+| Marketing-CMS / Communication / Reports / online-users / cache / server monitor | **PLANNED** — Phase F | |
 
 The rest of this section is the **full planned scope** — planned architecture,
 delivered incrementally on `nadoumi-admin/`.
@@ -154,14 +169,14 @@ Approved group order (`nav.groups`):
 | --- | --- |
 | _(top)_ | Dashboard → **implemented** |
 | Operations | Applicants → **implemented** · Applications · Documents |
-| Education | Universities · Programs · Scholarships |
+| Education | Universities → **implemented** · Programs → **implemented** · Scholarships → **implemented** |
 | _(top)_ | Partnerships |
-| People | Employees · Roles & Permissions |
+| People | Staff → **implemented** · Students → **implemented** · Roles → **implemented** · Menus & Permissions → **implemented** · Departments → **implemented** · Posts → **implemented** |
 | Finance | Payments · Invoices · Revenue · Expenses · Payroll |
 | Growth | Marketing / CMS |
-| Communication | Conversations · Notifications |
+| Communication | Conversations · Notifications → **implemented** |
 | _(top)_ | Reports & Analytics |
-| System | Configuration · Audit Logs |
+| System | Dictionaries → **implemented** · Configuration → **implemented** · Scheduled Jobs → **implemented** · Operation Logs → **implemented** · Sign-in Logs → **implemented** |
 
 Everything not marked **implemented** is **PLANNED** and absent from the running
 sidebar. A status report lists a Nadoumi screen as delivered only when it has a

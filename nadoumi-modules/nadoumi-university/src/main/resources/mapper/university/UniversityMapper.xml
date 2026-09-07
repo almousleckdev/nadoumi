@@ -6,6 +6,8 @@
         <id     property="id"                    column="id"/>
         <result property="name"                  column="name"/>
         <result property="slug"                  column="slug"/>
+        <result property="referenceCode"         column="reference_code"/>
+        <result property="partnerStatus"         column="partner_status"/>
         <result property="nameCn"                column="name_cn"/>
         <result property="country"               column="country"/>
         <result property="type"                  column="type"/>
@@ -32,6 +34,7 @@
         <result property="bannerMediaId"         column="banner_media_id"/>
         <result property="recommended"           column="is_recommended"/>
         <result property="featured"              column="is_featured"/>
+        <result property="publicPartner"         column="public_partner"/>
         <result property="status"                column="status"/>
         <result property="publishStatus"         column="publish_status"/>
         <result property="createBy"              column="create_by"/>
@@ -42,12 +45,12 @@
     </resultMap>
 
     <sql id="cols">
-        id, name, name_cn, slug, country, type, city, province, founded_year,
+        id, name, name_cn, slug, reference_code, partner_status, country, type, city, province, founded_year,
         total_students, international_students, faculty_count, website, ranking_tier,
         introduction, history, campus_info, accommodation_info, nearby_info,
         admissions_email, office_phone, logo_document_id, banner_document_id,
         logo_image_url, cover_image_url, logo_media_id, banner_media_id,
-        is_recommended, is_featured, status, publish_status,
+        is_recommended, is_featured, public_partner, status, publish_status,
         create_by, create_time, update_by, update_time, remark
     </sql>
 
@@ -69,6 +72,7 @@
             <if test="type != null">and type = #{type}</if>
             <if test="featured != null">and is_featured = #{featured}</if>
             <if test="recommended != null">and is_recommended = #{recommended}</if>
+            <if test="publicPartner != null">and public_partner = #{publicPartner}</if>
             <if test="status != null">and status = #{status}</if>
             <if test="publishStatus != null">and publish_status = #{publishStatus}</if>
         </where>
@@ -83,27 +87,33 @@
         select id from nad_university where slug = #{slug} limit 1
     </select>
 
+    <select id="maxReferenceSeq" resultType="java.lang.Integer">
+        select max(cast(substring(reference_code, char_length(#{prefix}) + 1) as unsigned))
+        from nad_university where reference_code like concat(#{prefix}, '%')
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.university.domain.University"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_university
-            (name, name_cn, slug, country, type, city, province, founded_year,
+            (name, name_cn, slug, reference_code, partner_status, country, type, city, province, founded_year,
              total_students, international_students, faculty_count, website, ranking_tier,
              introduction, history, campus_info, accommodation_info, nearby_info,
              admissions_email, office_phone, logo_document_id, banner_document_id,
              logo_image_url, cover_image_url, logo_media_id, banner_media_id,
-             is_recommended, is_featured, status, publish_status, create_by, create_time, remark)
+             is_recommended, is_featured, public_partner, status, publish_status, create_by, create_time, remark)
         values
-            (#{name}, #{nameCn}, #{slug}, #{country}, #{type}, #{city}, #{province}, #{foundedYear},
+            (#{name}, #{nameCn}, #{slug}, #{referenceCode}, #{partnerStatus}, #{country}, #{type}, #{city}, #{province}, #{foundedYear},
              #{totalStudents}, #{internationalStudents}, #{facultyCount}, #{website}, #{rankingTier},
              #{introduction}, #{history}, #{campusInfo}, #{accommodationInfo}, #{nearbyInfo},
              #{admissionsEmail}, #{officePhone}, #{logoDocumentId}, #{bannerDocumentId},
              #{logoImageUrl}, #{coverImageUrl}, #{logoMediaId}, #{bannerMediaId},
-             #{recommended}, #{featured}, #{status}, #{publishStatus}, #{createBy}, now(), #{remark})
+             #{recommended}, #{featured}, #{publicPartner}, #{status}, #{publishStatus}, #{createBy}, now(), #{remark})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.university.domain.University">
         update nad_university set
-            name = #{name}, name_cn = #{nameCn}, slug = #{slug}, country = #{country}, type = #{type},
+            name = #{name}, name_cn = #{nameCn}, slug = #{slug}, partner_status = #{partnerStatus},
+            country = #{country}, type = #{type},
             city = #{city}, province = #{province}, founded_year = #{foundedYear},
             total_students = #{totalStudents}, international_students = #{internationalStudents},
             faculty_count = #{facultyCount}, website = #{website}, ranking_tier = #{rankingTier},
@@ -113,7 +123,7 @@
             logo_document_id = #{logoDocumentId}, banner_document_id = #{bannerDocumentId},
             logo_image_url = #{logoImageUrl}, cover_image_url = #{coverImageUrl},
             logo_media_id = #{logoMediaId}, banner_media_id = #{bannerMediaId},
-            is_recommended = #{recommended}, is_featured = #{featured},
+            is_recommended = #{recommended}, is_featured = #{featured}, public_partner = #{publicPartner},
             status = #{status}, publish_status = #{publishStatus},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}

@@ -26,6 +26,39 @@ Two separate concerns (CLAUDE.md §12): **Chat** (people ↔ people) vs **Notifi
 - Reusable: `AsyncManager` / `AsyncFactory` / `ThreadPoolConfig`; Redis (pub/sub
   available); Quartz (JDBC store to be enabled — Phase 2).
 
+### 1a. Notifications — EXISTING (Step 5, slices 1–3 + 5)
+
+`nadoumi-notification` module. **What is built:**
+
+- **Transactional outbox** — `nad_outbox_event` (`V30`). Producers append via the
+  `com.nadoumi.common.outbox.OutboxWriter` SPI **inside their own transaction**
+  (`Propagation.MANDATORY`). `OutboxPollerJob` (Quartz `sys_job`, active, 15s —
+  `V31`) drains PENDING rows, hands each to `OutboxToNotificationDispatcher`,
+  marks `DONE`, or retries with backoff and parks `FAILED` after 10 attempts.
+- **Model** — `nad_notification` (+ `source_ref` idempotency key,
+  `ON DELETE CASCADE` to `sys_user`) / `nad_notification_delivery`
+  (unique `(notification_id, channel)`) / `nad_notification_preference` /
+  `nad_notification_template` (`V32`); menu + `nad:notification:*` perms + four
+  default `en` templates (`{{var}}` placeholders) (`V33`).
+- **`NotificationService.create`** — one row + IN_APP delivery (recorded `SENT`)
+  + one PENDING delivery per secondary channel the type declares and the
+  preference allows; transactional types ignore the preference. Idempotent on
+  `(recipient_user_id, source_ref)`.
+- **Channels + dispatch** — `NotificationRenderer` (`{{var}}`, `locale='en'`
+  fallback); `EmailNotificationChannel` over the `MailSender` port (`smtp` /
+  `log`); `NotificationDeliveryDispatcher` + `notificationDispatchJob` (Quartz,
+  active, 30s — `V34`) with per-delivery backoff / dead-letter.
+- **Producers wired** — `ContactService` emits `ContactInquiryReceived` (its old
+  direct support-inbox mail is removed); `ScholarshipAdminService` emits
+  `ScholarshipPublished` on the transition to PUBLISHED.
+- **APIs** — `/api/notifications` (the caller's own feed: list, unread-count,
+  mark-read, mark-all) for any authenticated principal; `/api/staff/notifications`
+  (oversight incl. per-channel delivery status) gated by `nad:notification:*`.
+
+**Deferred to slice 4:** SSE `/api/{student,staff}/stream` + Redis pub/sub
+fan-out (§5). Until then the admin/notification bell polls
+`/api/notifications/unread-count`. SMS / WhatsApp / Push remain schema-only.
+
 ## 2. Requirements
 
 Chat: conversations, participants, messages, attachments, read status. Notifications:

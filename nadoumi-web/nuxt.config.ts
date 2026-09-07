@@ -67,6 +67,7 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: 'en' },
       titleTemplate: '%s · Nadoumi',
       meta: [{ name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+      link: [{ rel: 'icon', type: 'image/jpeg', href: '/favicon.jpg' }],
     },
   },
 })
