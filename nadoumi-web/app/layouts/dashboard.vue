@@ -1,5 +1,8 @@
 <template>
-  <DashboardShell>
-    <slot />
-  </DashboardShell>
+  <div class="contents">
+    <DashboardShell>
+      <slot />
+    </DashboardShell>
+    <AiAssistant />
+  </div>
 </template>

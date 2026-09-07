@@ -229,6 +229,19 @@ export interface Page<T> {
   totalPages: number
 }
 
+/**
+ * Minimal application view for the assistant's "track by ID" lookup.
+ * The Applications module (Step 6) is not built yet; the assistant handles a
+ * missing endpoint gracefully.
+ */
+export interface ApplicationSummary {
+  id: number
+  opportunityTitle?: string | null
+  status: string
+  stage?: string | null
+  updatedAt?: string | null
+}
+
 export interface SessionDto {
   authenticated: boolean
   user?: { userId: number; username: string; nickName: string | null; email: string | null }
