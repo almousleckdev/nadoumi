@@ -6,5 +6,6 @@
       <slot />
     </main>
     <SiteFooter />
+    <AiAssistant />
   </div>
 </template>
