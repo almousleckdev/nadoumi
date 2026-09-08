@@ -233,12 +233,22 @@ management:
       base-path: /actuator
       exposure:
         include: health,info,metrics,prometheus
+    health:
+      # mail-server reachability must not gate the app's health — the transport
+      # is chosen by nadoumi.mail.transport and a slow/refusing SMTP host would
+      # otherwise flap the readiness probe. Re-enable per-env if you want it.
+      mail:
+        enabled: false
   endpoint:
     health:
       probes:
         enabled: true
       show-details: when_authorized
       show-components: when_authorized
+      group:
+        # what "ready to serve traffic" actually means here: DB + Redis reachable.
+        readiness:
+          include: readinessState,db,redis
   info:
     env:
       enabled: false
