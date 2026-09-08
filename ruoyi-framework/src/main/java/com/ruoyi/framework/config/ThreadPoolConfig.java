@@ -2,6 +2,7 @@ package com.ruoyi.framework.config;
 
 import com.ruoyi.common.utils.Threads;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -17,17 +18,21 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class ThreadPoolConfig
 {
-    // 核心线程池大小
-    private int corePoolSize = 50;
+    // 核心线程池大小 (override: thread-pool.core-pool-size)
+    @Value("${thread-pool.core-pool-size:50}")
+    private int corePoolSize;
 
-    // 最大可创建的线程数
-    private int maxPoolSize = 200;
+    // 最大可创建的线程数 (override: thread-pool.max-pool-size)
+    @Value("${thread-pool.max-pool-size:200}")
+    private int maxPoolSize;
 
-    // 队列最大长度
-    private int queueCapacity = 1000;
+    // 队列最大长度 (override: thread-pool.queue-capacity)
+    @Value("${thread-pool.queue-capacity:1000}")
+    private int queueCapacity;
 
-    // 线程池维护线程所允许的空闲时间
-    private int keepAliveSeconds = 300;
+    // 线程池维护线程所允许的空闲时间 (override: thread-pool.keep-alive-seconds)
+    @Value("${thread-pool.keep-alive-seconds:300}")
+    private int keepAliveSeconds;
 
     @Bean(name = "threadPoolTaskExecutor")
     public ThreadPoolTaskExecutor threadPoolTaskExecutor()
