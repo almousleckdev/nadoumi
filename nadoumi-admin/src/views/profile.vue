@@ -215,6 +215,7 @@ import {
   type ProfileUser, type ProfileSession,
 } from '@/api/profile'
 import { useUserStore } from '@/stores/user'
+import { assetUrl } from '@/utils/asset'
 
 const { t } = useI18n()
 const userStore = useUserStore()
@@ -253,7 +254,7 @@ const AVATAR_MAX_MB = 2
 const initial = computed(() =>
   (userStore.nickName || userStore.name || '?').trim().charAt(0).toUpperCase())
 
-const avatarUrl = computed(() => localAvatar.value || user.value.avatar || '')
+const avatarUrl = computed(() => localAvatar.value || assetUrl(user.value.avatar) || '')
 
 const infoRules = {
   nickName: [{ required: true, trigger: 'blur', message: t('common.required') }],

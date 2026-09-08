@@ -50,7 +50,7 @@
       >
         <img
           v-if="userStore.avatar"
-          :src="userStore.avatar"
+          :src="assetUrl(userStore.avatar)"
           class="topbar__avatar topbar__avatar--img"
           alt=""
         >
@@ -93,6 +93,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { myUnreadCount } from '@/api/notification'
 import { useConfirm } from '@/composables/useConfirm'
+import { assetUrl } from '@/utils/asset'
 
 defineProps<{ collapsed?: boolean }>()
 const emit = defineEmits<{ 'toggle-collapse': []; 'toggle-mobile': [] }>()
