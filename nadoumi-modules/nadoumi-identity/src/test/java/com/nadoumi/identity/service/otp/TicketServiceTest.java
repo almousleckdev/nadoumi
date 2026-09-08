@@ -28,16 +28,16 @@ class TicketServiceTest {
     }
 
     @Test
-    void consume_returns_the_email_then_deletes_the_key() {
-        when(redis.<String>getCacheObject(startsWith("nad:ticket:REGISTER:"))).thenReturn("a@x.com");
+    void consume_atomically_gets_and_deletes_the_key() {
+        when(redis.<String>getAndDelete(startsWith("nad:ticket:REGISTER:"))).thenReturn("a@x.com");
 
         assertThat(tickets.consume("tkt_abc", OtpPurpose.REGISTER)).isEqualTo("a@x.com");
-        verify(redis).deleteObject("nad:ticket:REGISTER:tkt_abc");
+        verify(redis).getAndDelete("nad:ticket:REGISTER:tkt_abc");
     }
 
     @Test
     void consume_throws_when_the_ticket_is_gone() {
-        when(redis.getCacheObject(any())).thenReturn(null);
+        when(redis.getAndDelete(any())).thenReturn(null);
 
         assertThatThrownBy(() -> tickets.consume("tkt_x", OtpPurpose.PASSWORD_RESET))
                 .isInstanceOf(OtpException.class)

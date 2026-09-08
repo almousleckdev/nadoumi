@@ -28,6 +28,10 @@ spring:
 #nadoumi:
 #  mail:
 #    transport: smtp          # log | smtp
+#    dev-inbox:
+#      # Enable ONLY for local Playwright E2E: mounts the anonymous
+#      # GET /api/dev/mail/latest that the readOtp helper polls. Off by default.
+#      enabled: true
 
 # token:
 #   secret: <your own 64+ char secret>   # optional locally; a dev default ships in application.yml

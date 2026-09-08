@@ -37,7 +37,7 @@ public class UserApplicantAccessService {
     }
 
     /** Self-registration: the registering user becomes the applicant's ACTIVE OWNER. */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UserApplicantAccess grantOwnerOnSelfRegistration(Long userId, Long applicantId) {
         if (mapper.findActiveOwner(applicantId) != null) {
             throw new GrantException("applicant already has an active owner");
@@ -56,7 +56,7 @@ public class UserApplicantAccessService {
      * ({@code is_interim=1}, expires in {@value #INTERIM_OWNER_DAYS} days) plus a
      * PENDING OWNER invite to {@code invitedEmail}.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UserApplicantAccess createStaffApplicantAccess(Long applicantId, String invitedEmail, Long staffUserId) {
         if (mapper.findActiveOwner(applicantId) != null) {
             throw new GrantException("applicant already has an active owner");
@@ -83,7 +83,7 @@ public class UserApplicantAccessService {
      * Activate every PENDING invite addressed to {@code email} for this just-authenticated
      * user. An OWNER invite atomically promotes and revokes the interim owner.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int acceptInvitesFor(Long userId, String email) {
         if (email == null || email.isBlank()) {
             return 0;
@@ -120,7 +120,7 @@ public class UserApplicantAccessService {
     }
 
     /** ACTIVE OWNER (or staff with {@code nad:applicant:access:manage}) adds a delegate grant. */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UserApplicantAccess delegate(Long applicantId, Long targetUserId, String targetEmail,
             AccessRole role, LocalDateTime expiresAt) {
         if (role == AccessRole.OWNER) {
@@ -141,7 +141,7 @@ public class UserApplicantAccessService {
     }
 
     /** Soft-revoke a non-owner grant. The owner grant only leaves via {@link #transferOwnership}. */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void revoke(Long grantId, String reason) {
         UserApplicantAccess grant = mapper.findById(grantId);
         if (grant == null) {
@@ -160,7 +160,7 @@ public class UserApplicantAccessService {
     }
 
     /** Atomic ownership handover to a user who already holds an ACTIVE grant on the applicant. */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void transferOwnership(Long applicantId, Long toUserId, AccessRole previousOwnerNewRole) {
         assertCanManageAccess(applicantId);
         UserApplicantAccess currentOwner = mapper.lockActiveOwner(applicantId);

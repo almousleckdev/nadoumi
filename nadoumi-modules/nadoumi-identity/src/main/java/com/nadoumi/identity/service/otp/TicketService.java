@@ -34,11 +34,12 @@ public class TicketService {
 
     public String consume(String ticketId, OtpPurpose purpose) {
         String storageKey = key(purpose, ticketId);
-        String email = redis.getCacheObject(storageKey);
+        // Atomic get-and-delete (Redis GETDEL): two concurrent replays of the same
+        // ticket cannot both pass the null check before one of them deletes it.
+        String email = redis.getAndDelete(storageKey);
         if (email == null) {
             throw new OtpException("verification ticket is invalid or expired");
         }
-        redis.deleteObject(storageKey);
         return email;
     }
 

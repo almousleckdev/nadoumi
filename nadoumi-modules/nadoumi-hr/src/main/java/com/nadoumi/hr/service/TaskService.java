@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.hr.domain.Task;
 import com.nadoumi.hr.domain.TaskEvent;
 import com.nadoumi.hr.domain.TaskStatus;
@@ -62,6 +63,8 @@ public class TaskService {
     @Transactional(readOnly = true)
     public PageResponse<TaskResponse> list(String q, String status, String priority, Long assigneeUserId,
             Long createdByUserId, Long ownedByUserId, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Task> rows = taskMapper.search(nz(q), nz(status), nz(priority), assigneeUserId, createdByUserId,
                 ownedByUserId);
@@ -75,7 +78,7 @@ public class TaskService {
         return TaskResponse.detail(t, eventMapper.findByTask(id));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TaskResponse create(TaskRequest req, long actorUserId) {
         Task t = new Task();
         t.setTitle(req.title().trim());
@@ -98,7 +101,7 @@ public class TaskService {
         return get(t.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TaskResponse update(long id, TaskRequest req, long actorUserId) {
         Task t = require(id);
         if (TaskStatus.valueOf(t.getStatus()).isTerminal()) {
@@ -130,7 +133,7 @@ public class TaskService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TaskResponse changeStatus(long id, String targetRaw, String note, long actorUserId, boolean isAdmin) {
         Task t = require(id);
         // A rank-and-file employee may only move a task that is assigned to them
@@ -172,7 +175,7 @@ public class TaskService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
         if (taskMapper.deleteById(id) == 0) {
             throw new NadNotFoundException("task not found");

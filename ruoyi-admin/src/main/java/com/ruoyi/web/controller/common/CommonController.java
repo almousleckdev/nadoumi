@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +23,19 @@ import com.ruoyi.framework.config.ServerConfig;
 
 /**
  * 通用请求处理
- * 
+ *
+ * <p>Nadoumi: these generic upload/download endpoints belong to the RuoYi staff
+ * console ({@code ruoyi-ui}). They carry no per-resource permission and
+ * {@code /download?delete=true} removes a file with only an extension check, so
+ * the whole controller is restricted to staff ({@code user_type='00'}) — an
+ * external/student JWT is otherwise {@code authenticated()} and would pass.
+ * {@code nadoumi-web} uploads go through {@code nadoumi-media} instead.
+ *
  * @author ruoyi
  */
 @RestController
 @RequestMapping("/common")
+@PreAuthorize("@currentCaller.isStaff()")
 public class CommonController
 {
     private static final Logger log = LoggerFactory.getLogger(CommonController.class);

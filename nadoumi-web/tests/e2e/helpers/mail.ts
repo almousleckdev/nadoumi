@@ -2,8 +2,10 @@ const BACKEND = process.env.NUXT_BACKEND_BASE_URL ?? 'http://localhost:8080'
 
 /**
  * Reads the 6-digit OTP from the last email captured for `email`. Requires the
- * backend to run with `nadoumi.mail.transport=log`, which mounts
- * `GET /api/dev/mail/latest`.
+ * backend to run with `nadoumi.mail.transport=log` (the default) AND
+ * `nadoumi.mail.dev-inbox.enabled=true`, which together mount the anonymous
+ * `GET /api/dev/mail/latest`. Set the flag in `config/application-local.yml`
+ * (see `config/application-local.yml.example`); it is off by default.
  *
  * `expectSubject` guards against reading a stale earlier mail (e.g. the
  * registration code when we want the password-reset code) — it keeps polling

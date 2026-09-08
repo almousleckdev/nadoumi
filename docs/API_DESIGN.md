@@ -69,7 +69,7 @@ under `/api/...`.
 | POST | `/api/student/password` | **NEW.** bearer (student). `{ currentPassword, newPassword }` → verify current, `PasswordPolicy` (incl. ≠ current), **other sessions revoked**, `204`. |
 | GET | `/api/student/me` | student-shaped identity: `{ user:{id,name,locale}, accessibleApplicants:[{applicantId, accessRole, capabilities[]}] }`. **No** `roles`/`permissions`. |
 | POST | `/api/student/logout` | invalidate token. |
-| GET | `/api/dev/mail/latest?to=` | **NEW, non-prod.** Only mounted when `nadoumi.mail.transport=log`. Returns the last email captured for a recipient — E2E OTP retrieval. |
+| GET | `/api/dev/mail/latest?to=` | **NEW, non-prod, anonymous.** Returns the last email captured for a recipient (raw OTP / reset codes) — E2E OTP retrieval. Mounted only when `nadoumi.mail.dev-inbox.enabled=true` (explicit opt-in, off by default and in every committed config) **and** the `prod` profile is not active. `nadoumi.mail.transport` must be `log`. |
 
 The Nuxt BFF (D2) sets the JWT in an httpOnly + Secure + SameSite=Lax cookie; browser
 JS never holds the raw token. Revision 2 BFF passthroughs:
@@ -306,7 +306,14 @@ upload controller, including the catalog controllers.
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403
   authorization/confidentiality; 404 not found / not visible; 409 optimistic-lock
-  conflict; 422 business-rule rejection.
+  conflict; 422 business-rule rejection; **429** rate-limit exceeded, with a
+  `Retry-After` header (seconds) — `@RateLimiter` no longer answers HTTP 200.
+- **500s never leak internals.** Unhandled exceptions return a generic
+  `"An internal error occurred"`; the cause (SQL, table names, stack) is logged
+  only. `NadApiExceptionHandler` maps the framework 4xx that no module advice
+  owns (`HttpMessageNotReadableException`, missing/invalid params, method not
+  allowed) to `problem+json`; anything it does not recognise falls through to
+  RuoYi's sanitized handler rather than being force-cast to 500.
 - **Typed payloads.** Java `record` request/response DTOs per context. **Never** a
   MyBatis/JPA entity on the wire. Explicit field-by-field mapping (MapStruct or hand);
   no reflective copy from an entity to a confidential-adjacent DTO.
@@ -315,6 +322,9 @@ upload controller, including the catalog controllers.
   `application/problem+json`. `AjaxResult` is not reused under `/api/**`.
 - **Pagination:** `?page=0&size=20&sort=field,desc`; response
   `{ content, page, size, totalElements, totalPages }` (Spring `Page` shape).
+  `size` is clamped to `PageSupport.MAX_SIZE` (100) and `page` floored at 0 in
+  every list service — an oversized request is capped, not rejected, so it cannot
+  drive an unbounded `LIMIT`.
 - **Versioning — DECIDED (recommended, pending final nod):** URI prefix **`/api/v1/...`**.
 - **Validation:** `jakarta.validation` on DTOs + `@Validated` controllers.
 - **Idempotency:** `Idempotency-Key` header required on `POST` for payments and

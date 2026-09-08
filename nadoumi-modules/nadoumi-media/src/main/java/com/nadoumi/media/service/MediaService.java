@@ -54,7 +54,7 @@ public class MediaService implements MediaGateway {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult upload(InputStream source,
                                    String originalFilename,
                                    String declaredContentType,
@@ -136,7 +136,7 @@ public class MediaService implements MediaGateway {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void softDelete(long assetId, long actorUserId) {
         storage.softDelete(assetId, actorUserId);
     }

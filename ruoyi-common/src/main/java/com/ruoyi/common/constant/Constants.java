@@ -157,13 +157,24 @@ public class Constants
 
     /**
      * 自动识别json对象白名单配置（仅允许解析的包名，范围越小越安全）
+     *
+     * <p>Nadoumi: {@code com.nadoumi} added so a cached object written by a Nadoumi
+     * module (with FastJson2's {@code @type} class name) still passes the Redis
+     * deserializer's autotype filter — otherwise it fails to read back.
      */
-    public static final String[] JSON_WHITELIST_STR = { "com.ruoyi" };
+    public static final String[] JSON_WHITELIST_STR = { "com.ruoyi", "com.nadoumi" };
 
     /**
      * 定时任务白名单配置（仅允许访问的包名，如其他需要可以自行添加）
+     *
+     * <p>Nadoumi: the {@code com.nadoumi.*.job} packages hold the platform's Quartz
+     * job beans ({@code outboxPollerJob}, {@code scholarshipDeadlineReminderJob}, …).
+     * Without them {@link com.ruoyi.quartz.util.ScheduleUtils#whiteList} rejects any
+     * attempt to create or edit those jobs from the admin console. Add a new module's
+     * job package here when it ships a scheduled job.
      */
-    public static final String[] JOB_WHITELIST_STR = { "com.ruoyi.quartz.task" };
+    public static final String[] JOB_WHITELIST_STR = { "com.ruoyi.quartz.task",
+            "com.nadoumi.notification.job", "com.nadoumi.scholarship.job", "com.nadoumi.media.job" };
 
     /**
      * 定时任务违规的字符

@@ -13,7 +13,8 @@ Operationalizes `CLAUDE.md` §18.
 - Modern, clean Java. K&R braces. Records for immutable data carriers / DTOs.
 - Small cohesive classes, explicit single responsibility. No god services.
 - Constructor injection, `final` fields. No field injection.
-- Transactional boundaries at the service method, deliberately scoped.
+- Transactional boundaries at the service method, deliberately scoped. Writes use
+  `@Transactional(rollbackFor = Exception.class)`; reads use `readOnly = true`.
 - Structured errors — typed exceptions mapped to consistent API responses; no
   swallowed exceptions, no bare `catch (Exception e)` that hides failures.
 - No magic constants — name them.

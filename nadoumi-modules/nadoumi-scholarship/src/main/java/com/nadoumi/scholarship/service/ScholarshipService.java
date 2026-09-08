@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.mapper.ScholarshipMapper;
@@ -32,6 +33,8 @@ public class ScholarshipService {
     }
 
     public PageResponse<PublicScholarshipResponse> list(ScholarshipSearch filter, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Scholarship> rows = mapper.searchPublic(filter);
         long total = new PageInfo<>(rows).getTotal();

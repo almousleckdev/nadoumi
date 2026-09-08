@@ -11,6 +11,7 @@ import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.identity.money.FxRates;
@@ -70,6 +71,8 @@ public class ProgramService {
 
     public PageResponse<ProgramResponse> list(String q, Long universityId, ProgramType type,
             ProgramTeachingLanguage language, String field, ProgramStatus status, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Program> rows = mapper.search(ProgramSearch.staff(q, universityId, type, language, field, status));
         long total = new PageInfo<>(rows).getTotal();
@@ -84,7 +87,7 @@ public class ProgramService {
         return toResponse(p);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ProgramResponse create(ProgramRequest req) {
         String universityName = requireUniversity(req.universityId());
         Program p = new Program();
@@ -100,7 +103,7 @@ public class ProgramService {
         return get(p.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ProgramResponse update(Long id, ProgramRequest req) {
         Program p = load(id);
         boolean wasLive = isLive(p);
@@ -132,7 +135,7 @@ public class ProgramService {
         outbox.write("program", p.getId(), OutboxEventTypes.PROGRAM_PUBLISHED, payload.toJSONString());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         if (mapper.delete(id) == 0) {
             throw new NadNotFoundException("programme not found");
@@ -142,7 +145,7 @@ public class ProgramService {
 
     // ---- media upload (staff, nad:program:edit) ----
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadImage(long id, MultipartFile file) {
         load(id);
         MediaUploadResult result;
@@ -165,6 +168,8 @@ public class ProgramService {
         if (universityId != null) {
             universityService.publicGet(String.valueOf(universityId)); // 404 if the university is not public
         }
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Program> rows = mapper.search(
                 ProgramSearch.publicCatalog(q, universityId, type, language, field, featured, hot));

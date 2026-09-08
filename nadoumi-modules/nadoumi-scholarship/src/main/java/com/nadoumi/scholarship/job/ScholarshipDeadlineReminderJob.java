@@ -37,7 +37,7 @@ public class ScholarshipDeadlineReminderJob {
         this.outbox = outbox;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void run() {
         List<Scholarship> due = mapper.findDueForDeadlineReminder(REMINDER_WINDOW_DAYS);
         if (due.isEmpty()) {

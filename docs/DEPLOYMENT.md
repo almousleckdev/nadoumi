@@ -175,7 +175,8 @@ zero-config start working.
 | `TOKEN_KID` / `TOKEN_HEADER` / `TOKEN_EXPIRE_TIME` | `v1` / `Authorization` / `30` | |
 | `DRUID_CONSOLE_USERNAME` / `DRUID_CONSOLE_PASSWORD` | `ruoyi` / `123456` | disable the servlet in prod |
 | `RUOYI_PROFILE` | `D:/ruoyi/uploadPath` | upload dir — set on macOS/Linux |
-| `NADOUMI_MAIL_TRANSPORT` | `log` | `log` (write `./mail-outbox.log` + `GET /api/dev/mail/latest`, no network) or `smtp`. **Revision 2** |
+| `NADOUMI_MAIL_TRANSPORT` | `log` | `log` (write `./mail-outbox.log`, no network) or `smtp`. **Revision 2** |
+| `NADOUMI_MAIL_DEV_INBOX_ENABLED` | `false` | mounts the anonymous `GET /api/dev/mail/latest` (raw OTP codes) — local dev / CI only. Leave `false` in staging/prod; also blocked under the `prod` profile. |
 | `NADOUMI_MAIL_FROM` | `no-reply@nadoumi.local` | `From:` header |
 | `NADOUMI_MAIL_LOG_FILE` | `./mail-outbox.log` | `transport=log` sink |
 | `NADOUMI_WEB_LOGIN_URL` | `http://localhost:3000/login` | used in the "account exists" mail |

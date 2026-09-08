@@ -3,6 +3,8 @@ package com.ruoyi.framework.web.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -15,6 +17,7 @@ import com.ruoyi.common.constant.HttpStatus;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.text.Convert;
 import com.ruoyi.common.exception.DemoModeException;
+import com.ruoyi.common.exception.RateLimitExceededException;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.html.EscapeUtil;
@@ -64,6 +67,18 @@ public class GlobalExceptionHandler
     }
 
     /**
+     * 触发限流：返回 HTTP 429 + Retry-After（不再是 200 的 AjaxResult 包装）
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<AjaxResult> handleRateLimitExceeded(RateLimitExceededException e, HttpServletRequest request)
+    {
+        log.warn("request '{}' was rate limited", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, Integer.toString(e.getRetryAfterSeconds()))
+                .body(AjaxResult.error(HttpStatus.TOO_MANY_REQUESTS, e.getMessage()));
+    }
+
+    /**
      * 请求路径中缺少必需的路径变量
      */
     @ExceptionHandler(MissingPathVariableException.class)
@@ -92,24 +107,29 @@ public class GlobalExceptionHandler
 
     /**
      * 拦截未知的运行时异常
+     *
+     * <p>The client gets a generic message; the cause (which may carry SQL, table
+     * names, or internal identifiers) is logged, not returned.
      */
     @ExceptionHandler(RuntimeException.class)
     public AjaxResult handleRuntimeException(RuntimeException e, HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
         log.error("request '{}' raised an unknown error.", requestURI, e);
-        return AjaxResult.error(e.getMessage());
+        return AjaxResult.error("An internal error occurred");
     }
 
     /**
      * 系统异常
+     *
+     * <p>Generic message only — see {@link #handleRuntimeException}.
      */
     @ExceptionHandler(Exception.class)
     public AjaxResult handleException(Exception e, HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
         log.error("request '{}' raised a system error.", requestURI, e);
-        return AjaxResult.error(e.getMessage());
+        return AjaxResult.error("An internal error occurred");
     }
 
     /**

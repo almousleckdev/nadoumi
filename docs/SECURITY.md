@@ -134,6 +134,13 @@ CI, no network) or `transport=smtp` (Mailpit locally via `docker-compose.yml`, G
 `smtp.gmail.com:587` + App Password for staging/prod). All creds are env-only
 (`SPRING_MAIL_*`, `NADOUMI_MAIL_*`) — never committed (§7).
 
+**Dev mail inbox:** `GET /api/dev/mail/latest` is `@Anonymous` and returns raw OTP /
+reset codes, so it is gated independently of `transport`: it mounts only when
+`nadoumi.mail.dev-inbox.enabled=true` (a dedicated opt-in — absent, and therefore
+off, in every committed config; `application-test.yml` sets it for the ITs, local
+E2E sets it in `config/application-local.yml`) **and** the `prod` profile is not
+active (`@Profile("!prod")`). Choosing `transport=log` alone never exposes it.
+
 ## 2. Authorization (EXISTING)
 
 - **Model:** RBAC. `sys_user` –< `sys_user_role` >– `sys_role` –< `sys_role_menu` >–
@@ -293,6 +300,14 @@ Cloudinary call — full detail `docs/DOCUMENT_MANAGEMENT.md` §3.4):
 | Filename sanitisation | strip path separators/control chars/leading dots; collapse to `[A-Za-z0-9._-]`; max 100 chars; empty → generated `upload-<uuid>` |
 | Hard denylist (every category) | `text/html`, `image/svg+xml`, `application/xhtml+xml`, `application/x-msdownload`, `application/x-sh`, zip, java-archive — never accepted regardless of declared/sniffed MIME |
 | Checksum | SHA-256, streamed, for document-shaped categories (dedupe + tamper evidence) |
+
+**Legacy RuoYi `/common/*` upload/download.** Used only by the `ruoyi-ui` staff
+console; `nadoumi-web` and `nadoumi-admin` do not call it. It has no per-resource
+permission and `/common/download?delete=true` removes a file with only an
+extension check, so the whole `CommonController` is now
+`@PreAuthorize("@currentCaller.isStaff()")` — an external/student JWT is
+otherwise merely `authenticated()` and would pass. New paths must upload through
+`nadoumi-media` (validation pipeline above), not `/common/*`.
 
 **`CLOUDINARY_URL` handling.** Env var only — `cloudinary://<key>:<secret>@<cloud>`.
 No `application.yml` default; `CloudinaryMediaStorage`'s constructor **fails fast**

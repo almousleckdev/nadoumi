@@ -74,7 +74,7 @@ public class StudentAuthService {
         this.sessionRevoker = sessionRevoker;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public StudentRegisterResponse register(StudentRegisterRequest req) {
         if (!"true".equalsIgnoreCase(configService.selectConfigByKey(REGISTER_ENABLED_KEY))) {
             throw new NadForbiddenException("student registration is disabled");
@@ -105,7 +105,7 @@ public class StudentAuthService {
         return new StudentRegisterResponse(user.getUserId(), user.getUserName());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public String login(StudentLoginRequest req) {
         String email = normalizeEmail(req.email());
         Long userId = identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE);
@@ -128,7 +128,7 @@ public class StudentAuthService {
      * sets the new password, and revokes <em>every</em> session for the account.
      * Issues no token and performs no login (spec §15.4).
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void resetPassword(String ticket, String newPassword) {
         String email = tickets.consume(ticket, OtpPurpose.PASSWORD_RESET);
         Long userId = identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE);
@@ -148,7 +148,7 @@ public class StudentAuthService {
      * the policy (including "different from current"), then revoke every session
      * except the caller's and refresh the caller's cached credentials.
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void changePassword(HttpServletRequest request, String currentPassword, String newPassword) {
         Long userId = caller.requireUserId();
         SysUser user = userService.selectUserById(userId);

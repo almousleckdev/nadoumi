@@ -15,6 +15,9 @@ public interface NotificationDeliveryMapper {
      */
     void insert(NotificationDelivery delivery);
 
+    /** Multi-row insert of already-built delivery rows (one fan-out chunk). */
+    int insertBatch(@Param("rows") List<NotificationDelivery> rows);
+
     List<NotificationDelivery> findByNotification(@Param("notificationId") long notificationId);
 
     /** PENDING deliveries whose {@code next_attempt_at <= now()}, oldest first. */

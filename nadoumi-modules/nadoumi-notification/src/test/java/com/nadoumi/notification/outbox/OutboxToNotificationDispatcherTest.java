@@ -1,5 +1,6 @@
 package com.nadoumi.notification.outbox;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,9 +15,11 @@ import com.nadoumi.notification.domain.NotificationType;
 import com.nadoumi.notification.domain.OutboxEvent;
 import com.nadoumi.notification.mapper.NotificationAudienceMapper;
 import com.nadoumi.notification.render.NotificationRenderer;
+import com.nadoumi.notification.service.NotificationRequest;
 import com.nadoumi.notification.service.NotificationService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class OutboxToNotificationDispatcherTest {
 
@@ -44,8 +47,14 @@ class OutboxToNotificationDispatcherTest {
         dispatcher.dispatch(event(OutboxEventTypes.UNIVERSITY_PUBLISHED,
                 "{\"universityId\":7,\"universityName\":\"Fudan\",\"country\":\"CN\",\"universitySlug\":\"fudan\"}"));
 
-        // one staff + two students, each once
-        verify(notificationService, times(3)).create(any());
+        // one staff + two students, fanned out in a single batch call
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
+        verify(notificationService).createBatch(batch.capture());
+        assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
+                .containsExactlyInAnyOrder(1L, 10L, 11L);
+        assertThat(batch.getValue()).extracting(NotificationRequest::sourceRef)
+                .allMatch(ref -> ref.startsWith("outbox:42:"));
     }
 
     @Test
@@ -57,7 +66,11 @@ class OutboxToNotificationDispatcherTest {
                 "{\"taskId\":3,\"taskTitle\":\"x\",\"taskStatus\":\"IN_PROGRESS\",\"fromStatus\":\"PENDING\","
                         + "\"actor\":\"a\",\"recipientUserIds\":[5,6]}"));
 
-        verify(notificationService, times(2)).create(any());
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
+        verify(notificationService).createBatch(batch.capture());
+        assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
+                .containsExactlyInAnyOrder(5L, 6L);
         verify(audience, times(0)).findActiveStudentUserIds();
     }
 }

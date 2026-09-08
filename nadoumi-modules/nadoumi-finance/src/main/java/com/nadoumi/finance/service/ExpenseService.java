@@ -3,6 +3,7 @@ package com.nadoumi.finance.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Expense;
 import com.nadoumi.finance.domain.ExpenseCategory;
 import com.nadoumi.finance.domain.ExpenseStatus;
@@ -43,6 +44,8 @@ public class ExpenseService {
     @Transactional(readOnly = true)
     public PageResponse<Expense> list(String q, String status, Long categoryId, LocalDate from, LocalDate to,
             int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Expense> rows = mapper.search(nz(q), nz(status), categoryId, from, to);
         long total = new PageInfo<>(rows).getTotal();
@@ -63,7 +66,7 @@ public class ExpenseService {
         return mapper.listCategories();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Expense create(ExpenseRequest req) {
         Expense e = new Expense();
         apply(e, req);
@@ -74,7 +77,7 @@ public class ExpenseService {
         return get(e.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Expense update(long id, ExpenseRequest req) {
         Expense e = get(id);
         if (!EDITABLE.contains(e.getStatus())) {
@@ -86,7 +89,7 @@ public class ExpenseService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Expense changeStatus(long id, String targetRaw, boolean canApprove) {
         Expense e = get(id);
         ExpenseStatus from = ExpenseStatus.valueOf(e.getStatus());
@@ -118,7 +121,7 @@ public class ExpenseService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
         Expense e = get(id);
         if (!Set.of("DRAFT", "REJECTED").contains(e.getStatus())) {

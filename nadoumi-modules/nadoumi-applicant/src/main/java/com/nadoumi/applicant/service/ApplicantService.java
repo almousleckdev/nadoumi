@@ -19,6 +19,7 @@ import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.common.access.ApplicantCapability;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
@@ -69,7 +70,7 @@ public class ApplicantService {
         this.media = media;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ApplicantResponse createAboutMe(SelfApplicantRequest req) {
         if (!caller.isExternal()) {
             throw new AccessDeniedException("staff create applicants via /api/staff/applicants");
@@ -84,7 +85,7 @@ public class ApplicantService {
         return ApplicantResponse.of(a, true);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ApplicantResponse createByStaff(StaffCreateApplicantRequest req) {
         Applicant a = new Applicant();
         apply(a, req.givenName(), req.familyName(), req.dob(), req.nationality(),
@@ -101,7 +102,7 @@ public class ApplicantService {
         return ApplicantResponse.of(load(id), includePii());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ApplicantResponse update(Long id, SelfApplicantRequest req) {
         requireCapability(id, ApplicantCapability.EDIT_PROFILE);
         Applicant a = load(id);
@@ -112,7 +113,7 @@ public class ApplicantService {
         return ApplicantResponse.of(a, includePii());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void archive(Long id) {
         if (!caller.isStaff()) {
             throw new AccessDeniedException("archive is a staff action");
@@ -123,6 +124,8 @@ public class ApplicantService {
 
     public PageResponse<ApplicantResponse> listForStaff(String name, ApplicantStatus status,
             String nationality, java.time.LocalDateTime createdAfter, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Applicant> rows = mapper.search(name, status, nationality, createdAfter);
         long total = new PageInfo<>(rows).getTotal();
@@ -146,7 +149,7 @@ public class ApplicantService {
      * {@code photo_media_id} at it. Returns the new media id (no URL — PROTECTED
      * bytes are served only through {@link #photoUrl}).
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public long uploadPhoto(long applicantId, MultipartFile file) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         MediaUploadResult result;
@@ -192,7 +195,7 @@ public class ApplicantService {
         return mapper.findEducation(applicantId).stream().map(EducationResponse::of).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EducationResponse addEducation(Long applicantId, EducationRequest req) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         ApplicantEducation e = new ApplicantEducation();
@@ -208,7 +211,7 @@ public class ApplicantService {
         return EducationResponse.of(e);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EducationResponse updateEducation(Long applicantId, Long educationId, EducationRequest req) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         ApplicantEducation e = mapper.findEducationById(educationId);
@@ -226,7 +229,7 @@ public class ApplicantService {
         return EducationResponse.of(e);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteEducation(Long applicantId, Long educationId) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         if (mapper.deleteEducation(educationId, applicantId) == 0) {
@@ -241,7 +244,7 @@ public class ApplicantService {
         return mapper.findTestScores(applicantId).stream().map(TestScoreResponse::of).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TestScoreResponse addTestScore(Long applicantId, TestScoreRequest req) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         ApplicantTestScore s = new ApplicantTestScore();
@@ -255,7 +258,7 @@ public class ApplicantService {
         return TestScoreResponse.of(s);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TestScoreResponse updateTestScore(Long applicantId, Long scoreId, TestScoreRequest req) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         ApplicantTestScore s = mapper.findTestScoreById(scoreId);
@@ -271,7 +274,7 @@ public class ApplicantService {
         return TestScoreResponse.of(s);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteTestScore(Long applicantId, Long scoreId) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         if (mapper.deleteTestScore(scoreId, applicantId) == 0) {
@@ -286,7 +289,7 @@ public class ApplicantService {
         return mapper.findContacts(applicantId).stream().map(ContactResponse::of).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ContactResponse addContact(Long applicantId, ContactRequest req) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         ApplicantContact c = new ApplicantContact();
@@ -299,7 +302,7 @@ public class ApplicantService {
         return ContactResponse.of(c);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ContactResponse updateContact(Long applicantId, Long contactId, ContactRequest req) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         ApplicantContact c = mapper.findContactById(contactId);
@@ -314,7 +317,7 @@ public class ApplicantService {
         return ContactResponse.of(c);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void deleteContact(Long applicantId, Long contactId) {
         requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
         if (mapper.deleteContact(contactId, applicantId) == 0) {
