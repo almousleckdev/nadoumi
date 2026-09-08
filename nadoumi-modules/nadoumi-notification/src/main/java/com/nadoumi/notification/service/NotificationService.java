@@ -15,7 +15,10 @@ import com.nadoumi.notification.mapper.NotificationPreferenceMapper;
 import com.nadoumi.notification.web.response.NotificationDetailView;
 import com.nadoumi.notification.web.response.NotificationView;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -48,22 +51,14 @@ public class NotificationService {
     /**
      * @return the new {@code nad_notification} id
      */
+    /** Chunk size for {@link #createBatch} — keeps each multi-row INSERT well under max_allowed_packet. */
+    private static final int BATCH_CHUNK = 500;
+
     @Transactional(rollbackFor = Exception.class)
     public long create(NotificationRequest req) {
-        Assert.notNull(req.type(), "notification type is required");
-        Assert.hasText(req.title(), "notification title is required");
-        Assert.hasText(req.body(), "notification body is required");
+        validate(req);
 
-        Notification n = new Notification();
-        n.setRecipientUserId(req.recipientUserId());
-        n.setType(req.type().name());
-        n.setTitle(req.title());
-        n.setBody(req.body());
-        n.setDataJson(req.dataJson());
-        n.setSourceRef(req.sourceRef());
-        n.setApplicationId(req.applicationId());
-        n.setConversationId(req.conversationId());
-        n.setMessageId(req.messageId());
+        Notification n = rowFrom(req);
         int inserted = notificationMapper.insert(n);
         if (inserted == 0 || n.getId() == null) {
             return 0L; // a row for this (recipient, source_ref) already exists — idempotent no-op
@@ -78,6 +73,83 @@ public class NotificationService {
             }
         }
         return n.getId();
+    }
+
+    /**
+     * Bulk equivalent of {@link #create} for a fan-out to many recipients (a
+     * published-catalog announcement to every active student). Each {@value #BATCH_CHUNK}-row
+     * chunk is one multi-row notification insert + one multi-row delivery insert,
+     * not N transactions of single-row inserts. Idempotent: a recipient whose
+     * {@code (recipient, source_ref)} row already exists is skipped, so the outbox
+     * poller's at-least-once redelivery stays a no-op.
+     *
+     * <p>All requests in a call must share one {@link NotificationType} (the outbox
+     * dispatcher builds one batch per event).
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void createBatch(List<NotificationRequest> reqs) {
+        if (reqs == null || reqs.isEmpty()) {
+            return;
+        }
+        for (int from = 0; from < reqs.size(); from += BATCH_CHUNK) {
+            insertChunk(reqs.subList(from, Math.min(from + BATCH_CHUNK, reqs.size())));
+        }
+    }
+
+    private void insertChunk(List<NotificationRequest> chunk) {
+        chunk.forEach(NotificationService::validate);
+        chunk.forEach(r -> Assert.hasText(r.sourceRef(), "createBatch requires a source_ref on every request"));
+
+        List<String> refs = chunk.stream().map(NotificationRequest::sourceRef).toList();
+        Set<String> existing = new HashSet<>(notificationMapper.findExistingSourceRefs(refs));
+        List<Notification> rows = chunk.stream()
+                .filter(r -> !existing.contains(r.sourceRef()))
+                .map(NotificationService::rowFrom)
+                .toList();
+        if (rows.isEmpty()) {
+            return;
+        }
+        notificationMapper.insertBatch(rows); // useGeneratedKeys back-fills each id
+
+        NotificationType type = chunk.get(0).type();
+        List<Long> recipientIds = rows.stream().map(Notification::getRecipientUserId).toList();
+
+        List<NotificationDelivery> deliveries = new ArrayList<>(rows.size());
+        LocalDateTime now = LocalDateTime.now();
+        for (Notification n : rows) {
+            deliveries.add(deliveryRow(n.getId(), NotificationChannelKind.IN_APP,
+                    IN_APP_PROVIDER, DeliveryStatus.SENT, now));
+        }
+        for (NotificationChannelKind channel : type.secondaryChannels()) {
+            Set<Long> optedOut = type.isTransactional() ? Set.of() : new HashSet<>(
+                    preferenceMapper.findDisabledUserIds(recipientIds, type.name(), channel.name()));
+            for (Notification n : rows) {
+                if (!optedOut.contains(n.getRecipientUserId())) {
+                    deliveries.add(deliveryRow(n.getId(), channel, null, DeliveryStatus.PENDING, null));
+                }
+            }
+        }
+        deliveryMapper.insertBatch(deliveries);
+    }
+
+    private static void validate(NotificationRequest req) {
+        Assert.notNull(req.type(), "notification type is required");
+        Assert.hasText(req.title(), "notification title is required");
+        Assert.hasText(req.body(), "notification body is required");
+    }
+
+    private static Notification rowFrom(NotificationRequest req) {
+        Notification n = new Notification();
+        n.setRecipientUserId(req.recipientUserId());
+        n.setType(req.type().name());
+        n.setTitle(req.title());
+        n.setBody(req.body());
+        n.setDataJson(req.dataJson());
+        n.setSourceRef(req.sourceRef());
+        n.setApplicationId(req.applicationId());
+        n.setConversationId(req.conversationId());
+        n.setMessageId(req.messageId());
+        return n;
     }
 
     // ---- recipient reads --------------------------------------------------

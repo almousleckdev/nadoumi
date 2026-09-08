@@ -15,6 +15,13 @@
         where user_id = #{userId} and type = #{type} and channel = #{channel}
     </select>
 
+    <select id="findDisabledUserIds" resultType="long">
+        select user_id from nad_notification_preference
+        where type = #{type} and channel = #{channel} and enabled = 0
+          and user_id in
+        <foreach collection="userIds" item="u" open="(" separator="," close=")">#{u}</foreach>
+    </select>
+
     <select id="findByUser" resultMap="preference">
         select id, user_id, type, channel, enabled from nad_notification_preference
         where user_id = #{userId}

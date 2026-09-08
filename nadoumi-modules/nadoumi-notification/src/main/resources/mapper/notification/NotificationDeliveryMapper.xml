@@ -31,6 +31,17 @@
              0, now(), #{sentAt}, now())
     </insert>
 
+    <insert id="insertBatch">
+        insert into nad_notification_delivery
+            (notification_id, channel, provider, provider_message_id, status,
+             attempts, next_attempt_at, sent_at, created_at)
+        values
+        <foreach collection="rows" item="d" separator=",">
+            (#{d.notificationId}, #{d.channel}, #{d.provider}, #{d.providerMessageId}, #{d.status},
+             0, now(), #{d.sentAt}, now())
+        </foreach>
+    </insert>
+
     <select id="findByNotification" resultMap="delivery">
         select <include refid="cols"/> from nad_notification_delivery
         where notification_id = #{notificationId}

@@ -71,11 +71,12 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
         String body = renderer.render(type, NotificationChannelKind.IN_APP,
                 NotificationRenderer.DEFAULT_LOCALE, context).body();
 
+        List<NotificationRequest> batch = new java.util.ArrayList<>(recipients.size());
         for (Long userId : recipients) {
-            String sourceRef = "outbox:" + event.getId() + ":" + userId;
-            notificationService.create(NotificationRequest.fromEvent(
-                    userId, type, type.defaultTitle(), body, sourceRef, event.getPayloadJson()));
+            batch.add(NotificationRequest.fromEvent(userId, type, type.defaultTitle(), body,
+                    "outbox:" + event.getId() + ":" + userId, event.getPayloadJson()));
         }
+        notificationService.createBatch(batch);
     }
 
     private static NotificationType mapType(String eventType) {

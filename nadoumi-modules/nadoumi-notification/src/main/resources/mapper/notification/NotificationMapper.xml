@@ -34,6 +34,25 @@
              #{applicationId}, #{conversationId}, #{messageId}, now())
     </insert>
 
+    <select id="findExistingSourceRefs" resultType="string">
+        select source_ref from nad_notification
+        where source_ref in
+        <foreach collection="sourceRefs" item="s" open="(" separator="," close=")">#{s}</foreach>
+    </select>
+
+    <!-- Plain (not "ignore") so useGeneratedKeys back-fills every id; the caller
+         has already dropped source_refs that exist. -->
+    <insert id="insertBatch" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_notification
+            (recipient_user_id, type, title, body, data_json, source_ref,
+             application_id, conversation_id, message_id, created_at)
+        values
+        <foreach collection="rows" item="r" separator=",">
+            (#{r.recipientUserId}, #{r.type}, #{r.title}, #{r.body}, #{r.dataJson}, #{r.sourceRef},
+             #{r.applicationId}, #{r.conversationId}, #{r.messageId}, now())
+        </foreach>
+    </insert>
+
     <select id="findByRecipient" resultMap="notification">
         select <include refid="cols"/> from nad_notification
         where recipient_user_id = #{recipientUserId}
