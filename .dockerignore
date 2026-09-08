@@ -1,0 +1,15 @@
+.git
+**/target
+**/node_modules
+**/dist
+**/.nuxt
+**/.output
+nadoumi-web
+nadoumi-admin
+ruoyi-ui
+config/application-local.yml
+config/application-druid.yml
+*.log
+logs
+.idea
+.vscode
