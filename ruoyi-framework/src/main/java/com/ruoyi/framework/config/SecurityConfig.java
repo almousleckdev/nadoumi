@@ -88,9 +88,18 @@ public class SecurityConfig
         return httpSecurity
             // CSRF禁用，因为不使用session
             .csrf(csrf -> csrf.disable())
-            // 禁用HTTP响应标头
+            // 响应安全标头
             .headers((headersCustomizer) -> {
-                headersCustomizer.cacheControl(cache -> cache.disable()).frameOptions(options -> options.sameOrigin());
+                headersCustomizer
+                    // RuoYi disables Spring Security's blanket no-store so /profile/**
+                    // images and static assets stay cacheable; API bodies are bearer-
+                    // token JSON, not a disk-cache risk.
+                    .cacheControl(cache -> cache.disable())
+                    // nothing embeds this origin in a frame
+                    .frameOptions(options -> options.deny())
+                    // 1-year HSTS (emitted only on HTTPS requests)
+                    .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(31536000));
+                // X-Content-Type-Options: nosniff is on by Spring Security default
             })
             // 认证失败处理类
             .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
@@ -103,7 +112,10 @@ public class SecurityConfig
                 requests.requestMatchers("/login", "/register", "/captchaImage").permitAll()
                     // 静态资源，可匿名访问
                     .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**.html", "/**.css", "/**.js", "/profile/**").permitAll()
-                    .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**", "/druid/**").permitAll()
+                    // /druid/** is NOT anonymous — the stat servlet is off by default
+                    // (see application-druid.yml); enabling it locally also needs the
+                    // path added here or an authenticated session.
+                    .requestMatchers("/swagger-ui.html", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                     // Actuator: liveness/readiness probes only; metrics/info require auth
                     .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                     // 除上面外的所有请求全部需要鉴权认证
