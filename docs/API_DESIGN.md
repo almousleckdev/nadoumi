@@ -69,7 +69,7 @@ under `/api/...`.
 | POST | `/api/student/password` | **NEW.** bearer (student). `{ currentPassword, newPassword }` → verify current, `PasswordPolicy` (incl. ≠ current), **other sessions revoked**, `204`. |
 | GET | `/api/student/me` | student-shaped identity: `{ user:{id,name,locale}, accessibleApplicants:[{applicantId, accessRole, capabilities[]}] }`. **No** `roles`/`permissions`. |
 | POST | `/api/student/logout` | invalidate token. |
-| GET | `/api/dev/mail/latest?to=` | **NEW, non-prod.** Only mounted when `nadoumi.mail.transport=log`. Returns the last email captured for a recipient — E2E OTP retrieval. |
+| GET | `/api/dev/mail/latest?to=` | **NEW, non-prod, anonymous.** Returns the last email captured for a recipient (raw OTP / reset codes) — E2E OTP retrieval. Mounted only when `nadoumi.mail.dev-inbox.enabled=true` (explicit opt-in, off by default and in every committed config) **and** the `prod` profile is not active. `nadoumi.mail.transport` must be `log`. |
 
 The Nuxt BFF (D2) sets the JWT in an httpOnly + Secure + SameSite=Lax cookie; browser
 JS never holds the raw token. Revision 2 BFF passthroughs:

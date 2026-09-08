@@ -134,6 +134,13 @@ CI, no network) or `transport=smtp` (Mailpit locally via `docker-compose.yml`, G
 `smtp.gmail.com:587` + App Password for staging/prod). All creds are env-only
 (`SPRING_MAIL_*`, `NADOUMI_MAIL_*`) — never committed (§7).
 
+**Dev mail inbox:** `GET /api/dev/mail/latest` is `@Anonymous` and returns raw OTP /
+reset codes, so it is gated independently of `transport`: it mounts only when
+`nadoumi.mail.dev-inbox.enabled=true` (a dedicated opt-in — absent, and therefore
+off, in every committed config; `application-test.yml` sets it for the ITs, local
+E2E sets it in `config/application-local.yml`) **and** the `prod` profile is not
+active (`@Profile("!prod")`). Choosing `transport=log` alone never exposes it.
+
 ## 2. Authorization (EXISTING)
 
 - **Model:** RBAC. `sys_user` –< `sys_user_role` >– `sys_role` –< `sys_role_menu` >–

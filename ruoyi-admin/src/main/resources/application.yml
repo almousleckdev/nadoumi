@@ -142,11 +142,15 @@ spring:
 # Nadoumi-specific configuration
 nadoumi:
   mail:
-    # log  = write rendered mails to logFile + expose GET /api/dev/mail/latest (no network)
-    # smtp = send via spring.mail.* above
+    # log  = write rendered mails to logFile (no network); smtp = send via spring.mail.* above
     transport: ${NADOUMI_MAIL_TRANSPORT:log}
     from: ${NADOUMI_MAIL_FROM:no-reply@nadoumi.local}
     logFile: ${NADOUMI_MAIL_LOG_FILE:./mail-outbox.log}
+    # Anonymous GET /api/dev/mail/latest — reads raw OTP / reset codes for E2E.
+    # Explicit opt-in, OFF unless set true, and never mounted under the prod profile.
+    # Do not enable outside local dev / CI.
+    dev-inbox:
+      enabled: ${NADOUMI_MAIL_DEV_INBOX_ENABLED:false}
     # where public "Contact us" submissions are forwarded
     supportInbox: ${NADOUMI_MAIL_SUPPORT_INBOX:support@nadoumi.local}
   web:

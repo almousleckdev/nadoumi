@@ -16,3 +16,10 @@ logging:
 
 ruoyi:
   profile: ${java.io.tmpdir}/nadoumi-test-upload
+
+nadoumi:
+  mail:
+    # OtpEndToEndTest reads the captured code via GET /api/dev/mail/latest.
+    # Off by default everywhere else; see DevMailController.
+    dev-inbox:
+      enabled: true
