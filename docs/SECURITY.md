@@ -301,6 +301,14 @@ Cloudinary call — full detail `docs/DOCUMENT_MANAGEMENT.md` §3.4):
 | Hard denylist (every category) | `text/html`, `image/svg+xml`, `application/xhtml+xml`, `application/x-msdownload`, `application/x-sh`, zip, java-archive — never accepted regardless of declared/sniffed MIME |
 | Checksum | SHA-256, streamed, for document-shaped categories (dedupe + tamper evidence) |
 
+**Legacy RuoYi `/common/*` upload/download.** Used only by the `ruoyi-ui` staff
+console; `nadoumi-web` and `nadoumi-admin` do not call it. It has no per-resource
+permission and `/common/download?delete=true` removes a file with only an
+extension check, so the whole `CommonController` is now
+`@PreAuthorize("@currentCaller.isStaff()")` — an external/student JWT is
+otherwise merely `authenticated()` and would pass. New paths must upload through
+`nadoumi-media` (validation pipeline above), not `/common/*`.
+
 **`CLOUDINARY_URL` handling.** Env var only — `cloudinary://<key>:<secret>@<cloud>`.
 No `application.yml` default; `CloudinaryMediaStorage`'s constructor **fails fast**
 at startup if the value is absent or malformed. Never logged — `CloudinaryMediaStorage`
