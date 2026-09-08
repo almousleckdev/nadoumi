@@ -24,6 +24,12 @@ public class HttpUtils
 {
     private static final Logger log = LoggerFactory.getLogger(HttpUtils.class);
 
+    /** Connect timeout (ms) — a stuck DNS/handshake must not hang the caller thread. */
+    private static final int CONNECT_TIMEOUT_MS = 5000;
+
+    /** Read timeout (ms) — a stalled remote must not hold the caller thread open. */
+    private static final int READ_TIMEOUT_MS = 10000;
+
     /**
      * 向指定 URL 发送GET方法的请求
      *
@@ -65,6 +71,8 @@ public class HttpUtils
             log.info("sendGet - {}", urlNameString);
             URL realUrl = new URL(urlNameString);
             URLConnection connection = realUrl.openConnection();
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            connection.setReadTimeout(READ_TIMEOUT_MS);
             connection.setRequestProperty("accept", "*/*");
             connection.setRequestProperty("connection", "Keep-Alive");
             connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
@@ -140,6 +148,8 @@ public class HttpUtils
             log.info("sendPost - {}", url);
             URL realUrl = new URL(url);
             URLConnection conn = realUrl.openConnection();
+            conn.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            conn.setReadTimeout(READ_TIMEOUT_MS);
             conn.setRequestProperty("accept", "*/*");
             conn.setRequestProperty("connection", "Keep-Alive");
             conn.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
