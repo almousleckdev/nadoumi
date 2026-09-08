@@ -48,7 +48,7 @@ public class NotificationService {
     /**
      * @return the new {@code nad_notification} id
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public long create(NotificationRequest req) {
         Assert.notNull(req.type(), "notification type is required");
         Assert.hasText(req.title(), "notification title is required");
@@ -97,12 +97,12 @@ public class NotificationService {
         return notificationMapper.countUnread(userId);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean markRead(long id, long userId) {
         return notificationMapper.markRead(id, userId) > 0;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public int markAllRead(long userId) {
         return notificationMapper.markAllRead(userId);
     }

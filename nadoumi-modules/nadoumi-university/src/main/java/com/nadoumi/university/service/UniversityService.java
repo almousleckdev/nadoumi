@@ -70,7 +70,7 @@ public class UniversityService {
         return toResponse(loadWithChildren(id));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UniversityResponse create(UniversityRequest req) {
         University u = new University();
         apply(u, req);
@@ -86,7 +86,7 @@ public class UniversityService {
         return get(u.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public UniversityResponse update(Long id, UniversityRequest req) {
         University u = load(id);
         boolean wasLive = u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED;
@@ -113,7 +113,7 @@ public class UniversityService {
         outbox.write("university", u.getId(), OutboxEventTypes.UNIVERSITY_PUBLISHED, payload.toJSONString());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         if (mapper.delete(id) == 0) {
             throw new NadNotFoundException("university not found");
@@ -123,7 +123,7 @@ public class UniversityService {
 
     // ---- media uploads (staff) ----
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadLogo(long id, MultipartFile file) {
         load(id);
         MediaUploadResult result = uploadFor(id, file, MediaCategory.UNIVERSITY_LOGO);
@@ -131,7 +131,7 @@ public class UniversityService {
         return result;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadBanner(long id, MultipartFile file) {
         load(id);
         MediaUploadResult result = uploadFor(id, file, MediaCategory.UNIVERSITY_BANNER);
@@ -139,7 +139,7 @@ public class UniversityService {
         return result;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadGalleryImage(long id, MultipartFile file) {
         load(id);
         List<UniversityGalleryImage> existing = mapper.findGallery(id);

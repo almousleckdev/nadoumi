@@ -87,7 +87,7 @@ public class ProgramService {
         return toResponse(p);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ProgramResponse create(ProgramRequest req) {
         String universityName = requireUniversity(req.universityId());
         Program p = new Program();
@@ -103,7 +103,7 @@ public class ProgramService {
         return get(p.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ProgramResponse update(Long id, ProgramRequest req) {
         Program p = load(id);
         boolean wasLive = isLive(p);
@@ -135,7 +135,7 @@ public class ProgramService {
         outbox.write("program", p.getId(), OutboxEventTypes.PROGRAM_PUBLISHED, payload.toJSONString());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         if (mapper.delete(id) == 0) {
             throw new NadNotFoundException("programme not found");
@@ -145,7 +145,7 @@ public class ProgramService {
 
     // ---- media upload (staff, nad:program:edit) ----
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadImage(long id, MultipartFile file) {
         load(id);
         MediaUploadResult result;

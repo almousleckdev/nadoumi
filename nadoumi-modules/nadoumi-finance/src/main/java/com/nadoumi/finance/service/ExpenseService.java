@@ -66,7 +66,7 @@ public class ExpenseService {
         return mapper.listCategories();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Expense create(ExpenseRequest req) {
         Expense e = new Expense();
         apply(e, req);
@@ -77,7 +77,7 @@ public class ExpenseService {
         return get(e.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Expense update(long id, ExpenseRequest req) {
         Expense e = get(id);
         if (!EDITABLE.contains(e.getStatus())) {
@@ -89,7 +89,7 @@ public class ExpenseService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Expense changeStatus(long id, String targetRaw, boolean canApprove) {
         Expense e = get(id);
         ExpenseStatus from = ExpenseStatus.valueOf(e.getStatus());
@@ -121,7 +121,7 @@ public class ExpenseService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
         Expense e = get(id);
         if (!Set.of("DRAFT", "REJECTED").contains(e.getStatus())) {

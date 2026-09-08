@@ -73,7 +73,7 @@ public class EmployeeService {
         return u.getRoles().stream().map(r -> r.getRoleId()).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EmployeeResponse create(EmployeeRequest req, boolean canViewComp) {
         long userId;
         if (req.userId() != null) {
@@ -126,7 +126,7 @@ public class EmployeeService {
         return get(e.getId(), canViewComp);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public EmployeeResponse update(long id, EmployeeRequest req, boolean canViewComp) {
         Employee existing = mapper.findById(id);
         if (existing == null) {
@@ -152,7 +152,7 @@ public class EmployeeService {
         return get(id, canViewComp);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
         if (mapper.deleteById(id) == 0) {
             throw new NadNotFoundException("employee not found");

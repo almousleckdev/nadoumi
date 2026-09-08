@@ -152,7 +152,10 @@ nadoumi-modules/            (new Maven aggregator; ruoyi-admin depends on it)
 - New `/api/**` endpoints use real HTTP status codes + `problem+json` errors — not
   `AjaxResult`. Existing `/system|/monitor|/tool` endpoints keep RuoYi conventions.
 - Validation with `jakarta.validation` on DTOs; `@Validated` controllers.
-- `@Transactional` on service methods that write; keep transactions short; no remote
+- `@Transactional(rollbackFor = Exception.class)` on service methods that write —
+  Spring's default only rolls back unchecked exceptions, so a checked / third-party
+  `Exception` after a write would otherwise commit the partial change. Read-only
+  methods use `@Transactional(readOnly = true)`. Keep transactions short; no remote
   calls inside a transaction.
 - Authorization: `@PreAuthorize` **and** a service-level check via
   `NadoumiAccessService` for resource-scoped access (defense in depth). Every

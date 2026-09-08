@@ -77,7 +77,7 @@ public class ScholarshipAdminService {
         return toResponse(loadWithChildren(id));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ScholarshipResponse create(ScholarshipRequest req) {
         Scholarship s = new Scholarship();
         apply(s, req);
@@ -96,7 +96,7 @@ public class ScholarshipAdminService {
         return get(s.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ScholarshipResponse update(Long id, ScholarshipRequest req) {
         Scholarship existing = load(id);
         boolean wasPublished = existing.getPublishStatus() == PublishStatus.PUBLISHED;
@@ -134,7 +134,7 @@ public class ScholarshipAdminService {
                 OutboxEventTypes.SCHOLARSHIP_PUBLISHED, payload.toJSONString());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(Long id) {
         if (mapper.delete(id) == 0) {
             throw new NadNotFoundException("scholarship not found");
@@ -143,7 +143,7 @@ public class ScholarshipAdminService {
 
     // ---- media uploads (staff, nad:scholarship:edit) ----
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadHero(long id, MultipartFile file) {
         load(id);
         MediaUploadResult result = uploadFor(id, file, MediaCategory.SCHOLARSHIP_HERO);
@@ -151,7 +151,7 @@ public class ScholarshipAdminService {
         return result;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadCover(long id, MultipartFile file) {
         load(id);
         MediaUploadResult result = uploadFor(id, file, MediaCategory.SCHOLARSHIP_COVER);
@@ -199,7 +199,7 @@ public class ScholarshipAdminService {
         return ScholarshipInternalResponse.of(internal, universityName);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public ScholarshipInternalResponse putInternal(Long scholarshipId, ScholarshipInternalRequest req) {
         load(scholarshipId);
         if (req.universityId() != null) {

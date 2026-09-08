@@ -46,7 +46,7 @@ public class DepartmentService {
         return d != null && d.getUniversityId() == universityId;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public DepartmentResponse create(long universityId, DepartmentRequest req) {
         requireUniversity(universityId);
         requireUniqueName(universityId, req.name().trim(), null);
@@ -58,7 +58,7 @@ public class DepartmentService {
         return get(universityId, d.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public DepartmentResponse update(long universityId, long id, DepartmentRequest req) {
         Department d = load(universityId, id);
         requireUniqueName(universityId, req.name().trim(), id);
@@ -68,7 +68,7 @@ public class DepartmentService {
         return get(universityId, id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long universityId, long id) {
         load(universityId, id);
         if (mapper.countMajorsUsing(id) > 0) {

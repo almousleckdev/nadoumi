@@ -45,7 +45,7 @@ public class RevenueService {
         return r;
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Revenue create(RevenueRequest req) {
         Revenue r = new Revenue();
         apply(r, req);
@@ -55,7 +55,7 @@ public class RevenueService {
         return get(r.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Revenue update(long id, RevenueRequest req) {
         Revenue r = get(id);
         apply(r, req);
@@ -64,7 +64,7 @@ public class RevenueService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
         if (mapper.deleteById(id) == 0) {
             throw new NadNotFoundException("revenue record not found");

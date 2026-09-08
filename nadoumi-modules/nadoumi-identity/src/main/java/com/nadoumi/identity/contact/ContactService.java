@@ -38,7 +38,7 @@ public class ContactService {
      * @return {@code true} if the message was accepted and stored, {@code false}
      *         if it was dropped as a bot submission (honeypot tripped).
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public boolean submit(ContactRequest req, String ipAddress, String userAgent) {
         if (StringUtils.hasText(req.website())) {
             log.debug("contact honeypot tripped from ip={}", ipAddress);

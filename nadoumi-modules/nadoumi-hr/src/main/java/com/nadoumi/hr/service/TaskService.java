@@ -78,7 +78,7 @@ public class TaskService {
         return TaskResponse.detail(t, eventMapper.findByTask(id));
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TaskResponse create(TaskRequest req, long actorUserId) {
         Task t = new Task();
         t.setTitle(req.title().trim());
@@ -101,7 +101,7 @@ public class TaskService {
         return get(t.getId());
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TaskResponse update(long id, TaskRequest req, long actorUserId) {
         Task t = require(id);
         if (TaskStatus.valueOf(t.getStatus()).isTerminal()) {
@@ -133,7 +133,7 @@ public class TaskService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public TaskResponse changeStatus(long id, String targetRaw, String note, long actorUserId, boolean isAdmin) {
         Task t = require(id);
         // A rank-and-file employee may only move a task that is assigned to them
@@ -175,7 +175,7 @@ public class TaskService {
         return get(id);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
         if (taskMapper.deleteById(id) == 0) {
             throw new NadNotFoundException("task not found");
