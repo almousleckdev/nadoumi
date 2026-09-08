@@ -166,8 +166,15 @@ public class Constants
 
     /**
      * 定时任务白名单配置（仅允许访问的包名，如其他需要可以自行添加）
+     *
+     * <p>Nadoumi: the {@code com.nadoumi.*.job} packages hold the platform's Quartz
+     * job beans ({@code outboxPollerJob}, {@code scholarshipDeadlineReminderJob}, …).
+     * Without them {@link com.ruoyi.quartz.util.ScheduleUtils#whiteList} rejects any
+     * attempt to create or edit those jobs from the admin console. Add a new module's
+     * job package here when it ships a scheduled job.
      */
-    public static final String[] JOB_WHITELIST_STR = { "com.ruoyi.quartz.task" };
+    public static final String[] JOB_WHITELIST_STR = { "com.ruoyi.quartz.task",
+            "com.nadoumi.notification.job", "com.nadoumi.scholarship.job", "com.nadoumi.media.job" };
 
     /**
      * 定时任务违规的字符
