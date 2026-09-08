@@ -11,6 +11,7 @@ import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.university.domain.University;
@@ -57,6 +58,8 @@ public class UniversityService {
 
     public PageResponse<UniversityResponse> list(String q, String country, String province, String city,
             UniversityType type, UniversityStatus status, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<University> rows = mapper.search(UniversitySearch.staff(q, country, province, city, type, status));
         long total = new PageInfo<>(rows).getTotal();
@@ -165,6 +168,8 @@ public class UniversityService {
     public PageResponse<PublicUniversityResponse> publicList(String q, String country, String province,
             String city, UniversityType type, Boolean featured, Boolean recommended, Boolean publicPartner,
             int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<University> rows = mapper.search(
                 UniversitySearch.publicCatalog(q, country, province, city, type, featured, recommended, publicPartner));

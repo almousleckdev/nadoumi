@@ -19,6 +19,7 @@ import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.common.access.ApplicantCapability;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
@@ -123,6 +124,8 @@ public class ApplicantService {
 
     public PageResponse<ApplicantResponse> listForStaff(String name, ApplicantStatus status,
             String nationality, java.time.LocalDateTime createdAfter, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Applicant> rows = mapper.search(name, status, nationality, createdAfter);
         long total = new PageInfo<>(rows).getTotal();

@@ -3,6 +3,7 @@ package com.nadoumi.finance.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Expense;
 import com.nadoumi.finance.domain.ExpenseCategory;
 import com.nadoumi.finance.domain.ExpenseStatus;
@@ -43,6 +44,8 @@ public class ExpenseService {
     @Transactional(readOnly = true)
     public PageResponse<Expense> list(String q, String status, Long categoryId, LocalDate from, LocalDate to,
             int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Expense> rows = mapper.search(nz(q), nz(status), categoryId, from, to);
         long total = new PageInfo<>(rows).getTotal();

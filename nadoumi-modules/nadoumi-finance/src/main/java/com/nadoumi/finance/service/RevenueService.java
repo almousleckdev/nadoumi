@@ -3,6 +3,7 @@ package com.nadoumi.finance.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Revenue;
 import com.nadoumi.finance.mapper.RevenueMapper;
 import com.nadoumi.finance.web.request.RevenueRequest;
@@ -27,6 +28,8 @@ public class RevenueService {
 
     @Transactional(readOnly = true)
     public PageResponse<Revenue> list(String q, String source, LocalDate from, LocalDate to, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Revenue> rows = mapper.search(nz(q), nz(source), from, to);
         long total = new PageInfo<>(rows).getTotal();

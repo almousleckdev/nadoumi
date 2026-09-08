@@ -322,6 +322,9 @@ upload controller, including the catalog controllers.
   `application/problem+json`. `AjaxResult` is not reused under `/api/**`.
 - **Pagination:** `?page=0&size=20&sort=field,desc`; response
   `{ content, page, size, totalElements, totalPages }` (Spring `Page` shape).
+  `size` is clamped to `PageSupport.MAX_SIZE` (100) and `page` floored at 0 in
+  every list service — an oversized request is capped, not rejected, so it cannot
+  drive an unbounded `LIMIT`.
 - **Versioning — DECIDED (recommended, pending final nod):** URI prefix **`/api/v1/...`**.
 - **Validation:** `jakarta.validation` on DTOs + `@Validated` controllers.
 - **Idempotency:** `Idempotency-Key` header required on `POST` for payments and

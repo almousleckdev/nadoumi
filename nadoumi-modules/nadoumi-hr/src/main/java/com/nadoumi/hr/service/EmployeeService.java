@@ -3,6 +3,7 @@ package com.nadoumi.hr.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.hr.domain.Employee;
 import com.nadoumi.hr.mapper.EmployeeMapper;
 import com.nadoumi.hr.web.request.EmployeeRequest;
@@ -42,6 +43,8 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public PageResponse<EmployeeResponse> list(String q, Long deptId, String status, int page, int size,
             boolean canViewComp) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Employee> rows = mapper.search(blankToNull(q), deptId, blankToNull(status));
         long total = new PageInfo<>(rows).getTotal();

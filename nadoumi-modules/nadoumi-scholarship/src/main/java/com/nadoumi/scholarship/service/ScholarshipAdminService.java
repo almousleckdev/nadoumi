@@ -11,6 +11,7 @@ import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
@@ -63,6 +64,8 @@ public class ScholarshipAdminService {
 
     @Transactional(readOnly = true)
     public PageResponse<ScholarshipResponse> list(ScholarshipSearch filter, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Scholarship> rows = mapper.searchStaff(filter);
         long total = new PageInfo<>(rows).getTotal();

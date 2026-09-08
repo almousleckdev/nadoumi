@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.notification.NotificationChannelKind;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.notification.domain.DeliveryStatus;
 import com.nadoumi.notification.domain.Notification;
 import com.nadoumi.notification.domain.NotificationDelivery;
@@ -83,6 +84,8 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public PageResponse<NotificationView> listForRecipient(long userId, boolean unreadOnly, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Notification> rows = notificationMapper.findByRecipient(userId, unreadOnly);
         long total = new PageInfo<>(rows).getTotal();
@@ -108,6 +111,8 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public PageResponse<NotificationView> staffSearch(Long recipientUserId, String type, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Notification> rows = notificationMapper.search(recipientUserId, type);
         long total = new PageInfo<>(rows).getTotal();

@@ -7,6 +7,7 @@ import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.web.PageResponse;
+import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.hr.domain.Task;
 import com.nadoumi.hr.domain.TaskEvent;
 import com.nadoumi.hr.domain.TaskStatus;
@@ -62,6 +63,8 @@ public class TaskService {
     @Transactional(readOnly = true)
     public PageResponse<TaskResponse> list(String q, String status, String priority, Long assigneeUserId,
             Long createdByUserId, Long ownedByUserId, int page, int size) {
+        page = PageSupport.clampPage(page);
+        size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Task> rows = taskMapper.search(nz(q), nz(status), nz(priority), assigneeUserId, createdByUserId,
                 ownedByUserId);
