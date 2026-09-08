@@ -27,7 +27,9 @@ public class SessionRevoker {
      * @return the number of sessions deleted
      */
     public int revokeAll(Long userId, String exceptToken) {
-        Collection<String> keys = redis.keys(CacheConstants.LOGIN_TOKEN_KEY + "*");
+        // SCAN, not KEYS — KEYS login_tokens:* is O(N) and blocks Redis's single
+        // thread, freezing every login / rate-limit check while it runs.
+        Collection<String> keys = redis.scanKeys(CacheConstants.LOGIN_TOKEN_KEY + "*");
         if (keys == null) {
             return 0;
         }

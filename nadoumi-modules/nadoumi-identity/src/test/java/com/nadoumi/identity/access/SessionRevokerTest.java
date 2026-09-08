@@ -29,7 +29,7 @@ class SessionRevokerTest {
         String a = CacheConstants.LOGIN_TOKEN_KEY + "aaa";
         String b = CacheConstants.LOGIN_TOKEN_KEY + "bbb";
         String c = CacheConstants.LOGIN_TOKEN_KEY + "ccc";
-        when(redis.keys(CacheConstants.LOGIN_TOKEN_KEY + "*")).thenReturn(List.of(a, b, c));
+        when(redis.scanKeys(CacheConstants.LOGIN_TOKEN_KEY + "*")).thenReturn(List.of(a, b, c));
         when(redis.getCacheObject(a)).thenReturn(session(7L, "aaa"));
         when(redis.getCacheObject(b)).thenReturn(session(7L, "bbb"));
         when(redis.getCacheObject(c)).thenReturn(session(9L, "ccc"));
@@ -46,7 +46,7 @@ class SessionRevokerTest {
     void with_a_null_exception_token_it_deletes_all_of_the_users_sessions() {
         String a = CacheConstants.LOGIN_TOKEN_KEY + "aaa";
         String b = CacheConstants.LOGIN_TOKEN_KEY + "bbb";
-        when(redis.keys(CacheConstants.LOGIN_TOKEN_KEY + "*")).thenReturn(List.of(a, b));
+        when(redis.scanKeys(CacheConstants.LOGIN_TOKEN_KEY + "*")).thenReturn(List.of(a, b));
         when(redis.getCacheObject(a)).thenReturn(session(7L, "aaa"));
         when(redis.getCacheObject(b)).thenReturn(session(7L, "bbb"));
 
@@ -55,7 +55,7 @@ class SessionRevokerTest {
 
     @Test
     void tolerates_no_sessions() {
-        when(redis.keys(CacheConstants.LOGIN_TOKEN_KEY + "*")).thenReturn(null);
+        when(redis.scanKeys(CacheConstants.LOGIN_TOKEN_KEY + "*")).thenReturn(null);
         assertThat(revoker.revokeAll(7L, null)).isZero();
     }
 }
