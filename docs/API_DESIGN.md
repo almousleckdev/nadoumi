@@ -306,7 +306,14 @@ upload controller, including the catalog controllers.
 
 - **Real HTTP status codes.** 200/201/204; 400 validation; 401 unauthenticated; 403
   authorization/confidentiality; 404 not found / not visible; 409 optimistic-lock
-  conflict; 422 business-rule rejection.
+  conflict; 422 business-rule rejection; **429** rate-limit exceeded, with a
+  `Retry-After` header (seconds) — `@RateLimiter` no longer answers HTTP 200.
+- **500s never leak internals.** Unhandled exceptions return a generic
+  `"An internal error occurred"`; the cause (SQL, table names, stack) is logged
+  only. `NadApiExceptionHandler` maps the framework 4xx that no module advice
+  owns (`HttpMessageNotReadableException`, missing/invalid params, method not
+  allowed) to `problem+json`; anything it does not recognise falls through to
+  RuoYi's sanitized handler rather than being force-cast to 500.
 - **Typed payloads.** Java `record` request/response DTOs per context. **Never** a
   MyBatis/JPA entity on the wire. Explicit field-by-field mapping (MapStruct or hand);
   no reflective copy from an entity to a confidential-adjacent DTO.
