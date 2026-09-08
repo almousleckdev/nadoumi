@@ -2,6 +2,7 @@ package com.ruoyi.common.core.redis;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +10,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.BoundSetOperations;
+import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
@@ -107,6 +110,21 @@ public class RedisCache
     {
         ValueOperations<String, T> operation = redisTemplate.opsForValue();
         return operation.get(key);
+    }
+
+    /**
+     * 原子地读取并删除一个键（Redis GETDEL）。
+     *
+     * <p>Use where a non-atomic get-then-delete would let two concurrent callers
+     * both observe the value before either deletes it (e.g. single-use tokens).
+     *
+     * @param key 缓存键值
+     * @return the value that was stored, or {@code null} if the key was absent
+     */
+    public <T> T getAndDelete(final String key)
+    {
+        ValueOperations<String, T> operation = redisTemplate.opsForValue();
+        return operation.getAndDelete(key);
     }
 
     /**
@@ -265,5 +283,30 @@ public class RedisCache
     public Collection<String> keys(final String pattern)
     {
         return redisTemplate.keys(pattern);
+    }
+
+    /**
+     * 非阻塞地匹配键（Redis SCAN）。
+     *
+     * <p>Drop-in for {@link #keys} that iterates with a cursor instead of the
+     * O(N) blocking {@code KEYS} command, so a large keyspace does not stall
+     * Redis's single-threaded event loop. Ordering is not guaranteed and a key
+     * changed mid-scan may be missed or seen twice — fine for best-effort sweeps.
+     *
+     * @param pattern glob-style match pattern
+     * @return the matching keys
+     */
+    public Collection<String> scanKeys(final String pattern)
+    {
+        Set<String> keys = new HashSet<>();
+        ScanOptions options = ScanOptions.scanOptions().match(pattern).count(200).build();
+        try (Cursor<String> cursor = redisTemplate.scan(options))
+        {
+            while (cursor.hasNext())
+            {
+                keys.add(cursor.next());
+            }
+        }
+        return keys;
     }
 }
