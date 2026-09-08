@@ -3,6 +3,7 @@ package com.ruoyi.framework.aspectj;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -16,8 +17,8 @@ import org.springframework.stereotype.Component;
 import com.ruoyi.common.annotation.RateLimiter;
 import com.ruoyi.common.enums.LimitType;
 import com.ruoyi.common.exception.RateLimitExceededException;
+import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.ip.IpUtils;
 
 /**
  * 限流处理
@@ -80,12 +81,24 @@ public class RateLimiterAspect
         StringBuffer stringBuffer = new StringBuffer(rateLimiter.key());
         if (rateLimiter.limitType() == LimitType.IP)
         {
-            stringBuffer.append(IpUtils.getIpAddr()).append("-");
+            stringBuffer.append(clientIp()).append("-");
         }
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         Class<?> targetClass = method.getDeclaringClass();
         stringBuffer.append(targetClass.getName()).append("-").append(method.getName());
         return stringBuffer.toString();
+    }
+
+    /**
+     * The socket peer address — NOT a client-supplied {@code X-Forwarded-For}, which
+     * an attacker can rotate to get a fresh bucket per request. A deployment behind a
+     * reverse proxy must set {@code server.forward-headers-strategy=native} with
+     * trusted proxies so {@code getRemoteAddr()} resolves to the real client.
+     */
+    private String clientIp()
+    {
+        HttpServletRequest request = ServletUtils.getRequest();
+        return request != null ? request.getRemoteAddr() : "unknown";
     }
 }
