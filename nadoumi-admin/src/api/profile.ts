@@ -36,7 +36,7 @@ export const updateProfile = (body: ProfileInput) =>
   request.put('/system/user/profile', body)
 
 export const updatePassword = (oldPassword: string, newPassword: string) =>
-  request.put('/system/user/profile/updatePwd', null, { params: { oldPassword, newPassword } })
+  request.put('/system/user/profile/updatePwd', { oldPassword, newPassword })
 
 export interface ProfileSession {
   loginTime: number

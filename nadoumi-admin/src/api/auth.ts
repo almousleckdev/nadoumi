@@ -26,4 +26,4 @@ export const getInfo = () =>
 export const logout = () => request.post('/logout')
 
 export const updatePassword = (oldPassword: string, newPassword: string) =>
-  request.put('/system/user/profile/updatePwd', null, { params: { oldPassword, newPassword } })
+  request.put('/system/user/profile/updatePwd', { oldPassword, newPassword })

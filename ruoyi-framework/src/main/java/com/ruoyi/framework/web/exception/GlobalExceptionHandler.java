@@ -3,6 +3,7 @@ package com.ruoyi.framework.web.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -31,6 +32,22 @@ import com.ruoyi.common.utils.html.EscapeUtil;
 public class GlobalExceptionHandler
 {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     * Temporary diagnostic switch. When {@code NADOUMI_ERRORS_VERBOSE=true}, an
+     * otherwise-generic 500 body carries the exception type + message so a problem
+     * can be diagnosed from the browser without server-log access. Keep it OFF in
+     * normal operation — it can leak internals.
+     */
+    @Value("${nadoumi.errors.verbose:false}")
+    private boolean verboseErrors;
+
+    private String internalErrorBody(Exception e)
+    {
+        return verboseErrors
+                ? e.getClass().getSimpleName() + ": " + e.getMessage()
+                : "An internal error occurred";
+    }
 
     /**
      * 权限校验异常
@@ -116,7 +133,7 @@ public class GlobalExceptionHandler
     {
         String requestURI = request.getRequestURI();
         log.error("request '{}' raised an unknown error.", requestURI, e);
-        return AjaxResult.error("An internal error occurred");
+        return AjaxResult.error(internalErrorBody(e));
     }
 
     /**
@@ -129,7 +146,7 @@ public class GlobalExceptionHandler
     {
         String requestURI = request.getRequestURI();
         log.error("request '{}' raised a system error.", requestURI, e);
-        return AjaxResult.error("An internal error occurred");
+        return AjaxResult.error(internalErrorBody(e));
     }
 
     /**
