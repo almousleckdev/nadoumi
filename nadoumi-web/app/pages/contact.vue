@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { problemMessage } from '~/composables/useApi'
+import { CONTACT, telHref } from '~/data/contact'
 
 const { t, locale } = useI18n()
 useSeo(t('contact.title'), t('contact.lead'))
@@ -63,18 +64,29 @@ async function submit() {
         <div class="space-y-4">
           <div class="rounded-xl border border-slate-200 bg-white p-5">
             <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('contact.emailTitle') }}</h2>
-            <p class="mt-2 text-sm">
-              <a href="mailto:support@nadoumi.com" class="text-brand-700 hover:text-brand-800">support@nadoumi.com</a>
-            </p>
-            <p class="mt-1 text-sm text-slate-500">{{ t('contact.responseNote') }}</p>
+            <ul class="mt-2 space-y-1 text-sm">
+              <li v-for="e in CONTACT.emails" :key="e">
+                <a :href="`mailto:${e}`" class="text-brand-700 hover:text-brand-800">{{ e }}</a>
+              </li>
+            </ul>
+            <p class="mt-2 text-sm text-slate-500">{{ t('contact.responseNote') }}</p>
           </div>
-          <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-5">
+          <div class="rounded-xl border border-slate-200 bg-white p-5">
+            <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('contact.phoneTitle') }}</h2>
+            <ul class="mt-2 space-y-1 text-sm">
+              <li v-for="p in CONTACT.phones" :key="p">
+                <a :href="telHref(p)" class="text-slate-700 hover:text-slate-900">{{ p }}</a>
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-white p-5">
             <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('contact.officeTitle') }}</h2>
-            <p class="mt-2 text-sm text-slate-500">{{ t('contact.officePending') }}</p>
+            <p class="mt-2 text-sm text-slate-700">{{ CONTACT.officeEn }}</p>
+            <p class="mt-1 text-sm text-slate-500">{{ CONTACT.officeCn }}</p>
           </div>
-          <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-5">
+          <div class="rounded-xl border border-slate-200 bg-white p-5">
             <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('contact.hoursTitle') }}</h2>
-            <p class="mt-2 text-sm text-slate-500">{{ t('contact.hoursPending') }}</p>
+            <p class="mt-2 text-sm text-slate-700">{{ CONTACT.hours }}</p>
           </div>
         </div>
 

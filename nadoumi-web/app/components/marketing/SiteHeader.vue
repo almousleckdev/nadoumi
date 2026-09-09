@@ -52,7 +52,6 @@ watch(() => route.fullPath, () => { open.value = false })
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-3">
-          <NLocaleSwitcher class="hidden sm:block" />
           <template v-if="status === 'authed'">
             <NDropdown :label="user?.nickName ?? t('nav.dashboard')" trigger-test-id="user-menu">
               <NuxtLink :to="localePath('/dashboard')" class="block px-3 py-2 text-sm no-underline hover:bg-slate-50">{{ t('nav.dashboard') }}</NuxtLink>
@@ -61,8 +60,7 @@ watch(() => route.fullPath, () => { open.value = false })
             </NDropdown>
           </template>
           <template v-else>
-            <NuxtLink :to="localePath('/login')" class="hidden text-sm font-medium text-slate-700 no-underline hover:text-slate-900 hover:no-underline sm:inline">{{ t('nav.signIn') }}</NuxtLink>
-            <NButton :to="localePath('/register')" size="sm">{{ t('nav.createAccount') }}</NButton>
+            <NButton :to="localePath('/login')" size="sm">{{ t('nav.signIn') }}</NButton>
           </template>
           <button
             type="button"
@@ -90,9 +88,8 @@ watch(() => route.fullPath, () => { open.value = false })
         >
           {{ t(l.key) }}
         </NuxtLink>
-        <div class="mt-2 flex items-center justify-between border-t border-slate-100 px-3 pt-3">
-          <NLocaleSwitcher />
-          <NuxtLink v-if="status !== 'authed'" :to="localePath('/login')" class="text-sm font-medium text-slate-700 no-underline">{{ t('nav.signIn') }}</NuxtLink>
+        <div v-if="status !== 'authed'" class="mt-2 border-t border-slate-100 px-3 pt-3">
+          <NButton :to="localePath('/login')" size="sm" block>{{ t('nav.signIn') }}</NButton>
         </div>
       </nav>
     </NContainer>

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import logoUrl from '~/assets/images/logo.jpg'
+import { CONTACT, telHref } from '~/data/contact'
+import { GUIDES } from '~/data/guides'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -22,13 +24,10 @@ const legal = [
 <template>
   <footer class="border-t border-slate-200 bg-slate-50">
     <NContainer>
-      <div class="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div class="grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1.4fr]">
         <div class="max-w-xs">
           <img :src="logoUrl" alt="Nadoumi" class="h-10 w-auto" width="160" height="40">
           <p class="mt-3 text-sm text-slate-600">{{ t('footer.mission') }}</p>
-          <div class="mt-4">
-            <NLocaleSwitcher />
-          </div>
         </div>
 
         <div class="text-sm">
@@ -38,10 +37,7 @@ const legal = [
               <NuxtLink :to="localePath(l.to)" class="text-slate-600 no-underline hover:text-slate-900">{{ t(l.key) }}</NuxtLink>
             </li>
           </ul>
-        </div>
-
-        <div class="text-sm">
-          <p class="font-semibold text-slate-900">{{ t('footer.company') }}</p>
+          <p class="mt-6 font-semibold text-slate-900">{{ t('footer.company') }}</p>
           <ul class="mt-3 space-y-2">
             <li v-for="l in company" :key="l.to">
               <NuxtLink :to="localePath(l.to)" class="text-slate-600 no-underline hover:text-slate-900">{{ t(l.key) }}</NuxtLink>
@@ -50,15 +46,30 @@ const legal = [
         </div>
 
         <div class="text-sm">
-          <p class="font-semibold text-slate-900">{{ t('footer.contactTitle') }}</p>
+          <p class="font-semibold text-slate-900">{{ t('footer.guides') }}</p>
           <ul class="mt-3 space-y-2">
-            <li>
-              <a href="mailto:support@nadoumi.com" class="text-slate-600 no-underline hover:text-slate-900">{{ t('footer.contactEmail') }}</a>
-            </li>
-            <li>
-              <NuxtLink :to="localePath('/contact')" class="text-slate-600 no-underline hover:text-slate-900">{{ t('footer.contactForm') }}</NuxtLink>
+            <li v-for="g in GUIDES" :key="g.slug">
+              <NuxtLink :to="localePath(`/guides/${g.slug}`)" class="text-slate-600 no-underline hover:text-slate-900">{{ g.title }}</NuxtLink>
             </li>
           </ul>
+        </div>
+
+        <div class="text-sm">
+          <p class="font-semibold text-slate-900">{{ t('footer.contactTitle') }}</p>
+          <address class="mt-3 space-y-3 not-italic text-slate-600">
+            <p>{{ CONTACT.officeEn }}</p>
+            <p>{{ CONTACT.hours }}</p>
+            <ul class="space-y-1">
+              <li v-for="e in CONTACT.emails" :key="e">
+                <a :href="`mailto:${e}`" class="no-underline hover:text-slate-900">{{ e }}</a>
+              </li>
+            </ul>
+            <ul class="space-y-1">
+              <li v-for="p in CONTACT.phones" :key="p">
+                <a :href="telHref(p)" class="no-underline hover:text-slate-900">{{ p }}</a>
+              </li>
+            </ul>
+          </address>
         </div>
       </div>
 

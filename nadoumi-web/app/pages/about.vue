@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { imagery } from '~/data/imagery'
+import { CONTACT, telHref } from '~/data/contact'
 import whoImage from '~/assets/images/ceo.jpeg'
 import helpImage from '~/assets/images/apply.png'
 import ceoPhoto from '~/assets/team/ceo.jpeg'
@@ -125,24 +126,32 @@ const help = computed(() => [
         </ul>
       </section>
 
-      <!-- contact / location (details to be supplied) -->
+      <!-- contact / location -->
       <section class="grid gap-6 border-t border-slate-200 py-14 sm:grid-cols-2 lg:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-white p-6">
           <h3 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('about.contactTitle') }}</h3>
-          <p class="mt-3 text-sm text-slate-700">
-            <a href="mailto:support@nadoumi.com" class="text-brand-700 hover:text-brand-800">support@nadoumi.com</a>
-          </p>
-          <NuxtLink :to="localePath('/contact')" class="mt-1 inline-block text-sm font-medium text-brand-700 hover:text-brand-800">
+          <ul class="mt-3 space-y-1 text-sm">
+            <li v-for="e in CONTACT.emails" :key="e">
+              <a :href="`mailto:${e}`" class="text-brand-700 hover:text-brand-800">{{ e }}</a>
+            </li>
+          </ul>
+          <ul class="mt-3 space-y-1 text-sm text-slate-700">
+            <li v-for="p in CONTACT.phones" :key="p">
+              <a :href="telHref(p)" class="hover:text-slate-900">{{ p }}</a>
+            </li>
+          </ul>
+          <NuxtLink :to="localePath('/contact')" class="mt-3 inline-block text-sm font-medium text-brand-700 hover:text-brand-800">
             {{ t('about.contactCta') }} →
           </NuxtLink>
         </div>
-        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
           <h3 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('about.officeTitle') }}</h3>
-          <p class="mt-3 text-sm text-slate-500">{{ t('about.officePending') }}</p>
+          <p class="mt-3 text-sm text-slate-700">{{ CONTACT.officeEn }}</p>
+          <p class="mt-1 text-sm text-slate-500">{{ CONTACT.officeCn }}</p>
         </div>
-        <div class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6">
+        <div class="rounded-xl border border-slate-200 bg-white p-6">
           <h3 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('about.hoursTitle') }}</h3>
-          <p class="mt-3 text-sm text-slate-500">{{ t('about.hoursPending') }}</p>
+          <p class="mt-3 text-sm text-slate-700">{{ CONTACT.hours }}</p>
         </div>
       </section>
     </NContainer>

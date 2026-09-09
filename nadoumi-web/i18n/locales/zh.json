@@ -21,7 +21,8 @@
     "contactEmail": "support{'@'}nadoumi.com",
     "rights": "Nadoumi. International education platform.",
     "contactTitle": "Contact",
-    "contactForm": "Send a message"
+    "contactForm": "Send a message",
+    "guides": "Guides"
   },
   "common": {
     "loading": "Loading",
@@ -213,7 +214,8 @@
     "successTitle": "Message sent",
     "sent": "Thanks, we’ll be in touch.",
     "errorTitle": "Message not sent",
-    "errorBody": "Something went wrong sending your message. Please try again in a moment."
+    "errorBody": "Something went wrong sending your message. Please try again in a moment.",
+    "phoneTitle": "Phone"
   },
   "catalog": {
     "scholarshipsTitle": "Scholarships",
@@ -312,7 +314,9 @@
       "personal": "Personal",
       "verify": "Verify",
       "password": "Password"
-    }
+    },
+    "newToNadoumi": "New to Nadoumi?",
+    "createProfile": "Create a profile"
   },
   "dashboard": {
     "nav": {
@@ -789,5 +793,8 @@
     "trackStage": "Stage",
     "trackUpdated": "Last updated",
     "disclaimer": "Guided search across the live Nadoumi catalog."
+  },
+  "guides": {
+    "more": "More guides"
   }
 }

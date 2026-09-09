@@ -56,9 +56,13 @@ describe('contact page', () => {
     expect(w.find('#c-first').exists()).toBe(true)
   })
 
-  it('shows contact-info blocks with honest "to be supplied" placeholders', async () => {
+  it('shows the real contact details (emails, phones, office, hours)', async () => {
     const w = await mountSuspended(Contact)
-    expect(w.text()).toContain('support@nadoumi.com')
-    expect(w.text()).toContain('to be supplied')
+    const text = w.text()
+    expect(text).toContain('support@nadoumi.com')
+    expect(text).toContain('nadoumiedu@gmail.com')
+    expect(text).toContain('+86 159 0823 7607')
+    expect(text).toContain('Mianyang')
+    expect(text).toMatch(/09:00/)
   })
 })

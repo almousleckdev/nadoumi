@@ -52,9 +52,12 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
         <NButton type="submit" :loading="busy" block>{{ t('auth.submitLogin') }}</NButton>
       </form>
     </NCard>
-    <div class="mt-4 flex justify-between text-sm">
-      <NuxtLink :to="localePath('/register')" class="text-brand-700 hover:underline">{{ t('auth.toRegister') }}</NuxtLink>
+    <div class="mt-4 text-center text-sm">
       <NuxtLink :to="localePath('/forgot-password')" class="text-slate-500 hover:underline">{{ t('auth.forgot') }}</NuxtLink>
+    </div>
+    <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center text-sm text-slate-600">
+      {{ t('auth.newToNadoumi') }}
+      <NuxtLink :to="localePath('/register')" class="ml-1 font-semibold text-brand-700 hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
     </div>
   </div>
 </template>

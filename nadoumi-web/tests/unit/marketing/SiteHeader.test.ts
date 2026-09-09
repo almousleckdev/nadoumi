@@ -15,9 +15,11 @@ describe('SiteHeader', () => {
     expect(w.text()).not.toContain('Destinations')
   })
 
-  it('shows Sign in + Create account when signed out', async () => {
+  it('shows only Sign in when signed out (no Create account, no locale switcher)', async () => {
     const w = await mountSuspended(SiteHeader)
     expect(w.text()).toContain('Sign in')
-    expect(w.text()).toContain('Create account')
+    expect(w.text()).not.toContain('Create account')
+    // locale switcher removed from the header
+    expect(w.findComponent({ name: 'NLocaleSwitcher' }).exists()).toBe(false)
   })
 })
