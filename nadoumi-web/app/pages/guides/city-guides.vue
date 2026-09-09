@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Division } from '~/data/guides/china'
 import { CHINA_REGIONS, CHINA_DIVISION_COUNT } from '~/data/guides/china'
+import { GUIDE_HEROES } from '~/data/guides/heroes'
 
 const localePath = useLocalePath()
 
@@ -63,16 +64,32 @@ function reset() {
 
 <template>
   <div>
-    <PageHero
-      title="City Guides"
-      subtitle="Every province and region of China, its history, culture, language and festivals, with two cities and their leading universities."
-    >
-      <nav class="mt-4 text-sm">
-        <NuxtLink :to="localePath('/guides')" class="text-brand-700 no-underline hover:underline">Guides</NuxtLink>
-        <span class="mx-2 text-slate-400" aria-hidden="true">/</span>
-        <span class="text-slate-500">City Guides</span>
-      </nav>
-    </PageHero>
+    <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+      <img
+        :src="GUIDE_HEROES['city-guides']"
+        alt=""
+        decoding="async"
+        class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
+      >
+      <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-950/70 to-slate-950/40" aria-hidden="true" />
+      <NContainer>
+        <div class="max-w-2xl py-16 sm:py-20">
+          <nav class="text-sm text-white/70">
+            <NuxtLink :to="localePath('/guides')" class="no-underline hover:text-white">Guides</NuxtLink>
+            <span class="mx-2" aria-hidden="true">/</span>
+            <span>City Guides</span>
+          </nav>
+          <span class="mt-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
+            <GuideIcon name="map" :size="22" />
+          </span>
+          <h1 class="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">City Guides</h1>
+          <p class="mt-4 text-lg leading-8 text-slate-200">
+            Every province and region of China, its history, culture, language and festivals, with two
+            cities and their leading universities.
+          </p>
+        </div>
+      </NContainer>
+    </section>
 
     <NContainer>
       <div class="py-12 sm:py-16">

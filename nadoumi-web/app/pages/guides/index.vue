@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { GUIDES } from '~/data/guides'
+import { GUIDE_HEROES } from '~/data/guides/heroes'
 
 const localePath = useLocalePath()
 useSeo('Nadoumi Guides', 'Practical guides to studying in China, applying, scholarships, visas, daily life and a guide to every region.')
@@ -20,13 +21,14 @@ useSeo('Nadoumi Guides', 'Practical guides to studying in China, applying, schol
           class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white no-underline transition hover:border-brand-300 hover:shadow-md"
         >
           <div class="relative h-32 overflow-hidden bg-slate-100">
-            <NuxtImg
-              :src="g.hero"
+            <img
+              :src="GUIDE_HEROES[g.slug]"
               :alt="g.title"
-              sizes="sm:100vw md:50vw lg:33vw"
+              loading="lazy"
+              decoding="async"
               class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              :modifiers="{ fit: 'crop', auto: 'format' }"
-            />
+            >
+
             <span class="absolute bottom-0 left-4 translate-y-1/2 flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-700 shadow-sm">
               <GuideIcon :name="g.icon" :size="20" />
             </span>

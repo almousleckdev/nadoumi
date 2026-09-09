@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { GUIDES, guideBySlug } from '~/data/guides'
+import { GUIDE_HEROES } from '~/data/guides/heroes'
 
 const props = defineProps<{ slug: string }>()
 
@@ -7,6 +8,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 
 const guide = computed(() => guideBySlug(props.slug))
+const hero = computed(() => GUIDE_HEROES[props.slug])
 const others = computed(() => GUIDES.filter(g => g.slug !== props.slug))
 
 useSeo(
@@ -19,14 +21,13 @@ useSeo(
   <div>
     <!-- hero band -->
     <section class="relative isolate overflow-hidden bg-slate-900 text-white">
-      <NuxtImg
-        v-if="guide"
-        :src="guide.hero"
+      <img
+        v-if="hero"
+        :src="hero"
         alt=""
-        sizes="100vw"
+        decoding="async"
         class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
-        :modifiers="{ fit: 'crop', auto: 'format' }"
-      />
+      >
       <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-950/70 to-slate-950/40" aria-hidden="true" />
       <NContainer>
         <div class="max-w-2xl py-16 sm:py-20">
