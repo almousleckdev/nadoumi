@@ -26,12 +26,6 @@ export interface Division {
   overview: string
   culture: string
   cities: GuideCity[]
-  /**
-   * Optional Unsplash path (served via the `unsplash` provider, see
-   * `nuxt.config.ts`). Present only for the provinces we have a verified,
-   * on-topic photograph for; the rest use a designed graphic hero.
-   */
-  hero?: string
 }
 
 export interface Region {
@@ -49,7 +43,6 @@ export const CHINA_REGIONS: Region[] = [
     divisions: [
       {
         name: 'Beijing', cn: '北京', kind: 'Municipality',
-        hero: '/photo-1547981609-4b6bfe67ca0b',
         overview: 'China\'s capital for most of the last eight centuries, seat of the Yuan, Ming, Qing and the People\'s Republic. Home of the Forbidden City, the Temple of Heaven and the closest stretches of the Great Wall.',
         culture: 'Standard Mandarin (Putonghua) is based on the Beijing dialect. The city keeps Peking opera, hutong courtyard life and Spring Festival temple fairs alongside a fast modern rhythm; Beijing roast duck is its signature dish.',
         cities: [
@@ -68,7 +61,6 @@ export const CHINA_REGIONS: Region[] = [
       },
       {
         name: 'Hebei', cn: '河北', kind: 'Province',
-        hero: '/photo-1508804185872-d7badad00f7d',
         overview: 'The province that wraps around Beijing and Tianjin. It holds the Chengde imperial summer resort, the Shanhaiguan pass where the Great Wall meets the sea, and much of China\'s steel industry.',
         culture: 'Hebei bangzi is a loud, percussive regional opera; the province has deep martial-arts lineages and elaborate Lantern Festival lantern fairs and ice sculptures.',
         cities: [
@@ -137,7 +129,6 @@ export const CHINA_REGIONS: Region[] = [
     divisions: [
       {
         name: 'Shanghai', cn: '上海', kind: 'Municipality',
-        hero: '/photo-1545893835-abaa50cbe628',
         overview: 'A fishing town that became a treaty port in 1843 and is now China\'s financial capital. The Bund faces the Pudong skyline across the Huangpu river; shikumen lane houses survive between the towers.',
         culture: 'Shanghainese is a Wu dialect. The city\'s haipai ("Shanghai style") culture mixes Chinese and Western influences; xiaolongbao soup dumplings and the Yu Garden Lantern Festival are local touchstones.',
         cities: [
@@ -251,7 +242,6 @@ export const CHINA_REGIONS: Region[] = [
       },
       {
         name: 'Guangxi', cn: '广西', kind: 'Autonomous region',
-        hero: '/photo-1537531383496-f4749b8032cf',
         overview: 'A Zhuang autonomous region of dramatic karst scenery, the peaks of Guilin, the Li river, and the Longsheng rice terraces. The Zhuang are China\'s largest ethnic minority.',
         culture: 'The Zhuang language is co-official; South-western Mandarin and Cantonese are also common. The Zhuang "March Third" song festival, along with Yao and Miao customs, fills the spring calendar.',
         cities: [

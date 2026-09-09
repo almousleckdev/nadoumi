@@ -1,23 +1,25 @@
 <script setup lang="ts">
 import type { Division } from '~/data/guides/china'
 import { regionTint } from '~/data/guides/regions'
+import { provinceHero } from '~/data/guides/province-heroes'
 
 const props = defineProps<{ division: Division, regionId: string }>()
 const tint = computed(() => regionTint(props.regionId))
+const hero = computed(() => provinceHero(props.division.name))
 </script>
 
 <template>
   <article class="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow hover:shadow-md">
     <!-- hero: real photograph where we have one, a designed graphic otherwise -->
-    <div class="relative flex h-40 items-end overflow-hidden p-4" :style="{ background: tint.grad }">
-      <NuxtImg
-        v-if="division.hero"
-        :src="division.hero"
+    <div class="relative flex h-44 items-end overflow-hidden p-4" :style="{ background: tint.grad }">
+      <img
+        v-if="hero"
+        :src="hero"
         :alt="`${division.name}, China`"
-        sizes="sm:100vw md:50vw lg:33vw"
+        loading="lazy"
+        decoding="async"
         class="absolute inset-0 h-full w-full object-cover"
-        :modifiers="{ fit: 'crop', auto: 'format' }"
-      />
+      >
       <svg
         v-else
         class="pointer-events-none absolute inset-0 h-full w-full opacity-[0.18]"
@@ -30,7 +32,11 @@ const tint = computed(() => regionTint(props.regionId))
         <path d="M0 74 Q 50 44 100 62 T 200 58" fill="none" stroke="#fff" stroke-width="2" />
       </svg>
 
-      <div class="absolute inset-0" :class="division.hero ? 'bg-gradient-to-t from-slate-950/80 via-slate-950/25 to-transparent' : ''" aria-hidden="true" />
+      <div
+        class="absolute inset-0"
+        :class="hero ? 'bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent' : ''"
+        aria-hidden="true"
+      />
       <span class="pointer-events-none absolute -right-1 top-1 font-display text-7xl font-black leading-none text-white/20">{{ division.cn }}</span>
 
       <div class="relative">
