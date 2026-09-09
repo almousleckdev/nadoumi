@@ -188,6 +188,15 @@ zero-config start working.
 | `NADOUMI_MEDIA_SIGNED_URL_TTL_SECONDS` | `180` | PROTECTED-asset signed URL lifetime; clamped `[60, 600]`. |
 | `NADOUMI_MEDIA_MAX_UPLOAD_MB` | `20` | Hard upload ceiling across all categories; also sets `spring.servlet.multipart.max-file-size` (20MB) / `max-request-size` (22MB). |
 
+**Diagnosing "no email received":** as an `admin`, `GET /api/staff/mail/config`
+reports the effective wiring — `transport` (`log` vs `smtp`), the SMTP `host` /
+`port`, whether an SMTP username is set, and `willActuallySend` (false whenever
+`transport` is not exactly `smtp`). `POST /api/staff/mail/test {"to":"you@…"}`
+sends one message and returns `{ ok, error }` with the real exception class
+(e.g. `MailAuthenticationException: Authentication failed` for a bad Gmail App
+Password). The SMTP password is never returned or logged. `SmtpMailSender` also
+logs `SMTP mail transport active: host=… port=… auth=… from=…` once at startup.
+
 **Local dev:** repo-root `docker-compose.yml` provides `mysql`, `redis`, and
 `mailpit` (SMTP `:1025`, web UI `:8025`). `cp .env.example .env && docker compose up -d`.
 `.env` is git-ignored; `docker compose` and the exported shell env both read it.
