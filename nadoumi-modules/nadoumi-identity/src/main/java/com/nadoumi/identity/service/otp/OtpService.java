@@ -75,17 +75,27 @@ public class OtpService {
         }
         redis.setCacheObject(cooldownKey(purpose, email), "1", COOLDOWN_SECONDS, TimeUnit.SECONDS);
 
-        if (accountExists && purpose == OtpPurpose.REGISTER) {
-            mail.send(new EmailMessage(email, "Your Nadoumi account",
-                    templates.render("account-exists", Map.of("loginUrl", loginUrl))));
+        try {
+            if (accountExists && purpose == OtpPurpose.REGISTER) {
+                mail.send(new EmailMessage(email, "Your Nadoumi account",
+                        templates.render("account-exists", Map.of("loginUrl", loginUrl))));
+            }
+            else {
+                String code = codeGenerator.get();
+                redis.setCacheObject(otpKey(purpose, email), sha256(code) + "|0", TTL_SECONDS, TimeUnit.SECONDS);
+                String template = purpose == OtpPurpose.REGISTER ? "otp-register" : "otp-password-reset";
+                String subject = purpose == OtpPurpose.REGISTER ? "Verify your email" : "Reset your password";
+                mail.send(new EmailMessage(email, subject, templates.render(template,
+                        Map.of("otp", code, "ttlMinutes", Integer.toString(TTL_SECONDS / 60)))));
+            }
         }
-        else {
-            String code = codeGenerator.get();
-            redis.setCacheObject(otpKey(purpose, email), sha256(code) + "|0", TTL_SECONDS, TimeUnit.SECONDS);
-            String template = purpose == OtpPurpose.REGISTER ? "otp-register" : "otp-password-reset";
-            String subject = purpose == OtpPurpose.REGISTER ? "Verify your email" : "Reset your password";
-            mail.send(new EmailMessage(email, subject, templates.render(template,
-                    Map.of("otp", code, "ttlMinutes", Integer.toString(TTL_SECONDS / 60)))));
+        catch (RuntimeException e) {
+            // The mail never went out. Drop the code and the cooldown so the caller
+            // can retry straight away once mail delivery is restored, then let the
+            // failure surface (NadApiExceptionHandler maps MailException -> 502).
+            redis.deleteObject(otpKey(purpose, email));
+            redis.deleteObject(cooldownKey(purpose, email));
+            throw e;
         }
         return new IssueResult(true, COOLDOWN_SECONDS);
     }

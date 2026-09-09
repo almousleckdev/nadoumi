@@ -1,6 +1,8 @@
 package com.nadoumi.identity.exception;
 
 import com.ruoyi.common.exception.RateLimitExceededException;
+import com.ruoyi.common.exception.user.CaptchaException;
+import com.ruoyi.common.exception.user.CaptchaExpireException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -64,6 +67,22 @@ public class NadApiExceptionHandler {
             IllegalArgumentException.class, IllegalStateException.class })
     public ProblemDetail badRequest(Exception e) {
         return problem(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler({ CaptchaException.class, CaptchaExpireException.class })
+    public ProblemDetail captcha(Exception e) {
+        return problem(HttpStatus.BAD_REQUEST, "the captcha answer is incorrect or has expired");
+    }
+
+    /**
+     * SMTP is down or misconfigured (e.g. bad credentials). Surface a real 502 so
+     * the caller knows nothing was sent, and log the cause so operators can see
+     * which SMTP failure it was.
+     */
+    @ExceptionHandler(MailException.class)
+    public ProblemDetail mail(MailException e) {
+        log.error("outbound email failed on the /api surface", e);
+        return problem(HttpStatus.BAD_GATEWAY, "the email could not be sent right now, please try again shortly");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

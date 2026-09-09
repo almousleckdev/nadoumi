@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,6 +84,19 @@ class OtpServiceTest {
         assertThat(result.sent()).isFalse();
         assertThat(result.retryAfterSeconds()).isEqualTo(30);
         verify(mail, never()).send(any());
+    }
+
+    @Test
+    void issue_rolls_back_the_code_and_cooldown_when_the_mail_send_fails() {
+        when(redis.getExpire(cooldownKey(OtpPurpose.REGISTER))).thenReturn(-2L);
+        doThrow(new org.springframework.mail.MailSendException("smtp down"))
+                .when(mail).send(any(EmailMessage.class));
+
+        assertThatThrownBy(() -> otp.issue(EMAIL, OtpPurpose.REGISTER, false))
+                .isInstanceOf(org.springframework.mail.MailException.class);
+
+        verify(redis).deleteObject(otpKey(OtpPurpose.REGISTER));
+        verify(redis).deleteObject(cooldownKey(OtpPurpose.REGISTER));
     }
 
     @Test
