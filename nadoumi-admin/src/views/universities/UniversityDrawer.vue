@@ -424,6 +424,8 @@
             v-model="form.remark"
             type="textarea"
             :rows="2"
+            maxlength="500"
+            show-word-limit
           />
         </el-form-item>
       </FormSection>
