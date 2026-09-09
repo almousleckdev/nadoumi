@@ -20,7 +20,7 @@ useSeo('Nadoumi Guides', 'Practical guides to studying in China, applying, schol
           :to="localePath(`/guides/${g.slug}`)"
           class="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white no-underline transition hover:border-brand-300 hover:shadow-md"
         >
-          <div class="relative h-32 overflow-hidden bg-slate-100">
+          <div class="relative h-44 overflow-hidden bg-slate-100">
             <img
               :src="GUIDE_HEROES[g.slug]"
               :alt="g.title"

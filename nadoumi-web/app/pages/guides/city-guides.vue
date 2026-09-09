@@ -64,16 +64,16 @@ function reset() {
 
 <template>
   <div>
-    <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+    <section class="relative isolate flex min-h-[360px] items-end overflow-hidden bg-slate-900 text-white sm:min-h-[460px]">
       <img
         :src="GUIDE_HEROES['city-guides']"
         alt=""
         decoding="async"
-        class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
       >
-      <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-950/70 to-slate-950/40" aria-hidden="true" />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/90 via-slate-950/55 to-slate-950/15" aria-hidden="true" />
       <NContainer>
-        <div class="max-w-2xl py-16 sm:py-20">
+        <div class="max-w-2xl py-10 sm:py-12">
           <nav class="text-sm text-white/70">
             <NuxtLink :to="localePath('/guides')" class="no-underline hover:text-white">Guides</NuxtLink>
             <span class="mx-2" aria-hidden="true">/</span>
