@@ -32,6 +32,10 @@ export default defineNuxtConfig({
     { path: '~/components/marketing', pathPrefix: false },
     // onboarding/ document + wizard components, unprefixed (<PassportUploadCard>, …).
     { path: '~/components/onboarding', pathPrefix: false },
+    // guides/ building blocks (<GuideLayout>, <GuideSection>, <ProvinceCard>, …)
+    // are referenced unprefixed by the guide pages. `.vue` only so the sibling
+    // icons.ts data module is not registered as a component here.
+    { path: '~/components/guides', pathPrefix: false, extensions: ['vue'] },
     '~/components',
   ],
   fonts: {

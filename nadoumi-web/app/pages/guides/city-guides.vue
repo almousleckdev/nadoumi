@@ -1,18 +1,71 @@
 <script setup lang="ts">
+import type { Division } from '~/data/guides/china'
 import { CHINA_REGIONS, CHINA_DIVISION_COUNT } from '~/data/guides/china'
 
 const localePath = useLocalePath()
+
 useSeo(
-  'City Guides, Studying across China',
-  'A guide to every province and region of China: its history, culture, language and festivals, with two cities and their leading universities.',
+  'City Guides, studying across China',
+  'Every province and region of China: history, culture, language and festivals, with two cities and their leading universities. Search by province, city or university.',
 )
+
+interface Entry {
+  regionId: string
+  regionName: string
+  division: Division
+}
+
+const query = ref('')
+const activeRegion = ref('all')
+
+const regionChips = computed(() => [
+  { id: 'all', name: 'All regions' },
+  ...CHINA_REGIONS.map(r => ({ id: r.id, name: r.name })),
+])
+
+const allEntries = computed<Entry[]>(() =>
+  CHINA_REGIONS.flatMap(r =>
+    r.divisions.map(d => ({ regionId: r.id, regionName: r.name, division: d })),
+  ),
+)
+
+function haystack(d: Division): string {
+  return [
+    d.name,
+    d.cn,
+    d.overview,
+    d.culture,
+    ...d.cities.flatMap(c => [
+      c.name,
+      c.cn,
+      c.note,
+      ...c.universities.flatMap(u => [u.name, u.cn ?? '']),
+    ]),
+  ]
+    .join(' ')
+    .toLowerCase()
+}
+
+const results = computed(() => {
+  const q = query.value.trim().toLowerCase()
+  return allEntries.value.filter((e: Entry) => {
+    if (activeRegion.value !== 'all' && e.regionId !== activeRegion.value) return false
+    if (!q) return true
+    return haystack(e.division).includes(q)
+  })
+})
+
+function reset() {
+  query.value = ''
+  activeRegion.value = 'all'
+}
 </script>
 
 <template>
   <div>
     <PageHero
       title="City Guides"
-      subtitle="Every province and region of China, history, culture, language and festivals, with two cities and their leading universities."
+      subtitle="Every province and region of China, its history, culture, language and festivals, with two cities and their leading universities."
     >
       <nav class="mt-4 text-sm">
         <NuxtLink :to="localePath('/guides')" class="text-brand-700 no-underline hover:underline">Guides</NuxtLink>
@@ -22,38 +75,73 @@ useSeo(
     </PageHero>
 
     <NContainer>
-      <div class="grid gap-10 py-12 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14 sm:py-16">
-        <aside class="lg:sticky lg:top-24 lg:self-start">
-          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Regions</p>
-          <ul class="mt-3 space-y-1.5 text-sm">
-            <li v-for="r in CHINA_REGIONS" :key="r.id">
-              <a :href="`#${r.id}`" class="text-slate-600 no-underline hover:text-brand-700">{{ r.name }}</a>
-            </li>
-          </ul>
-          <p class="mt-6 text-xs text-slate-400">{{ CHINA_DIVISION_COUNT }} provinces &amp; regions</p>
-        </aside>
+      <div class="py-12 sm:py-16">
+        <p class="max-w-2xl leading-7 text-slate-700">
+          China is vast and varied. Each province has its own dialects, cuisine, festivals and
+          character, and its own universities. Search by province, city or university, or filter by
+          region, then explore the institutions on our
+          <NuxtLink :to="localePath('/universities')" class="text-brand-700 underline">Universities</NuxtLink> page.
+        </p>
 
-        <div class="space-y-14">
-          <p class="max-w-2xl leading-7 text-slate-700">
-            China is vast and varied, each province has its own dialects, cuisine, festivals and
-            character, and its own universities. Use this to get a feel for where you might study,
-            then explore the institutions on our
-            <NuxtLink :to="localePath('/universities')">Universities</NuxtLink> page.
-          </p>
+        <!-- search + region filter -->
+        <div class="sticky top-16 z-10 -mx-4 mt-8 border-y border-slate-200 bg-white/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-5">
+          <label for="city-search" class="sr-only">Search provinces, cities and universities</label>
+          <NInput
+            id="city-search"
+            v-model="query"
+            placeholder="Search a province, city or university"
+          >
+            <template #suffix>
+              <GuideIcon name="search" :size="18" class="text-slate-400" />
+            </template>
+          </NInput>
 
-          <section v-for="r in CHINA_REGIONS" :id="r.id" :key="r.id" class="scroll-mt-24">
-            <h2 class="font-display text-2xl font-bold text-slate-900">{{ r.name }}</h2>
-            <p class="mt-2 max-w-2xl leading-7 text-slate-600">{{ r.blurb }}</p>
-            <div class="mt-6 space-y-6">
-              <ProvinceGuide v-for="d in r.divisions" :key="d.name" :division="d" />
-            </div>
-          </section>
-
-          <p class="border-t border-slate-200 pt-8 text-sm text-slate-500">
-            University lists highlight a few leading institutions in each city and are not exhaustive.
-            Administrative descriptions follow the People's Republic of China.
-          </p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button
+              v-for="chip in regionChips"
+              :key="chip.id"
+              type="button"
+              class="rounded-full border px-3 py-1 text-sm transition"
+              :class="activeRegion === chip.id
+                ? 'border-brand-600 bg-brand-600 text-white'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-700'"
+              @click="activeRegion = chip.id"
+            >
+              {{ chip.name }}
+            </button>
+          </div>
         </div>
+
+        <p class="mt-6 text-sm text-slate-500">
+          Showing {{ results.length }} of {{ CHINA_DIVISION_COUNT }} provinces and regions
+        </p>
+
+        <!-- results -->
+        <div v-if="results.length" class="mt-4 grid gap-6 lg:grid-cols-2">
+          <ProvinceCard
+            v-for="e in results"
+            :key="e.division.name"
+            :division="e.division"
+            :region-id="e.regionId"
+          />
+        </div>
+
+        <div v-else class="mt-8 rounded-xl border border-dashed border-slate-300 p-10 text-center">
+          <p class="font-display text-lg font-semibold text-slate-900">No matching province</p>
+          <p class="mt-1 text-sm text-slate-500">Try a different city, university or region.</p>
+          <button
+            type="button"
+            class="mt-4 rounded-md border border-slate-200 px-4 py-2 text-sm font-medium text-brand-700 hover:border-brand-300"
+            @click="reset"
+          >
+            Clear search
+          </button>
+        </div>
+
+        <p class="mt-12 border-t border-slate-200 pt-8 text-sm text-slate-500">
+          University lists highlight a few leading institutions in each city and are not exhaustive.
+          Administrative descriptions follow the People's Republic of China.
+        </p>
       </div>
     </NContainer>
   </div>

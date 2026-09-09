@@ -22,10 +22,16 @@ export interface GuideCity {
 export interface Division {
   name: string
   cn: string
-  kind: 'Province' | 'Autonomous region' | 'Municipality' | 'Special administrative region' | 'Region'
+  kind: 'Province' | 'Autonomous region' | 'Municipality'
   overview: string
   culture: string
   cities: GuideCity[]
+  /**
+   * Optional Unsplash path (served via the `unsplash` provider, see
+   * `nuxt.config.ts`). Present only for the provinces we have a verified,
+   * on-topic photograph for; the rest use a designed graphic hero.
+   */
+  hero?: string
 }
 
 export interface Region {
@@ -43,6 +49,7 @@ export const CHINA_REGIONS: Region[] = [
     divisions: [
       {
         name: 'Beijing', cn: '北京', kind: 'Municipality',
+        hero: '/photo-1547981609-4b6bfe67ca0b',
         overview: 'China\'s capital for most of the last eight centuries, seat of the Yuan, Ming, Qing and the People\'s Republic. Home of the Forbidden City, the Temple of Heaven and the closest stretches of the Great Wall.',
         culture: 'Standard Mandarin (Putonghua) is based on the Beijing dialect. The city keeps Peking opera, hutong courtyard life and Spring Festival temple fairs alongside a fast modern rhythm; Beijing roast duck is its signature dish.',
         cities: [
@@ -61,6 +68,7 @@ export const CHINA_REGIONS: Region[] = [
       },
       {
         name: 'Hebei', cn: '河北', kind: 'Province',
+        hero: '/photo-1508804185872-d7badad00f7d',
         overview: 'The province that wraps around Beijing and Tianjin. It holds the Chengde imperial summer resort, the Shanhaiguan pass where the Great Wall meets the sea, and much of China\'s steel industry.',
         culture: 'Hebei bangzi is a loud, percussive regional opera; the province has deep martial-arts lineages and elaborate Lantern Festival lantern fairs and ice sculptures.',
         cities: [
@@ -129,6 +137,7 @@ export const CHINA_REGIONS: Region[] = [
     divisions: [
       {
         name: 'Shanghai', cn: '上海', kind: 'Municipality',
+        hero: '/photo-1545893835-abaa50cbe628',
         overview: 'A fishing town that became a treaty port in 1843 and is now China\'s financial capital. The Bund faces the Pudong skyline across the Huangpu river; shikumen lane houses survive between the towers.',
         culture: 'Shanghainese is a Wu dialect. The city\'s haipai ("Shanghai style") culture mixes Chinese and Western influences; xiaolongbao soup dumplings and the Yu Garden Lantern Festival are local touchstones.',
         cities: [
@@ -242,6 +251,7 @@ export const CHINA_REGIONS: Region[] = [
       },
       {
         name: 'Guangxi', cn: '广西', kind: 'Autonomous region',
+        hero: '/photo-1537531383496-f4749b8032cf',
         overview: 'A Zhuang autonomous region of dramatic karst scenery, the peaks of Guilin, the Li river, and the Longsheng rice terraces. The Zhuang are China\'s largest ethnic minority.',
         culture: 'The Zhuang language is co-official; South-western Mandarin and Cantonese are also common. The Zhuang "March Third" song festival, along with Yao and Miao customs, fills the spring calendar.',
         cities: [
@@ -360,40 +370,6 @@ export const CHINA_REGIONS: Region[] = [
         cities: [
           { name: 'Ürümqi', cn: '乌鲁木齐', note: 'The regional capital, said to be the city furthest from any ocean.', universities: [ { name: 'Xinjiang University', cn: '新疆大学' } ] },
           { name: 'Kashgar', cn: '喀什', note: 'The historic oasis city of the far west.', universities: [ { name: 'Kashgar University', cn: '喀什大学' } ] },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'sar-taiwan',
-    name: 'Special Administrative Regions & Taiwan',
-    blurb: 'Hong Kong and Macao are governed under "one country, two systems"; Taiwan is administered separately and claimed by the PRC.',
-    divisions: [
-      {
-        name: 'Hong Kong', cn: '香港', kind: 'Special administrative region',
-        overview: 'A British colony from 1842 until its return to China in 1997, now a special administrative region. A deep natural harbour made it one of the world\'s great trade and finance centres, packed onto steep hillsides.',
-        culture: 'Cantonese and English are both official, written in Traditional characters. Tin Hau temple parades, the Cheung Chau bun festival and dragon-boat races sit beside an intensely international daily life.',
-        cities: [
-          { name: 'Hong Kong Island', cn: '香港島', note: 'The financial district and the Peak.', universities: [ { name: 'The University of Hong Kong', cn: '香港大學' } ] },
-          { name: 'Kowloon & New Territories', cn: '九龍及新界', note: 'The dense mainland peninsula and the greener hills beyond.', universities: [ { name: 'The Chinese University of Hong Kong', cn: '香港中文大學' }, { name: 'The Hong Kong University of Science and Technology', cn: '香港科技大學' } ] },
-        ],
-      },
-      {
-        name: 'Macao', cn: '澳門', kind: 'Special administrative region',
-        overview: 'A Portuguese settlement from the mid-1500s until 1999, the oldest European foothold in East Asia, and now a special administrative region. It has the world\'s largest casino economy on a tiny footprint.',
-        culture: 'Cantonese and Portuguese are official, with Traditional characters. The Macau Grand Prix, the Feast of the Drunken Dragon and Macanese cooking (a Portuguese-Cantonese fusion) are unique to the city.',
-        cities: [
-          { name: 'Macau Peninsula', cn: '澳門半島', note: 'The historic centre, with the Ruins of St Paul\'s and A-Ma Temple.', universities: [ { name: 'University of Macau', cn: '澳門大學' } ] },
-          { name: 'Taipa & Cotai', cn: '氹仔及路氹', note: 'The southern islands, now joined by the casino strip.', universities: [ { name: 'Macau University of Science and Technology', cn: '澳門科技大學' } ] },
-        ],
-      },
-      {
-        name: 'Taiwan', cn: '臺灣', kind: 'Region',
-        overview: 'A subtropical island of high central mountains and a crowded western plain. It was home to Austronesian peoples, then held in turn by the Dutch, the Qing and Japan, before large-scale migration from the mainland in 1949. It is administered separately and claimed by the People\'s Republic of China.',
-        culture: 'Mandarin is the common language alongside Taiwanese Hokkien, Hakka and sixteen recognised indigenous languages, written in Traditional characters. Mazu pilgrimages, the Pingxi sky-lantern release at Lantern Festival, and an all-hours night-market food culture are defining traditions.',
-        cities: [
-          { name: 'Taipei', cn: '臺北', note: 'The largest city and administrative centre, in the island\'s north.', universities: [ { name: 'National Taiwan University', cn: '國立臺灣大學' } ] },
-          { name: 'Hsinchu & Tainan', cn: '新竹及臺南', note: 'The semiconductor hub of Hsinchu and the historic former capital of Tainan.', universities: [ { name: 'National Tsing Hua University', cn: '國立清華大學' }, { name: 'National Cheng Kung University', cn: '國立成功大學' } ] },
         ],
       },
     ],

@@ -10,26 +10,49 @@ const guide = computed(() => guideBySlug(props.slug))
 const others = computed(() => GUIDES.filter(g => g.slug !== props.slug))
 
 useSeo(
-  guide.value ? `${guide.value.title}, Nadoumi Guides` : 'Nadoumi Guides',
+  guide.value ? `${guide.value.title} · Nadoumi Guides` : 'Nadoumi Guides',
   guide.value?.summary ?? '',
 )
 </script>
 
 <template>
   <div>
-    <PageHero :title="guide?.title ?? t('footer.guides')" :subtitle="guide?.summary">
-      <nav class="mt-4 text-sm">
-        <NuxtLink :to="localePath('/guides')" class="text-brand-700 no-underline hover:underline">{{ t('footer.guides') }}</NuxtLink>
-        <span class="mx-2 text-slate-400" aria-hidden="true">/</span>
-        <span class="text-slate-500">{{ guide?.title }}</span>
-      </nav>
-    </PageHero>
+    <!-- hero band -->
+    <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+      <NuxtImg
+        v-if="guide"
+        :src="guide.hero"
+        alt=""
+        sizes="100vw"
+        class="absolute inset-0 -z-10 h-full w-full object-cover opacity-40"
+        :modifiers="{ fit: 'crop', auto: 'format' }"
+      />
+      <div class="absolute inset-0 -z-10 bg-gradient-to-b from-slate-950/70 to-slate-950/40" aria-hidden="true" />
+      <NContainer>
+        <div class="max-w-2xl py-16 sm:py-20">
+          <nav class="text-sm text-white/70">
+            <NuxtLink :to="localePath('/guides')" class="no-underline hover:text-white">{{ t('footer.guides') }}</NuxtLink>
+            <span class="mx-2" aria-hidden="true">/</span>
+            <span>{{ guide?.title }}</span>
+          </nav>
+          <span class="mt-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
+            <GuideIcon v-if="guide" :name="guide.icon" :size="22" />
+          </span>
+          <h1 class="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">{{ guide?.title }}</h1>
+          <p class="mt-4 text-lg leading-8 text-slate-200">{{ guide?.summary }}</p>
+        </div>
+      </NContainer>
+    </section>
 
     <NContainer>
-      <article class="guide-prose mx-auto max-w-3xl py-12 sm:py-16">
-        <slot />
-      </article>
+      <div class="mx-auto max-w-3xl py-12 sm:py-16">
+        <!-- lead paragraph(s) + GuideSection blocks -->
+        <div class="space-y-10 [&>p]:text-lg [&>p]:leading-8 [&>p]:text-slate-700 [&>p_a]:text-brand-700 [&>p_a]:underline">
+          <slot />
+        </div>
+      </div>
 
+      <!-- more guides -->
       <section class="border-t border-slate-200 py-12">
         <h2 class="font-display text-lg font-bold text-slate-900">{{ t('guides.more') }}</h2>
         <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -37,50 +60,18 @@ useSeo(
             v-for="g in others"
             :key="g.slug"
             :to="localePath(`/guides/${g.slug}`)"
-            class="group rounded-xl border border-slate-200 bg-white p-5 no-underline transition hover:border-brand-300 hover:shadow-sm"
+            class="group flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 no-underline transition hover:border-brand-300 hover:shadow-sm"
           >
-            <p class="font-display font-semibold text-slate-900 group-hover:text-brand-700">{{ g.title }}</p>
-            <p class="mt-1 text-sm leading-6 text-slate-600">{{ g.summary }}</p>
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
+              <GuideIcon :name="g.icon" :size="18" />
+            </span>
+            <span>
+              <span class="block font-display font-semibold text-slate-900 group-hover:text-brand-700">{{ g.title }}</span>
+              <span class="mt-0.5 block text-sm leading-6 text-slate-600">{{ g.summary }}</span>
+            </span>
           </NuxtLink>
         </div>
       </section>
     </NContainer>
   </div>
 </template>
-
-<!-- Not scoped: styles slotted prose passed by each guide page. All rules are
-     namespaced under .guide-prose so nothing leaks. -->
-<style>
-.guide-prose > h2 {
-  font-family: '"Plus Jakarta Sans"', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 700;
-  color: rgb(15 23 42);
-  margin-top: 2.5rem;
-  margin-bottom: 0.75rem;
-}
-.guide-prose > h2:first-child { margin-top: 0; }
-.guide-prose > h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: rgb(15 23 42);
-  margin-top: 1.75rem;
-  margin-bottom: 0.5rem;
-}
-.guide-prose > p,
-.guide-prose li {
-  color: rgb(51 65 85);
-  line-height: 1.8;
-}
-.guide-prose > p { margin-top: 1rem; }
-.guide-prose ul,
-.guide-prose ol { margin-top: 1rem; padding-left: 1.5rem; }
-.guide-prose ul { list-style: disc; }
-.guide-prose ol { list-style: decimal; }
-.guide-prose li { margin-top: 0.4rem; padding-left: 0.25rem; }
-.guide-prose li::marker { color: rgb(148 163 184); }
-.guide-prose a { color: rgb(4 120 87); text-decoration: underline; }
-.guide-prose strong { color: rgb(15 23 42); font-weight: 600; }
-.guide-prose hr { margin: 2.5rem 0; border: 0; border-top: 1px solid rgb(226 232 240); }
-</style>
