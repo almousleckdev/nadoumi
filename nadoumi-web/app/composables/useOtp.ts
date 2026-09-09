@@ -34,12 +34,32 @@ export function useOtp() {
    * mail actually went out: `throttled` is true when the request fell inside the
    * 60s resend window (no new mail), and `retryAfter` is the seconds until the
    * next request is allowed — used to size the cooldown exactly.
+   *
+   * `captcha` must be supplied when the server has the login captcha enabled
+   * (production does). Without it the backend rejects the call and no mail is
+   * ever generated.
    */
-  async function request(email: string, purpose: OtpPurpose): Promise<{ throttled: boolean, retryAfter: number }> {
+  async function request(
+    email: string,
+    purpose: OtpPurpose,
+    captcha?: { code: string, uuid: string },
+  ): Promise<{ throttled: boolean, retryAfter: number }> {
     busy.value = true
     try {
-      const res = await $fetch<{ sent: boolean, throttled?: boolean, retryAfter?: number }>(
-        '/api/student-email-otp', { method: 'POST', body: { email, purpose } })
+      const body: Record<string, string> = { email, purpose }
+      if (captcha?.code) {
+        body.code = captcha.code
+        body.uuid = captcha.uuid
+      }
+      const res = await $fetch<{ sent?: boolean, throttled?: boolean, retryAfter?: number, msg?: string, code?: number }>(
+        '/api/student-email-otp', { method: 'POST', body })
+      // The endpoint answers HTTP 200 both for its own success body AND for the
+      // framework's `{ code, msg }` error envelope (e.g. a missing/expired
+      // captcha). Anything that is not an explicit `{ sent: true }` is a
+      // failure — surface it instead of pretending a mail went out.
+      if (res.sent !== true) {
+        throw { statusCode: 400, data: { detail: res.msg || 'the verification code could not be sent' } }
+      }
       const retryAfter = res.retryAfter && res.retryAfter > 0 ? res.retryAfter : 60
       startCooldown(retryAfter)
       return { throttled: Boolean(res.throttled), retryAfter }

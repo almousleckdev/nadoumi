@@ -18,7 +18,7 @@ async function load() {
   }
 }
 onMounted(load)
-defineExpose({ enabled })
+defineExpose({ enabled, reload: load })
 </script>
 
 <template>

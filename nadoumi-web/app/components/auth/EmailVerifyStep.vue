@@ -23,12 +23,29 @@ const notice = ref('')
 const verifying = ref(false)
 const attemptsLeft = ref(MAX_ATTEMPTS)
 
+// Captcha: the backend requires it on every /email-otp call when the login
+// captcha is enabled (it is in production). One instance, kept mounted so its
+// uuid is stable; shown on the email step and whenever a resend is possible.
+const captchaRef = ref<{ enabled: boolean; reload: () => void } | null>(null)
+const captchaCode = ref('')
+const captchaUuid = ref('')
+const showCaptcha = computed(
+  () => stage.value === 'email' || (stage.value === 'otp' && cooldown.value === 0),
+)
+
 async function sendCode() {
   error.value = ''
   notice.value = ''
+  if (captchaRef.value?.enabled && !captchaCode.value.trim()) {
+    error.value = t('errors.captcha')
+    return
+  }
   const wasFirstRequest = stage.value === 'email'
   try {
-    const { throttled } = await request(props.email, props.purpose)
+    const { throttled } = await request(props.email, props.purpose, {
+      code: captchaCode.value.trim(),
+      uuid: captchaUuid.value,
+    })
     otp.value = ''
     attemptsLeft.value = MAX_ATTEMPTS
     stage.value = 'otp'
@@ -38,6 +55,11 @@ async function sendCode() {
   }
   catch (e) {
     error.value = authErrorMessage(e, t)
+  }
+  finally {
+    // a captcha answer is single-use (consumed on success, expired on failure)
+    captchaCode.value = ''
+    captchaRef.value?.reload()
   }
 }
 
@@ -74,6 +96,14 @@ function editEmail() {
 <template>
   <div class="grid gap-4">
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
+
+    <!-- one instance, kept mounted so its uuid is stable across the email/otp steps -->
+    <AuthCaptcha
+      v-show="showCaptcha"
+      ref="captchaRef"
+      v-model:code="captchaCode"
+      v-model:uuid="captchaUuid"
+    />
 
     <template v-if="stage === 'email'">
       <NField :label="t('auth.email')" for="otp-email" required>
@@ -114,6 +144,7 @@ function editEmail() {
           {{ t('auth.otp.attemptsLeft', { n: attemptsLeft }) }}
         </p>
         <p v-if="notice && !error" class="text-xs text-slate-500">{{ notice }}</p>
+
         <button
           type="button"
           class="text-start text-sm font-medium text-brand-700 hover:underline disabled:text-slate-400 disabled:no-underline"
