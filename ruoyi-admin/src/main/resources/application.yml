@@ -156,6 +156,25 @@ nadoumi:
   web:
     # used in transactional emails (e.g. the "account already exists" message)
     loginUrl: ${NADOUMI_WEB_LOGIN_URL:http://localhost:3000/login}
+    # public site origin — builds CTA links and hosts /email/* assets. No trailing slash.
+    # Emails need absolute, reachable URLs, so this defaults to the live site.
+    baseUrl: ${NADOUMI_WEB_BASE_URL:https://nadoumi.com}
+  # brand + contact block rendered into every transactional email (EmailLayout).
+  # Keep contact.* in sync with nadoumi-web/app/data/contact.ts until a shared API exists.
+  brand:
+    wordmark: ${NADOUMI_BRAND_WORDMARK:Nadoumi}
+    logoPath: ${NADOUMI_BRAND_LOGO_PATH:/email/nadoumi-logo.png}
+    preferencesPath: ${NADOUMI_BRAND_PREFERENCES_PATH:/account/notifications}
+    contact:
+      emails: ${NADOUMI_BRAND_EMAILS:support@nadoumi.com}
+      phones: ${NADOUMI_BRAND_PHONES:+86 159 0823 7607}
+      officeEn: ${NADOUMI_BRAND_OFFICE:Room 02, Floor 8, Unit 1, Building 6, Jiuzhou Beijun, No. 2 Fuxi Road, Fucheng District, Mianyang, Sichuan, China}
+      hours: ${NADOUMI_BRAND_HOURS:Monday to Friday, 09:00-18:00 (China Standard Time, UTC+8)}
+    # blank -> that social icon is omitted from the footer
+    social:
+      facebook: ${NADOUMI_SOCIAL_FACEBOOK:}
+      instagram: ${NADOUMI_SOCIAL_INSTAGRAM:}
+      tiktok: ${NADOUMI_SOCIAL_TIKTOK:}
   media:
     # Cloudinary folder prefix so one cloud can host all envs without collision
     env: ${NADOUMI_MEDIA_ENV:dev}

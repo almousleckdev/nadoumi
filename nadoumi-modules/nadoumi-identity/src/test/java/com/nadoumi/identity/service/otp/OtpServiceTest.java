@@ -11,6 +11,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.nadoumi.identity.service.mail.BrandProperties;
+import com.nadoumi.identity.service.mail.EmailLayout;
 import com.nadoumi.identity.service.mail.EmailMessage;
 import com.nadoumi.identity.service.mail.MailSender;
 import com.nadoumi.identity.service.mail.MailTemplates;
@@ -26,8 +28,10 @@ class OtpServiceTest {
     private final RedisCache redis = mock(RedisCache.class);
     private final MailSender mail = mock(MailSender.class);
     private final TicketService tickets = mock(TicketService.class);
+    private final EmailLayout emailLayout = new EmailLayout(
+            new BrandProperties("https://web.local", null, null, null, null, null));
     private final OtpService otp = new OtpService(
-            redis, mail, new MailTemplates(), tickets, "https://web.local/login", () -> CODE);
+            redis, mail, new MailTemplates(), emailLayout, tickets, "https://web.local/login", () -> CODE);
 
     private static String otpKey(OtpPurpose purpose) {
         return "nad:otp:" + purpose.name() + ":" + OtpService.sha256(EMAIL);
@@ -49,7 +53,13 @@ class OtpServiceTest {
                 eq(OtpService.sha256(CODE) + "|0"), eq(OtpService.TTL_SECONDS), eq(TimeUnit.SECONDS));
         verify(redis).setCacheObject(eq(cooldownKey(OtpPurpose.REGISTER)),
                 eq("1"), eq(OtpService.COOLDOWN_SECONDS), eq(TimeUnit.SECONDS));
-        verify(mail).send(any(EmailMessage.class));
+
+        org.mockito.ArgumentCaptor<EmailMessage> sent = org.mockito.ArgumentCaptor.forClass(EmailMessage.class);
+        verify(mail).send(sent.capture());
+        EmailMessage msg = sent.getValue();
+        assertThat(msg.subject()).isEqualTo("Verify your email — Nadoumi");
+        assertThat(msg.body()).contains(CODE);                       // OTP survives in the plain-text part
+        assertThat(msg.htmlBody()).contains(CODE).contains("<!DOCTYPE html>").contains("Nadoumi");
     }
 
     @Test

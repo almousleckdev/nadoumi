@@ -200,6 +200,25 @@ public class NotificationService {
         return NotificationDetailView.from(n, deliveryMapper.findByNotification(id));
     }
 
+    /** Provider tag for an EMAIL row a specialised composer sent itself (not via the dispatcher). */
+    private static final String EMAIL_DIRECT_PROVIDER = "mail";
+
+    /**
+     * Record the outcome of an EMAIL a specialised composer (e.g. the Welcome
+     * email) sent directly through the {@code MailSender} port instead of the
+     * generic dispatcher, so it still appears in the staff notification console.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void recordDirectEmailDelivery(long notificationId, boolean sent, String error) {
+        NotificationDelivery row = deliveryRow(notificationId, NotificationChannelKind.EMAIL,
+                EMAIL_DIRECT_PROVIDER, sent ? DeliveryStatus.SENT : DeliveryStatus.FAILED,
+                sent ? LocalDateTime.now() : null);
+        if (!sent) {
+            row.setLastError(error);
+        }
+        deliveryMapper.insert(row);
+    }
+
     private boolean channelEnabled(long userId, NotificationType type, NotificationChannelKind channel) {
         if (type.isTransactional()) {
             return true;

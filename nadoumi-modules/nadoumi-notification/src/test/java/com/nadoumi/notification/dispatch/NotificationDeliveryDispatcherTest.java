@@ -68,7 +68,7 @@ class NotificationDeliveryDispatcherTest {
         when(deliveryMapper.findDispatchable(100)).thenReturn(List.of(pending(1L, 0)));
         when(notificationMapper.findById(101L)).thenReturn(notification(101L));
         when(recipientMapper.findEmail(9L)).thenReturn("stu@example.test");
-        when(emailChannel.send(eq("stu@example.test"), any(), any()))
+        when(emailChannel.send(eq("stu@example.test"), any(), any(), any()))
                 .thenReturn(NotificationSendResult.sent(null));
 
         dispatcher.run();
@@ -82,7 +82,7 @@ class NotificationDeliveryDispatcherTest {
         when(deliveryMapper.findDispatchable(100)).thenReturn(List.of(pending(2L, 0)));
         when(notificationMapper.findById(102L)).thenReturn(notification(102L));
         when(recipientMapper.findEmail(9L)).thenReturn("stu@example.test");
-        when(emailChannel.send(any(), any(), any())).thenReturn(NotificationSendResult.failed("smtp down"));
+        when(emailChannel.send(any(), any(), any(), any())).thenReturn(NotificationSendResult.failed("smtp down"));
 
         dispatcher.run();
 
@@ -98,7 +98,7 @@ class NotificationDeliveryDispatcherTest {
                 .thenReturn(List.of(pending(3L, NotificationDeliveryDispatcher.MAX_ATTEMPTS - 1)));
         when(notificationMapper.findById(103L)).thenReturn(notification(103L));
         when(recipientMapper.findEmail(9L)).thenReturn("stu@example.test");
-        when(emailChannel.send(any(), any(), any())).thenReturn(NotificationSendResult.failed("still down"));
+        when(emailChannel.send(any(), any(), any(), any())).thenReturn(NotificationSendResult.failed("still down"));
 
         dispatcher.run();
 
@@ -114,6 +114,6 @@ class NotificationDeliveryDispatcherTest {
         dispatcher.run();
 
         verify(deliveryMapper).recordFailure(eq(4L), eq("FAILED"), any(), any(LocalDateTime.class));
-        verify(emailChannel, never()).send(any(), any(), any());
+        verify(emailChannel, never()).send(any(), any(), any(), any());
     }
 }

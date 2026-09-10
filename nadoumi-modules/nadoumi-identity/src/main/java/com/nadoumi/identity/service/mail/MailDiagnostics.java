@@ -60,7 +60,7 @@ public class MailDiagnostics {
 
     public TestResult sendTest(String to) {
         try {
-            mailSender.send(new EmailMessage(to, "Nadoumi mail test",
+            mailSender.send(EmailMessage.text(to, "Nadoumi mail test",
                     "This is a Nadoumi outbound-email test. If it reached your inbox, SMTP is working."));
             return new TestResult(true, null);
         }

@@ -1,6 +1,9 @@
 package com.nadoumi.identity.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.nadoumi.common.access.AccessCapabilityMatrix;
+import com.nadoumi.common.outbox.OutboxEventTypes;
+import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.identity.access.CapabilityOverrides;
 import com.nadoumi.identity.access.CurrentCaller;
 import com.nadoumi.identity.access.SessionRevoker;
@@ -9,6 +12,7 @@ import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadForbiddenException;
 import com.nadoumi.identity.mapper.NadIdentityMapper;
 import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
+import com.nadoumi.identity.service.mail.PasswordChangedEvent;
 import com.nadoumi.identity.service.otp.OtpPurpose;
 import com.nadoumi.identity.service.otp.TicketService;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -29,6 +33,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,11 +62,14 @@ public class StudentAuthService {
     private final CurrentCaller caller;
     private final TicketService tickets;
     private final SessionRevoker sessionRevoker;
+    private final ApplicationEventPublisher events;
+    private final OutboxWriter outbox;
 
     public StudentAuthService(ISysConfigService configService, ISysUserService userService,
             SysLoginService loginService, TokenService tokenService, NadIdentityMapper identityMapper,
             UserApplicantAccessMapper accessMapper, UserApplicantAccessService grants, CurrentCaller caller,
-            TicketService tickets, SessionRevoker sessionRevoker) {
+            TicketService tickets, SessionRevoker sessionRevoker, ApplicationEventPublisher events,
+            OutboxWriter outbox) {
         this.configService = configService;
         this.userService = userService;
         this.loginService = loginService;
@@ -72,6 +80,8 @@ public class StudentAuthService {
         this.caller = caller;
         this.tickets = tickets;
         this.sessionRevoker = sessionRevoker;
+        this.events = events;
+        this.outbox = outbox;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -102,6 +112,16 @@ public class StudentAuthService {
         }
         identityMapper.updateUserType(user.getUserId(), STUDENT_USER_TYPE);
         identityMapper.markEmailVerified(user.getUserId());
+
+        // Committed with the account row; the poller fans it to the Welcome email.
+        JSONObject payload = new JSONObject();
+        payload.put("userId", user.getUserId());
+        payload.put("email", email);
+        payload.put("firstName", req.firstName().trim());
+        payload.put("displayName", user.getNickName());
+        payload.put("locale", "en");
+        outbox.write("user", user.getUserId(), OutboxEventTypes.STUDENT_REGISTERED, payload.toJSONString());
+
         return new StudentRegisterResponse(user.getUserId(), user.getUserName());
     }
 
@@ -141,6 +161,7 @@ public class StudentAuthService {
         userService.resetUserPwd(userId, SecurityUtils.encryptPassword(newPassword));
         identityMapper.touchPwdUpdateDate(userId);
         sessionRevoker.revokeAll(userId, null);
+        events.publishEvent(new PasswordChangedEvent(userId, email));
     }
 
     /**
@@ -169,6 +190,7 @@ public class StudentAuthService {
             me.getUser().setPassword(encoded);
             tokenService.setLoginUser(me);
         }
+        events.publishEvent(new PasswordChangedEvent(userId, user.getEmail()));
     }
 
     public StudentIdentityResponse me() {

@@ -112,6 +112,8 @@ public class SecurityConfig
                 requests.requestMatchers("/login", "/register", "/captchaImage").permitAll()
                     // 静态资源，可匿名访问
                     .requestMatchers(HttpMethod.GET, "/", "/*.html", "/**.html", "/**.css", "/**.js", "/profile/**").permitAll()
+                    // transactional-email assets (logo, social icons) — referenced by absolute URL from mail clients
+                    .requestMatchers(HttpMethod.GET, "/email/**").permitAll()
                     // /druid/** is NOT anonymous — the stat servlet is off by default
                     // (see application-druid.yml); enabling it locally also needs the
                     // path added here or an authenticated session.

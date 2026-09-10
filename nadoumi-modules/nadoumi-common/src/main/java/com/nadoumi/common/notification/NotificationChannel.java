@@ -7,5 +7,14 @@ package com.nadoumi.common.notification;
  */
 public interface NotificationChannel {
     NotificationChannelKind kind();
-    NotificationSendResult send(String recipient, String subject, String body);
+
+    /**
+     * @param recipient channel-specific address (email / user id)
+     * @param subject   rendered subject ({@code null} for channels without one)
+     * @param body      rendered plain body — IDs and safe fields only, no PII
+     * @param type      the {@code NotificationType} name, so a channel can pick a
+     *                  destination link or presentation without depending on the
+     *                  notification module's enum
+     */
+    NotificationSendResult send(String recipient, String subject, String body, String type);
 }

@@ -164,6 +164,77 @@ provider webhooks → /api/internal/notifications/webhook/** → reconcile DELIV
   decision, document-rejected) are non-optional.
 - **No PII in rendered templates** — IDs + safe fields only (`SECURITY.md` §6).
 
+### 4.3 Email design system — BUILT
+
+One shared, non-boxed Nadoumi email design backs **every** transactional email
+(identity and notification alike). Home: `com.nadoumi.identity.service.mail`
+(`nadoumi-notification` already depends on this package, so no new module edge).
+
+- **`EmailMessage(to, subject, body, htmlBody)`** — `body` is always the
+  plain-text alternative; `htmlBody` is a full HTML document or `null`.
+  `SmtpMailSender` sends `multipart/alternative` when `htmlBody` is set;
+  `LoggingMailSender` records both parts.
+- **`EmailContent`** — the channel-neutral model: preheader, one heading, a list
+  of blocks (`Paragraph`, `CodeBlock`, `KeyValues`, `Divider`), an optional CTA,
+  optional titled `ItemGroup`s (plain hairline-separated rows — used by the
+  welcome email; empty groups are dropped), locale, and a
+  `showPreferencesLink` flag (non-transactional only).
+- **`EmailLayout`** — the single place email chrome exists. Renders one
+  `EmailContent` into **both** the HTML and a parity plain-text alternative
+  (a test asserts every URL + the OTP present in the HTML is present in the
+  text). Design: off-white full-bleed background, one 600px column, generous
+  whitespace, **no card/border/shadow**; a text wordmark header over a hairline;
+  a consistent footer on every email — contact block (`nadoumi.brand.contact.*`)
+  → social icons (Facebook / Instagram / TikTok, each shown only if its URL is
+  configured) → the Nadoumi logo → legal line → preferences link when applicable.
+  Table layout, `role="presentation"`, inlined CSS + one `<style>` for
+  `@media max-width` and `prefers-color-scheme: dark`, real `alt`, `lang`,
+  semantic headings, WCAG-AA contrast.
+- **`BrandProperties`** (`nadoumi.brand.*`) — wordmark, `baseUrl`
+  (`nadoumi.web.baseUrl`, default `https://nadoumi.com`), logo path, contact
+  emails/phones/office/hours, social URLs, preferences path. `contact.*` mirrors
+  `nadoumi-web/app/data/contact.ts` (kept in sync by hand until a shared API
+  exists). Email assets: `ruoyi-admin/.../static/email/` (logo + 3 social icons,
+  **placeholders**), served anonymously via `SecurityConfig` `permitAll` on
+  `/email/**`.
+- **Identity emails on the shell:** `otp-register`, `otp-password-reset`,
+  `account-exists` (subjects standardised, OTP shown as a `CodeBlock`), plus a
+  new **`password-changed`** security email fired after a reset / change via a
+  `PasswordChangedEvent` + `@TransactionalEventListener(AFTER_COMMIT)` — a
+  swallow-on-failure courtesy notice, never a gate.
+- **Notification emails on the shell:** `EmailNotificationChannel` wraps the
+  rendered `nad_notification_template` body in `EmailLayout` and adds a
+  per-type CTA (`SCHOLARSHIP_*` → `/scholarships`, `PROGRAM_PUBLISHED` →
+  `/programs`, `UNIVERSITY_PUBLISHED` → `/universities`, `CONTACT_INQUIRY_RECEIVED`
+  / `TASK_PROGRESS` → `/admin`, `APPLICATION_*` → `/account/applications`). The
+  `NotificationChannel.send` SPI gained a `String type` argument for this.
+- **Welcome email:** see §4.4.
+- **Application emails:** `NotificationType.APPLICATION_SUBMITTED` /
+  `APPLICATION_STATUS_CHANGED` + `en` templates ship in `V55`; **no producer
+  yet** — the Application module (Step 6) emits the events (`DOMAIN_EVENTS.md`).
+
+### 4.4 Welcome email — BUILT
+
+`StudentAuthService.register` writes a **`StudentRegistered`** outbox event in its
+own transaction. `OutboxToNotificationDispatcher` hands it to
+**`WelcomeContentComposer`** (in `nadoumi-notification`, which gains read-only
+compile deps on `nadoumi-scholarship` + `nadoumi-program`), which:
+
+1. creates the `WELCOME` notification — **IN_APP only** (the type declares no
+   secondary channel), idempotent on `(userId, outbox:<eventId>:<userId>)`;
+2. pulls up to 3 most-recently-published programmes and up to 3 soonest-deadline
+   scholarships through the **public** catalog services (student-safe DTOs only —
+   `SECURITY.md` scholarship confidentiality); **omits a section entirely when
+   its query returns nothing — never a placeholder**;
+3. renders `EmailContent` (personalised heading, intro from the `WELCOME` EMAIL
+   `body_tpl`, the two `ItemGroup`s, an "Explore Nadoumi" CTA) through
+   `EmailLayout` and sends it directly via `MailSender`, then records an EMAIL
+   `nad_notification_delivery` row (`NotificationService.recordDirectEmailDelivery`)
+   so the send shows in the staff console.
+
+This is the one deliberate asymmetry: the welcome email carries structured list
+sections the generic flat-string dispatch path does not model, so it bypasses it.
+
 ---
 
 ## 5. Realtime transport — D6 APPROVED

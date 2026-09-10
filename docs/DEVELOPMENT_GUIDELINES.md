@@ -207,6 +207,32 @@ nadoumi-modules/            (new Maven aggregator; ruoyi-admin depends on it)
 - New business feature ⇒ tests in the same PR. Critical security rules ⇒ automated
   tests are mandatory.
 
+## 6a. Adding a transactional email (BASELINE)
+
+Every Nadoumi email uses the one shared design — never hand-roll HTML/CSS
+(`COMMUNICATION_AND_NOTIFICATIONS.md` §4.3).
+
+1. **Build an `EmailContent`** (`com.nadoumi.identity.service.mail`) with
+   `EmailContent.builder(heading)` — paragraphs, an optional `code(...)`,
+   `keyValues(...)`, a single `cta(label, url)`, and `itemGroup(...)` for
+   link lists (empty groups drop themselves). Set `showPreferencesLink(true)`
+   only for non-transactional mail. URLs come from `BrandProperties.url("/path")`.
+2. **Render + send:** `EmailRender r = emailLayout.render(content);`
+   `mailSender.send(new EmailMessage(to, subject, r.text(), r.html()));`
+   Editable copy that ops should change without a redeploy lives in
+   `resources/mail/*.txt` (`${var}`, `MailTemplates`) or
+   `nad_notification_template` (`{{var}}`).
+3. **Notification-pipeline email** (fan-out, preferences, retries): add a
+   `NotificationType`, an outbox event type + `OutboxToNotificationDispatcher`
+   mapping, and `en` templates in a new `V*` migration. `EmailNotificationChannel`
+   wraps the body in `EmailLayout` automatically; give the type a CTA in
+   `ctaFor(...)`.
+4. **Never** put PII/confidential fields in a template or an outbox payload
+   (`SECURITY.md` §6). Student-facing catalog data comes from the **public**
+   services only.
+5. **Tests:** assert the plain-text part carries every URL/code the HTML does,
+   the footer renders, and (student-facing) no confidential field leaks.
+
 ## 7. Definition of Done (EXISTING — CLAUDE.md §22)
 
 Requirements understood → architecture documented → DB designed → backend →

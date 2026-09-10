@@ -1,13 +1,18 @@
 package com.nadoumi.identity.service.mail;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,13 +37,13 @@ public class SmtpMailSender implements MailSender {
 
     @Override
     public void send(EmailMessage message) {
-        SimpleMailMessage smtp = new SimpleMailMessage();
-        smtp.setFrom(from);
-        smtp.setTo(message.to());
-        smtp.setSubject(message.subject());
-        smtp.setText(message.body());
         try {
-            mail.send(smtp);
+            if (message.htmlBody() == null) {
+                mail.send(plainText(message));
+            }
+            else {
+                mail.send(multipart(message));
+            }
         }
         catch (MailException e) {
             // Body is omitted on purpose (it carries the raw OTP). The cause is
@@ -47,6 +52,31 @@ public class SmtpMailSender implements MailSender {
             log.error("SMTP send failed to={} subject=\"{}\"", message.to(), message.subject(), e);
             throw e;
         }
+    }
+
+    private SimpleMailMessage plainText(EmailMessage message) {
+        SimpleMailMessage smtp = new SimpleMailMessage();
+        smtp.setFrom(from);
+        smtp.setTo(message.to());
+        smtp.setSubject(message.subject());
+        smtp.setText(message.body());
+        return smtp;
+    }
+
+    /** {@code multipart/alternative}: plain-text part first, HTML part second. */
+    private MimeMessage multipart(EmailMessage message) {
+        MimeMessage mime = mail.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mime, true, StandardCharsets.UTF_8.name());
+            helper.setFrom(from);
+            helper.setTo(message.to());
+            helper.setSubject(message.subject());
+            helper.setText(message.body(), message.htmlBody());
+        }
+        catch (MessagingException e) {
+            throw new MailSendException("could not assemble MIME message", e);
+        }
+        return mime;
     }
 
     /** One line at startup so a misconfigured environment is obvious in the logs. */

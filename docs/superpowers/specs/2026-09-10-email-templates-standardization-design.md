@@ -1,7 +1,21 @@
 # Nadoumi — Transactional Email Standardization — Engineering Specification
 
-Status: **DRAFT — for review**. Author: Claude Sonnet 5. Date: 2026-09-10.
+Status: **IMPLEMENTED** (2026-09-10). Author: Claude Sonnet 5. Date: 2026-09-10.
 Session: https://claude.ai/code/session_01Y7D71KBp6FSgBrHAJP9ZFg
+
+> Implementation notes / deviations from the design:
+> - `EmailContent` carries `List<ItemGroup>` (the "one group vs many" §11 point) —
+>   the builder drops an empty group, so a section with no data never renders.
+> - `BrandProperties` is registered via `@EnableConfigurationProperties` on
+>   `NadoumiModuleConfiguration` (the identity module's existing `@Configuration`).
+> - `NotificationChannel.send` gained a `String type` argument (§4.1 option a).
+> - `nadoumi.web.baseUrl` defaults to `https://nadoumi.com` (the live site) rather
+>   than localhost — emails need absolute reachable URLs even under the default profile.
+> - Welcome-email delivery auditing: `NotificationService.recordDirectEmailDelivery`
+>   inserts the EMAIL `nad_notification_delivery` row after the composer sends.
+> - DB-integration tests (`@Testcontainers`) were not executed here — no Docker in
+>   the build environment. Identity (67) + notification (29) unit/service tests pass;
+>   the full reactor compiles including all test sources.
 
 > One consistent, non-boxed, responsive, accessible Nadoumi email design applied
 > across every transactional email the platform sends, backed by a single shared

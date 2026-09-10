@@ -26,8 +26,9 @@ class OutboxToNotificationDispatcherTest {
     private final NotificationService notificationService = mock(NotificationService.class);
     private final NotificationRenderer renderer = mock(NotificationRenderer.class);
     private final NotificationAudienceMapper audience = mock(NotificationAudienceMapper.class);
+    private final WelcomeContentComposer welcomeComposer = mock(WelcomeContentComposer.class);
     private final OutboxToNotificationDispatcher dispatcher =
-            new OutboxToNotificationDispatcher(notificationService, renderer, audience);
+            new OutboxToNotificationDispatcher(notificationService, renderer, audience, welcomeComposer);
 
     private static OutboxEvent event(String type, String payload) {
         OutboxEvent e = new OutboxEvent();
@@ -72,5 +73,19 @@ class OutboxToNotificationDispatcherTest {
         assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
                 .containsExactlyInAnyOrder(5L, 6L);
         verify(audience, times(0)).findActiveStudentUserIds();
+    }
+
+    @Test
+    void studentRegistered_isHandedToTheWelcomeComposer_notTheGenericFanOut() {
+        OutboxEvent e = event(OutboxEventTypes.STUDENT_REGISTERED,
+                "{\"userId\":77,\"email\":\"stu@example.test\",\"firstName\":\"Amina\",\"locale\":\"en\"}");
+
+        dispatcher.dispatch(e);
+
+        ArgumentCaptor<java.util.Map<String, Object>> ctx = ArgumentCaptor.forClass(java.util.Map.class);
+        verify(welcomeComposer).handle(eq(e), ctx.capture());
+        assertThat(ctx.getValue()).containsEntry("userId", 77).containsEntry("email", "stu@example.test");
+        verify(notificationService, times(0)).create(any());
+        verify(notificationService, times(0)).createBatch(any());
     }
 }
