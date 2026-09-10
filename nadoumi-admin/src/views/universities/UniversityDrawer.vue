@@ -329,17 +329,37 @@
           <el-button
             :icon="Delete"
             text
-            @click="form.gallery.splice(i, 1)"
+            @click="removeGalleryRow(i)"
           />
         </div>
-        <el-button
-          v-if="form.gallery.length < 6"
-          size="small"
-          :icon="Plus"
-          @click="form.gallery.push({ imageUrl: null, mediaId: null, url: null, caption: null })"
+        <div
+          v-if="form.gallery.length < MAX_GALLERY"
+          class="gal-actions"
         >
-          {{ t('university.addGalleryImage') }}
-        </el-button>
+          <input
+            ref="galleryPicker"
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+            @change="onGalleryFiles"
+          >
+          <el-button
+            size="small"
+            :icon="Plus"
+            @click="galleryPicker?.click()"
+          >
+            {{ t('university.addGalleryImages') }}
+          </el-button>
+          <el-button
+            size="small"
+            text
+            :icon="Plus"
+            @click="form.gallery.push({ imageUrl: null, mediaId: null, url: null, caption: null })"
+          >
+            {{ t('university.addGalleryImage') }}
+          </el-button>
+        </div>
         <p
           v-else
           class="gal-max"
@@ -446,6 +466,11 @@ import {
 import Drawer from '@/components/ui/Drawer.vue'
 import FormSection from '@/components/ui/FormSection.vue'
 import ImageUpload from '@/components/ui/ImageUpload.vue'
+import request from '@/utils/request'
+
+/** Backend cap — keep in step with UniversityRequest.gallery @Size(max). */
+const MAX_GALLERY = 10
+const MAX_IMAGE_MB = 5
 
 const props = defineProps<{ modelValue: boolean, university: University | null }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [u: University] }>()
@@ -469,18 +494,88 @@ type Uploader = InstanceType<typeof ImageUpload>
 const logoUp = ref<Uploader>()
 const bannerUp = ref<Uploader>()
 const galUps = ref<Uploader[]>([])
+const galleryPicker = ref<HTMLInputElement>()
 function setGalUp(el: unknown, i: number) {
   if (el) galUps.value[i] = el as Uploader
 }
+
+interface GalleryUploadResult { mediaId?: number, url?: string | null }
+
+/** Send one file to the gallery endpoint of a saved university. */
+async function uploadGalleryFile(universityId: number, file: File): Promise<GalleryUploadResult | null> {
+  const fd = new FormData()
+  fd.append('file', file)
+  try {
+    const { data } = await request.post<GalleryUploadResult>(`/api/staff/universities/${universityId}/gallery`, fd)
+    return typeof data?.mediaId === 'number' ? data : null
+  }
+  catch {
+    // request.ts already toasts the problem+json detail
+    return null
+  }
+}
+
 async function flushDeferredImages(id: number) {
   await Promise.all([
     logoUp.value?.flush(id),
     bannerUp.value?.flush(id),
     ...galUps.value.map(u => u?.flush(id)),
   ])
+  // multi-picked rows held locally in create mode — send them now
+  for (const g of form.gallery) {
+    if (!g._file) continue
+    const res = await uploadGalleryFile(id, g._file)
+    if (res) {
+      g.mediaId = res.mediaId ?? null
+      g.imageUrl = res.url ?? null
+      if (g.url) URL.revokeObjectURL(g.url)
+      g.url = res.url ?? null
+    }
+    g._file = null
+  }
 }
 
-type GalleryRow = { imageUrl: string | null, mediaId: number | null, url: string | null, caption: string | null }
+/** One "Add images" pick: validate, respect the cap, upload now (edit) or hold (create). */
+async function onGalleryFiles(e: Event) {
+  const input = e.target as HTMLInputElement
+  const files = Array.from(input.files ?? [])
+  input.value = ''
+  const room = MAX_GALLERY - form.gallery.length
+  if (room <= 0 || !files.length) return
+  if (files.length > room) ElMessage.warning(t('university.galleryTrimmed', { n: MAX_GALLERY }))
+  for (const file of files.slice(0, room)) {
+    if (!file.type.startsWith('image/')) {
+      ElMessage.error(t('imageUpload.badType'))
+      continue
+    }
+    if (file.size / 1024 / 1024 > MAX_IMAGE_MB) {
+      ElMessage.error(t('imageUpload.tooBig', { mb: MAX_IMAGE_MB }))
+      continue
+    }
+    if (form.id) {
+      const res = await uploadGalleryFile(form.id, file)
+      if (res) form.gallery.push({ imageUrl: res.url ?? null, mediaId: res.mediaId ?? null, url: res.url ?? null, caption: null })
+    }
+    else {
+      form.gallery.push({ imageUrl: null, mediaId: null, url: URL.createObjectURL(file), caption: null, _file: file })
+    }
+  }
+}
+
+function removeGalleryRow(i: number) {
+  const g = form.gallery[i]
+  if (g?._file && g.url) URL.revokeObjectURL(g.url)
+  form.gallery.splice(i, 1)
+}
+
+type GalleryRow = {
+  imageUrl: string | null
+  mediaId: number | null
+  url: string | null
+  caption: string | null
+  /** create-mode only: a multi-picked file held until the record exists */
+  _file?: File | null
+}
 type DeptRow = { id: number | undefined, name: string, nameCn: string | null }
 
 // snapshot of the university's departments as loaded, to diff against on save
@@ -639,7 +734,7 @@ function payload(): UniversityInput {
       .map(r => ({ source: r.source.trim(), rankPosition: Number(r.rankPosition), rankYear: orNum(r.rankYear), note: orNull(r.note ?? '') })),
     gallery: form.gallery
       .filter(g => g.mediaId != null || Boolean(g.imageUrl?.trim()))
-      .slice(0, 6)
+      .slice(0, MAX_GALLERY)
       .map(g => ({
         mediaId: g.mediaId ?? null,
         imageUrl: g.imageUrl?.trim() || undefined,
@@ -690,6 +785,12 @@ async function save() {
 }
 .gal-row {
   align-items: flex-start;
+}
+.gal-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 .imgs {
   display: flex;

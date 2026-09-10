@@ -40,7 +40,10 @@
     "signOut": "Sign out",
     "nothingYet": "Nothing here yet.",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "close": "关闭",
+    "previous": "上一张",
+    "next": "下一张"
   },
   "home": {
     "hero": {
