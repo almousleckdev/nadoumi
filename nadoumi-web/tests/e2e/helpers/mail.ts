@@ -27,7 +27,7 @@ export async function readOtp(email: string, expectSubject?: RegExp): Promise<st
 }
 
 export const REGISTER_SUBJECT = /verify your email/i
-export const RESET_SUBJECT = /reset your password/i
+export const RESET_SUBJECT = /reset your .*password/i
 
 export function uniqueEmail(prefix = 'e2e'): string {
   return `${prefix}${Date.now().toString().slice(-9)}${Math.floor(Math.random() * 1000)}@example.com`
