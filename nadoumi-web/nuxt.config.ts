@@ -36,6 +36,9 @@ export default defineNuxtConfig({
     // are referenced unprefixed by the guide pages. `.vue` only so the sibling
     // icons.ts data module is not registered as a component here.
     { path: '~/components/guides', pathPrefix: false, extensions: ['vue'] },
+    // catalog/ pieces for the public university / programme / scholarship pages
+    // (<GalleryLightbox>, …) are referenced unprefixed by those pages.
+    { path: '~/components/catalog', pathPrefix: false },
     '~/components',
   ],
   fonts: {
