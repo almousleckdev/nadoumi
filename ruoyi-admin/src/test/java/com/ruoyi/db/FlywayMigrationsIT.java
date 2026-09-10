@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(50);
+        assertThat(applied).isEqualTo(51);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -328,6 +328,16 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT status FROM sys_job "
                 + "WHERE invoke_target = 'scholarshipDeadlineReminderJob.run()'")).isEqualTo("0");
 
+        // V54 — university catalog import (22 China universities as DRAFT / PROSPECT)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university WHERE create_by = 'import'")).isEqualTo("22");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university "
+                + "WHERE create_by = 'import' AND (publish_status <> 'DRAFT' OR partner_status <> 'PROSPECT')")).isEqualTo("0");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT reference_code) FROM nad_university WHERE create_by = 'import'")).isEqualTo("22");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_highlight h "
+                + "JOIN nad_university u ON u.id = h.university_id AND u.create_by = 'import'")).isEqualTo("430");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_ranking r "
+                + "JOIN nad_university u ON u.id = r.university_id AND u.create_by = 'import'")).isEqualTo("66");
+
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
         assertThat(single(ds, "SELECT status FROM sys_user WHERE user_id = 1")).isEqualTo("1");
@@ -356,7 +366,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(49); // V2..V53
+        assertThat(applied).isEqualTo(50); // V2..V54
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
