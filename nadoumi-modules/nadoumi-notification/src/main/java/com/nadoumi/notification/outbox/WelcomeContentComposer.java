@@ -126,7 +126,7 @@ public class WelcomeContentComposer {
                     .publicList(null, null, null, null, null, null, null, 0, SECTION_SIZE)
                     .content().stream()
                     .map(p -> new ListItem(
-                            join(p.name(), p.universityName(), " — "),
+                            join(p.name(), p.universityName(), " · "),
                             join(p.programType(), p.field(), " · "),
                             brand.url("/programs/" + p.slug())))
                     .toList();

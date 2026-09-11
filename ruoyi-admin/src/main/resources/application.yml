@@ -162,6 +162,11 @@ nadoumi:
   # brand + contact block rendered into every transactional email (EmailLayout).
   # Keep contact.* in sync with nadoumi-web/app/data/contact.ts until a shared API exists.
   brand:
+    # public site origin — hosts /email/* assets (logo, social icons) and builds
+    # the CTA/footer links. Reuses the same origin as nadoumi.web.baseUrl above:
+    # without this, BrandProperties falls back to its localhost default and the
+    # logo/social images render as broken links in a real inbox.
+    baseUrl: ${NADOUMI_WEB_BASE_URL:https://nadoumi.com}
     wordmark: ${NADOUMI_BRAND_WORDMARK:Nadoumi}
     logoPath: ${NADOUMI_BRAND_LOGO_PATH:/email/nadoumi-logo.png}
     preferencesPath: ${NADOUMI_BRAND_PREFERENCES_PATH:/account/notifications}
