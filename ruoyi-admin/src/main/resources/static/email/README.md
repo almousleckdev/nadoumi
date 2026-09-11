@@ -1,7 +1,16 @@
 # Transactional email assets
 
-Served anonymously at `${nadoumi.web.baseUrl}/email/*` and referenced by absolute
-URL from every transactional email (`EmailLayout`).
+Served anonymously by this backend at `/email/*` and referenced by absolute URL
+(`${nadoumi.brand.assetBaseUrl}/email/*`, default `https://api.nadoumi.com`)
+from every transactional email (`EmailLayout`).
+
+`nadoumi.brand.assetBaseUrl` is deliberately separate from `nadoumi.brand.baseUrl`
+(default `https://nadoumi.com`, shared with `nadoumi.web.baseUrl`): the public
+site (`nadoumi-web`, Nuxt) and this API are different deployments, so CTA/content
+links (which must land on the site) and these asset URLs (which must land on
+this backend) cannot share one origin. If that ever changes — e.g. both are
+fronted by the same reverse proxy — `assetBaseUrl` can simply be left unset,
+since it falls back to `baseUrl`.
 
 | File | Purpose | Status |
 |---|---|---|
@@ -18,13 +27,3 @@ Until then those two icons are correctly hidden, not broken.
 
 Replacing a file needs no code change (bust the CDN cache if `static/` is fronted
 by one).
-
-**Reachability**: these are served by this backend at `/email/*`, but every
-email builds the URL as `${nadoumi.brand.baseUrl}/email/*` (defaults to
-`https://nadoumi.com`, the public *site's* origin). That only resolves if the
-deployment routes `/email/*` on that origin to this backend (e.g. a reverse-proxy
-rule in front of both the Nuxt site and this API) — if the backend is deployed on
-its own origin instead, override `nadoumi.brand.baseUrl` (`NADOUMI_WEB_BASE_URL`
-is shared with `nadoumi.web.baseUrl`, so use a dedicated env var/property split
-if the two origins ever diverge) to the origin that actually serves this
-directory.

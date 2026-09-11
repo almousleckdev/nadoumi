@@ -9,8 +9,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * in sync with {@code nadoumi-web/app/data/contact.ts} until a shared API exists
  * (see {@code docs/DEVELOPMENT_GUIDELINES.md}).
  *
- * @param baseUrl         public site origin, no trailing slash (also hosts the email assets)
- * @param logoPath        absolute path of the footer logo under {@code baseUrl}
+ * <p>{@code baseUrl} and {@code assetBaseUrl} are deliberately separate origins:
+ * the public site (Nuxt, {@code nadoumi-web}) and this API are different
+ * deployments. CTA/content links must resolve on the public site; the logo and
+ * social icons are files this backend itself serves under {@code /email/*}, so
+ * they must resolve on this backend's own origin, not the site's.
+ *
+ * @param baseUrl         public site origin, no trailing slash — CTA and content links
+ * @param assetBaseUrl    this backend's own public origin, no trailing slash — serves
+ *                        {@code /email/*} (logo + social icons); falls back to
+ *                        {@code baseUrl} when unset, for deployments where both are
+ *                        the same origin
+ * @param logoPath        absolute path of the footer logo under {@code assetBaseUrl}
  * @param wordmark        plain-text wordmark shown in the header
  * @param contact         support contact block for the footer
  * @param social          social profile URLs; a blank/null one hides that icon
@@ -19,6 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("nadoumi.brand")
 public record BrandProperties(
         String baseUrl,
+        String assetBaseUrl,
         String logoPath,
         String wordmark,
         Contact contact,
@@ -27,6 +38,7 @@ public record BrandProperties(
 
     public BrandProperties {
         baseUrl = stripTrailingSlash(baseUrl == null || baseUrl.isBlank() ? "http://localhost:3000" : baseUrl.trim());
+        assetBaseUrl = assetBaseUrl == null || assetBaseUrl.isBlank() ? baseUrl : stripTrailingSlash(assetBaseUrl.trim());
         logoPath = blankTo(logoPath, "/email/nadoumi-logo.png");
         wordmark = blankTo(wordmark, "Nadoumi");
         preferencesPath = blankTo(preferencesPath, "/account/notifications");
@@ -47,19 +59,28 @@ public record BrandProperties(
     }
 
     public String logoUrl() {
-        return baseUrl + logoPath;
+        return assetBaseUrl + logoPath;
     }
 
     public String preferencesUrl() {
         return baseUrl + preferencesPath;
     }
 
-    /** Absolute URL for an app path such as {@code /scholarships}. */
+    /** Absolute URL for a public-site app path such as {@code /scholarships}. */
     public String url(String path) {
+        return absolute(baseUrl, path);
+    }
+
+    /** Absolute URL for a path this backend itself serves, such as {@code /email/facebook.png}. */
+    public String assetUrl(String path) {
+        return absolute(assetBaseUrl, path);
+    }
+
+    private static String absolute(String origin, String path) {
         if (path == null || path.isBlank()) {
-            return baseUrl;
+            return origin;
         }
-        return path.startsWith("http") ? path : baseUrl + (path.startsWith("/") ? path : "/" + path);
+        return path.startsWith("http") ? path : origin + (path.startsWith("/") ? path : "/" + path);
     }
 
     private static String blankTo(String value, String fallback) {
