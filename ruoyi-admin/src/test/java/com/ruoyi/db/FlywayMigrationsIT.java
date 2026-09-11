@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(50);
+        assertThat(applied).isEqualTo(52); // V1 baseline + V2..V55
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -356,7 +356,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(49); // V2..V53
+        assertThat(applied).isEqualTo(51); // V2..V55
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
