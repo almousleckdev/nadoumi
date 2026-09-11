@@ -58,10 +58,6 @@ public record BrandProperties(
     public record Social(String facebook, String instagram, String tiktok, String whatsapp) {
     }
 
-    public String logoUrl() {
-        return assetBaseUrl + logoPath;
-    }
-
     public String preferencesUrl() {
         return baseUrl + preferencesPath;
     }

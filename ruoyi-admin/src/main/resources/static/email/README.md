@@ -25,5 +25,12 @@ An icon only appears in the footer when its URL is configured
 `NADOUMI_SOCIAL_FACEBOOK`/`NADOUMI_SOCIAL_INSTAGRAM` once those profiles exist.
 Until then those two icons are correctly hidden, not broken.
 
-Replacing a file needs no code change (bust the CDN cache if `static/` is fronted
-by one).
+Replacing a file needs no code change — and no manual cache-busting either.
+Every URL `EmailLayout` builds for a file here carries a `?v=<content hash>`
+query param, computed from the file's own bytes at first use and cached for
+the life of the process. Replace a file's content and the next email
+automatically gets a new URL for it, so mail providers that cache a fetched
+image by URL (Gmail's image proxy, most notably — it can keep serving a stale
+image against an unchanged URL more or less indefinitely) are forced to fetch
+the new version instead of showing what they cached the first time this file's
+name was ever used.
