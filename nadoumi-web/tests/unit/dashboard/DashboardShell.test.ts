@@ -23,7 +23,7 @@ describe('DashboardShell', () => {
 
   it('calls signOut from the account menu', async () => {
     const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
-    await w.find('button[aria-haspopup="menu"]').trigger('click')
+    await w.find('[data-test="account-menu"]').trigger('click')
     await w.find('[data-test="sign-out"]').trigger('click')
     expect(signOut).toHaveBeenCalled()
   })

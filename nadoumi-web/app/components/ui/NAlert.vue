@@ -6,6 +6,7 @@ const props = withDefaults(defineProps<{
 }>(), { tone: 'info', title: undefined })
 defineEmits<{ dismiss: [] }>()
 
+const { t } = useI18n()
 const role = computed(() => (props.tone === 'warning' || props.tone === 'danger' ? 'alert' : 'status'))
 const tones = {
   info: 'bg-slate-50 border-slate-200 text-slate-800',
@@ -21,6 +22,6 @@ const tones = {
       <p v-if="title" class="font-semibold">{{ title }}</p>
       <div><slot /></div>
     </div>
-    <button v-if="dismissible" type="button" aria-label="Dismiss" class="shrink-0 opacity-70 hover:opacity-100" @click="$emit('dismiss')">×</button>
+    <button v-if="dismissible" type="button" :aria-label="t('common.dismiss')" class="shrink-0 opacity-70 hover:opacity-100" @click="$emit('dismiss')">×</button>
   </div>
 </template>

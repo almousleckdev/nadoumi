@@ -49,7 +49,7 @@ const legal = [
           <p class="font-semibold text-slate-900">{{ t('footer.guides') }}</p>
           <ul class="mt-3 space-y-2">
             <li v-for="g in GUIDES" :key="g.slug">
-              <NuxtLink :to="localePath(`/guides/${g.slug}`)" class="text-slate-600 no-underline hover:text-slate-900">{{ g.title }}</NuxtLink>
+              <NuxtLink :to="localePath(`/guides/${g.slug}`)" class="text-slate-600 no-underline hover:text-slate-900">{{ t(`guides.meta.${g.slug}.title`) }}</NuxtLink>
             </li>
           </ul>
         </div>

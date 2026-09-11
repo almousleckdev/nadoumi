@@ -1,803 +1,1745 @@
 {
   "nav": {
-    "home": "Home",
-    "scholarships": "Scholarships",
-    "universities": "Universities",
-    "about": "About",
+    "home": "Accueil",
+    "scholarships": "Bourses",
+    "universities": "Universités",
+    "about": "À propos",
     "contact": "Contact",
-    "signIn": "Sign in",
-    "getStarted": "Create profile",
-    "createAccount": "Create account",
-    "dashboard": "Dashboard",
-    "aria": "Primary navigation"
+    "signIn": "Se connecter",
+    "getStarted": "Créer un profil",
+    "createAccount": "Créer un compte",
+    "dashboard": "Tableau de bord",
+    "aria": "Navigation principale"
   },
   "footer": {
-    "mission": "Nadoumi helps international students discover and secure study opportunities abroad.",
-    "explore": "Explore",
-    "company": "Company",
-    "getStarted": "Get started",
-    "privacy": "Privacy",
-    "terms": "Terms",
+    "mission": "Nadoumi aide les étudiants internationaux à découvrir et obtenir des opportunités d'études à l'étranger.",
+    "explore": "Explorer",
+    "company": "Entreprise",
+    "getStarted": "Commencer",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
     "contactEmail": "support{'@'}nadoumi.com",
-    "rights": "Nadoumi. International education platform.",
+    "rights": "Nadoumi. Plateforme d'éducation internationale.",
     "contactTitle": "Contact",
-    "contactForm": "Send a message",
+    "contactForm": "Envoyer un message",
     "guides": "Guides"
   },
   "common": {
-    "loading": "Loading",
-    "save": "Save",
-    "cancel": "Cancel",
-    "add": "Add",
-    "remove": "Remove",
-    "edit": "Edit",
-    "delete": "Delete",
-    "confirm": "Confirm",
-    "back": "Back",
-    "search": "Search",
-    "none": "Nothing here yet",
-    "retry": "Try again",
-    "signOut": "Sign out",
-    "nothingYet": "Nothing here yet.",
-    "yes": "Yes",
-    "no": "No",
+    "loading": "Chargement",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "search": "Rechercher",
+    "none": "Rien pour le moment",
+    "retry": "Réessayer",
+    "signOut": "Se déconnecter",
+    "nothingYet": "Rien pour le moment.",
+    "yes": "Oui",
+    "no": "Non",
     "close": "Fermer",
+    "dismiss": "Ignorer",
     "previous": "Précédent",
-    "next": "Suivant"
+    "next": "Suivant",
+    "pagination": "Pagination",
+    "switchingLanguage": "Changement de langue…"
   },
   "home": {
     "hero": {
-      "eyebrow": "International education platform",
-      "title": "Study abroad with a team that manages the whole journey",
-      "subtitle": "Discover universities and scholarships, build one applicant profile, and apply and track every step with Nadoumi.",
-      "ctaScholarships": "Explore scholarships",
-      "ctaUniversities": "Explore universities",
-      "searchLabel": "Search universities",
-      "searchPlaceholder": "Search a university by name or city",
-      "searchNote": "Searches the university catalogue. Scholarship search arrives with the Scholarship module."
+      "eyebrow": "Plateforme d'éducation internationale",
+      "title": "Étudiez à l'étranger avec une équipe qui gère tout le parcours",
+      "subtitle": "Découvrez des universités et des bourses, créez un seul profil de candidature, puis postulez et suivez chaque étape avec Nadoumi.",
+      "ctaScholarships": "Explorer les bourses",
+      "ctaUniversities": "Explorer les universités",
+      "searchLabel": "Rechercher une université",
+      "searchPlaceholder": "Rechercher une université par nom ou par ville",
+      "searchNote": "Recherche dans le catalogue des universités. La recherche de bourses arrive avec le module Bourses."
     },
     "featuredUnis": {
-      "eyebrow": "Universities",
-      "title": "Featured universities",
-      "description": "Institutions Nadoumi is highlighting right now.",
-      "empty": "No featured universities are published yet."
+      "eyebrow": "Universités",
+      "title": "Universités en vedette",
+      "description": "Établissements que Nadoumi met en avant en ce moment.",
+      "empty": "Aucune université en vedette n'est encore publiée."
     },
     "recommendedUnis": {
-      "eyebrow": "Recommended by Nadoumi",
-      "title": "Recommended universities",
-      "description": "Where our advisers see strong outcomes for international students.",
-      "empty": "No recommended universities are published yet."
+      "eyebrow": "Recommandées par Nadoumi",
+      "title": "Universités recommandées",
+      "description": "Là où nos conseillers constatent de bons résultats pour les étudiants internationaux.",
+      "empty": "Aucune université recommandée n'est encore publiée."
     },
     "story1": {
-      "eyebrow": "Discover",
-      "title": "Study where the world comes together",
-      "body": "Nadoumi works with universities across China, Malaysia and beyond. Browse each institution’s profile, campus, rankings and the programmes it offers before you commit."
+      "eyebrow": "Découvrir",
+      "title": "Étudiez là où le monde se rencontre",
+      "body": "Nadoumi travaille avec des universités en Chine, en Malaisie et ailleurs. Parcourez le profil, le campus, les classements et les programmes de chaque établissement avant de vous engager."
     },
     "story2": {
-      "eyebrow": "One profile, every application",
-      "title": "Built around your profile",
-      "body": "Add your details, education history and documents once. Nadoumi reuses them for every application, and each submission is kept as a historical record. Later profile edits never rewrite it."
+      "eyebrow": "Un seul profil, toutes les candidatures",
+      "title": "Construit autour de votre profil",
+      "body": "Renseignez vos informations, votre parcours scolaire et vos documents une seule fois. Nadoumi les réutilise pour chaque candidature, et chaque soumission est conservée comme un historique. Les modifications ultérieures de votre profil ne le réécrivent jamais."
     },
     "scholarshipDiscovery": {
-      "eyebrow": "Scholarships",
-      "title": "New and featured scholarships",
-      "description": "Search and filter scholarships by level, category, teaching language, intake, funding and more."
+      "eyebrow": "Bourses",
+      "title": "Bourses nouvelles et en vedette",
+      "description": "Recherchez et filtrez les bourses par niveau, catégorie, langue d'enseignement, session d'admission, financement et plus encore."
     },
     "programDiscovery": {
       "eyebrow": "Programmes",
-      "title": "Hot programmes and language courses",
-      "description": "Degree and language programmes, discovered through the university that offers them.",
-      "empty": "No programmes are featured yet."
+      "title": "Programmes populaires et cours de langue",
+      "description": "Programmes diplômants et cours de langue, à découvrir via l'université qui les propose.",
+      "empty": "Aucun programme n'est encore mis en avant."
     },
     "partners": {
-      "eyebrow": "Partnerships",
-      "title": "Partner universities",
-      "description": "Institutions Nadoumi holds a direct working relationship with."
+      "eyebrow": "Partenariats",
+      "title": "Universités partenaires",
+      "description": "Établissements avec lesquels Nadoumi entretient une relation de travail directe."
     },
     "arriving": {
-      "scholarships": "the Scholarship catalogue",
-      "programs": "the Programme catalogue",
-      "partnerships": "the Partnership module"
+      "scholarships": "le catalogue des Bourses",
+      "programs": "le catalogue des Programmes",
+      "partnerships": "le module Partenariats"
     },
     "journey": {
-      "eyebrow": "How it works",
-      "title": "Your journey with Nadoumi",
-      "description": "From your first application fee to your admission documents. Here is what to expect.",
-      "s1t": "Pay the application fee",
-      "s1b": "Start your application and settle the application fee to begin processing.",
-      "s2t": "Primary review",
-      "s2b": "Nadoumi checks your profile and documents against the opportunity’s requirements.",
-      "s3t": "University assignment",
-      "s3b": "Your case is matched and submitted to the university.",
-      "s4t": "Admission issued",
-      "s4b": "The university confirms your place and issues your admission letter.",
-      "s5t": "Pay the project fee",
-      "s5b": "Settle the remaining project and service fees to move to enrolment.",
-      "s6t": "JW202 issued",
-      "s6b": "Your visa documentation (JW202 / JW201) is prepared and released.",
-      "s7t": "Documents delivered",
-      "s7b": "Your admission and visa documents are couriered to you.",
-      "s8t": "Application successful",
-      "s8b": "You’re ready to travel and enrol. Nadoumi stays available through arrival."
+      "eyebrow": "Comment ça marche",
+      "title": "Votre parcours avec Nadoumi",
+      "description": "Des premiers frais de candidature à vos documents d'admission. Voici ce à quoi vous attendre.",
+      "s1t": "Payer les frais de candidature",
+      "s1b": "Commencez votre candidature et réglez les frais de candidature pour lancer le traitement.",
+      "s2t": "Examen initial",
+      "s2b": "Nadoumi vérifie votre profil et vos documents par rapport aux exigences de l'opportunité.",
+      "s3t": "Attribution de l'université",
+      "s3b": "Votre dossier est rapproché puis soumis à l'université.",
+      "s4t": "Admission délivrée",
+      "s4b": "L'université confirme votre place et délivre votre lettre d'admission.",
+      "s5t": "Payer les frais de dossier",
+      "s5b": "Réglez le reste des frais de dossier et de service pour passer à l'inscription.",
+      "s6t": "JW202 délivré",
+      "s6b": "Vos documents de visa (JW202 / JW201) sont préparés puis délivrés.",
+      "s7t": "Documents livrés",
+      "s7b": "Vos documents d'admission et de visa vous sont envoyés par coursier.",
+      "s8t": "Candidature réussie",
+      "s8b": "Vous êtes prêt à voyager et à vous inscrire. Nadoumi reste disponible jusqu'à votre arrivée."
     },
     "cta": {
-      "eyebrow": "Ready when you are",
-      "title": "Start your international education with Nadoumi",
-      "body": "Create a free profile, explore your options, and apply with a team that runs the whole process.",
-      "apply": "Apply now",
-      "contact": "Contact us"
+      "eyebrow": "Prêt quand vous l'êtes",
+      "title": "Commencez votre parcours d'études internationales avec Nadoumi",
+      "body": "Créez un profil gratuit, explorez vos options, et postulez avec une équipe qui gère tout le processus.",
+      "apply": "Postuler maintenant",
+      "contact": "Nous contacter"
     },
     "newScholarships": {
-      "eyebrow": "Scholarships",
-      "title": "New scholarships",
-      "description": "The latest opportunities published on Nadoumi.",
-      "empty": "No scholarships are published yet."
+      "eyebrow": "Bourses",
+      "title": "Nouvelles bourses",
+      "description": "Les dernières opportunités publiées sur Nadoumi.",
+      "empty": "Aucune bourse n'est encore publiée."
     },
     "fundedScholarships": {
-      "eyebrow": "Fully funded",
-      "title": "Fully funded scholarships",
-      "description": "Tuition, accommodation and a stipend covered.",
-      "empty": "No fully funded scholarships are published yet."
+      "eyebrow": "Entièrement financées",
+      "title": "Bourses entièrement financées",
+      "description": "Frais de scolarité, hébergement et une allocation pris en charge.",
+      "empty": "Aucune bourse entièrement financée n'est encore publiée."
     }
   },
   "about": {
-    "eyebrow": "About Nadoumi",
-    "title": "The team that runs your study-abroad journey",
-    "lead": "Nadoumi is an international education platform. We help students discover universities and scholarships, and we manage the application process end to end.",
-    "whoTitle": "Who we are",
-    "whoBody": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle: profile, documents, submission, decisions and enrolment.",
-    "whoBody2": "An account holder can manage applications for more than one student, so parents, relatives and advisers can work alongside the student they support.",
-    "missionTitle": "Our mission",
-    "missionBody": "Make international study accessible: help students find opportunities that fit, and carry the operational load of applying so they can focus on their studies.",
-    "visionTitle": "Our vision",
-    "visionBody": "A single trusted place where any student can discover, apply for and track an international education, with universities and partners on the other side of the same platform.",
-    "valuesTitle": "What we stand for",
-    "v1t": "Clarity for students",
-    "v1b": "Students see the information that matters to them. Internal partner and operational data never leaks into public views.",
-    "v2t": "Historical accuracy",
-    "v2b": "An application is a record of what was submitted, when. Later profile edits never rewrite a past submission.",
-    "v3t": "No invented data",
-    "v3b": "Numbers, universities, scholarships and rankings are shown only when they come from real records. Never mocked to fill space.",
-    "v4t": "One reusable profile",
-    "v4b": "Enter your details once. Nadoumi reuses them across every application and keeps you in control of them.",
-    "helpTitle": "How Nadoumi helps",
-    "h1": "Build a reusable applicant profile with your details, education and documents.",
-    "h2": "Discover universities, programmes and scholarships that fit your goals.",
-    "h3": "Apply for yourself or a student you represent. Nadoumi pre-fills what it knows.",
-    "h4": "Provide and track the documents each opportunity requires.",
-    "h5": "Receive decisions, complete payments and prepare for enrolment.",
-    "teamTitle": "The team behind Nadoumi",
-    "teamIntro": "Advisers, case officers and partnerships staff who run applications day to day.",
-    "teamPending": "Team profiles and photos to be supplied by Nadoumi.",
-    "contactTitle": "Get in touch",
-    "contactCta": "Go to the contact page",
-    "officeTitle": "Office",
-    "officePending": "Office address to be supplied by Nadoumi.",
-    "hoursTitle": "Working hours",
-    "hoursPending": "Working hours to be supplied by Nadoumi.",
-    "ctaTitle": "Start your international education with Nadoumi",
-    "ctaBody": "Create a free profile and explore your options, or reach out with a question.",
+    "eyebrow": "À propos de Nadoumi",
+    "title": "L'équipe qui gère votre parcours d'études à l'étranger",
+    "lead": "Nadoumi est une plateforme d'éducation internationale. Nous aidons les étudiants à découvrir des universités et des bourses, et nous gérons le processus de candidature de bout en bout.",
+    "whoTitle": "Qui nous sommes",
+    "whoBody": "Nadoumi met en relation les étudiants avec des universités, des programmes et des bourses en Chine, en Malaisie et dans d'autres destinations, et les accompagne tout au long du cycle de candidature : profil, documents, soumission, décisions et inscription.",
+    "whoBody2": "Un titulaire de compte peut gérer les candidatures de plusieurs étudiants, afin que parents, proches et conseillers puissent travailler aux côtés de l'étudiant qu'ils accompagnent.",
+    "missionTitle": "Notre mission",
+    "missionBody": "Rendre les études internationales accessibles : aider les étudiants à trouver les opportunités qui leur correspondent, et prendre en charge la gestion de la candidature pour qu'ils puissent se concentrer sur leurs études.",
+    "visionTitle": "Notre vision",
+    "visionBody": "Un lieu unique et fiable où tout étudiant peut découvrir, demander et suivre une formation internationale, avec les universités et partenaires réunis sur la même plateforme.",
+    "valuesTitle": "Ce que nous défendons",
+    "v1t": "Clarté pour les étudiants",
+    "v1b": "Les étudiants voient les informations qui les concernent. Les données internes de partenariat et opérationnelles ne fuient jamais vers les vues publiques.",
+    "v2t": "Exactitude historique",
+    "v2b": "Une candidature est un enregistrement de ce qui a été soumis, et à quel moment. Les modifications ultérieures du profil ne réécrivent jamais une soumission passée.",
+    "v3t": "Aucune donnée inventée",
+    "v3b": "Les chiffres, universités, bourses et classements ne sont affichés que lorsqu'ils proviennent de données réelles. Jamais simulés pour combler un vide.",
+    "v4t": "Un profil unique et réutilisable",
+    "v4b": "Renseignez vos informations une seule fois. Nadoumi les réutilise pour chaque candidature et vous en gardez la maîtrise.",
+    "helpTitle": "Comment Nadoumi vous aide",
+    "h1": "Créez un profil de candidat réutilisable avec vos informations, votre parcours scolaire et vos documents.",
+    "h2": "Découvrez des universités, des programmes et des bourses adaptés à vos objectifs.",
+    "h3": "Postulez pour vous-même ou pour un étudiant que vous représentez. Nadoumi préremplit ce qu'il sait déjà.",
+    "h4": "Fournissez et suivez les documents requis par chaque opportunité.",
+    "h5": "Recevez les décisions, réglez les paiements et préparez votre inscription.",
+    "teamTitle": "L'équipe derrière Nadoumi",
+    "teamIntro": "Conseillers, chargés de dossier et équipe des partenariats qui gèrent les candidatures au quotidien.",
+    "teamPending": "Profils et photos de l'équipe à fournir par Nadoumi.",
+    "contactTitle": "Nous contacter",
+    "contactCta": "Aller à la page de contact",
+    "officeTitle": "Bureau",
+    "officePending": "Adresse du bureau à fournir par Nadoumi.",
+    "hoursTitle": "Horaires d'ouverture",
+    "hoursPending": "Horaires d'ouverture à fournir par Nadoumi.",
+    "ctaTitle": "Commencez votre parcours d'études internationales avec Nadoumi",
+    "ctaBody": "Créez un profil gratuit et explorez vos options, ou contactez-nous pour toute question.",
     "team1name": "",
-    "team1role": "Founder & CEO",
+    "team1role": "Fondateur et PDG",
     "team2name": "",
-    "team2role": "Head of Partnerships",
+    "team2role": "Responsable des partenariats",
     "team3name": "",
-    "team3role": "Head of Student Success",
+    "team3role": "Responsable de la réussite étudiante",
     "team4name": "",
-    "team4role": "Software Engineer"
+    "team4role": "Ingénieur logiciel"
   },
   "contact": {
     "title": "Contact",
-    "lead": "Questions about applications, scholarships or partner universities? Send us a message and the team will get back to you.",
-    "emailTitle": "Email",
-    "responseNote": "We usually reply within two business days.",
-    "officeTitle": "Office",
-    "officePending": "Office address to be supplied.",
-    "hoursTitle": "Working hours",
-    "hoursPending": "Working hours to be supplied.",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "email": "Email",
-    "phone": "Phone",
-    "optional": "Optional",
-    "category": "Topic",
-    "categoryPlaceholder": "Choose a topic",
+    "lead": "Des questions sur les candidatures, les bourses ou les universités partenaires ? Envoyez-nous un message, notre équipe vous répondra.",
+    "emailTitle": "E-mail",
+    "responseNote": "Nous répondons généralement sous deux jours ouvrés.",
+    "officeTitle": "Bureau",
+    "officePending": "Adresse du bureau à fournir.",
+    "hoursTitle": "Horaires d'ouverture",
+    "hoursPending": "Horaires d'ouverture à fournir.",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "optional": "Facultatif",
+    "category": "Sujet",
+    "categoryPlaceholder": "Choisir un sujet",
     "cat": {
-      "GENERAL": "General enquiry",
-      "SCHOLARSHIPS": "Scholarships",
-      "UNIVERSITIES": "Universities",
-      "APPLICATIONS": "My application",
-      "PARTNERSHIPS": "Partnerships",
-      "OTHER": "Something else"
+      "GENERAL": "Demande générale",
+      "SCHOLARSHIPS": "Bourses",
+      "UNIVERSITIES": "Universités",
+      "APPLICATIONS": "Ma candidature",
+      "PARTNERSHIPS": "Partenariats",
+      "OTHER": "Autre chose"
     },
-    "subject": "Subject",
+    "subject": "Objet",
     "message": "Message",
-    "submit": "Send message",
-    "sending": "Sending…",
-    "successTitle": "Message sent",
-    "sent": "Thanks, we’ll be in touch.",
-    "errorTitle": "Message not sent",
-    "errorBody": "Something went wrong sending your message. Please try again in a moment.",
-    "phoneTitle": "Phone"
+    "submit": "Envoyer le message",
+    "sending": "Envoi en cours…",
+    "successTitle": "Message envoyé",
+    "sent": "Merci, nous vous recontacterons.",
+    "errorTitle": "Message non envoyé",
+    "errorBody": "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer dans un instant.",
+    "phoneTitle": "Téléphone"
   },
   "catalog": {
-    "scholarshipsTitle": "Scholarships",
-    "scholarshipsSubtitle": "Funding opportunities across our destination countries.",
-    "universitiesTitle": "Universities",
-    "universitiesSubtitle": "Institutions in the Nadoumi catalogue.",
-    "programsTitle": "Programs",
-    "programsSubtitle": "Degree programmes and intakes.",
-    "empty": "This catalogue isn't available yet. Check back soon.",
-    "emptyDetail": "We're still building this section.",
-    "rollingDeadline": "Rolling deadline",
-    "deadline": "Deadline {date}",
-    "backToList": "Back to list",
-    "featured": "Featured",
+    "scholarshipsTitle": "Bourses",
+    "scholarshipsSubtitle": "Opportunités de financement dans nos pays de destination.",
+    "universitiesTitle": "Universités",
+    "universitiesSubtitle": "Établissements du catalogue Nadoumi.",
+    "programsTitle": "Programmes",
+    "programsSubtitle": "Programmes diplômants et sessions d'admission.",
+    "empty": "Ce catalogue n'est pas encore disponible. Revenez bientôt.",
+    "emptyDetail": "Nous construisons encore cette section.",
+    "rollingDeadline": "Admission continue",
+    "deadline": "Échéance {date}",
+    "backToList": "Retour à la liste",
+    "featured": "En vedette",
     "typePublic": "Public",
-    "typePrivate": "Private",
-    "viewUniversity": "View university",
-    "viewAllUniversities": "View all universities",
-    "anyType": "Any type",
-    "country": "Country",
+    "typePrivate": "Privé",
+    "viewUniversity": "Voir l'université",
+    "viewAllUniversities": "Voir toutes les universités",
+    "anyType": "Tout type",
+    "country": "Pays",
     "province": "Province",
-    "city": "City",
-    "recommendedShort": "Recommended",
-    "resultCount": "{n} results",
-    "searchUniversities": "Search universities",
-    "searchUniversitiesPlaceholder": "University name or city",
-    "clearFilters": "Clear filters",
-    "noResultsTitle": "No matches",
-    "noResultsBody": "Try removing a filter or searching for something broader.",
-    "noUniversitiesTitle": "No universities yet",
-    "noUniversitiesBody": "Published universities will appear here as the catalogue grows.",
-    "allUniversities": "All universities",
-    "universityFallbackTitle": "University",
-    "universityUnavailable": "This university is not available."
+    "city": "Ville",
+    "recommendedShort": "Recommandée",
+    "resultCount": "{n} résultats",
+    "searchUniversities": "Rechercher des universités",
+    "searchUniversitiesPlaceholder": "Nom de l'université ou ville",
+    "clearFilters": "Effacer les filtres",
+    "noResultsTitle": "Aucun résultat",
+    "noResultsBody": "Essayez de retirer un filtre ou de rechercher quelque chose de plus large.",
+    "noUniversitiesTitle": "Aucune université pour le moment",
+    "noUniversitiesBody": "Les universités publiées apparaîtront ici à mesure que le catalogue grandit.",
+    "allUniversities": "Toutes les universités",
+    "universityFallbackTitle": "Université",
+    "universityUnavailable": "Cette université n'est pas disponible."
   },
   "auth": {
-    "loginTitle": "Sign in",
-    "registerTitle": "Create your profile",
-    "fullName": "Full name",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "username": "Username",
-    "usernameHint": "2–20 characters, used to sign in",
-    "passportNameHint": "Enter your name exactly as it appears on your passport.",
-    "step1Title": "Your details",
-    "step2Title": "Set a password",
-    "next": "Next",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm password",
-    "passwordHint": "5–20 characters",
-    "captcha": "Enter the code shown",
-    "captchaReload": "Reload image",
-    "acceptTerms": "I agree to the {terms} and {privacy}.",
-    "submitLogin": "Sign in",
-    "submitRegister": "Create profile",
-    "toRegister": "New to Nadoumi? Create a profile",
-    "toLogin": "Already have an account? Sign in",
-    "forgot": "Forgot your password?",
-    "forgotTitle": "Password help",
-    "forgotBody": "Password reset isn't self-service yet. Email support{'@'}nadoumi.com from your registered address and we'll help you back in.",
-    "genericError": "Something went wrong. Please check your details and try again.",
-    "passwordMismatch": "Passwords do not match.",
+    "loginTitle": "Se connecter",
+    "registerTitle": "Créez votre profil",
+    "fullName": "Nom complet",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "username": "Nom d'utilisateur",
+    "usernameHint": "2 à 20 caractères, utilisé pour vous connecter",
+    "passportNameHint": "Saisissez votre nom exactement comme il apparaît sur votre passeport.",
+    "step1Title": "Vos informations",
+    "step2Title": "Définir un mot de passe",
+    "next": "Suivant",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "passwordHint": "5 à 20 caractères",
+    "captcha": "Saisissez le code affiché",
+    "captchaReload": "Recharger l'image",
+    "acceptTerms": "J'accepte les {terms} et la {privacy}.",
+    "submitLogin": "Se connecter",
+    "submitRegister": "Créer le profil",
+    "toRegister": "Nouveau sur Nadoumi ? Créez un profil",
+    "toLogin": "Vous avez déjà un compte ? Connectez-vous",
+    "forgot": "Mot de passe oublié ?",
+    "forgotTitle": "Aide pour le mot de passe",
+    "forgotBody": "La réinitialisation du mot de passe n'est pas encore en libre-service. Écrivez à support{'@'}nadoumi.com depuis votre adresse enregistrée et nous vous aiderons à récupérer votre accès.",
+    "genericError": "Une erreur s'est produite. Vérifiez vos informations et réessayez.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
     "otp": {
-      "verify": "Verify",
-      "sent": "We sent a 6-digit code to {email}. Enter it below.",
-      "resend": "Resend code",
-      "resendIn": "Resend in {n}s",
-      "verified": "Email verified",
-      "badCode": "That code is invalid or expired.",
-      "groupLabel": "Enter the {n}-digit verification code",
-      "digitLabel": "Digit {i} of {n}",
-      "editEmail": "Edit email",
-      "emailLabel": "Code sent to",
-      "attemptsLeft": "{n} attempts remaining",
-      "verifying": "Verifying…",
-      "resentNote": "A new code is on its way.",
-      "throttledNote": "We already sent a code. Check your inbox and spam. You can request another shortly."
+      "verify": "Vérifier",
+      "sent": "Nous avons envoyé un code à 6 chiffres à {email}. Saisissez-le ci-dessous.",
+      "resend": "Renvoyer le code",
+      "resendIn": "Renvoyer dans {n} s",
+      "verified": "E-mail vérifié",
+      "badCode": "Ce code est invalide ou a expiré.",
+      "groupLabel": "Saisissez le code de vérification à {n} chiffres",
+      "digitLabel": "Chiffre {i} sur {n}",
+      "editEmail": "Modifier l'e-mail",
+      "emailLabel": "Code envoyé à",
+      "attemptsLeft": "{n} tentatives restantes",
+      "verifying": "Vérification…",
+      "resentNote": "Un nouveau code arrive.",
+      "throttledNote": "Nous avons déjà envoyé un code. Vérifiez votre boîte de réception et vos indésirables. Vous pourrez en redemander un sous peu."
     },
     "reset": {
-      "title": "Reset password",
-      "newPassword": "New password",
-      "done": "Your password has been reset. You can now sign in with your new password.",
-      "toLogin": "Go to sign in"
+      "title": "Réinitialiser le mot de passe",
+      "newPassword": "Nouveau mot de passe",
+      "done": "Votre mot de passe a été réinitialisé. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+      "toLogin": "Aller à la connexion"
     },
-    "acceptTermsShort": "I agree to the {terms}",
-    "acceptPrivacyShort": "I agree to the {privacy}",
-    "consentRequired": "Please accept the Terms and the Privacy Policy to continue.",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password",
-    "pwStrong": "Strong password",
-    "pwRequirements": "Your password needs:",
-    "acceptBothShort": "I agree to the {terms} and the {privacy}",
-    "step3Title": "Set a password",
+    "acceptTermsShort": "J'accepte les {terms}",
+    "acceptPrivacyShort": "J'accepte la {privacy}",
+    "consentRequired": "Veuillez accepter les Conditions et la Politique de confidentialité pour continuer.",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "pwStrong": "Mot de passe fort",
+    "pwRequirements": "Votre mot de passe doit contenir :",
+    "acceptBothShort": "J'accepte les {terms} et la {privacy}",
+    "step3Title": "Définir un mot de passe",
     "registerStep": {
-      "personal": "Personal",
-      "verify": "Verify",
-      "password": "Password"
+      "personal": "Informations",
+      "verify": "Vérification",
+      "password": "Mot de passe"
     },
-    "newToNadoumi": "New to Nadoumi?",
-    "createProfile": "Create a profile"
+    "newToNadoumi": "Nouveau sur Nadoumi ?",
+    "createProfile": "Créer un profil"
   },
   "dashboard": {
     "nav": {
-      "overview": "Overview",
-      "profile": "Profile",
-      "education": "Education",
-      "testScores": "Test scores",
+      "overview": "Aperçu",
+      "profile": "Profil",
+      "education": "Scolarité",
+      "testScores": "Résultats de tests",
       "contacts": "Contacts",
-      "account": "Account"
+      "account": "Compte"
     },
-    "welcome": "Welcome, {name}",
-    "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
-    "completeness": "Profile completeness",
-    "quickProfile": "Edit profile",
-    "quickEducation": "Add education",
-    "applicantLabel": "Applicant",
-    "switchApplicant": "Switch applicant",
-    "profileTitle": "Applicant profile",
-    "createProfileTitle": "Create your applicant profile",
-    "createProfileBlurb": "Tell us who the application is about. You can edit this any time.",
-    "givenName": "Given name",
-    "familyName": "Family name",
-    "dob": "Date of birth",
-    "nationality": "Nationality (ISO alpha-2)",
-    "passportNo": "Passport number",
-    "phone": "Phone",
-    "eduTitle": "Education history",
-    "eduEmpty": "No education entries yet.",
-    "institution": "Institution",
-    "level": "Level",
-    "field": "Field of study",
-    "gpa": "GPA",
-    "gpaScale": "GPA scale",
-    "startDate": "Start date",
-    "endDate": "End date",
-    "testTitle": "Test scores",
-    "testEmpty": "No test scores yet.",
+    "welcome": "Bienvenue, {name}",
+    "overviewBlurb": "Complétez votre profil de candidat pour que l'équipe puisse commencer à vous proposer des opportunités.",
+    "completeness": "Complétude du profil",
+    "quickProfile": "Modifier le profil",
+    "quickEducation": "Ajouter une formation",
+    "applicantLabel": "Candidat",
+    "switchApplicant": "Changer de candidat",
+    "profileTitle": "Profil du candidat",
+    "createProfileTitle": "Créez votre profil de candidat",
+    "createProfileBlurb": "Indiquez-nous pour qui est la candidature. Vous pourrez modifier ceci à tout moment.",
+    "givenName": "Prénom",
+    "familyName": "Nom de famille",
+    "dob": "Date de naissance",
+    "nationality": "Nationalité (ISO alpha-2)",
+    "passportNo": "Numéro de passeport",
+    "phone": "Téléphone",
+    "eduTitle": "Parcours scolaire",
+    "eduEmpty": "Aucune formation renseignée pour le moment.",
+    "institution": "Établissement",
+    "level": "Niveau",
+    "field": "Domaine d'études",
+    "gpa": "Moyenne (GPA)",
+    "gpaScale": "Échelle du GPA",
+    "startDate": "Date de début",
+    "endDate": "Date de fin",
+    "testTitle": "Résultats de tests",
+    "testEmpty": "Aucun résultat de test pour le moment.",
     "testType": "Test",
     "score": "Score",
-    "takenOn": "Taken on",
-    "expiresOn": "Expires on",
+    "takenOn": "Passé le",
+    "expiresOn": "Expire le",
     "contactsTitle": "Contacts",
-    "contactsEmpty": "No contacts yet.",
-    "relation": "Relationship",
-    "contactName": "Name",
-    "relationGUARDIAN": "Guardian",
-    "relationEMERGENCY": "Emergency",
-    "relationOTHER": "Other",
-    "accountTitle": "Account",
-    "accountUser": "Signed in as",
-    "changePassword": "Change password",
-    "pwCurrent": "Current password",
-    "pwNew": "New password",
-    "pwConfirm": "Confirm new password",
-    "pwUpdated": "Password updated.",
-    "pwOtherSessionsEnded": "You have been signed out on your other devices.",
-    "onboardingProgress": "Onboarding progress",
-    "comingSoon": "This area activates once applications are open.",
-    "sectionApplications": "Applications",
-    "sectionActivity": "Recent activity",
+    "contactsEmpty": "Aucun contact pour le moment.",
+    "relation": "Lien",
+    "contactName": "Nom",
+    "relationGUARDIAN": "Tuteur",
+    "relationEMERGENCY": "Urgence",
+    "relationOTHER": "Autre",
+    "accountTitle": "Compte",
+    "accountUser": "Connecté en tant que",
+    "changePassword": "Changer le mot de passe",
+    "pwCurrent": "Mot de passe actuel",
+    "pwNew": "Nouveau mot de passe",
+    "pwConfirm": "Confirmer le nouveau mot de passe",
+    "pwUpdated": "Mot de passe mis à jour.",
+    "pwOtherSessionsEnded": "Vous avez été déconnecté sur vos autres appareils.",
+    "onboardingProgress": "Progression de la configuration",
+    "comingSoon": "Cette section s'active une fois les candidatures ouvertes.",
+    "sectionApplications": "Candidatures",
+    "sectionActivity": "Activité récente",
     "sectionNotifications": "Notifications",
-    "savedOk": "Saved",
-    "addedOk": "Added",
-    "removedOk": "Removed",
-    "removeConfirm": "Remove this entry?"
+    "savedOk": "Enregistré",
+    "addedOk": "Ajouté",
+    "removedOk": "Retiré",
+    "removeConfirm": "Retirer cette entrée ?"
   },
   "validation": {
-    "required": "This field is required.",
-    "email": "Enter a valid email address.",
-    "min": "Must be at least {n} characters.",
-    "max": "Must be at most {n} characters.",
-    "len2": "Use the 2-letter country code.",
+    "required": "Ce champ est obligatoire.",
+    "email": "Saisissez une adresse e-mail valide.",
+    "min": "Doit comporter au moins {n} caractères.",
+    "max": "Doit comporter au plus {n} caractères.",
+    "len2": "Utilisez le code pays à 2 lettres.",
     "password": {
-      "tooShort": "Use at least 8 characters.",
-      "tooLong": "Use at most 32 characters.",
-      "needUpper": "Add an uppercase letter.",
-      "needLower": "Add a lowercase letter.",
-      "needDigit": "Add a number.",
-      "needSpecial": "Add a special character.",
-      "sameAsCurrent": "Choose a password different from your current one.",
-      "length": "8–32 characters",
-      "noPersonal": "Doesn't contain your name or email",
-      "mismatch": "Passwords do not match."
+      "tooShort": "Utilisez au moins 8 caractères.",
+      "tooLong": "Utilisez au plus 32 caractères.",
+      "needUpper": "Ajoutez une majuscule.",
+      "needLower": "Ajoutez une minuscule.",
+      "needDigit": "Ajoutez un chiffre.",
+      "needSpecial": "Ajoutez un caractère spécial.",
+      "sameAsCurrent": "Choisissez un mot de passe différent de l'actuel.",
+      "length": "8 à 32 caractères",
+      "noPersonal": "Ne contient pas votre nom ni votre e-mail",
+      "mismatch": "Les mots de passe ne correspondent pas."
     }
   },
   "errors": {
-    "network": "Can't reach the server. Check your connection and try again.",
-    "server": "Something went wrong on our side. Please try again shortly.",
-    "rateLimited": "Too many attempts. Please wait a minute and try again.",
-    "generic": "Something went wrong. Please try again.",
-    "validation": "Please check the highlighted fields and try again.",
-    "emailTaken": "An account with this email already exists. Try signing in instead.",
-    "badCredentials": "Email or password is incorrect.",
-    "currentPasswordWrong": "Your current password is incorrect.",
-    "otpInvalid": "That verification code is invalid or has expired. Request a new one.",
-    "otpExpired": "Your verification session has expired. Please start again.",
-    "otpEmailMismatch": "The verification doesn't match this email address.",
-    "captcha": "The captcha answer was incorrect. Please try again.",
-    "registrationDisabled": "Registration is currently closed.",
-    "invalidEmail": "Enter a valid email address.",
-    "loadSection": "This section could not be loaded. Please refresh."
+    "network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+    "server": "Une erreur s'est produite de notre côté. Veuillez réessayer sous peu.",
+    "rateLimited": "Trop de tentatives. Veuillez patienter une minute puis réessayer.",
+    "generic": "Une erreur s'est produite. Veuillez réessayer.",
+    "validation": "Veuillez vérifier les champs surlignés et réessayer.",
+    "emailTaken": "Un compte existe déjà avec cet e-mail. Essayez plutôt de vous connecter.",
+    "badCredentials": "L'e-mail ou le mot de passe est incorrect.",
+    "currentPasswordWrong": "Votre mot de passe actuel est incorrect.",
+    "otpInvalid": "Ce code de vérification est invalide ou a expiré. Demandez-en un nouveau.",
+    "otpExpired": "Votre session de vérification a expiré. Veuillez recommencer.",
+    "otpEmailMismatch": "La vérification ne correspond pas à cette adresse e-mail.",
+    "captcha": "La réponse au captcha était incorrecte. Veuillez réessayer.",
+    "registrationDisabled": "Les inscriptions sont actuellement fermées.",
+    "invalidEmail": "Saisissez une adresse e-mail valide.",
+    "loadSection": "Cette section n'a pas pu être chargée. Veuillez actualiser la page."
   },
   "legal": {
-    "draftNote": "Draft. Placeholder text pending legal review.",
-    "privacyTitle": "Privacy Policy",
-    "privacyIntro": "This page explains what personal data Nadoumi collects and how it is used.",
-    "privacyBody": "Nadoumi processes the information you provide to build your applicant profile and submit applications on your behalf. Data is stored securely and shared only with the universities and partners involved in your applications.",
-    "termsTitle": "Terms of Service",
-    "termsIntro": "These terms govern your use of the Nadoumi platform.",
-    "termsBody": "By creating an account you agree to provide accurate information and to use the platform only for legitimate education applications. Nadoumi may update these terms; material changes will be notified.",
-    "contactLine": "Questions? Reach us via the contact page."
+    "draftNote": "Brouillon. Texte provisoire en attente de révision juridique.",
+    "privacyTitle": "Politique de confidentialité",
+    "privacyIntro": "Cette page explique quelles données personnelles Nadoumi collecte et comment elles sont utilisées.",
+    "privacyBody": "Nadoumi traite les informations que vous fournissez pour créer votre profil de candidat et soumettre des candidatures en votre nom. Les données sont stockées de façon sécurisée et partagées uniquement avec les universités et partenaires impliqués dans vos candidatures.",
+    "termsTitle": "Conditions d'utilisation",
+    "termsIntro": "Ces conditions régissent votre utilisation de la plateforme Nadoumi.",
+    "termsBody": "En créant un compte, vous vous engagez à fournir des informations exactes et à utiliser la plateforme uniquement pour des candidatures d'études légitimes. Nadoumi peut mettre à jour ces conditions ; les changements importants seront notifiés.",
+    "contactLine": "Des questions ? Contactez-nous via la page de contact."
   },
   "onboarding": {
-    "title": "Set up your profile",
-    "intro": "A few steps to get your applicant profile ready. You can come back and edit any section later.",
-    "progress": "Step {n} of {total}",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "skip": "Skip for now",
-    "saved": "Saved",
-    "saving": "Saving…",
-    "legendRequired": "Required",
-    "legendRecommended": "Recommended",
-    "legendOptional": "Optional",
-    "comingSoon": "Coming soon. This section is shown for reference and is not saved yet.",
+    "title": "Configurez votre profil",
+    "intro": "Quelques étapes pour préparer votre profil de candidat. Vous pourrez revenir modifier chaque section plus tard.",
+    "progress": "Étape {n} sur {total}",
+    "next": "Suivant",
+    "back": "Retour",
+    "finish": "Terminer",
+    "skip": "Passer pour l'instant",
+    "saved": "Enregistré",
+    "saving": "Enregistrement…",
+    "legendRequired": "Obligatoire",
+    "legendRecommended": "Recommandé",
+    "legendOptional": "Facultatif",
+    "comingSoon": "Bientôt disponible. Cette section est affichée à titre indicatif et n'est pas encore enregistrée.",
     "steps": {
-      "personal": "Personal",
-      "identity": "Identity",
-      "education": "Education",
-      "interests": "Interests",
-      "location": "Location",
+      "personal": "Informations",
+      "identity": "Identité",
+      "education": "Scolarité",
+      "interests": "Intérêts",
+      "location": "Localisation",
       "contact": "Contact",
-      "review": "Review"
+      "review": "Vérification"
     },
     "personal": {
-      "title": "Personal information",
-      "blurb": "Your name as it appears on your passport."
+      "title": "Informations personnelles",
+      "blurb": "Votre nom tel qu'il apparaît sur votre passeport."
     },
     "identity": {
-      "title": "Identity",
-      "blurb": "Passport and nationality details for your applications.",
-      "extras": "Gender, country of residence and preferred contact language will be added here."
+      "title": "Identité",
+      "blurb": "Détails de passeport et de nationalité pour vos candidatures.",
+      "extras": "Le genre, le pays de résidence et la langue de contact préférée seront ajoutés ici."
     },
     "education": {
-      "title": "Education history",
-      "blurb": "Add each institution you have attended."
+      "title": "Parcours scolaire",
+      "blurb": "Ajoutez chaque établissement que vous avez fréquenté."
     },
     "interests": {
-      "title": "Study interests",
-      "blurb": "What and where you want to study."
+      "title": "Domaines d'intérêt",
+      "blurb": "Ce que vous voulez étudier, et où."
     },
     "location": {
-      "title": "Current location",
-      "blurb": "Where you are now. This affects visa and logistics guidance."
+      "title": "Localisation actuelle",
+      "blurb": "Où vous êtes actuellement. Cela influence les conseils sur le visa et la logistique."
     },
     "contact": {
-      "title": "Guardian / emergency contact",
-      "blurb": "Someone we can reach if we cannot reach you."
+      "title": "Tuteur / contact d'urgence",
+      "blurb": "Une personne que nous pouvons joindre si nous ne pouvons pas vous joindre."
     },
     "review": {
-      "title": "Review",
-      "blurb": "Check what you have entered, then finish.",
-      "done": "Profile set up. You can refine any section from the dashboard."
+      "title": "Vérification",
+      "blurb": "Vérifiez ce que vous avez saisi, puis terminez.",
+      "done": "Profil configuré. Vous pouvez affiner chaque section depuis le tableau de bord."
     },
     "badge": {
-      "plannedBackend": "Coming soon"
+      "plannedBackend": "Bientôt disponible"
     },
     "crop": {
       "zoom": "Zoom",
-      "rotate": "Rotate",
-      "reset": "Reset",
-      "apply": "Use this crop"
+      "rotate": "Pivoter",
+      "reset": "Réinitialiser",
+      "apply": "Utiliser ce cadrage"
     },
     "doc": {
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
-      "fit": "Fit",
-      "previewAlt": "Uploaded document"
+      "zoomIn": "Zoomer",
+      "zoomOut": "Dézoomer",
+      "fit": "Ajuster",
+      "previewAlt": "Document téléversé"
     },
     "photo": {
-      "title": "Profile photo",
-      "guidance": "Face centred, plain background, even lighting. JPEG, PNG or WebP, up to 5 MB, at least 400x400.",
-      "none": "No photo",
-      "tooSmall": "Image must be at least {px}x{px} pixels."
+      "title": "Photo de profil",
+      "guidance": "Visage centré, fond uni, éclairage homogène. JPEG, PNG ou WebP, jusqu'à 5 Mo, au moins 400x400.",
+      "none": "Aucune photo",
+      "tooSmall": "L'image doit mesurer au moins {px}x{px} pixels."
     },
     "passport": {
-      "title": "Passport",
-      "guidance": "Upload a clear photo or scan of your passport photo page. The details must be readable.",
-      "none": "No passport uploaded",
-      "confirmReadable": "I confirm the passport details are clearly readable.",
-      "formats": "JPEG, PNG or PDF, up to 10 MB"
+      "title": "Passeport",
+      "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport. Les informations doivent être lisibles.",
+      "none": "Aucun passeport téléversé",
+      "confirmReadable": "Je confirme que les informations du passeport sont clairement lisibles.",
+      "formats": "JPEG, PNG ou PDF, jusqu'à 10 Mo"
     },
     "upload": {
-      "choose": "Choose file",
-      "replace": "Replace",
-      "remove": "Remove",
-      "save": "Upload",
-      "notYet": "Uploading will be available once document storage is enabled.",
-      "badType": "Choose a JPEG, PNG or WebP image.",
-      "badTypePassport": "Choose a JPEG, PNG or PDF file.",
-      "tooBig": "File is larger than {mb} MB."
+      "choose": "Choisir un fichier",
+      "replace": "Remplacer",
+      "remove": "Retirer",
+      "save": "Téléverser",
+      "notYet": "Le téléversement sera disponible une fois le stockage des documents activé.",
+      "badType": "Choisissez une image JPEG, PNG ou WebP.",
+      "badTypePassport": "Choisissez un fichier JPEG, PNG ou PDF.",
+      "tooBig": "Le fichier dépasse {mb} Mo."
     }
   },
   "university": {
-    "founded": "Founded",
-    "students": "Students",
-    "intlStudents": "International students",
-    "faculty": "Faculty",
-    "rankingTier": "Ranking tier",
-    "introduction": "Introduction",
-    "history": "History",
-    "campus": "Campus & facilities",
-    "accommodation": "Accommodation",
-    "nearby": "The area",
-    "highlights": "Highlights",
-    "advantages": "Advantages",
+    "founded": "Fondée en",
+    "students": "Étudiants",
+    "intlStudents": "Étudiants internationaux",
+    "faculty": "Corps enseignant",
+    "rankingTier": "Niveau de classement",
+    "introduction": "Présentation",
+    "history": "Histoire",
+    "campus": "Campus et installations",
+    "accommodation": "Hébergement",
+    "nearby": "Les environs",
+    "highlights": "Points forts",
+    "advantages": "Atouts",
     "programmes": "Programmes",
-    "programmesEmpty": "No programmes are listed for this university yet.",
-    "gallery": "Gallery",
-    "galleryArriving": "Arriving with document storage",
-    "rankings": "Rankings",
-    "contact": "Official contact",
-    "website": "Official website",
+    "programmesEmpty": "Aucun programme n'est encore répertorié pour cette université.",
+    "gallery": "Galerie",
+    "galleryArriving": "Disponible avec le stockage de documents",
+    "rankings": "Classements",
+    "contact": "Contact officiel",
+    "website": "Site officiel",
     "admissionsEmail": "Admissions",
-    "officePhone": "Phone"
+    "officePhone": "Téléphone"
   },
   "program": {
     "fallbackTitle": "Programme",
-    "notAvailable": "This programme is not available.",
-    "offeredBy": "Offered by {university}",
-    "backToUniversity": "Back to {university}",
-    "view": "View programme",
-    "hot": "Hot",
-    "duration": "{months} months",
-    "durationLabel": "Duration",
-    "tuition": "Tuition",
-    "field": "Field of study",
-    "language": "Teaching language",
-    "majors": "Majors",
-    "intakes": "Intakes",
-    "applyWindow": "{open} to {close}",
-    "applyFrom": "Opens {open}",
-    "applyUntil": "Closes {close}",
+    "notAvailable": "Ce programme n'est pas disponible.",
+    "offeredBy": "Proposé par {university}",
+    "backToUniversity": "Retour à {university}",
+    "view": "Voir le programme",
+    "hot": "Populaire",
+    "duration": "{months} mois",
+    "durationLabel": "Durée",
+    "tuition": "Frais de scolarité",
+    "field": "Domaine d'études",
+    "language": "Langue d'enseignement",
+    "majors": "Spécialités",
+    "intakes": "Sessions d'admission",
+    "applyWindow": "Du {open} au {close}",
+    "applyFrom": "Ouvre le {open}",
+    "applyUntil": "Ferme le {close}",
     "sectionTitle": "Programmes",
-    "sectionIntro": "Courses of study offered by this university, each with its intakes and majors.",
+    "sectionIntro": "Formations proposées par cette université, chacune avec ses sessions d'admission et ses spécialités.",
     "level": {
       "DEGREE": "Diplôme",
-      "LANGUAGE": "Language",
-      "NON_DEGREE": "Non-degree",
-      "DIPLOMA": "Diploma",
-      "BACHELOR": "Bachelor’s",
-      "MASTER": "Master’s",
-      "PHD": "PhD"
+      "LANGUAGE": "Langue",
+      "NON_DEGREE": "Non diplômant",
+      "DIPLOMA": "Diplôme court",
+      "BACHELOR": "Licence",
+      "MASTER": "Master",
+      "PHD": "Doctorat"
     },
     "lang": {
-      "ENGLISH": "English",
-      "CHINESE": "Chinese",
-      "BILINGUAL": "Bilingual"
+      "ENGLISH": "Anglais",
+      "CHINESE": "Chinois",
+      "BILINGUAL": "Bilingue"
     },
     "intake": {
-      "SPRING_MARCH": "Spring (March)",
-      "AUTUMN_SEPTEMBER": "Autumn (September)",
-      "SUMMER": "Summer",
-      "WINTER": "Winter",
-      "ROLLING": "Rolling"
+      "SPRING_MARCH": "Printemps (mars)",
+      "AUTUMN_SEPTEMBER": "Automne (septembre)",
+      "SUMMER": "Été",
+      "WINTER": "Hiver",
+      "ROLLING": "Admission continue"
     },
-    "applyNow": "Apply for this programme",
-    "applyVia": "Applications for this programme are handled through {university}. Create a profile to start.",
-    "term": "Intake",
-    "opens": "Opens",
-    "closes": "Closes",
-    "rolling": "Rolling",
-    "noMajors": "Majors for this programme will be listed soon.",
-    "majorsIntro": "Fields of study you can specialise in within this programme.",
-    "tuitionNote": "Set by the university. The USD figure is indicative.",
-    "universityLabel": "University"
+    "applyNow": "Postuler à ce programme",
+    "applyVia": "Les candidatures pour ce programme sont traitées via {university}. Créez un profil pour commencer.",
+    "term": "Session",
+    "opens": "Ouvre le",
+    "closes": "Ferme le",
+    "rolling": "Admission continue",
+    "noMajors": "Les spécialités de ce programme seront bientôt répertoriées.",
+    "majorsIntro": "Domaines dans lesquels vous pouvez vous spécialiser au sein de ce programme.",
+    "tuitionNote": "Défini par l'université. Le montant en USD est indicatif.",
+    "universityLabel": "Université"
   },
   "scholarships": {
-    "searchLabel": "Search scholarships",
-    "searchPlaceholder": "Scholarship name, field or country",
-    "sortLabel": "Sort",
-    "sortRelevance": "Most relevant",
-    "sortDeadline": "Deadline (soonest)",
-    "sortNewest": "Recently published",
-    "sortTitle": "Title (A–Z)",
-    "anyFunding": "Any funding",
-    "anyLanguage": "Any language",
-    "withStipend": "With stipend",
-    "moreFilters": "More filters: level and category",
-    "fLevel": "Education level",
-    "fCategory": "Category",
-    "colRef": "Ref.",
-    "colFees": "Upfront fee (¥·$)",
-    "feesNone": "None",
-    "colTitle": "Scholarship",
-    "colLevel": "Level",
-    "colLanguage": "Language",
-    "colIntake": "Next intake",
-    "colDeadline": "Deadline",
-    "colFunding": "Funding",
-    "colLocation": "Location",
-    "apply": "Apply",
-    "applyNow": "Apply now",
-    "applyNote": "Applying opens the guided application in your dashboard. Sign in or create a profile to start.",
-    "view": "View",
-    "viewAll": "View all scholarships",
-    "hot": "Hot",
-    "noneTitle": "No scholarships published yet",
-    "noneBody": "The catalogue is being populated. Check back soon, or create a profile to be ready.",
-    "notFound": "This scholarship is not available.",
-    "benefits": "Benefits",
-    "requirements": "Requirements",
-    "policy": "Policy & notes",
-    "eligibility": "Eligibility",
-    "fees": "Fees",
-    "documents": "Documents required",
-    "documentsNote": "Set by the scholarship, collected during the application.",
-    "stipend": "Stipend",
-    "stipendDuration": "Paid for {n} months",
-    "upfront": "Upfront fees",
-    "accommodation": "Accommodation",
-    "coverage": "What the award covers",
-    "renewal": "Renewal & annual review",
-    "studyDuration": "Study duration",
-    "applicationChannel": "Application channel",
-    "requiresFinancialProof": "Financial proof / a guarantor is required",
-    "requiresFoundationYear": "A foundation / preparatory year is required",
+    "searchLabel": "Rechercher des bourses",
+    "searchPlaceholder": "Nom de bourse, domaine ou pays",
+    "sortLabel": "Trier",
+    "sortRelevance": "Les plus pertinentes",
+    "sortDeadline": "Échéance (la plus proche)",
+    "sortNewest": "Publiées récemment",
+    "sortTitle": "Titre (A à Z)",
+    "anyFunding": "Tout financement",
+    "anyLanguage": "Toute langue",
+    "withStipend": "Avec allocation",
+    "moreFilters": "Plus de filtres : niveau et catégorie",
+    "fLevel": "Niveau d'études",
+    "fCategory": "Catégorie",
+    "colRef": "Réf.",
+    "colFees": "Frais initiaux (¥·$)",
+    "feesNone": "Aucun",
+    "colTitle": "Bourse",
+    "colLevel": "Niveau",
+    "colLanguage": "Langue",
+    "colIntake": "Prochaine session",
+    "colDeadline": "Échéance",
+    "colFunding": "Financement",
+    "colLocation": "Lieu",
+    "apply": "Postuler",
+    "applyNow": "Postuler maintenant",
+    "applyNote": "Postuler ouvre la candidature guidée dans votre tableau de bord. Connectez-vous ou créez un profil pour commencer.",
+    "view": "Voir",
+    "viewAll": "Voir toutes les bourses",
+    "hot": "Populaire",
+    "noneTitle": "Aucune bourse publiée pour le moment",
+    "noneBody": "Le catalogue est en cours de constitution. Revenez bientôt, ou créez un profil pour être prêt.",
+    "notFound": "Cette bourse n'est pas disponible.",
+    "benefits": "Avantages",
+    "requirements": "Conditions requises",
+    "policy": "Politique et remarques",
+    "eligibility": "Éligibilité",
+    "fees": "Frais",
+    "documents": "Documents requis",
+    "documentsNote": "Définis par la bourse, collectés pendant la candidature.",
+    "stipend": "Allocation",
+    "stipendDuration": "Versée pendant {n} mois",
+    "upfront": "Frais initiaux",
+    "accommodation": "Hébergement",
+    "coverage": "Ce que couvre la bourse",
+    "renewal": "Renouvellement et bilan annuel",
+    "studyDuration": "Durée des études",
+    "applicationChannel": "Canal de candidature",
+    "requiresFinancialProof": "Une preuve financière ou un garant est requis",
+    "requiresFoundationYear": "Une année préparatoire est requise",
     "coverageKind": {
-      "TUITION": "Tuition",
-      "ACCOMMODATION": "Accommodation",
-      "STIPEND": "Living stipend",
-      "MEDICAL_INSURANCE": "Comprehensive medical insurance",
-      "SETTLEMENT_ALLOWANCE": "One-off settlement allowance",
-      "TRAVEL": "Travel / airfare",
-      "REGISTRATION_FEE": "Registration fee",
-      "VISA_FEE": "Visa fee",
-      "OTHER": "Other"
+      "TUITION": "Frais de scolarité",
+      "ACCOMMODATION": "Hébergement",
+      "STIPEND": "Allocation de subsistance",
+      "MEDICAL_INSURANCE": "Assurance maladie complète",
+      "SETTLEMENT_ALLOWANCE": "Allocation d'installation unique",
+      "TRAVEL": "Voyage / billet d'avion",
+      "REGISTRATION_FEE": "Frais d'inscription",
+      "VISA_FEE": "Frais de visa",
+      "OTHER": "Autre"
     },
     "channel": {
-      "DIRECT_UNIVERSITY": "Direct to the university",
-      "CSC_AGENCY": "Via a CSC agency number",
-      "NADOUMI": "Through Nadoumi",
-      "OTHER": "Other"
+      "DIRECT_UNIVERSITY": "Directement à l'université",
+      "CSC_AGENCY": "Via un numéro d'agence CSC",
+      "NADOUMI": "Via Nadoumi",
+      "OTHER": "Autre"
     },
-    "nonDegreeDuration": "Non-degree duration",
+    "nonDegreeDuration": "Durée non diplômante",
     "room": {
-      "SINGLE": "Single room",
-      "DOUBLE": "Double room",
-      "TRIPLE": "Triple room",
-      "QUAD": "Quad room",
-      "SHARED": "Shared / dormitory"
+      "SINGLE": "Chambre simple",
+      "DOUBLE": "Chambre double",
+      "TRIPLE": "Chambre triple",
+      "QUAD": "Chambre quadruple",
+      "SHARED": "Chambre partagée / dortoir"
     },
     "nonDegree": {
-      "HALF_YEAR": "Half year",
-      "ONE_YEAR": "One year"
+      "HALF_YEAR": "Un semestre",
+      "ONE_YEAR": "Un an"
     },
-    "intakes": "Intakes",
-    "closes": "closes",
-    "required": "required",
-    "optional": "optional",
+    "intakes": "Sessions d'admission",
+    "closes": "ferme",
+    "required": "requis",
+    "optional": "facultatif",
     "level": {
-      "NON_DEGREE": "Non-degree",
-      "DIPLOMA": "Diploma",
-      "BACHELOR": "Bachelor's",
-      "MASTER": "Master's",
-      "PHD": "PhD"
+      "NON_DEGREE": "Non diplômant",
+      "DIPLOMA": "Diplôme court",
+      "BACHELOR": "Licence",
+      "MASTER": "Master",
+      "PHD": "Doctorat"
     },
     "funding": {
-      "FULLY": "Fully funded",
-      "PARTIAL": "Partially funded",
-      "SELF": "Self-funded"
+      "FULLY": "Entièrement financée",
+      "PARTIAL": "Partiellement financée",
+      "SELF": "Autofinancée"
     },
     "lang": {
-      "ENGLISH": "English",
-      "CHINESE": "Chinese",
-      "BOTH": "English & Chinese"
+      "ENGLISH": "Anglais",
+      "CHINESE": "Chinois",
+      "BOTH": "Anglais et chinois"
     },
     "intake": {
-      "SPRING_MARCH": "Spring / March",
-      "AUTUMN_SEPTEMBER": "Autumn / September"
+      "SPRING_MARCH": "Printemps / mars",
+      "AUTUMN_SEPTEMBER": "Automne / septembre"
     },
     "freq": {
-      "MONTHLY": "month",
-      "YEARLY": "year",
-      "ONE_OFF": "one-off"
+      "MONTHLY": "mois",
+      "YEARLY": "an",
+      "ONE_OFF": "unique"
     },
     "category": {
       "CSC": "CSC",
-      "CGS": "Chinese Government",
-      "GOVERNMENT": "Government",
-      "PROVINCIAL": "Provincial",
-      "UNIVERSITY": "University",
-      "PRESIDENTIAL": "Presidential",
-      "LANGUAGE": "Language",
+      "CGS": "Gouvernement chinois",
+      "GOVERNMENT": "Gouvernementale",
+      "PROVINCIAL": "Provinciale",
+      "UNIVERSITY": "Universitaire",
+      "PRESIDENTIAL": "Présidentielle",
+      "LANGUAGE": "Langue",
       "TYPE_A": "Type A",
       "TYPE_B": "Type B",
       "TYPE_C": "Type C",
       "TYPE_D": "Type D"
     },
     "fee": {
-      "TUITION_BEFORE": "Tuition (before scholarship)",
-      "TUITION_AFTER": "Tuition (after scholarship)",
-      "ACCOMMODATION_BEFORE": "Accommodation (before)",
-      "ACCOMMODATION_AFTER": "Accommodation (after)",
-      "REGISTRATION": "Registration fee",
-      "APPLICATION": "Application fee",
-      "NADOUMI_APPLICATION": "Nadoumi application fee",
-      "NADOUMI_SERVICE": "Nadoumi service fee",
-      "INSURANCE": "Insurance",
-      "VISA": "Visa fee",
-      "OTHER": "Other fee"
+      "TUITION_BEFORE": "Frais de scolarité (avant bourse)",
+      "TUITION_AFTER": "Frais de scolarité (après bourse)",
+      "ACCOMMODATION_BEFORE": "Hébergement (avant)",
+      "ACCOMMODATION_AFTER": "Hébergement (après)",
+      "REGISTRATION": "Frais d'inscription",
+      "APPLICATION": "Frais de candidature",
+      "NADOUMI_APPLICATION": "Frais de candidature Nadoumi",
+      "NADOUMI_SERVICE": "Frais de service Nadoumi",
+      "INSURANCE": "Assurance",
+      "VISA": "Frais de visa",
+      "OTHER": "Autre frais"
     },
     "doc": {
-      "PASSPORT": "Passport",
-      "DEGREE": "Degree certificate",
-      "TRANSCRIPT": "Academic transcript",
-      "LANGUAGE_CERT": "Language certificate",
+      "PASSPORT": "Passeport",
+      "DEGREE": "Diplôme",
+      "TRANSCRIPT": "Relevé de notes",
+      "LANGUAGE_CERT": "Certificat de langue",
       "VISA": "Visa",
-      "PHYSICAL_EXAM": "Physical examination",
-      "STUDY_PLAN": "Study plan",
-      "RECOMMENDATION_LETTER": "Recommendation letter",
-      "OTHER": "Other document"
+      "PHYSICAL_EXAM": "Examen médical",
+      "STUDY_PLAN": "Projet d'études",
+      "RECOMMENDATION_LETTER": "Lettre de recommandation",
+      "OTHER": "Autre document"
     },
     "elig": {
-      "age": "Age",
-      "gpa": "GPA",
-      "inChina": "Currently in China",
-      "nationality": "Nationality"
+      "age": "Âge",
+      "gpa": "Moyenne (GPA)",
+      "inChina": "Actuellement en Chine",
+      "nationality": "Nationalité"
     },
-    "deadlineLabel": "Application deadline",
-    "deadlineDays": "{n} days left",
-    "deadlineToday": "Closes today",
-    "deadlinePassed": "Deadline has passed",
-    "deadlineRolling": "Rolling admissions",
-    "free": "Included",
-    "colRoom": "Room type",
-    "colDetails": "Details",
-    "colPrice": "Price",
+    "deadlineLabel": "Date limite de candidature",
+    "deadlineDays": "{n} jours restants",
+    "deadlineToday": "Ferme aujourd'hui",
+    "deadlinePassed": "La date limite est passée",
+    "deadlineRolling": "Admissions continues",
+    "free": "Inclus",
+    "colRoom": "Type de chambre",
+    "colDetails": "Détails",
+    "colPrice": "Prix",
     "colDoc": "Document",
-    "colRequirement": "Requirement",
-    "colNotes": "Notes"
+    "colRequirement": "Exigence",
+    "colNotes": "Remarques"
   },
   "assistant": {
-    "fabLabel": "Open the Nadoumi assistant",
-    "title": "Nadoumi Assistant",
-    "subtitle": "Find scholarships and track your application",
-    "close": "Close",
-    "greeting": "Hi! I can help you discover scholarships and check on an application. What would you like to do?",
-    "tabFind": "Find scholarships",
-    "tabTrack": "Track application",
-    "findPlaceholder": "e.g. fully funded master in engineering",
-    "findHint": "Type a subject, country or keyword.",
-    "anyFunding": "Any funding",
-    "fundingFully": "Fully funded",
-    "fundingPartial": "Partial",
-    "fundingSelf": "Self funded",
-    "search": "Search",
-    "searching": "Searching…",
-    "noResults": "No scholarships matched. Try a broader keyword.",
-    "resultsTitle": "Top matches",
-    "viewAll": "See all results",
-    "open": "Open",
-    "deadline": "Deadline",
-    "rolling": "Rolling",
-    "trackPlaceholder": "Enter your application ID",
-    "trackHint": "You can find the ID in your dashboard or confirmation email.",
-    "trackCta": "Check status",
-    "trackChecking": "Checking…",
-    "trackNotFound": "We couldn't find an application with that ID. Check the ID and try again.",
-    "trackComingSoon": "Application tracking is being connected. In the meantime, sign in to your dashboard to see your applications.",
-    "trackGoDashboard": "Go to my dashboard",
-    "trackStatus": "Status",
-    "trackStage": "Stage",
-    "trackUpdated": "Last updated",
-    "disclaimer": "Guided search across the live Nadoumi catalog."
+    "fabLabel": "Ouvrir l'assistant Nadoumi",
+    "title": "Assistant Nadoumi",
+    "subtitle": "Trouvez des bourses et suivez votre candidature",
+    "close": "Fermer",
+    "greeting": "Bonjour ! Je peux vous aider à découvrir des bourses et à suivre une candidature. Que souhaitez-vous faire ?",
+    "tabFind": "Trouver des bourses",
+    "tabTrack": "Suivre une candidature",
+    "findPlaceholder": "ex. master entièrement financé en ingénierie",
+    "findHint": "Saisissez un sujet, un pays ou un mot-clé.",
+    "anyFunding": "Tout financement",
+    "fundingFully": "Entièrement financée",
+    "fundingPartial": "Partiellement financée",
+    "fundingSelf": "Autofinancée",
+    "search": "Rechercher",
+    "searching": "Recherche en cours…",
+    "noResults": "Aucune bourse ne correspond. Essayez un mot-clé plus large.",
+    "resultsTitle": "Meilleures correspondances",
+    "viewAll": "Voir tous les résultats",
+    "open": "Ouvrir",
+    "deadline": "Échéance",
+    "rolling": "Admission continue",
+    "trackPlaceholder": "Saisissez l'identifiant de votre candidature",
+    "trackHint": "Vous trouverez l'identifiant dans votre tableau de bord ou dans l'e-mail de confirmation.",
+    "trackCta": "Vérifier le statut",
+    "trackChecking": "Vérification…",
+    "trackNotFound": "Nous n'avons trouvé aucune candidature avec cet identifiant. Vérifiez-le et réessayez.",
+    "trackComingSoon": "Le suivi des candidatures est en cours de mise en place. En attendant, connectez-vous à votre tableau de bord pour voir vos candidatures.",
+    "trackGoDashboard": "Aller à mon tableau de bord",
+    "trackStatus": "Statut",
+    "trackStage": "Étape",
+    "trackUpdated": "Dernière mise à jour",
+    "disclaimer": "Recherche guidée dans le catalogue Nadoumi en temps réel."
   },
   "guides": {
-    "more": "More guides"
+    "more": "Plus de guides",
+    "hub": {
+      "seoTitle": "Guides Nadoumi",
+      "seoDescription": "Des guides pratiques pour étudier en Chine : candidater, les bourses, les visas, la vie quotidienne et un guide de chaque région.",
+      "title": "Guides",
+      "subtitle": "Tout ce dont vous avez besoin avant et après votre candidature pour étudier en Chine, expliqué simplement et tenu à jour.",
+      "read": "Lire"
+    },
+    "howToApply": {
+      "intro": "Postuler dans une université chinoise est simple une fois vos documents en ordre. La plupart des établissements ouvrent les candidatures entre {openWindow} pour une rentrée en septembre ; les échéances des bourses tombent plus tôt, souvent entre {deadlineWindow}. Commencez environ un an à l'avance.",
+      "openWindow": "novembre et mars",
+      "deadlineWindow": "janvier et avril",
+      "sections": {
+        "journey": {
+          "eyebrow": "Le parcours",
+          "title": "Six étapes jusqu'à l'inscription"
+        },
+        "checklist": {
+          "eyebrow": "Liste de contrôle",
+          "title": "Documents nécessaires"
+        },
+        "support": {
+          "eyebrow": "Accompagnement",
+          "title": "Comment Nadoumi vous aide"
+        }
+      },
+      "steps": {
+        "choosePrograms": {
+          "title": "Choisir des programmes",
+          "body": "Déterminez le niveau, la langue d'enseignement, le domaine et le budget. Présélectionnez trois à six options pour garder des alternatives. Sur Nadoumi, filtrez par pays, financement, langue et niveau, et comparez les exigences côte à côte."
+        },
+        "prepareDocuments": {
+          "title": "Préparer vos documents",
+          "body": "Consultez la liste ci-dessous. Faites notarier et traduire tout ce qui n'est pas déjà en chinois ou en anglais, et commencez tôt l'examen médical."
+        },
+        "submitApplication": {
+          "title": "Soumettre la candidature",
+          "body": "Via le portail propre à l'université et, pour la bourse du gouvernement chinois, également via le système CSC. Réglez les frais de candidature (généralement 400 à 800 ¥). Postulez à la bourse et à l'admission en même temps : l'une ne garantit pas l'autre."
+        },
+        "interviews": {
+          "title": "Entretiens et décisions",
+          "body": "Certains départements organisent un court entretien en ligne. Les décisions arrivent entre avril et juillet : une notification d'admission et, en cas d'attribution, un certificat de bourse séparé."
+        },
+        "acceptVisa": {
+          "title": "Accepter et obtenir votre formulaire de visa",
+          "body": "Confirmez votre place ; l'université délivre un JW202 (autofinancé / bourse universitaire) ou JW201 (bourse gouvernementale) avec la lettre d'admission. Poursuivez avec le Guide du visa étudiant."
+        },
+        "beforeYouFly": {
+          "title": "Avant de partir",
+          "body": "Réservez un logement, prévoyez les fonds des premiers mois (les allocations sont versées après l'inscription), apportez tous les originaux, et notez la date limite d'inscription : la manquer peut annuler l'offre."
+        }
+      },
+      "docs": {
+        "passport": {
+          "term": "Passeport",
+          "detail": "Valide au moins pour la durée de vos études, plus six mois."
+        },
+        "diploma": {
+          "term": "Diplôme et relevés de notes",
+          "detail": "Diplôme le plus élevé et dossier complet, notariés et traduits."
+        },
+        "language": {
+          "term": "Certificat de langue",
+          "detail": "HSK pour un enseignement en chinois, IELTS ou TOEFL pour un enseignement en anglais (ou une lettre attestant l'anglais comme langue d'enseignement)."
+        },
+        "studyPlan": {
+          "term": "Projet d'études",
+          "detail": "Une lettre de motivation, généralement de 800 à 1 500 mots, nommant les encadrants ou équipes de recherche visés."
+        },
+        "recommendations": {
+          "term": "Deux lettres de recommandation",
+          "detail": "De référents académiques qui vous ont enseigné ou encadré."
+        },
+        "physicalExam": {
+          "term": "Formulaire d'examen médical",
+          "detail": "Le formulaire d'examen physique pour étrangers, pour les programmes de plus de six mois, accompagné d'une photo sur fond blanc."
+        }
+      },
+      "under18": {
+        "title": "Moins de 18 ans ?",
+        "body": "Vous devez aussi fournir un document de tutelle notarié désignant un tuteur résidant en Chine."
+      },
+      "supportBody": "Nous suivons chaque étape, signalons les échéances et relisons vos documents avant l'envoi. {createProfile} pour commencer, ou consultez le {visaGuide} pour savoir ce qui suit l'offre.",
+      "createProfile": "Créez un profil"
+    },
+    "scholarshipTypes": {
+      "intro": "Le financement des études en Chine se répartit en quatre grandes catégories. Beaucoup d'étudiants les combinent, par exemple une bourse provinciale pour les frais de scolarité et une bourse universitaire pour le logement. Chaque bourse listée sur Nadoumi indique précisément ce qu'elle couvre et qui y est éligible.",
+      "sections": {
+        "csc": {
+          "eyebrow": "1",
+          "title": "Bourse du gouvernement chinois (CSC)"
+        },
+        "provincial": {
+          "eyebrow": "2",
+          "title": "Bourses provinciales et municipales"
+        },
+        "university": {
+          "eyebrow": "3",
+          "title": "Bourses universitaires"
+        },
+        "confucius": {
+          "eyebrow": "4",
+          "title": "Institut Confucius et bourses d'entreprise"
+        },
+        "reference": {
+          "eyebrow": "Référence",
+          "title": "Ce que couvre chaque type"
+        },
+        "improve": {
+          "eyebrow": "Optimiser vos chances",
+          "title": "Comment renforcer une candidature"
+        },
+        "next": {
+          "eyebrow": "Étape suivante",
+          "title": "Trouvez ce à quoi vous êtes éligible"
+        }
+      },
+      "csc": {
+        "body": "Le dispositif national, géré par le China Scholarship Council, comporte plusieurs filières : le programme bilatéral (via le ministère de votre pays), le programme Chinese-University (candidature directe auprès d'une université désignée), et les programmes Route de la Soie et Grande Muraille. Une bourse complète couvre {coverage} ({stipend}) et {insurance}. Elle est très compétitive, avec des échéances précoces (souvent de janvier à mars).",
+        "coverage": "les frais de scolarité, le logement sur le campus ou une allocation, une allocation mensuelle",
+        "stipend": "environ 2 500 ¥ pour une licence, 3 000 ¥ pour un master, 3 500 ¥ pour un doctorat",
+        "insurance": "une assurance médicale complète"
+      },
+      "provincial": {
+        "body": "Les provinces et grandes villes (Jiangsu, Zhejiang, Shanghai, Guangdong, Pékin et d'autres) gèrent leurs propres dispositifs pour attirer des étudiants vers les universités de la région. La couverture va de l'exonération des frais de scolarité à un forfait quasi complet, et ces bourses sont souvent moins compétitives que la CSC."
+      },
+      "university": {
+        "body": "Presque toutes les universités proposent leurs propres bourses. Elles peuvent être totales ou partielles, sont souvent {renewable}, et ont généralement les échéances les plus tardives. Pour beaucoup de candidats, c'est la voie la plus réaliste vers un financement complet.",
+        "renewable": "renouvelables chaque année selon les résultats"
+      },
+      "confucius": {
+        "body": "La {scholarshipName} finance les études de langue chinoise et les diplômes en enseignement du chinois, sur candidature auprès d'un Institut Confucius ou d'un centre d'examen HSK. Des entreprises et fondations parrainent aussi des étudiants dans des domaines comme l'ingénierie, l'énergie et l'agriculture, souvent avec un stage ou un engagement d'embauche à la clé après le diplôme.",
+        "scholarshipName": "Bourse de l'Institut Confucius"
+      },
+      "coverage": {
+        "fullyFunded": {
+          "term": "Entièrement financée",
+          "detail": "Frais de scolarité, logement et allocation mensuelle, plus une assurance complète."
+        },
+        "tuitionAccommodation": {
+          "term": "Scolarité + logement",
+          "detail": "Pas d'allocation ; vous couvrez vos frais de subsistance."
+        },
+        "tuitionWaiver": {
+          "term": "Exonération des frais de scolarité",
+          "detail": "Seuls les frais de scolarité ; logement et frais de subsistance restent à votre charge."
+        },
+        "partial": {
+          "term": "Partielle",
+          "detail": "Un pourcentage ou un montant fixe de réduction sur les frais de scolarité."
+        }
+      },
+      "improve": {
+        "early": "Postulez tôt dans le cycle et à plusieurs bourses à la fois.",
+        "language": "Atteignez ou dépassez le niveau de langue requis {before} de postuler.",
+        "before": "avant",
+        "studyPlan": "Rédigez un projet d'études précis mentionnant des encadrants et des équipes de recherche.",
+        "target": "Ciblez les universités où votre profil est solide, pas seulement les plus prestigieuses."
+      },
+      "next": {
+        "body": "Parcourez les bourses ouvertes sur {scholarships}, ou {createProfile} et Nadoumi vous proposera celles auxquelles vous êtes éligible.",
+        "scholarshipsLink": "Bourses",
+        "createProfileLink": "créez un profil"
+      }
+    },
+    "studentVisaGuide": {
+      "intro": "Étudier en Chine plus de 180 jours nécessite un visa {x1}, converti en {residencePermit} après votre arrivée. Les programmes plus courts utilisent un visa {x2}. C'est la voie standard ; vérifiez toujours auprès de l'ambassade ou du consulat de Chine le plus proche, les modalités variant selon les pays.",
+      "x1": "X1",
+      "residencePermitTerm": "permis de séjour",
+      "x2": "X2",
+      "sections": {
+        "beforeApply": {
+          "eyebrow": "Avant de postuler",
+          "title": "Les deux documents clés"
+        },
+        "embassy": {
+          "eyebrow": "À l'ambassade",
+          "title": "Demander le visa"
+        },
+        "afterLand": {
+          "eyebrow": "Après votre arrivée",
+          "title": "Dans votre premier mois"
+        },
+        "whileStudying": {
+          "eyebrow": "Pendant vos études",
+          "title": "Conservez un statut valide"
+        }
+      },
+      "documents": {
+        "admissionNotice": {
+          "term": "Notification d'admission",
+          "detail": "La lettre d'admission originale de votre université."
+        },
+        "jwForm": {
+          "term": "JW202 ou JW201",
+          "detail": "Le formulaire de demande de visa pour étudier en Chine. JW202 pour les étudiants autofinancés ou boursiers universitaires ; JW201 pour les boursiers du gouvernement chinois."
+        }
+      },
+      "beforeApplyBody": "L'université envoie les deux documents après acceptation de votre place. Conservez les originaux en lieu sûr ; l'ambassade, puis le service de l'immigration, en auront besoin.",
+      "embassySteps": {
+        "cova": "Complétez le formulaire de demande de visa en ligne (COVA) et imprimez-le.",
+        "gather": "Réunissez : un passeport valide six mois ou plus avec une page vierge, une photo récente, la notification d'admission et le formulaire JW, ainsi que tout document requis par le consulat selon votre nationalité.",
+        "appointment": "Prenez rendez-vous au Centre de services pour les demandes de visa chinois ou à l'ambassade, déposez le dossier en personne, et réglez les frais.",
+        "collect": "Récupérez le visa sous environ quatre jours ouvrés. Un X1 est généralement à entrée unique, valable 90 jours à partir de sa délivrance ; planifiez votre voyage en conséquence."
+      },
+      "arrive": {
+        "registerAddress": {
+          "title": "Enregistrez votre adresse sous 24 heures",
+          "body": "Au poste de police local. Si vous logez en résidence universitaire, l'université s'en charge généralement ; si vous louez, vous devez le faire vous-même, et à nouveau après chaque voyage à l'étranger."
+        },
+        "medicalCheck": {
+          "title": "Effectuez le contrôle médical",
+          "body": "Si vous avez passé l'examen physique pour étrangers dans votre pays, apportez le rapport et la radiographie pour vérification au Centre de santé pour voyages internationaux local ; sinon, passez l'examen en Chine."
+        },
+        "residencePermit": {
+          "title": "Demandez le permis de séjour sous 30 jours",
+          "body": "Auprès du Bureau de gestion des entrées et sorties, avec votre passeport et visa X1, JW202 ou JW201, notification d'admission, rapport médical vérifié, enregistrement du logement et photos. Le permis remplace le visa et est délivré pour l'année académique, renouvelable chaque année."
+        }
+      },
+      "whileStudying": {
+        "renew": "Renouvelez le permis de séjour au moins {window}.",
+        "renewWindow": "un mois avant son expiration",
+        "reregister": "Réenregistrez votre adresse auprès de la police après chaque retour en Chine.",
+        "workPermission": "Le travail à temps partiel et les stages nécessitent une autorisation préalable de l'université et de l'immigration.",
+        "changeUniversity": "Si vous changez d'université ou quittez la Chine, votre permis doit être mis à jour ou annulé rapidement."
+      },
+      "beforeAllThis": {
+        "title": "Avant tout cela",
+        "body": "L'offre et le formulaire JW viennent d'abord, lisez {howToApply}."
+      }
+    },
+    "livingInChina": {
+      "intro": "Le quotidien d'un étudiant international en Chine est confortable et abordable une fois les bases mises en place. Presque tout passe par le téléphone, les campus fournissent l'essentiel de ce dont vous avez besoin, et les villes sont remarquablement bien connectées. Voici les aspects pratiques.",
+      "sections": {
+        "money": {
+          "eyebrow": "Argent",
+          "title": "Payer au quotidien"
+        },
+        "transport": {
+          "eyebrow": "Transports",
+          "title": "Se déplacer"
+        },
+        "home": {
+          "eyebrow": "Logement",
+          "title": "Où vous logerez"
+        },
+        "everyday": {
+          "eyebrow": "Au quotidien",
+          "title": "Nourriture, livraison et connectivité"
+        },
+        "health": {
+          "eyebrow": "Santé",
+          "title": "Assurance et soins"
+        },
+        "settlingIn": {
+          "eyebrow": "S'installer",
+          "title": "Le premier mois"
+        }
+      },
+      "pay": {
+        "walletApps": {
+          "term": "WeChat Pay et Alipay",
+          "detail": "Les QR codes couvrent presque tous les achats, du restaurant universitaire au métro. Reliez-les à un compte bancaire chinois dès vos premières semaines."
+        },
+        "bankAccount": {
+          "term": "Un compte bancaire local",
+          "detail": "Apportez votre passeport, votre permis de séjour et une attestation de l'université. Les cartes internationales fonctionnent dans les hôtels et aéroports, rarement ailleurs."
+        },
+        "budget": {
+          "term": "Un budget étudiant",
+          "detail": "Environ 2 000 à 3 500 yuans par mois pour la nourriture, les transports et l'essentiel, hors des plus grandes villes. Pékin, Shanghai et Shenzhen coûtent plus cher."
+        }
+      },
+      "moneyNote": "Gardez un peu d'espèces pour les petits commerçants et les marchés traditionnels, mais vous utiliserez votre téléphone en premier réflexe presque partout.",
+      "move": {
+        "metro": {
+          "term": "Métro et bus",
+          "detail": "Paiement par QR code dans chaque grande ville. Les tarifs se comptent en quelques yuans."
+        },
+        "railway": {
+          "term": "Train à grande vitesse",
+          "detail": "Rapide, ponctuel et abordable entre les villes. Réservez sur l'application Railway 12306 ou Trip.com."
+        },
+        "didi": {
+          "term": "Didi",
+          "detail": "L'application de VTC pour taxis et voitures privées, avec une interface en anglais."
+        },
+        "bikes": {
+          "term": "Vélos en libre-service",
+          "detail": "Les vélos Meituan et HelloRide sont partout pour les courts trajets ; déverrouillage par QR code."
+        }
+      },
+      "documentsCallout": {
+        "title": "Ayez toujours vos documents sur vous",
+        "body": "Votre passeport et votre permis de séjour sont nécessaires pour acheter des billets de train et vous enregistrer à l'hôtel."
+      },
+      "homeBody": "La plupart des universités proposent des {dorms} pour les étudiants internationaux, chambres simples ou partagées avec salle de bain, à partir d'environ 1 000 à 2 500 yuans par mois, réservées séparément de l'admission et souvent avec un dépôt de garantie. Louer hors campus revient moins cher par chambre dans les villes plus petites, mais implique de traiter avec des agences, des contrats et votre propre enregistrement auprès de la police. Les étudiants de première année commencent presque toujours en résidence universitaire.",
+      "onCampusDorms": "résidences universitaires sur le campus",
+      "daily": {
+        "canteens": {
+          "term": "Restaurants universitaires",
+          "detail": "L'option la plus économique, un repas complet coûte entre 8 et 20 yuans. Les cantines halal (清真) sont courantes."
+        },
+        "delivery": {
+          "term": "Meituan et Ele.me",
+          "detail": "Repas et courses livrés en moins d'une heure."
+        },
+        "shopping": {
+          "term": "Taobao et JD",
+          "detail": "Tout le reste, souvent livré le lendemain, à un point de retrait sur le campus."
+        },
+        "sim": {
+          "term": "Une carte SIM locale",
+          "detail": "Chez China Mobile, Unicom ou Telecom, avec votre passeport. Les données mobiles sont bon marché et rapides."
+        }
+      },
+      "everydayNote": "Certaines applications et certains sites étrangers ne sont pas accessibles sur les réseaux chinois ; de nombreux étudiants utilisent un VPN universitaire ou commercial pour leurs études et pour rester en contact avec leur pays. Configurez {wechat} avant votre arrivée, c'est le pilier de la vie étudiante.",
+      "wechat": "WeChat",
+      "healthBody": "Une {insurance} pour étudiants internationaux est obligatoire, généralement organisée par l'université (environ 600 à 800 yuans par an, inclus dans la plupart des bourses complètes). Les cliniques du campus traitent les problèmes mineurs ; les grands hôpitaux disposent de services internationaux ou VIP avec du personnel anglophone. Gardez votre carte d'assurance et votre numéro de police sur votre téléphone.",
+      "insuranceTerm": "assurance médicale complète",
+      "settlingIn": {
+        "mandarin": "Apprenez tôt un mandarin de survie : chiffres, directions et nourriture, même si votre diplôme est en anglais.",
+        "orientation": "Participez à la session d'accueil du bureau des étudiants internationaux et aux associations étudiantes, le moyen le plus rapide de créer un réseau.",
+        "copies": "Gardez des copies numériques et papier de votre passeport, visa, lettre d'admission et formulaire JW.",
+        "registration": "Respectez les règles d'enregistrement et de permis, consultez le {visaGuide}."
+      }
+    },
+    "welcomeToChina": {
+      "intro": "La Chine accueille l'une des plus grandes communautés d'étudiants internationaux au monde, répartie dans plus d'un millier d'universités, des tropiques de Hainan aux steppes du nord. Les diplômes sont enseignés en chinois et, de plus en plus, en anglais ; les frais de scolarité sont modestes ; et de généreuses bourses sont accessibles aux candidats solides. Voici une courte présentation avant de vous lancer.",
+      "sections": {
+        "case": {
+          "eyebrow": "Pourquoi",
+          "title": "Pourquoi étudier en Chine"
+        },
+        "structure": {
+          "eyebrow": "Structure",
+          "title": "Comment fonctionne le système"
+        },
+        "language": {
+          "eyebrow": "Langue",
+          "title": "Dans quelle langue vais-je étudier ?"
+        },
+        "dailyLife": {
+          "eyebrow": "Vie quotidienne",
+          "title": "La vie en bref"
+        },
+        "next": {
+          "eyebrow": "Étape suivante",
+          "title": "Vos prochaines étapes"
+        }
+      },
+      "why": {
+        "lowCost": {
+          "term": "Coût réduit",
+          "detail": "Les frais de scolarité dans les universités publiques représentent une fraction de ceux de programmes comparables en Europe ou en Amérique du Nord, et le coût de la vie hors des plus grandes villes est bas."
+        },
+        "realScholarships": {
+          "term": "De vraies bourses",
+          "detail": "Les bourses gouvernementales, provinciales et universitaires peuvent couvrir la scolarité, le logement et une allocation mensuelle."
+        },
+        "wideChoice": {
+          "term": "Un large choix",
+          "detail": "Ingénierie, médecine, commerce, sciences, langue chinoise et relations internationales, beaucoup avec des filières enseignées en anglais."
+        },
+        "network": {
+          "term": "Un réseau régional",
+          "detail": "Même une année de mandarin ouvre des portes dans toute l'Asie ; les diplômés en ressortent avec un véritable réseau."
+        }
+      },
+      "structureBody": "Une licence dure généralement quatre ans (cinq pour la médecine et l'architecture) ; un master, deux à trois ; un doctorat, trois à quatre. L'année académique s'étend de septembre à juillet, avec de longues vacances d'hiver autour du Nouvel An chinois. Vous entendrez parler d'universités {doubleFirstClass}, et des anciennes appellations {label985} et {label211}, qui désignent les établissements à forte intensité de recherche.",
+      "doubleFirstClass": "« Double First-Class »",
+      "label985": "« 985 »",
+      "label211": "« 211 »",
+      "languageBody": "Les diplômes enseignés en chinois exigent en général un certificat {hsk} (HSK 4 pour de nombreux programmes, HSK 5 pour les sciences humaines et la médecine). Les diplômes enseignés en anglais exigent l'{ieltsToefl}, ou une preuve que votre formation précédente s'est faite en anglais, ainsi qu'un ou deux semestres de mandarin de base comme condition d'obtention du diplôme.",
+      "hsk": "HSK",
+      "ieltsToefl": "IELTS ou le TOEFL",
+      "notReadyCallout": {
+        "title": "Pas encore prêt en chinois ?",
+        "body": "Un programme de langue d'un an constitue la passerelle habituelle, et de nombreuses bourses l'incluent."
+      },
+      "life": {
+        "phone": {
+          "term": "Tout par téléphone",
+          "detail": "WeChat et Alipay gèrent la messagerie, les paiements, les transports et les livraisons."
+        },
+        "railway": {
+          "term": "Train à grande vitesse",
+          "detail": "Un vaste réseau relie toutes les grandes villes, rapide et abordable."
+        },
+        "campus": {
+          "term": "Vie sur le campus",
+          "detail": "Des campus clos et autonomes avec résidences, restaurants universitaires, cliniques et installations sportives sur place."
+        },
+        "safety": {
+          "term": "Sécurité au quotidien",
+          "detail": "Faible criminalité de rue ; le bureau des étudiants internationaux vous aide à vous installer."
+        }
+      },
+      "lifeNote": "Pour tous les aspects pratiques, lisez {livingGuide}.",
+      "nextSteps": {
+        "shortlist": "Présélectionnez des programmes : commencez par {scholarships} et {universities}.",
+        "requirements": "Vérifiez les exigences linguistiques et académiques pour chacun.",
+        "documents": "Préparez vos documents tôt : consultez {howToApply}.",
+        "visa": "Postulez, acceptez votre offre, et obtenez le formulaire {jwForm} pour le visa : consultez le {visaGuide}."
+      },
+      "jwForm": "JW202/JW201",
+      "finalCta": "{createProfile} et Nadoumi vous proposera des programmes, suivra vos échéances et vous guidera à chaque étape jusqu'à l'inscription.",
+      "createProfileLink": "Créez un profil"
+    },
+    "faq": {
+      "intro": "Réponses brèves aux questions que se posent le plus souvent les étudiants avant de postuler. Pour plus de détails, suivez les liens vers les guides complets.",
+      "sections": {
+        "next": {
+          "eyebrow": "Étape suivante",
+          "title": "Encore des doutes ?"
+        }
+      },
+      "stillUnsure": "{contact} ou {createProfile} et nous vous guiderons à chaque étape.",
+      "createProfileLink": "créez un profil",
+      "groups": {
+        "studyingAndLanguage": {
+          "title": "Études et langue",
+          "items": [
+            {
+              "q": "Dois-je parler chinois pour étudier en Chine ?",
+              "a": "Pas nécessairement. De nombreuses licences et la plupart des masters et doctorats proposent des filières enseignées en anglais, notamment en ingénierie, commerce, médecine et sciences. Les diplômes enseignés en chinois exigent un certificat HSK, généralement de niveau 4 à 5. Dans tous les cas, un ou deux semestres de mandarin de base sont souvent une condition d'obtention du diplôme, et un programme de langue d'un an constitue la passerelle standard si votre chinois n'est pas encore suffisant."
+            },
+            {
+              "q": "Est-ce sûr, et à quoi ressemble la vie sur le campus ?",
+              "a": "Les campus chinois sont clos, autonomes et généralement très sûrs, avec résidences, restaurants universitaires, cliniques et installations sportives sur place. La vie quotidienne passe par WeChat et Alipay ; le bureau des étudiants internationaux et les associations étudiantes sont le moyen le plus rapide de créer un réseau."
+            }
+          ]
+        },
+        "costAndFunding": {
+          "title": "Coût et financement",
+          "items": [
+            {
+              "q": "Combien cela coûte-t-il ?",
+              "a": "Les frais de scolarité en université publique s'élèvent généralement à 18 000-40 000 yuans par an pour une licence (les programmes de médecine et de MBA coûtent plus cher). Le logement sur le campus coûte environ 1 000 à 2 500 yuans par mois, et un budget de vie modeste hors des plus grandes villes est de 2 000 à 3 500 yuans par mois. Une bourse complète supprime les frais de scolarité et de logement et ajoute une allocation mensuelle."
+            },
+            {
+              "q": "Puis-je obtenir une bourse complète ?",
+              "a": "Oui, via la bourse du gouvernement chinois, les dispositifs provinciaux, les bourses universitaires ou la bourse de l'Institut Confucius. Postulez tôt dans le cycle, à plusieurs bourses à la fois, et satisfaites le niveau de langue requis avant de postuler. Les bourses universitaires ont les échéances les plus tardives et constituent la voie la plus réaliste vers un financement complet pour de nombreux candidats."
+            }
+          ]
+        },
+        "applying": {
+          "title": "Candidature",
+          "items": [
+            {
+              "q": "Quand dois-je postuler ?",
+              "a": "Environ un an à l'avance. Les candidatures ouvrent généralement de novembre à mars pour une rentrée en septembre ; les échéances des bourses tombent plus tôt, souvent de janvier à avril. Les décisions arrivent d'avril à juillet."
+            },
+            {
+              "q": "De quels documents ai-je besoin ?",
+              "a": "Passeport ; diplôme et relevés de notes notariés et traduits ; un certificat de langue (HSK, IELTS ou TOEFL) ; un projet d'études ; deux lettres de recommandation ; une photo d'identité ; et, pour les programmes de plus de six mois, le formulaire d'examen physique pour étrangers. Les candidats de moins de 18 ans ont également besoin d'un document de tutelle notarié."
+            }
+          ]
+        },
+        "visaAndFamily": {
+          "title": "Visa et famille",
+          "items": [
+            {
+              "q": "De quel visa ai-je besoin ?",
+              "a": "Un visa X1 pour les programmes de plus de 180 jours, que vous convertissez en permis de séjour dans les 30 jours suivant votre arrivée ; un visa X2 pour les programmes plus courts. Vous postulez avec votre notification d'admission originale et le formulaire JW202 ou JW201 de l'université."
+            },
+            {
+              "q": "Puis-je travailler pendant mes études ?",
+              "a": "Uniquement avec l'autorisation préalable de l'université et des autorités de l'immigration. Travailler avec un permis d'études sans autorisation peut compromettre votre statut. Les stages rémunérés liés à votre programme sont généralement possibles avec les documents appropriés."
+            },
+            {
+              "q": "Puis-je faire venir ma famille ?",
+              "a": "Le conjoint et les enfants peuvent demander un visa de personne à charge S1 ou S2 une fois que vous détenez un permis de séjour, mais vous devez prouver que vous pouvez subvenir à leurs besoins ; les résidences universitaires n'hébergent pas les familles, vous devrez donc louer hors campus. Les règles varient selon les villes, renseignez-vous auprès du bureau international de l'université."
+            }
+          ]
+        },
+        "afterGraduation": {
+          "title": "Après le diplôme",
+          "items": [
+            {
+              "q": "Que puis-je faire après l'obtention de mon diplôme ?",
+              "a": "Les options incluent la poursuite d'études en Chine, un permis de travail si vous trouvez un emploi éligible (nécessitant généralement une expérience pertinente ou un master), ou un retour dans votre pays avec un diplôme reconnu et un réseau régional. Certaines villes proposent des visas de recherche d'emploi ou d'entrepreneuriat post-diplôme pour les diplômés des meilleures universités."
+            },
+            {
+              "q": "Comment Nadoumi vous aide-t-il ?",
+              "a": "Nous vous proposons des programmes et des bourses pour lesquels vous êtes éligible, suivons chaque échéance, relisons vos documents avant l'envoi, et vous accompagnons dans les offres, le formulaire JW, le visa et l'inscription."
+            }
+          ]
+        }
+      }
+    },
+    "cityGuides": {
+      "seoTitle": "Guides des villes, étudier partout en Chine",
+      "seoDescription": "Chaque province et région de Chine : histoire, culture, langue et fêtes, avec deux villes et leurs grandes universités. Recherchez par province, ville ou université.",
+      "heroSubtitle": "Chaque province et région de Chine, son histoire, sa culture, sa langue et ses fêtes, avec deux villes et leurs grandes universités.",
+      "intro": "La Chine est vaste et variée. Chaque province a ses dialectes, sa cuisine, ses fêtes et son caractère, ainsi que ses propres universités. Recherchez par province, ville ou université, ou filtrez par région, puis explorez les établissements sur notre page {universities}.",
+      "searchLabel": "Rechercher une province, une ville ou une université",
+      "searchPlaceholder": "Rechercher une province, une ville ou une université",
+      "allRegions": "Toutes les régions",
+      "showingCount": "{count} provinces et régions affichées sur {total}",
+      "topUniversities": "Meilleures universités",
+      "noResults": {
+        "title": "Aucune province correspondante",
+        "body": "Essayez une autre ville, université ou région.",
+        "clear": "Effacer la recherche"
+      },
+      "universitiesNote": "Les listes d'universités mettent en avant quelques établissements de premier plan par ville et ne sont pas exhaustives. Les découpages administratifs suivent ceux de la République populaire de Chine.",
+      "kind": {
+        "province": "Province",
+        "autonomousRegion": "Région autonome",
+        "municipality": "Municipalité"
+      },
+      "regions": {
+        "north": {
+          "name": "Chine du Nord"
+        },
+        "northeast": {
+          "name": "Chine du Nord-Est"
+        },
+        "east": {
+          "name": "Chine de l'Est"
+        },
+        "central": {
+          "name": "Chine centrale"
+        },
+        "south": {
+          "name": "Chine du Sud"
+        },
+        "southwest": {
+          "name": "Chine du Sud-Ouest"
+        },
+        "northwest": {
+          "name": "Chine du Nord-Ouest"
+        }
+      },
+      "divisions": {
+        "beijing": {
+          "overview": "Capitale de la Chine pendant la majeure partie des huit derniers siècles, siège des dynasties Yuan et Qing ainsi que de la République populaire. Elle abrite la Cité interdite, le Temple du Ciel et les tronçons de la Grande Muraille les plus proches.",
+          "culture": "Le mandarin standard (putonghua) est basé sur le dialecte de Pékin. La ville conserve l'opéra de Pékin, la vie des cours de hutong et les foires du Nouvel An chinois, aux côtés d'un rythme moderne effréné ; le canard laqué de Pékin en est le plat emblématique.",
+          "cities": {
+            "haidian-district": {
+              "note": "Le quartier universitaire et technologique au nord-ouest de la ville."
+            },
+            "chaoyang-district": {
+              "note": "Le quartier central des affaires et des ambassades, à l'est de la vieille ville."
+            }
+          }
+        },
+        "tianjin": {
+          "overview": "Un port sur le golfe de Bohai et l'accès historique de Pékin à la mer. Les concessions étrangères du XIXe siècle ont laissé des avenues d'inspiration européenne le long de la rivière Haihe.",
+          "culture": "Le dialecte de Tianjin est réputé pour sa vivacité d'esprit ; la ville est le berceau du xiangsheng (dialogue comique). Les petits pains vapeur Goubuli, l'artisanat de figurines en argile et les estampes du Nouvel An sont des traditions locales.",
+          "cities": {
+            "nankai-district": {
+              "note": "Le cœur universitaire, à côté du parc Nankai."
+            },
+            "jinnan-district": {
+              "note": "Une zone de campus et d'entreprises plus récente, au sud."
+            }
+          }
+        },
+        "hebei": {
+          "overview": "La province qui entoure Pékin et Tianjin. Elle abrite la résidence d'été impériale de Chengde, le col de Shanhaiguan où la Grande Muraille rejoint la mer, et une grande partie de l'industrie sidérurgique chinoise.",
+          "culture": "Le hebei bangzi est un opéra régional bruyant et percussif ; la province conserve de profondes traditions d'arts martiaux ainsi que des fêtes des lanternes et sculptures de glace élaborées.",
+          "cities": {
+            "shijiazhuang": {
+              "note": "La capitale provinciale, ville ferroviaire de la plaine."
+            },
+            "baoding": {
+              "note": "Un ancien siège provincial des Qing, au sud-ouest de Pékin."
+            }
+          }
+        },
+        "shanxi": {
+          "overview": "Un plateau de loess à l'est du fleuve Jaune, l'un des plus anciens foyers de la civilisation chinoise. On y trouve la ville fortifiée Ming de Pingyao, les grottes bouddhiques de Yungang, et l'héritage des marchands du Jin, fondateurs des premières banques chinoises.",
+          "culture": "Le groupe dialectal jin se distingue au sein du mandarin. Le Shanxi est réputé pour ses nouilles taillées à la main et son vinaigre vieilli, son théâtre d'ombres et ses spectaculaires fêtes des lanternes.",
+          "cities": {
+            "taiyuan": {
+              "note": "La capitale provinciale industrielle, dans la vallée de la rivière Fen."
+            },
+            "datong": {
+              "note": "Une ancienne capitale frontalière du nord, porte d'accès aux grottes de Yungang."
+            }
+          }
+        },
+        "inner-mongolia": {
+          "overview": "Une longue bande de steppes, de déserts et de forêts le long de la frontière nord de la Chine, riche en charbon et en terres rares. Le mausolée de Gengis Khan se dresse sur son plateau d'Ordos.",
+          "culture": "Le mongol est coofficiel avec le mandarin et s'écrit en script mongol vertical. Le festival d'été du Naadam propose lutte, courses de chevaux et tir à l'arc ; le chant diphonique, le violon morin khuur et le thé au lait font partie du quotidien.",
+          "cities": {
+            "hohhot": {
+              "note": "La capitale régionale, ville de temples en bordure de steppe."
+            },
+            "baotou": {
+              "note": "Un pôle industriel de l'acier et des terres rares sur le fleuve Jaune."
+            }
+          }
+        },
+        "liaoning": {
+          "overview": "La plus méridionale et la plus industrielle des provinces du Nord-Est. Shenyang abrite le Palais impérial du début des Qing ; Dalian est une ville côtière au climat doux, bâtie par la Russie et le Japon.",
+          "culture": "L'accent mandarin du Nord-Est, prononcé, est reconnaissable dans tout le pays. La comédie chantée et dansée errenzhuan, les ragoûts copieux, le chou mariné et les fêtes de glace hivernales caractérisent la région.",
+          "cities": {
+            "shenyang": {
+              "note": "La capitale provinciale et la plus grande ville du Nord-Est."
+            },
+            "dalian": {
+              "note": "Une ville portuaire et balnéaire sur la mer Jaune, connue pour ses places et ses tramways."
+            }
+          }
+        },
+        "jilin": {
+          "overview": "Centrée sur les monts Changbai et leur lac de cratère, à la frontière nord-coréenne. Changchun s'est développée autour de l'automobile et du cinéma ; Yanbian est une préfecture autonome coréo-chinoise.",
+          "culture": "Le mandarin y cohabite avec le coréen à Yanbian. Le givre hivernal sur la rivière Songhua attire les photographes ; plats mandchous et coréens, nouilles froides, kimchi et barbecue sont des incontournables.",
+          "cities": {
+            "changchun": {
+              "note": "La capitale provinciale, ville industrielle et universitaire planifiée."
+            },
+            "yanji": {
+              "note": "Le siège de la préfecture autonome coréenne de Yanbian."
+            }
+          }
+        },
+        "heilongjiang": {
+          "overview": "L'extrême nord-est de la Chine, frontalier de la Russie le long du fleuve Amour, avec le gisement pétrolier de Daqing et de vastes terres agricoles noires. Harbin, bâtie par le chemin de fer transmandchourien, conserve une architecture russe.",
+          "culture": "Le Festival international de sculptures sur glace et de neige de Harbin est le plus grand du monde. Emprunts au russe, saucisses et pain de seigle, baignades d'hiver et hot-pot réchauffent les longs hivers.",
+          "cities": {
+            "harbin": {
+              "note": "La capitale provinciale, sur la rivière Songhua."
+            },
+            "daqing": {
+              "note": "Une ville née du plus célèbre gisement pétrolier chinois."
+            }
+          }
+        },
+        "shanghai": {
+          "overview": "Un village de pêcheurs devenu port du traité en 1843, aujourd'hui capitale financière de la Chine. Le Bund fait face à la skyline de Pudong de l'autre côté de la rivière Huangpu ; des ruelles shikumen subsistent entre les tours.",
+          "culture": "Le shanghaïen est un dialecte wu. La culture « haipai » (style shanghaïen) mêle influences chinoises et occidentales ; les raviolis à la soupe xiaolongbao et la fête des lanternes du jardin Yu en sont des marqueurs locaux.",
+          "cities": {
+            "yangpu-district": {
+              "note": "Un district du nord-est bâti autour de ses universités et d'un front de rivière réaménagé."
+            },
+            "minhang-district": {
+              "note": "Un vaste district méridional avec de grands campus et une industrie active."
+            }
+          }
+        },
+        "jiangsu": {
+          "overview": "La riche province immédiatement en amont de Shanghai. Nankin a été à plusieurs reprises capitale dynastique ; les jardins classiques et les canaux de Suzhou, sur le Grand Canal, sont classés au patrimoine mondial.",
+          "culture": "Le wu et le mandarin de Jianghuai y sont tous deux parlés. Le kunqu, opéra raffiné qui a façonné tout le théâtre chinois postérieur, est né ici, tout comme la délicate cuisine huaiyang.",
+          "cities": {
+            "nanjing": {
+              "note": "La capitale provinciale, ville fortifiée sur le Yangtsé riche en histoire."
+            },
+            "suzhou": {
+              "note": "Une ville de canaux réputée pour ses jardins, sa soie et, aujourd'hui, ses hautes technologies."
+            }
+          }
+        },
+        "zhejiang": {
+          "overview": "Une province côtière vallonnée du thé, de la soie et de l'entreprise privée. Le lac de l'Ouest de Hangzhou inspire les poètes depuis mille ans ; le mont Putuo est une importante île de pèlerinage bouddhiste.",
+          "culture": "Les dialectes wu varient fortement d'une vallée à l'autre. L'opéra yue, le thé vert Longjing, et le mascaret d'automne qui remonte en rugissant la rivière Qiantang sont des traditions du Zhejiang.",
+          "cities": {
+            "hangzhou": {
+              "note": "La capitale provinciale et un centre technologique au bord du lac de l'Ouest."
+            },
+            "ningbo": {
+              "note": "Un port de commerce ancien et l'un des ports de fret les plus actifs au monde."
+            }
+          }
+        },
+        "anhui": {
+          "overview": "Une province de l'intérieur traversée par le Yangtsé et la rivière Huai. Le mont Huangshan (mont Jaune) et les villages blanchis à la chaux de Xidi et Hongcun, dans la région de Huizhou, sont classés au patrimoine mondial.",
+          "culture": "Les marchands de Huizhou ont bâti la culture chinoise des pierres à encre, du papier de riz et des pinceaux. L'opéra de l'Anhui, arrivé à Pékin en 1790, est devenu l'ancêtre de l'opéra de Pékin.",
+          "cities": {
+            "hefei": {
+              "note": "La capitale provinciale et un pôle scientifique national."
+            },
+            "wuhu": {
+              "note": "Un port fluvial sur le Yangtsé et une ville industrielle."
+            }
+          }
+        },
+        "fujian": {
+          "overview": "Une côte montagneuse face à Taïwan, historiquement un point de départ d'émigration vers l'Asie du Sud-Est. Quanzhou fut un grand port médiéval de la route maritime de la soie ; les maisons rondes en terre hakka (tulou) sont classées au patrimoine mondial.",
+          "culture": "Les dialectes min, le hokkien au sud, le parler de Fuzhou au nord, diffèrent fortement du mandarin. Le thé oolong, le théâtre de marionnettes à gaine et le festival de la déesse de la mer Mazu sont centraux dans la vie locale.",
+          "cities": {
+            "fuzhou": {
+              "note": "La capitale provinciale, ville de banians et de sources chaudes."
+            },
+            "xiamen": {
+              "note": "Une ville insulaire avec un quartier colonial sur Gulangyu et un climat doux."
+            }
+          }
+        },
+        "jiangxi": {
+          "overview": "Un bassin drainé par la rivière Gan vers le lac Poyang, le plus grand lac d'eau douce de Chine. Jingdezhen produit de la porcelaine impériale depuis mille ans ; Jinggangshan fut la première base rurale communiste.",
+          "culture": "Le gan et le hakka sont les principaux dialectes. La danse rituelle masquée nuo, les traditions claniques des salles ancestrales et les courses de bateaux-dragons y sont bien vivantes.",
+          "cities": {
+            "nanchang": {
+              "note": "La capitale provinciale, ville fluviale à l'histoire révolutionnaire."
+            },
+            "jingdezhen": {
+              "note": "La « capitale de la porcelaine » de Chine."
+            }
+          }
+        },
+        "shandong": {
+          "overview": "Une péninsule entre les mers de Bohai et Jaune, et le lieu de naissance de Confucius et de Mencius. Le mont Tai est le plus vénéré des monts sacrés de Chine ; Qingdao conserve un quartier allemand et une brasserie célèbre.",
+          "culture": "Le mandarin jilu est le parler local. La cuisine lu est l'une des quatre grandes traditions régionales ; Weifang accueille chaque printemps un festival international du cerf-volant.",
+          "cities": {
+            "jinan": {
+              "note": "La « ville des sources » et capitale provinciale."
+            },
+            "qingdao": {
+              "note": "Une ville côtière de toits rouges, de plages et de bière."
+            }
+          }
+        },
+        "henan": {
+          "overview": "Le cœur de la plaine centrale où s'est formée la civilisation chinoise. Elle compte trois anciennes capitales (Luoyang, Kaifeng et Anyang, où furent découverts les os oraculaires), le temple de Shaolin et les grottes de Longmen.",
+          "culture": "Le mandarin des plaines centrales est le parler local. L'opéra yu est la plus grande forme d'opéra régional du pays ; nouilles de blé et galettes farcies composent l'alimentation quotidienne.",
+          "cities": {
+            "zhengzhou": {
+              "note": "Un grand nœud ferroviaire et la capitale provinciale."
+            },
+            "kaifeng": {
+              "note": "Une ancienne capitale de la dynastie Song, sur le fleuve Jaune."
+            }
+          }
+        },
+        "hubei": {
+          "overview": "Là où la rivière Han rejoint le Yangtsé à Wuhan, cœur des transports en Chine. La révolution de 1911 y a débuté ; en amont se dresse le barrage des Trois Gorges.",
+          "culture": "Le mandarin du sud-ouest et l'ancien héritage Chu façonnent l'identité locale. Les nouilles chaudes et sèches (reganmian) sont le petit-déjeuner de Wuhan ; les courses de bateaux-dragons seraient nées sur ces rivières.",
+          "cities": {
+            "wuhan": {
+              "note": "La capitale provinciale, l'une des plus grandes villes intérieures de Chine."
+            },
+            "yichang": {
+              "note": "La ville qui borde le barrage des Trois Gorges."
+            }
+          }
+        },
+        "hunan": {
+          "overview": "Une province de lacs et de montagnes au sud du Yangtsé. Le lac Dongting, les piliers de quartz de Zhangjiajie et le village natal de Mao Zedong, Shaoshan, s'y trouvent, tout comme l'académie de Yuelu, vieille de mille ans.",
+          "culture": "Le dialecte xiang est parlé dans toute la province. L'opéra folklorique au tambour fleuri, une cuisine très pimentée et les fêtes des peuples Miao et Tujia donnent au Hunan un caractère affirmé.",
+          "cities": {
+            "changsha": {
+              "note": "La vivante capitale provinciale sur la rivière Xiang."
+            },
+            "xiangtan": {
+              "note": "Une ville industrielle proche de Shaoshan."
+            }
+          }
+        },
+        "guangdong": {
+          "overview": "Le delta de la rivière des Perles, moteur industriel et exportateur de la Chine. Guangzhou (Canton) est un port de commerce extérieur depuis deux mille ans ; Shenzhen est passée du village à la mégapole en quarante ans.",
+          "culture": "Le cantonais, le teochew et le hakka y sont tous parlés. L'opéra cantonais, la danse du lion, les marchés aux fleurs de printemps et, surtout, les déjeuners de dim sum « yum cha » forment la culture du Lingnan.",
+          "cities": {
+            "guangzhou": {
+              "note": "La capitale provinciale et la grande ville commerçante du sud de la Chine."
+            },
+            "shenzhen": {
+              "note": "Une jeune métropole technologique à la frontière de Hong Kong."
+            }
+          }
+        },
+        "guangxi": {
+          "overview": "Une région autonome zhuang aux paysages karstiques spectaculaires, avec les pics de Guilin, la rivière Li et les rizières en terrasses de Longsheng. Les Zhuang forment la plus grande minorité ethnique de Chine.",
+          "culture": "La langue zhuang est coofficielle ; le mandarin du sud-ouest et le cantonais sont également courants. Le festival du chant zhuang « Troisième jour du troisième mois », ainsi que les coutumes yao et miao, animent le calendrier printanier.",
+          "cities": {
+            "nanning": {
+              "note": "La verdoyante capitale régionale, proche de la frontière vietnamienne."
+            },
+            "guilin": {
+              "note": "La ville touristique au milieu des pics calcaires."
+            }
+          }
+        },
+        "hainan": {
+          "overview": "La province insulaire tropicale de Chine et un nouveau port franc. Sanya, à la pointe sud, est une ville balnéaire ; l'intérieur des terres accueille les peuples Li et Miao.",
+          "culture": "Le hainanais (un dialecte min) est parlé aux côtés du mandarin. Le tissage de brocart li, la sculpture sur coque de noix de coco et les rassemblements de chants folkloriques « Junpo » en plein air sont des traditions insulaires.",
+          "cities": {
+            "haikou": {
+              "note": "La capitale provinciale, sur la côte nord."
+            },
+            "sanya": {
+              "note": "La ville balnéaire tropicale de l'extrême sud."
+            }
+          }
+        },
+        "chongqing": {
+          "overview": "Une ville de montagne où la rivière Jialing rejoint le Yangtsé, et capitale chinoise en temps de guerre de 1937 à 1945. Routes, voies ferrées et bâtiments s'étagent sur plusieurs niveaux le long des falaises.",
+          "culture": "Le dialecte chongqinois du mandarin du sud-ouest est rapide et direct. La ville est le berceau du hotpot brûlant et engourdissant ; la vieille ville de Ciqikou et la fête du Printemps y perpétuent d'anciennes coutumes.",
+          "cities": {
+            "shapingba-district": {
+              "note": "Le principal quartier universitaire, à l'ouest de la ville."
+            },
+            "yuzhong-district": {
+              "note": "La péninsule qui forme le centre-ville historique."
+            }
+          }
+        },
+        "sichuan": {
+          "overview": "Le « pays d'abondance » : la plaine de Chengdu est irriguée par les ouvrages de Dujiangyan depuis plus de deux mille ans. Elle abrite les pandas géants, les lacs de Jiuzhaigou et le Grand Bouddha de Leshan.",
+          "culture": "Le sichuanais, dialecte mandarin du sud-ouest, est chaleureux et joueur. L'opéra du Sichuan et son art fulgurant du « changement de visage », la vie tranquille des maisons de thé et la cuisine au poivre du Sichuan, qui engourdit la bouche, sont célèbres dans tout le pays.",
+          "cities": {
+            "chengdu": {
+              "note": "La capitale provinciale, détendue, et un centre technologique."
+            },
+            "mianyang": {
+              "note": "La « ville des sciences » désignée par la Chine, au nord-est de Chengdu, et siège de Nadoumi."
+            }
+          }
+        },
+        "guizhou": {
+          "overview": "Un plateau accidenté, truffé de grottes et l'une des provinces les plus diversifiées sur le plan ethnique. Huangguoshu est la plus grande chute d'eau du pays ; le Moutai, l'alcool national, y est distillé.",
+          "culture": "Le mandarin y cohabite avec les langues miao, dong et buyi. Les « grands chœurs » dong sont un art reconnu par l'UNESCO ; les festivals du sheng lusheng et le festival du repas des sœurs miao rassemblent des vallées entières.",
+          "cities": {
+            "guiyang": {
+              "note": "La capitale provinciale, fraîche et boisée, et un centre du big data."
+            },
+            "zunyi": {
+              "note": "Une ville historique où le Parti communiste tint une réunion décisive en 1935."
+            }
+          }
+        },
+        "yunnan": {
+          "overview": "La province chinoise la plus riche en biodiversité, aux frontières du Myanmar, du Laos et du Vietnam. Elle conserve les vieilles villes de Lijiang et Dali, les hauts plateaux de Shangri-La et la forêt tropicale de Xishuangbanna, et elle est la source du thé pu-erh.",
+          "culture": "Vingt-cinq minorités ethniques y vivent ; bai, naxi (avec ses pictogrammes dongba), dai et yi comptent parmi leurs langues. Le festival de l'aspersion d'eau dai, le festival des torches yi et la foire du troisième mois de Dali sont les temps forts de l'année.",
+          "cities": {
+            "kunming": {
+              "note": "La douce « ville du printemps » et capitale provinciale."
+            },
+            "dali": {
+              "note": "Une vieille ville au bord d'un lac, centre de la culture bai."
+            }
+          }
+        },
+        "tibet": {
+          "overview": "Le haut plateau, à plus de quatre mille mètres d'altitude en moyenne. Lhassa abrite le palais du Potala et le temple du Jokhang ; la face nord de l'Everest s'élève à sa frontière sud.",
+          "culture": "Le tibétain est coofficiel et s'écrit dans sa propre écriture. Le bouddhisme tibétain façonne la vie quotidienne ; le Losar (Nouvel An), le Shoton, « fête du yaourt », avec son immense thangka dévoilé, le thé au beurre et la tsampa sont des traditions centrales.",
+          "cities": {
+            "lhasa": {
+              "note": "La capitale régionale et centre spirituel du Tibet."
+            },
+            "nyingchi": {
+              "note": "Une vallée plus basse et plus verte, au sud-est."
+            }
+          }
+        },
+        "shaanxi": {
+          "overview": "Le berceau de la Chine impériale. Xi'an, l'antique Chang'an, fut la capitale des Zhou, des Qin, des Han et des Tang, et le point de départ oriental de la route de la soie ; l'armée en terre cuite, l'enceinte fortifiée intacte et le mont Hua s'y trouvent.",
+          "culture": "Le dialecte guanzhong du mandarin des plaines centrales est parlé autour de Xi'an. Le qinqiang est l'un des plus anciens opéras de Chine ; le découpage de papier, la fête des lanternes et les larges nouilles « biangbiang » sont emblématiques du Shaanxi.",
+          "cities": {
+            "xian": {
+              "note": "La capitale provinciale, l'une des grandes villes historiques du monde."
+            },
+            "yangling": {
+              "note": "Une zone nationale d'agrotechnologie à l'ouest de Xi'an."
+            }
+          }
+        },
+        "gansu": {
+          "overview": "Une longue province le long du corridor du Hexi, l'étroit passage de la route de la soie entre déserts et montagnes. Les grottes de Mogao à Dunhuang conservent mille ans de peintures murales bouddhiques ; le fort de Jiayuguan marque l'extrémité occidentale de la Grande Muraille des Ming.",
+          "culture": "Le mandarin des plaines centrales et le lanyin y côtoient le tibétain et le dongxiang. Les chants de montagne hua'er, la danse inspirée de Dunhuang et la soupe de nouilles de bœuf étirées à la main de Lanzhou constituent la culture locale.",
+          "cities": {
+            "lanzhou": {
+              "note": "La capitale provinciale, égrenée le long du fleuve Jaune."
+            },
+            "tianshui": {
+              "note": "Une ville ancienne proche des grottes de Maijishan."
+            }
+          }
+        },
+        "qinghai": {
+          "overview": "Une province de haute altitude, peu peuplée, d'où naissent le Yangtsé, le fleuve Jaune et le Mékong. Le lac Qinghai est le plus grand de Chine ; Kumbum est un important monastère bouddhiste tibétain.",
+          "culture": "Mandarin, tibétain et mongol y sont tous parlés. Des pèlerins font le tour du lac Qinghai à pied ; l'opéra tibétain et la course cycliste internationale autour du lac, chaque été, rythment le calendrier.",
+          "cities": {
+            "xining": {
+              "note": "La capitale provinciale, la plus grande ville du plateau."
+            },
+            "golmud": {
+              "note": "Une ville ferroviaire du désert, sur la ligne du Tibet."
+            }
+          }
+        },
+        "ningxia": {
+          "overview": "Une petite région autonome hui où le fleuve Jaune trace un ruban de terres agricoles à travers un pays aride. Les tombeaux royaux des Xia occidentaux, l'art rupestre du mont Helan et une industrie viticole en plein essor en sont les emblèmes.",
+          "culture": "Le mandarin zhongyuan y est parlé, avec un fort héritage musulman hui, des mosquées, une cuisine halal, et l'observance répandue de l'Aïd el-Fitr et de l'Aïd el-Kebir.",
+          "cities": {
+            "yinchuan": {
+              "note": "La capitale régionale, entre le fleuve et les montagnes."
+            },
+            "zhongwei": {
+              "note": "Une ville où le désert rejoint le fleuve Jaune à Shapotou."
+            }
+          }
+        },
+        "xinjiang": {
+          "overview": "La plus grande région de Chine, carrefour de la route de la soie entre les monts Tianshan et le désert du Taklamakan. Turpan est une oasis sous le niveau de la mer ; le vieux bazar de Kashgar commerce depuis deux mille ans.",
+          "culture": "L'ouïghour, langue turcique, est coofficiel avec le mandarin ; le kazakh et le kirghize y sont aussi parlés. Les douze suites musicales muqam sont un art reconnu par l'UNESCO ; nouilles laghman, pilaf et naan, et les fêtes de Corban (Aïd) et de Norouz rythment l'année.",
+          "cities": {
+            "urumqi": {
+              "note": "La capitale régionale, réputée la ville la plus éloignée de tout océan."
+            },
+            "kashgar": {
+              "note": "L'antique ville-oasis de l'extrême ouest."
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "welcome-to-china": {
+        "title": "Bienvenue en Chine",
+        "summary": "Une orientation pour étudier en Chine : le système, la langue, le rythme de vie, et ce qui en vaut la peine."
+      },
+      "how-to-apply": {
+        "title": "Comment postuler",
+        "summary": "Le parcours de candidature étape par étape : choisir un programme, les documents, les échéances, les offres et l'inscription."
+      },
+      "scholarship-types": {
+        "title": "Types de bourses",
+        "summary": "Bourses gouvernementales, universitaires, provinciales et d'entreprise expliquées : ce qu'elles couvrent et à qui elles conviennent."
+      },
+      "student-visa-guide": {
+        "title": "Guide du visa étudiant",
+        "summary": "Du formulaire JW202 / JW201 et du visa X1 / X2 au permis de séjour que vous obtenez après votre arrivée."
+      },
+      "living-in-china": {
+        "title": "Vivre en Chine",
+        "summary": "Logement, paiements, téléphonie, transports, santé et vie quotidienne en tant qu'étudiant international."
+      },
+      "city-guides": {
+        "title": "Guides des villes",
+        "summary": "Chaque province de Chine : son histoire, sa culture, sa langue et ses festivals, avec deux villes et leurs principales universités."
+      },
+      "faq": {
+        "title": "FAQ",
+        "summary": "Des réponses claires aux questions que se posent le plus souvent les étudiants avant de postuler."
+      }
+    }
   }
 }

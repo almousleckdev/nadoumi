@@ -52,6 +52,7 @@ watch(() => route.fullPath, () => { open.value = false })
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-3">
+          <NLocaleSwitcher />
           <template v-if="status === 'authed'">
             <NDropdown :label="user?.nickName ?? t('nav.dashboard')" trigger-test-id="user-menu">
               <NuxtLink :to="localePath('/dashboard')" class="block px-3 py-2 text-sm no-underline hover:bg-slate-50">{{ t('nav.dashboard') }}</NuxtLink>

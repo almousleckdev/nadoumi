@@ -11,7 +11,7 @@ const emit = defineEmits<{ remove: [chip: ActiveChip], clear: [] }>()
       v-for="chip in chips"
       :key="`${chip.key}:${chip.value}`"
       type="button"
-      class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white py-1 pl-3 pr-2 text-sm text-slate-700 hover:border-slate-300"
+      class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white py-1 ps-3 pe-2 text-sm text-slate-700 hover:border-slate-300"
       @click="emit('remove', chip)"
     >
       {{ chip.label }}

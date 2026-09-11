@@ -1,803 +1,1745 @@
 {
   "nav": {
-    "home": "Home",
-    "scholarships": "Scholarships",
-    "universities": "Universities",
-    "about": "About",
-    "contact": "Contact",
-    "signIn": "Sign in",
-    "getStarted": "Create profile",
-    "createAccount": "Create account",
-    "dashboard": "Dashboard",
-    "aria": "Primary navigation"
+    "home": "首页",
+    "scholarships": "奖学金",
+    "universities": "院校",
+    "about": "关于我们",
+    "contact": "联系我们",
+    "signIn": "登录",
+    "getStarted": "创建档案",
+    "createAccount": "创建账户",
+    "dashboard": "个人中心",
+    "aria": "主导航"
   },
   "footer": {
-    "mission": "Nadoumi helps international students discover and secure study opportunities abroad.",
-    "explore": "Explore",
-    "company": "Company",
-    "getStarted": "Get started",
-    "privacy": "Privacy",
-    "terms": "Terms",
+    "mission": "Nadoumi 帮助国际学生发现并获得海外留学机会。",
+    "explore": "浏览",
+    "company": "公司",
+    "getStarted": "立即开始",
+    "privacy": "隐私政策",
+    "terms": "服务条款",
     "contactEmail": "support{'@'}nadoumi.com",
-    "rights": "Nadoumi. International education platform.",
-    "contactTitle": "Contact",
-    "contactForm": "Send a message",
-    "guides": "Guides"
+    "rights": "Nadoumi。国际教育平台。",
+    "contactTitle": "联系我们",
+    "contactForm": "发送消息",
+    "guides": "留学指南"
   },
   "common": {
-    "loading": "Loading",
-    "save": "Save",
-    "cancel": "Cancel",
-    "add": "Add",
-    "remove": "Remove",
-    "edit": "Edit",
-    "delete": "Delete",
-    "confirm": "Confirm",
-    "back": "Back",
-    "search": "Search",
-    "none": "Nothing here yet",
-    "retry": "Try again",
-    "signOut": "Sign out",
-    "nothingYet": "Nothing here yet.",
-    "yes": "Yes",
-    "no": "No",
+    "loading": "加载中",
+    "save": "保存",
+    "cancel": "取消",
+    "add": "添加",
+    "remove": "移除",
+    "edit": "编辑",
+    "delete": "删除",
+    "confirm": "确认",
+    "back": "返回",
+    "search": "搜索",
+    "none": "暂无内容",
+    "retry": "重试",
+    "signOut": "退出登录",
+    "nothingYet": "暂无内容。",
+    "yes": "是",
+    "no": "否",
     "close": "关闭",
-    "previous": "上一张",
-    "next": "下一张"
+    "dismiss": "关闭",
+    "previous": "上一步",
+    "next": "下一步",
+    "pagination": "分页",
+    "switchingLanguage": "正在切换语言…"
   },
   "home": {
     "hero": {
-      "eyebrow": "International education platform",
-      "title": "Study abroad with a team that manages the whole journey",
-      "subtitle": "Discover universities and scholarships, build one applicant profile, and apply and track every step with Nadoumi.",
-      "ctaScholarships": "Explore scholarships",
-      "ctaUniversities": "Explore universities",
-      "searchLabel": "Search universities",
-      "searchPlaceholder": "Search a university by name or city",
-      "searchNote": "Searches the university catalogue. Scholarship search arrives with the Scholarship module."
+      "eyebrow": "国际教育平台",
+      "title": "留学海外，由专业团队全程护航",
+      "subtitle": "探索院校与奖学金,创建一份申请档案,即可申请并跟踪 Nadoumi 上的每一个环节。",
+      "ctaScholarships": "浏览奖学金",
+      "ctaUniversities": "浏览院校",
+      "searchLabel": "搜索院校",
+      "searchPlaceholder": "按名称或城市搜索院校",
+      "searchNote": "搜索范围为院校目录。奖学金搜索将随奖学金模块一同上线。"
     },
     "featuredUnis": {
-      "eyebrow": "Universities",
-      "title": "Featured universities",
-      "description": "Institutions Nadoumi is highlighting right now.",
-      "empty": "No featured universities are published yet."
+      "eyebrow": "院校",
+      "title": "精选院校",
+      "description": "Nadoumi 目前重点推荐的院校。",
+      "empty": "暂无已发布的精选院校。"
     },
     "recommendedUnis": {
-      "eyebrow": "Recommended by Nadoumi",
-      "title": "Recommended universities",
-      "description": "Where our advisers see strong outcomes for international students.",
-      "empty": "No recommended universities are published yet."
+      "eyebrow": "Nadoumi 推荐",
+      "title": "推荐院校",
+      "description": "我们的顾问团队认为国际学生在此表现优异的院校。",
+      "empty": "暂无已发布的推荐院校。"
     },
     "story1": {
-      "eyebrow": "Discover",
-      "title": "Study where the world comes together",
-      "body": "Nadoumi works with universities across China, Malaysia and beyond. Browse each institution’s profile, campus, rankings and the programmes it offers before you commit."
+      "eyebrow": "探索",
+      "title": "在世界的交汇点学习",
+      "body": "Nadoumi 与中国、马来西亚及其他国家和地区的院校合作。在做出决定前,浏览每所院校的简介、校园、排名及所设专业项目。"
     },
     "story2": {
-      "eyebrow": "One profile, every application",
-      "title": "Built around your profile",
-      "body": "Add your details, education history and documents once. Nadoumi reuses them for every application, and each submission is kept as a historical record. Later profile edits never rewrite it."
+      "eyebrow": "一份档案,申请所有项目",
+      "title": "围绕您的档案打造",
+      "body": "只需填写一次个人信息、教育背景与证件资料。Nadoumi 会在每次申请中复用这些信息,每一次提交都会作为历史记录保存,后续修改档案不会改写既往记录。"
     },
     "scholarshipDiscovery": {
-      "eyebrow": "Scholarships",
-      "title": "New and featured scholarships",
-      "description": "Search and filter scholarships by level, category, teaching language, intake, funding and more."
+      "eyebrow": "奖学金",
+      "title": "最新及精选奖学金",
+      "description": "按学历层次、类别、授课语言、入学批次、资助方式等条件搜索并筛选奖学金。"
     },
     "programDiscovery": {
-      "eyebrow": "Programmes",
-      "title": "Hot programmes and language courses",
-      "description": "Degree and language programmes, discovered through the university that offers them.",
-      "empty": "No programmes are featured yet."
+      "eyebrow": "专业项目",
+      "title": "热门专业与语言课程",
+      "description": "学位专业与语言课程,由提供该项目的院校一并展示。",
+      "empty": "暂无精选专业项目。"
     },
     "partners": {
-      "eyebrow": "Partnerships",
-      "title": "Partner universities",
-      "description": "Institutions Nadoumi holds a direct working relationship with."
+      "eyebrow": "合作关系",
+      "title": "合作院校",
+      "description": "与 Nadoumi 建立直接合作关系的院校。"
     },
     "arriving": {
-      "scholarships": "the Scholarship catalogue",
-      "programs": "the Programme catalogue",
-      "partnerships": "the Partnership module"
+      "scholarships": "奖学金目录",
+      "programs": "专业项目目录",
+      "partnerships": "合作伙伴模块"
     },
     "journey": {
-      "eyebrow": "How it works",
-      "title": "Your journey with Nadoumi",
-      "description": "From your first application fee to your admission documents. Here is what to expect.",
-      "s1t": "Pay the application fee",
-      "s1b": "Start your application and settle the application fee to begin processing.",
-      "s2t": "Primary review",
-      "s2b": "Nadoumi checks your profile and documents against the opportunity’s requirements.",
-      "s3t": "University assignment",
-      "s3b": "Your case is matched and submitted to the university.",
-      "s4t": "Admission issued",
-      "s4b": "The university confirms your place and issues your admission letter.",
-      "s5t": "Pay the project fee",
-      "s5b": "Settle the remaining project and service fees to move to enrolment.",
-      "s6t": "JW202 issued",
-      "s6b": "Your visa documentation (JW202 / JW201) is prepared and released.",
-      "s7t": "Documents delivered",
-      "s7b": "Your admission and visa documents are couriered to you.",
-      "s8t": "Application successful",
-      "s8b": "You’re ready to travel and enrol. Nadoumi stays available through arrival."
+      "eyebrow": "运作方式",
+      "title": "您与 Nadoumi 的申请之旅",
+      "description": "从缴纳首笔申请费到收到入学材料,以下是您可以期待的完整流程。",
+      "s1t": "缴纳申请费",
+      "s1b": "开始申请并缴纳申请费,即可启动审核流程。",
+      "s2t": "初步审核",
+      "s2b": "Nadoumi 将根据项目要求核对您的档案与证件资料。",
+      "s3t": "院校匹配",
+      "s3b": "为您匹配合适院校并提交申请材料。",
+      "s4t": "发放录取通知",
+      "s4b": "院校确认录取名额并发放录取通知书。",
+      "s5t": "缴纳项目费用",
+      "s5b": "缴清剩余的项目及服务费用,进入入学准备阶段。",
+      "s6t": "发放 JW202 表",
+      "s6b": "为您准备并发放签证材料(JW202 / JW201)。",
+      "s7t": "材料寄送",
+      "s7b": "您的录取及签证材料将通过快递寄送给您。",
+      "s8t": "申请成功",
+      "s8b": "您已准备好启程入学。Nadoumi 在您抵达后仍将持续提供支持。"
     },
     "cta": {
-      "eyebrow": "Ready when you are",
-      "title": "Start your international education with Nadoumi",
-      "body": "Create a free profile, explore your options, and apply with a team that runs the whole process.",
-      "apply": "Apply now",
-      "contact": "Contact us"
+      "eyebrow": "随时为您准备就绪",
+      "title": "与 Nadoumi 一起开启国际教育之旅",
+      "body": "免费创建档案,探索适合您的选择,并由全程护航的团队协助申请。",
+      "apply": "立即申请",
+      "contact": "联系我们"
     },
     "newScholarships": {
-      "eyebrow": "Scholarships",
-      "title": "New scholarships",
-      "description": "The latest opportunities published on Nadoumi.",
-      "empty": "No scholarships are published yet."
+      "eyebrow": "奖学金",
+      "title": "最新奖学金",
+      "description": "Nadoumi 上最新发布的申请机会。",
+      "empty": "暂无已发布的奖学金。"
     },
     "fundedScholarships": {
-      "eyebrow": "Fully funded",
-      "title": "Fully funded scholarships",
-      "description": "Tuition, accommodation and a stipend covered.",
-      "empty": "No fully funded scholarships are published yet."
+      "eyebrow": "全额资助",
+      "title": "全额资助奖学金",
+      "description": "涵盖学费、住宿及生活补贴。",
+      "empty": "暂无已发布的全额资助奖学金。"
     }
   },
   "about": {
-    "eyebrow": "About Nadoumi",
-    "title": "The team that runs your study-abroad journey",
-    "lead": "Nadoumi is an international education platform. We help students discover universities and scholarships, and we manage the application process end to end.",
-    "whoTitle": "Who we are",
-    "whoBody": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle: profile, documents, submission, decisions and enrolment.",
-    "whoBody2": "An account holder can manage applications for more than one student, so parents, relatives and advisers can work alongside the student they support.",
-    "missionTitle": "Our mission",
-    "missionBody": "Make international study accessible: help students find opportunities that fit, and carry the operational load of applying so they can focus on their studies.",
-    "visionTitle": "Our vision",
-    "visionBody": "A single trusted place where any student can discover, apply for and track an international education, with universities and partners on the other side of the same platform.",
-    "valuesTitle": "What we stand for",
-    "v1t": "Clarity for students",
-    "v1b": "Students see the information that matters to them. Internal partner and operational data never leaks into public views.",
-    "v2t": "Historical accuracy",
-    "v2b": "An application is a record of what was submitted, when. Later profile edits never rewrite a past submission.",
-    "v3t": "No invented data",
-    "v3b": "Numbers, universities, scholarships and rankings are shown only when they come from real records. Never mocked to fill space.",
-    "v4t": "One reusable profile",
-    "v4b": "Enter your details once. Nadoumi reuses them across every application and keeps you in control of them.",
-    "helpTitle": "How Nadoumi helps",
-    "h1": "Build a reusable applicant profile with your details, education and documents.",
-    "h2": "Discover universities, programmes and scholarships that fit your goals.",
-    "h3": "Apply for yourself or a student you represent. Nadoumi pre-fills what it knows.",
-    "h4": "Provide and track the documents each opportunity requires.",
-    "h5": "Receive decisions, complete payments and prepare for enrolment.",
-    "teamTitle": "The team behind Nadoumi",
-    "teamIntro": "Advisers, case officers and partnerships staff who run applications day to day.",
-    "teamPending": "Team profiles and photos to be supplied by Nadoumi.",
-    "contactTitle": "Get in touch",
-    "contactCta": "Go to the contact page",
-    "officeTitle": "Office",
-    "officePending": "Office address to be supplied by Nadoumi.",
-    "hoursTitle": "Working hours",
-    "hoursPending": "Working hours to be supplied by Nadoumi.",
-    "ctaTitle": "Start your international education with Nadoumi",
-    "ctaBody": "Create a free profile and explore your options, or reach out with a question.",
+    "eyebrow": "关于 Nadoumi",
+    "title": "为您全程护航留学之旅的团队",
+    "lead": "Nadoumi 是一个国际教育平台。我们帮助学生发现院校与奖学金机会,并全程管理申请流程。",
+    "whoTitle": "我们是谁",
+    "whoBody": "Nadoumi 将学生与中国、马来西亚及其他目的地的院校、专业项目和奖学金相连接,并在档案建立、材料准备、提交申请、录取决定及入学注册的整个周期中提供支持。",
+    "whoBody2": "一个账户可同时管理多位学生的申请,让家长、亲属及顾问能够与所支持的学生协同处理申请事务。",
+    "missionTitle": "我们的使命",
+    "missionBody": "让国际教育触手可及:帮助学生找到真正适合的机会,并承担申请过程中的繁琐事务,让他们能专注于学业本身。",
+    "visionTitle": "我们的愿景",
+    "visionBody": "打造一个值得信赖的统一平台,让每一位学生都能在此发现、申请并跟踪国际教育机会,院校与合作伙伴也同在同一平台之上。",
+    "valuesTitle": "我们的核心理念",
+    "v1t": "为学生提供清晰信息",
+    "v1b": "学生只会看到与自己相关的信息。内部合作方及运营数据绝不会出现在公开页面中。",
+    "v2t": "历史记录真实准确",
+    "v2b": "每一次申请都是提交内容与时间的真实记录。后续修改档案不会改写既往提交内容。",
+    "v3t": "绝不编造数据",
+    "v3b": "数据、院校、奖学金及排名信息仅在来自真实记录时才会展示,绝不为填充页面而虚构内容。",
+    "v4t": "一份可复用的档案",
+    "v4b": "只需填写一次个人信息,Nadoumi 会在每次申请中复用,您始终掌控自己的信息。",
+    "helpTitle": "Nadoumi 如何为您提供帮助",
+    "h1": "创建一份可复用的申请人档案,填写个人信息、教育背景及证件资料。",
+    "h2": "发现符合您目标的院校、专业项目与奖学金。",
+    "h3": "为自己或您所代理的学生申请,Nadoumi 会自动填充已知信息。",
+    "h4": "按要求提供并跟踪每个申请机会所需的证件材料。",
+    "h5": "接收录取决定、完成缴费并为入学做好准备。",
+    "teamTitle": "Nadoumi 背后的团队",
+    "teamIntro": "由日常负责申请事务的顾问、案例专员及合作团队组成。",
+    "teamPending": "团队成员简介与照片,待 Nadoumi 补充。",
+    "contactTitle": "联系我们",
+    "contactCta": "前往联系页面",
+    "officeTitle": "办公地址",
+    "officePending": "办公地址,待 Nadoumi 补充。",
+    "hoursTitle": "工作时间",
+    "hoursPending": "工作时间,待 Nadoumi 补充。",
+    "ctaTitle": "与 Nadoumi 一起开启国际教育之旅",
+    "ctaBody": "免费创建档案,探索您的选择,或直接联系我们咨询问题。",
     "team1name": "",
-    "team1role": "Founder & CEO",
+    "team1role": "创始人兼首席执行官",
     "team2name": "",
-    "team2role": "Head of Partnerships",
+    "team2role": "合作伙伴负责人",
     "team3name": "",
-    "team3role": "Head of Student Success",
+    "team3role": "学生成功负责人",
     "team4name": "",
-    "team4role": "Software Engineer"
+    "team4role": "软件工程师"
   },
   "contact": {
-    "title": "Contact",
-    "lead": "Questions about applications, scholarships or partner universities? Send us a message and the team will get back to you.",
-    "emailTitle": "Email",
-    "responseNote": "We usually reply within two business days.",
-    "officeTitle": "Office",
-    "officePending": "Office address to be supplied.",
-    "hoursTitle": "Working hours",
-    "hoursPending": "Working hours to be supplied.",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "email": "Email",
-    "phone": "Phone",
-    "optional": "Optional",
-    "category": "Topic",
-    "categoryPlaceholder": "Choose a topic",
+    "title": "联系我们",
+    "lead": "对申请、奖学金或合作院校有疑问？给我们留言,团队会尽快与您联系。",
+    "emailTitle": "邮箱",
+    "responseNote": "我们通常会在两个工作日内回复。",
+    "officeTitle": "办公地址",
+    "officePending": "办公地址待补充。",
+    "hoursTitle": "工作时间",
+    "hoursPending": "工作时间待补充。",
+    "firstName": "名",
+    "lastName": "姓",
+    "email": "邮箱",
+    "phone": "电话",
+    "optional": "选填",
+    "category": "咨询主题",
+    "categoryPlaceholder": "请选择主题",
     "cat": {
-      "GENERAL": "General enquiry",
-      "SCHOLARSHIPS": "Scholarships",
-      "UNIVERSITIES": "Universities",
-      "APPLICATIONS": "My application",
-      "PARTNERSHIPS": "Partnerships",
-      "OTHER": "Something else"
+      "GENERAL": "一般咨询",
+      "SCHOLARSHIPS": "奖学金",
+      "UNIVERSITIES": "院校",
+      "APPLICATIONS": "我的申请",
+      "PARTNERSHIPS": "合作伙伴",
+      "OTHER": "其他"
     },
-    "subject": "Subject",
-    "message": "Message",
-    "submit": "Send message",
-    "sending": "Sending…",
-    "successTitle": "Message sent",
-    "sent": "Thanks, we’ll be in touch.",
-    "errorTitle": "Message not sent",
-    "errorBody": "Something went wrong sending your message. Please try again in a moment.",
-    "phoneTitle": "Phone"
+    "subject": "主题",
+    "message": "留言内容",
+    "submit": "发送留言",
+    "sending": "发送中…",
+    "successTitle": "留言已发送",
+    "sent": "感谢您的留言,我们会尽快与您联系。",
+    "errorTitle": "留言发送失败",
+    "errorBody": "发送留言时出现问题,请稍后重试。",
+    "phoneTitle": "电话"
   },
   "catalog": {
-    "scholarshipsTitle": "Scholarships",
-    "scholarshipsSubtitle": "Funding opportunities across our destination countries.",
-    "universitiesTitle": "Universities",
-    "universitiesSubtitle": "Institutions in the Nadoumi catalogue.",
-    "programsTitle": "Programs",
-    "programsSubtitle": "Degree programmes and intakes.",
-    "empty": "This catalogue isn't available yet. Check back soon.",
-    "emptyDetail": "We're still building this section.",
-    "rollingDeadline": "Rolling deadline",
-    "deadline": "Deadline {date}",
-    "backToList": "Back to list",
-    "featured": "Featured",
-    "typePublic": "Public",
-    "typePrivate": "Private",
-    "viewUniversity": "View university",
-    "viewAllUniversities": "View all universities",
-    "anyType": "Any type",
-    "country": "Country",
-    "province": "Province",
-    "city": "City",
-    "recommendedShort": "Recommended",
-    "resultCount": "{n} results",
-    "searchUniversities": "Search universities",
-    "searchUniversitiesPlaceholder": "University name or city",
-    "clearFilters": "Clear filters",
-    "noResultsTitle": "No matches",
-    "noResultsBody": "Try removing a filter or searching for something broader.",
-    "noUniversitiesTitle": "No universities yet",
-    "noUniversitiesBody": "Published universities will appear here as the catalogue grows.",
-    "allUniversities": "All universities",
-    "universityFallbackTitle": "University",
-    "universityUnavailable": "This university is not available."
+    "scholarshipsTitle": "奖学金",
+    "scholarshipsSubtitle": "覆盖我们目的地国家的资助机会。",
+    "universitiesTitle": "院校",
+    "universitiesSubtitle": "Nadoumi 目录中的院校。",
+    "programsTitle": "专业项目",
+    "programsSubtitle": "学位专业与招生批次。",
+    "empty": "该目录暂未开放,请稍后再来查看。",
+    "emptyDetail": "该栏目仍在建设中。",
+    "rollingDeadline": "滚动录取",
+    "deadline": "截止日期 {date}",
+    "backToList": "返回列表",
+    "featured": "精选",
+    "typePublic": "公立",
+    "typePrivate": "私立",
+    "viewUniversity": "查看院校",
+    "viewAllUniversities": "查看全部院校",
+    "anyType": "不限类型",
+    "country": "国家",
+    "province": "省份",
+    "city": "城市",
+    "recommendedShort": "推荐",
+    "resultCount": "{n} 条结果",
+    "searchUniversities": "搜索院校",
+    "searchUniversitiesPlaceholder": "院校名称或城市",
+    "clearFilters": "清除筛选条件",
+    "noResultsTitle": "未找到匹配结果",
+    "noResultsBody": "请尝试移除某个筛选条件,或使用更宽泛的关键词搜索。",
+    "noUniversitiesTitle": "暂无院校",
+    "noUniversitiesBody": "随着目录不断完善,已发布的院校将显示在此处。",
+    "allUniversities": "全部院校",
+    "universityFallbackTitle": "院校",
+    "universityUnavailable": "该院校暂不可用。"
   },
   "auth": {
-    "loginTitle": "Sign in",
-    "registerTitle": "Create your profile",
-    "fullName": "Full name",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "username": "Username",
-    "usernameHint": "2–20 characters, used to sign in",
-    "passportNameHint": "Enter your name exactly as it appears on your passport.",
-    "step1Title": "Your details",
-    "step2Title": "Set a password",
-    "next": "Next",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm password",
-    "passwordHint": "5–20 characters",
-    "captcha": "Enter the code shown",
-    "captchaReload": "Reload image",
-    "acceptTerms": "I agree to the {terms} and {privacy}.",
-    "submitLogin": "Sign in",
-    "submitRegister": "Create profile",
-    "toRegister": "New to Nadoumi? Create a profile",
-    "toLogin": "Already have an account? Sign in",
-    "forgot": "Forgot your password?",
-    "forgotTitle": "Password help",
-    "forgotBody": "Password reset isn't self-service yet. Email support{'@'}nadoumi.com from your registered address and we'll help you back in.",
-    "genericError": "Something went wrong. Please check your details and try again.",
-    "passwordMismatch": "Passwords do not match.",
+    "loginTitle": "登录",
+    "registerTitle": "创建您的档案",
+    "fullName": "姓名",
+    "firstName": "名",
+    "lastName": "姓",
+    "username": "用户名",
+    "usernameHint": "2 至 20 个字符,用于登录",
+    "passportNameHint": "请输入与护照上完全一致的姓名。",
+    "step1Title": "您的基本信息",
+    "step2Title": "设置密码",
+    "next": "下一步",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "passwordHint": "5 至 20 个字符",
+    "captcha": "输入验证码",
+    "captchaReload": "刷新图片",
+    "acceptTerms": "我同意{terms}及{privacy}。",
+    "submitLogin": "登录",
+    "submitRegister": "创建档案",
+    "toRegister": "还没有 Nadoumi 账户？创建档案",
+    "toLogin": "已有账户？直接登录",
+    "forgot": "忘记密码？",
+    "forgotTitle": "密码帮助",
+    "forgotBody": "密码重置功能暂未开放自助服务。请使用您的注册邮箱发送邮件至 support{'@'}nadoumi.com,我们会协助您恢复账户访问。",
+    "genericError": "出现问题,请检查您填写的信息后重试。",
+    "passwordMismatch": "两次输入的密码不一致。",
     "otp": {
-      "verify": "Verify",
-      "sent": "We sent a 6-digit code to {email}. Enter it below.",
-      "resend": "Resend code",
-      "resendIn": "Resend in {n}s",
-      "verified": "Email verified",
-      "badCode": "That code is invalid or expired.",
-      "groupLabel": "Enter the {n}-digit verification code",
-      "digitLabel": "Digit {i} of {n}",
-      "editEmail": "Edit email",
-      "emailLabel": "Code sent to",
-      "attemptsLeft": "{n} attempts remaining",
-      "verifying": "Verifying…",
-      "resentNote": "A new code is on its way.",
-      "throttledNote": "We already sent a code. Check your inbox and spam. You can request another shortly."
+      "verify": "验证",
+      "sent": "我们已向 {email} 发送 6 位验证码,请在下方输入。",
+      "resend": "重新发送验证码",
+      "resendIn": "{n} 秒后可重新发送",
+      "verified": "邮箱已验证",
+      "badCode": "验证码无效或已过期。",
+      "groupLabel": "请输入 {n} 位验证码",
+      "digitLabel": "第 {i} 位,共 {n} 位",
+      "editEmail": "修改邮箱",
+      "emailLabel": "验证码已发送至",
+      "attemptsLeft": "剩余 {n} 次尝试机会",
+      "verifying": "验证中…",
+      "resentNote": "新验证码正在发送。",
+      "throttledNote": "我们已发送过验证码,请查收收件箱及垃圾邮件文件夹。您稍后可再次请求发送。"
     },
     "reset": {
-      "title": "Reset password",
-      "newPassword": "New password",
-      "done": "Your password has been reset. You can now sign in with your new password.",
-      "toLogin": "Go to sign in"
+      "title": "重置密码",
+      "newPassword": "新密码",
+      "done": "密码已重置,您现在可以使用新密码登录。",
+      "toLogin": "前往登录"
     },
-    "acceptTermsShort": "I agree to the {terms}",
-    "acceptPrivacyShort": "I agree to the {privacy}",
-    "consentRequired": "Please accept the Terms and the Privacy Policy to continue.",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password",
-    "pwStrong": "Strong password",
-    "pwRequirements": "Your password needs:",
-    "acceptBothShort": "I agree to the {terms} and the {privacy}",
-    "step3Title": "Set a password",
+    "acceptTermsShort": "我同意{terms}",
+    "acceptPrivacyShort": "我同意{privacy}",
+    "consentRequired": "请先同意服务条款及隐私政策以继续。",
+    "showPassword": "显示密码",
+    "hidePassword": "隐藏密码",
+    "pwStrong": "密码强度高",
+    "pwRequirements": "您的密码需满足：",
+    "acceptBothShort": "我同意{terms}及{privacy}",
+    "step3Title": "设置密码",
     "registerStep": {
-      "personal": "Personal",
-      "verify": "Verify",
-      "password": "Password"
+      "personal": "基本信息",
+      "verify": "验证",
+      "password": "密码"
     },
-    "newToNadoumi": "New to Nadoumi?",
-    "createProfile": "Create a profile"
+    "newToNadoumi": "还没有 Nadoumi 账户？",
+    "createProfile": "创建档案"
   },
   "dashboard": {
     "nav": {
-      "overview": "Overview",
-      "profile": "Profile",
-      "education": "Education",
-      "testScores": "Test scores",
-      "contacts": "Contacts",
-      "account": "Account"
+      "overview": "概览",
+      "profile": "档案",
+      "education": "教育经历",
+      "testScores": "考试成绩",
+      "contacts": "联系人",
+      "account": "账户"
     },
-    "welcome": "Welcome, {name}",
-    "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
-    "completeness": "Profile completeness",
-    "quickProfile": "Edit profile",
-    "quickEducation": "Add education",
-    "applicantLabel": "Applicant",
-    "switchApplicant": "Switch applicant",
-    "profileTitle": "Applicant profile",
-    "createProfileTitle": "Create your applicant profile",
-    "createProfileBlurb": "Tell us who the application is about. You can edit this any time.",
-    "givenName": "Given name",
-    "familyName": "Family name",
-    "dob": "Date of birth",
-    "nationality": "Nationality (ISO alpha-2)",
-    "passportNo": "Passport number",
-    "phone": "Phone",
-    "eduTitle": "Education history",
-    "eduEmpty": "No education entries yet.",
-    "institution": "Institution",
-    "level": "Level",
-    "field": "Field of study",
-    "gpa": "GPA",
-    "gpaScale": "GPA scale",
-    "startDate": "Start date",
-    "endDate": "End date",
-    "testTitle": "Test scores",
-    "testEmpty": "No test scores yet.",
-    "testType": "Test",
-    "score": "Score",
-    "takenOn": "Taken on",
-    "expiresOn": "Expires on",
-    "contactsTitle": "Contacts",
-    "contactsEmpty": "No contacts yet.",
-    "relation": "Relationship",
-    "contactName": "Name",
-    "relationGUARDIAN": "Guardian",
-    "relationEMERGENCY": "Emergency",
-    "relationOTHER": "Other",
-    "accountTitle": "Account",
-    "accountUser": "Signed in as",
-    "changePassword": "Change password",
-    "pwCurrent": "Current password",
-    "pwNew": "New password",
-    "pwConfirm": "Confirm new password",
-    "pwUpdated": "Password updated.",
-    "pwOtherSessionsEnded": "You have been signed out on your other devices.",
-    "onboardingProgress": "Onboarding progress",
-    "comingSoon": "This area activates once applications are open.",
-    "sectionApplications": "Applications",
-    "sectionActivity": "Recent activity",
-    "sectionNotifications": "Notifications",
-    "savedOk": "Saved",
-    "addedOk": "Added",
-    "removedOk": "Removed",
-    "removeConfirm": "Remove this entry?"
+    "welcome": "欢迎回来，{name}",
+    "overviewBlurb": "请完善您的申请人档案,以便工作人员为您匹配合适的申请机会。",
+    "completeness": "档案完整度",
+    "quickProfile": "编辑档案",
+    "quickEducation": "添加教育经历",
+    "applicantLabel": "申请人",
+    "switchApplicant": "切换申请人",
+    "profileTitle": "申请人档案",
+    "createProfileTitle": "创建您的申请人档案",
+    "createProfileBlurb": "请告诉我们这份申请是为谁创建的,您可以随时修改。",
+    "givenName": "名",
+    "familyName": "姓",
+    "dob": "出生日期",
+    "nationality": "国籍（ISO 两位字母代码）",
+    "passportNo": "护照号码",
+    "phone": "电话",
+    "eduTitle": "教育经历",
+    "eduEmpty": "暂无教育经历记录。",
+    "institution": "院校名称",
+    "level": "层次",
+    "field": "专业方向",
+    "gpa": "平均绩点（GPA）",
+    "gpaScale": "GPA 满分制",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "testTitle": "考试成绩",
+    "testEmpty": "暂无考试成绩记录。",
+    "testType": "考试类型",
+    "score": "分数",
+    "takenOn": "考试日期",
+    "expiresOn": "有效期至",
+    "contactsTitle": "联系人",
+    "contactsEmpty": "暂无联系人记录。",
+    "relation": "关系",
+    "contactName": "姓名",
+    "relationGUARDIAN": "监护人",
+    "relationEMERGENCY": "紧急联系人",
+    "relationOTHER": "其他",
+    "accountTitle": "账户",
+    "accountUser": "当前登录账号",
+    "changePassword": "修改密码",
+    "pwCurrent": "当前密码",
+    "pwNew": "新密码",
+    "pwConfirm": "确认新密码",
+    "pwUpdated": "密码已更新。",
+    "pwOtherSessionsEnded": "您已在其他设备上退出登录。",
+    "onboardingProgress": "资料完善进度",
+    "comingSoon": "此栏目将在申请开放后启用。",
+    "sectionApplications": "申请记录",
+    "sectionActivity": "最近动态",
+    "sectionNotifications": "通知",
+    "savedOk": "已保存",
+    "addedOk": "已添加",
+    "removedOk": "已移除",
+    "removeConfirm": "确定要移除该记录吗？"
   },
   "validation": {
-    "required": "This field is required.",
-    "email": "Enter a valid email address.",
-    "min": "Must be at least {n} characters.",
-    "max": "Must be at most {n} characters.",
-    "len2": "Use the 2-letter country code.",
+    "required": "此字段为必填项。",
+    "email": "请输入有效的邮箱地址。",
+    "min": "至少需要 {n} 个字符。",
+    "max": "最多不超过 {n} 个字符。",
+    "len2": "请使用两位字母的国家代码。",
     "password": {
-      "tooShort": "Use at least 8 characters.",
-      "tooLong": "Use at most 32 characters.",
-      "needUpper": "Add an uppercase letter.",
-      "needLower": "Add a lowercase letter.",
-      "needDigit": "Add a number.",
-      "needSpecial": "Add a special character.",
-      "sameAsCurrent": "Choose a password different from your current one.",
-      "length": "8–32 characters",
-      "noPersonal": "Doesn't contain your name or email",
-      "mismatch": "Passwords do not match."
+      "tooShort": "至少使用 8 个字符。",
+      "tooLong": "最多使用 32 个字符。",
+      "needUpper": "请添加一个大写字母。",
+      "needLower": "请添加一个小写字母。",
+      "needDigit": "请添加一个数字。",
+      "needSpecial": "请添加一个特殊字符。",
+      "sameAsCurrent": "请选择与当前密码不同的新密码。",
+      "length": "8 至 32 个字符",
+      "noPersonal": "不能包含您的姓名或邮箱",
+      "mismatch": "两次输入的密码不一致。"
     }
   },
   "errors": {
-    "network": "Can't reach the server. Check your connection and try again.",
-    "server": "Something went wrong on our side. Please try again shortly.",
-    "rateLimited": "Too many attempts. Please wait a minute and try again.",
-    "generic": "Something went wrong. Please try again.",
-    "validation": "Please check the highlighted fields and try again.",
-    "emailTaken": "An account with this email already exists. Try signing in instead.",
-    "badCredentials": "Email or password is incorrect.",
-    "currentPasswordWrong": "Your current password is incorrect.",
-    "otpInvalid": "That verification code is invalid or has expired. Request a new one.",
-    "otpExpired": "Your verification session has expired. Please start again.",
-    "otpEmailMismatch": "The verification doesn't match this email address.",
-    "captcha": "The captcha answer was incorrect. Please try again.",
-    "registrationDisabled": "Registration is currently closed.",
-    "invalidEmail": "Enter a valid email address.",
-    "loadSection": "This section could not be loaded. Please refresh."
+    "network": "无法连接到服务器,请检查网络连接后重试。",
+    "server": "我们这边出现了问题,请稍后重试。",
+    "rateLimited": "尝试次数过多,请等待一分钟后重试。",
+    "generic": "出现问题,请重试。",
+    "validation": "请检查高亮标注的字段后重试。",
+    "emailTaken": "该邮箱已注册账户,请直接登录。",
+    "badCredentials": "邮箱或密码不正确。",
+    "currentPasswordWrong": "当前密码不正确。",
+    "otpInvalid": "验证码无效或已过期,请重新获取。",
+    "otpExpired": "验证会话已过期,请重新开始。",
+    "otpEmailMismatch": "验证信息与该邮箱地址不匹配。",
+    "captcha": "图形验证码输入错误,请重试。",
+    "registrationDisabled": "注册功能目前已关闭。",
+    "invalidEmail": "请输入有效的邮箱地址。",
+    "loadSection": "该栏目加载失败,请刷新页面重试。"
   },
   "legal": {
-    "draftNote": "Draft. Placeholder text pending legal review.",
-    "privacyTitle": "Privacy Policy",
-    "privacyIntro": "This page explains what personal data Nadoumi collects and how it is used.",
-    "privacyBody": "Nadoumi processes the information you provide to build your applicant profile and submit applications on your behalf. Data is stored securely and shared only with the universities and partners involved in your applications.",
-    "termsTitle": "Terms of Service",
-    "termsIntro": "These terms govern your use of the Nadoumi platform.",
-    "termsBody": "By creating an account you agree to provide accurate information and to use the platform only for legitimate education applications. Nadoumi may update these terms; material changes will be notified.",
-    "contactLine": "Questions? Reach us via the contact page."
+    "draftNote": "草案内容,待法务审核后正式生效。",
+    "privacyTitle": "隐私政策",
+    "privacyIntro": "本页说明 Nadoumi 收集哪些个人信息以及如何使用这些信息。",
+    "privacyBody": "Nadoumi 会处理您提供的信息,用于建立您的申请人档案并代您提交申请。您的数据将被安全存储,且仅与参与您申请事务的院校及合作方共享。",
+    "termsTitle": "服务条款",
+    "termsIntro": "以下条款适用于您对 Nadoumi 平台的使用。",
+    "termsBody": "创建账户即表示您同意提供真实准确的信息,并仅将本平台用于正当的教育申请事务。Nadoumi 可能会更新本条款,重大变更将另行通知。",
+    "contactLine": "有疑问？请通过联系页面与我们联系。"
   },
   "onboarding": {
-    "title": "Set up your profile",
-    "intro": "A few steps to get your applicant profile ready. You can come back and edit any section later.",
-    "progress": "Step {n} of {total}",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "skip": "Skip for now",
-    "saved": "Saved",
-    "saving": "Saving…",
-    "legendRequired": "Required",
-    "legendRecommended": "Recommended",
-    "legendOptional": "Optional",
-    "comingSoon": "Coming soon. This section is shown for reference and is not saved yet.",
+    "title": "完善您的档案",
+    "intro": "只需几个步骤即可完成申请人档案的准备,您可以随时返回修改任意部分。",
+    "progress": "第 {n} 步，共 {total} 步",
+    "next": "下一步",
+    "back": "返回",
+    "finish": "完成",
+    "skip": "暂时跳过",
+    "saved": "已保存",
+    "saving": "保存中…",
+    "legendRequired": "必填",
+    "legendRecommended": "建议填写",
+    "legendOptional": "选填",
+    "comingSoon": "即将上线。该栏目仅供参考展示,暂不会被保存。",
     "steps": {
-      "personal": "Personal",
-      "identity": "Identity",
-      "education": "Education",
-      "interests": "Interests",
-      "location": "Location",
-      "contact": "Contact",
-      "review": "Review"
+      "personal": "基本信息",
+      "identity": "身份信息",
+      "education": "教育经历",
+      "interests": "兴趣方向",
+      "location": "所在地",
+      "contact": "联系人",
+      "review": "确认信息"
     },
     "personal": {
-      "title": "Personal information",
-      "blurb": "Your name as it appears on your passport."
+      "title": "个人信息",
+      "blurb": "请填写与护照一致的姓名。"
     },
     "identity": {
-      "title": "Identity",
-      "blurb": "Passport and nationality details for your applications.",
-      "extras": "Gender, country of residence and preferred contact language will be added here."
+      "title": "身份信息",
+      "blurb": "用于申请事务的护照及国籍信息。",
+      "extras": "性别、居住国家及偏好联系语言等信息将在此处添加。"
     },
     "education": {
-      "title": "Education history",
-      "blurb": "Add each institution you have attended."
+      "title": "教育经历",
+      "blurb": "请添加您曾就读过的每一所院校。"
     },
     "interests": {
-      "title": "Study interests",
-      "blurb": "What and where you want to study."
+      "title": "留学意向",
+      "blurb": "您希望学习的专业方向及目的地。"
     },
     "location": {
-      "title": "Current location",
-      "blurb": "Where you are now. This affects visa and logistics guidance."
+      "title": "当前所在地",
+      "blurb": "您当前所在的位置,这会影响签证及物流方面的指引。"
     },
     "contact": {
-      "title": "Guardian / emergency contact",
-      "blurb": "Someone we can reach if we cannot reach you."
+      "title": "监护人 / 紧急联系人",
+      "blurb": "当我们无法联系到您时可以联系的对象。"
     },
     "review": {
-      "title": "Review",
-      "blurb": "Check what you have entered, then finish.",
-      "done": "Profile set up. You can refine any section from the dashboard."
+      "title": "确认信息",
+      "blurb": "请核对您填写的内容,然后完成提交。",
+      "done": "档案已完成设置,您可以随时在个人中心调整任意部分内容。"
     },
     "badge": {
-      "plannedBackend": "Coming soon"
+      "plannedBackend": "即将上线"
     },
     "crop": {
-      "zoom": "Zoom",
-      "rotate": "Rotate",
-      "reset": "Reset",
-      "apply": "Use this crop"
+      "zoom": "缩放",
+      "rotate": "旋转",
+      "reset": "重置",
+      "apply": "应用此裁剪"
     },
     "doc": {
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
-      "fit": "Fit",
-      "previewAlt": "Uploaded document"
+      "zoomIn": "放大",
+      "zoomOut": "缩小",
+      "fit": "适应窗口",
+      "previewAlt": "已上传的文件"
     },
     "photo": {
-      "title": "Profile photo",
-      "guidance": "Face centred, plain background, even lighting. JPEG, PNG or WebP, up to 5 MB, at least 400x400.",
-      "none": "No photo",
-      "tooSmall": "Image must be at least {px}x{px} pixels."
+      "title": "证件照",
+      "guidance": "面部居中、背景简洁、光线均匀。支持 JPEG、PNG 或 WebP 格式,大小不超过 5 MB,分辨率至少为 400x400。",
+      "none": "暂无照片",
+      "tooSmall": "图片尺寸至少需为 {px}x{px} 像素。"
     },
     "passport": {
-      "title": "Passport",
-      "guidance": "Upload a clear photo or scan of your passport photo page. The details must be readable.",
-      "none": "No passport uploaded",
-      "confirmReadable": "I confirm the passport details are clearly readable.",
-      "formats": "JPEG, PNG or PDF, up to 10 MB"
+      "title": "护照",
+      "guidance": "请上传护照个人信息页的清晰照片或扫描件,确保信息可清晰辨认。",
+      "none": "尚未上传护照",
+      "confirmReadable": "我确认护照信息清晰可辨。",
+      "formats": "支持 JPEG、PNG 或 PDF 格式,大小不超过 10 MB"
     },
     "upload": {
-      "choose": "Choose file",
-      "replace": "Replace",
-      "remove": "Remove",
-      "save": "Upload",
-      "notYet": "Uploading will be available once document storage is enabled.",
-      "badType": "Choose a JPEG, PNG or WebP image.",
-      "badTypePassport": "Choose a JPEG, PNG or PDF file.",
-      "tooBig": "File is larger than {mb} MB."
+      "choose": "选择文件",
+      "replace": "替换",
+      "remove": "移除",
+      "save": "上传",
+      "notYet": "文件上传功能将在证件存储服务启用后开放。",
+      "badType": "请选择 JPEG、PNG 或 WebP 格式的图片。",
+      "badTypePassport": "请选择 JPEG、PNG 或 PDF 格式的文件。",
+      "tooBig": "文件大小超过 {mb} MB。"
     }
   },
   "university": {
-    "founded": "Founded",
-    "students": "Students",
-    "intlStudents": "International students",
-    "faculty": "Faculty",
-    "rankingTier": "Ranking tier",
-    "introduction": "Introduction",
-    "history": "History",
-    "campus": "Campus & facilities",
-    "accommodation": "Accommodation",
-    "nearby": "The area",
-    "highlights": "Highlights",
-    "advantages": "Advantages",
-    "programmes": "Programmes",
-    "programmesEmpty": "No programmes are listed for this university yet.",
-    "gallery": "Gallery",
-    "galleryArriving": "Arriving with document storage",
-    "rankings": "Rankings",
-    "contact": "Official contact",
-    "website": "Official website",
-    "admissionsEmail": "Admissions",
-    "officePhone": "Phone"
+    "founded": "创办于",
+    "students": "在校学生人数",
+    "intlStudents": "国际学生人数",
+    "faculty": "教职工人数",
+    "rankingTier": "排名层级",
+    "introduction": "院校简介",
+    "history": "发展历史",
+    "campus": "校园与设施",
+    "accommodation": "住宿条件",
+    "nearby": "周边环境",
+    "highlights": "亮点",
+    "advantages": "优势",
+    "programmes": "专业项目",
+    "programmesEmpty": "该院校暂未列出专业项目。",
+    "gallery": "图片集",
+    "galleryArriving": "证件存储服务上线后开放",
+    "rankings": "排名情况",
+    "contact": "官方联系方式",
+    "website": "官方网站",
+    "admissionsEmail": "招生邮箱",
+    "officePhone": "联系电话"
   },
   "program": {
-    "fallbackTitle": "Programme",
-    "notAvailable": "This programme is not available.",
-    "offeredBy": "Offered by {university}",
-    "backToUniversity": "Back to {university}",
-    "view": "View programme",
-    "hot": "Hot",
-    "duration": "{months} months",
-    "durationLabel": "Duration",
-    "tuition": "Tuition",
-    "field": "Field of study",
-    "language": "Teaching language",
-    "majors": "Majors",
-    "intakes": "Intakes",
-    "applyWindow": "{open} to {close}",
-    "applyFrom": "Opens {open}",
-    "applyUntil": "Closes {close}",
-    "sectionTitle": "Programmes",
-    "sectionIntro": "Courses of study offered by this university, each with its intakes and majors.",
+    "fallbackTitle": "专业项目",
+    "notAvailable": "该专业项目暂不可用。",
+    "offeredBy": "由 {university} 提供",
+    "backToUniversity": "返回 {university}",
+    "view": "查看专业项目",
+    "hot": "热门",
+    "duration": "{months} 个月",
+    "durationLabel": "学制时长",
+    "tuition": "学费",
+    "field": "专业方向",
+    "language": "授课语言",
+    "majors": "专业方向",
+    "intakes": "入学批次",
+    "applyWindow": "{open} 至 {close}",
+    "applyFrom": "{open} 开放申请",
+    "applyUntil": "{close} 截止申请",
+    "sectionTitle": "专业项目",
+    "sectionIntro": "该院校开设的专业项目,均附有对应的入学批次与专业方向。",
     "level": {
-      "DEGREE": "学位",
-      "LANGUAGE": "Language",
-      "NON_DEGREE": "Non-degree",
-      "DIPLOMA": "Diploma",
-      "BACHELOR": "Bachelor’s",
-      "MASTER": "Master’s",
-      "PHD": "PhD"
+      "DEGREE": "学位项目",
+      "LANGUAGE": "语言课程",
+      "NON_DEGREE": "非学位项目",
+      "DIPLOMA": "专科",
+      "BACHELOR": "本科",
+      "MASTER": "硕士",
+      "PHD": "博士"
     },
     "lang": {
-      "ENGLISH": "English",
-      "CHINESE": "Chinese",
-      "BILINGUAL": "Bilingual"
+      "ENGLISH": "英语",
+      "CHINESE": "中文",
+      "BILINGUAL": "双语"
     },
     "intake": {
-      "SPRING_MARCH": "Spring (March)",
-      "AUTUMN_SEPTEMBER": "Autumn (September)",
-      "SUMMER": "Summer",
-      "WINTER": "Winter",
-      "ROLLING": "Rolling"
+      "SPRING_MARCH": "春季（3 月）",
+      "AUTUMN_SEPTEMBER": "秋季（9 月）",
+      "SUMMER": "夏季",
+      "WINTER": "冬季",
+      "ROLLING": "滚动录取"
     },
-    "applyNow": "Apply for this programme",
-    "applyVia": "Applications for this programme are handled through {university}. Create a profile to start.",
-    "term": "Intake",
-    "opens": "Opens",
-    "closes": "Closes",
-    "rolling": "Rolling",
-    "noMajors": "Majors for this programme will be listed soon.",
-    "majorsIntro": "Fields of study you can specialise in within this programme.",
-    "tuitionNote": "Set by the university. The USD figure is indicative.",
-    "universityLabel": "University"
+    "applyNow": "申请该专业项目",
+    "applyVia": "该专业项目的申请由 {university} 负责处理,创建档案即可开始申请。",
+    "term": "入学批次",
+    "opens": "开放日期",
+    "closes": "截止日期",
+    "rolling": "滚动录取",
+    "noMajors": "该专业项目的方向信息即将公布。",
+    "majorsIntro": "您可在该专业项目下选择的具体方向。",
+    "tuitionNote": "由院校设定,美元金额仅供参考。",
+    "universityLabel": "院校"
   },
   "scholarships": {
-    "searchLabel": "Search scholarships",
-    "searchPlaceholder": "Scholarship name, field or country",
-    "sortLabel": "Sort",
-    "sortRelevance": "Most relevant",
-    "sortDeadline": "Deadline (soonest)",
-    "sortNewest": "Recently published",
-    "sortTitle": "Title (A–Z)",
-    "anyFunding": "Any funding",
-    "anyLanguage": "Any language",
-    "withStipend": "With stipend",
-    "moreFilters": "More filters: level and category",
-    "fLevel": "Education level",
-    "fCategory": "Category",
-    "colRef": "Ref.",
-    "colFees": "Upfront fee (¥·$)",
-    "feesNone": "None",
-    "colTitle": "Scholarship",
-    "colLevel": "Level",
-    "colLanguage": "Language",
-    "colIntake": "Next intake",
-    "colDeadline": "Deadline",
-    "colFunding": "Funding",
-    "colLocation": "Location",
-    "apply": "Apply",
-    "applyNow": "Apply now",
-    "applyNote": "Applying opens the guided application in your dashboard. Sign in or create a profile to start.",
-    "view": "View",
-    "viewAll": "View all scholarships",
-    "hot": "Hot",
-    "noneTitle": "No scholarships published yet",
-    "noneBody": "The catalogue is being populated. Check back soon, or create a profile to be ready.",
-    "notFound": "This scholarship is not available.",
-    "benefits": "Benefits",
-    "requirements": "Requirements",
-    "policy": "Policy & notes",
-    "eligibility": "Eligibility",
-    "fees": "Fees",
-    "documents": "Documents required",
-    "documentsNote": "Set by the scholarship, collected during the application.",
-    "stipend": "Stipend",
-    "stipendDuration": "Paid for {n} months",
-    "upfront": "Upfront fees",
-    "accommodation": "Accommodation",
-    "coverage": "What the award covers",
-    "renewal": "Renewal & annual review",
-    "studyDuration": "Study duration",
-    "applicationChannel": "Application channel",
-    "requiresFinancialProof": "Financial proof / a guarantor is required",
-    "requiresFoundationYear": "A foundation / preparatory year is required",
+    "searchLabel": "搜索奖学金",
+    "searchPlaceholder": "奖学金名称、专业方向或国家",
+    "sortLabel": "排序方式",
+    "sortRelevance": "相关度优先",
+    "sortDeadline": "截止日期（最近优先）",
+    "sortNewest": "最新发布",
+    "sortTitle": "名称（A-Z）",
+    "anyFunding": "不限资助方式",
+    "anyLanguage": "不限授课语言",
+    "withStipend": "含生活补贴",
+    "moreFilters": "更多筛选：学历层次与类别",
+    "fLevel": "学历层次",
+    "fCategory": "类别",
+    "colRef": "编号",
+    "colFees": "预付费用（¥·$）",
+    "feesNone": "无",
+    "colTitle": "奖学金名称",
+    "colLevel": "层次",
+    "colLanguage": "语言",
+    "colIntake": "下一批次",
+    "colDeadline": "截止日期",
+    "colFunding": "资助方式",
+    "colLocation": "所在地",
+    "apply": "申请",
+    "applyNow": "立即申请",
+    "applyNote": "点击申请后将进入个人中心的引导式申请流程,请先登录或创建档案。",
+    "view": "查看",
+    "viewAll": "查看全部奖学金",
+    "hot": "热门",
+    "noneTitle": "暂无已发布的奖学金",
+    "noneBody": "目录内容正在完善中,请稍后再来查看,或先创建档案做好准备。",
+    "notFound": "该奖学金暂不可用。",
+    "benefits": "资助内容",
+    "requirements": "申请要求",
+    "policy": "政策与说明",
+    "eligibility": "申请资格",
+    "fees": "费用",
+    "documents": "所需材料",
+    "documentsNote": "由该奖学金设定,在申请过程中收集。",
+    "stipend": "生活补贴",
+    "stipendDuration": "发放 {n} 个月",
+    "upfront": "预付费用",
+    "accommodation": "住宿",
+    "coverage": "资助范围",
+    "renewal": "续期与年度审核",
+    "studyDuration": "学习年限",
+    "applicationChannel": "申请渠道",
+    "requiresFinancialProof": "需提供经济能力证明或担保人",
+    "requiresFoundationYear": "需完成预科年",
     "coverageKind": {
-      "TUITION": "Tuition",
-      "ACCOMMODATION": "Accommodation",
-      "STIPEND": "Living stipend",
-      "MEDICAL_INSURANCE": "Comprehensive medical insurance",
-      "SETTLEMENT_ALLOWANCE": "One-off settlement allowance",
-      "TRAVEL": "Travel / airfare",
-      "REGISTRATION_FEE": "Registration fee",
-      "VISA_FEE": "Visa fee",
-      "OTHER": "Other"
+      "TUITION": "学费",
+      "ACCOMMODATION": "住宿",
+      "STIPEND": "生活补贴",
+      "MEDICAL_INSURANCE": "综合医疗保险",
+      "SETTLEMENT_ALLOWANCE": "一次性安家费",
+      "TRAVEL": "交通 / 机票",
+      "REGISTRATION_FEE": "注册费",
+      "VISA_FEE": "签证费",
+      "OTHER": "其他"
     },
     "channel": {
-      "DIRECT_UNIVERSITY": "Direct to the university",
-      "CSC_AGENCY": "Via a CSC agency number",
-      "NADOUMI": "Through Nadoumi",
-      "OTHER": "Other"
+      "DIRECT_UNIVERSITY": "直接向院校申请",
+      "CSC_AGENCY": "通过 CSC 代理机构号申请",
+      "NADOUMI": "通过 Nadoumi 申请",
+      "OTHER": "其他"
     },
-    "nonDegreeDuration": "Non-degree duration",
+    "nonDegreeDuration": "非学位项目学制",
     "room": {
-      "SINGLE": "Single room",
-      "DOUBLE": "Double room",
-      "TRIPLE": "Triple room",
-      "QUAD": "Quad room",
-      "SHARED": "Shared / dormitory"
+      "SINGLE": "单人间",
+      "DOUBLE": "双人间",
+      "TRIPLE": "三人间",
+      "QUAD": "四人间",
+      "SHARED": "合住 / 宿舍"
     },
     "nonDegree": {
-      "HALF_YEAR": "Half year",
-      "ONE_YEAR": "One year"
+      "HALF_YEAR": "半年",
+      "ONE_YEAR": "一年"
     },
-    "intakes": "Intakes",
-    "closes": "closes",
-    "required": "required",
-    "optional": "optional",
+    "intakes": "入学批次",
+    "closes": "截止",
+    "required": "必需",
+    "optional": "可选",
     "level": {
-      "NON_DEGREE": "Non-degree",
-      "DIPLOMA": "Diploma",
-      "BACHELOR": "Bachelor's",
-      "MASTER": "Master's",
-      "PHD": "PhD"
+      "NON_DEGREE": "非学位项目",
+      "DIPLOMA": "专科",
+      "BACHELOR": "本科",
+      "MASTER": "硕士",
+      "PHD": "博士"
     },
     "funding": {
-      "FULLY": "Fully funded",
-      "PARTIAL": "Partially funded",
-      "SELF": "Self-funded"
+      "FULLY": "全额资助",
+      "PARTIAL": "部分资助",
+      "SELF": "自费"
     },
     "lang": {
-      "ENGLISH": "English",
-      "CHINESE": "Chinese",
-      "BOTH": "English & Chinese"
+      "ENGLISH": "英语",
+      "CHINESE": "中文",
+      "BOTH": "英语及中文"
     },
     "intake": {
-      "SPRING_MARCH": "Spring / March",
-      "AUTUMN_SEPTEMBER": "Autumn / September"
+      "SPRING_MARCH": "春季 / 3 月",
+      "AUTUMN_SEPTEMBER": "秋季 / 9 月"
     },
     "freq": {
-      "MONTHLY": "month",
-      "YEARLY": "year",
-      "ONE_OFF": "one-off"
+      "MONTHLY": "月",
+      "YEARLY": "年",
+      "ONE_OFF": "一次性"
     },
     "category": {
       "CSC": "CSC",
-      "CGS": "Chinese Government",
-      "GOVERNMENT": "Government",
-      "PROVINCIAL": "Provincial",
-      "UNIVERSITY": "University",
-      "PRESIDENTIAL": "Presidential",
-      "LANGUAGE": "Language",
-      "TYPE_A": "Type A",
-      "TYPE_B": "Type B",
-      "TYPE_C": "Type C",
-      "TYPE_D": "Type D"
+      "CGS": "中国政府奖学金",
+      "GOVERNMENT": "政府奖学金",
+      "PROVINCIAL": "省级奖学金",
+      "UNIVERSITY": "院校奖学金",
+      "PRESIDENTIAL": "校长奖学金",
+      "LANGUAGE": "语言奖学金",
+      "TYPE_A": "A 类",
+      "TYPE_B": "B 类",
+      "TYPE_C": "C 类",
+      "TYPE_D": "D 类"
     },
     "fee": {
-      "TUITION_BEFORE": "Tuition (before scholarship)",
-      "TUITION_AFTER": "Tuition (after scholarship)",
-      "ACCOMMODATION_BEFORE": "Accommodation (before)",
-      "ACCOMMODATION_AFTER": "Accommodation (after)",
-      "REGISTRATION": "Registration fee",
-      "APPLICATION": "Application fee",
-      "NADOUMI_APPLICATION": "Nadoumi application fee",
-      "NADOUMI_SERVICE": "Nadoumi service fee",
-      "INSURANCE": "Insurance",
-      "VISA": "Visa fee",
-      "OTHER": "Other fee"
+      "TUITION_BEFORE": "学费（资助前）",
+      "TUITION_AFTER": "学费（资助后）",
+      "ACCOMMODATION_BEFORE": "住宿费（资助前）",
+      "ACCOMMODATION_AFTER": "住宿费（资助后）",
+      "REGISTRATION": "注册费",
+      "APPLICATION": "申请费",
+      "NADOUMI_APPLICATION": "Nadoumi 申请费",
+      "NADOUMI_SERVICE": "Nadoumi 服务费",
+      "INSURANCE": "保险费",
+      "VISA": "签证费",
+      "OTHER": "其他费用"
     },
     "doc": {
-      "PASSPORT": "Passport",
-      "DEGREE": "Degree certificate",
-      "TRANSCRIPT": "Academic transcript",
-      "LANGUAGE_CERT": "Language certificate",
-      "VISA": "Visa",
-      "PHYSICAL_EXAM": "Physical examination",
-      "STUDY_PLAN": "Study plan",
-      "RECOMMENDATION_LETTER": "Recommendation letter",
-      "OTHER": "Other document"
+      "PASSPORT": "护照",
+      "DEGREE": "学位证书",
+      "TRANSCRIPT": "成绩单",
+      "LANGUAGE_CERT": "语言成绩证明",
+      "VISA": "签证",
+      "PHYSICAL_EXAM": "体检报告",
+      "STUDY_PLAN": "学习计划",
+      "RECOMMENDATION_LETTER": "推荐信",
+      "OTHER": "其他材料"
     },
     "elig": {
-      "age": "Age",
-      "gpa": "GPA",
-      "inChina": "Currently in China",
-      "nationality": "Nationality"
+      "age": "年龄",
+      "gpa": "平均绩点（GPA）",
+      "inChina": "目前是否在华",
+      "nationality": "国籍"
     },
-    "deadlineLabel": "Application deadline",
-    "deadlineDays": "{n} days left",
-    "deadlineToday": "Closes today",
-    "deadlinePassed": "Deadline has passed",
-    "deadlineRolling": "Rolling admissions",
-    "free": "Included",
-    "colRoom": "Room type",
-    "colDetails": "Details",
-    "colPrice": "Price",
-    "colDoc": "Document",
-    "colRequirement": "Requirement",
-    "colNotes": "Notes"
+    "deadlineLabel": "申请截止日期",
+    "deadlineDays": "剩余 {n} 天",
+    "deadlineToday": "今日截止",
+    "deadlinePassed": "申请已截止",
+    "deadlineRolling": "滚动录取",
+    "free": "已包含",
+    "colRoom": "房型",
+    "colDetails": "详情",
+    "colPrice": "价格",
+    "colDoc": "材料",
+    "colRequirement": "要求",
+    "colNotes": "备注"
   },
   "assistant": {
-    "fabLabel": "Open the Nadoumi assistant",
-    "title": "Nadoumi Assistant",
-    "subtitle": "Find scholarships and track your application",
-    "close": "Close",
-    "greeting": "Hi! I can help you discover scholarships and check on an application. What would you like to do?",
-    "tabFind": "Find scholarships",
-    "tabTrack": "Track application",
-    "findPlaceholder": "e.g. fully funded master in engineering",
-    "findHint": "Type a subject, country or keyword.",
-    "anyFunding": "Any funding",
-    "fundingFully": "Fully funded",
-    "fundingPartial": "Partial",
-    "fundingSelf": "Self funded",
-    "search": "Search",
-    "searching": "Searching…",
-    "noResults": "No scholarships matched. Try a broader keyword.",
-    "resultsTitle": "Top matches",
-    "viewAll": "See all results",
-    "open": "Open",
-    "deadline": "Deadline",
-    "rolling": "Rolling",
-    "trackPlaceholder": "Enter your application ID",
-    "trackHint": "You can find the ID in your dashboard or confirmation email.",
-    "trackCta": "Check status",
-    "trackChecking": "Checking…",
-    "trackNotFound": "We couldn't find an application with that ID. Check the ID and try again.",
-    "trackComingSoon": "Application tracking is being connected. In the meantime, sign in to your dashboard to see your applications.",
-    "trackGoDashboard": "Go to my dashboard",
-    "trackStatus": "Status",
-    "trackStage": "Stage",
-    "trackUpdated": "Last updated",
-    "disclaimer": "Guided search across the live Nadoumi catalog."
+    "fabLabel": "打开 Nadoumi 助手",
+    "title": "Nadoumi 助手",
+    "subtitle": "查找奖学金并跟踪您的申请",
+    "close": "关闭",
+    "greeting": "您好！我可以帮您查找奖学金或查询申请进度,请问您需要什么帮助？",
+    "tabFind": "查找奖学金",
+    "tabTrack": "查询申请",
+    "findPlaceholder": "例如：工程学全额资助硕士",
+    "findHint": "请输入专业方向、国家或关键词。",
+    "anyFunding": "不限资助方式",
+    "fundingFully": "全额资助",
+    "fundingPartial": "部分资助",
+    "fundingSelf": "自费",
+    "search": "搜索",
+    "searching": "搜索中…",
+    "noResults": "未找到匹配的奖学金,请尝试更宽泛的关键词。",
+    "resultsTitle": "最佳匹配结果",
+    "viewAll": "查看全部结果",
+    "open": "打开",
+    "deadline": "截止日期",
+    "rolling": "滚动录取",
+    "trackPlaceholder": "请输入您的申请编号",
+    "trackHint": "申请编号可在个人中心或确认邮件中查看。",
+    "trackCta": "查询进度",
+    "trackChecking": "查询中…",
+    "trackNotFound": "未找到该编号对应的申请记录,请核对编号后重试。",
+    "trackComingSoon": "申请进度跟踪功能正在接入中。在此之前,请登录个人中心查看您的申请。",
+    "trackGoDashboard": "前往我的个人中心",
+    "trackStatus": "状态",
+    "trackStage": "阶段",
+    "trackUpdated": "最近更新",
+    "disclaimer": "基于 Nadoumi 实时目录的引导式搜索。"
   },
   "guides": {
-    "more": "More guides"
+    "more": "更多留学指南",
+    "hub": {
+      "seoTitle": "Nadoumi 留学指南",
+      "seoDescription": "关于赴华留学、申请流程、奖学金、签证及日常生活的实用指南，以及每个地区的详细介绍。",
+      "title": "留学指南",
+      "subtitle": "赴华留学申请前后所需的一切信息，内容清晰易懂并持续更新。",
+      "read": "阅读"
+    },
+    "howToApply": {
+      "intro": "只要材料齐全，申请中国大学的流程非常清晰。大多数院校的申请通道在{openWindow}期间开放，对应 9 月入学；奖学金截止日期通常更早，多集中在{deadlineWindow}。建议提前约一年开始准备。",
+      "openWindow": "11 月至 3 月",
+      "deadlineWindow": "1 月至 4 月",
+      "sections": {
+        "journey": {
+          "eyebrow": "申请流程",
+          "title": "入学六步走"
+        },
+        "checklist": {
+          "eyebrow": "材料清单",
+          "title": "所需材料"
+        },
+        "support": {
+          "eyebrow": "支持保障",
+          "title": "Nadoumi 如何提供帮助"
+        }
+      },
+      "steps": {
+        "choosePrograms": {
+          "title": "选择专业项目",
+          "body": "确定学历层次、授课语言、专业方向与预算，建议筛选出 3 到 6 个备选项目。在 Nadoumi，您可按国家、资助方式、语言及学历层次筛选，并并列对比各项要求。"
+        },
+        "prepareDocuments": {
+          "title": "准备申请材料",
+          "body": "请参考下方材料清单。凡不是中文或英文的材料均需公证并翻译，同时应尽早开始体检。"
+        },
+        "submitApplication": {
+          "title": "提交申请",
+          "body": "通过院校自有申请系统提交；若申请中国政府奖学金，还需通过 CSC 系统提交。需缴纳申请费（通常为 400 至 800 元）。建议同时申请奖学金与录取，二者互不保证。"
+        },
+        "interviews": {
+          "title": "面试与录取结果",
+          "body": "部分院系会安排简短的线上面试。录取结果一般于 4 月至 7 月发放：包括录取通知书，若获得奖学金，还会另发奖学金证书。"
+        },
+        "acceptVisa": {
+          "title": "确认录取并领取签证表格",
+          "body": "确认入学名额后，院校将随录取通知书一并发放 JW202 表（自费生 / 校级奖学金生）或 JW201 表（政府奖学金生）。后续请参阅《学生签证指南》。"
+        },
+        "beforeYouFly": {
+          "title": "启程前准备",
+          "body": "提前预订住宿，准备好前几个月的生活费用（生活补贴通常在注册后发放），携带所有材料原件，并留意注册截止日期——逾期可能导致录取资格作废。"
+        }
+      },
+      "docs": {
+        "passport": {
+          "term": "护照",
+          "detail": "有效期需覆盖整个学习期限，并额外预留六个月。"
+        },
+        "diploma": {
+          "term": "学位证书及成绩单",
+          "detail": "最高学历证书及完整成绩记录，需公证并翻译。"
+        },
+        "language": {
+          "term": "语言成绩证明",
+          "detail": "中文授课项目需提供 HSK 成绩，英文授课项目需提供 IELTS 或 TOEFL 成绩（或英语授课证明信）。"
+        },
+        "studyPlan": {
+          "term": "学习计划",
+          "detail": "个人陈述，一般为 800 至 1500 字，需注明意向导师或研究团队。"
+        },
+        "recommendations": {
+          "term": "两封推荐信",
+          "detail": "由曾指导或授课的学术推荐人出具。"
+        },
+        "physicalExam": {
+          "term": "体检表",
+          "detail": "学习期限超过六个月的项目需提供《外国人体格检查表》，并附一张白底证件照。"
+        }
+      },
+      "under18": {
+        "title": "未满 18 周岁？",
+        "body": "还需提供经公证的监护声明，注明一位在中国境内居住的监护人。"
+      },
+      "supportBody": "我们会跟踪每一个申请环节、提醒各项截止日期，并在您提交前审核材料。{createProfile}即可开始，或阅读{visaGuide}了解录取后的后续事宜。",
+      "createProfile": "创建档案"
+    },
+    "scholarshipTypes": {
+      "intro": "赴华留学的资助大致分为四大类，许多学生会将其组合使用，例如以省级奖学金覆盖学费、再以院校奖学金覆盖住宿费。Nadoumi 上列出的每一项奖学金都清楚标明其资助内容及申请资格。",
+      "sections": {
+        "csc": {
+          "eyebrow": "1",
+          "title": "中国政府奖学金（CSC）"
+        },
+        "provincial": {
+          "eyebrow": "2",
+          "title": "省级及市级奖学金"
+        },
+        "university": {
+          "eyebrow": "3",
+          "title": "院校奖学金"
+        },
+        "confucius": {
+          "eyebrow": "4",
+          "title": "孔子学院及企业奖学金"
+        },
+        "reference": {
+          "eyebrow": "参考",
+          "title": "资助内容说明"
+        },
+        "improve": {
+          "eyebrow": "提升申请成功率",
+          "title": "如何提升申请竞争力"
+        },
+        "next": {
+          "eyebrow": "下一步",
+          "title": "查找您符合的资助项目"
+        }
+      },
+      "csc": {
+        "body": "该项目为国家级奖学金，由中国国家留学基金管理委员会（CSC）负责管理，包含多个申请渠道：双边项目（通过本国教育主管部门申请）、中国大学项目（直接向指定院校申请），以及丝绸之路和长城项目。全额奖学金涵盖{coverage}（{stipend}）以及{insurance}。竞争较为激烈，截止日期通常较早（多集中在 1 月至 3 月）。",
+        "coverage": "学费、校内住宿或住宿补贴、每月生活津贴",
+        "stipend": "本科生约每月 2500 元，硕士生约 3000 元，博士生约 3500 元",
+        "insurance": "综合医疗保险"
+      },
+      "provincial": {
+        "body": "各省份及大城市（如江苏、浙江、上海、广东、北京等）均设有各自的奖学金项目，用以吸引学生前往本地区院校就读。资助范围从学费减免到接近全额资助不等，竞争压力通常低于国家级奖学金（CSC）。"
+      },
+      "university": {
+        "body": "几乎所有院校都设有自己的奖学金项目，可为全额或部分资助，通常{renewable}，且截止日期往往最晚。对许多申请人而言，这是获得全额资助最切实可行的途径。",
+        "renewable": "根据学业成绩逐年续期"
+      },
+      "confucius": {
+        "body": "{scholarshipName}用于资助中文语言学习及中文教学相关学位项目，可通过孔子学院或 HSK 考点提交申请。企业与基金会也会在工程、能源、农业等领域资助学生，通常要求毕业后完成实习或入职。",
+        "scholarshipName": "孔子学院奖学金"
+      },
+      "coverage": {
+        "fullyFunded": {
+          "term": "全额资助",
+          "detail": "涵盖学费、住宿及每月生活津贴，并附综合保险。"
+        },
+        "tuitionAccommodation": {
+          "term": "学费 + 住宿",
+          "detail": "不含生活津贴，生活费用需自行承担。"
+        },
+        "tuitionWaiver": {
+          "term": "学费减免",
+          "detail": "仅减免学费，住宿及生活费用需自行承担。"
+        },
+        "partial": {
+          "term": "部分资助",
+          "detail": "按固定比例或固定金额减免学费。"
+        }
+      },
+      "improve": {
+        "early": "尽早在申请周期开始时提交，并同时申请多项奖学金。",
+        "language": "在申请{before}达到或超过语言要求。",
+        "before": "之前",
+        "studyPlan": "撰写具体的学习计划，注明意向导师或研究团队。",
+        "target": "选择与自身条件匹配度高的院校，而不仅是知名度最高的院校。"
+      },
+      "next": {
+        "body": "前往{scholarships}页面浏览当前开放的奖学金，或{createProfile}后由 Nadoumi 为您匹配符合资格的项目。",
+        "scholarshipsLink": "奖学金",
+        "createProfileLink": "创建档案"
+      }
+    },
+    "studentVisaGuide": {
+      "intro": "在中国学习超过 180 天需办理{x1}签证，抵达后转换为{residencePermit}；学制较短的项目则使用{x2}签证。这是标准流程，具体要求因国家而异，请务必以您所在地最近的中国使领馆规定为准。",
+      "x1": "X1",
+      "residencePermitTerm": "居留许可",
+      "x2": "X2",
+      "sections": {
+        "beforeApply": {
+          "eyebrow": "申请前",
+          "title": "两份关键材料"
+        },
+        "embassy": {
+          "eyebrow": "在使领馆",
+          "title": "办理签证"
+        },
+        "afterLand": {
+          "eyebrow": "抵达后",
+          "title": "入境第一个月内"
+        },
+        "whileStudying": {
+          "eyebrow": "在校学习期间",
+          "title": "保持合法身份"
+        }
+      },
+      "documents": {
+        "admissionNotice": {
+          "term": "录取通知书",
+          "detail": "由您所就读院校出具的原版录取通知书。"
+        },
+        "jwForm": {
+          "term": "JW202 或 JW201 表",
+          "detail": "来华学习签证申请表。自费生或获得院校奖学金的学生使用 JW202 表；获得中国政府奖学金的学生使用 JW201 表。"
+        }
+      },
+      "beforeApplyBody": "院校会在您确认入学名额后一并寄送这两份材料。请妥善保管原件，使领馆及后续的出入境管理部门均需要用到。",
+      "embassySteps": {
+        "cova": "在线填写签证申请表（COVA）并打印。",
+        "gather": "准备材料：有效期六个月以上且有空白页的护照、近期照片、录取通知书及 JW 表格，以及使领馆针对您国籍要求的其他材料。",
+        "appointment": "在中国签证申请服务中心或使领馆预约，本人递交材料并缴纳签证费。",
+        "collect": "约四个工作日后可领取签证。X1 签证通常为单次入境，自签发之日起 90 天内有效，请据此安排行程。"
+      },
+      "arrive": {
+        "registerAddress": {
+          "title": "24 小时内办理住宿登记",
+          "body": "需在当地派出所办理。若入住校内宿舍，通常由院校统一代办；若为校外租房，则需本人办理，且每次出境再入境后均需重新办理。"
+        },
+        "medicalCheck": {
+          "title": "完成体检",
+          "body": "若已在本国完成外国人体格检查，请携带报告及 X 光片到当地国际旅行卫生保健中心核验；否则需在中国境内完成体检。"
+        },
+        "residencePermit": {
+          "title": "30 日内办理居留许可",
+          "body": "前往出入境管理局，携带护照及 X1 签证、JW202 或 JW201 表、录取通知书、经核验的体检报告、住宿登记证明及照片办理。居留许可将取代签证，有效期为一个学年，可逐年续签。"
+        }
+      },
+      "whileStudying": {
+        "renew": "请至少在居留许可{window}办理续签。",
+        "renewWindow": "到期前一个月",
+        "reregister": "每次从境外再次入境中国后，须重新办理住宿登记。",
+        "workPermission": "兼职工作及实习均需事先获得院校与出入境管理部门的批准。",
+        "changeUniversity": "若您转学或离校，须及时更新或注销居留许可。"
+      },
+      "beforeAllThis": {
+        "title": "在此之前",
+        "body": "请先了解录取及 JW 表格相关事宜，请阅读{howToApply}。"
+      }
+    },
+    "livingInChina": {
+      "intro": "只要把基本事项安排妥当，国际学生在中国的日常生活既舒适又经济实惠。几乎所有事情都可以通过手机完成，校园能满足大部分日常需求，城市之间的交通也十分便捷。以下是实用信息。",
+      "sections": {
+        "money": {
+          "eyebrow": "支付",
+          "title": "日常付款方式"
+        },
+        "transport": {
+          "eyebrow": "交通",
+          "title": "出行方式"
+        },
+        "home": {
+          "eyebrow": "住宿",
+          "title": "住宿选择"
+        },
+        "everyday": {
+          "eyebrow": "日常生活",
+          "title": "餐饮、外卖与网络"
+        },
+        "health": {
+          "eyebrow": "健康",
+          "title": "保险与医疗"
+        },
+        "settlingIn": {
+          "eyebrow": "安顿下来",
+          "title": "入学第一个月"
+        }
+      },
+      "pay": {
+        "walletApps": {
+          "term": "微信支付与支付宝",
+          "detail": "扫码支付几乎覆盖所有消费场景，从食堂到地铁均可使用。建议入学初期尽快绑定中国银行账户。"
+        },
+        "bankAccount": {
+          "term": "本地银行账户",
+          "detail": "开户需携带护照、居留许可及院校证明信。国际信用卡仅在酒店及机场等场所可用，其他场合较少适用。"
+        },
+        "budget": {
+          "term": "留学生活预算",
+          "detail": "在非一线城市，每月餐饮、交通及基本生活开支约为 2000 至 3500 元；北京、上海、深圳等城市花费更高。"
+        }
+      },
+      "moneyNote": "建议随身携带少量现金，以备小商贩及传统市场使用，但在几乎所有场合，手机支付仍是首选方式。",
+      "move": {
+        "metro": {
+          "term": "地铁与公交",
+          "detail": "各大城市均支持扫码支付，票价通常仅需几元。"
+        },
+        "railway": {
+          "term": "高铁",
+          "detail": "城市间出行快捷、准时且价格实惠，可通过“铁路 12306”应用或携程预订。"
+        },
+        "didi": {
+          "term": "滴滴出行",
+          "detail": "网约车平台，支持出租车及专车预约，提供英文界面。"
+        },
+        "bikes": {
+          "term": "共享单车",
+          "detail": "美团单车与哈啰单车在城市各处均可找到，适合短途出行，扫码即可解锁。"
+        }
+      },
+      "documentsCallout": {
+        "title": "请随身携带证件",
+        "body": "购买火车票及入住酒店均需出示护照与居留许可。"
+      },
+      "homeBody": "大多数院校为国际学生提供{dorms}，单人间或合住间均配有独立卫浴，月租约为 1000 至 2500 元，需单独预订且通常需缴纳押金，与录取手续分开办理。在较小城市校外租房单间费用更低，但需自行处理中介、合同及派出所登记事宜。新生通常首年入住校内宿舍。",
+      "onCampusDorms": "校内宿舍",
+      "daily": {
+        "canteens": {
+          "term": "校园食堂",
+          "detail": "最经济的选择，一份完整餐食约为 8 至 20 元，多数食堂设有清真窗口。"
+        },
+        "delivery": {
+          "term": "美团外卖与饿了么",
+          "detail": "餐食及日用品可在一小时内送达。"
+        },
+        "shopping": {
+          "term": "淘宝与京东",
+          "detail": "其他各类商品，通常次日即可送达至校内取货点。"
+        },
+        "sim": {
+          "term": "本地电话卡",
+          "detail": "凭护照可在中国移动、联通或电信办理，流量套餐价格实惠且网速快。"
+        }
+      },
+      "everydayNote": "部分境外应用及网站在中国境内网络下无法访问，许多学生会使用院校或商业 VPN 服务以便学习及与家人保持联系。建议抵达前提前设置好{wechat}，它是留学生活中不可或缺的工具。",
+      "wechat": "微信",
+      "healthBody": "国际学生必须购买{insurance}，通常由院校统一安排（每年约 600 至 800 元，多数全额奖学金已包含此项）。校医院可处理常见小病；大型医院设有国际部或 VIP 部门，配备可用英语沟通的医护人员。请将保险卡及保单号保存在手机中以备不时之需。",
+      "insuranceTerm": "综合医疗保险",
+      "settlingIn": {
+        "mandarin": "尽早学习基础生存中文，如数字、方位及点餐用语，即使所修专业以英语授课。",
+        "orientation": "参加国际学生办公室的迎新活动及各类学生社团，是快速建立人脉的最佳方式。",
+        "copies": "妥善保存护照、签证、录取通知书及 JW 表格的电子版与纸质版。",
+        "registration": "请遵守住宿登记及居留许可相关规定，详见{visaGuide}。"
+      }
+    },
+    "welcomeToChina": {
+      "intro": "中国是全球国际学生数量最多的留学目的地之一，一千多所院校遍布全国，从海南的热带地区到北方的草原一应俱全。学位课程以中文授课为主，英文授课项目也日益增多；学费相对低廉，优秀申请人还可获得丰厚的奖学金资助。以下是入门须知，助您快速上手。",
+      "sections": {
+        "case": {
+          "eyebrow": "选择理由",
+          "title": "为什么选择赴华留学"
+        },
+        "structure": {
+          "eyebrow": "教育体系",
+          "title": "教育体系如何运作"
+        },
+        "language": {
+          "eyebrow": "授课语言",
+          "title": "我将用什么语言学习"
+        },
+        "dailyLife": {
+          "eyebrow": "日常生活",
+          "title": "生活速览"
+        },
+        "next": {
+          "eyebrow": "下一步",
+          "title": "您的后续步骤"
+        }
+      },
+      "why": {
+        "lowCost": {
+          "term": "费用低廉",
+          "detail": "公立院校学费仅为欧美同类项目的一小部分，非一线城市生活成本也较低。"
+        },
+        "realScholarships": {
+          "term": "真实可得的奖学金",
+          "detail": "政府、省级及院校奖学金可覆盖学费、住宿及每月生活补贴。"
+        },
+        "wideChoice": {
+          "term": "专业选择广泛",
+          "detail": "涵盖工程、医学、商科、理科、中文及国际关系等专业，多数设有英文授课方向。"
+        },
+        "network": {
+          "term": "区域人脉网络",
+          "detail": "即使只学习一年中文，也能为您打开亚洲各地的机会之门；毕业生将收获真正的人脉网络。"
+        }
+      },
+      "structureBody": "本科学制通常为四年（医学与建筑学为五年）；硕士为两到三年；博士为三到四年。学年一般为 9 月至次年 7 月，春节前后设有较长的寒假。您会听到院校被称为{doubleFirstClass}，以及更早的{label985}和{label211}称号，这些均代表研究实力突出的院校。",
+      "doubleFirstClass": "“双一流”",
+      "label985": "“985”",
+      "label211": "“211”",
+      "languageBody": "中文授课项目通常要求提供{hsk}成绩（多数项目要求 HSK 4 级，人文及医学类项目通常要求 HSK 5 级）。英文授课项目通常要求提供{ieltsToefl}成绩，或证明此前教育背景为英文授课，并需在毕业前完成一到两个学期的基础中文课程。",
+      "hsk": "HSK（汉语水平考试）",
+      "ieltsToefl": "IELTS 或 TOEFL",
+      "notReadyCallout": {
+        "title": "中文水平尚未达标？",
+        "body": "一年制语言课程是常见的过渡方案，许多奖学金项目也已将其纳入其中。"
+      },
+      "life": {
+        "phone": {
+          "term": "一部手机搞定一切",
+          "detail": "微信与支付宝可用于社交、支付、出行及外卖等各类日常需求。"
+        },
+        "railway": {
+          "term": "高铁网络",
+          "detail": "覆盖全国主要城市的庞大高铁网络，快捷且价格实惠。"
+        },
+        "campus": {
+          "term": "校园生活",
+          "detail": "封闭式独立校园内设有宿舍、食堂、医务室及体育设施等完善配套。"
+        },
+        "safety": {
+          "term": "日常安全保障",
+          "detail": "街头犯罪率低；国际学生办公室会协助您顺利安顿。"
+        }
+      },
+      "lifeNote": "如需了解完整的生活实用信息，请阅读{livingGuide}。",
+      "nextSteps": {
+        "shortlist": "筛选意向专业项目：可从{scholarships}与{universities}页面开始。",
+        "requirements": "核实每个项目的语言及学术要求。",
+        "documents": "尽早准备申请材料：详见{howToApply}。",
+        "visa": "提交申请、接受录取，并领取用于办理签证的{jwForm}表：详见{visaGuide}。"
+      },
+      "jwForm": "JW202/JW201",
+      "finalCta": "{createProfile}后，Nadoumi 将为您匹配合适的专业项目、跟踪各项截止日期，并全程指导您完成入学各环节。",
+      "createProfileLink": "创建档案"
+    },
+    "faq": {
+      "intro": "针对学生在申请前最常提出的问题给出简明解答，如需了解详情，请点击链接查看完整指南。",
+      "sections": {
+        "next": {
+          "eyebrow": "下一步",
+          "title": "仍有疑问？"
+        }
+      },
+      "stillUnsure": "{contact}，或{createProfile}，我们将全程为您提供指导。",
+      "createProfileLink": "创建档案",
+      "groups": {
+        "studyingAndLanguage": {
+          "title": "学习与语言",
+          "items": [
+            {
+              "q": "赴华留学是否必须会中文？",
+              "a": "并非一定如此。许多本科项目以及大多数硕士、博士项目均设有英文授课方向，尤其是工程、商科、医学及理科专业。中文授课学位通常要求提供 HSK 成绩，一般为 4 级至 5 级。无论哪种情况，完成一到两个学期的基础中文课程通常是毕业要求之一；若中文水平尚未达标，一年制语言课程是常见的过渡方案。"
+            },
+            {
+              "q": "留学安全吗？校园生活是怎样的？",
+              "a": "中国高校校园多为封闭式独立管理，总体安全性较高，内设宿舍、食堂、医务室及体育设施等完善配套。日常生活主要通过微信与支付宝完成；国际学生办公室及各类学生社团是建立人脉最快捷的方式。"
+            }
+          ]
+        },
+        "costAndFunding": {
+          "title": "费用与资助",
+          "items": [
+            {
+              "q": "留学费用大概是多少？",
+              "a": "公立院校本科学费一般为每年 18000 至 40000 元（医学及 MBA 项目费用更高）。校内住宿费约为每月 1000 至 2500 元，非一线城市每月基本生活费约为 2000 至 3500 元。若获得全额奖学金，则可免除学费与住宿费，并另发放每月生活津贴。"
+            },
+            {
+              "q": "我能申请到全额奖学金吗？",
+              "a": "可以，可通过中国政府奖学金、省级奖学金、院校奖学金或孔子学院奖学金等途径申请。建议尽早在申请周期开始时提交，并同时申请多项奖学金，且在申请前应达到语言要求。院校奖学金的截止日期通常最晚，对许多申请人而言是获得全额资助最切实可行的途径。"
+            }
+          ]
+        },
+        "applying": {
+          "title": "申请流程",
+          "items": [
+            {
+              "q": "我应该何时开始申请？",
+              "a": "建议提前约一年准备。申请通道一般于 11 月至 3 月期间开放，对应 9 月入学；奖学金截止日期通常更早，多集中在 1 月至 4 月。录取结果一般于 4 月至 7 月公布。"
+            },
+            {
+              "q": "需要准备哪些材料？",
+              "a": "护照；经公证及翻译的学位证书与成绩单；语言成绩证明（HSK、IELTS 或 TOEFL）；学习计划；两封推荐信；证件照；学习期限超过六个月的项目还需提供《外国人体格检查表》。未满 18 周岁的申请人还需提供经公证的监护文件。"
+            }
+          ]
+        },
+        "visaAndFamily": {
+          "title": "签证与家属",
+          "items": [
+            {
+              "q": "我需要办理哪种签证？",
+              "a": "学习期限超过 180 天需办理 X1 签证，并在抵达后 30 天内转换为居留许可；学制较短的项目办理 X2 签证。申请时需提供原版录取通知书及院校出具的 JW202 或 JW201 表格。"
+            },
+            {
+              "q": "留学期间可以打工吗？",
+              "a": "仅可在获得院校及出入境管理部门事先批准的情况下进行。未经批准擅自在学习许可下打工可能影响您的合法身份。若与所学专业相关，在办妥相应手续后通常可参与带薪实习。"
+            },
+            {
+              "q": "可以携带家属同行吗？",
+              "a": "在您获得居留许可后，配偶及子女可申请 S1 或 S2 家属签证，但需证明具备足够的经济能力供养家属；学生宿舍不接受家属入住，因此需在校外自行租房。具体政策因城市而异，请向院校国际处咨询确认。"
+            }
+          ]
+        },
+        "afterGraduation": {
+          "title": "毕业之后",
+          "items": [
+            {
+              "q": "毕业后我可以做什么？",
+              "a": "毕业后的选择包括：继续在中国深造、若找到符合条件的工作（通常需具备相关工作经验或硕士学位）可申请工作许可，或携带获得认证的学位及区域人脉回国发展。部分城市还为知名院校毕业生提供毕业后求职或创业签证。"
+            },
+            {
+              "q": "Nadoumi 能提供哪些帮助？",
+              "a": "我们会为您匹配符合条件的专业项目与奖学金、跟踪各项截止日期、在提交前审核您的材料，并全程指导您完成录取、JW 表格办理、签证申请及入学注册等各个环节。"
+            }
+          ]
+        }
+      }
+    },
+    "cityGuides": {
+      "seoTitle": "城市指南，走遍中国求学",
+      "seoDescription": "中国每一个省份和地区：历史、文化、语言与节庆，附两座城市及其顶尖高校。可按省份、城市或大学搜索。",
+      "heroSubtitle": "中国每一个省份和地区的历史、文化、语言与节庆，附两座城市及其顶尖高校。",
+      "intro": "中国幅员辽阔、风貌多样。每个省份都有自己的方言、美食、节庆与个性，也都有自己的高校。可按省份、城市或大学搜索，或按地区筛选，再到我们的{universities}页面了解各校详情。",
+      "searchLabel": "搜索省份、城市和大学",
+      "searchPlaceholder": "搜索省份、城市或大学",
+      "allRegions": "所有地区",
+      "showingCount": "显示 {total} 个省份和地区中的 {count} 个",
+      "topUniversities": "顶尖高校",
+      "noResults": {
+        "title": "未找到匹配的省份",
+        "body": "请尝试其他城市、大学或地区。",
+        "clear": "清除搜索"
+      },
+      "universitiesNote": "高校名单仅列出各城市部分代表性院校，并非详尽名单。行政区划描述以中华人民共和国现行划分为准。",
+      "kind": {
+        "province": "省",
+        "autonomousRegion": "自治区",
+        "municipality": "直辖市"
+      },
+      "regions": {
+        "north": {
+          "name": "华北"
+        },
+        "northeast": {
+          "name": "东北"
+        },
+        "east": {
+          "name": "华东"
+        },
+        "central": {
+          "name": "华中"
+        },
+        "south": {
+          "name": "华南"
+        },
+        "southwest": {
+          "name": "西南"
+        },
+        "northwest": {
+          "name": "西北"
+        }
+      },
+      "divisions": {
+        "beijing": {
+          "overview": "过去八个世纪里大部分时间是中国的都城，曾为元、明、清和中华人民共和国的所在地，拥有故宫、天坛以及距市区最近的长城段。",
+          "culture": "标准普通话以北京话为基础。这座城市既保留着京剧、胡同四合院生活和春节庙会，又拥有飞快的现代节奏；北京烤鸭是其招牌美食。",
+          "cities": {
+            "haidian-district": {
+              "note": "城市西北部的高校与科技聚集区。"
+            },
+            "chaoyang-district": {
+              "note": "老城以东的中央商务与使馆区。"
+            }
+          }
+        },
+        "tianjin": {
+          "overview": "渤海湾畔的港口城市，是北京通往大海的历史门户。十九世纪的外国租界在海河沿岸留下了欧式街道。",
+          "culture": "天津话以机智幽默著称，是相声的发源地。狗不理包子、泥人彩塑与年画都是当地传统。",
+          "cities": {
+            "nankai-district": {
+              "note": "南开公园旁的学术核心区。"
+            },
+            "jinnan-district": {
+              "note": "南部较新的校园与产业区。"
+            }
+          }
+        },
+        "hebei": {
+          "overview": "环绕京津的省份，拥有承德避暑山庄、长城与海相接的山海关，以及中国大部分的钢铁产业。",
+          "culture": "河北梆子是一种响亮而富有节奏感的地方戏曲；这里有深厚的武术传统，以及精彩的元宵灯会与冰雕。",
+          "cities": {
+            "shijiazhuang": {
+              "note": "平原上的铁路枢纽城市，省会所在地。"
+            },
+            "baoding": {
+              "note": "北京西南的清代旧省会。"
+            }
+          }
+        },
+        "shanxi": {
+          "overview": "黄河以东的黄土高原，中华文明最古老的发祥地之一，保留着明代古城平遥、云冈石窟佛教艺术，以及创办中国最早票号的晋商遗产。",
+          "culture": "晋方言在普通话体系中独具特色。山西以手工刀削面和陈醋闻名，还有皮影戏与壮观的元宵灯展。",
+          "cities": {
+            "taiyuan": {
+              "note": "汾河谷地的工业省会。"
+            },
+            "datong": {
+              "note": "曾为北方边关重镇，通往云冈石窟的门户。"
+            }
+          }
+        },
+        "inner-mongolia": {
+          "overview": "沿中国北部边境延伸的草原、沙漠与森林地带，煤炭与稀土资源丰富。成吉思汗陵坐落于鄂尔多斯高原。",
+          "culture": "蒙古语与普通话同为官方语言，使用竖写蒙古文。夏季那达慕大会包含摔跤、赛马与射箭；呼麦、马头琴与奶茶是日常文化的一部分。",
+          "cities": {
+            "hohhot": {
+              "note": "草原边缘的寺庙之城，自治区首府。"
+            },
+            "baotou": {
+              "note": "黄河畔的钢铁与稀土工业重镇。"
+            }
+          }
+        },
+        "liaoning": {
+          "overview": "东北三省中最南、工业化程度最高的省份。沈阳拥有清初皇宫；大连是俄、日两国建设的气候温和的海滨城市。",
+          "culture": "浓重的东北口音在全国都能一耳辨识。二人转歌舞小戏、浓郁炖菜、酸菜与冬季冰雪节共同定义了这片地区。",
+          "cities": {
+            "shenyang": {
+              "note": "东北地区最大的城市，省会所在地。"
+            },
+            "dalian": {
+              "note": "黄海之滨的港口与海滨城市，以广场和有轨电车闻名。"
+            }
+          }
+        },
+        "jilin": {
+          "overview": "以长白山及其火山口湖为中心，邻接朝鲜边境。长春因汽车与电影产业而兴起；延边是朝鲜族自治州。",
+          "culture": "延边地区朝鲜语与普通话并用。松花江上的冬季雾凇吸引众多摄影爱好者；满族与朝鲜族菜肴、冷面、泡菜与烧烤是当地日常饮食。",
+          "cities": {
+            "changchun": {
+              "note": "规划有序的工业与大学城，省会所在地。"
+            },
+            "yanji": {
+              "note": "延边朝鲜族自治州首府。"
+            }
+          }
+        },
+        "heilongjiang": {
+          "overview": "中国最东北端，沿黑龙江与俄罗斯接壤，拥有大庆油田和广袤的黑土农田。哈尔滨因中东铁路而兴建，至今保留着俄式建筑风貌。",
+          "culture": "哈尔滨国际冰雪节是全球规模最大的冰雪节庆。俄语借词、红肠与黑麦面包、冬泳与火锅为漫长的冬季增添暖意。",
+          "cities": {
+            "harbin": {
+              "note": "松花江畔的省会城市。"
+            },
+            "daqing": {
+              "note": "因中国最著名油田而兴起的城市。"
+            }
+          }
+        },
+        "shanghai": {
+          "overview": "1843年由渔村开埠为通商口岸，如今是中国的金融中心。外滩隔黄浦江与陆家嘴天际线相望；石库门里弄在高楼之间留存至今。",
+          "culture": "上海话属吴语方言。“海派”文化融合中西影响；小笼包与豫园元宵灯会是当地文化的代表。",
+          "cities": {
+            "yangpu-district": {
+              "note": "东北部以高校为核心、滨江地带焕然一新的城区。"
+            },
+            "minhang-district": {
+              "note": "南部大型城区，拥有重要校区与产业。"
+            }
+          }
+        },
+        "jiangsu": {
+          "overview": "紧邻上海上游的富庶省份。南京曾多次作为朝代都城；苏州古典园林与运河是大运河沿线的世界遗产。",
+          "culture": "吴语与江淮官话在此并存。塑造了后世中国戏曲的昆曲发源于此，精致的淮扬菜同样源自这里。",
+          "cities": {
+            "nanjing": {
+              "note": "长江畔历史层叠的古城，省会所在地。"
+            },
+            "suzhou": {
+              "note": "以园林、丝绸闻名的运河城市，如今也是高新技术中心。"
+            }
+          }
+        },
+        "zhejiang": {
+          "overview": "多丘陵的沿海省份，盛产茶叶、丝绸并富民营经济。杭州西湖千年来激发无数诗人灵感；普陀山是重要的佛教朝圣海岛。",
+          "culture": "吴语在各山谷间差异显著。越剧、龙井绿茶，以及秋日观赏钱塘江大潮，都是浙江的传统。",
+          "cities": {
+            "hangzhou": {
+              "note": "西湖畔的科技中心，省会所在地。"
+            },
+            "ningbo": {
+              "note": "历史悠久的贸易港口，也是全球最繁忙的货运港之一。"
+            }
+          }
+        },
+        "anhui": {
+          "overview": "被长江与淮河分割的内陆省份。黄山与粉墙黛瓦的徽州古村落西递、宏村均为世界遗产。",
+          "culture": "徽商造就了中国的砚台、宣纸与制笔文化。徽剧于1790年传入北京，成为京剧的前身。",
+          "cities": {
+            "hefei": {
+              "note": "国家级科学中心，省会所在地。"
+            },
+            "wuhu": {
+              "note": "长江畔的港口与制造业城市。"
+            }
+          }
+        },
+        "fujian": {
+          "overview": "面向台湾的多山海岸，历史上是东南亚移民的出发地。泉州曾是海上丝绸之路的中世纪大港；客家土楼是世界遗产。",
+          "culture": "闽方言（南部的闽南话、北部的福州话）与普通话差异很大。乌龙茶、布袋戏与妈祖海神信仰是当地生活的核心。",
+          "cities": {
+            "fuzhou": {
+              "note": "榕树与温泉之城，省会所在地。"
+            },
+            "xiamen": {
+              "note": "拥有鼓浪屿殖民风情街区、气候温和的海岛城市。"
+            }
+          }
+        },
+        "jiangxi": {
+          "overview": "赣江流域汇入中国最大淡水湖鄱阳湖的盆地。景德镇千年来烧制御用瓷器；井冈山是共产党最早的农村根据地。",
+          "culture": "赣语与客家话是主要方言。傩面具祭祀舞蹈、祠堂宗族传统与龙舟赛在此盛行。",
+          "cities": {
+            "nanchang": {
+              "note": "拥有革命历史的江畔城市，省会所在地。"
+            },
+            "jingdezhen": {
+              "note": "中国的“瓷都”。"
+            }
+          }
+        },
+        "shandong": {
+          "overview": "位于渤海与黄海之间的半岛，孔子与孟子的诞生地。泰山是中国最受尊崇的名山；青岛保留着德式街区与著名啤酒厂。",
+          "culture": "冀鲁官话是当地方言。鲁菜是四大传统菜系之一；潍坊每年春季举办国际风筝节。",
+          "cities": {
+            "jinan": {
+              "note": "“泉城”，省会所在地。"
+            },
+            "qingdao": {
+              "note": "红瓦、海滩与啤酒之城，沿海城市。"
+            }
+          }
+        },
+        "henan": {
+          "overview": "中华文明发源的中原核心地带。拥有三座古都（洛阳、开封与发现甲骨文的安阳）、少林寺与龙门石窟。",
+          "culture": "中原官话是当地方言。豫剧是全国规模最大的地方戏曲；面条和馅饼是日常主食。",
+          "cities": {
+            "zhengzhou": {
+              "note": "重要铁路枢纽，省会所在地。"
+            },
+            "kaifeng": {
+              "note": "黄河畔的宋代旧都。"
+            }
+          }
+        },
+        "hubei": {
+          "overview": "汉江与长江在武汉交汇之处，是中国的交通枢纽。1911年辛亥革命始于此；上游矗立着三峡大坝。",
+          "culture": "西南官话与古楚文化塑造了当地身份认同。热干面是武汉人的早餐；龙舟赛相传起源于这些江河之上。",
+          "cities": {
+            "wuhan": {
+              "note": "中国内陆最大城市之一，省会所在地。"
+            },
+            "yichang": {
+              "note": "三峡大坝所在的城市。"
+            }
+          }
+        },
+        "hunan": {
+          "overview": "长江以南多湖泊山峦的省份。洞庭湖、张家界石英岩柱与毛泽东故乡韶山均在此，千年学府岳麓书院亦坐落于此。",
+          "culture": "湘方言通行全省。花鼓戏、辛辣的湘菜，以及苗族、土家族的节庆，赋予湖南鲜明的个性。",
+          "cities": {
+            "changsha": {
+              "note": "湘江畔活力十足的省会城市。"
+            },
+            "xiangtan": {
+              "note": "毗邻韶山的工业城市。"
+            }
+          }
+        },
+        "guangdong": {
+          "overview": "珠江三角洲是中国的制造与出口引擎。广州两千年来一直是对外贸易港口；深圳仅用四十年便从村庄发展为超大城市。",
+          "culture": "粤语、潮汕话与客家话均通行于此。粤剧、舞狮、春季花市，以及饮茶“叹早茶”，构成了岭南文化。",
+          "cities": {
+            "guangzhou": {
+              "note": "华南地区的贸易大都会，省会所在地。"
+            },
+            "shenzhen": {
+              "note": "毗邻香港的年轻科技都市。"
+            }
+          }
+        },
+        "guangxi": {
+          "overview": "拥有壮观喀斯特地貌的壮族自治区，包括桂林山峰、漓江和龙胜梯田。壮族是中国人口最多的少数民族。",
+          "culture": "壮语为官方语言之一；西南官话与粤语也很常见。壮族“三月三”歌节，以及瑶族、苗族的习俗，让春季的日历十分丰富。",
+          "cities": {
+            "nanning": {
+              "note": "靠近越南边境的绿意盎然的自治区首府。"
+            },
+            "guilin": {
+              "note": "群峰环绕的旅游城市。"
+            }
+          }
+        },
+        "hainan": {
+          "overview": "中国的热带岛屿省份，也是新兴的自由贸易港。南端的三亚是海滨度假城市；内陆地区是黎族与苗族的聚居地。",
+          "culture": "海南话（闽语的一支）与普通话并用。黎族织锦、椰壳雕刻与露天“军坡”民歌聚会是海岛传统。",
+          "cities": {
+            "haikou": {
+              "note": "北部海岸的省会城市。"
+            },
+            "sanya": {
+              "note": "最南端的热带度假城市。"
+            }
+          }
+        },
+        "chongqing": {
+          "overview": "嘉陵江与长江交汇处的山城，1937年至1945年是中国的战时首都。道路、铁路与建筑沿悬崖层叠分布。",
+          "culture": "西南官话中的重庆方言直爽利落。这里是麻辣火锅的发源地；磁器口古镇与春节保留着许多旧俗。",
+          "cities": {
+            "shapingba-district": {
+              "note": "城市西部主要的高校聚集区。"
+            },
+            "yuzhong-district": {
+              "note": "构成历史市中心的半岛地带。"
+            }
+          }
+        },
+        "sichuan": {
+          "overview": "“天府之国”，成都平原两千多年来一直由都江堰灌溉工程滋养，是大熊猫、九寨沟湖泊与乐山大佛的所在地。",
+          "culture": "西南官话中的四川话温暖诙谐。川剧的变脸绝技、悠闲的茶馆生活，以及让人麻辣过瘾的花椒菜肴，在全国享有盛名。",
+          "cities": {
+            "chengdu": {
+              "note": "悠闲的科技中心，省会所在地。"
+            },
+            "mianyang": {
+              "note": "成都东北方向的中国“科技城”，也是纳杜米所在地。"
+            }
+          }
+        },
+        "guizhou": {
+          "overview": "多溶洞的崎岖高原，是中国民族构成最多样的省份之一。黄果树瀑布是全国最大瀑布；国酒茅台在此酿造。",
+          "culture": "普通话与苗语、侗语、布依语在此并存。侗族大歌是联合国教科文组织认定的艺术形式；芦笙节与苗族姊妹节让整个山谷欢聚一堂。",
+          "cities": {
+            "guiyang": {
+              "note": "凉爽多林的省会城市，也是大数据中心。"
+            },
+            "zunyi": {
+              "note": "共产党1935年召开关键会议的历史名城。"
+            }
+          }
+        },
+        "yunnan": {
+          "overview": "中国生物多样性最丰富的省份，与缅甸、老挝和越南接壤。保留着丽江、大理古城，香格里拉高原与西双版纳雨林，也是普洱茶的原产地。",
+          "culture": "这里生活着二十五个少数民族；白族、纳西族（拥有东巴象形文字）、傣族与彝族都在其中。傣族泼水节、彝族火把节与大理三月街是全年的重要节庆。",
+          "cities": {
+            "kunming": {
+              "note": "气候温和的“春城”，省会所在地。"
+            },
+            "dali": {
+              "note": "湖畔古城，白族文化中心。"
+            }
+          }
+        },
+        "tibet": {
+          "overview": "平均海拔超过四千米的高原。拉萨拥有布达拉宫与大昭寺；珠穆朗玛峰北坡耸立于其南部边境。",
+          "culture": "藏语为官方语言之一，有自己的文字。藏传佛教塑造了日常生活；藏历新年洛萨节、展示巨幅唐卡的雪顿“酸奶节”、酥油茶与糌粑都是核心传统。",
+          "cities": {
+            "lhasa": {
+              "note": "西藏的自治区首府与精神中心。"
+            },
+            "nyingchi": {
+              "note": "东南部海拔较低、更为翠绿的河谷地区。"
+            }
+          }
+        },
+        "shaanxi": {
+          "overview": "中华帝国的发祥地。作为古长安，西安曾是周、秦、汉、唐的都城，也是丝绸之路的东方起点；兵马俑、完整的古城墙与华山均在此。",
+          "culture": "中原官话中的关中方言通行于西安周边。秦腔是中国最古老的戏曲之一；剪纸、元宵灯会与宽厚的“biangbiang”面是陕西的标志。",
+          "cities": {
+            "xian": {
+              "note": "世界伟大历史名城之一，省会所在地。"
+            },
+            "yangling": {
+              "note": "西安以西的国家级农业科技示范区。"
+            }
+          }
+        },
+        "gansu": {
+          "overview": "沿河西走廊延伸的狭长省份，是穿越沙漠与山脉的丝绸之路要道。敦煌莫高窟保存着千年佛教壁画；嘉峪关是明长城的西端起点。",
+          "culture": "中原官话与兰银官话在此与藏语、东乡语交汇。花儿山歌、受敦煌启发的舞蹈，以及兰州手工拉制的牛肉面，构成了当地文化。",
+          "cities": {
+            "lanzhou": {
+              "note": "沿黄河延展的省会城市。"
+            },
+            "tianshui": {
+              "note": "毗邻麦积山石窟的古城。"
+            }
+          }
+        },
+        "qinghai": {
+          "overview": "地势高、人口稀少的省份，长江、黄河与湄公河均发源于此。青海湖是中国最大的湖泊；塔尔寺是重要的藏传佛教寺院。",
+          "culture": "普通话、藏语与蒙古语在此并用。朝圣者徒步绕青海湖而行；藏戏以及每年夏季环湖国际自行车赛是当地的重要节令。",
+          "cities": {
+            "xining": {
+              "note": "高原上最大的城市，省会所在地。"
+            },
+            "golmud": {
+              "note": "通往西藏铁路线上的沙漠铁路小城。"
+            }
+          }
+        },
+        "ningxia": {
+          "overview": "小型回族自治区，黄河在干旱地带穿出一条农田绿带。西夏王陵、贺兰山岩画与蓬勃发展的葡萄酒产业是当地地标。",
+          "culture": "通行中原官话，回族穆斯林文化底蕴深厚，清真寺与清真美食随处可见，开斋节与古尔邦节被广泛庆祝。",
+          "cities": {
+            "yinchuan": {
+              "note": "黄河与山脉之间的自治区首府。"
+            },
+            "zhongwei": {
+              "note": "沙坡头一带沙漠与黄河交汇的小城。"
+            }
+          }
+        },
+        "xinjiang": {
+          "overview": "中国面积最大的地区，是天山山脉与塔克拉玛干沙漠之间的丝绸之路要冲。吐鲁番是低于海平面的绿洲；喀什老巴扎已交易两千余年。",
+          "culture": "突厥语系的维吾尔语与普通话同为官方语言，哈萨克语和柯尔克孜语也在使用。十二木卡姆是联合国教科文组织认定的艺术形式；拉条子、抓饭与馕，以及古尔邦节（开斋节）与诺鲁孜节定义了这一年。",
+          "cities": {
+            "urumqi": {
+              "note": "自治区首府，据称是离任何海洋都最远的城市。"
+            },
+            "kashgar": {
+              "note": "中国最西端的历史绿洲古城。"
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "welcome-to-china": {
+        "title": "欢迎来到中国",
+        "summary": "赴华留学入门指南：教育体系、语言、生活节奏，以及这一切为何值得。"
+      },
+      "how-to-apply": {
+        "title": "如何申请",
+        "summary": "逐步了解申请流程：选择专业项目、准备材料、截止日期、录取通知及入学注册。"
+      },
+      "scholarship-types": {
+        "title": "奖学金类型",
+        "summary": "政府、院校、省级及企业奖学金详解：各自的资助内容及适合人群。"
+      },
+      "student-visa-guide": {
+        "title": "学生签证指南",
+        "summary": "从 JW202 / JW201 表格与 X1 / X2 签证，到抵达后需办理的居留许可。"
+      },
+      "living-in-china": {
+        "title": "在中国生活",
+        "summary": "作为国际学生的住宿、支付、通讯、交通、医疗与日常生活指南。"
+      },
+      "city-guides": {
+        "title": "城市指南",
+        "summary": "中国各省份介绍：历史、文化、语言与节庆，附两座代表城市及其知名院校。"
+      },
+      "faq": {
+        "title": "常见问题",
+        "summary": "对学生在申请前最常提出的问题给出明确解答。"
+      }
+    }
   }
 }

@@ -4,8 +4,12 @@ import { regionTint } from '~/data/guides/regions'
 import { provinceHero } from '~/data/guides/province-heroes'
 
 const props = defineProps<{ division: Division, regionId: string }>()
+const { t } = useI18n()
 const tint = computed(() => regionTint(props.regionId))
 const hero = computed(() => provinceHero(props.division.name))
+const kindLabel = computed(() => t(`guides.cityGuides.kind.${props.division.kind}`))
+const overview = computed(() => t(`guides.cityGuides.divisions.${props.division.slug}.overview`))
+const culture = computed(() => t(`guides.cityGuides.divisions.${props.division.slug}.culture`))
 </script>
 
 <template>
@@ -40,17 +44,17 @@ const hero = computed(() => provinceHero(props.division.name))
       <span class="pointer-events-none absolute -right-1 top-1 font-display text-7xl font-black leading-none text-white/20">{{ division.cn }}</span>
 
       <div class="relative">
-        <p class="text-[11px] font-semibold uppercase tracking-wide text-white/75">{{ division.kind }}</p>
+        <p class="text-[11px] font-semibold uppercase tracking-wide text-white/75">{{ kindLabel }}</p>
         <h3 class="font-display text-2xl font-bold text-white drop-shadow-sm">{{ division.name }}</h3>
       </div>
     </div>
 
     <div class="flex flex-1 flex-col p-5">
-      <p class="text-sm leading-6 text-slate-600">{{ division.overview }}</p>
-      <p class="mt-2 text-sm leading-6 text-slate-600">{{ division.culture }}</p>
+      <p class="text-sm leading-6 text-slate-600">{{ overview }}</p>
+      <p class="mt-2 text-sm leading-6 text-slate-600">{{ culture }}</p>
 
       <div class="mt-4 grid flex-1 gap-3 sm:grid-cols-2">
-        <CityCard v-for="c in division.cities" :key="c.name" :city="c" :tint="tint" />
+        <CityCard v-for="c in division.cities" :key="c.id" :city="c" :division-slug="division.slug" :tint="tint" />
       </div>
     </div>
   </article>

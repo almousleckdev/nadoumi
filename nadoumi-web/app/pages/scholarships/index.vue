@@ -240,7 +240,7 @@ function clearAll() {
                 <td colspan="8" class="px-4 py-8 text-center">
                   <NAlert tone="danger">
                     {{ t('errors.loadSection') }}
-                    <button type="button" class="ml-2 font-medium underline" @click="refresh">{{ t('common.retry') }}</button>
+                    <button type="button" class="ms-2 font-medium underline" @click="refresh">{{ t('common.retry') }}</button>
                   </NAlert>
                 </td>
               </tr>
@@ -262,8 +262,8 @@ function clearAll() {
                   <NuxtLink :to="localePath(`/scholarships/${s.slug}`)" class="font-medium text-slate-900 hover:text-brand-800">
                     {{ s.title }}
                   </NuxtLink>
-                  <span v-if="s.hot" class="ml-2 rounded-full bg-amber-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-amber-800">{{ t('scholarships.hot') }}</span>
-                  <span v-else-if="s.featured" class="ml-2 rounded-full bg-brand-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-brand-800">{{ t('catalog.featured') }}</span>
+                  <span v-if="s.hot" class="ms-2 rounded-full bg-amber-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-amber-800">{{ t('scholarships.hot') }}</span>
+                  <span v-else-if="s.featured" class="ms-2 rounded-full bg-brand-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-brand-800">{{ t('catalog.featured') }}</span>
                   <span v-if="s.referenceCode" class="mt-0.5 block font-mono text-[0.7rem] text-slate-400">{{ s.referenceCode }}</span>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3 text-slate-600">{{ place(s) || '' }}</td>
@@ -271,7 +271,7 @@ function clearAll() {
                 <td class="whitespace-nowrap px-4 py-3 text-slate-600">{{ nextIntake(s) || t('catalog.rollingDeadline') }}</td>
                 <td class="whitespace-nowrap px-4 py-3">
                   <span class="text-slate-700">{{ fundingLabel(s.fundingModel) }}</span>
-                  <span v-if="s.hasStipend" class="ml-1 text-emerald-600" :title="t('scholarships.withStipend')">●</span>
+                  <span v-if="s.hasStipend" class="ms-1 text-emerald-600" :title="t('scholarships.withStipend')">●</span>
                 </td>
                 <td class="whitespace-nowrap px-4 py-3 text-right">
                   <template v-if="fee(s)">

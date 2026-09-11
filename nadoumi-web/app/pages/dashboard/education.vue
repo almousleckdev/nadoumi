@@ -38,7 +38,7 @@ useSeo(t('dashboard.eduTitle'), t('dashboard.eduTitle'))
   <SectionCard :title="t('dashboard.eduTitle')">
     <NAlert v-if="activeApplicantId == null" tone="warning">
       {{ t('dashboard.createProfileBlurb') }}
-      <NuxtLink :to="localePath('/dashboard/profile')" class="ml-1 underline">{{ t('dashboard.quickProfile') }}</NuxtLink>
+      <NuxtLink :to="localePath('/dashboard/profile')" class="ms-1 underline">{{ t('dashboard.quickProfile') }}</NuxtLink>
     </NAlert>
     <template v-else>
       <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>

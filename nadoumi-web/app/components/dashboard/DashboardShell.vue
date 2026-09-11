@@ -23,8 +23,9 @@ const nav = [
           <NuxtLink :to="localePath('/')" class="font-display text-lg font-bold">Nadoumi</NuxtLink>
         </div>
         <div class="flex items-center gap-3">
+          <NLocaleSwitcher />
           <ApplicantSwitcher v-if="applicants.length > 1" />
-          <NDropdown>
+          <NDropdown trigger-test-id="account-menu">
             <template #trigger>
               <NAvatar :name="user?.nickName ?? user?.username" />
             </template>

@@ -4,6 +4,7 @@
 interface LocaleItem { code: string; name?: string }
 const { locale, locales } = useI18n()
 const switchLocalePath = useSwitchLocalePath()
+const { changeLocale } = useLocaleTransition()
 const list = computed(() => locales.value as unknown as LocaleItem[])
 </script>
 
@@ -16,6 +17,7 @@ const list = computed(() => locales.value as unknown as LocaleItem[])
       :aria-current="l.code === locale ? 'true' : undefined"
       class="block px-3 py-2 text-sm hover:bg-slate-50"
       :class="l.code === locale ? 'font-semibold text-brand-700' : 'text-slate-700'"
+      @click.prevent="changeLocale(l.code)"
     >
       {{ l.name }}
     </NuxtLink>

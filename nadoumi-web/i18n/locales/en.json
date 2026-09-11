@@ -42,8 +42,11 @@
     "yes": "Yes",
     "no": "No",
     "close": "Close",
+    "dismiss": "Dismiss",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "pagination": "Pagination",
+    "switchingLanguage": "Switching language…"
   },
   "home": {
     "hero": {
@@ -798,6 +801,945 @@
     "disclaimer": "Guided search across the live Nadoumi catalog."
   },
   "guides": {
-    "more": "More guides"
+    "more": "More guides",
+    "hub": {
+      "seoTitle": "Nadoumi Guides",
+      "seoDescription": "Practical guides to studying in China, applying, scholarships, visas, daily life and a guide to every region.",
+      "title": "Guides",
+      "subtitle": "Everything you need before and after you apply to study in China, written plainly and kept up to date.",
+      "read": "Read"
+    },
+    "howToApply": {
+      "intro": "Applying to a Chinese university is straightforward once your documents are in order. Most institutions open applications between {openWindow} for a September start; scholarship deadlines fall earlier, often {deadlineWindow}. Start about a year ahead.",
+      "openWindow": "November and March",
+      "deadlineWindow": "January to April",
+      "sections": {
+        "journey": {
+          "eyebrow": "The journey",
+          "title": "Six steps to enrolment"
+        },
+        "checklist": {
+          "eyebrow": "Checklist",
+          "title": "Documents you will need"
+        },
+        "support": {
+          "eyebrow": "Support",
+          "title": "How Nadoumi helps"
+        }
+      },
+      "steps": {
+        "choosePrograms": {
+          "title": "Choose programmes",
+          "body": "Decide on level, language of instruction, field and budget. Shortlist three to six so you have options. On Nadoumi you can filter by country, funding, language and level and compare requirements side by side."
+        },
+        "prepareDocuments": {
+          "title": "Prepare your documents",
+          "body": "See the checklist below. Notarise and translate anything not already in Chinese or English, and start the medical exam early."
+        },
+        "submitApplication": {
+          "title": "Submit the application",
+          "body": "Through the university's own portal and, for the Chinese Government Scholarship, also the CSC system. Pay the application fee (usually ¥400 to 800). Apply for the scholarship and the admission at the same time; one does not guarantee the other."
+        },
+        "interviews": {
+          "title": "Interviews and decisions",
+          "body": "Some departments hold a short online interview. Decisions arrive from April to July: an Admission Notice and, if awarded, a separate Scholarship Certificate."
+        },
+        "acceptVisa": {
+          "title": "Accept and get your visa form",
+          "body": "Confirm your place; the university issues a JW202 (self-funded / university scholarship) or JW201 (government scholarship) with the admission letter. Continue to the Student Visa Guide."
+        },
+        "beforeYouFly": {
+          "title": "Before you fly",
+          "body": "Book accommodation, arrange the first months' funds (stipends are paid after registration), bring every original, and note the registration deadline: missing it can void the offer."
+        }
+      },
+      "docs": {
+        "passport": {
+          "term": "Passport",
+          "detail": "Valid for at least the length of your study, plus six months."
+        },
+        "diploma": {
+          "term": "Diploma & transcripts",
+          "detail": "Highest qualification and full records, notarised and translated."
+        },
+        "language": {
+          "term": "Language certificate",
+          "detail": "HSK for Chinese-taught, IELTS or TOEFL for English-taught (or an English-medium letter)."
+        },
+        "studyPlan": {
+          "term": "Study plan",
+          "detail": "A personal statement, usually 800 to 1,500 words, naming supervisors or research groups."
+        },
+        "recommendations": {
+          "term": "Two recommendation letters",
+          "detail": "From academic referees who taught or supervised you."
+        },
+        "physicalExam": {
+          "term": "Physical Examination Form",
+          "detail": "The Foreigner Physical Examination Form for programmes over six months, plus a white-background photo."
+        }
+      },
+      "under18": {
+        "title": "Under 18?",
+        "body": "You also need a notarised guardianship document naming a guardian resident in China."
+      },
+      "supportBody": "We track every step, flag deadlines, and review your documents before you submit. {createProfile} to begin, or read the {visaGuide} for what comes after the offer.",
+      "createProfile": "Create a profile"
+    },
+    "scholarshipTypes": {
+      "intro": "Funding to study in China comes in four broad layers. Many students combine them, for example a provincial award for tuition plus a university award for accommodation. Every scholarship listed on Nadoumi shows exactly what it covers and who is eligible.",
+      "sections": {
+        "csc": {
+          "eyebrow": "1",
+          "title": "Chinese Government Scholarship (CSC)"
+        },
+        "provincial": {
+          "eyebrow": "2",
+          "title": "Provincial and municipal scholarships"
+        },
+        "university": {
+          "eyebrow": "3",
+          "title": "University scholarships"
+        },
+        "confucius": {
+          "eyebrow": "4",
+          "title": "Confucius Institute and enterprise scholarships"
+        },
+        "reference": {
+          "eyebrow": "Reference",
+          "title": "What coverage means"
+        },
+        "improve": {
+          "eyebrow": "Improve your odds",
+          "title": "How to strengthen an application"
+        },
+        "next": {
+          "eyebrow": "Next",
+          "title": "Find what you qualify for"
+        }
+      },
+      "csc": {
+        "body": "The national scheme, run by the China Scholarship Council, with several channels: the bilateral programme (through your home country's ministry), the Chinese-University Programme (apply directly to a designated university), and the Silk Road and Great Wall programmes. A full award covers {coverage} ({stipend}) and {insurance}. It is competitive, with early deadlines (often January to March).",
+        "coverage": "tuition, on-campus accommodation or an allowance, a monthly stipend",
+        "stipend": "roughly ¥2,500 for a bachelor's, ¥3,000 for a master's, ¥3,500 for a PhD",
+        "insurance": "comprehensive medical insurance"
+      },
+      "provincial": {
+        "body": "Provinces and large cities (Jiangsu, Zhejiang, Shanghai, Guangdong, Beijing and others) run their own schemes to attract students to universities in the region. Coverage ranges from a tuition waiver to a near-full package, and they are often less competitive than the CSC."
+      },
+      "university": {
+        "body": "Almost every university offers its own awards. These can be full or partial, are frequently {renewable}, and usually have the latest deadlines. For many applicants this is the most realistic route to full funding.",
+        "renewable": "renewable each year based on results"
+      },
+      "confucius": {
+        "body": "The {scholarshipName} funds Chinese-language study and degrees in Chinese-language teaching, applied through a Confucius Institute or HSK test centre. Companies and foundations also sponsor students in fields such as engineering, energy and agriculture, often with an internship or job expectation after graduation.",
+        "scholarshipName": "Confucius Institute Scholarship"
+      },
+      "coverage": {
+        "fullyFunded": {
+          "term": "Fully funded",
+          "detail": "Tuition, accommodation and a monthly stipend, plus comprehensive insurance."
+        },
+        "tuitionAccommodation": {
+          "term": "Tuition + accommodation",
+          "detail": "No stipend; you cover living costs."
+        },
+        "tuitionWaiver": {
+          "term": "Tuition waiver",
+          "detail": "Only the tuition; accommodation and living costs are yours."
+        },
+        "partial": {
+          "term": "Partial",
+          "detail": "A fixed percentage or amount off tuition."
+        }
+      },
+      "improve": {
+        "early": "Apply a full cycle early and to several scholarships at once.",
+        "language": "Meet or exceed the language requirement {before} you apply.",
+        "before": "before",
+        "studyPlan": "Write a specific study plan that names supervisors and research groups.",
+        "target": "Target universities where your profile is strong, not only the top names."
+      },
+      "next": {
+        "body": "Browse open awards on {scholarships}, or {createProfile} and Nadoumi will match you to the ones you are eligible for.",
+        "scholarshipsLink": "Scholarships",
+        "createProfileLink": "create a profile"
+      }
+    },
+    "studentVisaGuide": {
+      "intro": "Studying in China for longer than 180 days means an {x1} visa, converted into a {residencePermit} after you arrive. Shorter programmes use an {x2} visa. This is the standard path; always check your nearest Chinese embassy or consulate, as details vary by country.",
+      "x1": "X1",
+      "residencePermitTerm": "residence permit",
+      "x2": "X2",
+      "sections": {
+        "beforeApply": {
+          "eyebrow": "Before you apply",
+          "title": "The two key documents"
+        },
+        "embassy": {
+          "eyebrow": "At the embassy",
+          "title": "Applying for the visa"
+        },
+        "afterLand": {
+          "eyebrow": "After you land",
+          "title": "Within your first month"
+        },
+        "whileStudying": {
+          "eyebrow": "While you study",
+          "title": "Keep your status valid"
+        }
+      },
+      "documents": {
+        "admissionNotice": {
+          "term": "Admission Notice",
+          "detail": "The original admission letter from your university."
+        },
+        "jwForm": {
+          "term": "JW202 or JW201",
+          "detail": "The Visa Application for Study in China form. JW202 for self-funded or university-scholarship students; JW201 for Chinese Government Scholarship students."
+        }
+      },
+      "beforeApplyBody": "The university sends both after you accept your place. Keep the originals safe; the embassy and, later, the immigration office both need them.",
+      "embassySteps": {
+        "cova": "Complete the online visa application form (COVA) and print it.",
+        "gather": "Gather: passport valid six months or more with a blank page, a recent photo, the Admission Notice and JW form, and any documents the consulate lists for your nationality.",
+        "appointment": "Book an appointment at the Chinese Visa Application Service Centre or embassy, submit in person, and pay the fee.",
+        "collect": "Collect the visa in about four working days. An X1 is usually single-entry, valid 90 days from issue, so time your travel accordingly."
+      },
+      "arrive": {
+        "registerAddress": {
+          "title": "Register your address within 24 hours",
+          "body": "At the local police station. If you live in a university dormitory the university normally does this; if you rent, you must do it yourself, and again after every trip abroad."
+        },
+        "medicalCheck": {
+          "title": "Complete the medical check",
+          "body": "If you did the Foreigner Physical Examination at home, bring the report and X-ray to be verified at the local International Travel Healthcare Centre; otherwise you take the exam in China."
+        },
+        "residencePermit": {
+          "title": "Apply for the residence permit within 30 days",
+          "body": "At the Exit-Entry Administration Bureau, with your passport and X1 visa, JW202 or JW201, Admission Notice, verified medical report, accommodation registration and photos. The permit replaces the visa and is issued for the academic year, renewable annually."
+        }
+      },
+      "whileStudying": {
+        "renew": "Renew the residence permit at least {window}.",
+        "renewWindow": "one month before it expires",
+        "reregister": "Re-register your address with the police after every re-entry to China.",
+        "workPermission": "Part-time work and internships need prior permission from both the university and immigration.",
+        "changeUniversity": "If you change university or leave, your permit must be updated or cancelled promptly."
+      },
+      "beforeAllThis": {
+        "title": "Before all this",
+        "body": "The offer and JW form come first, read {howToApply}."
+      }
+    },
+    "livingInChina": {
+      "intro": "Day-to-day life as an international student in China is comfortable and inexpensive once the basics are set up. Almost everything runs through your phone, campuses provide most of what you need, and cities are exceptionally well connected. Here is the practical picture.",
+      "sections": {
+        "money": {
+          "eyebrow": "Money",
+          "title": "Paying for things"
+        },
+        "transport": {
+          "eyebrow": "Transport",
+          "title": "Getting around"
+        },
+        "home": {
+          "eyebrow": "Home",
+          "title": "Where you will live"
+        },
+        "everyday": {
+          "eyebrow": "Everyday",
+          "title": "Food, delivery and connectivity"
+        },
+        "health": {
+          "eyebrow": "Health",
+          "title": "Insurance and care"
+        },
+        "settlingIn": {
+          "eyebrow": "Settling in",
+          "title": "The first month"
+        }
+      },
+      "pay": {
+        "walletApps": {
+          "term": "WeChat Pay & Alipay",
+          "detail": "QR codes cover almost every purchase, from the canteen to the metro. Link them to a Chinese bank account in your first weeks."
+        },
+        "bankAccount": {
+          "term": "A local bank account",
+          "detail": "Bring your passport, residence permit and a university letter. International cards work at hotels and airports, rarely elsewhere."
+        },
+        "budget": {
+          "term": "A student budget",
+          "detail": "Roughly 2,000 to 3,500 yuan a month for food, transport and essentials outside the biggest cities. Beijing, Shanghai and Shenzhen run higher."
+        }
+      },
+      "moneyNote": "Carry a little cash for small vendors and older markets, but you will reach for your phone first almost everywhere.",
+      "move": {
+        "metro": {
+          "term": "Metro & bus",
+          "detail": "Pay by QR in every large city. Fares are a few yuan."
+        },
+        "railway": {
+          "term": "High-speed rail",
+          "detail": "Fast, punctual and affordable between cities. Book on the Railway 12306 app or Trip.com."
+        },
+        "didi": {
+          "term": "Didi",
+          "detail": "The ride-hailing app for taxis and private cars, with an English interface."
+        },
+        "bikes": {
+          "term": "Shared bikes",
+          "detail": "Meituan and HelloRide bikes are everywhere for short hops; unlock by QR."
+        }
+      },
+      "documentsCallout": {
+        "title": "Always carry your documents",
+        "body": "Your passport and residence permit are needed to buy train tickets and check into hotels."
+      },
+      "homeBody": "Most universities offer {dorms} for international students, single or shared rooms with a bathroom, from around 1,000 to 2,500 yuan a month, booked separately from admission and often with a deposit. Renting off campus is cheaper per room in smaller cities but means dealing with agents, contracts and your own police registration. First-year students almost always start in the dorm.",
+      "onCampusDorms": "on-campus dormitories",
+      "daily": {
+        "canteens": {
+          "term": "Campus canteens",
+          "detail": "The cheapest option, a full meal is 8 to 20 yuan. Halal (清真) canteens are common."
+        },
+        "delivery": {
+          "term": "Meituan & Ele.me",
+          "detail": "Food and groceries delivered in under an hour."
+        },
+        "shopping": {
+          "term": "Taobao & JD",
+          "detail": "Everything else, often next day, to a campus pick-up point."
+        },
+        "sim": {
+          "term": "A local SIM",
+          "detail": "From China Mobile, Unicom or Telecom with your passport. Data is cheap and fast."
+        }
+      },
+      "everydayNote": "Some foreign apps and sites are not reachable on Chinese networks; many students use a university or commercial VPN for study and to stay in touch with home. Set up {wechat} before you arrive, it is the backbone of student life.",
+      "wechat": "WeChat",
+      "healthBody": "A {insurance} for international students is mandatory, usually arranged through the university (about 600 to 800 yuan a year, included in most full scholarships). Campus clinics handle minor issues; larger hospitals have international or VIP departments with English-speaking staff. Keep the insurance card and policy number on your phone.",
+      "insuranceTerm": "comprehensive medical insurance policy",
+      "settlingIn": {
+        "mandarin": "Learn survival Mandarin early, numbers, directions and food, even if your degree is in English.",
+        "orientation": "Join the international student office orientation and the student associations, the fastest way to a network.",
+        "copies": "Keep digital and paper copies of your passport, visa, admission letter and JW form.",
+        "registration": "Follow the rules on registration and permits, see the {visaGuide}."
+      }
+    },
+    "welcomeToChina": {
+      "intro": "China hosts one of the largest international student communities in the world, spread across more than a thousand universities from the tropics of Hainan to the grasslands of the north. Degrees are taught in Chinese and, increasingly, in English; tuition is modest; and generous scholarships are available to strong applicants. This is a short orientation before you dive in.",
+      "sections": {
+        "case": {
+          "eyebrow": "The case",
+          "title": "Why study in China"
+        },
+        "structure": {
+          "eyebrow": "Structure",
+          "title": "How the system works"
+        },
+        "language": {
+          "eyebrow": "Language",
+          "title": "What language will I study in?"
+        },
+        "dailyLife": {
+          "eyebrow": "Daily life",
+          "title": "Life in brief"
+        },
+        "next": {
+          "eyebrow": "Next",
+          "title": "Your next steps"
+        }
+      },
+      "why": {
+        "lowCost": {
+          "term": "Low cost",
+          "detail": "Public-university tuition is a fraction of comparable programmes in Europe or North America, and living costs outside the biggest cities are low."
+        },
+        "realScholarships": {
+          "term": "Real scholarships",
+          "detail": "Government, provincial and university awards can cover tuition, accommodation and a monthly stipend."
+        },
+        "wideChoice": {
+          "term": "Wide choice",
+          "detail": "Engineering, medicine, business, sciences, Chinese language and international relations, many with English-taught tracks."
+        },
+        "network": {
+          "term": "A regional network",
+          "detail": "Even a year of Mandarin opens doors across Asia; graduates leave with a genuine network."
+        }
+      },
+      "structureBody": "A bachelor's degree usually takes four years (five for medicine and architecture); a master's two to three; a PhD three to four. The academic year runs from September to July with a long winter break around Spring Festival. You will hear universities described as {doubleFirstClass}, and the older {label985} and {label211} labels, which mark the research-intensive institutions.",
+      "doubleFirstClass": "\"Double First-Class\"",
+      "label985": "\"985\"",
+      "label211": "\"211\"",
+      "languageBody": "Chinese-taught degrees normally require an {hsk} certificate (HSK 4 for many programmes, HSK 5 for humanities and medicine). English-taught degrees require {ieltsToefl}, or proof your previous education was in English, plus a semester or two of basic Mandarin as a graduation requirement.",
+      "hsk": "HSK",
+      "ieltsToefl": "IELTS or TOEFL",
+      "notReadyCallout": {
+        "title": "Not ready in Chinese?",
+        "body": "A one-year language programme is the standard bridge, and many scholarships include it."
+      },
+      "life": {
+        "phone": {
+          "term": "Everything by phone",
+          "detail": "WeChat and Alipay handle messaging, payments, transport and deliveries."
+        },
+        "railway": {
+          "term": "High-speed rail",
+          "detail": "A vast network links every major city, fast and affordable."
+        },
+        "campus": {
+          "term": "Campus living",
+          "detail": "Walled, self-contained campuses with dorms, canteens, clinics and sports on site."
+        },
+        "safety": {
+          "term": "Safe day to day",
+          "detail": "Low street crime; the international student office helps you settle in."
+        }
+      },
+      "lifeNote": "For the full practical set-up, read {livingGuide}.",
+      "nextSteps": {
+        "shortlist": "Shortlist programmes: start from {scholarships} and {universities}.",
+        "requirements": "Check the language and academic requirements for each.",
+        "documents": "Prepare documents early: see {howToApply}.",
+        "visa": "Apply, accept your offer, and get the {jwForm} form for the visa: see the {visaGuide}."
+      },
+      "jwForm": "JW202/JW201",
+      "finalCta": "{createProfile} and Nadoumi will match you to programmes, track your deadlines and guide each step to enrolment.",
+      "createProfileLink": "Create a profile"
+    },
+    "faq": {
+      "intro": "Short answers to the questions students ask most before applying. For detail, follow the links to the full guides.",
+      "sections": {
+        "next": {
+          "eyebrow": "Next",
+          "title": "Still unsure?"
+        }
+      },
+      "stillUnsure": "{contact} or {createProfile} and we will guide you through every step.",
+      "createProfileLink": "create a profile",
+      "groups": {
+        "studyingAndLanguage": {
+          "title": "Studying and language",
+          "items": [
+            {
+              "q": "Do I need to speak Chinese to study in China?",
+              "a": "Not necessarily. Many bachelor's and most master's and PhD programmes have English-taught tracks, especially in engineering, business, medicine and the sciences. Chinese-taught degrees require an HSK certificate, usually HSK 4 to 5. Either way, a semester or two of basic Mandarin is a common graduation requirement, and a one-year language programme is the standard bridge if your Chinese is not yet ready."
+            },
+            {
+              "q": "Is it safe, and what is campus life like?",
+              "a": "Chinese campuses are walled, self-contained and generally very safe, with dormitories, canteens, clinics and sports facilities on site. Daily life runs through WeChat and Alipay; the international student office and student associations are the fastest way to build a network."
+            }
+          ]
+        },
+        "costAndFunding": {
+          "title": "Cost and funding",
+          "items": [
+            {
+              "q": "How much does it cost?",
+              "a": "Public-university tuition is typically 18,000 to 40,000 yuan a year for a bachelor's (medicine and MBA programmes are higher). On-campus accommodation is around 1,000 to 2,500 yuan a month, and a modest living budget outside the largest cities is 2,000 to 3,500 yuan a month. A full scholarship removes tuition and accommodation and adds a monthly stipend."
+            },
+            {
+              "q": "Can I get a full scholarship?",
+              "a": "Yes, through the Chinese Government Scholarship, provincial schemes, university awards or the Confucius Institute Scholarship. Apply a full cycle early, to several at once, and meet the language requirement before applying. University scholarships have the latest deadlines and are the most realistic route to full funding for many applicants."
+            }
+          ]
+        },
+        "applying": {
+          "title": "Applying",
+          "items": [
+            {
+              "q": "When should I apply?",
+              "a": "About a year ahead. Applications generally open November to March for a September start; scholarship deadlines fall earlier, often January to April. Decisions arrive April to July."
+            },
+            {
+              "q": "What documents do I need?",
+              "a": "Passport; notarised and translated diploma and transcripts; a language certificate (HSK or IELTS or TOEFL); a study plan; two recommendation letters; a passport photo; and, for programmes over six months, the Foreigner Physical Examination Form. Applicants under 18 also need a notarised guardianship document."
+            }
+          ]
+        },
+        "visaAndFamily": {
+          "title": "Visa and family",
+          "items": [
+            {
+              "q": "What visa do I need?",
+              "a": "An X1 visa for programmes longer than 180 days, which you convert into a residence permit within 30 days of arriving; an X2 visa for shorter programmes. You apply with your original Admission Notice and the JW202 or JW201 form from the university."
+            },
+            {
+              "q": "Can I work while studying?",
+              "a": "Only with prior permission from both the university and the immigration authorities. Working on a study permit without approval can jeopardise your status. Paid internships tied to your programme are usually possible with the right paperwork."
+            },
+            {
+              "q": "Can I bring my family?",
+              "a": "Spouses and children can apply for an S1 or S2 dependant visa once you hold a residence permit, but you must show you can support them; student dormitories do not house families, so you would rent off campus. Policies vary by city, check with the university international office."
+            }
+          ]
+        },
+        "afterGraduation": {
+          "title": "After graduation",
+          "items": [
+            {
+              "q": "What can I do after graduating?",
+              "a": "Options include further study in China, a work permit if you find a qualifying job (generally requiring relevant experience or a master's), or returning home with a recognised degree and regional network. Some cities run post-graduation job-search or entrepreneurship visas for graduates of top universities."
+            },
+            {
+              "q": "How does Nadoumi help?",
+              "a": "We match you to programmes and scholarships you qualify for, track every deadline, review your documents before submission, and guide you through offers, the JW form, the visa and enrolment."
+            }
+          ]
+        }
+      }
+    },
+    "cityGuides": {
+      "seoTitle": "City Guides, studying across China",
+      "seoDescription": "Every province and region of China: history, culture, language and festivals, with two cities and their leading universities. Search by province, city or university.",
+      "heroSubtitle": "Every province and region of China, its history, culture, language and festivals, with two cities and their leading universities.",
+      "intro": "China is vast and varied. Each province has its own dialects, cuisine, festivals and character, and its own universities. Search by province, city or university, or filter by region, then explore the institutions on our {universities} page.",
+      "searchLabel": "Search provinces, cities and universities",
+      "searchPlaceholder": "Search a province, city or university",
+      "allRegions": "All regions",
+      "showingCount": "Showing {count} of {total} provinces and regions",
+      "topUniversities": "Top universities",
+      "noResults": {
+        "title": "No matching province",
+        "body": "Try a different city, university or region.",
+        "clear": "Clear search"
+      },
+      "universitiesNote": "University lists highlight a few leading institutions in each city and are not exhaustive. Administrative descriptions follow the People's Republic of China.",
+      "kind": {
+        "province": "Province",
+        "autonomousRegion": "Autonomous region",
+        "municipality": "Municipality"
+      },
+      "regions": {
+        "north": {
+          "name": "North China"
+        },
+        "northeast": {
+          "name": "Northeast China"
+        },
+        "east": {
+          "name": "East China"
+        },
+        "central": {
+          "name": "Central China"
+        },
+        "south": {
+          "name": "South China"
+        },
+        "southwest": {
+          "name": "Southwest China"
+        },
+        "northwest": {
+          "name": "Northwest China"
+        }
+      },
+      "divisions": {
+        "beijing": {
+          "overview": "China's capital for most of the last eight centuries, seat of the Yuan, Ming, Qing and the People's Republic. Home of the Forbidden City, the Temple of Heaven and the closest stretches of the Great Wall.",
+          "culture": "Standard Mandarin (Putonghua) is based on the Beijing dialect. The city keeps Peking opera, hutong courtyard life and Spring Festival temple fairs alongside a fast modern rhythm; Beijing roast duck is its signature dish.",
+          "cities": {
+            "haidian-district": {
+              "note": "The university and technology quarter in the city's north-west."
+            },
+            "chaoyang-district": {
+              "note": "The central business and embassy district east of the old city."
+            }
+          }
+        },
+        "tianjin": {
+          "overview": "A port on the Bohai Gulf and Beijing's historic gateway to the sea. Nineteenth-century foreign concessions left European avenues along the Haihe river.",
+          "culture": "The Tianjin dialect is known for quick wit; the city is the home of xiangsheng (crosstalk comedy). Goubuli steamed buns, clay figurine folk art and New Year woodblock prints are local traditions.",
+          "cities": {
+            "nankai-district": {
+              "note": "The academic core beside Nankai Park."
+            },
+            "jinnan-district": {
+              "note": "A newer campus and enterprise zone in the south."
+            }
+          }
+        },
+        "hebei": {
+          "overview": "The province that wraps around Beijing and Tianjin. It holds the Chengde imperial summer resort, the Shanhaiguan pass where the Great Wall meets the sea, and much of China's steel industry.",
+          "culture": "Hebei bangzi is a loud, percussive regional opera; the province has deep martial-arts lineages and elaborate Lantern Festival lantern fairs and ice sculptures.",
+          "cities": {
+            "shijiazhuang": {
+              "note": "The provincial capital, a railway city on the plain."
+            },
+            "baoding": {
+              "note": "A former Qing provincial seat south-west of Beijing."
+            }
+          }
+        },
+        "shanxi": {
+          "overview": "A loess plateau east of the Yellow River and one of the oldest centres of Chinese civilisation. It keeps the walled Ming city of Pingyao, the Yungang Buddhist grottoes, and the legacy of the Jin merchants who ran China's first banks.",
+          "culture": "The Jin dialect group is distinct within Mandarin. Shanxi is famous for hand-sliced noodles and aged vinegar, for shadow-puppet theatre and for spectacular Lantern Festival displays.",
+          "cities": {
+            "taiyuan": {
+              "note": "The industrial provincial capital in the Fen river valley."
+            },
+            "datong": {
+              "note": "A former northern frontier capital, gateway to the Yungang Grottoes."
+            }
+          }
+        },
+        "inner-mongolia": {
+          "overview": "A long band of grassland, desert and forest along China's northern border, with major coal and rare-earth reserves. The mausoleum of Genghis Khan stands in its Ordos plateau.",
+          "culture": "Mongolian is co-official with Mandarin and written in the vertical Mongol script. The summer Naadam festival features wrestling, horse racing and archery; throat singing, the morin khuur fiddle and milk tea are everyday culture.",
+          "cities": {
+            "hohhot": {
+              "note": "The regional capital, a city of temples on the steppe edge."
+            },
+            "baotou": {
+              "note": "A steel and rare-earth industrial hub on the Yellow River."
+            }
+          }
+        },
+        "liaoning": {
+          "overview": "The southernmost and most industrial of the north-eastern provinces. Shenyang holds the early-Qing Imperial Palace; Dalian is a mild coastal city built by Russia and Japan.",
+          "culture": "The broad Northeastern Mandarin accent is instantly recognisable nationwide. Errenzhuan song-and-dance comedy, thick stews, pickled cabbage and winter ice festivals define the region.",
+          "cities": {
+            "shenyang": {
+              "note": "The provincial capital and largest city of the north-east."
+            },
+            "dalian": {
+              "note": "A port and beach city on the Yellow Sea, known for its squares and trams."
+            }
+          }
+        },
+        "jilin": {
+          "overview": "Centred on the Changbai Mountains and their crater lake on the North Korean border. Changchun grew up around the car and film industries; Yanbian is a Korean-Chinese autonomous prefecture.",
+          "culture": "Mandarin is spoken alongside Korean in Yanbian. The winter rime ice on the Songhua river draws photographers; Manchu and Korean dishes, cold noodles, kimchi and barbecue are staples.",
+          "cities": {
+            "changchun": {
+              "note": "The provincial capital, a planned industrial and university city."
+            },
+            "yanji": {
+              "note": "The seat of the Yanbian Korean Autonomous Prefecture."
+            }
+          }
+        },
+        "heilongjiang": {
+          "overview": "China's far north-east, bordering Russia along the Amur river, with the Daqing oilfield and vast black-soil farmland. Harbin was built by the Trans-Manchurian Railway and still shows Russian architecture.",
+          "culture": "Harbin's International Ice and Snow Sculpture Festival is the world's largest. Russian loanwords, sausage and rye bread, winter swimming and hot-pot warm the long winters.",
+          "cities": {
+            "harbin": {
+              "note": "The provincial capital on the Songhua river."
+            },
+            "daqing": {
+              "note": "A city that grew from China's most famous oilfield."
+            }
+          }
+        },
+        "shanghai": {
+          "overview": "A fishing town that became a treaty port in 1843 and is now China's financial capital. The Bund faces the Pudong skyline across the Huangpu river; shikumen lane houses survive between the towers.",
+          "culture": "Shanghainese is a Wu dialect. The city's haipai (\"Shanghai style\") culture mixes Chinese and Western influences; xiaolongbao soup dumplings and the Yu Garden Lantern Festival are local touchstones.",
+          "cities": {
+            "yangpu-district": {
+              "note": "A north-eastern district built around its universities and a redeveloped riverfront."
+            },
+            "minhang-district": {
+              "note": "A large southern district with major campuses and industry."
+            }
+          }
+        },
+        "jiangsu": {
+          "overview": "The prosperous province immediately upriver and inland from Shanghai. Nanjing served as a dynastic capital many times; Suzhou's classical gardens and canals are a UNESCO site on the Grand Canal.",
+          "culture": "Wu and Jianghuai Mandarin are both spoken. Kunqu, the refined opera that shaped all later Chinese theatre, was born here, as was the delicate Huaiyang cuisine.",
+          "cities": {
+            "nanjing": {
+              "note": "The provincial capital, a walled city on the Yangtze with layers of history."
+            },
+            "suzhou": {
+              "note": "A canal city of gardens, silk and, today, high technology."
+            }
+          }
+        },
+        "zhejiang": {
+          "overview": "A hilly coastal province of tea, silk and private enterprise. Hangzhou's West Lake has inspired poets for a thousand years; Mount Putuo is a major Buddhist pilgrimage island.",
+          "culture": "Wu dialects vary sharply from valley to valley. Yue opera, Longjing green tea, and watching the autumn tidal bore roar up the Qiantang river are Zhejiang traditions.",
+          "cities": {
+            "hangzhou": {
+              "note": "The provincial capital and a technology centre beside West Lake."
+            },
+            "ningbo": {
+              "note": "An ancient trading port and one of the world's busiest cargo harbours."
+            }
+          }
+        },
+        "anhui": {
+          "overview": "An inland province split by the Yangtze and Huai rivers. Huangshan (the Yellow Mountain) and the whitewashed Huizhou villages of Xidi and Hongcun are UNESCO sites.",
+          "culture": "The Huizhou merchants built China's ink-stones, rice paper and brush culture. Anhui opera travelled to Beijing in 1790 and became the ancestor of Peking opera.",
+          "cities": {
+            "hefei": {
+              "note": "The provincial capital and a national science hub."
+            },
+            "wuhu": {
+              "note": "A Yangtze river port and manufacturing city."
+            }
+          }
+        },
+        "fujian": {
+          "overview": "A mountainous coast facing Taiwan, historically a launch point for emigration across South-East Asia. Quanzhou was a great medieval maritime-Silk-Road port; the Hakka tulou earthen roundhouses are a UNESCO site.",
+          "culture": "The Min dialects, Hokkien in the south, Fuzhou speech in the north, differ greatly from Mandarin. Oolong tea, glove-puppet theatre and the Mazu sea-goddess festival are central to local life.",
+          "cities": {
+            "fuzhou": {
+              "note": "The provincial capital, a city of banyan trees and hot springs."
+            },
+            "xiamen": {
+              "note": "An island city with a colonial quarter on Gulangyu and a mild climate."
+            }
+          }
+        },
+        "jiangxi": {
+          "overview": "A basin drained by the Gan river into Poyang, China's largest freshwater lake. Jingdezhen has produced imperial porcelain for a thousand years; Jinggangshan was the first Communist rural base.",
+          "culture": "Gan and Hakka are the main dialects. Nuo masked ritual dance, ancestral-hall clan traditions and Dragon Boat racing are strong here.",
+          "cities": {
+            "nanchang": {
+              "note": "The provincial capital, a river city with a revolutionary history."
+            },
+            "jingdezhen": {
+              "note": "The \"porcelain capital\" of China."
+            }
+          }
+        },
+        "shandong": {
+          "overview": "A peninsula between the Bohai and Yellow seas, and the birthplace of Confucius and Mencius. Mount Tai is the most revered of China's sacred peaks; Qingdao keeps a German quarter and a famous brewery.",
+          "culture": "Jilu Mandarin is the local speech. Lu cuisine is one of the four great regional traditions; Weifang holds an international kite festival every spring.",
+          "cities": {
+            "jinan": {
+              "note": "The \"city of springs\" and provincial capital."
+            },
+            "qingdao": {
+              "note": "A coastal city of red roofs, beaches and beer."
+            }
+          }
+        },
+        "henan": {
+          "overview": "The core of the Central Plains where Chinese civilisation formed. It holds three ancient capitals (Luoyang, Kaifeng and Anyang, where the oracle bones were found), the Shaolin Temple and the Longmen Grottoes.",
+          "culture": "Central Plains Mandarin is the local speech. Yu opera is the country's largest regional opera form; wheat noodles and stuffed flatbreads are the everyday diet.",
+          "cities": {
+            "zhengzhou": {
+              "note": "A major railway junction and the provincial capital."
+            },
+            "kaifeng": {
+              "note": "A former Song-dynasty capital on the Yellow River."
+            }
+          }
+        },
+        "hubei": {
+          "overview": "Where the Han river joins the Yangtze at Wuhan, the transport heart of China. The 1911 revolution began here; upriver stands the Three Gorges Dam.",
+          "culture": "South-western Mandarin and the ancient Chu heritage shape local identity. Hot-dry noodles (reganmian) are Wuhan's breakfast; Dragon Boat racing is said to have started on these rivers.",
+          "cities": {
+            "wuhan": {
+              "note": "The provincial capital and one of China's largest inland cities."
+            },
+            "yichang": {
+              "note": "The city beside the Three Gorges Dam."
+            }
+          }
+        },
+        "hunan": {
+          "overview": "A province of lakes and mountains south of the Yangtze. Dongting Lake, the quartz pillars of Zhangjiajie and Mao Zedong's home village of Shaoshan are all here, as is the thousand-year-old Yuelu Academy.",
+          "culture": "The Xiang dialect is spoken across the province. Flower-drum folk opera, fiercely chilli-hot cuisine and the festivals of the Miao and Tujia peoples give Hunan a bold character.",
+          "cities": {
+            "changsha": {
+              "note": "The lively provincial capital on the Xiang river."
+            },
+            "xiangtan": {
+              "note": "An industrial city near Shaoshan."
+            }
+          }
+        },
+        "guangdong": {
+          "overview": "The Pearl River delta, China's manufacturing and export engine. Guangzhou (Canton) has been a foreign-trade port for two thousand years; Shenzhen went from village to megacity in forty.",
+          "culture": "Cantonese, Teochew and Hakka are all spoken. Cantonese opera, lion dance, spring flower markets and, above all, dim sum \"yum cha\" tea lunches are the culture of Lingnan.",
+          "cities": {
+            "guangzhou": {
+              "note": "The provincial capital and southern China's great trading city."
+            },
+            "shenzhen": {
+              "note": "A young technology metropolis on the Hong Kong border."
+            }
+          }
+        },
+        "guangxi": {
+          "overview": "A Zhuang autonomous region of dramatic karst scenery, the peaks of Guilin, the Li river, and the Longsheng rice terraces. The Zhuang are China's largest ethnic minority.",
+          "culture": "The Zhuang language is co-official; South-western Mandarin and Cantonese are also common. The Zhuang \"March Third\" song festival, along with Yao and Miao customs, fills the spring calendar.",
+          "cities": {
+            "nanning": {
+              "note": "The green regional capital near the Vietnam border."
+            },
+            "guilin": {
+              "note": "The tourism city among the limestone peaks."
+            }
+          }
+        },
+        "hainan": {
+          "overview": "China's tropical island province and a new free-trade port. Sanya on the southern tip is a beach-resort city; the interior is home to the Li and Miao peoples.",
+          "culture": "Hainanese (a Min dialect) is spoken alongside Mandarin. Li brocade weaving, coconut-shell carving and open-air \"Junpo\" folk-song gatherings are island traditions.",
+          "cities": {
+            "haikou": {
+              "note": "The provincial capital on the north coast."
+            },
+            "sanya": {
+              "note": "The tropical resort city of the far south."
+            }
+          }
+        },
+        "chongqing": {
+          "overview": "A mountain city where the Jialing meets the Yangtze, and China's wartime capital from 1937 to 1945. Roads, railways and buildings stack up the cliffs on many levels.",
+          "culture": "The Chongqing dialect of South-western Mandarin is fast and direct. The city is the home of numbing-spicy hotpot; Ciqikou old town and Spring Festival keep older customs alive.",
+          "cities": {
+            "shapingba-district": {
+              "note": "The main university district in the city's west."
+            },
+            "yuzhong-district": {
+              "note": "The peninsula that forms the historic city centre."
+            }
+          }
+        },
+        "sichuan": {
+          "overview": "The \"land of abundance\", the Chengdu plain has been irrigated by the Dujiangyan works for over two thousand years. It holds the giant pandas, Jiuzhaigou's lakes, and the Leshan Giant Buddha.",
+          "culture": "Sichuanese, a South-western Mandarin dialect, is warm and playful. Sichuan opera with its lightning \"face-changing\", unhurried teahouse life and mouth-numbing peppercorn cuisine are famous nationwide.",
+          "cities": {
+            "chengdu": {
+              "note": "The relaxed provincial capital and a technology centre."
+            },
+            "mianyang": {
+              "note": "China's designated \"science city\", north-east of Chengdu, and Nadoumi's home."
+            }
+          }
+        },
+        "guizhou": {
+          "overview": "A rugged, cave-riddled plateau and one of China's most ethnically varied provinces. Huangguoshu is the country's largest waterfall; Moutai, the national spirit, is distilled here.",
+          "culture": "Mandarin shares the province with Miao, Dong and Buyi languages. Dong \"grand choirs\" are a UNESCO art; the Lusheng reed-pipe festivals and the Miao Sisters' Meal festival draw whole valleys together.",
+          "cities": {
+            "guiyang": {
+              "note": "The cool, forested provincial capital and a big-data centre."
+            },
+            "zunyi": {
+              "note": "A historic city where the Communist Party held a pivotal 1935 meeting."
+            }
+          }
+        },
+        "yunnan": {
+          "overview": "China's most biodiverse province, on the borders of Myanmar, Laos and Vietnam. It keeps the old towns of Lijiang and Dali, the Shangri-La highlands and the Xishuangbanna rainforest, and it is the source of Pu'er tea.",
+          "culture": "Twenty-five ethnic minorities live here; Bai, Naxi (with its Dongba pictographs), Dai and Yi are among their languages. The Dai Water-Splashing Festival, the Yi Torch Festival and the Dali Third Month Fair are the year's highlights.",
+          "cities": {
+            "kunming": {
+              "note": "The mild \"spring city\" and provincial capital."
+            },
+            "dali": {
+              "note": "A lakeside old town and centre of Bai culture."
+            }
+          }
+        },
+        "tibet": {
+          "overview": "The high plateau, averaging over four thousand metres. Lhasa holds the Potala Palace and the Jokhang Temple; the north face of Mount Everest rises on its southern border.",
+          "culture": "Tibetan is co-official and written in its own script. Tibetan Buddhism shapes daily life; Losar (New Year), the Shoton \"yoghurt festival\" with its giant unveiled thangka, butter tea and tsampa are central traditions.",
+          "cities": {
+            "lhasa": {
+              "note": "The regional capital and spiritual centre of Tibet."
+            },
+            "nyingchi": {
+              "note": "A lower, greener valley region in the south-east."
+            }
+          }
+        },
+        "shaanxi": {
+          "overview": "The cradle of imperial China. Xi'an, as ancient Chang'an, was the capital of the Zhou, Qin, Han and Tang and the eastern end of the Silk Road; the Terracotta Army, the intact city wall and Mount Hua are all here.",
+          "culture": "The Guanzhong dialect of Central Plains Mandarin is spoken around Xi'an. Qinqiang is one of China's oldest operas; paper-cutting, the Lantern Festival, and wide \"biangbiang\" noodles are Shaanxi hallmarks.",
+          "cities": {
+            "xian": {
+              "note": "The provincial capital and one of the great historic cities of the world."
+            },
+            "yangling": {
+              "note": "A national agriculture-technology zone west of Xi'an."
+            }
+          }
+        },
+        "gansu": {
+          "overview": "A long province along the Hexi Corridor, the narrow Silk Road passage between desert and mountains. Dunhuang's Mogao caves hold a thousand years of Buddhist murals; Jiayuguan fort marks the western end of the Ming Great Wall.",
+          "culture": "Central Plains and Lanyin Mandarin meet Tibetan and Dongxiang here. Hua'er mountain songs, Dunhuang-inspired dance, and Lanzhou's hand-pulled beef noodle soup are the local culture.",
+          "cities": {
+            "lanzhou": {
+              "note": "The provincial capital, strung along the Yellow River."
+            },
+            "tianshui": {
+              "note": "An ancient city near the Maijishan Grottoes."
+            }
+          }
+        },
+        "qinghai": {
+          "overview": "A high, thinly populated province that gives rise to the Yangtze, Yellow and Mekong rivers. Qinghai Lake is China's largest; Kumbum is a major Tibetan-Buddhist monastery.",
+          "culture": "Mandarin, Tibetan and Mongolian are all spoken. Pilgrims circle Qinghai Lake on foot; Tibetan opera, and the international cycling race around the lake each summer, mark the calendar.",
+          "cities": {
+            "xining": {
+              "note": "The provincial capital and the plateau's largest city."
+            },
+            "golmud": {
+              "note": "A desert railway town on the line to Tibet."
+            }
+          }
+        },
+        "ningxia": {
+          "overview": "A small Hui autonomous region where the Yellow River creates a ribbon of farmland through dry country. The Western Xia royal tombs, Helan Mountain rock art and a fast-growing wine industry are its landmarks.",
+          "culture": "Zhongyuan Mandarin is spoken, with a strong Hui Muslim heritage, mosques, halal cuisine, and the widely observed Eid al-Fitr and Eid al-Adha.",
+          "cities": {
+            "yinchuan": {
+              "note": "The regional capital between the river and the mountains."
+            },
+            "zhongwei": {
+              "note": "A town where the desert meets the Yellow River at Shapotou."
+            }
+          }
+        },
+        "xinjiang": {
+          "overview": "China's largest region, a Silk Road crossroads of the Tianshan mountains and the Taklamakan desert. Turpan is a below-sea-level oasis; Kashgar's old bazaar has traded for two millennia.",
+          "culture": "Uyghur, a Turkic language, is co-official with Mandarin; Kazakh and Kyrgyz are also spoken. The Twelve Muqam song suites are a UNESCO art; laghman noodles, pilaf and naan, and the festivals of Corban (Eid) and Nowruz define the year.",
+          "cities": {
+            "urumqi": {
+              "note": "The regional capital, said to be the city furthest from any ocean."
+            },
+            "kashgar": {
+              "note": "The historic oasis city of the far west."
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "welcome-to-china": {
+        "title": "Welcome to China",
+        "summary": "An orientation to studying in China: the system, the language, the pace of life, and what makes it worth it."
+      },
+      "how-to-apply": {
+        "title": "How to Apply",
+        "summary": "The application journey step by step: choosing a programme, documents, deadlines, offers and enrolment."
+      },
+      "scholarship-types": {
+        "title": "Scholarship Types",
+        "summary": "Government, university, provincial and enterprise scholarships explained: what they cover and who they suit."
+      },
+      "student-visa-guide": {
+        "title": "Student Visa Guide",
+        "summary": "From the JW202/JW201 form and X1/X2 visa to the residence permit you convert it into after arrival."
+      },
+      "living-in-china": {
+        "title": "Living in China",
+        "summary": "Housing, payments, phones, transport, healthcare and daily life as an international student."
+      },
+      "city-guides": {
+        "title": "City Guides",
+        "summary": "Every province of China: its history, culture, language and festivals, with two cities and their leading universities."
+      },
+      "faq": {
+        "title": "FAQ",
+        "summary": "Straight answers to the questions students ask most before applying."
+      }
+    }
   }
 }

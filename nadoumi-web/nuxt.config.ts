@@ -65,6 +65,7 @@ export default defineNuxtConfig({
     locales: [
       { code: 'en', language: 'en', file: 'en.json', name: 'English' },
       { code: 'fr', language: 'fr', file: 'fr.json', name: 'Français' },
+      { code: 'es', language: 'es', file: 'es.json', name: 'Español' },
       { code: 'ar', language: 'ar', file: 'ar.json', dir: 'rtl', name: 'العربية' },
       { code: 'zh', language: 'zh-CN', file: 'zh.json', name: '中文' },
     ],
