@@ -60,7 +60,9 @@ class EmailLayoutTest {
         assertThat(html).contains("482913");
         assertThat(html).contains("https://nadoumi.test/login");                     // CTA
         assertThat(html).contains("https://nadoumi.test/programs/mbbs-fudan");       // list item
-        assertThat(html).contains("<img src=\"https://nadoumi.test/email/nadoumi-logo.png\" alt=\"Nadoumi\"");
+        // cache-busted with a content hash (?v=...), so match the src prefix and the alt separately
+        assertThat(html).contains("<img src=\"https://nadoumi.test/email/nadoumi-logo.png?v=");
+        assertThat(html).contains("\" alt=\"Nadoumi\"");
         assertThat(html).contains("support@nadoumi.test").contains("1 Test Road, Mianyang");
         assertThat(html).contains("Manage your email preferences");
         // not a boxed/card layout
@@ -101,8 +103,8 @@ class EmailLayoutTest {
         BrandProperties brand = brand("https://facebook.com/n", null, null, null, "https://api.nadoumi.test");
         String html = new EmailLayout(brand).render(sample(true)).html();
 
-        assertThat(html).contains("<img src=\"https://api.nadoumi.test/email/nadoumi-logo.png\"");
-        assertThat(html).contains("<img src=\"https://api.nadoumi.test/email/facebook.png\"");
+        assertThat(html).contains("<img src=\"https://api.nadoumi.test/email/nadoumi-logo.png?v=");
+        assertThat(html).contains("<img src=\"https://api.nadoumi.test/email/facebook.png?v=");
         // content/CTA links still resolve on the site, not the backend
         assertThat(html).contains("https://nadoumi.test/login").contains("https://nadoumi.test/programs/mbbs-fudan");
         assertThat(html).doesNotContain("https://nadoumi.test/email/");
@@ -111,7 +113,26 @@ class EmailLayoutTest {
     @Test
     void asset_base_url_falls_back_to_the_site_origin_when_unset() {
         String html = layout(null, null, null, null).render(sample(true)).html();
-        assertThat(html).contains("<img src=\"https://nadoumi.test/email/nadoumi-logo.png\"");
+        assertThat(html).contains("<img src=\"https://nadoumi.test/email/nadoumi-logo.png?v=");
+    }
+
+    @Test
+    void asset_urls_carry_a_cache_busting_version_query_param() {
+        // Mail providers (Gmail's image proxy in particular) cache a fetched image by
+        // URL. Without a version param, redeploying a changed logo/icon leaves every
+        // recipient looking at the stale cached image indefinitely.
+        //
+        // The version is a hash of the actual file under static/email/, read via
+        // ClassPathResource — a resource this module (nadoumi-identity) does not
+        // itself own (ruoyi-admin does, as the assembled app), so it isn't on this
+        // module's own test classpath and EmailLayout's documented "0" fallback
+        // applies here. The real hash is verified at actual app runtime instead:
+        // booting the packaged jar and sending a live OTP email produced
+        // ".../tiktok.png?v=0e3037505e", ".../nadoumi-logo.png?v=5b0583c85d", etc.
+        // — see the fix(notification) commit introducing this test for that trace.
+        String html = layout("https://facebook.com/n", null, null, null).render(sample(true)).html();
+        assertThat(html).containsPattern("nadoumi-logo\\.png\\?v=[0-9a-f]{1,10}\"");
+        assertThat(html).containsPattern("facebook\\.png\\?v=[0-9a-f]{1,10}\"");
     }
 
     @Test
@@ -121,7 +142,8 @@ class EmailLayoutTest {
                 .doesNotContain("/email/tiktok.png").doesNotContain("/email/whatsapp.png");
 
         String igOnly = layout(null, "https://instagram.com/nadoumi", null, null).render(sample(true)).html();
-        assertThat(igOnly).contains("<img src=\"https://nadoumi.test/email/instagram.png\" alt=\"Nadoumi on Instagram\"");
+        assertThat(igOnly).contains("<img src=\"https://nadoumi.test/email/instagram.png?v=");
+        assertThat(igOnly).contains("\" alt=\"Nadoumi on Instagram\"");
         assertThat(igOnly).doesNotContain("/email/facebook.png").doesNotContain("/email/tiktok.png")
                 .doesNotContain("/email/whatsapp.png");
 

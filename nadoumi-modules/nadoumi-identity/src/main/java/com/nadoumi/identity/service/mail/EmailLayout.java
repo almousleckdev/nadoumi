@@ -8,10 +8,16 @@ import com.nadoumi.identity.service.mail.EmailContent.ItemGroup;
 import com.nadoumi.identity.service.mail.EmailContent.KeyValues;
 import com.nadoumi.identity.service.mail.EmailContent.ListItem;
 import com.nadoumi.identity.service.mail.EmailContent.Paragraph;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 /**
  * The single source of the Nadoumi transactional-email design. Turns an
@@ -36,12 +42,40 @@ public class EmailLayout {
 
     private final BrandProperties brand;
 
+    /**
+     * Content-hash cache-buster per {@code static/email/*} file, computed once per
+     * distinct filename and reused for the life of the process. Mail providers
+     * (Gmail's image proxy in particular) cache a fetched image by URL, sometimes
+     * for a long time — replacing a file's bytes without changing its URL leaves
+     * recipients staring at the previous version indefinitely. Appending {@code
+     * ?v=<hash>} makes the URL change exactly when, and only when, the file's
+     * content actually changes, so every cache treats it as a new resource.
+     */
+    private final Map<String, String> assetVersions = new ConcurrentHashMap<>();
+
     public EmailLayout(BrandProperties brand) {
         this.brand = brand;
     }
 
     public EmailRender render(EmailContent content) {
         return new EmailRender(html(content), text(content));
+    }
+
+    /** Absolute, cache-busted URL for a file under {@code static/email/}. */
+    private String versionedAssetUrl(String file) {
+        String version = assetVersions.computeIfAbsent(file, EmailLayout::fingerprint);
+        return brand.assetUrl("/email/" + file) + "?v=" + version;
+    }
+
+    private static String fingerprint(String file) {
+        try (InputStream in = new ClassPathResource("static/email/" + file).getInputStream()) {
+            return DigestUtils.md5DigestAsHex(in).substring(0, 10);
+        }
+        catch (IOException e) {
+            // Asset missing at build time — keep the URL well-formed; appendIcon()/the
+            // logo <img> still render, they simply won't cache-bust until it exists.
+            return "0";
+        }
     }
 
     // ------------------------------------------------------------------ HTML
@@ -98,7 +132,9 @@ public class EmailLayout {
         if (!social.isEmpty()) {
             b.append("<tr><td align=\"center\" style=\"padding:16px 0 0 0;\">").append(social).append("</td></tr>\n");
         }
-        b.append("<tr><td align=\"center\" style=\"padding:24px 0 0 0;\"><img src=\"").append(esc(brand.logoUrl()))
+        String logoFile = brand.logoPath().substring(brand.logoPath().lastIndexOf('/') + 1);
+        b.append("<tr><td align=\"center\" style=\"padding:24px 0 0 0;\"><img src=\"")
+                .append(esc(versionedAssetUrl(logoFile)))
                 .append("\" alt=\"").append(esc(brand.wordmark()))
                 .append("\" width=\"120\" style=\"display:block;border:0;height:auto;\"></td></tr>\n");
         b.append("<tr><td align=\"center\" class=\"mu\" style=\"padding:12px 0 40px 0;font-family:").append(FONT)
@@ -222,7 +258,7 @@ public class EmailLayout {
             return;
         }
         b.append("<a href=\"").append(esc(url)).append("\" style=\"display:inline-block;margin:0 6px;\"><img src=\"")
-                .append(esc(brand.assetUrl("/email/" + file))).append("\" alt=\"").append(esc(brand.wordmark()))
+                .append(esc(versionedAssetUrl(file))).append("\" alt=\"").append(esc(brand.wordmark()))
                 .append(" on ").append(esc(name))
                 .append("\" width=\"24\" height=\"24\" style=\"display:block;border:0;\"></a>");
     }
