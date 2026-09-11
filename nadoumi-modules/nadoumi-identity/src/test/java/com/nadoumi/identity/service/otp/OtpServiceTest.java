@@ -29,7 +29,7 @@ class OtpServiceTest {
     private final MailSender mail = mock(MailSender.class);
     private final TicketService tickets = mock(TicketService.class);
     private final EmailLayout emailLayout = new EmailLayout(
-            new BrandProperties("https://web.local", null, null, null, null, null));
+            new BrandProperties("https://web.local", null, null, null, null, null, null));
     private final OtpService otp = new OtpService(
             redis, mail, new MailTemplates(), emailLayout, tickets, "https://web.local/login", () -> CODE);
 

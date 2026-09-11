@@ -15,8 +15,13 @@ import org.junit.jupiter.params.provider.CsvSource;
 class EmailLayoutTest {
 
     private static BrandProperties brand(String facebook, String instagram, String tiktok, String whatsapp) {
+        return brand(facebook, instagram, tiktok, whatsapp, null);
+    }
+
+    private static BrandProperties brand(
+            String facebook, String instagram, String tiktok, String whatsapp, String assetBaseUrl) {
         return new BrandProperties(
-                "https://nadoumi.test", "/email/nadoumi-logo.png", "Nadoumi",
+                "https://nadoumi.test", assetBaseUrl, "/email/nadoumi-logo.png", "Nadoumi",
                 new BrandProperties.Contact(
                         List.of("support@nadoumi.test"), List.of("+86 159 0823 7607"),
                         "1 Test Road, Mianyang", "Mon-Fri, 09:00-18:00 UTC+8"),
@@ -86,6 +91,27 @@ class EmailLayoutTest {
     void transactional_content_has_no_preferences_link() {
         String html = layout(null, null, null, null).render(sample(false)).html();
         assertThat(html).doesNotContain("Manage your email preferences");
+    }
+
+    @Test
+    void logo_and_social_icons_resolve_on_the_dedicated_asset_origin_not_the_site_origin() {
+        // baseUrl (the public site) and assetBaseUrl (this backend) are different
+        // deployments in production — the logo/icons must resolve on the backend
+        // that actually serves /email/*, never on the site's origin.
+        BrandProperties brand = brand("https://facebook.com/n", null, null, null, "https://api.nadoumi.test");
+        String html = new EmailLayout(brand).render(sample(true)).html();
+
+        assertThat(html).contains("<img src=\"https://api.nadoumi.test/email/nadoumi-logo.png\"");
+        assertThat(html).contains("<img src=\"https://api.nadoumi.test/email/facebook.png\"");
+        // content/CTA links still resolve on the site, not the backend
+        assertThat(html).contains("https://nadoumi.test/login").contains("https://nadoumi.test/programs/mbbs-fudan");
+        assertThat(html).doesNotContain("https://nadoumi.test/email/");
+    }
+
+    @Test
+    void asset_base_url_falls_back_to_the_site_origin_when_unset() {
+        String html = layout(null, null, null, null).render(sample(true)).html();
+        assertThat(html).contains("<img src=\"https://nadoumi.test/email/nadoumi-logo.png\"");
     }
 
     @Test

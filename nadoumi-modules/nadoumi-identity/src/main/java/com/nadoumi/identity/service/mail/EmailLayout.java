@@ -222,7 +222,7 @@ public class EmailLayout {
             return;
         }
         b.append("<a href=\"").append(esc(url)).append("\" style=\"display:inline-block;margin:0 6px;\"><img src=\"")
-                .append(esc(brand.url("/email/" + file))).append("\" alt=\"").append(esc(brand.wordmark()))
+                .append(esc(brand.assetUrl("/email/" + file))).append("\" alt=\"").append(esc(brand.wordmark()))
                 .append(" on ").append(esc(name))
                 .append("\" width=\"24\" height=\"24\" style=\"display:block;border:0;\"></a>");
     }

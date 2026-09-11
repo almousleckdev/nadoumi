@@ -191,15 +191,17 @@ One shared, non-boxed Nadoumi email design backs **every** transactional email
   when applicable.
   Table layout, `role="presentation"`, inlined CSS + one `<style>` for
   `@media max-width`, real `alt`, `lang`, semantic headings, WCAG-AA contrast.
-- **`BrandProperties`** (`nadoumi.brand.*`) — wordmark, `baseUrl`
-  (`nadoumi.web.baseUrl`, default `https://nadoumi.com`), logo path, contact
-  emails/phones/office/hours, social URLs, preferences path. `contact.*` mirrors
-  `nadoumi-web/app/data/contact.ts` (kept in sync by hand until a shared API
-  exists). Email assets: `ruoyi-admin/.../static/email/` (real brand logo + 4
-  social icons — the icon art is generic/monochrome pending an official asset
-  kit), served anonymously via `SecurityConfig` `permitAll` on `/email/**`.
-  Reachability depends on `nadoumi.brand.baseUrl` actually routing to this
-  backend in production (see `static/email/README.md`).
+- **`BrandProperties`** (`nadoumi.brand.*`) — wordmark, two deliberately
+  separate origins (`baseUrl`, shared with `nadoumi.web.baseUrl`, default
+  `https://nadoumi.com`, for CTA/content links; `assetBaseUrl`, default
+  `https://api.nadoumi.com`, this backend's own origin — falls back to
+  `baseUrl` when unset), logo path, contact emails/phones/office/hours, social
+  URLs (Facebook/Instagram/TikTok/WhatsApp), preferences path. `contact.*`
+  mirrors `nadoumi-web/app/data/contact.ts` (kept in sync by hand until a
+  shared API exists). Email assets: `ruoyi-admin/.../static/email/` (real
+  brand logo + 4 social icons — the icon art is generic/monochrome pending an
+  official asset kit), served anonymously via `SecurityConfig` `permitAll` on
+  `/email/**`, resolved against `assetBaseUrl` (see `static/email/README.md`).
 - **Identity emails on the shell:** `otp-register`, `otp-password-reset`,
   `account-exists` (subjects standardised, OTP shown as a `CodeBlock`), plus a
   new **`password-changed`** security email fired after a reset / change via a

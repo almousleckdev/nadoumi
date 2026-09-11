@@ -24,7 +24,7 @@ class PasswordChangedMailerTest {
 
     private final MailSender mail = mock(MailSender.class);
     private final BrandProperties brand = new BrandProperties(
-            "https://nadoumi.test", null, "Nadoumi",
+            "https://nadoumi.test", null, null, "Nadoumi",
             new BrandProperties.Contact(List.of("support@nadoumi.test"), List.of(), null, null),
             new BrandProperties.Social(null, null, null, null), null);
     private final PasswordChangedMailer mailer =
