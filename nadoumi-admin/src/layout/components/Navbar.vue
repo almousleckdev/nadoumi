@@ -26,6 +26,20 @@
     <div class="topbar__spacer" />
 
     <button
+      class="topbar__locale"
+      type="button"
+      :aria-label="localeButtonLabel"
+      @click="toggleLocale"
+    >
+      <Transition
+        name="locale-swap"
+        mode="out-in"
+      >
+        <span :key="locale">{{ locale === 'en' ? '中文' : 'EN' }}</span>
+      </Transition>
+    </button>
+
+    <button
       class="topbar__icon-btn"
       type="button"
       :aria-label="t('notifications.mine')"
@@ -94,11 +108,16 @@ import { useUserStore } from '@/stores/user'
 import { myUnreadCount } from '@/api/notification'
 import { useConfirm } from '@/composables/useConfirm'
 import { assetUrl } from '@/utils/asset'
+import { setLocale } from '@/lang'
 
 defineProps<{ collapsed?: boolean }>()
 const emit = defineEmits<{ 'toggle-collapse': []; 'toggle-mobile': [] }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const localeButtonLabel = computed(() => (locale.value === 'en' ? 'Switch to Chinese' : '切换为英文'))
+function toggleLocale() {
+  setLocale(locale.value === 'en' ? 'zh' : 'en')
+}
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
@@ -189,6 +208,38 @@ async function onCommand(cmd: string) {
 }
 .topbar__spacer {
   flex: 1;
+}
+.topbar__locale {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--nad-border, #e2e5ea);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--nad-ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+.topbar__locale:hover {
+  background: var(--nad-canvas);
+  border-color: var(--nad-brand-500);
+  color: var(--nad-ink);
+}
+.locale-swap-enter-active,
+.locale-swap-leave-active {
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+.locale-swap-enter-from {
+  opacity: 0;
+  transform: translateY(3px);
+}
+.locale-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-3px);
 }
 .topbar__user {
   display: flex;
