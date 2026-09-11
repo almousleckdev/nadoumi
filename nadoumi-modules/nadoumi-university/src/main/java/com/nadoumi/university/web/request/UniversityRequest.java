@@ -49,7 +49,7 @@ public record UniversityRequest(
         @Size(max = 500) String remark,
         @Valid List<RankingInput> rankings,
         @Valid List<HighlightInput> highlights,
-        @Valid @Size(max = 6, message = "at most 6 gallery images") List<GalleryInput> gallery) {
+        @Valid @Size(max = 10, message = "at most 10 gallery images") List<GalleryInput> gallery) {
 
     public record RankingInput(
             @NotBlank @Size(max = 40) String source,
@@ -63,8 +63,14 @@ public record UniversityRequest(
             @NotBlank @Size(max = 400) String text) {
     }
 
+    /**
+     * A gallery row. {@code imageUrl} is optional at the bean-validation layer on
+     * purpose: the admin form can submit trailing empty rows the user added but
+     * never filled. {@code UniversityService#replaceChildren} drops any row whose
+     * {@code imageUrl} is blank, so only real images are persisted.
+     */
     public record GalleryInput(
-            @NotBlank @Size(max = 500) String imageUrl,
+            @Size(max = 500) String imageUrl,
             Long mediaId,
             @Size(max = 200) String caption) {
     }

@@ -58,6 +58,19 @@ class UniversityServiceTest {
                 base.rankings(), base.highlights(), base.gallery());
     }
 
+    private static UniversityRequest reqWithGallery(String name, String country,
+            List<UniversityRequest.GalleryInput> gallery) {
+        UniversityRequest b = req(name, country);
+        return new UniversityRequest(
+                b.name(), b.nameCn(), b.country(), b.type(), b.city(), b.province(),
+                b.foundedYear(), b.totalStudents(), b.internationalStudents(), b.facultyCount(),
+                b.website(), b.rankingTier(), b.introduction(), b.history(), b.campusInfo(),
+                b.accommodationInfo(), b.nearbyInfo(), b.admissionsEmail(), b.officePhone(),
+                b.logoImageUrl(), b.coverImageUrl(), b.logoMediaId(), b.bannerMediaId(), b.recommended(),
+                b.featured(), b.publicPartner(), b.partnerStatus(), b.status(), b.publishStatus(), b.remark(),
+                b.rankings(), b.highlights(), gallery);
+    }
+
     @Test
     void create_persists_the_profile_and_replaces_children() {
         when(mapper.findIdByNameAndCountry("Tsinghua University", "CN")).thenReturn(null);
@@ -168,16 +181,36 @@ class UniversityServiceTest {
     }
 
     @Test
-    void galleryCapStillSix() {
+    void galleryCapIsTen() {
         University row = new University();
         row.setId(3L);
         when(mapper.findById(3L)).thenReturn(row);
         when(mapper.findGallery(3L)).thenReturn(List.of(
-                gal(1), gal(2), gal(3), gal(4), gal(5), gal(6)));
+                gal(1), gal(2), gal(3), gal(4), gal(5), gal(6), gal(7), gal(8), gal(9), gal(10)));
 
         assertThatThrownBy(() -> service.uploadGalleryImage(3L, upload()))
                 .isInstanceOf(NadBadRequestException.class);
         verify(media, never()).upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong());
+    }
+
+    @Test
+    void update_skips_blank_gallery_rows_and_persists_only_real_images() {
+        University existing = new University();
+        existing.setId(8L);
+        when(mapper.findById(8L)).thenReturn(existing);
+        when(mapper.findIdByNameAndCountry("Zhejiang University", "CN")).thenReturn(8L);
+
+        List<UniversityRequest.GalleryInput> gallery = java.util.Arrays.asList(
+                new UniversityRequest.GalleryInput("https://res.cloudinary.com/x/a.png", 11L, "Campus"),
+                new UniversityRequest.GalleryInput("   ", null, null),   // trailing empty row from the form
+                new UniversityRequest.GalleryInput(null, null, null),    // never filled
+                new UniversityRequest.GalleryInput("https://res.cloudinary.com/x/b.png", 12L, null));
+
+        service.update(8L, reqWithGallery("Zhejiang University", "CN", gallery));
+
+        verify(mapper).deleteGallery(8L);
+        verify(mapper, org.mockito.Mockito.times(2))
+                .insertGalleryImage(any(), any(), org.mockito.ArgumentMatchers.anyInt());
     }
 
     @Test

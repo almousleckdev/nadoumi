@@ -23,6 +23,9 @@ useSeo(
   u.value?.introduction?.slice(0, 155) ?? t('catalog.universitiesSubtitle'),
 )
 
+/** Index of the gallery image shown in the lightbox, or null when it is closed. */
+const lightboxIndex = ref<number | null>(null)
+
 const monogram = computed(() => u.value?.name.trim().charAt(0).toUpperCase() ?? 'N')
 const place = computed(() => {
   const x = u.value
@@ -158,18 +161,30 @@ const prose = computed(() => {
           <section v-if="u.gallery.length">
             <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.gallery') }}</h2>
             <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <figure v-for="g in u.gallery" :key="g.id" class="overflow-hidden rounded-xl bg-slate-100">
-                <img
-                  :src="mediaUrl(g.url ?? g.imageUrl)"
-                  :alt="g.caption ?? ''"
-                  loading="lazy"
-                  decoding="async"
-                  class="aspect-[4/3] w-full object-cover"
+              <figure
+                v-for="(g, i) in u.gallery"
+                :key="g.id"
+                class="overflow-hidden rounded-xl bg-slate-100"
+              >
+                <button
+                  type="button"
+                  class="group block w-full cursor-zoom-in rounded focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+                  :aria-label="g.caption || t('university.gallery')"
+                  @click="lightboxIndex = i"
                 >
+                  <img
+                    :src="mediaUrl(g.url ?? g.imageUrl)"
+                    :alt="g.caption ?? ''"
+                    loading="lazy"
+                    decoding="async"
+                    class="aspect-[4/3] w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+                  >
+                </button>
                 <figcaption v-if="g.caption" class="px-2 py-1.5 text-xs text-slate-500">{{ g.caption }}</figcaption>
               </figure>
             </div>
           </section>
+          <GalleryLightbox v-model="lightboxIndex" :images="u.gallery" />
         </div>
 
         <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">

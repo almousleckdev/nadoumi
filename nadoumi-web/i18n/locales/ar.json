@@ -40,7 +40,10 @@
     "signOut": "Sign out",
     "nothingYet": "Nothing here yet.",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "close": "إغلاق",
+    "previous": "السابق",
+    "next": "التالي"
   },
   "home": {
     "hero": {

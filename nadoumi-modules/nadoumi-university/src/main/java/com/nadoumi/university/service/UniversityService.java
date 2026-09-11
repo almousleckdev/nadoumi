@@ -42,7 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class UniversityService {
 
-    private static final int MAX_GALLERY_IMAGES = 6;
+    private static final int MAX_GALLERY_IMAGES = 10;
 
     private final UniversityMapper mapper;
     private final MediaGateway media;
@@ -245,6 +245,8 @@ public class UniversityService {
         if (req.gallery() != null) {
             int order = 0;
             for (UniversityRequest.GalleryInput in : req.gallery()) {
+                // The admin form can submit trailing rows the user added but never
+                // filled — skip anything without a usable image URL.
                 if (in.imageUrl() == null || in.imageUrl().isBlank()) {
                     continue;
                 }

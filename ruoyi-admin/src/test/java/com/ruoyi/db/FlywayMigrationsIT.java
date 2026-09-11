@@ -328,6 +328,16 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT status FROM sys_job "
                 + "WHERE invoke_target = 'scholarshipDeadlineReminderJob.run()'")).isEqualTo("0");
 
+        // V54 — university catalog import (22 China universities as DRAFT / PROSPECT)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university WHERE create_by = 'import'")).isEqualTo("22");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university "
+                + "WHERE create_by = 'import' AND (publish_status <> 'DRAFT' OR partner_status <> 'PROSPECT')")).isEqualTo("0");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT reference_code) FROM nad_university WHERE create_by = 'import'")).isEqualTo("22");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_highlight h "
+                + "JOIN nad_university u ON u.id = h.university_id AND u.create_by = 'import'")).isEqualTo("430");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_ranking r "
+                + "JOIN nad_university u ON u.id = r.university_id AND u.create_by = 'import'")).isEqualTo("66");
+
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
         assertThat(single(ds, "SELECT status FROM sys_user WHERE user_id = 1")).isEqualTo("1");
