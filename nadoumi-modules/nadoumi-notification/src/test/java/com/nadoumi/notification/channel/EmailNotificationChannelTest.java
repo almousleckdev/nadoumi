@@ -21,7 +21,7 @@ class EmailNotificationChannelTest {
     private final BrandProperties brand = new BrandProperties(
             "https://nadoumi.test", null, "Nadoumi",
             new BrandProperties.Contact(List.of("support@nadoumi.test"), List.of(), null, null),
-            new BrandProperties.Social(null, null, null), null);
+            new BrandProperties.Social(null, null, null, null), null);
     private final EmailNotificationChannel channel =
             new EmailNotificationChannel(mailSender, new EmailLayout(brand), brand);
 
