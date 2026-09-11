@@ -180,7 +180,7 @@ const eligibilityRows = computed(() => {
           </section>
 
           <p v-if="s.requiresFinancialProof || s.requiresFoundationYear" class="text-sm text-slate-600">
-            <span v-if="s.requiresFinancialProof" class="mr-3">• {{ t('scholarships.requiresFinancialProof') }}</span>
+            <span v-if="s.requiresFinancialProof" class="me-3">• {{ t('scholarships.requiresFinancialProof') }}</span>
             <span v-if="s.requiresFoundationYear">• {{ t('scholarships.requiresFoundationYear') }}</span>
           </p>
 

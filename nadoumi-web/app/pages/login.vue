@@ -57,7 +57,7 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
     </div>
     <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center text-sm text-slate-600">
       {{ t('auth.newToNadoumi') }}
-      <NuxtLink :to="localePath('/register')" class="ml-1 font-semibold text-brand-700 hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
+      <NuxtLink :to="localePath('/register')" class="ms-1 font-semibold text-brand-700 hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
     </div>
   </div>
 </template>

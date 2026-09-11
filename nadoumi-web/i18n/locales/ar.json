@@ -1,803 +1,1745 @@
 {
   "nav": {
-    "home": "Home",
-    "scholarships": "Scholarships",
-    "universities": "Universities",
-    "about": "About",
-    "contact": "Contact",
-    "signIn": "Sign in",
-    "getStarted": "Create profile",
-    "createAccount": "Create account",
-    "dashboard": "Dashboard",
-    "aria": "Primary navigation"
+    "home": "الرئيسية",
+    "scholarships": "المنح الدراسية",
+    "universities": "الجامعات",
+    "about": "من نحن",
+    "contact": "تواصل معنا",
+    "signIn": "تسجيل الدخول",
+    "getStarted": "إنشاء ملف تعريفي",
+    "createAccount": "إنشاء حساب",
+    "dashboard": "لوحة التحكم",
+    "aria": "التنقل الرئيسي"
   },
   "footer": {
-    "mission": "Nadoumi helps international students discover and secure study opportunities abroad.",
-    "explore": "Explore",
-    "company": "Company",
-    "getStarted": "Get started",
-    "privacy": "Privacy",
-    "terms": "Terms",
+    "mission": "تساعد Nadoumi الطلاب الدوليين على اكتشاف فرص الدراسة في الخارج والحصول عليها.",
+    "explore": "استكشف",
+    "company": "الشركة",
+    "getStarted": "ابدأ الآن",
+    "privacy": "الخصوصية",
+    "terms": "الشروط",
     "contactEmail": "support{'@'}nadoumi.com",
-    "rights": "Nadoumi. International education platform.",
-    "contactTitle": "Contact",
-    "contactForm": "Send a message",
-    "guides": "Guides"
+    "rights": "Nadoumi. منصة تعليم دولية.",
+    "contactTitle": "تواصل معنا",
+    "contactForm": "أرسل رسالة",
+    "guides": "الأدلة الإرشادية"
   },
   "common": {
-    "loading": "Loading",
-    "save": "Save",
-    "cancel": "Cancel",
-    "add": "Add",
-    "remove": "Remove",
-    "edit": "Edit",
-    "delete": "Delete",
-    "confirm": "Confirm",
-    "back": "Back",
-    "search": "Search",
-    "none": "Nothing here yet",
-    "retry": "Try again",
-    "signOut": "Sign out",
-    "nothingYet": "Nothing here yet.",
-    "yes": "Yes",
-    "no": "No",
+    "loading": "جارٍ التحميل",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "add": "إضافة",
+    "remove": "إزالة",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "confirm": "تأكيد",
+    "back": "رجوع",
+    "search": "بحث",
+    "none": "لا يوجد شيء هنا بعد",
+    "retry": "إعادة المحاولة",
+    "signOut": "تسجيل الخروج",
+    "nothingYet": "لا يوجد شيء هنا بعد.",
+    "yes": "نعم",
+    "no": "لا",
     "close": "إغلاق",
+    "dismiss": "تجاهل",
     "previous": "السابق",
-    "next": "التالي"
+    "next": "التالي",
+    "pagination": "ترقيم الصفحات",
+    "switchingLanguage": "جارٍ تغيير اللغة…"
   },
   "home": {
     "hero": {
-      "eyebrow": "International education platform",
-      "title": "Study abroad with a team that manages the whole journey",
-      "subtitle": "Discover universities and scholarships, build one applicant profile, and apply and track every step with Nadoumi.",
-      "ctaScholarships": "Explore scholarships",
-      "ctaUniversities": "Explore universities",
-      "searchLabel": "Search universities",
-      "searchPlaceholder": "Search a university by name or city",
-      "searchNote": "Searches the university catalogue. Scholarship search arrives with the Scholarship module."
+      "eyebrow": "منصة تعليم دولية",
+      "title": "ادرس في الخارج مع فريق يتولى الرحلة بأكملها",
+      "subtitle": "اكتشف الجامعات والمنح الدراسية، وأنشئ ملفًا تعريفيًا واحدًا للمتقدمين، وقدّم طلبك وتابع كل خطوة مع Nadoumi.",
+      "ctaScholarships": "استكشف المنح الدراسية",
+      "ctaUniversities": "استكشف الجامعات",
+      "searchLabel": "ابحث عن جامعة",
+      "searchPlaceholder": "ابحث عن جامعة بالاسم أو المدينة",
+      "searchNote": "يبحث هذا في دليل الجامعات. سيتوفر البحث عن المنح الدراسية مع وحدة المنح الدراسية."
     },
     "featuredUnis": {
-      "eyebrow": "Universities",
-      "title": "Featured universities",
-      "description": "Institutions Nadoumi is highlighting right now.",
-      "empty": "No featured universities are published yet."
+      "eyebrow": "الجامعات",
+      "title": "جامعات مميزة",
+      "description": "المؤسسات التي تبرزها Nadoumi حاليًا.",
+      "empty": "لا توجد جامعات مميزة منشورة بعد."
     },
     "recommendedUnis": {
-      "eyebrow": "Recommended by Nadoumi",
-      "title": "Recommended universities",
-      "description": "Where our advisers see strong outcomes for international students.",
-      "empty": "No recommended universities are published yet."
+      "eyebrow": "موصى بها من Nadoumi",
+      "title": "جامعات موصى بها",
+      "description": "الجامعات التي يرى مستشارونا فيها نتائج قوية للطلاب الدوليين.",
+      "empty": "لا توجد جامعات موصى بها منشورة بعد."
     },
     "story1": {
-      "eyebrow": "Discover",
-      "title": "Study where the world comes together",
-      "body": "Nadoumi works with universities across China, Malaysia and beyond. Browse each institution’s profile, campus, rankings and the programmes it offers before you commit."
+      "eyebrow": "اكتشف",
+      "title": "ادرس حيث يلتقي العالم",
+      "body": "تتعاون Nadoumi مع جامعات في الصين وماليزيا ووجهات أخرى. تصفّح الملف التعريفي لكل مؤسسة وحرمها الجامعي وتصنيفاتها والبرامج التي تقدمها قبل اتخاذ قرارك."
     },
     "story2": {
-      "eyebrow": "One profile, every application",
-      "title": "Built around your profile",
-      "body": "Add your details, education history and documents once. Nadoumi reuses them for every application, and each submission is kept as a historical record. Later profile edits never rewrite it."
+      "eyebrow": "ملف تعريفي واحد لكل طلب",
+      "title": "مصمم حول ملفك التعريفي",
+      "body": "أضف بياناتك ومسيرتك التعليمية ومستنداتك مرة واحدة. تعيد Nadoumi استخدامها في كل طلب، ويُحتفظ بكل طلب مُقدَّم كسجل تاريخي. لا تؤدي تعديلات الملف التعريفي اللاحقة إلى إعادة كتابته أبدًا."
     },
     "scholarshipDiscovery": {
-      "eyebrow": "Scholarships",
-      "title": "New and featured scholarships",
-      "description": "Search and filter scholarships by level, category, teaching language, intake, funding and more."
+      "eyebrow": "المنح الدراسية",
+      "title": "منح دراسية جديدة ومميزة",
+      "description": "ابحث عن المنح الدراسية وصفّها حسب المستوى الدراسي والفئة ولغة التدريس وموعد القبول والتمويل وغير ذلك."
     },
     "programDiscovery": {
-      "eyebrow": "Programmes",
-      "title": "Hot programmes and language courses",
-      "description": "Degree and language programmes, discovered through the university that offers them.",
-      "empty": "No programmes are featured yet."
+      "eyebrow": "البرامج",
+      "title": "برامج رائجة ودورات لغة",
+      "description": "برامج أكاديمية ودورات لغة، يمكنك اكتشافها من خلال الجامعة التي تقدمها.",
+      "empty": "لا توجد برامج مميزة بعد."
     },
     "partners": {
-      "eyebrow": "Partnerships",
-      "title": "Partner universities",
-      "description": "Institutions Nadoumi holds a direct working relationship with."
+      "eyebrow": "الشراكات",
+      "title": "الجامعات الشريكة",
+      "description": "المؤسسات التي تربطها بـ Nadoumi علاقة عمل مباشرة."
     },
     "arriving": {
-      "scholarships": "the Scholarship catalogue",
-      "programs": "the Programme catalogue",
-      "partnerships": "the Partnership module"
+      "scholarships": "دليل المنح الدراسية",
+      "programs": "دليل البرامج",
+      "partnerships": "وحدة الشراكات"
     },
     "journey": {
-      "eyebrow": "How it works",
-      "title": "Your journey with Nadoumi",
-      "description": "From your first application fee to your admission documents. Here is what to expect.",
-      "s1t": "Pay the application fee",
-      "s1b": "Start your application and settle the application fee to begin processing.",
-      "s2t": "Primary review",
-      "s2b": "Nadoumi checks your profile and documents against the opportunity’s requirements.",
-      "s3t": "University assignment",
-      "s3b": "Your case is matched and submitted to the university.",
-      "s4t": "Admission issued",
-      "s4b": "The university confirms your place and issues your admission letter.",
-      "s5t": "Pay the project fee",
-      "s5b": "Settle the remaining project and service fees to move to enrolment.",
-      "s6t": "JW202 issued",
-      "s6b": "Your visa documentation (JW202 / JW201) is prepared and released.",
-      "s7t": "Documents delivered",
-      "s7b": "Your admission and visa documents are couriered to you.",
-      "s8t": "Application successful",
-      "s8b": "You’re ready to travel and enrol. Nadoumi stays available through arrival."
+      "eyebrow": "كيف تسير العملية",
+      "title": "رحلتك مع Nadoumi",
+      "description": "من دفع رسوم طلبك الأولى إلى استلام مستندات قبولك، إليك ما يمكن توقعه.",
+      "s1t": "ادفع رسوم الطلب",
+      "s1b": "ابدأ طلبك وسدد رسوم الطلب لبدء المعالجة.",
+      "s2t": "المراجعة الأولية",
+      "s2b": "تتحقق Nadoumi من ملفك التعريفي ومستنداتك مقارنةً بمتطلبات الفرصة.",
+      "s3t": "تحديد الجامعة",
+      "s3b": "تتم مطابقة حالتك وإرسالها إلى الجامعة.",
+      "s4t": "صدور القبول",
+      "s4b": "تؤكد الجامعة مقعدك وتصدر خطاب القبول الخاص بك.",
+      "s5t": "ادفع رسوم المشروع",
+      "s5b": "سدد باقي رسوم المشروع والخدمة للانتقال إلى مرحلة التسجيل.",
+      "s6t": "صدور نموذج JW202",
+      "s6b": "يتم إعداد مستندات تأشيرتك (JW202 / JW201) وإصدارها.",
+      "s7t": "تسليم المستندات",
+      "s7b": "تُرسل إليك مستندات القبول والتأشيرة عبر خدمة البريد السريع.",
+      "s8t": "نجاح الطلب",
+      "s8b": "أنت الآن جاهز للسفر والتسجيل. تبقى Nadoumi متاحة لدعمك حتى بعد وصولك."
     },
     "cta": {
-      "eyebrow": "Ready when you are",
-      "title": "Start your international education with Nadoumi",
-      "body": "Create a free profile, explore your options, and apply with a team that runs the whole process.",
-      "apply": "Apply now",
-      "contact": "Contact us"
+      "eyebrow": "جاهزون عندما تكون جاهزًا",
+      "title": "ابدأ رحلتك التعليمية الدولية مع Nadoumi",
+      "body": "أنشئ ملفًا تعريفيًا مجانيًا، واستكشف خياراتك، وقدّم طلبك مع فريق يدير العملية بأكملها.",
+      "apply": "قدّم الآن",
+      "contact": "تواصل معنا"
     },
     "newScholarships": {
-      "eyebrow": "Scholarships",
-      "title": "New scholarships",
-      "description": "The latest opportunities published on Nadoumi.",
-      "empty": "No scholarships are published yet."
+      "eyebrow": "المنح الدراسية",
+      "title": "منح دراسية جديدة",
+      "description": "أحدث الفرص المنشورة على Nadoumi.",
+      "empty": "لا توجد منح دراسية منشورة بعد."
     },
     "fundedScholarships": {
-      "eyebrow": "Fully funded",
-      "title": "Fully funded scholarships",
-      "description": "Tuition, accommodation and a stipend covered.",
-      "empty": "No fully funded scholarships are published yet."
+      "eyebrow": "ممولة بالكامل",
+      "title": "منح دراسية ممولة بالكامل",
+      "description": "تشمل الرسوم الدراسية والسكن ومخصصًا شهريًا.",
+      "empty": "لا توجد منح دراسية ممولة بالكامل منشورة بعد."
     }
   },
   "about": {
-    "eyebrow": "About Nadoumi",
-    "title": "The team that runs your study-abroad journey",
-    "lead": "Nadoumi is an international education platform. We help students discover universities and scholarships, and we manage the application process end to end.",
-    "whoTitle": "Who we are",
-    "whoBody": "Nadoumi connects students with universities, programmes and scholarships across China, Malaysia and other destinations, and supports them through the whole application lifecycle: profile, documents, submission, decisions and enrolment.",
-    "whoBody2": "An account holder can manage applications for more than one student, so parents, relatives and advisers can work alongside the student they support.",
-    "missionTitle": "Our mission",
-    "missionBody": "Make international study accessible: help students find opportunities that fit, and carry the operational load of applying so they can focus on their studies.",
-    "visionTitle": "Our vision",
-    "visionBody": "A single trusted place where any student can discover, apply for and track an international education, with universities and partners on the other side of the same platform.",
-    "valuesTitle": "What we stand for",
-    "v1t": "Clarity for students",
-    "v1b": "Students see the information that matters to them. Internal partner and operational data never leaks into public views.",
-    "v2t": "Historical accuracy",
-    "v2b": "An application is a record of what was submitted, when. Later profile edits never rewrite a past submission.",
-    "v3t": "No invented data",
-    "v3b": "Numbers, universities, scholarships and rankings are shown only when they come from real records. Never mocked to fill space.",
-    "v4t": "One reusable profile",
-    "v4b": "Enter your details once. Nadoumi reuses them across every application and keeps you in control of them.",
-    "helpTitle": "How Nadoumi helps",
-    "h1": "Build a reusable applicant profile with your details, education and documents.",
-    "h2": "Discover universities, programmes and scholarships that fit your goals.",
-    "h3": "Apply for yourself or a student you represent. Nadoumi pre-fills what it knows.",
-    "h4": "Provide and track the documents each opportunity requires.",
-    "h5": "Receive decisions, complete payments and prepare for enrolment.",
-    "teamTitle": "The team behind Nadoumi",
-    "teamIntro": "Advisers, case officers and partnerships staff who run applications day to day.",
-    "teamPending": "Team profiles and photos to be supplied by Nadoumi.",
-    "contactTitle": "Get in touch",
-    "contactCta": "Go to the contact page",
-    "officeTitle": "Office",
-    "officePending": "Office address to be supplied by Nadoumi.",
-    "hoursTitle": "Working hours",
-    "hoursPending": "Working hours to be supplied by Nadoumi.",
-    "ctaTitle": "Start your international education with Nadoumi",
-    "ctaBody": "Create a free profile and explore your options, or reach out with a question.",
+    "eyebrow": "عن Nadoumi",
+    "title": "الفريق الذي يدير رحلتك للدراسة في الخارج",
+    "lead": "Nadoumi منصة تعليم دولية. نساعد الطلاب على اكتشاف الجامعات والمنح الدراسية، وندير عملية التقديم من البداية إلى النهاية.",
+    "whoTitle": "من نحن",
+    "whoBody": "تربط Nadoumi الطلاب بالجامعات والبرامج والمنح الدراسية في الصين وماليزيا ووجهات أخرى، وتدعمهم طوال دورة التقديم بأكملها: الملف التعريفي والمستندات والتقديم والقرارات والتسجيل.",
+    "whoBody2": "يمكن لصاحب الحساب إدارة طلبات أكثر من طالب واحد، بحيث يستطيع الأهل والأقارب والمستشارون العمل جنبًا إلى جنب مع الطالب الذي يدعمونه.",
+    "missionTitle": "مهمتنا",
+    "missionBody": "جعل التعليم الدولي في متناول الجميع: مساعدة الطلاب على إيجاد الفرص المناسبة لهم، وتحمل العبء التشغيلي للتقديم حتى يتمكنوا من التركيز على دراستهم.",
+    "visionTitle": "رؤيتنا",
+    "visionBody": "مكان واحد موثوق يمكن لأي طالب من خلاله اكتشاف تعليم دولي والتقديم له ومتابعته، مع وجود الجامعات والشركاء على المنصة ذاتها.",
+    "valuesTitle": "ما نؤمن به",
+    "v1t": "وضوح للطلاب",
+    "v1b": "يرى الطلاب المعلومات التي تهمهم فقط. لا تصل بيانات الشركاء الداخلية والتشغيلية أبدًا إلى الصفحات العامة.",
+    "v2t": "دقة تاريخية",
+    "v2b": "كل طلب هو سجل لما تم تقديمه ومتى تم تقديمه. لا تؤدي تعديلات الملف التعريفي اللاحقة إلى إعادة كتابة طلب سابق أبدًا.",
+    "v3t": "لا بيانات مُختلقة",
+    "v3b": "لا تُعرض الأرقام والجامعات والمنح الدراسية والتصنيفات إلا عندما تكون مستندة إلى سجلات حقيقية، ولا تُختلق أبدًا لملء المساحة.",
+    "v4t": "ملف تعريفي واحد قابل لإعادة الاستخدام",
+    "v4b": "أدخل بياناتك مرة واحدة. تعيد Nadoumi استخدامها في كل طلب وتبقى أنت المتحكم بها.",
+    "helpTitle": "كيف تساعدك Nadoumi",
+    "h1": "أنشئ ملفًا تعريفيًا قابلًا لإعادة الاستخدام يتضمن بياناتك ومسيرتك التعليمية ومستنداتك.",
+    "h2": "اكتشف الجامعات والبرامج والمنح الدراسية التي تناسب أهدافك.",
+    "h3": "قدّم لنفسك أو لطالب تمثّله. تملأ Nadoumi مسبقًا ما تعرفه بالفعل.",
+    "h4": "قدّم المستندات التي تتطلبها كل فرصة وتابع حالتها.",
+    "h5": "استلم القرارات وأكمل المدفوعات واستعد للتسجيل.",
+    "teamTitle": "الفريق وراء Nadoumi",
+    "teamIntro": "مستشارون ومسؤولو ملفات وفريق شراكات يديرون الطلبات يوميًا.",
+    "teamPending": "ستوفّر Nadoumi ملفات الفريق وصورهم لاحقًا.",
+    "contactTitle": "تواصل معنا",
+    "contactCta": "الانتقال إلى صفحة التواصل",
+    "officeTitle": "المكتب",
+    "officePending": "ستوفّر Nadoumi عنوان المكتب لاحقًا.",
+    "hoursTitle": "ساعات العمل",
+    "hoursPending": "ستوفّر Nadoumi ساعات العمل لاحقًا.",
+    "ctaTitle": "ابدأ رحلتك التعليمية الدولية مع Nadoumi",
+    "ctaBody": "أنشئ ملفًا تعريفيًا مجانيًا واستكشف خياراتك، أو تواصل معنا بسؤالك.",
     "team1name": "",
-    "team1role": "Founder & CEO",
+    "team1role": "المؤسس والرئيس التنفيذي",
     "team2name": "",
-    "team2role": "Head of Partnerships",
+    "team2role": "رئيس قسم الشراكات",
     "team3name": "",
-    "team3role": "Head of Student Success",
+    "team3role": "رئيس قسم نجاح الطلاب",
     "team4name": "",
-    "team4role": "Software Engineer"
+    "team4role": "مهندس برمجيات"
   },
   "contact": {
-    "title": "Contact",
-    "lead": "Questions about applications, scholarships or partner universities? Send us a message and the team will get back to you.",
-    "emailTitle": "Email",
-    "responseNote": "We usually reply within two business days.",
-    "officeTitle": "Office",
-    "officePending": "Office address to be supplied.",
-    "hoursTitle": "Working hours",
-    "hoursPending": "Working hours to be supplied.",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "email": "Email",
-    "phone": "Phone",
-    "optional": "Optional",
-    "category": "Topic",
-    "categoryPlaceholder": "Choose a topic",
+    "title": "تواصل معنا",
+    "lead": "لديك أسئلة حول الطلبات أو المنح الدراسية أو الجامعات الشريكة؟ أرسل لنا رسالة وسيتواصل معك الفريق.",
+    "emailTitle": "البريد الإلكتروني",
+    "responseNote": "نرد عادةً خلال يومي عمل.",
+    "officeTitle": "المكتب",
+    "officePending": "سيتم توفير عنوان المكتب لاحقًا.",
+    "hoursTitle": "ساعات العمل",
+    "hoursPending": "سيتم توفير ساعات العمل لاحقًا.",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "optional": "اختياري",
+    "category": "الموضوع",
+    "categoryPlaceholder": "اختر موضوعًا",
     "cat": {
-      "GENERAL": "General enquiry",
-      "SCHOLARSHIPS": "Scholarships",
-      "UNIVERSITIES": "Universities",
-      "APPLICATIONS": "My application",
-      "PARTNERSHIPS": "Partnerships",
-      "OTHER": "Something else"
+      "GENERAL": "استفسار عام",
+      "SCHOLARSHIPS": "المنح الدراسية",
+      "UNIVERSITIES": "الجامعات",
+      "APPLICATIONS": "طلبي",
+      "PARTNERSHIPS": "الشراكات",
+      "OTHER": "أمر آخر"
     },
-    "subject": "Subject",
-    "message": "Message",
-    "submit": "Send message",
-    "sending": "Sending…",
-    "successTitle": "Message sent",
-    "sent": "Thanks, we’ll be in touch.",
-    "errorTitle": "Message not sent",
-    "errorBody": "Something went wrong sending your message. Please try again in a moment.",
-    "phoneTitle": "Phone"
+    "subject": "العنوان",
+    "message": "الرسالة",
+    "submit": "إرسال الرسالة",
+    "sending": "جارٍ الإرسال…",
+    "successTitle": "تم إرسال الرسالة",
+    "sent": "شكرًا لك، سنتواصل معك قريبًا.",
+    "errorTitle": "تعذّر إرسال الرسالة",
+    "errorBody": "حدث خطأ أثناء إرسال رسالتك. يرجى المحاولة مرة أخرى بعد قليل.",
+    "phoneTitle": "الهاتف"
   },
   "catalog": {
-    "scholarshipsTitle": "Scholarships",
-    "scholarshipsSubtitle": "Funding opportunities across our destination countries.",
-    "universitiesTitle": "Universities",
-    "universitiesSubtitle": "Institutions in the Nadoumi catalogue.",
-    "programsTitle": "Programs",
-    "programsSubtitle": "Degree programmes and intakes.",
-    "empty": "This catalogue isn't available yet. Check back soon.",
-    "emptyDetail": "We're still building this section.",
-    "rollingDeadline": "Rolling deadline",
-    "deadline": "Deadline {date}",
-    "backToList": "Back to list",
-    "featured": "Featured",
-    "typePublic": "Public",
-    "typePrivate": "Private",
-    "viewUniversity": "View university",
-    "viewAllUniversities": "View all universities",
-    "anyType": "Any type",
-    "country": "Country",
-    "province": "Province",
-    "city": "City",
-    "recommendedShort": "Recommended",
-    "resultCount": "{n} results",
-    "searchUniversities": "Search universities",
-    "searchUniversitiesPlaceholder": "University name or city",
-    "clearFilters": "Clear filters",
-    "noResultsTitle": "No matches",
-    "noResultsBody": "Try removing a filter or searching for something broader.",
-    "noUniversitiesTitle": "No universities yet",
-    "noUniversitiesBody": "Published universities will appear here as the catalogue grows.",
-    "allUniversities": "All universities",
-    "universityFallbackTitle": "University",
-    "universityUnavailable": "This university is not available."
+    "scholarshipsTitle": "المنح الدراسية",
+    "scholarshipsSubtitle": "فرص تمويل في دول وجهاتنا.",
+    "universitiesTitle": "الجامعات",
+    "universitiesSubtitle": "المؤسسات المدرجة في دليل Nadoumi.",
+    "programsTitle": "البرامج",
+    "programsSubtitle": "البرامج الأكاديمية ومواعيد القبول.",
+    "empty": "هذا الدليل غير متاح بعد. يرجى العودة قريبًا.",
+    "emptyDetail": "لا نزال نعمل على بناء هذا القسم.",
+    "rollingDeadline": "قبول مستمر",
+    "deadline": "الموعد النهائي {date}",
+    "backToList": "العودة إلى القائمة",
+    "featured": "مميزة",
+    "typePublic": "عامة",
+    "typePrivate": "خاصة",
+    "viewUniversity": "عرض الجامعة",
+    "viewAllUniversities": "عرض جميع الجامعات",
+    "anyType": "أي نوع",
+    "country": "الدولة",
+    "province": "المحافظة",
+    "city": "المدينة",
+    "recommendedShort": "موصى بها",
+    "resultCount": "{n} نتيجة",
+    "searchUniversities": "ابحث عن جامعات",
+    "searchUniversitiesPlaceholder": "اسم الجامعة أو المدينة",
+    "clearFilters": "مسح عوامل التصفية",
+    "noResultsTitle": "لا توجد نتائج مطابقة",
+    "noResultsBody": "جرّب إزالة أحد عوامل التصفية أو البحث بكلمة أوسع.",
+    "noUniversitiesTitle": "لا توجد جامعات بعد",
+    "noUniversitiesBody": "ستظهر الجامعات المنشورة هنا مع نمو الدليل.",
+    "allUniversities": "جميع الجامعات",
+    "universityFallbackTitle": "جامعة",
+    "universityUnavailable": "هذه الجامعة غير متاحة."
   },
   "auth": {
-    "loginTitle": "Sign in",
-    "registerTitle": "Create your profile",
-    "fullName": "Full name",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "username": "Username",
-    "usernameHint": "2–20 characters, used to sign in",
-    "passportNameHint": "Enter your name exactly as it appears on your passport.",
-    "step1Title": "Your details",
-    "step2Title": "Set a password",
-    "next": "Next",
-    "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm password",
-    "passwordHint": "5–20 characters",
-    "captcha": "Enter the code shown",
-    "captchaReload": "Reload image",
-    "acceptTerms": "I agree to the {terms} and {privacy}.",
-    "submitLogin": "Sign in",
-    "submitRegister": "Create profile",
-    "toRegister": "New to Nadoumi? Create a profile",
-    "toLogin": "Already have an account? Sign in",
-    "forgot": "Forgot your password?",
-    "forgotTitle": "Password help",
-    "forgotBody": "Password reset isn't self-service yet. Email support{'@'}nadoumi.com from your registered address and we'll help you back in.",
-    "genericError": "Something went wrong. Please check your details and try again.",
-    "passwordMismatch": "Passwords do not match.",
+    "loginTitle": "تسجيل الدخول",
+    "registerTitle": "أنشئ ملفك التعريفي",
+    "fullName": "الاسم الكامل",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "username": "اسم المستخدم",
+    "usernameHint": "من 2 إلى 20 حرفًا، يُستخدم لتسجيل الدخول",
+    "passportNameHint": "أدخل اسمك تمامًا كما يظهر في جواز سفرك.",
+    "step1Title": "بياناتك",
+    "step2Title": "تعيين كلمة مرور",
+    "next": "التالي",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "passwordHint": "من 5 إلى 20 حرفًا",
+    "captcha": "أدخل الرمز الظاهر",
+    "captchaReload": "تحديث الصورة",
+    "acceptTerms": "أوافق على {terms} و{privacy}.",
+    "submitLogin": "تسجيل الدخول",
+    "submitRegister": "إنشاء الملف التعريفي",
+    "toRegister": "جديد على Nadoumi؟ أنشئ ملفًا تعريفيًا",
+    "toLogin": "لديك حساب بالفعل؟ سجّل الدخول",
+    "forgot": "هل نسيت كلمة المرور؟",
+    "forgotTitle": "المساعدة في كلمة المرور",
+    "forgotBody": "إعادة تعيين كلمة المرور ليست متاحة بشكل ذاتي حتى الآن. راسلنا على support{'@'}nadoumi.com من عنوان بريدك المسجّل وسنساعدك على استعادة الدخول.",
+    "genericError": "حدث خطأ ما. يرجى التحقق من بياناتك والمحاولة مرة أخرى.",
+    "passwordMismatch": "كلمتا المرور غير متطابقتين.",
     "otp": {
-      "verify": "Verify",
-      "sent": "We sent a 6-digit code to {email}. Enter it below.",
-      "resend": "Resend code",
-      "resendIn": "Resend in {n}s",
-      "verified": "Email verified",
-      "badCode": "That code is invalid or expired.",
-      "groupLabel": "Enter the {n}-digit verification code",
-      "digitLabel": "Digit {i} of {n}",
-      "editEmail": "Edit email",
-      "emailLabel": "Code sent to",
-      "attemptsLeft": "{n} attempts remaining",
-      "verifying": "Verifying…",
-      "resentNote": "A new code is on its way.",
-      "throttledNote": "We already sent a code. Check your inbox and spam. You can request another shortly."
+      "verify": "تحقّق",
+      "sent": "أرسلنا رمزًا مكونًا من 6 أرقام إلى {email}. أدخله أدناه.",
+      "resend": "إعادة إرسال الرمز",
+      "resendIn": "يمكن إعادة الإرسال خلال {n} ثانية",
+      "verified": "تم التحقق من البريد الإلكتروني",
+      "badCode": "هذا الرمز غير صالح أو منتهي الصلاحية.",
+      "groupLabel": "أدخل رمز التحقق المكون من {n} أرقام",
+      "digitLabel": "الرقم {i} من {n}",
+      "editEmail": "تعديل البريد الإلكتروني",
+      "emailLabel": "أُرسل الرمز إلى",
+      "attemptsLeft": "تبقّى {n} محاولات",
+      "verifying": "جارٍ التحقق…",
+      "resentNote": "رمز جديد في الطريق إليك.",
+      "throttledNote": "لقد أرسلنا رمزًا بالفعل. تحقق من صندوق الوارد ومجلد الرسائل غير المرغوب فيها. يمكنك طلب رمز آخر قريبًا."
     },
     "reset": {
-      "title": "Reset password",
-      "newPassword": "New password",
-      "done": "Your password has been reset. You can now sign in with your new password.",
-      "toLogin": "Go to sign in"
+      "title": "إعادة تعيين كلمة المرور",
+      "newPassword": "كلمة المرور الجديدة",
+      "done": "تمت إعادة تعيين كلمة مرورك. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
+      "toLogin": "الانتقال إلى تسجيل الدخول"
     },
-    "acceptTermsShort": "I agree to the {terms}",
-    "acceptPrivacyShort": "I agree to the {privacy}",
-    "consentRequired": "Please accept the Terms and the Privacy Policy to continue.",
-    "showPassword": "Show password",
-    "hidePassword": "Hide password",
-    "pwStrong": "Strong password",
-    "pwRequirements": "Your password needs:",
-    "acceptBothShort": "I agree to the {terms} and the {privacy}",
-    "step3Title": "Set a password",
+    "acceptTermsShort": "أوافق على {terms}",
+    "acceptPrivacyShort": "أوافق على {privacy}",
+    "consentRequired": "يرجى الموافقة على الشروط وسياسة الخصوصية للمتابعة.",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "pwStrong": "كلمة مرور قوية",
+    "pwRequirements": "يجب أن تحتوي كلمة مرورك على:",
+    "acceptBothShort": "أوافق على {terms} و{privacy}",
+    "step3Title": "تعيين كلمة مرور",
     "registerStep": {
-      "personal": "Personal",
-      "verify": "Verify",
-      "password": "Password"
+      "personal": "البيانات الشخصية",
+      "verify": "التحقق",
+      "password": "كلمة المرور"
     },
-    "newToNadoumi": "New to Nadoumi?",
-    "createProfile": "Create a profile"
+    "newToNadoumi": "جديد على Nadoumi؟",
+    "createProfile": "إنشاء ملف تعريفي"
   },
   "dashboard": {
     "nav": {
-      "overview": "Overview",
-      "profile": "Profile",
-      "education": "Education",
-      "testScores": "Test scores",
-      "contacts": "Contacts",
-      "account": "Account"
+      "overview": "نظرة عامة",
+      "profile": "الملف التعريفي",
+      "education": "التعليم",
+      "testScores": "نتائج الاختبارات",
+      "contacts": "جهات الاتصال",
+      "account": "الحساب"
     },
-    "welcome": "Welcome, {name}",
-    "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
-    "completeness": "Profile completeness",
-    "quickProfile": "Edit profile",
-    "quickEducation": "Add education",
-    "applicantLabel": "Applicant",
-    "switchApplicant": "Switch applicant",
-    "profileTitle": "Applicant profile",
-    "createProfileTitle": "Create your applicant profile",
-    "createProfileBlurb": "Tell us who the application is about. You can edit this any time.",
-    "givenName": "Given name",
-    "familyName": "Family name",
-    "dob": "Date of birth",
-    "nationality": "Nationality (ISO alpha-2)",
-    "passportNo": "Passport number",
-    "phone": "Phone",
-    "eduTitle": "Education history",
-    "eduEmpty": "No education entries yet.",
-    "institution": "Institution",
-    "level": "Level",
-    "field": "Field of study",
-    "gpa": "GPA",
-    "gpaScale": "GPA scale",
-    "startDate": "Start date",
-    "endDate": "End date",
-    "testTitle": "Test scores",
-    "testEmpty": "No test scores yet.",
-    "testType": "Test",
-    "score": "Score",
-    "takenOn": "Taken on",
-    "expiresOn": "Expires on",
-    "contactsTitle": "Contacts",
-    "contactsEmpty": "No contacts yet.",
-    "relation": "Relationship",
-    "contactName": "Name",
-    "relationGUARDIAN": "Guardian",
-    "relationEMERGENCY": "Emergency",
-    "relationOTHER": "Other",
-    "accountTitle": "Account",
-    "accountUser": "Signed in as",
-    "changePassword": "Change password",
-    "pwCurrent": "Current password",
-    "pwNew": "New password",
-    "pwConfirm": "Confirm new password",
-    "pwUpdated": "Password updated.",
-    "pwOtherSessionsEnded": "You have been signed out on your other devices.",
-    "onboardingProgress": "Onboarding progress",
-    "comingSoon": "This area activates once applications are open.",
-    "sectionApplications": "Applications",
-    "sectionActivity": "Recent activity",
-    "sectionNotifications": "Notifications",
-    "savedOk": "Saved",
-    "addedOk": "Added",
-    "removedOk": "Removed",
-    "removeConfirm": "Remove this entry?"
+    "welcome": "مرحبًا، {name}",
+    "overviewBlurb": "أكمل ملفك التعريفي كمتقدم حتى يتمكن الفريق من البدء في مطابقتك بالفرص المناسبة.",
+    "completeness": "نسبة اكتمال الملف التعريفي",
+    "quickProfile": "تعديل الملف التعريفي",
+    "quickEducation": "إضافة مؤهل تعليمي",
+    "applicantLabel": "المتقدم",
+    "switchApplicant": "تبديل المتقدم",
+    "profileTitle": "الملف التعريفي للمتقدم",
+    "createProfileTitle": "أنشئ ملفك التعريفي كمتقدم",
+    "createProfileBlurb": "أخبرنا عن الشخص المقصود بهذا الطلب. يمكنك تعديل ذلك في أي وقت.",
+    "givenName": "الاسم الأول",
+    "familyName": "اسم العائلة",
+    "dob": "تاريخ الميلاد",
+    "nationality": "الجنسية (رمز آيزو من حرفين)",
+    "passportNo": "رقم جواز السفر",
+    "phone": "رقم الهاتف",
+    "eduTitle": "المسيرة التعليمية",
+    "eduEmpty": "لا توجد مؤهلات تعليمية مضافة بعد.",
+    "institution": "المؤسسة التعليمية",
+    "level": "المستوى",
+    "field": "مجال الدراسة",
+    "gpa": "المعدل التراكمي (GPA)",
+    "gpaScale": "مقياس المعدل التراكمي",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء",
+    "testTitle": "نتائج الاختبارات",
+    "testEmpty": "لا توجد نتائج اختبارات بعد.",
+    "testType": "نوع الاختبار",
+    "score": "الدرجة",
+    "takenOn": "تاريخ الاختبار",
+    "expiresOn": "تاريخ الانتهاء",
+    "contactsTitle": "جهات الاتصال",
+    "contactsEmpty": "لا توجد جهات اتصال بعد.",
+    "relation": "صلة القرابة",
+    "contactName": "الاسم",
+    "relationGUARDIAN": "ولي الأمر",
+    "relationEMERGENCY": "للطوارئ",
+    "relationOTHER": "أخرى",
+    "accountTitle": "الحساب",
+    "accountUser": "مسجّل الدخول باسم",
+    "changePassword": "تغيير كلمة المرور",
+    "pwCurrent": "كلمة المرور الحالية",
+    "pwNew": "كلمة المرور الجديدة",
+    "pwConfirm": "تأكيد كلمة المرور الجديدة",
+    "pwUpdated": "تم تحديث كلمة المرور.",
+    "pwOtherSessionsEnded": "تم تسجيل خروجك من أجهزتك الأخرى.",
+    "onboardingProgress": "تقدّم إعداد الملف التعريفي",
+    "comingSoon": "يُفعَّل هذا القسم فور فتح باب التقديم.",
+    "sectionApplications": "الطلبات",
+    "sectionActivity": "النشاط الأخير",
+    "sectionNotifications": "الإشعارات",
+    "savedOk": "تم الحفظ",
+    "addedOk": "تمت الإضافة",
+    "removedOk": "تمت الإزالة",
+    "removeConfirm": "هل تريد إزالة هذا العنصر؟"
   },
   "validation": {
-    "required": "This field is required.",
-    "email": "Enter a valid email address.",
-    "min": "Must be at least {n} characters.",
-    "max": "Must be at most {n} characters.",
-    "len2": "Use the 2-letter country code.",
+    "required": "هذا الحقل مطلوب.",
+    "email": "أدخل عنوان بريد إلكتروني صالحًا.",
+    "min": "يجب ألا يقل عن {n} أحرف.",
+    "max": "يجب ألا يزيد عن {n} أحرف.",
+    "len2": "استخدم رمز الدولة المكون من حرفين.",
     "password": {
-      "tooShort": "Use at least 8 characters.",
-      "tooLong": "Use at most 32 characters.",
-      "needUpper": "Add an uppercase letter.",
-      "needLower": "Add a lowercase letter.",
-      "needDigit": "Add a number.",
-      "needSpecial": "Add a special character.",
-      "sameAsCurrent": "Choose a password different from your current one.",
-      "length": "8–32 characters",
-      "noPersonal": "Doesn't contain your name or email",
-      "mismatch": "Passwords do not match."
+      "tooShort": "استخدم 8 أحرف على الأقل.",
+      "tooLong": "استخدم 32 حرفًا على الأكثر.",
+      "needUpper": "أضف حرفًا كبيرًا.",
+      "needLower": "أضف حرفًا صغيرًا.",
+      "needDigit": "أضف رقمًا.",
+      "needSpecial": "أضف رمزًا خاصًا.",
+      "sameAsCurrent": "اختر كلمة مرور مختلفة عن كلمة مرورك الحالية.",
+      "length": "من 8 إلى 32 حرفًا",
+      "noPersonal": "لا تحتوي على اسمك أو بريدك الإلكتروني",
+      "mismatch": "كلمتا المرور غير متطابقتين."
     }
   },
   "errors": {
-    "network": "Can't reach the server. Check your connection and try again.",
-    "server": "Something went wrong on our side. Please try again shortly.",
-    "rateLimited": "Too many attempts. Please wait a minute and try again.",
-    "generic": "Something went wrong. Please try again.",
-    "validation": "Please check the highlighted fields and try again.",
-    "emailTaken": "An account with this email already exists. Try signing in instead.",
-    "badCredentials": "Email or password is incorrect.",
-    "currentPasswordWrong": "Your current password is incorrect.",
-    "otpInvalid": "That verification code is invalid or has expired. Request a new one.",
-    "otpExpired": "Your verification session has expired. Please start again.",
-    "otpEmailMismatch": "The verification doesn't match this email address.",
-    "captcha": "The captcha answer was incorrect. Please try again.",
-    "registrationDisabled": "Registration is currently closed.",
-    "invalidEmail": "Enter a valid email address.",
-    "loadSection": "This section could not be loaded. Please refresh."
+    "network": "تعذّر الوصول إلى الخادم. تحقق من اتصالك وحاول مرة أخرى.",
+    "server": "حدث خطأ من جانبنا. يرجى المحاولة مرة أخرى بعد قليل.",
+    "rateLimited": "محاولات كثيرة جدًا. يرجى الانتظار دقيقة ثم المحاولة مرة أخرى.",
+    "generic": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "validation": "يرجى مراجعة الحقول المُبرزة والمحاولة مرة أخرى.",
+    "emailTaken": "يوجد حساب بهذا البريد الإلكتروني بالفعل. جرّب تسجيل الدخول بدلًا من ذلك.",
+    "badCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    "currentPasswordWrong": "كلمة مرورك الحالية غير صحيحة.",
+    "otpInvalid": "رمز التحقق غير صالح أو منتهي الصلاحية. اطلب رمزًا جديدًا.",
+    "otpExpired": "انتهت صلاحية جلسة التحقق. يرجى البدء من جديد.",
+    "otpEmailMismatch": "لا يتطابق التحقق مع عنوان البريد الإلكتروني هذا.",
+    "captcha": "إجابة رمز التحقق كانت غير صحيحة. يرجى المحاولة مرة أخرى.",
+    "registrationDisabled": "التسجيل مغلق حاليًا.",
+    "invalidEmail": "أدخل عنوان بريد إلكتروني صالحًا.",
+    "loadSection": "تعذّر تحميل هذا القسم. يرجى تحديث الصفحة."
   },
   "legal": {
-    "draftNote": "Draft. Placeholder text pending legal review.",
-    "privacyTitle": "Privacy Policy",
-    "privacyIntro": "This page explains what personal data Nadoumi collects and how it is used.",
-    "privacyBody": "Nadoumi processes the information you provide to build your applicant profile and submit applications on your behalf. Data is stored securely and shared only with the universities and partners involved in your applications.",
-    "termsTitle": "Terms of Service",
-    "termsIntro": "These terms govern your use of the Nadoumi platform.",
-    "termsBody": "By creating an account you agree to provide accurate information and to use the platform only for legitimate education applications. Nadoumi may update these terms; material changes will be notified.",
-    "contactLine": "Questions? Reach us via the contact page."
+    "draftNote": "مسودة. نص مؤقت في انتظار المراجعة القانونية.",
+    "privacyTitle": "سياسة الخصوصية",
+    "privacyIntro": "توضح هذه الصفحة البيانات الشخصية التي تجمعها Nadoumi وكيفية استخدامها.",
+    "privacyBody": "تعالج Nadoumi المعلومات التي تقدّمها لإنشاء ملفك التعريفي كمتقدم وتقديم الطلبات نيابةً عنك. تُخزَّن البيانات بأمان ولا تُشارَك إلا مع الجامعات والشركاء المعنيين بطلباتك.",
+    "termsTitle": "شروط الخدمة",
+    "termsIntro": "تحكم هذه الشروط استخدامك لمنصة Nadoumi.",
+    "termsBody": "بإنشائك حسابًا، فإنك توافق على تقديم معلومات دقيقة واستخدام المنصة فقط لطلبات التعليم المشروعة. يجوز لـ Nadoumi تحديث هذه الشروط، وسيتم إخطارك بأي تغييرات جوهرية.",
+    "contactLine": "لديك أسئلة؟ تواصل معنا عبر صفحة التواصل."
   },
   "onboarding": {
-    "title": "Set up your profile",
-    "intro": "A few steps to get your applicant profile ready. You can come back and edit any section later.",
-    "progress": "Step {n} of {total}",
-    "next": "Next",
-    "back": "Back",
-    "finish": "Finish",
-    "skip": "Skip for now",
-    "saved": "Saved",
-    "saving": "Saving…",
-    "legendRequired": "Required",
-    "legendRecommended": "Recommended",
-    "legendOptional": "Optional",
-    "comingSoon": "Coming soon. This section is shown for reference and is not saved yet.",
+    "title": "أعدّ ملفك التعريفي",
+    "intro": "بضع خطوات لتجهيز ملفك التعريفي كمتقدم. يمكنك العودة لاحقًا وتعديل أي قسم.",
+    "progress": "الخطوة {n} من {total}",
+    "next": "التالي",
+    "back": "رجوع",
+    "finish": "إنهاء",
+    "skip": "تخطَّ هذا حاليًا",
+    "saved": "تم الحفظ",
+    "saving": "جارٍ الحفظ…",
+    "legendRequired": "مطلوب",
+    "legendRecommended": "موصى به",
+    "legendOptional": "اختياري",
+    "comingSoon": "قريبًا. يُعرض هذا القسم للاطلاع فقط ولا يُحفظ بعد.",
     "steps": {
-      "personal": "Personal",
-      "identity": "Identity",
-      "education": "Education",
-      "interests": "Interests",
-      "location": "Location",
-      "contact": "Contact",
-      "review": "Review"
+      "personal": "البيانات الشخصية",
+      "identity": "الهوية",
+      "education": "التعليم",
+      "interests": "الاهتمامات",
+      "location": "الموقع",
+      "contact": "جهة الاتصال",
+      "review": "المراجعة"
     },
     "personal": {
-      "title": "Personal information",
-      "blurb": "Your name as it appears on your passport."
+      "title": "المعلومات الشخصية",
+      "blurb": "اسمك كما يظهر في جواز سفرك."
     },
     "identity": {
-      "title": "Identity",
-      "blurb": "Passport and nationality details for your applications.",
-      "extras": "Gender, country of residence and preferred contact language will be added here."
+      "title": "الهوية",
+      "blurb": "تفاصيل جواز السفر والجنسية اللازمة لطلباتك.",
+      "extras": "سيُضاف هنا الجنس وبلد الإقامة ولغة التواصل المفضّلة."
     },
     "education": {
-      "title": "Education history",
-      "blurb": "Add each institution you have attended."
+      "title": "المسيرة التعليمية",
+      "blurb": "أضف كل مؤسسة درست فيها."
     },
     "interests": {
-      "title": "Study interests",
-      "blurb": "What and where you want to study."
+      "title": "اهتماماتك الدراسية",
+      "blurb": "ما الذي تريد دراسته وأين."
     },
     "location": {
-      "title": "Current location",
-      "blurb": "Where you are now. This affects visa and logistics guidance."
+      "title": "موقعك الحالي",
+      "blurb": "المكان الذي تتواجد فيه الآن. يؤثر هذا على إرشادات التأشيرة واللوجستيات."
     },
     "contact": {
-      "title": "Guardian / emergency contact",
-      "blurb": "Someone we can reach if we cannot reach you."
+      "title": "ولي الأمر / جهة اتصال الطوارئ",
+      "blurb": "شخص يمكننا التواصل معه إذا تعذّر التواصل معك."
     },
     "review": {
-      "title": "Review",
-      "blurb": "Check what you have entered, then finish.",
-      "done": "Profile set up. You can refine any section from the dashboard."
+      "title": "المراجعة",
+      "blurb": "راجع ما أدخلته ثم أنهِ العملية.",
+      "done": "تم إعداد الملف التعريفي. يمكنك تعديل أي قسم في أي وقت من لوحة التحكم."
     },
     "badge": {
-      "plannedBackend": "Coming soon"
+      "plannedBackend": "قريبًا"
     },
     "crop": {
-      "zoom": "Zoom",
-      "rotate": "Rotate",
-      "reset": "Reset",
-      "apply": "Use this crop"
+      "zoom": "تكبير",
+      "rotate": "تدوير",
+      "reset": "إعادة تعيين",
+      "apply": "استخدام هذا القص"
     },
     "doc": {
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
-      "fit": "Fit",
-      "previewAlt": "Uploaded document"
+      "zoomIn": "تكبير",
+      "zoomOut": "تصغير",
+      "fit": "ملاءمة",
+      "previewAlt": "المستند المرفوع"
     },
     "photo": {
-      "title": "Profile photo",
-      "guidance": "Face centred, plain background, even lighting. JPEG, PNG or WebP, up to 5 MB, at least 400x400.",
-      "none": "No photo",
-      "tooSmall": "Image must be at least {px}x{px} pixels."
+      "title": "صورة الملف التعريفي",
+      "guidance": "الوجه في المنتصف، خلفية بسيطة، إضاءة متساوية. بصيغة JPEG أو PNG أو WebP، بحجم لا يتجاوز 5 ميغابايت، وبأبعاد 400×400 على الأقل.",
+      "none": "لا توجد صورة",
+      "tooSmall": "يجب أن تكون أبعاد الصورة {px}×{px} بكسل على الأقل."
     },
     "passport": {
-      "title": "Passport",
-      "guidance": "Upload a clear photo or scan of your passport photo page. The details must be readable.",
-      "none": "No passport uploaded",
-      "confirmReadable": "I confirm the passport details are clearly readable.",
-      "formats": "JPEG, PNG or PDF, up to 10 MB"
+      "title": "جواز السفر",
+      "guidance": "ارفع صورة أو نسخة ممسوحة واضحة لصفحة الصورة في جواز سفرك. يجب أن تكون التفاصيل واضحة للقراءة.",
+      "none": "لم يُرفع جواز سفر",
+      "confirmReadable": "أؤكد أن تفاصيل جواز السفر واضحة للقراءة تمامًا.",
+      "formats": "بصيغة JPEG أو PNG أو PDF، بحجم لا يتجاوز 10 ميغابايت"
     },
     "upload": {
-      "choose": "Choose file",
-      "replace": "Replace",
-      "remove": "Remove",
-      "save": "Upload",
-      "notYet": "Uploading will be available once document storage is enabled.",
-      "badType": "Choose a JPEG, PNG or WebP image.",
-      "badTypePassport": "Choose a JPEG, PNG or PDF file.",
-      "tooBig": "File is larger than {mb} MB."
+      "choose": "اختيار ملف",
+      "replace": "استبدال",
+      "remove": "إزالة",
+      "save": "رفع",
+      "notYet": "سيتوفر الرفع بمجرد تفعيل تخزين المستندات.",
+      "badType": "اختر صورة بصيغة JPEG أو PNG أو WebP.",
+      "badTypePassport": "اختر ملفًا بصيغة JPEG أو PNG أو PDF.",
+      "tooBig": "حجم الملف أكبر من {mb} ميغابايت."
     }
   },
   "university": {
-    "founded": "Founded",
-    "students": "Students",
-    "intlStudents": "International students",
-    "faculty": "Faculty",
-    "rankingTier": "Ranking tier",
-    "introduction": "Introduction",
-    "history": "History",
-    "campus": "Campus & facilities",
-    "accommodation": "Accommodation",
-    "nearby": "The area",
-    "highlights": "Highlights",
-    "advantages": "Advantages",
-    "programmes": "Programmes",
-    "programmesEmpty": "No programmes are listed for this university yet.",
-    "gallery": "Gallery",
-    "galleryArriving": "Arriving with document storage",
-    "rankings": "Rankings",
-    "contact": "Official contact",
-    "website": "Official website",
-    "admissionsEmail": "Admissions",
-    "officePhone": "Phone"
+    "founded": "تأسست عام",
+    "students": "عدد الطلاب",
+    "intlStudents": "الطلاب الدوليون",
+    "faculty": "أعضاء هيئة التدريس",
+    "rankingTier": "مستوى التصنيف",
+    "introduction": "نبذة تعريفية",
+    "history": "التاريخ",
+    "campus": "الحرم الجامعي والمرافق",
+    "accommodation": "السكن",
+    "nearby": "المنطقة المحيطة",
+    "highlights": "أبرز المزايا",
+    "advantages": "المزايا",
+    "programmes": "البرامج",
+    "programmesEmpty": "لا توجد برامج مدرجة لهذه الجامعة بعد.",
+    "gallery": "معرض الصور",
+    "galleryArriving": "متاح مع تفعيل تخزين المستندات",
+    "rankings": "التصنيفات",
+    "contact": "جهة الاتصال الرسمية",
+    "website": "الموقع الرسمي",
+    "admissionsEmail": "القبول والتسجيل",
+    "officePhone": "الهاتف"
   },
   "program": {
-    "fallbackTitle": "Programme",
-    "notAvailable": "This programme is not available.",
-    "offeredBy": "Offered by {university}",
-    "backToUniversity": "Back to {university}",
-    "view": "View programme",
-    "hot": "Hot",
-    "duration": "{months} months",
-    "durationLabel": "Duration",
-    "tuition": "Tuition",
-    "field": "Field of study",
-    "language": "Teaching language",
-    "majors": "Majors",
-    "intakes": "Intakes",
-    "applyWindow": "{open} to {close}",
-    "applyFrom": "Opens {open}",
-    "applyUntil": "Closes {close}",
-    "sectionTitle": "Programmes",
-    "sectionIntro": "Courses of study offered by this university, each with its intakes and majors.",
+    "fallbackTitle": "برنامج",
+    "notAvailable": "هذا البرنامج غير متاح.",
+    "offeredBy": "تقدّمه {university}",
+    "backToUniversity": "العودة إلى {university}",
+    "view": "عرض البرنامج",
+    "hot": "رائج",
+    "duration": "{months} أشهر",
+    "durationLabel": "المدة",
+    "tuition": "الرسوم الدراسية",
+    "field": "مجال الدراسة",
+    "language": "لغة التدريس",
+    "majors": "التخصصات",
+    "intakes": "مواعيد القبول",
+    "applyWindow": "من {open} إلى {close}",
+    "applyFrom": "يفتح في {open}",
+    "applyUntil": "يُغلق في {close}",
+    "sectionTitle": "البرامج",
+    "sectionIntro": "برامج الدراسة التي تقدمها هذه الجامعة، مع مواعيد القبول والتخصصات الخاصة بكل منها.",
     "level": {
-      "DEGREE": "شهادة",
-      "LANGUAGE": "Language",
-      "NON_DEGREE": "Non-degree",
-      "DIPLOMA": "Diploma",
-      "BACHELOR": "Bachelor’s",
-      "MASTER": "Master’s",
-      "PHD": "PhD"
+      "DEGREE": "درجة علمية",
+      "LANGUAGE": "لغة",
+      "NON_DEGREE": "غير مؤهل لدرجة علمية",
+      "DIPLOMA": "دبلوم",
+      "BACHELOR": "بكالوريوس",
+      "MASTER": "ماجستير",
+      "PHD": "دكتوراه"
     },
     "lang": {
-      "ENGLISH": "English",
-      "CHINESE": "Chinese",
-      "BILINGUAL": "Bilingual"
+      "ENGLISH": "الإنجليزية",
+      "CHINESE": "الصينية",
+      "BILINGUAL": "ثنائية اللغة"
     },
     "intake": {
-      "SPRING_MARCH": "Spring (March)",
-      "AUTUMN_SEPTEMBER": "Autumn (September)",
-      "SUMMER": "Summer",
-      "WINTER": "Winter",
-      "ROLLING": "Rolling"
+      "SPRING_MARCH": "الربيع (مارس)",
+      "AUTUMN_SEPTEMBER": "الخريف (سبتمبر)",
+      "SUMMER": "الصيف",
+      "WINTER": "الشتاء",
+      "ROLLING": "قبول مستمر"
     },
-    "applyNow": "Apply for this programme",
-    "applyVia": "Applications for this programme are handled through {university}. Create a profile to start.",
-    "term": "Intake",
-    "opens": "Opens",
-    "closes": "Closes",
-    "rolling": "Rolling",
-    "noMajors": "Majors for this programme will be listed soon.",
-    "majorsIntro": "Fields of study you can specialise in within this programme.",
-    "tuitionNote": "Set by the university. The USD figure is indicative.",
-    "universityLabel": "University"
+    "applyNow": "قدّم لهذا البرنامج",
+    "applyVia": "تُدار طلبات هذا البرنامج عبر {university}. أنشئ ملفًا تعريفيًا للبدء.",
+    "term": "موعد القبول",
+    "opens": "يفتح في",
+    "closes": "يُغلق في",
+    "rolling": "قبول مستمر",
+    "noMajors": "ستُدرج تخصصات هذا البرنامج قريبًا.",
+    "majorsIntro": "المجالات التي يمكنك التخصص فيها ضمن هذا البرنامج.",
+    "tuitionNote": "تحدده الجامعة. الرقم بالدولار الأمريكي إرشادي فقط.",
+    "universityLabel": "الجامعة"
   },
   "scholarships": {
-    "searchLabel": "Search scholarships",
-    "searchPlaceholder": "Scholarship name, field or country",
-    "sortLabel": "Sort",
-    "sortRelevance": "Most relevant",
-    "sortDeadline": "Deadline (soonest)",
-    "sortNewest": "Recently published",
-    "sortTitle": "Title (A–Z)",
-    "anyFunding": "Any funding",
-    "anyLanguage": "Any language",
-    "withStipend": "With stipend",
-    "moreFilters": "More filters: level and category",
-    "fLevel": "Education level",
-    "fCategory": "Category",
-    "colRef": "Ref.",
-    "colFees": "Upfront fee (¥·$)",
-    "feesNone": "None",
-    "colTitle": "Scholarship",
-    "colLevel": "Level",
-    "colLanguage": "Language",
-    "colIntake": "Next intake",
-    "colDeadline": "Deadline",
-    "colFunding": "Funding",
-    "colLocation": "Location",
-    "apply": "Apply",
-    "applyNow": "Apply now",
-    "applyNote": "Applying opens the guided application in your dashboard. Sign in or create a profile to start.",
-    "view": "View",
-    "viewAll": "View all scholarships",
-    "hot": "Hot",
-    "noneTitle": "No scholarships published yet",
-    "noneBody": "The catalogue is being populated. Check back soon, or create a profile to be ready.",
-    "notFound": "This scholarship is not available.",
-    "benefits": "Benefits",
-    "requirements": "Requirements",
-    "policy": "Policy & notes",
-    "eligibility": "Eligibility",
-    "fees": "Fees",
-    "documents": "Documents required",
-    "documentsNote": "Set by the scholarship, collected during the application.",
-    "stipend": "Stipend",
-    "stipendDuration": "Paid for {n} months",
-    "upfront": "Upfront fees",
-    "accommodation": "Accommodation",
-    "coverage": "What the award covers",
-    "renewal": "Renewal & annual review",
-    "studyDuration": "Study duration",
-    "applicationChannel": "Application channel",
-    "requiresFinancialProof": "Financial proof / a guarantor is required",
-    "requiresFoundationYear": "A foundation / preparatory year is required",
+    "searchLabel": "ابحث عن منح دراسية",
+    "searchPlaceholder": "اسم المنحة أو المجال أو الدولة",
+    "sortLabel": "ترتيب حسب",
+    "sortRelevance": "الأكثر صلة",
+    "sortDeadline": "الموعد النهائي (الأقرب)",
+    "sortNewest": "الأحدث نشرًا",
+    "sortTitle": "العنوان (أ-ي)",
+    "anyFunding": "أي نوع تمويل",
+    "anyLanguage": "أي لغة",
+    "withStipend": "مع مخصص شهري",
+    "moreFilters": "المزيد من عوامل التصفية: المستوى والفئة",
+    "fLevel": "المستوى الدراسي",
+    "fCategory": "الفئة",
+    "colRef": "الرقم المرجعي",
+    "colFees": "الرسوم المقدّمة (¥·$)",
+    "feesNone": "لا يوجد",
+    "colTitle": "المنحة الدراسية",
+    "colLevel": "المستوى",
+    "colLanguage": "اللغة",
+    "colIntake": "موعد القبول القادم",
+    "colDeadline": "الموعد النهائي",
+    "colFunding": "التمويل",
+    "colLocation": "الموقع",
+    "apply": "قدّم",
+    "applyNow": "قدّم الآن",
+    "applyNote": "يفتح التقديم نموذج طلب موجَّه في لوحة تحكمك. سجّل الدخول أو أنشئ ملفًا تعريفيًا للبدء.",
+    "view": "عرض",
+    "viewAll": "عرض جميع المنح الدراسية",
+    "hot": "رائجة",
+    "noneTitle": "لا توجد منح دراسية منشورة بعد",
+    "noneBody": "يجري العمل على استكمال الدليل. عد قريبًا، أو أنشئ ملفًا تعريفيًا لتكون جاهزًا.",
+    "notFound": "هذه المنحة الدراسية غير متاحة.",
+    "benefits": "المزايا",
+    "requirements": "المتطلبات",
+    "policy": "السياسة والملاحظات",
+    "eligibility": "الأهلية",
+    "fees": "الرسوم",
+    "documents": "المستندات المطلوبة",
+    "documentsNote": "تحددها المنحة الدراسية، وتُجمع أثناء التقديم.",
+    "stipend": "المخصص الشهري",
+    "stipendDuration": "يُدفع لمدة {n} أشهر",
+    "upfront": "الرسوم المقدّمة",
+    "accommodation": "السكن",
+    "coverage": "ما تغطيه المنحة",
+    "renewal": "التجديد والمراجعة السنوية",
+    "studyDuration": "مدة الدراسة",
+    "applicationChannel": "قناة التقديم",
+    "requiresFinancialProof": "يتطلب إثباتًا ماليًا أو كفيلًا",
+    "requiresFoundationYear": "يتطلب سنة تأسيسية / تحضيرية",
     "coverageKind": {
-      "TUITION": "Tuition",
-      "ACCOMMODATION": "Accommodation",
-      "STIPEND": "Living stipend",
-      "MEDICAL_INSURANCE": "Comprehensive medical insurance",
-      "SETTLEMENT_ALLOWANCE": "One-off settlement allowance",
-      "TRAVEL": "Travel / airfare",
-      "REGISTRATION_FEE": "Registration fee",
-      "VISA_FEE": "Visa fee",
-      "OTHER": "Other"
+      "TUITION": "الرسوم الدراسية",
+      "ACCOMMODATION": "السكن",
+      "STIPEND": "مخصص المعيشة",
+      "MEDICAL_INSURANCE": "تأمين طبي شامل",
+      "SETTLEMENT_ALLOWANCE": "بدل استقرار لمرة واحدة",
+      "TRAVEL": "السفر / تذكرة الطيران",
+      "REGISTRATION_FEE": "رسوم التسجيل",
+      "VISA_FEE": "رسوم التأشيرة",
+      "OTHER": "أخرى"
     },
     "channel": {
-      "DIRECT_UNIVERSITY": "Direct to the university",
-      "CSC_AGENCY": "Via a CSC agency number",
-      "NADOUMI": "Through Nadoumi",
-      "OTHER": "Other"
+      "DIRECT_UNIVERSITY": "مباشرة عبر الجامعة",
+      "CSC_AGENCY": "عبر رقم وكالة CSC",
+      "NADOUMI": "عبر Nadoumi",
+      "OTHER": "أخرى"
     },
-    "nonDegreeDuration": "Non-degree duration",
+    "nonDegreeDuration": "مدة البرنامج غير المؤهل لدرجة علمية",
     "room": {
-      "SINGLE": "Single room",
-      "DOUBLE": "Double room",
-      "TRIPLE": "Triple room",
-      "QUAD": "Quad room",
-      "SHARED": "Shared / dormitory"
+      "SINGLE": "غرفة فردية",
+      "DOUBLE": "غرفة مزدوجة",
+      "TRIPLE": "غرفة ثلاثية",
+      "QUAD": "غرفة رباعية",
+      "SHARED": "غرفة مشتركة / سكن جماعي"
     },
     "nonDegree": {
-      "HALF_YEAR": "Half year",
-      "ONE_YEAR": "One year"
+      "HALF_YEAR": "نصف سنة",
+      "ONE_YEAR": "سنة واحدة"
     },
-    "intakes": "Intakes",
-    "closes": "closes",
-    "required": "required",
-    "optional": "optional",
+    "intakes": "مواعيد القبول",
+    "closes": "يُغلق",
+    "required": "مطلوب",
+    "optional": "اختياري",
     "level": {
-      "NON_DEGREE": "Non-degree",
-      "DIPLOMA": "Diploma",
-      "BACHELOR": "Bachelor's",
-      "MASTER": "Master's",
-      "PHD": "PhD"
+      "NON_DEGREE": "غير مؤهل لدرجة علمية",
+      "DIPLOMA": "دبلوم",
+      "BACHELOR": "بكالوريوس",
+      "MASTER": "ماجستير",
+      "PHD": "دكتوراه"
     },
     "funding": {
-      "FULLY": "Fully funded",
-      "PARTIAL": "Partially funded",
-      "SELF": "Self-funded"
+      "FULLY": "ممولة بالكامل",
+      "PARTIAL": "ممولة جزئيًا",
+      "SELF": "ذاتية التمويل"
     },
     "lang": {
-      "ENGLISH": "English",
-      "CHINESE": "Chinese",
-      "BOTH": "English & Chinese"
+      "ENGLISH": "الإنجليزية",
+      "CHINESE": "الصينية",
+      "BOTH": "الإنجليزية والصينية"
     },
     "intake": {
-      "SPRING_MARCH": "Spring / March",
-      "AUTUMN_SEPTEMBER": "Autumn / September"
+      "SPRING_MARCH": "الربيع / مارس",
+      "AUTUMN_SEPTEMBER": "الخريف / سبتمبر"
     },
     "freq": {
-      "MONTHLY": "month",
-      "YEARLY": "year",
-      "ONE_OFF": "one-off"
+      "MONTHLY": "شهر",
+      "YEARLY": "سنة",
+      "ONE_OFF": "دفعة واحدة"
     },
     "category": {
       "CSC": "CSC",
-      "CGS": "Chinese Government",
-      "GOVERNMENT": "Government",
-      "PROVINCIAL": "Provincial",
-      "UNIVERSITY": "University",
-      "PRESIDENTIAL": "Presidential",
-      "LANGUAGE": "Language",
-      "TYPE_A": "Type A",
-      "TYPE_B": "Type B",
-      "TYPE_C": "Type C",
-      "TYPE_D": "Type D"
+      "CGS": "الحكومة الصينية",
+      "GOVERNMENT": "حكومية",
+      "PROVINCIAL": "إقليمية",
+      "UNIVERSITY": "جامعية",
+      "PRESIDENTIAL": "رئاسية",
+      "LANGUAGE": "لغة",
+      "TYPE_A": "النوع أ",
+      "TYPE_B": "النوع ب",
+      "TYPE_C": "النوع ج",
+      "TYPE_D": "النوع د"
     },
     "fee": {
-      "TUITION_BEFORE": "Tuition (before scholarship)",
-      "TUITION_AFTER": "Tuition (after scholarship)",
-      "ACCOMMODATION_BEFORE": "Accommodation (before)",
-      "ACCOMMODATION_AFTER": "Accommodation (after)",
-      "REGISTRATION": "Registration fee",
-      "APPLICATION": "Application fee",
-      "NADOUMI_APPLICATION": "Nadoumi application fee",
-      "NADOUMI_SERVICE": "Nadoumi service fee",
-      "INSURANCE": "Insurance",
-      "VISA": "Visa fee",
-      "OTHER": "Other fee"
+      "TUITION_BEFORE": "الرسوم الدراسية (قبل المنحة)",
+      "TUITION_AFTER": "الرسوم الدراسية (بعد المنحة)",
+      "ACCOMMODATION_BEFORE": "السكن (قبل)",
+      "ACCOMMODATION_AFTER": "السكن (بعد)",
+      "REGISTRATION": "رسوم التسجيل",
+      "APPLICATION": "رسوم التقديم",
+      "NADOUMI_APPLICATION": "رسوم تقديم Nadoumi",
+      "NADOUMI_SERVICE": "رسوم خدمة Nadoumi",
+      "INSURANCE": "التأمين",
+      "VISA": "رسوم التأشيرة",
+      "OTHER": "رسوم أخرى"
     },
     "doc": {
-      "PASSPORT": "Passport",
-      "DEGREE": "Degree certificate",
-      "TRANSCRIPT": "Academic transcript",
-      "LANGUAGE_CERT": "Language certificate",
-      "VISA": "Visa",
-      "PHYSICAL_EXAM": "Physical examination",
-      "STUDY_PLAN": "Study plan",
-      "RECOMMENDATION_LETTER": "Recommendation letter",
-      "OTHER": "Other document"
+      "PASSPORT": "جواز السفر",
+      "DEGREE": "شهادة التخرج",
+      "TRANSCRIPT": "كشف الدرجات",
+      "LANGUAGE_CERT": "شهادة اللغة",
+      "VISA": "التأشيرة",
+      "PHYSICAL_EXAM": "الفحص الطبي",
+      "STUDY_PLAN": "خطة الدراسة",
+      "RECOMMENDATION_LETTER": "خطاب التوصية",
+      "OTHER": "مستند آخر"
     },
     "elig": {
-      "age": "Age",
-      "gpa": "GPA",
-      "inChina": "Currently in China",
-      "nationality": "Nationality"
+      "age": "العمر",
+      "gpa": "المعدل التراكمي (GPA)",
+      "inChina": "متواجد حاليًا في الصين",
+      "nationality": "الجنسية"
     },
-    "deadlineLabel": "Application deadline",
-    "deadlineDays": "{n} days left",
-    "deadlineToday": "Closes today",
-    "deadlinePassed": "Deadline has passed",
-    "deadlineRolling": "Rolling admissions",
-    "free": "Included",
-    "colRoom": "Room type",
-    "colDetails": "Details",
-    "colPrice": "Price",
-    "colDoc": "Document",
-    "colRequirement": "Requirement",
-    "colNotes": "Notes"
+    "deadlineLabel": "الموعد النهائي للتقديم",
+    "deadlineDays": "تبقّى {n} أيام",
+    "deadlineToday": "يُغلق اليوم",
+    "deadlinePassed": "انتهى الموعد النهائي",
+    "deadlineRolling": "قبول مستمر",
+    "free": "مشمول",
+    "colRoom": "نوع الغرفة",
+    "colDetails": "التفاصيل",
+    "colPrice": "السعر",
+    "colDoc": "المستند",
+    "colRequirement": "المتطلب",
+    "colNotes": "ملاحظات"
   },
   "assistant": {
-    "fabLabel": "Open the Nadoumi assistant",
-    "title": "Nadoumi Assistant",
-    "subtitle": "Find scholarships and track your application",
-    "close": "Close",
-    "greeting": "Hi! I can help you discover scholarships and check on an application. What would you like to do?",
-    "tabFind": "Find scholarships",
-    "tabTrack": "Track application",
-    "findPlaceholder": "e.g. fully funded master in engineering",
-    "findHint": "Type a subject, country or keyword.",
-    "anyFunding": "Any funding",
-    "fundingFully": "Fully funded",
-    "fundingPartial": "Partial",
-    "fundingSelf": "Self funded",
-    "search": "Search",
-    "searching": "Searching…",
-    "noResults": "No scholarships matched. Try a broader keyword.",
-    "resultsTitle": "Top matches",
-    "viewAll": "See all results",
-    "open": "Open",
-    "deadline": "Deadline",
-    "rolling": "Rolling",
-    "trackPlaceholder": "Enter your application ID",
-    "trackHint": "You can find the ID in your dashboard or confirmation email.",
-    "trackCta": "Check status",
-    "trackChecking": "Checking…",
-    "trackNotFound": "We couldn't find an application with that ID. Check the ID and try again.",
-    "trackComingSoon": "Application tracking is being connected. In the meantime, sign in to your dashboard to see your applications.",
-    "trackGoDashboard": "Go to my dashboard",
-    "trackStatus": "Status",
-    "trackStage": "Stage",
-    "trackUpdated": "Last updated",
-    "disclaimer": "Guided search across the live Nadoumi catalog."
+    "fabLabel": "افتح مساعد Nadoumi",
+    "title": "مساعد Nadoumi",
+    "subtitle": "ابحث عن منح دراسية وتابع طلبك",
+    "close": "إغلاق",
+    "greeting": "مرحبًا! يمكنني مساعدتك في اكتشاف المنح الدراسية ومتابعة طلب تقديم. بماذا تودّ أن تبدأ؟",
+    "tabFind": "البحث عن منح دراسية",
+    "tabTrack": "متابعة طلب",
+    "findPlaceholder": "مثال: ماجستير ممول بالكامل في الهندسة",
+    "findHint": "اكتب موضوعًا أو دولة أو كلمة مفتاحية.",
+    "anyFunding": "أي نوع تمويل",
+    "fundingFully": "ممولة بالكامل",
+    "fundingPartial": "ممولة جزئيًا",
+    "fundingSelf": "ذاتية التمويل",
+    "search": "بحث",
+    "searching": "جارٍ البحث…",
+    "noResults": "لا توجد منح دراسية مطابقة. جرّب كلمة مفتاحية أوسع.",
+    "resultsTitle": "أفضل النتائج المطابقة",
+    "viewAll": "عرض جميع النتائج",
+    "open": "فتح",
+    "deadline": "الموعد النهائي",
+    "rolling": "قبول مستمر",
+    "trackPlaceholder": "أدخل رقم طلبك",
+    "trackHint": "يمكنك العثور على الرقم في لوحة تحكمك أو في رسالة التأكيد.",
+    "trackCta": "تحقق من الحالة",
+    "trackChecking": "جارٍ التحقق…",
+    "trackNotFound": "لم نتمكن من العثور على طلب بهذا الرقم. تحقق من الرقم وحاول مرة أخرى.",
+    "trackComingSoon": "جارٍ العمل على ربط متابعة الطلبات. في هذه الأثناء، سجّل الدخول إلى لوحة تحكمك لعرض طلباتك.",
+    "trackGoDashboard": "الانتقال إلى لوحة تحكمي",
+    "trackStatus": "الحالة",
+    "trackStage": "المرحلة",
+    "trackUpdated": "آخر تحديث",
+    "disclaimer": "بحث موجَّه ضمن دليل Nadoumi المباشر."
   },
   "guides": {
-    "more": "More guides"
+    "more": "المزيد من الأدلة الإرشادية",
+    "hub": {
+      "seoTitle": "أدلة Nadoumi الإرشادية",
+      "seoDescription": "أدلة عملية للدراسة في الصين: التقديم، المنح الدراسية، التأشيرات، الحياة اليومية، ودليل لكل إقليم.",
+      "title": "الأدلة الإرشادية",
+      "subtitle": "كل ما تحتاجه قبل وبعد التقديم للدراسة في الصين، موضّح بوضوح ومحدَّث باستمرار.",
+      "read": "اقرأ"
+    },
+    "howToApply": {
+      "intro": "التقديم إلى جامعة صينية أمر بسيط بمجرد أن تكون مستنداتك جاهزة. تفتح معظم المؤسسات باب التقديم بين {openWindow} للالتحاق في سبتمبر؛ أما مواعيد المنح الدراسية النهائية فتكون أبكر، غالبًا بين {deadlineWindow}. ابدأ قبل نحو عام من الموعد.",
+      "openWindow": "نوفمبر ومارس",
+      "deadlineWindow": "يناير وأبريل",
+      "sections": {
+        "journey": {
+          "eyebrow": "الرحلة",
+          "title": "ست خطوات حتى التسجيل"
+        },
+        "checklist": {
+          "eyebrow": "قائمة التحقق",
+          "title": "المستندات التي ستحتاجها"
+        },
+        "support": {
+          "eyebrow": "الدعم",
+          "title": "كيف تساعدك Nadoumi"
+        }
+      },
+      "steps": {
+        "choosePrograms": {
+          "title": "اختر البرامج",
+          "body": "حدد المستوى ولغة التدريس والمجال والميزانية. أعدّ قائمة مختصرة من ثلاثة إلى ستة خيارات لتبقى لديك بدائل. على Nadoumi يمكنك التصفية حسب الدولة والتمويل واللغة والمستوى ومقارنة المتطلبات جنبًا إلى جنب."
+        },
+        "prepareDocuments": {
+          "title": "جهّز مستنداتك",
+          "body": "راجع قائمة التحقق أدناه. وثّق وترجم أي مستند ليس بالفعل بالصينية أو الإنجليزية، وابدأ الفحص الطبي مبكرًا."
+        },
+        "submitApplication": {
+          "title": "قدّم الطلب",
+          "body": "عبر بوابة الجامعة الخاصة، وبالنسبة لمنحة الحكومة الصينية، عبر نظام CSC أيضًا. ادفع رسوم التقديم (عادةً من 400 إلى 800 يوان). قدّم طلب المنحة والقبول في الوقت نفسه؛ فأحدهما لا يضمن الآخر."
+        },
+        "interviews": {
+          "title": "المقابلات والقرارات",
+          "body": "تُجري بعض الأقسام مقابلة قصيرة عبر الإنترنت. تصل القرارات من أبريل إلى يوليو: إشعار قبول، وإن تم منحك المنحة، شهادة منحة منفصلة."
+        },
+        "acceptVisa": {
+          "title": "أكّد قبولك واحصل على نموذج التأشيرة",
+          "body": "أكّد مقعدك؛ تصدر الجامعة نموذج JW202 (للطلاب ذاتيي التمويل / منحة الجامعة) أو JW201 (لمنحة الحكومة) مع خطاب القبول. تابع دليل تأشيرة الطالب."
+        },
+        "beforeYouFly": {
+          "title": "قبل السفر",
+          "body": "احجز السكن، ودبّر تمويل الأشهر الأولى (تُصرف المخصصات بعد التسجيل)، وأحضر جميع المستندات الأصلية، ولاحظ الموعد النهائي للتسجيل: قد يؤدي تفويته إلى إلغاء العرض."
+        }
+      },
+      "docs": {
+        "passport": {
+          "term": "جواز السفر",
+          "detail": "صالح لمدة لا تقل عن مدة دراستك، بالإضافة إلى ستة أشهر."
+        },
+        "diploma": {
+          "term": "الشهادة وكشوف الدرجات",
+          "detail": "أعلى مؤهل علمي والسجلات الكاملة، موثقة ومترجمة."
+        },
+        "language": {
+          "term": "شهادة اللغة",
+          "detail": "HSK للتدريس بالصينية، أو IELTS أو TOEFL للتدريس بالإنجليزية (أو خطاب يثبت أن لغة التدريس هي الإنجليزية)."
+        },
+        "studyPlan": {
+          "term": "خطة الدراسة",
+          "detail": "بيان شخصي، عادةً من 800 إلى 1500 كلمة، يذكر المشرفين أو مجموعات البحث المستهدفة."
+        },
+        "recommendations": {
+          "term": "خطابا توصية",
+          "detail": "من مُقيِّمين أكاديميين قاموا بتدريسك أو الإشراف عليك."
+        },
+        "physicalExam": {
+          "term": "استمارة الفحص الطبي",
+          "detail": "استمارة الفحص الطبي للأجانب للبرامج التي تزيد مدتها عن ستة أشهر، مع صورة بخلفية بيضاء."
+        }
+      },
+      "under18": {
+        "title": "أقل من 18 عامًا؟",
+        "body": "ستحتاج أيضًا إلى مستند وصاية موثّق يحدد وليًا مقيمًا في الصين."
+      },
+      "supportBody": "نتابع كل خطوة، وننبّهك إلى المواعيد النهائية، ونراجع مستنداتك قبل الإرسال. {createProfile} للبدء، أو اقرأ {visaGuide} لمعرفة ما يأتي بعد العرض.",
+      "createProfile": "أنشئ ملفًا تعريفيًا"
+    },
+    "scholarshipTypes": {
+      "intro": "يأتي تمويل الدراسة في الصين ضمن أربع فئات رئيسية. يجمع الكثير من الطلاب بينها، مثل منحة إقليمية لتغطية الرسوم الدراسية مع منحة جامعية لتغطية السكن. توضح كل منحة مدرجة على Nadoumi بدقة ما تغطيه ومن هو مؤهل لها.",
+      "sections": {
+        "csc": {
+          "eyebrow": "1",
+          "title": "منحة الحكومة الصينية (CSC)"
+        },
+        "provincial": {
+          "eyebrow": "2",
+          "title": "المنح الإقليمية والبلدية"
+        },
+        "university": {
+          "eyebrow": "3",
+          "title": "منح الجامعات"
+        },
+        "confucius": {
+          "eyebrow": "4",
+          "title": "معهد كونفوشيوس ومنح الشركات"
+        },
+        "reference": {
+          "eyebrow": "مرجع",
+          "title": "ماذا يعني كل نوع تغطية"
+        },
+        "improve": {
+          "eyebrow": "عزّز فرصك",
+          "title": "كيف تقوّي طلبك"
+        },
+        "next": {
+          "eyebrow": "الخطوة التالية",
+          "title": "اكتشف ما تكون مؤهلًا له"
+        }
+      },
+      "csc": {
+        "body": "البرنامج الوطني، الذي يديره مجلس المنح الدراسية الصيني، ويضم عدة مسارات: البرنامج الثنائي (عبر وزارة بلدك)، برنامج الجامعة الصينية (التقديم مباشرة إلى جامعة معيّنة)، وبرنامجا طريق الحرير والسور العظيم. تغطي المنحة الكاملة {coverage} ({stipend}) و{insurance}. وهي تنافسية للغاية، بمواعيد نهائية مبكرة (غالبًا من يناير إلى مارس).",
+        "coverage": "الرسوم الدراسية والسكن داخل الحرم الجامعي أو بدل سكن، ومخصصًا شهريًا",
+        "stipend": "نحو 2500 يوان للبكالوريوس، و3000 يوان للماجستير، و3500 يوان للدكتوراه",
+        "insurance": "تأمينًا طبيًا شاملًا"
+      },
+      "provincial": {
+        "body": "تدير الأقاليم والمدن الكبرى (جيانغسو وتشجيانغ وشنغهاي وقوانغدونغ وبكين وغيرها) برامجها الخاصة لجذب الطلاب إلى جامعات المنطقة. تتراوح التغطية بين إعفاء من الرسوم الدراسية وباقة شبه كاملة، وغالبًا ما تكون أقل تنافسية من منحة CSC."
+      },
+      "university": {
+        "body": "تقدّم كل جامعة تقريبًا منحها الخاصة. يمكن أن تكون كاملة أو جزئية، وغالبًا ما تكون {renewable}، وعادةً ما تكون مواعيدها النهائية هي الأحدث. بالنسبة لكثير من المتقدمين، يُعد هذا المسار الأكثر واقعية للحصول على تمويل كامل.",
+        "renewable": "قابلة للتجديد سنويًا بناءً على النتائج الدراسية"
+      },
+      "confucius": {
+        "body": "تموّل {scholarshipName} دراسة اللغة الصينية والدرجات العلمية في تدريس اللغة الصينية، ويُتقدَّم لها عبر معهد كونفوشيوس أو أحد مراكز اختبار HSK. كما ترعى الشركات والمؤسسات طلابًا في مجالات مثل الهندسة والطاقة والزراعة، وغالبًا ما يكون ذلك مرتبطًا بتدريب أو فرصة عمل بعد التخرج.",
+        "scholarshipName": "منحة معهد كونفوشيوس"
+      },
+      "coverage": {
+        "fullyFunded": {
+          "term": "ممولة بالكامل",
+          "detail": "الرسوم الدراسية والسكن ومخصص شهري، بالإضافة إلى تأمين شامل."
+        },
+        "tuitionAccommodation": {
+          "term": "الرسوم الدراسية + السكن",
+          "detail": "بدون مخصص شهري؛ تتحمل أنت تكاليف المعيشة."
+        },
+        "tuitionWaiver": {
+          "term": "إعفاء من الرسوم الدراسية",
+          "detail": "الرسوم الدراسية فقط؛ السكن وتكاليف المعيشة على عاتقك."
+        },
+        "partial": {
+          "term": "جزئية",
+          "detail": "نسبة أو مبلغ ثابت مخصوم من الرسوم الدراسية."
+        }
+      },
+      "improve": {
+        "early": "قدّم مبكرًا في الدورة ولعدة منح في آن واحد.",
+        "language": "استوفِ متطلب اللغة أو تجاوزه {before} التقديم.",
+        "before": "قبل",
+        "studyPlan": "اكتب خطة دراسة محددة تذكر أسماء المشرفين أو مجموعات البحث المستهدفة.",
+        "target": "استهدف الجامعات التي يتوافق معها ملفك بقوة، وليس فقط الأسماء الأكثر شهرة."
+      },
+      "next": {
+        "body": "تصفّح المنح المفتوحة حاليًا في {scholarships}، أو {createProfile} وستقترح عليك Nadoumi المنح التي تكون مؤهلًا لها.",
+        "scholarshipsLink": "المنح الدراسية",
+        "createProfileLink": "أنشئ ملفًا تعريفيًا"
+      }
+    },
+    "studentVisaGuide": {
+      "intro": "الدراسة في الصين لأكثر من 180 يومًا تستلزم تأشيرة {x1}، تُحوَّل إلى {residencePermit} بعد وصولك. أما البرامج الأقصر فتستخدم تأشيرة {x2}. هذا هو المسار المعتاد؛ تحقق دائمًا من أقرب سفارة أو قنصلية صينية، إذ تختلف التفاصيل حسب الدولة.",
+      "x1": "X1",
+      "residencePermitTerm": "تصريح إقامة",
+      "x2": "X2",
+      "sections": {
+        "beforeApply": {
+          "eyebrow": "قبل التقديم",
+          "title": "المستندان الأساسيان"
+        },
+        "embassy": {
+          "eyebrow": "في السفارة",
+          "title": "التقديم على التأشيرة"
+        },
+        "afterLand": {
+          "eyebrow": "بعد وصولك",
+          "title": "خلال شهرك الأول"
+        },
+        "whileStudying": {
+          "eyebrow": "أثناء الدراسة",
+          "title": "حافظ على وضعك القانوني"
+        }
+      },
+      "documents": {
+        "admissionNotice": {
+          "term": "إشعار القبول",
+          "detail": "خطاب القبول الأصلي الصادر عن جامعتك."
+        },
+        "jwForm": {
+          "term": "نموذج JW202 أو JW201",
+          "detail": "نموذج طلب التأشيرة للدراسة في الصين. JW202 للطلاب ذاتيي التمويل أو الحاصلين على منحة جامعية؛ JW201 للحاصلين على منحة الحكومة الصينية."
+        }
+      },
+      "beforeApplyBody": "ترسل الجامعة كلا المستندين بعد قبولك لمقعدك. احتفظ بالنسخ الأصلية في مكان آمن؛ فستحتاجها السفارة، ولاحقًا مكتب الهجرة.",
+      "embassySteps": {
+        "cova": "املأ نموذج طلب التأشيرة الإلكتروني (COVA) واطبعه.",
+        "gather": "جهّز: جواز سفر ساري المفعول لستة أشهر على الأقل مع صفحة فارغة، صورة حديثة، إشعار القبول ونموذج JW، وأي مستندات أخرى تحددها القنصلية بحسب جنسيتك.",
+        "appointment": "احجز موعدًا في مركز خدمات طلبات التأشيرة الصينية أو السفارة، وقدّم الطلب حضوريًا، وادفع الرسوم.",
+        "collect": "استلم التأشيرة خلال نحو أربعة أيام عمل. عادةً ما تكون تأشيرة X1 لدخول واحد وصالحة 90 يومًا من تاريخ الإصدار، فخطط لسفرك وفقًا لذلك."
+      },
+      "arrive": {
+        "registerAddress": {
+          "title": "سجّل عنوانك خلال 24 ساعة",
+          "body": "في مركز الشرطة المحلي. إذا كنت تقيم في سكن جامعي، تتولى الجامعة عادةً هذا الإجراء؛ أما إذا كنت تستأجر، فعليك القيام به بنفسك، وتكراره بعد كل رحلة إلى الخارج."
+        },
+        "medicalCheck": {
+          "title": "أكمل الفحص الطبي",
+          "body": "إذا أجريت فحص اللياقة الطبية للأجانب في بلدك، أحضر التقرير وصورة الأشعة للتحقق منهما في مركز الرعاية الصحية للسفر الدولي المحلي؛ وإلا فستجري الفحص داخل الصين."
+        },
+        "residencePermit": {
+          "title": "قدّم على تصريح الإقامة خلال 30 يومًا",
+          "body": "لدى مكتب إدارة الدخول والخروج، مع جواز سفرك وتأشيرة X1، ونموذج JW202 أو JW201، وإشعار القبول، والتقرير الطبي المعتمد، وتسجيل السكن، والصور. يحل هذا التصريح محل التأشيرة ويُصدر للعام الدراسي، قابل للتجديد سنويًا."
+        }
+      },
+      "whileStudying": {
+        "renew": "جدّد تصريح الإقامة قبل {window} على الأقل.",
+        "renewWindow": "شهر واحد من انتهاء صلاحيته",
+        "reregister": "أعد تسجيل عنوانك لدى الشرطة بعد كل عودة إلى الصين.",
+        "workPermission": "يتطلب العمل بدوام جزئي والتدريب إذنًا مسبقًا من الجامعة وإدارة الهجرة معًا.",
+        "changeUniversity": "إذا غيّرت جامعتك أو غادرت، يجب تحديث تصريحك أو إلغاؤه فورًا."
+      },
+      "beforeAllThis": {
+        "title": "قبل كل هذا",
+        "body": "يأتي عرض القبول ونموذج JW أولًا، اقرأ {howToApply}."
+      }
+    },
+    "livingInChina": {
+      "intro": "تكون الحياة اليومية لطالب دولي في الصين مريحة وغير مكلفة بمجرد ترتيب الأساسيات. يتم إنجاز كل شيء تقريبًا عبر الهاتف، وتوفر الحرم الجامعي معظم ما تحتاجه، والمدن مترابطة بشكل ممتاز. إليك الصورة العملية.",
+      "sections": {
+        "money": {
+          "eyebrow": "المال",
+          "title": "الدفع مقابل الأشياء"
+        },
+        "transport": {
+          "eyebrow": "المواصلات",
+          "title": "التنقل"
+        },
+        "home": {
+          "eyebrow": "السكن",
+          "title": "أين ستعيش"
+        },
+        "everyday": {
+          "eyebrow": "الحياة اليومية",
+          "title": "الطعام والتوصيل والاتصال"
+        },
+        "health": {
+          "eyebrow": "الصحة",
+          "title": "التأمين والرعاية"
+        },
+        "settlingIn": {
+          "eyebrow": "الاستقرار",
+          "title": "الشهر الأول"
+        }
+      },
+      "pay": {
+        "walletApps": {
+          "term": "WeChat Pay وAlipay",
+          "detail": "تغطي رموز QR كل عملية شراء تقريبًا، من المطعم الجامعي إلى المترو. اربطهما بحساب مصرفي صيني خلال أسابيعك الأولى."
+        },
+        "bankAccount": {
+          "term": "حساب مصرفي محلي",
+          "detail": "أحضر جواز سفرك وتصريح الإقامة وخطابًا من الجامعة. تعمل البطاقات الدولية في الفنادق والمطارات، ونادرًا ما تعمل في أماكن أخرى."
+        },
+        "budget": {
+          "term": "ميزانية طالب",
+          "detail": "نحو 2000 إلى 3500 يوان شهريًا للطعام والمواصلات والاحتياجات الأساسية خارج أكبر المدن. بكين وشنغهاي وشنتشن أغلى تكلفة."
+        }
+      },
+      "moneyNote": "احمل بعض النقد للباعة الصغار والأسواق التقليدية، لكنك ستلجأ إلى هاتفك أولًا في كل مكان تقريبًا.",
+      "move": {
+        "metro": {
+          "term": "المترو والحافلات",
+          "detail": "الدفع عبر رمز QR في كل مدينة كبرى. الأجرة بضعة يوانات فقط."
+        },
+        "railway": {
+          "term": "القطار فائق السرعة",
+          "detail": "سريع ودقيق المواعيد وبأسعار معقولة بين المدن. احجز عبر تطبيق Railway 12306 أو Trip.com."
+        },
+        "didi": {
+          "term": "ديدي",
+          "detail": "تطبيق استدعاء سيارات الأجرة والسيارات الخاصة، بواجهة إنجليزية."
+        },
+        "bikes": {
+          "term": "الدراجات المشتركة",
+          "detail": "دراجات Meituan وHelloRide متوفرة في كل مكان للمسافات القصيرة؛ يتم فتحها عبر رمز QR."
+        }
+      },
+      "documentsCallout": {
+        "title": "احمل مستنداتك دائمًا",
+        "body": "تحتاج إلى جواز سفرك وتصريح إقامتك لشراء تذاكر القطار وتسجيل الدخول في الفنادق."
+      },
+      "homeBody": "تقدّم معظم الجامعات {dorms} للطلاب الدوليين، غرف فردية أو مشتركة مع حمام، بإيجار يبدأ من نحو 1000 إلى 2500 يوان شهريًا، تُحجز بشكل منفصل عن القبول وغالبًا ما تتطلب تأمينًا ماليًا. الاستئجار خارج الحرم الجامعي أرخص لكل غرفة في المدن الأصغر، لكنه يعني التعامل مع الوكلاء والعقود وتسجيل الشرطة بنفسك. يبدأ طلاب السنة الأولى دائمًا تقريبًا بالإقامة في السكن الجامعي.",
+      "onCampusDorms": "سكن داخل الحرم الجامعي",
+      "daily": {
+        "canteens": {
+          "term": "مطاعم الحرم الجامعي",
+          "detail": "الخيار الأرخص؛ تتراوح تكلفة الوجبة الكاملة بين 8 و20 يوانًا. مطاعم الحلال (清真) منتشرة بشكل شائع."
+        },
+        "delivery": {
+          "term": "Meituan وEle.me",
+          "detail": "توصيل الطعام والبقالة في أقل من ساعة."
+        },
+        "shopping": {
+          "term": "Taobao وJD",
+          "detail": "كل شيء آخر، غالبًا في اليوم التالي، إلى نقطة استلام داخل الحرم الجامعي."
+        },
+        "sim": {
+          "term": "شريحة اتصال محلية",
+          "detail": "من China Mobile أو Unicom أو Telecom باستخدام جواز سفرك. البيانات رخيصة وسريعة."
+        }
+      },
+      "everydayNote": "لا يمكن الوصول إلى بعض التطبيقات والمواقع الأجنبية عبر الشبكات الصينية؛ يستخدم الكثير من الطلاب VPN جامعيًا أو تجاريًا للدراسة وللبقاء على تواصل مع بلدهم. جهّز {wechat} قبل وصولك، فهو ركيزة الحياة الطلابية.",
+      "wechat": "WeChat",
+      "healthBody": "{insurance} للطلاب الدوليين إلزامي، ويُرتَّب عادةً عبر الجامعة (بتكلفة نحو 600 إلى 800 يوان سنويًا، مشمولة في معظم المنح الكاملة). تتعامل العيادات الجامعية مع الحالات البسيطة؛ وتضم المستشفيات الكبرى أقسامًا دولية أو VIP بها طاقم يتحدث الإنجليزية. احتفظ ببطاقة التأمين ورقم الوثيقة على هاتفك.",
+      "insuranceTerm": "وثيقة تأمين طبي شامل",
+      "settlingIn": {
+        "mandarin": "تعلّم أساسيات اللغة الصينية مبكرًا: الأرقام والاتجاهات والطعام، حتى لو كانت دراستك باللغة الإنجليزية.",
+        "orientation": "شارك في جلسة التوجيه بمكتب الطلاب الدوليين وفي الجمعيات الطلابية، فهي أسرع طريقة لبناء شبكة علاقات.",
+        "copies": "احتفظ بنسخ رقمية وورقية من جواز سفرك وتأشيرتك وخطاب القبول ونموذج JW.",
+        "registration": "التزم بقواعد التسجيل والتصاريح، راجع {visaGuide}."
+      }
+    },
+    "welcomeToChina": {
+      "intro": "تستضيف الصين واحدة من أكبر مجتمعات الطلاب الدوليين في العالم، موزعة على أكثر من ألف جامعة، من مناطق هاينان الاستوائية إلى المراعي الشمالية. تُدرَّس البرامج باللغة الصينية، وبشكل متزايد بالإنجليزية؛ والرسوم الدراسية معتدلة؛ وتتوفر منح دراسية سخية للمتقدمين الأقوياء. إليك مقدمة موجزة قبل أن تبدأ.",
+      "sections": {
+        "case": {
+          "eyebrow": "الأسباب",
+          "title": "لماذا الدراسة في الصين"
+        },
+        "structure": {
+          "eyebrow": "البنية",
+          "title": "كيف يعمل النظام"
+        },
+        "language": {
+          "eyebrow": "اللغة",
+          "title": "بأي لغة سأدرس؟"
+        },
+        "dailyLife": {
+          "eyebrow": "الحياة اليومية",
+          "title": "الحياة باختصار"
+        },
+        "next": {
+          "eyebrow": "الخطوة التالية",
+          "title": "خطواتك القادمة"
+        }
+      },
+      "why": {
+        "lowCost": {
+          "term": "تكلفة منخفضة",
+          "detail": "رسوم الجامعات الحكومية تمثل جزءًا يسيرًا من تكلفة برامج مماثلة في أوروبا أو أمريكا الشمالية، وتكاليف المعيشة خارج أكبر المدن منخفضة."
+        },
+        "realScholarships": {
+          "term": "منح دراسية حقيقية",
+          "detail": "يمكن أن تغطي المنح الحكومية والإقليمية والجامعية الرسوم الدراسية والسكن ومخصصًا شهريًا."
+        },
+        "wideChoice": {
+          "term": "خيارات واسعة",
+          "detail": "الهندسة والطب والأعمال والعلوم واللغة الصينية والعلاقات الدولية، وكثير منها يوفر مسارات بالإنجليزية."
+        },
+        "network": {
+          "term": "شبكة علاقات إقليمية",
+          "detail": "حتى سنة واحدة من تعلم الماندرين تفتح أبوابًا في جميع أنحاء آسيا؛ ويخرج الخريجون بشبكة علاقات حقيقية."
+        }
+      },
+      "structureBody": "تستغرق درجة البكالوريوس عادةً أربع سنوات (خمس سنوات للطب والهندسة المعمارية)؛ والماجستير من سنتين إلى ثلاث؛ والدكتوراه من ثلاث إلى أربع. يمتد العام الدراسي من سبتمبر إلى يوليو مع عطلة شتوية طويلة حول عيد الربيع. ستسمع عن الجامعات موصوفة بـ{doubleFirstClass}، والتسميات الأقدم {label985} و{label211}، التي تميّز المؤسسات ذات الكثافة البحثية العالية.",
+      "doubleFirstClass": "«الدرجة الأولى المزدوجة»",
+      "label985": "«985»",
+      "label211": "«211»",
+      "languageBody": "تتطلب البرامج المدرَّسة بالصينية عادةً شهادة {hsk} (المستوى الرابع من HSK لكثير من البرامج، والمستوى الخامس للعلوم الإنسانية والطب). تتطلب البرامج المدرَّسة بالإنجليزية {ieltsToefl}، أو إثباتًا بأن تعليمك السابق كان بالإنجليزية، بالإضافة إلى فصل دراسي أو فصلين من الماندرين الأساسي كشرط للتخرج.",
+      "hsk": "HSK",
+      "ieltsToefl": "IELTS أو TOEFL",
+      "notReadyCallout": {
+        "title": "لست جاهزًا بعد في اللغة الصينية؟",
+        "body": "برنامج لغة لمدة سنة واحدة هو الجسر المعتاد، وتشمله العديد من المنح الدراسية."
+      },
+      "life": {
+        "phone": {
+          "term": "كل شيء عبر الهاتف",
+          "detail": "يتولى WeChat وAlipay المراسلة والمدفوعات والمواصلات والتوصيل."
+        },
+        "railway": {
+          "term": "القطار فائق السرعة",
+          "detail": "شبكة واسعة تربط كل مدينة رئيسية، سريعة وبأسعار معقولة."
+        },
+        "campus": {
+          "term": "الحياة داخل الحرم الجامعي",
+          "detail": "حرم جامعي مسوّر ومكتفٍ ذاتيًا يضم سكنًا ومطاعم وعيادات ومرافق رياضية."
+        },
+        "safety": {
+          "term": "أمان يومي",
+          "detail": "معدل جريمة شوارع منخفض؛ ويساعدك مكتب الطلاب الدوليين على الاستقرار."
+        }
+      },
+      "lifeNote": "للاطلاع على الإعداد العملي الكامل، اقرأ {livingGuide}.",
+      "nextSteps": {
+        "shortlist": "أعدّ قائمة مختصرة بالبرامج: ابدأ من {scholarships} و{universities}.",
+        "requirements": "تحقق من متطلبات اللغة والمتطلبات الأكاديمية لكل برنامج.",
+        "documents": "جهّز مستنداتك مبكرًا: راجع {howToApply}.",
+        "visa": "قدّم الطلب، واقبل عرضك، واحصل على نموذج {jwForm} للتأشيرة: راجع {visaGuide}."
+      },
+      "jwForm": "JW202/JW201",
+      "finalCta": "{createProfile} وستقترح عليك Nadoumi برامج مناسبة، وتتابع مواعيدك النهائية، وترشدك في كل خطوة حتى التسجيل.",
+      "createProfileLink": "أنشئ ملفًا تعريفيًا"
+    },
+    "faq": {
+      "intro": "إجابات موجزة عن الأسئلة الأكثر شيوعًا لدى الطلاب قبل التقديم. للمزيد من التفاصيل، اتبع الروابط إلى الأدلة الكاملة.",
+      "sections": {
+        "next": {
+          "eyebrow": "الخطوة التالية",
+          "title": "ما زلت غير متأكد؟"
+        }
+      },
+      "stillUnsure": "{contact} أو {createProfile} وسنرشدك خلال كل خطوة.",
+      "createProfileLink": "أنشئ ملفًا تعريفيًا",
+      "groups": {
+        "studyingAndLanguage": {
+          "title": "الدراسة واللغة",
+          "items": [
+            {
+              "q": "هل أحتاج إلى إتقان اللغة الصينية للدراسة في الصين؟",
+              "a": "ليس بالضرورة. تتوفر لكثير من برامج البكالوريوس ومعظم برامج الماجستير والدكتوراه مسارات تُدرَّس بالإنجليزية، خاصة في الهندسة والأعمال والطب والعلوم. تتطلب الدرجات المدرَّسة بالصينية شهادة HSK، عادةً من المستوى 4 إلى 5. وفي كلتا الحالتين، يُعد فصل دراسي أو فصلان من الماندرين الأساسي شرطًا شائعًا للتخرج، ويُعد برنامج لغة لمدة سنة واحدة الجسر المعتاد إذا لم يكن مستواك في الصينية جاهزًا بعد."
+            },
+            {
+              "q": "هل الأمر آمن، وكيف هي الحياة داخل الحرم الجامعي؟",
+              "a": "الحرم الجامعي في الصين مسوّر ومكتفٍ ذاتيًا وآمن بشكل عام، ويضم سكنًا ومطاعم وعيادات ومرافق رياضية في الموقع نفسه. تسير الحياة اليومية عبر WeChat وAlipay؛ ويُعد مكتب الطلاب الدوليين والجمعيات الطلابية أسرع طريقة لبناء شبكة علاقات."
+            }
+          ]
+        },
+        "costAndFunding": {
+          "title": "التكلفة والتمويل",
+          "items": [
+            {
+              "q": "كم تبلغ التكلفة؟",
+              "a": "تتراوح رسوم البكالوريوس في الجامعات الحكومية عادةً بين 18000 و40000 يوان سنويًا (برامج الطب وإدارة الأعمال أعلى تكلفة). يبلغ السكن داخل الحرم الجامعي نحو 1000 إلى 2500 يوان شهريًا، وتتراوح ميزانية المعيشة المتواضعة خارج أكبر المدن بين 2000 و3500 يوان شهريًا. تُلغي المنحة الكاملة الرسوم الدراسية والسكن وتضيف مخصصًا شهريًا."
+            },
+            {
+              "q": "هل يمكنني الحصول على منحة كاملة؟",
+              "a": "نعم، عبر منحة الحكومة الصينية، أو البرامج الإقليمية، أو منح الجامعات، أو منحة معهد كونفوشيوس. قدّم مبكرًا في الدورة ولعدة منح في آن واحد، واستوفِ متطلب اللغة قبل التقديم. تكون مواعيد منح الجامعات هي الأحدث، وتُعد المسار الأكثر واقعية للحصول على تمويل كامل لكثير من المتقدمين."
+            }
+          ]
+        },
+        "applying": {
+          "title": "التقديم",
+          "items": [
+            {
+              "q": "متى يجب أن أقدّم؟",
+              "a": "قبل نحو عام من الموعد. تفتح باب التقديم عمومًا من نوفمبر إلى مارس للالتحاق في سبتمبر؛ أما مواعيد المنح النهائية فتكون أبكر، غالبًا من يناير إلى أبريل. تصل القرارات من أبريل إلى يوليو."
+            },
+            {
+              "q": "ما المستندات التي أحتاجها؟",
+              "a": "جواز السفر؛ الشهادة وكشوف الدرجات موثقة ومترجمة؛ شهادة لغة (HSK أو IELTS أو TOEFL)؛ خطة دراسة؛ خطابا توصية؛ صورة شخصية بحجم جواز السفر؛ وللبرامج التي تزيد مدتها عن ستة أشهر، استمارة الفحص الطبي للأجانب. يحتاج المتقدمون دون 18 عامًا أيضًا إلى مستند وصاية موثّق."
+            }
+          ]
+        },
+        "visaAndFamily": {
+          "title": "التأشيرة والأسرة",
+          "items": [
+            {
+              "q": "ما التأشيرة التي أحتاجها؟",
+              "a": "تأشيرة X1 للبرامج التي تزيد مدتها عن 180 يومًا، تُحوَّل إلى تصريح إقامة خلال 30 يومًا من وصولك؛ وتأشيرة X2 للبرامج الأقصر. تتقدم بالطلب مع إشعار القبول الأصلي ونموذج JW202 أو JW201 من الجامعة."
+            },
+            {
+              "q": "هل يمكنني العمل أثناء الدراسة؟",
+              "a": "فقط بإذن مسبق من الجامعة وسلطات الهجرة معًا. قد يعرّض العمل بموجب تصريح دراسة دون موافقة وضعك القانوني للخطر. تكون التدريبات المدفوعة المرتبطة ببرنامجك ممكنة عادةً بالأوراق المناسبة."
+            },
+            {
+              "q": "هل يمكنني اصطحاب أسرتي؟",
+              "a": "يمكن للزوج/الزوجة والأبناء التقديم على تأشيرة معال من نوع S1 أو S2 بمجرد حصولك على تصريح إقامة، لكن عليك إثبات قدرتك على إعالتهم؛ ولا تستقبل السكنات الجامعية الأسر، لذا ستحتاج إلى الاستئجار خارج الحرم الجامعي. تختلف السياسات حسب المدينة، تحقق من ذلك لدى المكتب الدولي بالجامعة."
+            }
+          ]
+        },
+        "afterGraduation": {
+          "title": "بعد التخرج",
+          "items": [
+            {
+              "q": "ماذا يمكنني أن أفعل بعد التخرج؟",
+              "a": "تشمل الخيارات مواصلة الدراسة في الصين، أو الحصول على تصريح عمل إذا وجدت وظيفة مؤهلة (تتطلب عادةً خبرة ذات صلة أو درجة ماجستير)، أو العودة إلى بلدك بدرجة علمية معترف بها وشبكة علاقات إقليمية. تقدّم بعض المدن تأشيرات للبحث عن عمل أو لريادة الأعمال بعد التخرج لخريجي الجامعات المرموقة."
+            },
+            {
+              "q": "كيف تساعد Nadoumi؟",
+              "a": "نقترح عليك برامج ومنحًا دراسية تكون مؤهلًا لها، ونتابع كل موعد نهائي، ونراجع مستنداتك قبل الإرسال، ونرشدك خلال عروض القبول ونموذج JW والتأشيرة والتسجيل."
+            }
+          ]
+        }
+      }
+    },
+    "cityGuides": {
+      "seoTitle": "أدلة المدن، الدراسة في مختلف أنحاء الصين",
+      "seoDescription": "كل مقاطعة ومنطقة في الصين: التاريخ والثقافة واللغة والمهرجانات، مع مدينتين وأبرز جامعاتهما. ابحث حسب المقاطعة أو المدينة أو الجامعة.",
+      "heroSubtitle": "كل مقاطعة ومنطقة في الصين، تاريخها وثقافتها ولغتها ومهرجاناتها، مع مدينتين وأبرز جامعاتهما.",
+      "intro": "الصين شاسعة ومتنوعة. لكل مقاطعة لهجاتها ومطبخها ومهرجاناتها وطابعها الخاص، وجامعاتها الخاصة. ابحث حسب المقاطعة أو المدينة أو الجامعة، أو صفِّ حسب المنطقة، ثم استكشف المؤسسات في صفحة {universities} لدينا.",
+      "searchLabel": "ابحث عن مقاطعات ومدن وجامعات",
+      "searchPlaceholder": "ابحث عن مقاطعة أو مدينة أو جامعة",
+      "allRegions": "جميع المناطق",
+      "showingCount": "عرض {count} من {total} مقاطعة ومنطقة",
+      "topUniversities": "أبرز الجامعات",
+      "noResults": {
+        "title": "لا توجد مقاطعة مطابقة",
+        "body": "جرّب مدينة أو جامعة أو منطقة مختلفة.",
+        "clear": "مسح البحث"
+      },
+      "universitiesNote": "تُبرز قوائم الجامعات بضع مؤسسات رائدة في كل مدينة وليست شاملة. تتبع الأوصاف الإدارية التقسيمات المعتمدة في جمهورية الصين الشعبية.",
+      "kind": {
+        "province": "مقاطعة",
+        "autonomousRegion": "منطقة ذاتية الحكم",
+        "municipality": "بلدية"
+      },
+      "regions": {
+        "north": {
+          "name": "شمال الصين"
+        },
+        "northeast": {
+          "name": "شمال شرق الصين"
+        },
+        "east": {
+          "name": "شرق الصين"
+        },
+        "central": {
+          "name": "وسط الصين"
+        },
+        "south": {
+          "name": "جنوب الصين"
+        },
+        "southwest": {
+          "name": "جنوب غرب الصين"
+        },
+        "northwest": {
+          "name": "شمال غرب الصين"
+        }
+      },
+      "divisions": {
+        "beijing": {
+          "overview": "عاصمة الصين لمعظم القرون الثمانية الماضية، مقر أسرات يوان ومينغ وتشينغ وجمهورية الصين الشعبية. تضم المدينة المحرمة ومعبد السماء وأقرب أجزاء سور الصين العظيم.",
+          "culture": "تستند الماندرين الفصحى (بوتونغهوا) إلى لهجة بكين. تحافظ المدينة على أوبرا بكين وحياة الأفنية التقليدية «هوتونغ» ومهرجانات معابد عيد الربيع إلى جانب إيقاع حديث سريع؛ ويُعد البط المشوي على الطريقة البكينية طبقها المميز.",
+          "cities": {
+            "haidian-district": {
+              "note": "حي الجامعات والتكنولوجيا في شمال غرب المدينة."
+            },
+            "chaoyang-district": {
+              "note": "الحي المركزي للأعمال والسفارات شرق المدينة القديمة."
+            }
+          }
+        },
+        "tianjin": {
+          "overview": "ميناء على خليج بوهاي والبوابة التاريخية لبكين إلى البحر. تركت الامتيازات الأجنبية في القرن التاسع عشر شوارع أوروبية الطراز على ضفاف نهر هايخه.",
+          "culture": "تشتهر لهجة تيانجين بسرعة البديهة؛ والمدينة هي مهد فن «شيانغشنغ» (الكوميديا الحوارية). تُعد فطائر «غوبولي» المطهوة بالبخار وفن الدمى الطينية الشعبي ومطبوعات رأس السنة الخشبية من التقاليد المحلية.",
+          "cities": {
+            "nankai-district": {
+              "note": "المركز الأكاديمي المجاور لحديقة نانكاي."
+            },
+            "jinnan-district": {
+              "note": "منطقة أحدث للحرم الجامعي والمنشآت في الجنوب."
+            }
+          }
+        },
+        "hebei": {
+          "overview": "المقاطعة المحيطة ببكين وتيانجين. تضم منتجع تشنغده الصيفي الإمبراطوري، وممر شانهايغوان حيث يلتقي سور الصين العظيم بالبحر، وجزءًا كبيرًا من صناعة الصلب الصينية.",
+          "culture": "أوبرا «خبي بانغزي» صاخبة وإيقاعية؛ وتمتلك المقاطعة تقاليد عريقة في الفنون القتالية ومهرجانات فوانيس ونحت جليد متقنة في مهرجان الفوانيس.",
+          "cities": {
+            "shijiazhuang": {
+              "note": "عاصمة المقاطعة، مدينة سكك حديدية في السهل."
+            },
+            "baoding": {
+              "note": "مقر إقليمي سابق لأسرة تشينغ جنوب غرب بكين."
+            }
+          }
+        },
+        "shanxi": {
+          "overview": "هضبة لوس شرق النهر الأصفر وأحد أقدم مراكز الحضارة الصينية. تضم مدينة بينغياو المسوّرة من عهد مينغ، وكهوف يونغانغ البوذية، وإرث تجار جين الذين أداروا أول بنوك الصين.",
+          "culture": "مجموعة لهجات جين متميزة داخل الماندرين. تشتهر شانشي بالمعكرونة المقطوعة يدويًا والخل المعتّق، ومسرح خيال الظل، وعروض مهرجان الفوانيس المبهرة.",
+          "cities": {
+            "taiyuan": {
+              "note": "عاصمة المقاطعة الصناعية في وادي نهر فن."
+            },
+            "datong": {
+              "note": "عاصمة حدودية شمالية سابقة، بوابة كهوف يونغانغ."
+            }
+          }
+        },
+        "inner-mongolia": {
+          "overview": "شريط طويل من المراعي والصحاري والغابات على طول الحدود الشمالية للصين، بموارد كبيرة من الفحم والعناصر الأرضية النادرة. يقع ضريح جنكيز خان في هضبة أوردوس التابعة لها.",
+          "culture": "المنغولية لغة رسمية مشتركة مع الماندرين وتُكتب بالخط المنغولي العمودي. يضم مهرجان نادام الصيفي المصارعة وسباق الخيل والرماية؛ ويُعد الغناء الحلقي وآلة المورين خور والشاي بالحليب جزءًا من الحياة اليومية.",
+          "cities": {
+            "hohhot": {
+              "note": "عاصمة الإقليم، مدينة معابد على حافة السهوب."
+            },
+            "baotou": {
+              "note": "مركز صناعي للصلب والعناصر الأرضية النادرة على النهر الأصفر."
+            }
+          }
+        },
+        "liaoning": {
+          "overview": "أجنوبي مقاطعات الشمال الشرقي وأكثرها تصنيعًا. تضم شنيانغ القصر الإمبراطوري من أوائل عهد تشينغ؛ ودالييان مدينة ساحلية معتدلة المناخ بنتها روسيا واليابان.",
+          "culture": "لهجة الماندرين الشمالية الشرقية الواسعة معروفة في جميع أنحاء البلاد. تُحدِّد المنطقة كوميديا الغناء والرقص «إيرنجوان» والحساء الثقيل والملفوف المخلل ومهرجانات الجليد الشتوية.",
+          "cities": {
+            "shenyang": {
+              "note": "عاصمة المقاطعة وأكبر مدن الشمال الشرقي."
+            },
+            "dalian": {
+              "note": "مدينة ميناء وشاطئ على البحر الأصفر، معروفة بساحاتها وترامواتها."
+            }
+          }
+        },
+        "jilin": {
+          "overview": "تتمركز حول جبال تشانغباي وبحيرة فوهتها البركانية على الحدود مع كوريا الشمالية. نشأت تشانغتشون حول صناعتي السيارات والأفلام؛ ويانبيان محافظة ذاتية الحكم كورية صينية.",
+          "culture": "تُستخدم الكورية إلى جانب الماندرين في يانبيان. يجذب الصقيع الشتوي على نهر سونغهوا المصورين؛ وتُعد الأطباق المانشورية والكورية والمعكرونة الباردة والكيمتشي والشواء من الأطعمة الأساسية.",
+          "cities": {
+            "changchun": {
+              "note": "عاصمة المقاطعة، مدينة صناعية وجامعية مخططة."
+            },
+            "yanji": {
+              "note": "مقر محافظة يانبيان الكورية ذاتية الحكم."
+            }
+          }
+        },
+        "heilongjiang": {
+          "overview": "أقصى شمال شرق الصين، تحاذي روسيا على طول نهر آمور، وتضم حقل نفط داتشينغ وأراضي زراعية شاسعة ذات تربة سوداء. بُنيت هاربين على يد سكة حديد منشوريا العابرة ولا تزال تحتفظ بطابع معماري روسي.",
+          "culture": "مهرجان هاربين الدولي لنحت الجليد والثلج هو الأكبر في العالم. تُدفئ الكلمات المستعارة من الروسية والنقانق وخبز الجاودار والسباحة الشتوية وحساء «الهوت بوت» فصول الشتاء الطويلة.",
+          "cities": {
+            "harbin": {
+              "note": "عاصمة المقاطعة على نهر سونغهوا."
+            },
+            "daqing": {
+              "note": "مدينة نشأت من أشهر حقول النفط في الصين."
+            }
+          }
+        },
+        "shanghai": {
+          "overview": "قرية صيادين تحولت إلى ميناء معاهدة عام 1843، وهي الآن العاصمة المالية للصين. يواجه حي البند أفق بودونغ عبر نهر هوانغبو؛ وتبقى بيوت الأزقة «شيكومن» قائمة بين الأبراج.",
+          "culture": "الشنغهاية لهجة من لهجات الوو. تمزج ثقافة «هايباي» («الطراز الشنغهاي») بين التأثيرات الصينية والغربية؛ وتُعد فطائر «شياولونغباو» ومهرجان فوانيس حديقة يو من المعالم المحلية.",
+          "cities": {
+            "yangpu-district": {
+              "note": "حي شمالي شرقي بُني حول جامعاته وواجهة نهرية أُعيد تطويرها."
+            },
+            "minhang-district": {
+              "note": "حي جنوبي كبير يضم حرمًا جامعيًا رئيسيًا وصناعة نشطة."
+            }
+          }
+        },
+        "jiangsu": {
+          "overview": "المقاطعة المزدهرة الواقعة مباشرة أعلى نهر شنغهاي. كانت نانجينغ عاصمة سلالية مرات عدة؛ وحدائق سوتشو الكلاسيكية وقنواتها موقع تراث عالمي على القناة الكبرى.",
+          "culture": "تُستخدم لهجتا الوو وجيانغهواي الماندرين معًا. وُلد هنا فن الكونكيو الراقي الذي شكّل كل المسرح الصيني اللاحق، وكذلك مطبخ هوايانغ الرقيق.",
+          "cities": {
+            "nanjing": {
+              "note": "عاصمة المقاطعة، مدينة مسوّرة على نهر اليانغتسى تحمل طبقات من التاريخ."
+            },
+            "suzhou": {
+              "note": "مدينة قنوات مشهورة بالحدائق والحرير، واليوم بالتقنية العالية."
+            }
+          }
+        },
+        "zhejiang": {
+          "overview": "مقاطعة ساحلية تلّية للشاي والحرير والقطاع الخاص. ألهمت بحيرة الغرب في هانغتشو الشعراء لألف عام؛ وجبل بوتو جزيرة حج بوذي رئيسية.",
+          "culture": "تختلف لهجات الوو بشدة من واد لآخر. أوبرا يوي وشاي لونغجينغ الأخضر، ومشاهدة المد النهري الخريفي وهو يزأر صعودًا في نهر تشيانتانغ، من تقاليد تشجيانغ.",
+          "cities": {
+            "hangzhou": {
+              "note": "عاصمة المقاطعة ومركز تقني بجوار بحيرة الغرب."
+            },
+            "ningbo": {
+              "note": "ميناء تجاري قديم وأحد أكثر موانئ الشحن ازدحامًا في العالم."
+            }
+          }
+        },
+        "anhui": {
+          "overview": "مقاطعة داخلية يقسمها نهرا اليانغتسى وهواي. جبل هوانغشان (الجبل الأصفر) وقرى هويتشو المبيضة شيدي وهونغتسون مواقع تراث عالمي.",
+          "culture": "بنى تجار هويتشو ثقافة الصين في أحجار الحبر وورق الأرز وصناعة الفرش. انتقلت أوبرا آنهوي إلى بكين عام 1790 وأصبحت سلف أوبرا بكين.",
+          "cities": {
+            "hefei": {
+              "note": "عاصمة المقاطعة ومركز علمي وطني."
+            },
+            "wuhu": {
+              "note": "ميناء نهري على اليانغتسى ومدينة صناعية."
+            }
+          }
+        },
+        "fujian": {
+          "overview": "ساحل جبلي يطل على تايوان، وكان تاريخيًا نقطة انطلاق للهجرة عبر جنوب شرق آسيا. كانت تشيوانتشو ميناءً بحريًا كبيرًا على طريق الحرير في العصور الوسطى؛ ومنازل التولو الطينية الدائرية للهاكا موقع تراث عالمي.",
+          "culture": "تختلف لهجات مين، الهوكيين في الجنوب ولهجة فوتشو في الشمال، اختلافًا كبيرًا عن الماندرين. شاي الأولونغ ومسرح دمى القفاز ومهرجان إلهة البحر ماتسو محورية في الحياة المحلية.",
+          "cities": {
+            "fuzhou": {
+              "note": "عاصمة المقاطعة، مدينة أشجار البانيان والينابيع الساخنة."
+            },
+            "xiamen": {
+              "note": "مدينة جزرية بحي استعماري في غولانغيو ومناخ معتدل."
+            }
+          }
+        },
+        "jiangxi": {
+          "overview": "حوض يصرفه نهر غان إلى بويانغ، أكبر بحيرة عذبة في الصين. تنتج جينغدتشن الخزف الإمبراطوري منذ ألف عام؛ وكانت جينغغانغشان أول قاعدة ريفية شيوعية.",
+          "culture": "غان والهاكا هما اللهجتان الرئيسيتان. رقصة نوو الطقسية المقنّعة وتقاليد العشائر في قاعات الأسلاف وسباقات قوارب التنين قوية هنا.",
+          "cities": {
+            "nanchang": {
+              "note": "عاصمة المقاطعة، مدينة نهرية ذات تاريخ ثوري."
+            },
+            "jingdezhen": {
+              "note": "«عاصمة الخزف» في الصين."
+            }
+          }
+        },
+        "shandong": {
+          "overview": "شبه جزيرة بين بحري بوهاي والأصفر، ومسقط رأس كونفوشيوس ومنشيوس. جبل تاي هو الأكثر إجلالًا بين جبال الصين المقدسة؛ وتحتفظ تشينغداو بحي ألماني ومصنع جعة شهير.",
+          "culture": "ماندرين جيلو هو الكلام المحلي. مطبخ لو أحد التقاليد الإقليمية الأربعة الكبرى؛ وتقيم وايفانغ مهرجانًا دوليًا للطائرات الورقية كل ربيع.",
+          "cities": {
+            "jinan": {
+              "note": "«مدينة الينابيع» وعاصمة المقاطعة."
+            },
+            "qingdao": {
+              "note": "مدينة ساحلية بأسطح حمراء وشواطئ وجعة."
+            }
+          }
+        },
+        "henan": {
+          "overview": "جوهر السهل الأوسط حيث تشكّلت الحضارة الصينية. تضم ثلاث عواصم قديمة (لويانغ وكايفنغ وآنيانغ حيث اكتُشفت عظام الوحي)، ومعبد شاولين وكهوف لونغمن.",
+          "culture": "ماندرين السهل الأوسط هو الكلام المحلي. أوبرا يو أكبر أشكال الأوبرا الإقليمية في البلاد؛ والمعكرونة القمحية والفطائر المحشوة هي الغذاء اليومي.",
+          "cities": {
+            "zhengzhou": {
+              "note": "مفترق سكك حديدية رئيسي وعاصمة المقاطعة."
+            },
+            "kaifeng": {
+              "note": "عاصمة سابقة لأسرة سونغ على النهر الأصفر."
+            }
+          }
+        },
+        "hubei": {
+          "overview": "حيث يلتقي نهر هان باليانغتسى في ووهان، قلب النقل في الصين. بدأت ثورة 1911 هنا؛ ويرتفع سد الممرات الثلاثة أعلى النهر.",
+          "culture": "يشكّل ماندرين الجنوب الغربي وإرث تشو القديم الهوية المحلية. المعكرونة الحارة الجافة (ريغانميان) هي فطور ووهان؛ ويُقال إن سباقات قوارب التنين بدأت في هذه الأنهار.",
+          "cities": {
+            "wuhan": {
+              "note": "عاصمة المقاطعة وواحدة من أكبر مدن الصين الداخلية."
+            },
+            "yichang": {
+              "note": "المدينة المجاورة لسد الممرات الثلاثة."
+            }
+          }
+        },
+        "hunan": {
+          "overview": "مقاطعة بحيرات وجبال جنوب اليانغتسى. بحيرة دونغتينغ وأعمدة الكوارتز في تشانغجياجيه وقرية مسقط رأس ماو تسي تونغ شاوشان كلها هنا، وكذلك أكاديمية يويلو العريقة.",
+          "culture": "تُستخدم لهجة شيانغ في جميع أنحاء المقاطعة. أوبرا الطبل الزهري الشعبية والمطبخ الحار جدًا بالفلفل الحار ومهرجانات شعبي مياو وتوجيا تمنح هونان طابعًا جريئًا.",
+          "cities": {
+            "changsha": {
+              "note": "عاصمة المقاطعة النابضة بالحياة على نهر شيانغ."
+            },
+            "xiangtan": {
+              "note": "مدينة صناعية قرب شاوشان."
+            }
+          }
+        },
+        "guangdong": {
+          "overview": "دلتا نهر اللؤلؤ، محرك الصين للتصنيع والتصدير. غوانزو (كانتون) ميناء تجارة خارجية منذ ألفي عام؛ وتحولت شنتشن من قرية إلى مدينة عملاقة خلال أربعين عامًا.",
+          "culture": "تُستخدم الكانتونية والتشاوتشوية والهاكا جميعًا. أوبرا الكانتونية ورقصة الأسد وأسواق الزهور الربيعية، وقبل كل شيء غداء الدين سام «يوم تشا»، هي ثقافة لينغنان.",
+          "cities": {
+            "guangzhou": {
+              "note": "عاصمة المقاطعة ومدينة الصين التجارية الكبرى في الجنوب."
+            },
+            "shenzhen": {
+              "note": "مدينة تقنية شابة على حدود هونغ كونغ."
+            }
+          }
+        },
+        "guangxi": {
+          "overview": "منطقة ذاتية الحكم للزوانغ بمناظر كارستية مذهلة، تشمل قمم غويلين ونهر لي ومدرجات الأرز في لونغشنغ. الزوانغ أكبر أقلية عرقية في الصين.",
+          "culture": "لغة الزوانغ رسمية مشتركة؛ وماندرين الجنوب الغربي والكانتونية شائعان أيضًا. يملأ مهرجان الغناء الزوانغي «الثالث من مارس»، إلى جانب عادات شعبي ياو ومياو، التقويم الربيعي.",
+          "cities": {
+            "nanning": {
+              "note": "عاصمة الإقليم الخضراء قرب الحدود الفيتنامية."
+            },
+            "guilin": {
+              "note": "مدينة سياحية بين القمم الجيرية."
+            }
+          }
+        },
+        "hainan": {
+          "overview": "مقاطعة الصين الجزرية الاستوائية وميناء تجارة حرة جديد. سانيا في الطرف الجنوبي مدينة منتجعات شاطئية؛ والداخل موطن لشعبي لي ومياو.",
+          "culture": "تُستخدم الهاينانية (إحدى لهجات مين) إلى جانب الماندرين. نسيج لي المطرز ونحت قشرة جوز الهند وتجمعات الأغاني الشعبية المفتوحة «جونبو» من تقاليد الجزيرة.",
+          "cities": {
+            "haikou": {
+              "note": "عاصمة المقاطعة على الساحل الشمالي."
+            },
+            "sanya": {
+              "note": "مدينة المنتجعات الاستوائية في أقصى الجنوب."
+            }
+          }
+        },
+        "chongqing": {
+          "overview": "مدينة جبلية حيث يلتقي نهر جيالينغ باليانغتسى، وعاصمة الصين زمن الحرب من 1937 إلى 1945. تتراكم الطرق والسكك والمباني على المنحدرات بمستويات عدة.",
+          "culture": "لهجة تشونغتشينغ من ماندرين الجنوب الغربي سريعة ومباشرة. المدينة موطن حساء «الهوت بوت» الحار المخدِّر؛ وتحافظ بلدة تشيتشيكو القديمة وعيد الربيع على تقاليد أقدم.",
+          "cities": {
+            "shapingba-district": {
+              "note": "حي الجامعات الرئيسي في غرب المدينة."
+            },
+            "yuzhong-district": {
+              "note": "شبه الجزيرة التي تشكّل مركز المدينة التاريخي."
+            }
+          }
+        },
+        "sichuan": {
+          "overview": "«أرض الوفرة»، سهل تشنغدو الذي رَوَته أعمال دوجيانغيان لأكثر من ألفي عام. يضم الباندا العملاقة وبحيرات جيوتشايغو وبوذا ليشان العملاق.",
+          "culture": "لهجة السيتشوانية، إحدى لهجات الجنوب الغربي، دافئة ومرحة. أوبرا سيتشوان بفن «تغيير الوجه» الخاطف، وحياة بيوت الشاي الهادئة، ومطبخ الفلفل المخدِّر، مشهورة في جميع أنحاء البلاد.",
+          "cities": {
+            "chengdu": {
+              "note": "عاصمة المقاطعة المريحة ومركز تقني."
+            },
+            "mianyang": {
+              "note": "«مدينة العلوم» المعتمدة في الصين شمال شرق تشنغدو، ومقر ناضومي."
+            }
+          }
+        },
+        "guizhou": {
+          "overview": "هضبة وعرة مليئة بالكهوف وواحدة من أكثر مقاطعات الصين تنوعًا عرقيًا. هوانغغوشو أكبر شلال في البلاد؛ ويُقطَّر مشروب موتاي الوطني هنا.",
+          "culture": "يتشارك الماندرين المقاطعة مع لغات مياو ودونغ وبويي. تُعد جوقات دونغ الكبرى فنًا مدرجًا لدى اليونسكو؛ وتجمع مهرجانات آلة اللوشنغ ومهرجان وجبة أخوات مياو الوديان بأكملها.",
+          "cities": {
+            "guiyang": {
+              "note": "عاصمة المقاطعة الباردة المشجّرة ومركز البيانات الضخمة."
+            },
+            "zunyi": {
+              "note": "مدينة تاريخية عقد فيها الحزب الشيوعي اجتماعًا مفصليًا عام 1935."
+            }
+          }
+        },
+        "yunnan": {
+          "overview": "أكثر مقاطعات الصين تنوعًا بيولوجيًا، على حدود ميانمار ولاوس وفيتنام. تحافظ على بلدتي ليجيانغ ودالي القديمتين، ومرتفعات شانغريلا وغابة شيشوانغبانا المطيرة، وهي مصدر شاي البوير.",
+          "culture": "يعيش هنا خمسة وعشرون أقلية عرقية؛ من بين لغاتها باي وناشي (بكتابتها التصويرية دونغبا) وداي ويي. مهرجان رش الماء لشعب داي، ومهرجان المشاعل لشعب يي، ومعرض الشهر الثالث في دالي هي أبرز مناسبات العام.",
+          "cities": {
+            "kunming": {
+              "note": "«مدينة الربيع» المعتدلة، عاصمة المقاطعة."
+            },
+            "dali": {
+              "note": "بلدة قديمة على بحيرة ومركز ثقافة باي."
+            }
+          }
+        },
+        "tibet": {
+          "overview": "الهضبة المرتفعة التي يبلغ متوسط ارتفاعها أكثر من أربعة آلاف متر. تضم لهاسا قصر بوتالا ومعبد جوخانغ؛ ويرتفع الوجه الشمالي لجبل إفرست على حدودها الجنوبية.",
+          "culture": "التبتية لغة رسمية مشتركة تُكتب بخطها الخاص. تشكّل البوذية التبتية الحياة اليومية؛ ولوسار (رأس السنة) ومهرجان شوتون «الزبادي» بكشف ثانغكا العملاق، والشاي بالزبدة والتسامبا تقاليد محورية.",
+          "cities": {
+            "lhasa": {
+              "note": "عاصمة الإقليم والمركز الروحي للتبت."
+            },
+            "nyingchi": {
+              "note": "منطقة وادٍ أكثر انخفاضًا وخضرة في الجنوب الشرقي."
+            }
+          }
+        },
+        "shaanxi": {
+          "overview": "مهد الصين الإمبراطورية. كانت شيان، تشانغآن القديمة، عاصمة أسرات تشو وتشين وهان وتانغ، والطرف الشرقي لطريق الحرير؛ يضم جيش الطين الطيني وسور المدينة السليم وجبل هوا.",
+          "culture": "تُستخدم لهجة غوانتشونغ من ماندرين السهل الأوسط حول شيان. تشينتشيانغ إحدى أقدم أنواع الأوبرا في الصين؛ وقص الورق ومهرجان الفوانيس ومعكرونة «بيانغ بيانغ» العريضة من سمات شانشي.",
+          "cities": {
+            "xian": {
+              "note": "عاصمة المقاطعة وواحدة من أعظم المدن التاريخية في العالم."
+            },
+            "yangling": {
+              "note": "منطقة وطنية للتكنولوجيا الزراعية غرب شيان."
+            }
+          }
+        },
+        "gansu": {
+          "overview": "مقاطعة طويلة على طول ممر خه شي، الممر الضيق لطريق الحرير بين الصحراء والجبال. تحفظ كهوف موغاو في دونهوانغ ألف عام من الجداريات البوذية؛ ويُمثّل حصن جيايوغوان الطرف الغربي لسور الصين العظيم من عهد مينغ.",
+          "culture": "يلتقي ماندرين السهل الأوسط ولانيين هنا بالتبتية والدونغشيانغية. أغاني الجبال «هوا آر» والرقص المستوحى من دونهوانغ وحساء المعكرونة المسحوبة يدويًا باللحم البقري في لانتشو تشكّل الثقافة المحلية.",
+          "cities": {
+            "lanzhou": {
+              "note": "عاصمة المقاطعة الممتدة على طول النهر الأصفر."
+            },
+            "tianshui": {
+              "note": "مدينة قديمة قرب كهوف مايجيشان."
+            }
+          }
+        },
+        "qinghai": {
+          "overview": "مقاطعة مرتفعة قليلة السكان تنبع منها أنهار اليانغتسى والأصفر والميكونغ. بحيرة تشينغهاي أكبر بحيرة في الصين؛ ودير كومبوم من أهم الأديرة البوذية التبتية.",
+          "culture": "تُستخدم الماندرين والتبتية والمنغولية جميعًا. يطوف الحجاج حول بحيرة تشينغهاي سيرًا على الأقدام؛ وتُميّز الأوبرا التبتية وسباق الدراجات الدولي حول البحيرة كل صيف التقويم.",
+          "cities": {
+            "xining": {
+              "note": "عاصمة المقاطعة وأكبر مدن الهضبة."
+            },
+            "golmud": {
+              "note": "بلدة سكك حديدية صحراوية على الخط المتجه إلى التبت."
+            }
+          }
+        },
+        "ningxia": {
+          "overview": "منطقة صغيرة ذاتية الحكم لشعب هوي حيث يرسم النهر الأصفر شريطًا من الأراضي الزراعية عبر بلاد جافة. مقابر شيا الغربية الملكية وفن الصخور في جبل هيلان وصناعة نبيذ سريعة النمو من معالمها.",
+          "culture": "تُستخدم ماندرين تشونغيوان، مع إرث إسلامي قوي لشعب هوي، ومساجد ومطبخ حلال، والاحتفال الواسع بعيدي الفطر والأضحى.",
+          "cities": {
+            "yinchuan": {
+              "note": "عاصمة الإقليم بين النهر والجبال."
+            },
+            "zhongwei": {
+              "note": "بلدة يلتقي فيها الصحراء بالنهر الأصفر عند شاپوتو."
+            }
+          }
+        },
+        "xinjiang": {
+          "overview": "أكبر مناطق الصين، ملتقى طريق الحرير بين جبال تيانشان وصحراء تاكلامكان. توربان واحة تحت مستوى سطح البحر؛ وسوق كاشغر القديم يتاجر منذ ألفي عام.",
+          "culture": "الأويغورية، لغة تركية، رسمية مشتركة مع الماندرين؛ وتُستخدم أيضًا الكازاخية والقيرغيزية. سويتات موقام الاثنتا عشرة الغنائية فن مدرج لدى اليونسكو؛ ومعكرونة لاغمان والبيلاف والنان، ومهرجانا قربان (عيد الأضحى) والنيروز تحدد العام.",
+          "cities": {
+            "urumqi": {
+              "note": "عاصمة الإقليم، ويُقال إنها أبعد مدينة عن أي محيط."
+            },
+            "kashgar": {
+              "note": "مدينة الواحة التاريخية في أقصى الغرب."
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "welcome-to-china": {
+        "title": "مرحبًا بك في الصين",
+        "summary": "مقدمة تعريفية للدراسة في الصين: النظام التعليمي واللغة وإيقاع الحياة، وما يجعل التجربة تستحق العناء."
+      },
+      "how-to-apply": {
+        "title": "كيفية التقديم",
+        "summary": "رحلة التقديم خطوة بخطوة: اختيار البرنامج، المستندات، المواعيد النهائية، عروض القبول والتسجيل."
+      },
+      "scholarship-types": {
+        "title": "أنواع المنح الدراسية",
+        "summary": "شرح المنح الحكومية والجامعية والإقليمية ومنح الشركات: ما تغطيه ولمن تناسب."
+      },
+      "student-visa-guide": {
+        "title": "دليل تأشيرة الطالب",
+        "summary": "من نموذج JW202 / JW201 وتأشيرة X1 / X2 إلى تصريح الإقامة الذي تحصل عليه بعد الوصول."
+      },
+      "living-in-china": {
+        "title": "الحياة في الصين",
+        "summary": "السكن والمدفوعات والهواتف والمواصلات والرعاية الصحية والحياة اليومية كطالب دولي."
+      },
+      "city-guides": {
+        "title": "أدلة المدن",
+        "summary": "كل إقليم في الصين: تاريخه وثقافته ولغته ومهرجاناته، مع مدينتين وأبرز جامعاتهما."
+      },
+      "faq": {
+        "title": "الأسئلة الشائعة",
+        "summary": "إجابات واضحة عن الأسئلة الأكثر شيوعًا لدى الطلاب قبل التقديم."
+      }
+    }
   }
 }

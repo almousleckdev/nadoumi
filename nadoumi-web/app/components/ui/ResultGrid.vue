@@ -29,7 +29,7 @@ const { t } = useI18n()
 
     <NAlert v-else-if="error" tone="danger">
       {{ t('errors.loadSection') }}
-      <button type="button" class="ml-2 font-medium underline" @click="emit('retry')">
+      <button type="button" class="ms-2 font-medium underline" @click="emit('retry')">
         {{ t('common.retry') }}
       </button>
     </NAlert>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const props = defineProps<{ page: number, pageCount: number }>()
 const emit = defineEmits<{ 'update:page': [value: number] }>()
+const { t } = useI18n()
 
 /** windowed 0-based page numbers with gaps as -1 */
 const pages = computed<number[]>(() => {
@@ -26,11 +27,12 @@ function go(p: number) {
 </script>
 
 <template>
-  <nav v-if="pageCount > 1" class="flex items-center justify-center gap-1" aria-label="Pagination">
+  <nav v-if="pageCount > 1" class="flex items-center justify-center gap-1" :aria-label="t('common.pagination')">
     <button
       type="button"
       class="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent"
       :disabled="page === 0"
+      :aria-label="t('common.previous')"
       @click="go(page - 1)"
     >
       ‹
@@ -52,6 +54,7 @@ function go(p: number) {
       type="button"
       class="rounded-md px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:hover:bg-transparent"
       :disabled="page >= pageCount - 1"
+      :aria-label="t('common.next')"
       @click="go(page + 1)"
     >
       ›

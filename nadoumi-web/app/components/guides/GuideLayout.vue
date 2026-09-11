@@ -11,10 +11,10 @@ const guide = computed(() => guideBySlug(props.slug))
 const hero = computed(() => GUIDE_HEROES[props.slug])
 const others = computed(() => GUIDES.filter(g => g.slug !== props.slug))
 
-useSeo(
-  guide.value ? `${guide.value.title} · Nadoumi Guides` : 'Nadoumi Guides',
-  guide.value?.summary ?? '',
-)
+const title = computed(() => t(`guides.meta.${props.slug}.title`))
+const summary = computed(() => t(`guides.meta.${props.slug}.summary`))
+
+useSeo(`${title.value} · Nadoumi Guides`, summary.value)
 </script>
 
 <template>
@@ -34,13 +34,13 @@ useSeo(
           <nav class="text-sm text-white/70">
             <NuxtLink :to="localePath('/guides')" class="no-underline hover:text-white">{{ t('footer.guides') }}</NuxtLink>
             <span class="mx-2" aria-hidden="true">/</span>
-            <span>{{ guide?.title }}</span>
+            <span>{{ title }}</span>
           </nav>
           <span class="mt-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 text-white ring-1 ring-white/20">
             <GuideIcon v-if="guide" :name="guide.icon" :size="22" />
           </span>
-          <h1 class="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">{{ guide?.title }}</h1>
-          <p class="mt-4 text-lg leading-8 text-slate-200">{{ guide?.summary }}</p>
+          <h1 class="mt-4 font-display text-4xl font-bold tracking-tight sm:text-5xl">{{ title }}</h1>
+          <p class="mt-4 text-lg leading-8 text-slate-200">{{ summary }}</p>
         </div>
       </NContainer>
     </section>
@@ -67,8 +67,8 @@ useSeo(
               <GuideIcon :name="g.icon" :size="18" />
             </span>
             <span>
-              <span class="block font-display font-semibold text-slate-900 group-hover:text-brand-700">{{ g.title }}</span>
-              <span class="mt-0.5 block text-sm leading-6 text-slate-600">{{ g.summary }}</span>
+              <span class="block font-display font-semibold text-slate-900 group-hover:text-brand-700">{{ t(`guides.meta.${g.slug}.title`) }}</span>
+              <span class="mt-0.5 block text-sm leading-6 text-slate-600">{{ t(`guides.meta.${g.slug}.summary`) }}</span>
             </span>
           </NuxtLink>
         </div>

@@ -93,7 +93,7 @@ const prose = computed(() => {
       </span>
 
       <NContainer>
-        <div class="py-12 pr-20 sm:py-16 sm:pr-28">
+        <div class="py-12 pe-20 sm:py-16 sm:pe-28">
           <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ u.name }}</h1>
           <p v-if="u.nameCn" class="mt-1 text-lg text-white/70">{{ u.nameCn }}</p>
           <p class="mt-2 text-white/80">{{ place }}</p>

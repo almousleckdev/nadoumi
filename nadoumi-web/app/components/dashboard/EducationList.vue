@@ -47,7 +47,7 @@ function saveEdit() {
             <td class="py-2">{{ row.institution }}</td><td>{{ row.level }}</td><td>{{ row.field }}</td><td>{{ row.gpa }}</td>
             <td class="text-right">
               <button class="text-brand-700 hover:underline" @click="startEdit(row)">{{ t('common.edit') }}</button>
-              <button :data-test="`remove-${row.id}`" class="ml-3 text-red-600 hover:underline" @click="removeId = row.id">{{ t('common.remove') }}</button>
+              <button :data-test="`remove-${row.id}`" class="ms-3 text-red-600 hover:underline" @click="removeId = row.id">{{ t('common.remove') }}</button>
             </td>
           </tr>
           <tr v-else class="border-t border-slate-100">

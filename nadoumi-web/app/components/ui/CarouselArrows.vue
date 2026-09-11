@@ -5,6 +5,7 @@ withDefaults(defineProps<{ atStart?: boolean, atEnd?: boolean, label?: string }>
   label: undefined,
 })
 const emit = defineEmits<{ prev: [], next: [] }>()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -13,7 +14,7 @@ const emit = defineEmits<{ prev: [], next: [] }>()
       type="button"
       class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent"
       :disabled="atStart"
-      aria-label="Previous"
+      :aria-label="t('common.previous')"
       @click="emit('prev')"
     >
       <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" aria-hidden="true">
@@ -24,7 +25,7 @@ const emit = defineEmits<{ prev: [], next: [] }>()
       type="button"
       class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-colors hover:border-slate-300 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-transparent"
       :disabled="atEnd"
-      aria-label="Next"
+      :aria-label="t('common.next')"
       @click="emit('next')"
     >
       <svg viewBox="0 0 20 20" fill="none" class="h-4 w-4" aria-hidden="true">

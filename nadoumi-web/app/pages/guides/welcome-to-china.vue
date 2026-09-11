@@ -1,72 +1,112 @@
 <script setup lang="ts">
+import type { GuideIconName } from '~/components/guides/icons'
+
+const { t } = useI18n()
 const localePath = useLocalePath()
 
-const why = [
-  { icon: 'wallet', term: 'Low cost', detail: 'Public-university tuition is a fraction of comparable programmes in Europe or North America, and living costs outside the biggest cities are low.' },
-  { icon: 'award', term: 'Real scholarships', detail: 'Government, provincial and university awards can cover tuition, accommodation and a monthly stipend.' },
-  { icon: 'book', term: 'Wide choice', detail: 'Engineering, medicine, business, sciences, Chinese language and international relations, many with English-taught tracks.' },
-  { icon: 'globe', term: 'A regional network', detail: 'Even a year of Mandarin opens doors across Asia; graduates leave with a genuine network.' },
-] as const
+function items(section: string, rows: { key: string, icon: GuideIconName }[]) {
+  return rows.map(({ key, icon }) => ({
+    icon,
+    term: t(`guides.welcomeToChina.${section}.${key}.term`),
+    detail: t(`guides.welcomeToChina.${section}.${key}.detail`),
+  }))
+}
 
-const life = [
-  { icon: 'qr', term: 'Everything by phone', detail: 'WeChat and Alipay handle messaging, payments, transport and deliveries.' },
-  { icon: 'train', term: 'High-speed rail', detail: 'A vast network links every major city, fast and affordable.' },
-  { icon: 'home', term: 'Campus living', detail: 'Walled, self-contained campuses with dorms, canteens, clinics and sports on site.' },
-  { icon: 'shield', term: 'Safe day to day', detail: 'Low street crime; the international student office helps you settle in.' },
-] as const
+const why = items('why', [
+  { key: 'lowCost', icon: 'wallet' },
+  { key: 'realScholarships', icon: 'award' },
+  { key: 'wideChoice', icon: 'book' },
+  { key: 'network', icon: 'globe' },
+])
+const life = items('life', [
+  { key: 'phone', icon: 'qr' },
+  { key: 'railway', icon: 'train' },
+  { key: 'campus', icon: 'home' },
+  { key: 'safety', icon: 'shield' },
+])
 </script>
 
 <template>
   <GuideLayout slug="welcome-to-china">
-    <p>
-      China hosts one of the largest international student communities in the world, spread across
-      more than a thousand universities from the tropics of Hainan to the grasslands of the north.
-      Degrees are taught in Chinese and, increasingly, in English; tuition is modest; and generous
-      scholarships are available to strong applicants. This is a short orientation before you dive in.
-    </p>
+    <p>{{ t('guides.welcomeToChina.intro') }}</p>
 
-    <GuideSection eyebrow="The case" title="Why study in China">
+    <GuideSection :eyebrow="t('guides.welcomeToChina.sections.case.eyebrow')" :title="t('guides.welcomeToChina.sections.case.title')">
       <GuideIconList :items="why" />
     </GuideSection>
 
-    <GuideSection eyebrow="Structure" title="How the system works">
-      <p>
-        A bachelor's degree usually takes four years (five for medicine and architecture); a master's
-        two to three; a PhD three to four. The academic year runs from September to July with a long
-        winter break around Spring Festival. You will hear universities described as
-        <strong>"Double First-Class"</strong>, and the older <strong>"985"</strong> and
-        <strong>"211"</strong> labels, which mark the research-intensive institutions.
-      </p>
+    <GuideSection :eyebrow="t('guides.welcomeToChina.sections.structure.eyebrow')" :title="t('guides.welcomeToChina.sections.structure.title')">
+      <i18n-t keypath="guides.welcomeToChina.structureBody" tag="p" scope="global">
+        <template #doubleFirstClass>
+          <strong>{{ t('guides.welcomeToChina.doubleFirstClass') }}</strong>
+        </template>
+        <template #label985>
+          <strong>{{ t('guides.welcomeToChina.label985') }}</strong>
+        </template>
+        <template #label211>
+          <strong>{{ t('guides.welcomeToChina.label211') }}</strong>
+        </template>
+      </i18n-t>
     </GuideSection>
 
-    <GuideSection eyebrow="Language" title="What language will I study in?">
-      <p>
-        Chinese-taught degrees normally require an <strong>HSK</strong> certificate (HSK 4 for many
-        programmes, HSK 5 for humanities and medicine). English-taught degrees require
-        <strong>IELTS or TOEFL</strong>, or proof your previous education was in English, plus a
-        semester or two of basic Mandarin as a graduation requirement.
-      </p>
-      <GuideCallout title="Not ready in Chinese?" icon="check" tone="brand">
-        A one-year language programme is the standard bridge, and many scholarships include it.
+    <GuideSection :eyebrow="t('guides.welcomeToChina.sections.language.eyebrow')" :title="t('guides.welcomeToChina.sections.language.title')">
+      <i18n-t keypath="guides.welcomeToChina.languageBody" tag="p" scope="global">
+        <template #hsk>
+          <strong>{{ t('guides.welcomeToChina.hsk') }}</strong>
+        </template>
+        <template #ieltsToefl>
+          <strong>{{ t('guides.welcomeToChina.ieltsToefl') }}</strong>
+        </template>
+      </i18n-t>
+      <GuideCallout :title="t('guides.welcomeToChina.notReadyCallout.title')" icon="check" tone="brand">
+        {{ t('guides.welcomeToChina.notReadyCallout.body') }}
       </GuideCallout>
     </GuideSection>
 
-    <GuideSection eyebrow="Daily life" title="Life in brief">
+    <GuideSection :eyebrow="t('guides.welcomeToChina.sections.dailyLife.eyebrow')" :title="t('guides.welcomeToChina.sections.dailyLife.title')">
       <GuideIconList :items="life" />
-      <p>For the full practical set-up, read <NuxtLink :to="localePath('/guides/living-in-china')">Living in China</NuxtLink>.</p>
+      <i18n-t keypath="guides.welcomeToChina.lifeNote" tag="p" scope="global">
+        <template #livingGuide>
+          <NuxtLink :to="localePath('/guides/living-in-china')">{{ t('guides.meta.living-in-china.title') }}</NuxtLink>
+        </template>
+      </i18n-t>
     </GuideSection>
 
-    <GuideSection eyebrow="Next" title="Your next steps">
-      <ol class="list-decimal space-y-2 pl-6 marker:text-slate-400">
-        <li>Shortlist programmes: start from <NuxtLink :to="localePath('/scholarships')">Scholarships</NuxtLink> and <NuxtLink :to="localePath('/universities')">Universities</NuxtLink>.</li>
-        <li>Check the language and academic requirements for each.</li>
-        <li>Prepare documents early: see <NuxtLink :to="localePath('/guides/how-to-apply')">How to Apply</NuxtLink>.</li>
-        <li>Apply, accept your offer, and get the <strong>JW202/JW201</strong> form for the visa: see the <NuxtLink :to="localePath('/guides/student-visa-guide')">Student Visa Guide</NuxtLink>.</li>
+    <GuideSection :eyebrow="t('guides.welcomeToChina.sections.next.eyebrow')" :title="t('guides.welcomeToChina.sections.next.title')">
+      <ol class="list-decimal space-y-2 ps-6 marker:text-slate-400">
+        <li>
+          <i18n-t keypath="guides.welcomeToChina.nextSteps.shortlist" tag="span" scope="global">
+            <template #scholarships>
+              <NuxtLink :to="localePath('/scholarships')">{{ t('nav.scholarships') }}</NuxtLink>
+            </template>
+            <template #universities>
+              <NuxtLink :to="localePath('/universities')">{{ t('nav.universities') }}</NuxtLink>
+            </template>
+          </i18n-t>
+        </li>
+        <li>{{ t('guides.welcomeToChina.nextSteps.requirements') }}</li>
+        <li>
+          <i18n-t keypath="guides.welcomeToChina.nextSteps.documents" tag="span" scope="global">
+            <template #howToApply>
+              <NuxtLink :to="localePath('/guides/how-to-apply')">{{ t('guides.meta.how-to-apply.title') }}</NuxtLink>
+            </template>
+          </i18n-t>
+        </li>
+        <li>
+          <i18n-t keypath="guides.welcomeToChina.nextSteps.visa" tag="span" scope="global">
+            <template #jwForm>
+              <strong>{{ t('guides.welcomeToChina.jwForm') }}</strong>
+            </template>
+            <template #visaGuide>
+              <NuxtLink :to="localePath('/guides/student-visa-guide')">{{ t('guides.meta.student-visa-guide.title') }}</NuxtLink>
+            </template>
+          </i18n-t>
+        </li>
       </ol>
-      <p>
-        <NuxtLink :to="localePath('/register')">Create a profile</NuxtLink> and Nadoumi will match you
-        to programmes, track your deadlines and guide each step to enrolment.
-      </p>
+      <i18n-t keypath="guides.welcomeToChina.finalCta" tag="p" scope="global">
+        <template #createProfile>
+          <NuxtLink :to="localePath('/register')">{{ t('guides.welcomeToChina.createProfileLink') }}</NuxtLink>
+        </template>
+      </i18n-t>
     </GuideSection>
   </GuideLayout>
 </template>

@@ -2,7 +2,9 @@
 import type { GuideCity } from '~/data/guides/china'
 import type { RegionTint } from '~/data/guides/regions'
 
-defineProps<{ city: GuideCity, tint: RegionTint }>()
+const props = defineProps<{ city: GuideCity, divisionSlug: string, tint: RegionTint }>()
+const { t } = useI18n()
+const note = computed(() => t(`guides.cityGuides.divisions.${props.divisionSlug}.cities.${props.city.id}.note`))
 </script>
 
 <template>
@@ -11,9 +13,9 @@ defineProps<{ city: GuideCity, tint: RegionTint }>()
       <p class="font-display font-semibold text-slate-900">{{ city.name }}</p>
       <span class="font-display text-lg leading-none text-slate-300">{{ city.cn }}</span>
     </div>
-    <p class="mt-1 text-xs leading-5 text-slate-500">{{ city.note }}</p>
+    <p class="mt-1 text-xs leading-5 text-slate-500">{{ note }}</p>
 
-    <p class="mt-3 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Top universities</p>
+    <p class="mt-3 text-[11px] font-semibold uppercase tracking-wide text-slate-400">{{ t('guides.cityGuides.topUniversities') }}</p>
     <ul class="mt-1.5 space-y-1.5">
       <li
         v-for="u in city.universities"
