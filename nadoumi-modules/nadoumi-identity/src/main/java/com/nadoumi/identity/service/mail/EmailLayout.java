@@ -27,7 +27,7 @@ public class EmailLayout {
 
     private static final String FONT =
             "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
-    private static final String C_BG = "#f6f7f8";
+    private static final String C_BG = "#ffffff";
     private static final String C_TEXT = "#3b3f45";
     private static final String C_HEAD = "#16181a";
     private static final String C_MUTED = "#5c616a";
@@ -53,16 +53,12 @@ public class EmailLayout {
                 .append("\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n");
         b.append("<head>\n<meta charset=\"utf-8\">\n")
                 .append("<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n")
-                .append("<meta name=\"color-scheme\" content=\"light dark\">\n")
-                .append("<meta name=\"supported-color-schemes\" content=\"light dark\">\n")
+                .append("<meta name=\"color-scheme\" content=\"light\">\n")
+                .append("<meta name=\"supported-color-schemes\" content=\"light\">\n")
                 .append("<title>").append(esc(c.heading())).append("</title>\n")
                 .append("<style>\n")
                 .append("@media (max-width:620px){.np{padding-left:16px!important;padding-right:16px!important}")
                 .append(".h1{font-size:20px!important}}\n")
-                .append("@media (prefers-color-scheme:dark){")
-                .append(".bg{background:#16181a!important}.tx{color:#e8eaed!important}.hd{color:#f2f3f5!important}")
-                .append(".mu{color:#9aa0a6!important}.rule{border-color:#2a2d31!important}")
-                .append(".btn{background:#f6f7f8!important;color:#16181a!important}.lk{color:#6f9bff!important}}\n")
                 .append("</style>\n</head>\n");
         b.append("<body class=\"bg\" style=\"margin:0;padding:0;background:").append(C_BG).append(";\">\n");
         b.append("<span style=\"display:none!important;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;mso-hide:all;\">")
@@ -255,9 +251,9 @@ public class EmailLayout {
             for (ListItem item : group.items()) {
                 b.append("- ").append(item.title());
                 if (item.meta() != null && !item.meta().isBlank()) {
-                    b.append(" — ").append(item.meta());
+                    b.append(" · ").append(item.meta());
                 }
-                b.append(" — ").append(item.url()).append('\n');
+                b.append(" · ").append(item.url()).append('\n');
             }
             b.append('\n');
         }

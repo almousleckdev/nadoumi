@@ -36,7 +36,7 @@ class EmailLayoutTest {
                 .paragraph("This code expires in 10 minutes.")
                 .cta("Sign in", "https://nadoumi.test/login")
                 .itemGroup("Programmes to explore", List.of(
-                        new ListItem("MBBS — Fudan University", "Bachelor · Medicine",
+                        new ListItem("MBBS · Fudan University", "Bachelor · Medicine",
                                 "https://nadoumi.test/programs/mbbs-fudan")))
                 .showPreferencesLink(withPrefsLink)
                 .build();
@@ -116,10 +116,10 @@ class EmailLayoutTest {
     @ParameterizedTest(name = "{0} on {1} ≥ {2}:1")
     @CsvSource({
             // foreground, background, minimum ratio (WCAG AA) — mirrors EmailLayout's palette
-            "#3b3f45,#f6f7f8,4.5",   // body text
-            "#16181a,#f6f7f8,4.5",   // headings / code
-            "#5c616a,#f6f7f8,4.5",   // muted footer text
-            "#1a56db,#f6f7f8,4.5",   // links
+            "#3b3f45,#ffffff,4.5",   // body text
+            "#16181a,#ffffff,4.5",   // headings / code
+            "#5c616a,#ffffff,4.5",   // muted footer text
+            "#1a56db,#ffffff,4.5",   // links
             "#ffffff,#16181a,4.5",   // CTA button label on fill
     })
     void palette_meets_wcag_aa_contrast(String fg, String bg, double min) {

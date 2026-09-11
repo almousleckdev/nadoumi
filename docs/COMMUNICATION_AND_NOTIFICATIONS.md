@@ -182,14 +182,14 @@ One shared, non-boxed Nadoumi email design backs **every** transactional email
 - **`EmailLayout`** — the single place email chrome exists. Renders one
   `EmailContent` into **both** the HTML and a parity plain-text alternative
   (a test asserts every URL + the OTP present in the HTML is present in the
-  text). Design: off-white full-bleed background, one 600px column, generous
+  text). Design: plain white full-bleed background (no dark-mode swap — every
+  client renders the same fixed light theme), one 600px column, generous
   whitespace, **no card/border/shadow**; a text wordmark header over a hairline;
   a consistent footer on every email — contact block (`nadoumi.brand.contact.*`)
   → social icons (Facebook / Instagram / TikTok, each shown only if its URL is
   configured) → the Nadoumi logo → legal line → preferences link when applicable.
   Table layout, `role="presentation"`, inlined CSS + one `<style>` for
-  `@media max-width` and `prefers-color-scheme: dark`, real `alt`, `lang`,
-  semantic headings, WCAG-AA contrast.
+  `@media max-width`, real `alt`, `lang`, semantic headings, WCAG-AA contrast.
 - **`BrandProperties`** (`nadoumi.brand.*`) — wordmark, `baseUrl`
   (`nadoumi.web.baseUrl`, default `https://nadoumi.com`), logo path, contact
   emails/phones/office/hours, social URLs, preferences path. `contact.*` mirrors
