@@ -199,9 +199,9 @@ One shared, non-boxed Nadoumi email design backs **every** transactional email
   URLs (Facebook/Instagram/TikTok/WhatsApp), preferences path. `contact.*`
   mirrors `nadoumi-web/app/data/contact.ts` (kept in sync by hand until a
   shared API exists). Email assets: `ruoyi-admin/.../static/email/` (real
-  brand logo + 4 social icons — the icon art is generic/monochrome pending an
-  official asset kit), served anonymously via `SecurityConfig` `permitAll` on
-  `/email/**`, resolved against `assetBaseUrl` (see `static/email/README.md`).
+  brand logo + official Facebook/Instagram/TikTok/WhatsApp icon art), served
+  anonymously via `SecurityConfig` `permitAll` on `/email/**`, resolved
+  against `assetBaseUrl` (see `static/email/README.md`).
 - **Identity emails on the shell:** `otp-register`, `otp-password-reset`,
   `account-exists` (subjects standardised, OTP shown as a `CodeBlock`), plus a
   new **`password-changed`** security email fired after a reset / change via a

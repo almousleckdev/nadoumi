@@ -15,7 +15,7 @@ since it falls back to `baseUrl`.
 | File | Purpose | Status |
 |---|---|---|
 | `nadoumi-logo.png` | footer logo (displayed at 120px wide) | Real brand artwork, resized from `nadoumi-web/app/assets/images/logo.jpg`. |
-| `facebook.png` / `instagram.png` / `tiktok.png` / `whatsapp.png` | 24px footer social icons | Generic monochrome glyphs matching the email palette — swap for official platform icon art whenever the brand asset kit is available. |
+| `facebook.png` / `instagram.png` / `tiktok.png` / `whatsapp.png` | 24px footer social icons | Official platform icon art, background-flattened and squared for the fixed 24×24 footer slot. |
 
 An icon only appears in the footer when its URL is configured
 (`nadoumi.brand.social.{facebook,instagram,tiktok,whatsapp}`). `tiktok` and
