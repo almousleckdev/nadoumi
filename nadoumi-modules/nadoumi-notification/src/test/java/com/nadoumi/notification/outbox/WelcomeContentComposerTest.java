@@ -65,7 +65,7 @@ class WelcomeContentComposerTest {
     @BeforeEach
     void stubTemplates() {
         when(renderer.render(eq(NotificationType.WELCOME), eq(NotificationChannelKind.IN_APP), any(), any()))
-                .thenReturn(new NotificationRenderer.Rendered(null, "Welcome to Nadoumi - explore from your dashboard."));
+                .thenReturn(new NotificationRenderer.Rendered(null, "Welcome to Nadoumi. Explore from your dashboard."));
         when(renderer.render(eq(NotificationType.WELCOME), eq(NotificationChannelKind.EMAIL), any(), any()))
                 .thenReturn(new NotificationRenderer.Rendered("Welcome to Nadoumi",
                         "Your Nadoumi account is ready."));
