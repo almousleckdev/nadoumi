@@ -31,7 +31,7 @@ public record BrandProperties(
         wordmark = blankTo(wordmark, "Nadoumi");
         preferencesPath = blankTo(preferencesPath, "/account/notifications");
         contact = contact == null ? new Contact(List.of(), List.of(), null, null) : contact;
-        social = social == null ? new Social(null, null, null) : social;
+        social = social == null ? new Social(null, null, null, null) : social;
     }
 
     /** @param emails support inboxes, rendered as {@code mailto:} links */
@@ -43,7 +43,7 @@ public record BrandProperties(
         }
     }
 
-    public record Social(String facebook, String instagram, String tiktok) {
+    public record Social(String facebook, String instagram, String tiktok, String whatsapp) {
     }
 
     public String logoUrl() {

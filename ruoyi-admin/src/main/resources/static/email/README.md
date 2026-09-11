@@ -6,11 +6,15 @@ URL from every transactional email (`EmailLayout`).
 | File | Purpose | Status |
 |---|---|---|
 | `nadoumi-logo.png` | footer logo (displayed at 120px wide) | Real brand artwork, resized from `nadoumi-web/app/assets/images/logo.jpg`. |
-| `facebook.png` / `instagram.png` / `tiktok.png` | 24px footer social icons | Generic monochrome glyphs matching the email palette — swap for official platform icon art whenever the brand asset kit is available. |
+| `facebook.png` / `instagram.png` / `tiktok.png` / `whatsapp.png` | 24px footer social icons | Generic monochrome glyphs matching the email palette — swap for official platform icon art whenever the brand asset kit is available. |
 
 An icon only appears in the footer when its URL is configured
-(`nadoumi.brand.social.{facebook,instagram,tiktok}`); set the real profile URLs
-via env before production — until then the icon is correctly hidden, not broken.
+(`nadoumi.brand.social.{facebook,instagram,tiktok,whatsapp}`). `tiktok` and
+`whatsapp` currently default to real profile URLs baked into `application.yml`
+(overridable via `NADOUMI_SOCIAL_TIKTOK` / `NADOUMI_SOCIAL_WHATSAPP`);
+`facebook` and `instagram` are still blank — set
+`NADOUMI_SOCIAL_FACEBOOK`/`NADOUMI_SOCIAL_INSTAGRAM` once those profiles exist.
+Until then those two icons are correctly hidden, not broken.
 
 Replacing a file needs no code change (bust the CDN cache if `static/` is fronted
 by one).

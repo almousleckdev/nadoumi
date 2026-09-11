@@ -213,6 +213,7 @@ public class EmailLayout {
         appendIcon(b, s.facebook(), "facebook.png", "Facebook");
         appendIcon(b, s.instagram(), "instagram.png", "Instagram");
         appendIcon(b, s.tiktok(), "tiktok.png", "TikTok");
+        appendIcon(b, s.whatsapp(), "whatsapp.png", "WhatsApp");
         return b.toString();
     }
 
@@ -275,6 +276,7 @@ public class EmailLayout {
         appendSocialLine(b, "Facebook", s.facebook());
         appendSocialLine(b, "Instagram", s.instagram());
         appendSocialLine(b, "TikTok", s.tiktok());
+        appendSocialLine(b, "WhatsApp", s.whatsapp());
         b.append('\n').append("© ").append(Year.now().getValue()).append(' ').append(brand.wordmark())
                 .append(". International education platform.\n");
         if (c.showPreferencesLink()) {

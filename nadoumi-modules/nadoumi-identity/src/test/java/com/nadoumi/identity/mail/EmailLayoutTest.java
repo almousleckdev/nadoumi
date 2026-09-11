@@ -14,18 +14,18 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class EmailLayoutTest {
 
-    private static BrandProperties brand(String facebook, String instagram, String tiktok) {
+    private static BrandProperties brand(String facebook, String instagram, String tiktok, String whatsapp) {
         return new BrandProperties(
                 "https://nadoumi.test", "/email/nadoumi-logo.png", "Nadoumi",
                 new BrandProperties.Contact(
                         List.of("support@nadoumi.test"), List.of("+86 159 0823 7607"),
                         "1 Test Road, Mianyang", "Mon-Fri, 09:00-18:00 UTC+8"),
-                new BrandProperties.Social(facebook, instagram, tiktok),
+                new BrandProperties.Social(facebook, instagram, tiktok, whatsapp),
                 "/account/notifications");
     }
 
-    private static EmailLayout layout(String fb, String ig, String tt) {
-        return new EmailLayout(brand(fb, ig, tt));
+    private static EmailLayout layout(String fb, String ig, String tt, String wa) {
+        return new EmailLayout(brand(fb, ig, tt, wa));
     }
 
     private static EmailContent sample(boolean withPrefsLink) {
@@ -44,7 +44,7 @@ class EmailLayoutTest {
 
     @Test
     void html_carries_the_accessible_non_boxed_shell() {
-        String html = layout(null, null, null).render(sample(true)).html();
+        String html = layout(null, null, null, null).render(sample(true)).html();
 
         assertThat(html).startsWith("<!DOCTYPE html>");
         assertThat(html).contains("<html lang=\"en\"");
@@ -64,7 +64,7 @@ class EmailLayoutTest {
 
     @Test
     void plain_text_mirrors_every_url_and_the_code_from_the_html() {
-        EmailRender r = layout(null, null, null).render(sample(true));
+        EmailRender r = layout(null, null, null, null).render(sample(true));
 
         assertThat(r.text()).contains("VERIFY YOUR EMAIL ADDRESS").contains("=====");
         assertThat(r.text()).contains("CODE: 482913");
@@ -84,23 +84,25 @@ class EmailLayoutTest {
 
     @Test
     void transactional_content_has_no_preferences_link() {
-        String html = layout(null, null, null).render(sample(false)).html();
+        String html = layout(null, null, null, null).render(sample(false)).html();
         assertThat(html).doesNotContain("Manage your email preferences");
     }
 
     @Test
     void social_icons_render_only_for_configured_networks() {
-        String none = layout(null, null, null).render(sample(true)).html();
-        assertThat(none).doesNotContain("/email/facebook.png")
-                .doesNotContain("/email/instagram.png").doesNotContain("/email/tiktok.png");
+        String none = layout(null, null, null, null).render(sample(true)).html();
+        assertThat(none).doesNotContain("/email/facebook.png").doesNotContain("/email/instagram.png")
+                .doesNotContain("/email/tiktok.png").doesNotContain("/email/whatsapp.png");
 
-        String igOnly = layout(null, "https://instagram.com/nadoumi", null).render(sample(true)).html();
+        String igOnly = layout(null, "https://instagram.com/nadoumi", null, null).render(sample(true)).html();
         assertThat(igOnly).contains("<img src=\"https://nadoumi.test/email/instagram.png\" alt=\"Nadoumi on Instagram\"");
-        assertThat(igOnly).doesNotContain("/email/facebook.png").doesNotContain("/email/tiktok.png");
+        assertThat(igOnly).doesNotContain("/email/facebook.png").doesNotContain("/email/tiktok.png")
+                .doesNotContain("/email/whatsapp.png");
 
-        String all = layout("https://facebook.com/n", "https://instagram.com/n", "https://tiktok.com/@n")
-                .render(sample(true)).html();
-        assertThat(all).contains("/email/facebook.png").contains("/email/instagram.png").contains("/email/tiktok.png");
+        String all = layout("https://facebook.com/n", "https://instagram.com/n", "https://tiktok.com/@n",
+                "https://wa.me/message/n").render(sample(true)).html();
+        assertThat(all).contains("/email/facebook.png").contains("/email/instagram.png")
+                .contains("/email/tiktok.png").contains("/email/whatsapp.png");
     }
 
     @Test
@@ -110,7 +112,7 @@ class EmailLayoutTest {
                 .itemGroup("Programmes to explore", List.of())
                 .build();
         assertThat(c.itemGroups()).isEmpty();
-        assertThat(layout(null, null, null).render(c).html()).doesNotContain("Programmes to explore");
+        assertThat(layout(null, null, null, null).render(c).html()).doesNotContain("Programmes to explore");
     }
 
     @ParameterizedTest(name = "{0} on {1} ≥ {2}:1")

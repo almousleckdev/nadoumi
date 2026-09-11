@@ -179,7 +179,8 @@ nadoumi:
     social:
       facebook: ${NADOUMI_SOCIAL_FACEBOOK:}
       instagram: ${NADOUMI_SOCIAL_INSTAGRAM:}
-      tiktok: ${NADOUMI_SOCIAL_TIKTOK:}
+      tiktok: "${NADOUMI_SOCIAL_TIKTOK:https://www.tiktok.com/@nadoumi.consultin?_r=1&_t=ZS-99dx3mbqoQG}"
+      whatsapp: "${NADOUMI_SOCIAL_WHATSAPP:https://wa.me/message/OZJAF4R5J5U6A1}"
   media:
     # Cloudinary folder prefix so one cloud can host all envs without collision
     env: ${NADOUMI_MEDIA_ENV:dev}
