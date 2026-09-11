@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(51);
+        assertThat(applied).isEqualTo(52); // V1 baseline + V2..V55
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -226,7 +226,9 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role_menu rm JOIN sys_menu m ON m.menu_id = rm.menu_id "
                 + "WHERE rm.role_id = 3 AND m.perms LIKE 'nad:notification:%'")).isEqualTo("4");
         // 4 from V33 + 2 from V37 (TASK_PROGRESS) + 4 from V51 (UNIVERSITY/PROGRAM published)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("12");
+        // + 2 from V53 (SCHOLARSHIP_DEADLINE_REMINDER) + 6 from V55 (WELCOME,
+        // APPLICATION_SUBMITTED, APPLICATION_STATUS_CHANGED, each IN_APP + EMAIL)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("18");
         // V34 — notification dispatch Quartz job, seeded active
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");
@@ -366,7 +368,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(50); // V2..V54
+        assertThat(applied).isEqualTo(51); // V2..V55
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

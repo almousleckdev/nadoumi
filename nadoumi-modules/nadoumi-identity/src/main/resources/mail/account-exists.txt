@@ -1,6 +1,3 @@
-Someone entered this email address when creating a Nadoumi account.
+Someone entered this email address when creating a Nadoumi account, but an account with this address already exists.
 
-An account with this address already exists. If it was you, sign in at
-${loginUrl} - or use "Forgot password" to reset it.
-
-If this was not you, no action is needed.
+If it was you, sign in below. Use "Forgot password" if you no longer remember it. If it wasn't you, no action is needed.

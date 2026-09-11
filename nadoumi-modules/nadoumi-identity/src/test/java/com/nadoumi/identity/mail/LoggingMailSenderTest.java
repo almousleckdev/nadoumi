@@ -16,11 +16,15 @@ class LoggingMailSenderTest {
         Path outbox = dir.resolve("out.log");
         LoggingMailSender sender = new LoggingMailSender(outbox.toString());
 
-        sender.send(new EmailMessage("A@x.com", "one", "b1"));
-        sender.send(new EmailMessage("a@x.com", "two", "b2"));
+        sender.send(EmailMessage.text("A@x.com", "one", "b1"));
+        sender.send(new EmailMessage("a@x.com", "two", "b2", "<p>b2</p>"));
 
         assertThat(sender.last("a@x.com")).get().extracting(EmailMessage::subject).isEqualTo("two");
         assertThat(sender.last("MISSING@x.com")).isEmpty();
-        assertThat(Files.readAllLines(outbox)).hasSize(2);
+
+        var lines = Files.readAllLines(outbox);
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("\"html\":null");
+        assertThat(lines.get(1)).contains("\"html\":\"<p>b2</p>\"");
     }
 }

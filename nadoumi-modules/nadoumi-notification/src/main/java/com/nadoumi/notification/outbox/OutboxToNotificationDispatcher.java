@@ -34,16 +34,23 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
     private final NotificationService notificationService;
     private final NotificationRenderer renderer;
     private final NotificationAudienceMapper audienceMapper;
+    private final WelcomeContentComposer welcomeComposer;
 
     public OutboxToNotificationDispatcher(NotificationService notificationService, NotificationRenderer renderer,
-            NotificationAudienceMapper audienceMapper) {
+            NotificationAudienceMapper audienceMapper, WelcomeContentComposer welcomeComposer) {
         this.notificationService = notificationService;
         this.renderer = renderer;
         this.audienceMapper = audienceMapper;
+        this.welcomeComposer = welcomeComposer;
     }
 
     @Override
     public void dispatch(OutboxEvent event) {
+        if (OutboxEventTypes.STUDENT_REGISTERED.equals(event.getType())) {
+            welcomeComposer.handle(event, parseContext(event));
+            return;
+        }
+
         NotificationType type = mapType(event.getType());
         if (type == null) {
             log.warn("outbox event id={} type={} has no notification mapping — skipped",
@@ -87,6 +94,8 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             case OutboxEventTypes.UNIVERSITY_PUBLISHED -> NotificationType.UNIVERSITY_PUBLISHED;
             case OutboxEventTypes.PROGRAM_PUBLISHED -> NotificationType.PROGRAM_PUBLISHED;
             case OutboxEventTypes.TASK_PROGRESS_CHANGED -> NotificationType.TASK_PROGRESS;
+            case OutboxEventTypes.APPLICATION_SUBMITTED -> NotificationType.APPLICATION_SUBMITTED;
+            case OutboxEventTypes.APPLICATION_STATUS_CHANGED -> NotificationType.APPLICATION_STATUS_CHANGED;
             default -> null;
         };
     }

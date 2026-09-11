@@ -41,9 +41,13 @@ class StudentAuthServiceTest {
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final TicketService tickets = mock(TicketService.class);
     private final SessionRevoker sessionRevoker = mock(SessionRevoker.class);
+    private final org.springframework.context.ApplicationEventPublisher events =
+            mock(org.springframework.context.ApplicationEventPublisher.class);
+    private final com.nadoumi.common.outbox.OutboxWriter outbox =
+            mock(com.nadoumi.common.outbox.OutboxWriter.class);
 
     private final StudentAuthService service = new StudentAuthService(configService, userService, loginService,
-            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker);
+            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker, events, outbox);
 
     private static StudentRegisterRequest register(String email, String password, String ticket) {
         return new StudentRegisterRequest("Ada", "Lovelace", email, password, ticket);
@@ -104,6 +108,26 @@ class StudentAuthServiceTest {
         assertThat(response.username()).startsWith("stu_");
         verify(identityMapper).updateUserType(42L, StudentAuthService.STUDENT_USER_TYPE);
         verify(identityMapper).markEmailVerified(42L);
+
+        org.mockito.ArgumentCaptor<String> payload = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(outbox).write(eq("user"), eq(42L),
+                eq(com.nadoumi.common.outbox.OutboxEventTypes.STUDENT_REGISTERED), payload.capture());
+        assertThat(payload.getValue()).contains("\"userId\":42").contains("ada@example.com").contains("Ada");
+    }
+
+    @Test
+    void resetPassword_publishes_a_password_changed_event() {
+        when(tickets.consume("tkt", OtpPurpose.PASSWORD_RESET)).thenReturn("ada@example.com");
+        when(identityMapper.selectUserIdByEmailAndType("ada@example.com", StudentAuthService.STUDENT_USER_TYPE))
+                .thenReturn(42L);
+
+        service.resetPassword("tkt", "Abcdef1!");
+
+        org.mockito.ArgumentCaptor<com.nadoumi.identity.service.mail.PasswordChangedEvent> ev =
+                org.mockito.ArgumentCaptor.forClass(com.nadoumi.identity.service.mail.PasswordChangedEvent.class);
+        verify(events).publishEvent(ev.capture());
+        assertThat(ev.getValue().userId()).isEqualTo(42L);
+        assertThat(ev.getValue().email()).isEqualTo("ada@example.com");
     }
 
     @Test

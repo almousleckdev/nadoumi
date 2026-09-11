@@ -30,6 +30,17 @@
             <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-identity</artifactId>
         </dependency>
+        <!-- cross-module (read-only): public catalog services for the Welcome email's
+             "featured programmes" / "scholarships closing soon" sections. Service
+             interfaces only, never mappers. -->
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-scholarship</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-program</artifactId>
+        </dependency>
 
         <!-- RuoYi types: @Anonymous, SecurityUtils, @Log, page helpers -->
         <dependency>

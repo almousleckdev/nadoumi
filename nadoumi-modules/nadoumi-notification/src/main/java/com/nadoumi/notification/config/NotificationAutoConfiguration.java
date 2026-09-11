@@ -2,6 +2,8 @@ package com.nadoumi.notification.config;
 
 import com.nadoumi.common.notification.NotificationChannel;
 import com.nadoumi.common.outbox.OutboxWriter;
+import com.nadoumi.identity.service.mail.BrandProperties;
+import com.nadoumi.identity.service.mail.EmailLayout;
 import com.nadoumi.identity.service.mail.MailSender;
 import com.nadoumi.notification.channel.EmailNotificationChannel;
 import com.nadoumi.notification.dispatch.NotificationDeliveryDispatcher;
@@ -17,8 +19,11 @@ import com.nadoumi.notification.mapper.OutboxEventMapper;
 import com.nadoumi.notification.outbox.OutboxDispatcher;
 import com.nadoumi.notification.outbox.OutboxToNotificationDispatcher;
 import com.nadoumi.notification.outbox.OutboxWriterImpl;
+import com.nadoumi.notification.outbox.WelcomeContentComposer;
 import com.nadoumi.notification.render.NotificationRenderer;
 import com.nadoumi.notification.service.NotificationService;
+import com.nadoumi.program.service.ProgramService;
+import com.nadoumi.scholarship.service.ScholarshipService;
 import java.util.List;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -42,10 +47,20 @@ public class NotificationAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
+    WelcomeContentComposer welcomeContentComposer(NotificationService notificationService,
+            NotificationRenderer notificationRenderer, EmailLayout emailLayout, MailSender mailSender,
+            BrandProperties brandProperties, ScholarshipService scholarshipService, ProgramService programService) {
+        return new WelcomeContentComposer(notificationService, notificationRenderer, emailLayout, mailSender,
+                brandProperties, scholarshipService, programService);
+    }
+
+    @Bean
     @ConditionalOnMissingBean(OutboxDispatcher.class)
     OutboxDispatcher outboxDispatcher(NotificationService notificationService, NotificationRenderer notificationRenderer,
-            NotificationAudienceMapper notificationAudienceMapper) {
-        return new OutboxToNotificationDispatcher(notificationService, notificationRenderer, notificationAudienceMapper);
+            NotificationAudienceMapper notificationAudienceMapper, WelcomeContentComposer welcomeContentComposer) {
+        return new OutboxToNotificationDispatcher(notificationService, notificationRenderer, notificationAudienceMapper,
+                welcomeContentComposer);
     }
 
     /**
@@ -75,8 +90,9 @@ public class NotificationAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(name = "emailNotificationChannel")
-    NotificationChannel emailNotificationChannel(MailSender mailSender) {
-        return new EmailNotificationChannel(mailSender);
+    NotificationChannel emailNotificationChannel(MailSender mailSender, EmailLayout emailLayout,
+            BrandProperties brandProperties) {
+        return new EmailNotificationChannel(mailSender, emailLayout, brandProperties);
     }
 
     @Bean

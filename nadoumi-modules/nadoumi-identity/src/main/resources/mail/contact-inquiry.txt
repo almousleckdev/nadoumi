@@ -1,9 +1,0 @@
-New enquiry from the Nadoumi website.
-
-Name:     ${name}
-Email:    ${email}
-Phone:    ${phone}
-Category: ${category}
-Subject:  ${subject}
-
-${message}

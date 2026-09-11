@@ -102,7 +102,7 @@ public class NotificationDeliveryDispatcher {
 
             NotificationRenderer.Rendered rendered =
                     renderer.render(type, kind, NotificationRenderer.DEFAULT_LOCALE, context(notification));
-            NotificationSendResult result = channel.send(recipient, rendered.subject(), rendered.body());
+            NotificationSendResult result = channel.send(recipient, rendered.subject(), rendered.body(), type.name());
 
             if (result.status() == NotificationSendStatus.SENT) {
                 deliveryMapper.markSent(delivery.getId(), providerFor(kind),

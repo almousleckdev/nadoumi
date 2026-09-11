@@ -50,7 +50,7 @@ class OtpEndToEndTest extends AbstractNadIntegrationTest {
         // 3. retrievable through the test mail system, with a 6-digit code in the body
         String mail = mvc.perform(get("/api/dev/mail/latest").param("to", email))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.subject").value("Verify your email"))
+                .andExpect(jsonPath("$.subject").value("Verify your email — Nadoumi"))
                 .andReturn().getResponse().getContentAsString();
         String code = extractCode(JsonPath.read(mail, "$.body"));
 

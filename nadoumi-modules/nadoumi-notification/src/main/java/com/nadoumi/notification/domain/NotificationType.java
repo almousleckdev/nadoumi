@@ -31,7 +31,22 @@ public enum NotificationType {
     PROGRAM_PUBLISHED(false, "Programme published", Set.of(NotificationChannelKind.EMAIL)),
 
     /** A task changed status or assignment — the creator, assignee and admins are told. */
-    TASK_PROGRESS(true, "Task update", Set.of(NotificationChannelKind.EMAIL));
+    TASK_PROGRESS(true, "Task update", Set.of(NotificationChannelKind.EMAIL)),
+
+    /**
+     * A student finished registration. Declares <b>no</b> secondary channel on
+     * purpose: {@code IN_APP} is produced by {@code NotificationService}, and the
+     * personalised welcome email (with its programme / scholarship sections) is
+     * composed and sent by {@code WelcomeContentComposer}, not the generic
+     * flat-string dispatch path.
+     */
+    WELCOME(true, "Welcome to Nadoumi", Set.of()),
+
+    /** An application was submitted — the applicant's linked users are told. */
+    APPLICATION_SUBMITTED(true, "Application submitted", Set.of(NotificationChannelKind.EMAIL)),
+
+    /** An application's stage/status changed — the applicant's linked users are told. */
+    APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL));
 
     private final boolean transactional;
     private final String defaultTitle;

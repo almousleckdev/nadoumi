@@ -53,7 +53,8 @@ public class LoggingMailSender implements MailSender {
     private static String toJsonLine(EmailMessage m) {
         return "{\"to\":" + quote(m.to())
                 + ",\"subject\":" + quote(m.subject())
-                + ",\"body\":" + quote(m.body()) + "}";
+                + ",\"body\":" + quote(m.body())
+                + ",\"html\":" + (m.htmlBody() == null ? "null" : quote(m.htmlBody())) + "}";
     }
 
     private static String quote(String s) {

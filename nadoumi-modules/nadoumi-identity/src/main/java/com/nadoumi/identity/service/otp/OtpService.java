@@ -1,6 +1,9 @@
 package com.nadoumi.identity.service.otp;
 
+import com.nadoumi.identity.service.mail.EmailContent;
+import com.nadoumi.identity.service.mail.EmailLayout;
 import com.nadoumi.identity.service.mail.EmailMessage;
+import com.nadoumi.identity.service.mail.EmailRender;
 import com.nadoumi.identity.service.mail.MailSender;
 import com.nadoumi.identity.service.mail.MailTemplates;
 import com.ruoyi.common.core.redis.RedisCache;
@@ -35,21 +38,24 @@ public class OtpService {
     private final RedisCache redis;
     private final MailSender mail;
     private final MailTemplates templates;
+    private final EmailLayout emailLayout;
     private final TicketService tickets;
     private final String loginUrl;
     private final Supplier<String> codeGenerator;
 
     @Autowired
-    public OtpService(RedisCache redis, MailSender mail, MailTemplates templates, TicketService tickets,
+    public OtpService(RedisCache redis, MailSender mail, MailTemplates templates, EmailLayout emailLayout,
+            TicketService tickets,
             @Value("${nadoumi.web.loginUrl:http://localhost:3000/login}") String loginUrl) {
-        this(redis, mail, templates, tickets, loginUrl, OtpService::randomSixDigits);
+        this(redis, mail, templates, emailLayout, tickets, loginUrl, OtpService::randomSixDigits);
     }
 
-    OtpService(RedisCache redis, MailSender mail, MailTemplates templates, TicketService tickets,
-            String loginUrl, Supplier<String> codeGenerator) {
+    OtpService(RedisCache redis, MailSender mail, MailTemplates templates, EmailLayout emailLayout,
+            TicketService tickets, String loginUrl, Supplier<String> codeGenerator) {
         this.redis = redis;
         this.mail = mail;
         this.templates = templates;
+        this.emailLayout = emailLayout;
         this.tickets = tickets;
         this.loginUrl = loginUrl;
         this.codeGenerator = codeGenerator;
@@ -77,16 +83,12 @@ public class OtpService {
 
         try {
             if (accountExists && purpose == OtpPurpose.REGISTER) {
-                mail.send(new EmailMessage(email, "Your Nadoumi account",
-                        templates.render("account-exists", Map.of("loginUrl", loginUrl))));
+                mail.send(accountExistsMail(email));
             }
             else {
                 String code = codeGenerator.get();
                 redis.setCacheObject(otpKey(purpose, email), sha256(code) + "|0", TTL_SECONDS, TimeUnit.SECONDS);
-                String template = purpose == OtpPurpose.REGISTER ? "otp-register" : "otp-password-reset";
-                String subject = purpose == OtpPurpose.REGISTER ? "Verify your email" : "Reset your password";
-                mail.send(new EmailMessage(email, subject, templates.render(template,
-                        Map.of("otp", code, "ttlMinutes", Integer.toString(TTL_SECONDS / 60)))));
+                mail.send(otpMail(email, purpose, code));
             }
         }
         catch (RuntimeException e) {
@@ -129,6 +131,33 @@ public class OtpService {
         }
         redis.deleteObject(key);
         return tickets.mint(email, purpose);
+    }
+
+    private EmailMessage otpMail(String email, OtpPurpose purpose, String code) {
+        boolean register = purpose == OtpPurpose.REGISTER;
+        String template = register ? "otp-register" : "otp-password-reset";
+        EmailContent content = EmailContent.builder(register ? "Verify your email address" : "Reset your password")
+                .preheader(register ? "Your Nadoumi verification code" : "Your Nadoumi password reset code")
+                .paragraph(templates.render(template, Map.of()).strip())
+                .code(code)
+                .paragraph("This code expires in " + (TTL_SECONDS / 60) + " minutes and can be used once.")
+                .paragraph(register
+                        ? "If you didn't start creating a Nadoumi account, you can ignore this email."
+                        : "If you didn't ask to reset your password, you can ignore this email — nothing changes.")
+                .build();
+        EmailRender r = emailLayout.render(content);
+        String subject = register ? "Verify your email — Nadoumi" : "Reset your Nadoumi password";
+        return new EmailMessage(email, subject, r.text(), r.html());
+    }
+
+    private EmailMessage accountExistsMail(String email) {
+        EmailContent content = EmailContent.builder("You already have a Nadoumi account")
+                .preheader("An account with this email address already exists")
+                .paragraphs(templates.render("account-exists", Map.of()))
+                .cta("Sign in", loginUrl)
+                .build();
+        EmailRender r = emailLayout.render(content);
+        return new EmailMessage(email, "Your Nadoumi account", r.text(), r.html());
     }
 
     private static String otpKey(OtpPurpose purpose, String email) {

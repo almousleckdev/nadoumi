@@ -28,4 +28,19 @@ public final class OutboxEventTypes {
 
     /** A task's status or assignment changed. Aggregate: {@code task}. */
     public static final String TASK_PROGRESS_CHANGED = "TaskProgressChanged";
+
+    /** A student finished registration (email verified + account created). Aggregate: {@code user}. */
+    public static final String STUDENT_REGISTERED = "StudentRegistered";
+
+    /**
+     * An application was submitted. Aggregate: {@code application}.
+     * <p>PLANNED — no producer yet; the Application module (platform Step 6) emits this.</p>
+     */
+    public static final String APPLICATION_SUBMITTED = "ApplicationSubmitted";
+
+    /**
+     * An application's stage/status changed. Aggregate: {@code application}.
+     * <p>PLANNED — no producer yet; the Application module (platform Step 6) emits this.</p>
+     */
+    public static final String APPLICATION_STATUS_CHANGED = "ApplicationStatusChanged";
 }
