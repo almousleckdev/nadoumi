@@ -1,4 +1,4 @@
-package com.nadoumi.identity.exception;
+package com.nadoumi.common.exception;
 
 /** Caller input rejected (HTTP 400). */
 public class NadBadRequestException extends RuntimeException {

@@ -11,8 +11,8 @@ import static org.mockito.Mockito.when;
 
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaUploadResult;
-import com.nadoumi.identity.exception.NadBadRequestException;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.money.FxRates;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.enums.ProgramStatus;

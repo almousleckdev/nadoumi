@@ -93,6 +93,18 @@ shape as `nadoumi-media`: producers depend only on the
 `com.nadoumi.common.outbox.OutboxWriter` interface in `nadoumi-common`;
 `ruoyi-admin` carries the implementation on the runtime classpath.
 
+**EXISTING (P2 security remediation).** The generic API exceptions
+(`NadNotFoundException`, `NadBadRequestException`, `NadForbiddenException`) live
+in `com.nadoumi.common.exception` (pure classes, no Spring) rather than
+`nadoumi-identity` — any module can throw them without a Maven dependency on
+identity's mail/OTP/session stack. `nadoumi-identity`'s `NadApiExceptionHandler`
+(`@RestControllerAdvice`) still maps them to `problem+json`, since it needs
+Spring MVC and is transitively on the runtime classpath regardless (`ruoyi-admin`
+depends on every domain module). `nadoumi-finance`, `nadoumi-hr` and
+`nadoumi-university` no longer depend on `nadoumi-identity` at all as a result;
+`nadoumi-program`/`nadoumi-scholarship` still do, for `FxRates`. Identity-specific
+exceptions (`GrantException`) stay in `nadoumi-identity`.
+
 ## 4. Layering conventions (EXISTING, inherited)
 
 `Controller (extends BaseController)` → `IService` / `ServiceImpl` → `Mapper` (MyBatis XML)

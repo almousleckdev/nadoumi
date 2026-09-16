@@ -20,7 +20,12 @@
     <dependencies>
         <dependency>
             <groupId>com.nadoumi</groupId>
-            <artifactId>nadoumi-identity</artifactId>
+            <artifactId>nadoumi-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common</artifactId>
         </dependency>
 
         <dependency>

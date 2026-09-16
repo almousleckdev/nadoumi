@@ -1,5 +1,6 @@
 package com.nadoumi.media.service;
 
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaAccessClass;
 import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.common.media.MediaCategory;
@@ -11,7 +12,6 @@ import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.media.ProxyStream;
 import com.nadoumi.common.media.SignedUrl;
 import com.nadoumi.common.media.StoredAsset;
-import com.nadoumi.media.NadMediaNotFoundException;
 import com.nadoumi.media.config.MediaProperties;
 import com.nadoumi.media.policy.MediaCategoryPolicy;
 import com.nadoumi.media.spi.MediaChecksums;
@@ -143,7 +143,7 @@ public class MediaService implements MediaGateway {
 
     private StoredAsset require(long assetId) {
         return storage.find(assetId)
-                .orElseThrow(() -> new NadMediaNotFoundException("media asset not found: " + assetId));
+                .orElseThrow(() -> new NadNotFoundException("media asset not found: " + assetId));
     }
 
     private static MediaValidationException tooLarge(long actual, long max) {

@@ -1,7 +1,7 @@
 package com.nadoumi.university.service;
 
-import com.nadoumi.identity.exception.NadBadRequestException;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.university.domain.Department;
 import com.nadoumi.university.mapper.DepartmentMapper;
 import com.nadoumi.university.mapper.UniversityMapper;

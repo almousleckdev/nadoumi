@@ -1,5 +1,8 @@
 package com.nadoumi.identity.exception;
 
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadForbiddenException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.ruoyi.common.exception.RateLimitExceededException;
 import com.ruoyi.common.exception.user.CaptchaException;
 import com.ruoyi.common.exception.user.CaptchaExpireException;

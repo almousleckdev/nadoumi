@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.common.media.MediaGateway;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
@@ -22,6 +22,7 @@ import com.nadoumi.scholarship.mapper.ScholarshipSearch;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class ScholarshipServiceTest {
 
@@ -59,6 +60,21 @@ class ScholarshipServiceTest {
         assertThat(page.content().get(0).levels()).containsExactly("MASTER");
         verify(mapper).findLevels(1L);
         verify(mapper).findLevels(2L);
+    }
+
+    @Test
+    void upcomingDeadlines_sortsByDeadline_withoutExposingTheSearchFilterToTheCaller() {
+        when(mapper.searchPublic(any())).thenReturn(List.of(row(1)));
+        when(mapper.findLevels(anyLong())).thenReturn(List.of());
+        when(mapper.findCategories(anyLong())).thenReturn(List.of());
+        when(mapper.findIntakes(anyLong())).thenReturn(List.of());
+
+        var page = service.upcomingDeadlines(3);
+
+        assertThat(page.content()).hasSize(1);
+        ArgumentCaptor<ScholarshipSearch> filter = ArgumentCaptor.forClass(ScholarshipSearch.class);
+        verify(mapper).searchPublic(filter.capture());
+        assertThat(filter.getValue().sort()).isEqualTo("deadline");
     }
 
     @Test

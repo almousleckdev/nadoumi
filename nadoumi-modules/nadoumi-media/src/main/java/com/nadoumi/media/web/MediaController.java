@@ -1,9 +1,9 @@
 package com.nadoumi.media.web;
 
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaAccessClass;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.StoredAsset;
-import com.nadoumi.media.NadMediaNotFoundException;
 import com.ruoyi.common.annotation.Anonymous;
 import java.net.URI;
 import org.springframework.http.HttpStatus;
@@ -34,9 +34,9 @@ public class MediaController {
     @Anonymous
     public ResponseEntity<Void> get(@PathVariable long id) {
         StoredAsset asset = media.find(id)
-                .orElseThrow(() -> new NadMediaNotFoundException("media not found"));
+                .orElseThrow(() -> new NadNotFoundException("media not found"));
         if (asset.accessClass() != MediaAccessClass.PUBLIC) {
-            throw new NadMediaNotFoundException("media not found");
+            throw new NadNotFoundException("media not found");
         }
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(asset.secureUrl())).build();
     }

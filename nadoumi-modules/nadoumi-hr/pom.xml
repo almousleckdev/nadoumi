@@ -24,11 +24,6 @@
             <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.nadoumi</groupId>
-            <artifactId>nadoumi-identity</artifactId>
-        </dependency>
-
         <!-- RuoYi: SecurityUtils, @Log, page helpers, ISysUserService for staff accounts -->
         <dependency>
             <groupId>com.ruoyi</groupId>

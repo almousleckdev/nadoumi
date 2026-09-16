@@ -1,6 +1,6 @@
 package com.nadoumi.identity.service.otp;
 
-import com.nadoumi.identity.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadBadRequestException;
 
 /**
  * A bad, expired or exhausted OTP or verification ticket. Maps to HTTP 400

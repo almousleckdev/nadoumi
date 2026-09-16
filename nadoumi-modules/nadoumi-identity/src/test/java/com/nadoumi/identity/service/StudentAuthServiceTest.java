@@ -10,8 +10,8 @@ import static org.mockito.Mockito.when;
 
 import com.nadoumi.identity.access.CurrentCaller;
 import com.nadoumi.identity.access.SessionRevoker;
-import com.nadoumi.identity.exception.NadBadRequestException;
-import com.nadoumi.identity.exception.NadForbiddenException;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.identity.mapper.NadIdentityMapper;
 import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
 import com.nadoumi.identity.service.otp.OtpPurpose;

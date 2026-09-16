@@ -8,7 +8,7 @@ import com.nadoumi.finance.domain.Revenue;
 import com.nadoumi.finance.mapper.RevenueMapper;
 import com.nadoumi.finance.web.request.RevenueRequest;
 import com.nadoumi.finance.web.response.RevenueResponse;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.ruoyi.common.utils.AuditActor;
 import java.time.LocalDate;
 import java.util.List;

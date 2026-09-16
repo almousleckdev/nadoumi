@@ -10,8 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.common.media.MediaGateway;
-import com.nadoumi.identity.exception.NadBadRequestException;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.enums.HighlightKind;
 import com.nadoumi.university.domain.enums.PublishStatus;
