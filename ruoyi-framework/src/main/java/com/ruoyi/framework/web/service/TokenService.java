@@ -1,5 +1,6 @@
 package com.ruoyi.framework.web.service;
 
+import jakarta.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,14 @@ public class TokenService
     @Value("${token.secret}")
     private String secret;
 
+    // explicit opt-in to boot with the in-repo dev-default secret (local/test only)
+    @Value("${token.dev-secret-allowed:false}")
+    private boolean devSecretAllowed;
+
+    // the in-repo dev-default secret from application.yml's ${TOKEN_SECRET:<this>}
+    private static final String DEV_DEFAULT_SECRET =
+            "ZGV2LW9ubHktZG8tbm90LXVzZS1pbi1wcm9kLW5hZG91bWktcnVveWktaHM1MTItamp3dC1zZWNyZXQtMDAxMjM0NQ";
+
     // 令牌密钥标识 (JWT "kid" header; supports future key rotation)
     @Value("${token.kid:v1}")
     private String kid;
@@ -60,6 +69,27 @@ public class TokenService
 
     @Autowired
     private RedisCache redisCache;
+
+    @PostConstruct
+    void validateSecret() {
+        requireNonDefaultSecret(secret, devSecretAllowed);
+    }
+
+    /**
+     * Fails startup if the JWT signing secret is still the publicly-committed
+     * dev default — that value is readable by anyone with this repository and
+     * would let them forge a valid token for any user. Local/test runs must opt
+     * in explicitly via {@code token.dev-secret-allowed=true}; every real
+     * environment must set {@code TOKEN_SECRET} instead.
+     */
+    static void requireNonDefaultSecret(String secret, boolean devSecretAllowed) {
+        if (DEV_DEFAULT_SECRET.equals(secret) && !devSecretAllowed) {
+            throw new IllegalStateException("TOKEN_SECRET is not set. It is currently the publicly-committed "
+                    + "dev-default value, which lets anyone who has read this repository forge a valid JWT for "
+                    + "any user. Set the TOKEN_SECRET environment variable to a real, >= 64-byte secret, or, for "
+                    + "local development or tests only, opt in with token.dev-secret-allowed=true.");
+        }
+    }
 
     /**
      * 获取用户身份信息

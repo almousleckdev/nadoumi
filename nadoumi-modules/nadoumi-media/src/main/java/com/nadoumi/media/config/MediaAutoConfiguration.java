@@ -36,9 +36,13 @@ import org.springframework.util.StringUtils;
  * <ul>
  *   <li><b>{@code CLOUDINARY_URL} set</b> — the production path:
  *       {@link CloudinaryMediaStorage} over the Cloudinary client.</li>
- *   <li><b>{@code CLOUDINARY_URL} absent</b> — a local-development fallback:
+ *   <li><b>{@code CLOUDINARY_URL} absent</b> — the context fails to start, unless
+ *       {@code nadoumi.media.allow-local-fallback=true} is explicitly set, in which
+ *       case a local-development fallback is used instead:
  *       {@link LocalFilesystemMediaStorage}, writing under {@code ruoyi.profile}
- *       and serving from {@code /profile/media/**}. Not for any real environment.</li>
+ *       and serving from {@code /profile/media/**}. That path serves PROTECTED
+ *       assets through the same anonymous route as PUBLIC ones, so the flag must
+ *       never be set outside local development.</li>
  * </ul>
  */
 @AutoConfiguration
@@ -114,8 +118,11 @@ public class MediaAutoConfiguration {
     }
 
     /**
-     * Local-development fallback when no Cloudinary client is present. Files go
-     * under {@code <ruoyi.profile>/media}; URLs point at
+     * Local-development fallback when no Cloudinary client is present. Requires
+     * an explicit {@code nadoumi.media.allow-local-fallback=true} opt-in —
+     * otherwise a missing {@code CLOUDINARY_URL} fails the context instead of
+     * silently serving PROTECTED documents through the anonymous local path.
+     * When allowed, files go under {@code <ruoyi.profile>/media}; URLs point at
      * {@code <nadoumi.media.local.base-url>/profile/media/...} (default
      * {@code http://localhost:8080}).
      */
@@ -123,6 +130,12 @@ public class MediaAutoConfiguration {
     @ConditionalOnMissingBean(MediaStorageService.class)
     MediaStorageService localFilesystemMediaStorage(MediaAssetMapper assetMapper, MediaProperties properties,
             Environment env) {
+        if (!properties.isAllowLocalFallback()) {
+            throw new IllegalStateException(CLOUDINARY_URL_VAR + " is not set. Set it to a real "
+                    + "\"cloudinary://<key>:<secret>@<cloud>\" connection string, or, for local "
+                    + "development only, opt into the unauthenticated local-filesystem fallback with "
+                    + "nadoumi.media.allow-local-fallback=true.");
+        }
         String profileDir = env.getProperty("ruoyi.profile", System.getProperty("user.home") + "/nadoumi/upload");
         String baseUrl = env.getProperty("nadoumi.media.local.base-url", "http://localhost:8080");
         Path baseDir = Paths.get(profileDir, "media");

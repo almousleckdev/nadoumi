@@ -17,6 +17,11 @@ logging:
 ruoyi:
   profile: ${java.io.tmpdir}/nadoumi-test-upload
 
+# Tests never set a real TOKEN_SECRET; explicitly allow the in-repo dev default
+# here rather than relying on it silently everywhere (see TokenService).
+token:
+  dev-secret-allowed: true
+
 nadoumi:
   mail:
     # OtpEndToEndTest reads the captured code via GET /api/dev/mail/latest.

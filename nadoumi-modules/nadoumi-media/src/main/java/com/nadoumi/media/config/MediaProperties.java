@@ -29,6 +29,7 @@ public class MediaProperties {
     private int signedUrlTtlSeconds = DEFAULT_TTL_SECONDS;
     private int maxUploadMb = DEFAULT_MAX_UPLOAD_MB;
     private int reconcileGraceDays = DEFAULT_RECONCILE_GRACE_DAYS;
+    private boolean allowLocalFallback = false;
 
     public String getEnv() {
         return env;
@@ -66,5 +67,19 @@ public class MediaProperties {
 
     public void setReconcileGraceDays(int reconcileGraceDays) {
         this.reconcileGraceDays = reconcileGraceDays;
+    }
+
+    /**
+     * Explicit opt-in for {@code LocalFilesystemMediaStorage} when
+     * {@code CLOUDINARY_URL} is absent. Local storage serves PROTECTED assets
+     * through the same anonymous {@code /profile/**} path as PUBLIC ones, so this
+     * must stay {@code false} (the default) everywhere except local development.
+     */
+    public boolean isAllowLocalFallback() {
+        return allowLocalFallback;
+    }
+
+    public void setAllowLocalFallback(boolean allowLocalFallback) {
+        this.allowLocalFallback = allowLocalFallback;
     }
 }

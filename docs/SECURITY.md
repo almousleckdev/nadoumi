@@ -44,9 +44,14 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 | S5 | `admin` (`user_id = 1`) bypasses every permission check (`isAdmin()` → `*:*:*`). | By-design; document + restrict use. |
 
 **Remediation status:**
-- **S1/S2 — DONE (Phase 2).** `token.secret` is now `${TOKEN_SECRET:<90-char dev
-  placeholder>}` (the in-repo value is a labelled dev-only default; real envs must
-  override, ≥ 64 bytes for HS512). `jjwt` upgraded `0.9.1 → 0.12.6` (split
+- **S1/S2 — DONE (Phase 2); startup fail-fast added (P2 security remediation).**
+  `token.secret` is now `${TOKEN_SECRET:<90-char dev placeholder>}` (the in-repo
+  value is a labelled dev-only default; real envs must override, ≥ 64 bytes for
+  HS512), and `TokenService.validateSecret()` now refuses to start if the
+  resolved secret still equals that placeholder, unless `token.dev-secret-allowed`
+  is explicitly set (local/test only — closes the gap where anyone who had read
+  this repository could forge a valid JWT for any user in an environment that
+  forgot to set `TOKEN_SECRET`). `jjwt` upgraded `0.9.1 → 0.12.6` (split
   `jjwt-api`/`impl`/`jackson`); `TokenService` rewritten to
   `Keys.hmacShaKeyFor(secret)` + `Jwts.parser().verifyWith(key).parseSignedClaims`;
   a `kid` header (`${TOKEN_KID:v1}`) is emitted to enable future rotation (a
@@ -311,7 +316,13 @@ otherwise merely `authenticated()` and would pass. New paths must upload through
 
 **`CLOUDINARY_URL` handling.** Env var only — `cloudinary://<key>:<secret>@<cloud>`.
 No `application.yml` default; `CloudinaryMediaStorage`'s constructor **fails fast**
-at startup if the value is absent or malformed. Never logged — `CloudinaryMediaStorage`
+at startup if the value is malformed, and the `MediaStorageService` bean now fails
+the whole context if the value is **absent** too — closing a prior gap where a
+missing credential silently substituted an unauthenticated local-filesystem store
+(`LocalFilesystemMediaStorage`) reachable at the same anonymous `/profile/**` path
+as PUBLIC assets. That fallback is still available for local development only,
+behind an explicit `nadoumi.media.allow-local-fallback=true` opt-in — never set
+outside local dev. Never logged — `CloudinaryMediaStorage`
 logs `public_id` + byte size + owner, never the URL for PROTECTED/SENSITIVE assets
 and never the API secret. Rotate via the secret manager (§7).
 

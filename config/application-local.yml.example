@@ -35,3 +35,19 @@ spring:
 
 # token:
 #   secret: <your own 64+ char secret>   # optional locally; a dev default ships in application.yml
+
+# TOKEN_SECRET is required at startup: the context now fails fast if it's still
+# the publicly-committed dev default. For local dev/tests only, opt in instead
+# of setting a real secret (config/application-druid.yml already does this for
+# this checkout):
+#token:
+#  dev-secret-allowed: true
+
+# Media storage: CLOUDINARY_URL is required at startup (fails fast if absent).
+# Either set a real cloudinary://<key>:<secret>@<cloud> (env var or here), or, for
+# local dev only, opt into the unauthenticated local-filesystem fallback — never
+# set this outside local development, it serves PROTECTED documents over the
+# same anonymous path as PUBLIC assets:
+#nadoumi:
+#  media:
+#    allow-local-fallback: true

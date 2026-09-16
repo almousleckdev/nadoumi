@@ -171,7 +171,7 @@ zero-config start working.
 | `SPRING_DATA_REDIS_HOST` / `_PORT` / `_DATABASE` | `localhost` / `6379` / `0` | |
 | `SPRING_DATA_REDIS_PASSWORD` | *(empty)* | **required** in non-local envs |
 | `SPRING_DATA_REDIS_SSL_ENABLED` | `false` | set `true` in non-local envs |
-| `TOKEN_SECRET` | 90-char in-repo placeholder | **must** override; ≥ 64 bytes (HS512) |
+| `TOKEN_SECRET` | 90-char in-repo placeholder | **must** override; ≥ 64 bytes (HS512). The context now fails to start with the placeholder value unless `token.dev-secret-allowed=true` is explicitly set (local/test only — `application-test.yml` and `config/application-druid.yml` set it) — closes the prior gap where anyone who had read this repo could forge a valid JWT for any user. |
 | `TOKEN_KID` / `TOKEN_HEADER` / `TOKEN_EXPIRE_TIME` | `v1` / `Authorization` / `30` | |
 | `DRUID_CONSOLE_USERNAME` / `DRUID_CONSOLE_PASSWORD` | `ruoyi` / `123456` | disable the servlet in prod |
 | `RUOYI_PROFILE` | `D:/ruoyi/uploadPath` | upload dir — set on macOS/Linux |
@@ -183,7 +183,7 @@ zero-config start working.
 | `SPRING_MAIL_HOST` / `_PORT` | `localhost` / `1025` | dev = Mailpit (`docker-compose.yml`); staging/prod = `smtp.gmail.com` / `587` |
 | `SPRING_MAIL_USERNAME` / `_PASSWORD` | *(empty)* | Gmail: account + 16-char **App Password** |
 | `SPRING_MAIL_SMTP_AUTH` / `SPRING_MAIL_SMTP_STARTTLS` | `false` / `false` | `true` / `true` for Gmail |
-| `CLOUDINARY_URL` | *(none)* | `cloudinary://<key>:<secret>@<cloud>` — the only storage credential. **Required at startup**; `MediaStorageService` bean init fails fast if absent/malformed. Never logged. **DONE (P1)**, supersedes the reserved `NAD_STORAGE_*` placeholder. |
+| `CLOUDINARY_URL` | *(none)* | `cloudinary://<key>:<secret>@<cloud>` — the only real storage credential. **Required at startup**: the context now fails to start if it's absent or malformed, closing the previous silent fallback to an unauthenticated local-filesystem store. Local dev without Cloudinary must set `nadoumi.media.allow-local-fallback=true` explicitly (never outside local dev — it serves PROTECTED documents over the same anonymous `/profile/**` path as PUBLIC assets). Never logged. **DONE (P2 security remediation)**, supersedes the reserved `NAD_STORAGE_*` placeholder. |
 | `NADOUMI_MEDIA_ENV` | `dev` | `dev` \| `staging` \| `prod` — Cloudinary folder prefix, so one cloud hosts all envs without collision. |
 | `NADOUMI_MEDIA_SIGNED_URL_TTL_SECONDS` | `180` | PROTECTED-asset signed URL lifetime; clamped `[60, 600]`. |
 | `NADOUMI_MEDIA_MAX_UPLOAD_MB` | `20` | Hard upload ceiling across all categories; also sets `spring.servlet.multipart.max-file-size` (20MB) / `max-request-size` (22MB). |

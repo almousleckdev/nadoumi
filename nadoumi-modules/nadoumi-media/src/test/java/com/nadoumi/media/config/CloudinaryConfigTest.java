@@ -36,8 +36,16 @@ class CloudinaryConfigTest {
     }
 
     @Test
-    void fallsBackToLocalStorageWhenCloudinaryUrlMissing() {
-        runner.run(context -> {
+    void contextFailsWhenCloudinaryUrlMissingAndLocalFallbackNotAllowed() {
+        runner.run(context -> assertThat(context)
+                .hasFailed()
+                .getFailure()
+                .hasMessageContaining(CLOUDINARY_URL));
+    }
+
+    @Test
+    void fallsBackToLocalStorageWhenCloudinaryUrlMissingAndFallbackExplicitlyAllowed() {
+        runner.withPropertyValues("nadoumi.media.allow-local-fallback=true").run(context -> {
             assertThat(context).hasNotFailed().doesNotHaveBean(Cloudinary.class);
             assertThat(context).getBean(MediaStorageService.class).isInstanceOf(LocalFilesystemMediaStorage.class);
         });
