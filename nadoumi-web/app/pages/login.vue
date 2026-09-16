@@ -19,8 +19,7 @@ async function submit() {
     await $fetch('/api/student-session', { method: 'POST', body: { ...form } })
     await refresh()
     const r = route.query.redirect as string | undefined
-    const safe = !!r && r.startsWith('/') && !r.startsWith('//')
-    await navigateTo(safe ? r : localePath('/dashboard'))
+    await navigateTo(isSafeRedirectPath(r) ? r : localePath('/dashboard'))
   }
   catch (err) {
     error.value = authErrorMessage(err, t)
