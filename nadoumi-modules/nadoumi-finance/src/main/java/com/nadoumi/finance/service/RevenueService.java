@@ -9,7 +9,7 @@ import com.nadoumi.finance.mapper.RevenueMapper;
 import com.nadoumi.finance.web.request.RevenueRequest;
 import com.nadoumi.finance.web.response.RevenueResponse;
 import com.nadoumi.identity.exception.NadNotFoundException;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -47,8 +47,8 @@ public class RevenueService {
     public RevenueResponse create(RevenueRequest req) {
         Revenue r = new Revenue();
         apply(r, req);
-        r.setRecordedBy(currentUserId());
-        r.setCreateBy(currentUser());
+        r.setRecordedBy(AuditActor.userId());
+        r.setCreateBy(AuditActor.username());
         mapper.insert(r);
         return get(r.getId());
     }
@@ -57,7 +57,7 @@ public class RevenueService {
     public RevenueResponse update(long id, RevenueRequest req) {
         Revenue r = findEntity(id);
         apply(r, req);
-        r.setUpdateBy(currentUser());
+        r.setUpdateBy(AuditActor.username());
         mapper.update(r);
         return get(id);
     }
@@ -88,22 +88,6 @@ public class RevenueService {
         r.setRelatedType(nz(req.relatedType()));
         r.setRelatedId(req.relatedId());
         r.setNotes(nz(req.notes()));
-    }
-
-    private static long currentUserId() {
-        try {
-            return SecurityUtils.getUserId();
-        } catch (RuntimeException e) {
-            return 0L;
-        }
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        } catch (RuntimeException e) {
-            return "system";
-        }
     }
 
     private static String nz(String s) {

@@ -19,7 +19,7 @@ import com.nadoumi.hr.web.response.TaskResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadForbiddenException;
 import com.nadoumi.identity.exception.NadNotFoundException;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -108,7 +108,7 @@ public class TaskService {
         t.setDueDate(req.dueDate());
         t.setRelatedType(nz(req.relatedType()));
         t.setRelatedId(req.relatedId());
-        t.setCreateBy(currentUser());
+        t.setCreateBy(AuditActor.username());
         taskMapper.insert(t);
 
         writeEvent(t.getId(), EV_CREATED, null, TaskStatus.PENDING.name(), actorUserId, null);
@@ -136,7 +136,7 @@ public class TaskService {
         t.setDueDate(req.dueDate());
         t.setRelatedType(nz(req.relatedType()));
         t.setRelatedId(req.relatedId());
-        t.setUpdateBy(currentUser());
+        t.setUpdateBy(AuditActor.username());
         taskMapper.update(t);
 
         if (priorityChanged) {
@@ -185,7 +185,7 @@ public class TaskService {
             t.setApprovedByUserId(actorUserId);
             t.setApprovedAt(now);
         }
-        t.setUpdateBy(currentUser());
+        t.setUpdateBy(AuditActor.username());
         taskMapper.update(t);
 
         writeEvent(id, EV_STATUS, from.name(), target.name(), actorUserId, nz(note));
@@ -228,7 +228,7 @@ public class TaskService {
         payload.put("taskTitle", t.getTitle());
         payload.put("taskStatus", t.getStatus());
         payload.put("fromStatus", fromStatus == null ? "new" : fromStatus);
-        payload.put("actor", currentUser());
+        payload.put("actor", AuditActor.username());
         payload.put("recipientUserIds", new JSONArray(recipients.toArray()));
         outboxWriter.write(AGGREGATE, t.getId(), OutboxEventTypes.TASK_PROGRESS_CHANGED, payload.toJSONString());
     }
@@ -254,14 +254,6 @@ public class TaskService {
             return TaskStatus.valueOf(raw.trim().toUpperCase(java.util.Locale.ROOT));
         } catch (RuntimeException e) {
             throw new NadBadRequestException("unknown task status: " + raw);
-        }
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        } catch (RuntimeException e) {
-            return "system";
         }
     }
 

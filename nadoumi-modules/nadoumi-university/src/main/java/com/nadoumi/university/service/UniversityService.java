@@ -26,7 +26,7 @@ import com.nadoumi.university.mapper.UniversitySearch;
 import com.nadoumi.university.web.request.UniversityRequest;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.nadoumi.university.web.response.UniversityResponse;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -77,7 +77,7 @@ public class UniversityService {
         requireUniqueName(u.getName(), u.getCountry(), null);
         u.setSlug(uniqueSlug(u.getName(), null));
         u.setReferenceCode(nextReferenceCode());
-        u.setCreateBy(currentUser());
+        u.setCreateBy(AuditActor.username());
         mapper.insert(u);
         replaceChildren(u.getId(), req);
         if (u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED) {
@@ -93,7 +93,7 @@ public class UniversityService {
         apply(u, req);
         requireUniqueName(u.getName(), u.getCountry(), id);
         u.setSlug(uniqueSlug(u.getName(), id));
-        u.setUpdateBy(currentUser());
+        u.setUpdateBy(AuditActor.username());
         mapper.update(u);
         replaceChildren(id, req);
         boolean nowLive = u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED;
@@ -156,7 +156,7 @@ public class UniversityService {
         try {
             return media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), category, null,
-                    new MediaOwnerRef(MediaOwnerKind.UNIVERSITY, universityId), currentUserId());
+                    new MediaOwnerRef(MediaOwnerKind.UNIVERSITY, universityId), AuditActor.userId());
         }
         catch (IOException e) {
             throw new UncheckedIOException("failed to read upload", e);
@@ -266,25 +266,6 @@ public class UniversityService {
         Long existing = mapper.findIdByNameAndCountry(name, country);
         if (existing != null && !existing.equals(selfId)) {
             throw new NadBadRequestException("a university with this name already exists in " + country);
-        }
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        }
-        catch (RuntimeException e) {
-            return "system";
-        }
-    }
-
-    private static long currentUserId() {
-        try {
-            Long id = SecurityUtils.getUserId();
-            return id == null ? 0L : id;
-        }
-        catch (RuntimeException e) {
-            return 0L;
         }
     }
 

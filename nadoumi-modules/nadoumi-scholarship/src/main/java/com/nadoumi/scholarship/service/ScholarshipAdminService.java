@@ -31,7 +31,7 @@ import com.nadoumi.scholarship.web.request.ScholarshipRequest;
 import com.nadoumi.scholarship.web.response.ScholarshipInternalResponse;
 import com.nadoumi.scholarship.web.response.ScholarshipResponse;
 import com.nadoumi.university.service.UniversityService;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
@@ -82,7 +82,7 @@ public class ScholarshipAdminService {
         Scholarship s = new Scholarship();
         apply(s, req);
         s.setSlug(uniqueSlug(req.title(), null));
-        s.setCreateBy(currentUser());
+        s.setCreateBy(AuditActor.username());
         boolean publishing = req.publishStatus() == PublishStatus.PUBLISHED;
         if (publishing) {
             s.setPublishedAt(java.time.LocalDateTime.now());
@@ -107,7 +107,7 @@ public class ScholarshipAdminService {
         if (publishing) {
             assignReferenceCode(existing);
         }
-        existing.setUpdateBy(currentUser());
+        existing.setUpdateBy(AuditActor.username());
         mapper.update(existing);
         if (publishing) {
             mapper.markPublished(id);
@@ -163,7 +163,7 @@ public class ScholarshipAdminService {
         try {
             return media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), category, null,
-                    new MediaOwnerRef(MediaOwnerKind.SCHOLARSHIP, scholarshipId), currentUserId());
+                    new MediaOwnerRef(MediaOwnerKind.SCHOLARSHIP, scholarshipId), AuditActor.userId());
         }
         catch (IOException e) {
             throw new UncheckedIOException("failed to read upload", e);
@@ -208,7 +208,7 @@ public class ScholarshipAdminService {
         mapper.upsertInternal(scholarshipId, new ScholarshipInternal(
                 req.universityId(), req.programId(), req.partnershipId(),
                 req.internalStatus() == null ? "DRAFT" : req.internalStatus(),
-                req.operationalNotes(), req.confidentialTerms(), req.commissionModelJson()), currentUser());
+                req.operationalNotes(), req.confidentialTerms(), req.commissionModelJson()), AuditActor.username());
         return getInternal(scholarshipId);
     }
 
@@ -389,25 +389,6 @@ public class ScholarshipAdminService {
             case PARTIAL -> !PARTIAL_EXCLUDED.contains(code);
             case FULLY -> true;
         };
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        }
-        catch (RuntimeException e) {
-            return "system";
-        }
-    }
-
-    private static long currentUserId() {
-        try {
-            Long id = SecurityUtils.getUserId();
-            return id == null ? 0L : id;
-        }
-        catch (RuntimeException e) {
-            return 0L;
-        }
     }
 
     private static String upper(String s) {

@@ -7,7 +7,7 @@ import com.nadoumi.university.mapper.DepartmentMapper;
 import com.nadoumi.university.mapper.UniversityMapper;
 import com.nadoumi.university.web.request.DepartmentRequest;
 import com.nadoumi.university.web.response.DepartmentResponse;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,7 +53,7 @@ public class DepartmentService {
         Department d = new Department();
         d.setUniversityId(universityId);
         apply(d, req);
-        d.setCreateBy(currentUser());
+        d.setCreateBy(AuditActor.username());
         mapper.insert(d);
         return get(universityId, d.getId());
     }
@@ -63,7 +63,7 @@ public class DepartmentService {
         Department d = load(universityId, id);
         requireUniqueName(universityId, req.name().trim(), id);
         apply(d, req);
-        d.setUpdateBy(currentUser());
+        d.setUpdateBy(AuditActor.username());
         mapper.update(d);
         return get(universityId, id);
     }
@@ -103,15 +103,6 @@ public class DepartmentService {
         Long existing = mapper.findIdByUniversityAndName(universityId, name);
         if (existing != null && !existing.equals(selfId)) {
             throw new NadBadRequestException("a department with this name already exists for that university");
-        }
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        }
-        catch (RuntimeException e) {
-            return "system";
         }
     }
 

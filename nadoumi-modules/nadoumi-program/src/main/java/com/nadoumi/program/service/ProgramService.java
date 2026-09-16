@@ -29,7 +29,7 @@ import com.nadoumi.program.web.response.ProgramResponse;
 import com.nadoumi.program.web.response.PublicProgramResponse;
 import com.nadoumi.university.service.DepartmentService;
 import com.nadoumi.university.service.UniversityService;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
@@ -94,7 +94,7 @@ public class ProgramService {
         apply(p, req);
         requireUniqueName(p.getUniversityId(), p.getName(), null);
         p.setSlug(uniqueSlug(universityName, p.getName(), null));
-        p.setCreateBy(currentUser());
+        p.setCreateBy(AuditActor.username());
         mapper.insert(p);
         replaceChildren(p, req);
         if (isLive(p)) {
@@ -112,7 +112,7 @@ public class ProgramService {
         p.setId(id);
         requireUniqueName(p.getUniversityId(), p.getName(), id);
         p.setSlug(uniqueSlug(universityName, p.getName(), id));
-        p.setUpdateBy(currentUser());
+        p.setUpdateBy(AuditActor.username());
         mapper.update(p);
         replaceChildren(p, req);
         if (isLive(p) && !wasLive) {
@@ -152,7 +152,7 @@ public class ProgramService {
         try {
             result = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), MediaCategory.PROGRAM_IMAGE, null,
-                    new MediaOwnerRef(MediaOwnerKind.PROGRAM, id), currentUserId());
+                    new MediaOwnerRef(MediaOwnerKind.PROGRAM, id), AuditActor.userId());
         }
         catch (IOException e) {
             throw new UncheckedIOException("failed to read upload", e);
@@ -373,25 +373,6 @@ public class ProgramService {
                 return null;
             }
         });
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        }
-        catch (RuntimeException e) {
-            return "system";
-        }
-    }
-
-    private static long currentUserId() {
-        try {
-            Long id = SecurityUtils.getUserId();
-            return id == null ? 0L : id;
-        }
-        catch (RuntimeException e) {
-            return 0L;
-        }
     }
 
     private ProgramResponse toResponse(Program p) {

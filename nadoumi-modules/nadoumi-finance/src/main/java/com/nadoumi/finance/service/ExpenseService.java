@@ -12,7 +12,7 @@ import com.nadoumi.finance.web.request.ExpenseRequest;
 import com.nadoumi.finance.web.response.ExpenseResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
-import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.AuditActor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Year;
@@ -68,8 +68,8 @@ public class ExpenseService {
         Expense e = new Expense();
         apply(e, req);
         e.setStatus(ExpenseStatus.DRAFT.name());
-        e.setSubmittedBy(currentUserId());
-        e.setCreateBy(currentUser());
+        e.setSubmittedBy(AuditActor.userId());
+        e.setCreateBy(AuditActor.username());
         mapper.insert(e);
         return get(e.getId());
     }
@@ -81,7 +81,7 @@ public class ExpenseService {
             throw new NadBadRequestException("a " + e.getStatus() + " expense cannot be edited");
         }
         apply(e, req);
-        e.setUpdateBy(currentUser());
+        e.setUpdateBy(AuditActor.username());
         mapper.update(e);
         return get(id);
     }
@@ -107,13 +107,13 @@ public class ExpenseService {
             if (!StringUtils.hasText(e.getReceiptNo())) {
                 e.setReceiptNo(nextReceiptNo());
             }
-            e.setApprovedBy(currentUserId());
+            e.setApprovedBy(AuditActor.userId());
             e.setApprovedAt(now);
         }
         if (target == ExpenseStatus.PAID) {
             e.setPaidAt(now);
         }
-        e.setUpdateBy(currentUser());
+        e.setUpdateBy(AuditActor.username());
         mapper.update(e);
         return get(id);
     }
@@ -197,22 +197,6 @@ public class ExpenseService {
             return ExpenseStatus.valueOf(raw.trim().toUpperCase(Locale.ROOT));
         } catch (RuntimeException e) {
             throw new NadBadRequestException("unknown expense status: " + raw);
-        }
-    }
-
-    private static long currentUserId() {
-        try {
-            return SecurityUtils.getUserId();
-        } catch (RuntimeException e) {
-            return 0L;
-        }
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        } catch (RuntimeException e) {
-            return "system";
         }
     }
 

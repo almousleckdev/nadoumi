@@ -11,6 +11,7 @@ import com.nadoumi.hr.web.response.EmployeeResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.utils.AuditActor;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.service.ISysUserService;
 import java.util.List;
@@ -121,7 +122,7 @@ public class EmployeeService {
         e.setUserId(userId);
         e.setEmployeeNo(nextEmployeeNo());
         applyEmployment(e, req);
-        e.setCreateBy(currentUser());
+        e.setCreateBy(AuditActor.username());
         mapper.insert(e);
         return get(e.getId(), canViewComp);
     }
@@ -147,7 +148,7 @@ public class EmployeeService {
         Employee e = new Employee();
         e.setId(id);
         applyEmployment(e, req);
-        e.setUpdateBy(currentUser());
+        e.setUpdateBy(AuditActor.username());
         mapper.update(e);
         return get(id, canViewComp);
     }
@@ -183,14 +184,6 @@ public class EmployeeService {
     private String nextEmployeeNo() {
         Integer max = mapper.maxEmployeeSeq(EMPLOYEE_NO_PREFIX);
         return EMPLOYEE_NO_PREFIX + String.format(Locale.ROOT, "%04d", (max == null ? 0 : max) + 1);
-    }
-
-    private static String currentUser() {
-        try {
-            return SecurityUtils.getUsername();
-        } catch (RuntimeException e) {
-            return "system";
-        }
     }
 
     private static String blankToNull(String s) {
