@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ActiveChip } from '~/composables/useDiscovery'
 import type { ScholarshipCard, ScholarshipFacets } from '~/types/catalog'
+import type { DeadlineTone } from '~/utils/deadline'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -71,8 +72,16 @@ function fee(s: ScholarshipCard) {
   return s.applicationFee ?? s.serviceFee ?? null
 }
 function deadlineDays(s: ScholarshipCard): number | null {
-  if (!s.deadline) return null
-  return Math.ceil((new Date(`${s.deadline}T23:59:59`).getTime() - Date.now()) / 86_400_000)
+  return daysUntilDeadline(s.deadline)
+}
+const DEADLINE_TONE_CLASS: Record<DeadlineTone, string> = {
+  passed: 'bg-slate-100 text-slate-500',
+  urgent: 'bg-red-100 text-red-700',
+  soon: 'bg-amber-100 text-amber-700',
+  ok: 'bg-emerald-100 text-emerald-700',
+}
+function deadlineClass(s: ScholarshipCard): string {
+  return DEADLINE_TONE_CLASS[deadlineTone(deadlineDays(s))]
 }
 
 const chips = computed<ActiveChip[]>(() => {
@@ -285,10 +294,7 @@ function clearAll() {
                   <span
                     v-if="deadlineDays(s) != null"
                     class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold"
-                    :class="deadlineDays(s)! < 0 ? 'bg-slate-100 text-slate-500'
-                      : deadlineDays(s)! <= 30 ? 'bg-red-100 text-red-700'
-                      : deadlineDays(s)! <= 60 ? 'bg-amber-100 text-amber-700'
-                      : 'bg-emerald-100 text-emerald-700'"
+                    :class="deadlineClass(s)"
                   >{{ s.deadline }}</span>
                   <span v-else class="text-xs text-slate-400">{{ t('scholarships.deadlineRolling') }}</span>
                 </td>

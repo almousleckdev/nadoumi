@@ -40,12 +40,9 @@ function money(m?: { amountRmb: number, amountUsd: number } | null) {
 
 const deadlineInfo = computed(() => {
   const raw = s.value?.deadline
-  if (!raw) return { rolling: true, tone: 'ok' as const, days: null as number | null, date: '' }
-  const end = new Date(`${raw}T23:59:59`).getTime()
-  const days = Math.ceil((end - Date.now()) / 86_400_000)
-  // red once 10 days or fewer remain
-  const tone = days < 0 ? 'passed' : days <= 10 ? 'urgent' : days <= 45 ? 'soon' : 'ok'
-  return { rolling: false, tone, days, date: raw }
+  const days = daysUntilDeadline(raw)
+  if (!raw || days == null) return { rolling: true, tone: 'ok' as const, days: null as number | null, date: '' }
+  return { rolling: false, tone: deadlineTone(days), days, date: raw }
 })
 const deadlineText = computed(() => {
   const d = deadlineInfo.value
