@@ -1,5 +1,7 @@
 package com.nadoumi.common.access;
 
+import java.util.List;
+
 /**
  * Resource-scoped authorization for external users (Spring bean {@code @na}).
  *
@@ -45,4 +47,11 @@ public interface NadoumiAccessService {
      * @return true if the current staff caller may verify/reject the document
      */
     boolean canReviewDocument(Long documentId);
+
+    /**
+     * @return the applicant ids the current external caller holds any grant
+     *         for — empty for staff/unauthenticated callers. The
+     *         {@code authScope} for a MyBatis "list mine" finder.
+     */
+    List<Long> accessibleApplicantIds();
 }

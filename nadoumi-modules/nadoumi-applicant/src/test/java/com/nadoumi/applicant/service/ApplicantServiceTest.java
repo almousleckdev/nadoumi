@@ -16,10 +16,10 @@ import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.media.SignedUrl;
+import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.identity.access.NadoumiAccessServiceImpl;
-import com.nadoumi.identity.exception.NadForbiddenException;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadForbiddenException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
 import java.time.Instant;
@@ -30,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 class ApplicantServiceTest {
 
     private final ApplicantMapper mapper = mock(ApplicantMapper.class);
-    private final NadoumiAccessServiceImpl access = mock(NadoumiAccessServiceImpl.class);
+    private final NadoumiAccessService access = mock(NadoumiAccessService.class);
     private final UserApplicantAccessService grants = mock(UserApplicantAccessService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final PermissionService rbac = mock(PermissionService.class);

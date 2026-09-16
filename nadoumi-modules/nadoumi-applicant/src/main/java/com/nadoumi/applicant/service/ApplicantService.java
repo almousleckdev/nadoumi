@@ -27,10 +27,10 @@ import com.nadoumi.common.media.MediaOwnerKind;
 import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.media.SignedUrl;
+import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.identity.access.NadoumiAccessServiceImpl;
-import com.nadoumi.identity.exception.NadForbiddenException;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadForbiddenException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
 
@@ -53,13 +53,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicantService {
 
     private final ApplicantMapper mapper;
-    private final NadoumiAccessServiceImpl access;
+    private final NadoumiAccessService access;
     private final UserApplicantAccessService grants;
     private final CurrentCaller caller;
     private final PermissionService rbac;
     private final MediaGateway media;
 
-    public ApplicantService(ApplicantMapper mapper, NadoumiAccessServiceImpl access,
+    public ApplicantService(ApplicantMapper mapper, NadoumiAccessService access,
             UserApplicantAccessService grants, CurrentCaller caller, PermissionService rbac,
             MediaGateway media) {
         this.mapper = mapper;

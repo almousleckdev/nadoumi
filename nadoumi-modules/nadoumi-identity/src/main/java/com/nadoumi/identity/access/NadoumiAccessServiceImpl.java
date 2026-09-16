@@ -74,7 +74,7 @@ public class NadoumiAccessServiceImpl implements NadoumiAccessService {
         return rbac.hasPermi("nad:document:verify") || rbac.hasPermi("nad:document:reject");
     }
 
-    /** Accessible applicant ids for an external caller — the {@code authScope} for MyBatis finders. */
+    @Override
     public List<Long> accessibleApplicantIds() {
         Long userId = caller.userIdOrNull();
         return userId == null ? List.of() : grants.accessibleApplicantIds(userId);
