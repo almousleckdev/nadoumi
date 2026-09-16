@@ -74,8 +74,26 @@ public class TaskService {
 
     @Transactional(readOnly = true)
     public TaskResponse get(long id) {
+        return TaskResponse.detail(require(id), eventMapper.findByTask(id));
+    }
+
+    /**
+     * Same lookup, scoped like {@link #list}: a non-approver may only view a
+     * task they created or are assigned to.
+     */
+    @Transactional(readOnly = true)
+    public TaskResponse get(long id, long actorUserId, boolean isApprover) {
         Task t = require(id);
+        assertCanView(t, actorUserId, isApprover);
         return TaskResponse.detail(t, eventMapper.findByTask(id));
+    }
+
+    private void assertCanView(Task t, long actorUserId, boolean isApprover) {
+        if (!isApprover
+                && !java.util.Objects.equals(actorUserId, t.getAssigneeUserId())
+                && !java.util.Objects.equals(actorUserId, t.getCreatedByUserId())) {
+            throw new NadForbiddenException("you can only view your own tasks");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)

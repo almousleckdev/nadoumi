@@ -65,7 +65,7 @@ public class StaffTaskController {
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:task:query')")
     public TaskResponse get(@PathVariable long id) {
-        return service.get(id);
+        return service.get(id, actor(), isApprover());
     }
 
     @PostMapping

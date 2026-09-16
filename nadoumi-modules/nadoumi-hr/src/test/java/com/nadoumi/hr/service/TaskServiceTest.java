@@ -133,6 +133,23 @@ class TaskServiceTest {
     }
 
     @Test
+    void get_scoped_rejectsANonApproverWhoIsNeitherAssigneeNorCreator() {
+        when(taskMapper.findById(50L)).thenReturn(stored(50L, "PENDING")); // assignee=7, creator=3
+
+        assertThatThrownBy(() -> service.get(50L, 99L, false))
+                .isInstanceOf(NadForbiddenException.class);
+    }
+
+    @Test
+    void get_scoped_allowsTheAssignee_theCreator_andAnyApprover() {
+        when(taskMapper.findById(50L)).thenReturn(stored(50L, "PENDING")); // assignee=7, creator=3
+
+        assertThat(service.get(50L, 7L, false).id()).isEqualTo(50L);
+        assertThat(service.get(50L, 3L, false).id()).isEqualTo(50L);
+        assertThat(service.get(50L, 99L, true).id()).isEqualTo(50L);
+    }
+
+    @Test
     void emit_excludesTheActorFromRecipients() {
         when(taskMapper.findById(50L)).thenReturn(stored(50L, "PENDING"));
         // actor 7 is the assignee; creator is 3, approver audience is 9
