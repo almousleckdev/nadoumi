@@ -32,7 +32,7 @@ async function onSubmit(body: SelfApplicantBody) {
     notice.value = t('dashboard.savedOk')
   }
   catch (err) {
-    error.value = problemMessage(err, t('auth.genericError'))
+    error.value = authErrorMessage(err, t)
   }
   finally {
     busy.value = false

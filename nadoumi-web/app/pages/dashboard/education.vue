@@ -23,7 +23,7 @@ async function run(fn: () => Promise<unknown>, ok: string) {
   if (activeApplicantId.value == null) return
   busy.value = true; error.value = ''; notice.value = ''
   try { await fn(); await reload(); notice.value = ok }
-  catch (err) { error.value = problemMessage(err, t('auth.genericError')) }
+  catch (err) { error.value = authErrorMessage(err, t) }
   finally { busy.value = false }
 }
 

@@ -47,7 +47,7 @@ async function saveIdentity(body: SelfApplicantBody) {
     invalidateOnboarding()
     notice.value = t('onboarding.saved')
   }
-  catch (e) { error.value = problemMessage(e, t('auth.genericError')) }
+  catch (e) { error.value = authErrorMessage(e, t) }
   finally { busy.value = false }
 }
 
@@ -55,7 +55,7 @@ async function runEdu(fn: () => Promise<unknown>) {
   if (!applicant.value) return
   busy.value = true; error.value = ''
   try { await fn(); education.value = await listEducation(applicant.value.id).catch(() => []) }
-  catch (e) { error.value = problemMessage(e, t('auth.genericError')) }
+  catch (e) { error.value = authErrorMessage(e, t) }
   finally { busy.value = false }
 }
 const onEduAdd = (b: EducationBody) => runEdu(() => addEducation(applicant.value!.id, b))

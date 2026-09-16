@@ -45,7 +45,7 @@ describe('contact page', () => {
 
   it('surfaces a server error without losing the form', async () => {
     publicPost.mockImplementationOnce(() => Promise.reject(
-      Object.assign(new Error('rate limited'), { data: { detail: 'Too many attempts' } }),
+      Object.assign(new Error('rate limited'), { statusCode: 429 }),
     ))
     const w = await mountSuspended(Contact)
     await fill(w)

@@ -4,7 +4,6 @@ import { useApplicant } from '~/composables/useApplicant'
 const studentFetch = vi.fn()
 vi.mock('~/composables/useApi', () => ({
   useApi: () => ({ studentFetch, publicGet: vi.fn() }),
-  problemMessage: (_e: unknown, f: string) => f,
 }))
 
 beforeEach(() => studentFetch.mockReset())

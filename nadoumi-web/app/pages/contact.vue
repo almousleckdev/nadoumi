@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { problemMessage } from '~/composables/useApi'
 import { CONTACT, telHref } from '~/data/contact'
 
 const { t, locale } = useI18n()
@@ -49,7 +48,7 @@ async function submit() {
   }
   catch (e) {
     state.value = 'error'
-    errorMsg.value = problemMessage(e, t('contact.errorBody'))
+    errorMsg.value = authErrorMessage(e, t)
   }
 }
 </script>
