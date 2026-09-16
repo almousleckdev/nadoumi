@@ -1,11 +1,11 @@
 package com.nadoumi.finance.web;
 
 import com.nadoumi.common.web.PageResponse;
-import com.nadoumi.finance.domain.Expense;
 import com.nadoumi.finance.domain.ExpenseCategory;
 import com.nadoumi.finance.service.ExpenseService;
 import com.nadoumi.finance.service.ReceiptWriter;
 import com.nadoumi.finance.web.request.ExpenseRequest;
+import com.nadoumi.finance.web.response.ExpenseResponse;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -51,7 +51,7 @@ public class StaffExpenseController {
 
     @GetMapping
     @PreAuthorize("@ss.hasPermi('nad:expense:list')")
-    public PageResponse<Expense> list(
+    public PageResponse<ExpenseResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long categoryId,
@@ -70,7 +70,7 @@ public class StaffExpenseController {
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:expense:query')")
-    public Expense get(@PathVariable long id) {
+    public ExpenseResponse get(@PathVariable long id) {
         return service.get(id);
     }
 
@@ -86,21 +86,21 @@ public class StaffExpenseController {
     @PreAuthorize("@ss.hasPermi('nad:expense:add')")
     @Log(title = "Expense", businessType = BusinessType.INSERT)
     @ResponseStatus(HttpStatus.CREATED)
-    public Expense create(@Valid @RequestBody ExpenseRequest req) {
+    public ExpenseResponse create(@Valid @RequestBody ExpenseRequest req) {
         return service.create(req);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:expense:edit')")
     @Log(title = "Expense", businessType = BusinessType.UPDATE)
-    public Expense update(@PathVariable long id, @Valid @RequestBody ExpenseRequest req) {
+    public ExpenseResponse update(@PathVariable long id, @Valid @RequestBody ExpenseRequest req) {
         return service.update(id, req);
     }
 
     @PutMapping("/{id}/status")
     @PreAuthorize("@ss.hasPermi('nad:expense:edit')")
     @Log(title = "Expense status", businessType = BusinessType.UPDATE)
-    public Expense changeStatus(@PathVariable long id, @RequestBody Map<String, String> body) {
+    public ExpenseResponse changeStatus(@PathVariable long id, @RequestBody Map<String, String> body) {
         return service.changeStatus(id, body.getOrDefault("status", ""), canApprove());
     }
 

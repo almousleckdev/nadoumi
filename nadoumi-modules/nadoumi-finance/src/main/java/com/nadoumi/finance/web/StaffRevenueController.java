@@ -1,11 +1,11 @@
 package com.nadoumi.finance.web;
 
 import com.nadoumi.common.web.PageResponse;
-import com.nadoumi.finance.domain.Revenue;
 import com.nadoumi.finance.service.FinanceSummaryService;
 import com.nadoumi.finance.service.RevenueService;
 import com.nadoumi.finance.web.request.RevenueRequest;
 import com.nadoumi.finance.web.response.FinanceSummary;
+import com.nadoumi.finance.web.response.RevenueResponse;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import jakarta.validation.Valid;
@@ -39,7 +39,7 @@ public class StaffRevenueController {
 
     @GetMapping("/revenue")
     @PreAuthorize("@ss.hasPermi('nad:revenue:list')")
-    public PageResponse<Revenue> list(
+    public PageResponse<RevenueResponse> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String source,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
@@ -51,7 +51,7 @@ public class StaffRevenueController {
 
     @GetMapping("/revenue/{id}")
     @PreAuthorize("@ss.hasPermi('nad:revenue:query')")
-    public Revenue get(@PathVariable long id) {
+    public RevenueResponse get(@PathVariable long id) {
         return service.get(id);
     }
 
@@ -59,14 +59,14 @@ public class StaffRevenueController {
     @PreAuthorize("@ss.hasPermi('nad:revenue:add')")
     @Log(title = "Revenue", businessType = BusinessType.INSERT)
     @ResponseStatus(HttpStatus.CREATED)
-    public Revenue create(@Valid @RequestBody RevenueRequest req) {
+    public RevenueResponse create(@Valid @RequestBody RevenueRequest req) {
         return service.create(req);
     }
 
     @PutMapping("/revenue/{id}")
     @PreAuthorize("@ss.hasPermi('nad:revenue:edit')")
     @Log(title = "Revenue", businessType = BusinessType.UPDATE)
-    public Revenue update(@PathVariable long id, @Valid @RequestBody RevenueRequest req) {
+    public RevenueResponse update(@PathVariable long id, @Valid @RequestBody RevenueRequest req) {
         return service.update(id, req);
     }
 

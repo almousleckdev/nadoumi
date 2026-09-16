@@ -9,6 +9,7 @@ import com.nadoumi.finance.domain.ExpenseCategory;
 import com.nadoumi.finance.domain.ExpenseStatus;
 import com.nadoumi.finance.mapper.ExpenseMapper;
 import com.nadoumi.finance.web.request.ExpenseRequest;
+import com.nadoumi.finance.web.response.ExpenseResponse;
 import com.nadoumi.identity.exception.NadBadRequestException;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.ruoyi.common.utils.SecurityUtils;
@@ -42,23 +43,19 @@ public class ExpenseService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<Expense> list(String q, String status, Long categoryId, LocalDate from, LocalDate to,
+    public PageResponse<ExpenseResponse> list(String q, String status, Long categoryId, LocalDate from, LocalDate to,
             int page, int size) {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Expense> rows = mapper.search(nz(q), nz(status), categoryId, from, to);
         long total = new PageInfo<>(rows).getTotal();
-        return PageResponse.of(rows, page, size, total);
+        return PageResponse.of(rows.stream().map(ExpenseResponse::from).toList(), page, size, total);
     }
 
     @Transactional(readOnly = true)
-    public Expense get(long id) {
-        Expense e = mapper.findById(id);
-        if (e == null) {
-            throw new NadNotFoundException("expense not found");
-        }
-        return e;
+    public ExpenseResponse get(long id) {
+        return ExpenseResponse.from(findEntity(id));
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +64,7 @@ public class ExpenseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Expense create(ExpenseRequest req) {
+    public ExpenseResponse create(ExpenseRequest req) {
         Expense e = new Expense();
         apply(e, req);
         e.setStatus(ExpenseStatus.DRAFT.name());
@@ -78,8 +75,8 @@ public class ExpenseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Expense update(long id, ExpenseRequest req) {
-        Expense e = get(id);
+    public ExpenseResponse update(long id, ExpenseRequest req) {
+        Expense e = findEntity(id);
         if (!EDITABLE.contains(e.getStatus())) {
             throw new NadBadRequestException("a " + e.getStatus() + " expense cannot be edited");
         }
@@ -90,12 +87,12 @@ public class ExpenseService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Expense changeStatus(long id, String targetRaw, boolean canApprove) {
-        Expense e = get(id);
+    public ExpenseResponse changeStatus(long id, String targetRaw, boolean canApprove) {
+        Expense e = findEntity(id);
         ExpenseStatus from = ExpenseStatus.valueOf(e.getStatus());
         ExpenseStatus target = parse(targetRaw);
         if (from == target) {
-            return e;
+            return ExpenseResponse.from(e);
         }
         if (!from.canMoveTo(target)) {
             throw new NadBadRequestException("cannot move an expense from " + from + " to " + target);
@@ -123,7 +120,7 @@ public class ExpenseService {
 
     @Transactional(rollbackFor = Exception.class)
     public void delete(long id) {
-        Expense e = get(id);
+        Expense e = findEntity(id);
         if (!Set.of("DRAFT", "REJECTED").contains(e.getStatus())) {
             throw new NadBadRequestException("only a DRAFT or REJECTED expense can be deleted");
         }
@@ -132,11 +129,19 @@ public class ExpenseService {
 
     @Transactional(readOnly = true)
     public String receiptHtml(long id, ReceiptWriter writer) {
-        Expense e = get(id);
+        Expense e = findEntity(id);
         if (!Set.of("APPROVED", "PAID").contains(e.getStatus())) {
             throw new NadBadRequestException("a receipt is only available once the expense is APPROVED or PAID");
         }
         return writer.renderHtml(e);
+    }
+
+    private Expense findEntity(long id) {
+        Expense e = mapper.findById(id);
+        if (e == null) {
+            throw new NadNotFoundException("expense not found");
+        }
+        return e;
     }
 
     private void apply(Expense e, ExpenseRequest req) {

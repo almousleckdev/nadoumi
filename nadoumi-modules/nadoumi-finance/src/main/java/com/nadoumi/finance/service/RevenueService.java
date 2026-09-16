@@ -7,6 +7,7 @@ import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Revenue;
 import com.nadoumi.finance.mapper.RevenueMapper;
 import com.nadoumi.finance.web.request.RevenueRequest;
+import com.nadoumi.finance.web.response.RevenueResponse;
 import com.nadoumi.identity.exception.NadNotFoundException;
 import com.ruoyi.common.utils.SecurityUtils;
 import java.time.LocalDate;
@@ -27,26 +28,23 @@ public class RevenueService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<Revenue> list(String q, String source, LocalDate from, LocalDate to, int page, int size) {
+    public PageResponse<RevenueResponse> list(String q, String source, LocalDate from, LocalDate to, int page,
+            int size) {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Revenue> rows = mapper.search(nz(q), nz(source), from, to);
         long total = new PageInfo<>(rows).getTotal();
-        return PageResponse.of(rows, page, size, total);
+        return PageResponse.of(rows.stream().map(RevenueResponse::from).toList(), page, size, total);
     }
 
     @Transactional(readOnly = true)
-    public Revenue get(long id) {
-        Revenue r = mapper.findById(id);
-        if (r == null) {
-            throw new NadNotFoundException("revenue record not found");
-        }
-        return r;
+    public RevenueResponse get(long id) {
+        return RevenueResponse.from(findEntity(id));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Revenue create(RevenueRequest req) {
+    public RevenueResponse create(RevenueRequest req) {
         Revenue r = new Revenue();
         apply(r, req);
         r.setRecordedBy(currentUserId());
@@ -56,8 +54,8 @@ public class RevenueService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Revenue update(long id, RevenueRequest req) {
-        Revenue r = get(id);
+    public RevenueResponse update(long id, RevenueRequest req) {
+        Revenue r = findEntity(id);
         apply(r, req);
         r.setUpdateBy(currentUser());
         mapper.update(r);
@@ -69,6 +67,14 @@ public class RevenueService {
         if (mapper.deleteById(id) == 0) {
             throw new NadNotFoundException("revenue record not found");
         }
+    }
+
+    private Revenue findEntity(long id) {
+        Revenue r = mapper.findById(id);
+        if (r == null) {
+            throw new NadNotFoundException("revenue record not found");
+        }
+        return r;
     }
 
     private void apply(Revenue r, RevenueRequest req) {
