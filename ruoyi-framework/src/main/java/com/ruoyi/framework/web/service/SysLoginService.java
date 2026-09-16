@@ -44,16 +44,23 @@ public class SysLoginService
 
     @Autowired
     private RedisCache redisCache;
-    
+
     @Autowired
     private ISysUserService userService;
 
     @Autowired
     private ISysConfigService configService;
 
+    private final LoginUsernameGuard loginUsernameGuard;
+
+    public SysLoginService(LoginUsernameGuard loginUsernameGuard)
+    {
+        this.loginUsernameGuard = loginUsernameGuard;
+    }
+
     /**
      * 登录验证
-     * 
+     *
      * @param username 用户名
      * @param password 密码
      * @param code 验证码
@@ -62,6 +69,9 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
+        // extension point: a business module may reject a username outright
+        // (e.g. Nadoumi keeps external/student accounts off this endpoint)
+        loginUsernameGuard.assertLoginAllowed(username);
         // 验证码校验
         validateCaptcha(username, code, uuid);
         // 登录前置校验

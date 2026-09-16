@@ -13,6 +13,12 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 - **Mechanism:** stateless JWT bearer tokens. Spring Security
   `SessionCreationPolicy.STATELESS`, CSRF disabled.
 - **Login flow** (`SysLoginController.login` → `SysLoginService.login`):
+  0. `LoginUsernameGuard.assertLoginAllowed` — a RuoYi extension point
+     (`ruoyi-framework`) that defaults to a no-op and is overridden by
+     Nadoumi's `StaffLoginGuard` (`nadoumi-identity`), which rejects external/
+     student usernames at this staff-only endpoint. `SysLoginController`
+     carries no reference to Nadoumi — the coupling is a bean, not an import,
+     keeping RuoYi's generic controller foundation-only (CLAUDE.md §3).
   1. Captcha check — `sys.account.captchaEnabled` (`sys_config`, Redis-cached). Code
      stored in Redis `captcha_codes:<uuid>`, single-use, deleted on check.
   2. `loginPreCheck` — non-empty; password length 5–20 (`UserConstants`); username

@@ -21,7 +21,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.web.service.SysLoginService;
 import com.ruoyi.framework.web.service.SysPermissionService;
 import com.ruoyi.framework.web.service.TokenService;
-import com.nadoumi.identity.access.StaffLoginGuard;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysMenuService;
 
@@ -47,9 +46,6 @@ public class SysLoginController {
     @Autowired
     private ISysConfigService configService;
 
-    @Autowired
-    private StaffLoginGuard staffLoginGuard;
-
     /**
      * 登录方法
      *
@@ -59,8 +55,6 @@ public class SysLoginController {
     @PostMapping("/login")
     public AjaxResult login(@RequestBody LoginBody loginBody) {
         AjaxResult ajax = AjaxResult.success();
-        // Nadoumi: this endpoint is staff-only; external users use /api/student/login
-        staffLoginGuard.assertStaffLogin(loginBody.getUsername());
         // 生成令牌
         String token = loginService.login(loginBody.getUsername(), loginBody.getPassword(), loginBody.getCode(),
                 loginBody.getUuid());
