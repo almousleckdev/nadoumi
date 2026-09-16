@@ -16,7 +16,9 @@ export function useSession() {
       status.value = 'authed'
       user.value = s.user ?? null
       applicants.value = s.applicants ?? []
-      if (activeApplicantId.value === null) {
+      // reselect if the previously active id is gone (e.g. a different
+      // account signed in on this device) — never keep a stale selection
+      if (!applicants.value.some(a => a.applicantId === activeApplicantId.value)) {
         activeApplicantId.value = applicants.value[0]?.applicantId ?? null
       }
     }
@@ -34,6 +36,9 @@ export function useSession() {
     user.value = null
     applicants.value = []
     activeApplicantId.value = null
+    // so the next account signed in on this device re-evaluates from scratch,
+    // not this account's cached onboarding-complete state
+    useOnboarding().invalidate()
     await navigateTo(localePath('/'))
   }
 
