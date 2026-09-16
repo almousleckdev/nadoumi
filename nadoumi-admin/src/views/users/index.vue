@@ -6,7 +6,7 @@
     >
       <template #actions>
         <el-button
-          v-if="canEdit"
+          v-if="canAdd"
           type="primary"
           :icon="Plus"
           @click="openCreate"
@@ -64,12 +64,13 @@
       <template #cell-status="{ row }">
         <el-switch
           :model-value="(row as SysUserRow).status === '0'"
-          :disabled="!canEdit || (row as SysUserRow).userId === 1"
+          :disabled="!canEditUser || (row as SysUserRow).userId === 1"
           @change="(v) => toggleStatus(row as SysUserRow, Boolean(v))"
         />
       </template>
       <template #cell-actions="{ row }">
         <el-button
+          v-if="canEditUser"
           link
           type="primary"
           @click="openEdit(row as SysUserRow)"
@@ -77,7 +78,7 @@
           {{ t('common.edit') }}
         </el-button>
         <el-button
-          v-if="canEdit"
+          v-if="canResetPwd"
           link
           type="primary"
           @click="doResetPwd(row as SysUserRow)"
@@ -85,7 +86,7 @@
           {{ t('users.resetPwd') }}
         </el-button>
         <el-button
-          v-if="canEdit && (row as SysUserRow).userId !== 1"
+          v-if="canRemove && (row as SysUserRow).userId !== 1"
           link
           type="danger"
           @click="doDelete(row as SysUserRow)"
@@ -135,7 +136,10 @@ const userStore = useUserStore()
 
 const userType = computed(() => (route.meta.userType as string) || '00')
 const isStaff = computed(() => userType.value === '00')
-const canEdit = computed(() => userStore.hasPerm('system:user:add') || userStore.hasPerm('system:user:edit'))
+const canAdd = computed(() => userStore.hasPerm('system:user:add'))
+const canEditUser = computed(() => userStore.hasPerm('system:user:edit'))
+const canResetPwd = computed(() => userStore.hasPerm('system:user:resetPwd'))
+const canRemove = computed(() => userStore.hasPerm('system:user:remove'))
 
 const rows = ref<SysUserRow[]>([])
 const total = ref(0)

@@ -74,6 +74,7 @@
             {{ t('departments.addChild') }}
           </el-button>
           <el-button
+            v-if="userStore.hasPerm('system:dept:edit')"
             link
             type="primary"
             @click="openEdit(row.deptId)"

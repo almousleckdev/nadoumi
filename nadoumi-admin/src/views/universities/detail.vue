@@ -83,12 +83,16 @@
         <DescriptionList :items="profile">
           <template #website="{ value }">
             <a
-              v-if="value"
-              :href="String(value)"
+              v-if="safeHref(value)"
+              :href="safeHref(value)!"
               target="_blank"
               rel="noopener"
               class="link"
             >{{ value }}</a>
+            <span
+              v-else-if="value"
+              class="muted"
+            >{{ value }}</span>
             <span
               v-else
               class="muted"
@@ -333,6 +337,7 @@ import UniversityDrawer from './UniversityDrawer.vue'
 import DepartmentSection from './DepartmentSection.vue'
 import ProgramDrawer from '@/views/programs/ProgramDrawer.vue'
 import { assetUrl } from '@/utils/asset'
+import { safeHref } from '@/utils/url'
 
 const { t } = useI18n()
 const route = useRoute()

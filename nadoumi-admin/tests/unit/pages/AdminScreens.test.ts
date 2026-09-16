@@ -92,18 +92,62 @@ describe('Users screen', () => {
     await flushPromises()
     expect(sys.deleteUsers).toHaveBeenCalledWith([5])
   })
+
+  it('hides every row action for a user with only system:user:add', async () => {
+    useUserStore().permissions = ['system:user:add']
+    sys.listUsers.mockResolvedValue(page)
+    await router.push('/staff')
+    const w = mountView(Users)
+    await flushPromises()
+    expect(w.text()).not.toContain('Edit')
+    expect(w.text()).not.toContain('Reset password')
+    expect(w.text()).not.toContain('Delete')
+    expect(w.text()).toContain('New staff member')
+  })
+
+  it('shows only the edit action for a user with system:user:edit alone', async () => {
+    useUserStore().permissions = ['system:user:edit']
+    sys.listUsers.mockResolvedValue(page)
+    await router.push('/staff')
+    const w = mountView(Users)
+    await flushPromises()
+    expect(w.text()).toContain('Edit')
+    expect(w.text()).not.toContain('Reset password')
+    expect(w.text()).not.toContain('Delete')
+  })
+
+  it('shows only reset-password for a user with system:user:resetPwd alone', async () => {
+    useUserStore().permissions = ['system:user:resetPwd']
+    sys.listUsers.mockResolvedValue(page)
+    await router.push('/staff')
+    const w = mountView(Users)
+    await flushPromises()
+    expect(w.text()).toContain('Reset password')
+    expect(w.text()).not.toContain('Delete')
+  })
 })
 
 describe('Roles screen', () => {
+  const rolesPage = {
+    rows: [{ roleId: 2, roleName: 'Ops', roleKey: 'ops', roleSort: 1, dataScope: '1', status: '0', remark: null, createTime: null, admin: false }],
+    total: 1, code: 200,
+  }
+
   it('loads roles on mount', async () => {
-    sys.listRoles.mockResolvedValue({
-      rows: [{ roleId: 2, roleName: 'Ops', roleKey: 'ops', roleSort: 1, dataScope: '1', status: '0', remark: null, createTime: null, admin: false }],
-      total: 1, code: 200,
-    })
+    sys.listRoles.mockResolvedValue(rolesPage)
     const w = mountView(Roles)
     await flushPromises()
     expect(sys.listRoles).toHaveBeenCalled()
     expect(w.text()).toContain('Ops')
+  })
+
+  it('hides the edit action for a user without system:role:edit', async () => {
+    useUserStore().permissions = ['system:role:remove']
+    sys.listRoles.mockResolvedValue(rolesPage)
+    const w = mountView(Roles)
+    await flushPromises()
+    expect(w.text()).not.toContain('Edit')
+    expect(w.text()).toContain('Delete')
   })
 })
 

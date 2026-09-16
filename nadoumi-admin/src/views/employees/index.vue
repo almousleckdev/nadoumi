@@ -83,6 +83,7 @@
       </template>
       <template #cell-actions="{ row }">
         <el-button
+          v-if="userStore.hasPerm('nad:employee:edit')"
           link
           type="primary"
           @click="openEdit((row as Employee).id)"

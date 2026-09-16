@@ -64,6 +64,7 @@
       </template>
       <template #cell-actions="{ row }">
         <el-button
+          v-if="userStore.hasPerm('system:config:edit')"
           link
           type="primary"
           @click="open(row.configId)"

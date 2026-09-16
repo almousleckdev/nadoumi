@@ -58,6 +58,7 @@
       <template #cell-actions="{ row }">
         <template v-if="!(row as SysRole).admin">
           <el-button
+            v-if="userStore.hasPerm('system:role:edit')"
             link
             type="primary"
             @click="openEdit(row as SysRole)"

@@ -73,7 +73,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 const formRef = ref<FormInstance>()
-const form = reactive({ username: 'almousleck', password: '', code: '', uuid: '' })
+const form = reactive({ username: '', password: '', code: '', uuid: '' })
 const rules = {
   username: [{ required: true, message: t('common.username'), trigger: 'blur' }],
   password: [{ required: true, message: t('common.password'), trigger: 'blur' }],
