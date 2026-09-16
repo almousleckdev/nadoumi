@@ -59,6 +59,27 @@ public class SysLoginService
     }
 
     /**
+     * Staff entry point: same verification as {@link #login}, plus the
+     * extension-point username guard — a business module may reject a
+     * username outright here (e.g. Nadoumi keeps external/student accounts
+     * off this endpoint). Other callers of the shared {@link #login} (e.g.
+     * a module's own student/external login flow) are not subject to this
+     * guard, since it is specific to this entry point, not to the shared
+     * verification logic.
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @param code 验证码
+     * @param uuid 唯一标识
+     * @return 结果
+     */
+    public String staffLogin(String username, String password, String code, String uuid)
+    {
+        loginUsernameGuard.assertLoginAllowed(username);
+        return login(username, password, code, uuid);
+    }
+
+    /**
      * 登录验证
      *
      * @param username 用户名
@@ -69,9 +90,6 @@ public class SysLoginService
      */
     public String login(String username, String password, String code, String uuid)
     {
-        // extension point: a business module may reject a username outright
-        // (e.g. Nadoumi keeps external/student accounts off this endpoint)
-        loginUsernameGuard.assertLoginAllowed(username);
         // 验证码校验
         validateCaptcha(username, code, uuid);
         // 登录前置校验
