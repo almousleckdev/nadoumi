@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
-import com.nadoumi.identity.exception.NadNotFoundException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.mapper.ScholarshipMapper;
 import com.nadoumi.scholarship.mapper.ScholarshipSearch;
@@ -42,6 +42,19 @@ public class ScholarshipService {
         return PageResponse.of(
                 rows.stream().map(s -> PublicScholarshipResponse.card(s, heroUrl(s), coverUrl(s))).toList(),
                 page, size, total);
+    }
+
+    /**
+     * Published + active scholarships with the soonest deadline, for surfaces
+     * (e.g. the welcome email) that only need "what's closing soon" — so a
+     * caller outside this module never needs the {@link ScholarshipSearch}
+     * mapper-package filter type.
+     */
+    public PageResponse<PublicScholarshipResponse> upcomingDeadlines(int size) {
+        ScholarshipSearch bySoonestDeadline = new ScholarshipSearch(
+                null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, "deadline", null, null);
+        return list(bySoonestDeadline, 0, size);
     }
 
     public PublicScholarshipResponse getPublic(String slugOrId) {

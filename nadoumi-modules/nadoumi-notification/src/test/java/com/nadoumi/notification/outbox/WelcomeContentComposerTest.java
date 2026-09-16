@@ -23,7 +23,6 @@ import com.nadoumi.notification.service.NotificationRequest;
 import com.nadoumi.notification.service.NotificationService;
 import com.nadoumi.program.service.ProgramService;
 import com.nadoumi.program.web.response.PublicProgramResponse;
-import com.nadoumi.scholarship.mapper.ScholarshipSearch;
 import com.nadoumi.scholarship.service.ScholarshipService;
 import com.nadoumi.scholarship.web.response.PublicScholarshipResponse;
 import java.time.LocalDate;
@@ -99,7 +98,7 @@ class WelcomeContentComposerTest {
     void sends_a_personalised_welcome_with_both_sections_when_catalog_data_exists() {
         when(programService.publicList(any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt()))
                 .thenReturn(PageResponse.of(List.of(program("MBBS", "Fudan University", "mbbs-fudan")), 0, 3, 1));
-        when(scholarshipService.list(any(ScholarshipSearch.class), anyInt(), anyInt()))
+        when(scholarshipService.upcomingDeadlines(anyInt()))
                 .thenReturn(PageResponse.of(
                         List.of(scholarship("CSC Type A", "China", "csc-a", LocalDate.of(2026, 6, 30))), 0, 3, 1));
 
@@ -122,7 +121,7 @@ class WelcomeContentComposerTest {
     void drops_a_section_when_its_catalog_query_is_empty_and_never_invents_rows() {
         when(programService.publicList(any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt()))
                 .thenReturn(PageResponse.of(List.of(), 0, 3, 0));
-        when(scholarshipService.list(any(ScholarshipSearch.class), anyInt(), anyInt()))
+        when(scholarshipService.upcomingDeadlines(anyInt()))
                 .thenReturn(PageResponse.of(
                         List.of(scholarship("CSC Type A", "China", "csc-a", LocalDate.of(2026, 6, 30))), 0, 3, 1));
 
@@ -168,20 +167,18 @@ class WelcomeContentComposerTest {
     }
 
     @Test
-    void queries_scholarships_ordered_by_soonest_deadline() {
+    void asksForUpcomingDeadlines_notTheFullSearchFilter() {
         stubEmptyCatalog();
 
         composer.handle(event("{}"), ctx(77));
 
-        ArgumentCaptor<ScholarshipSearch> search = ArgumentCaptor.forClass(ScholarshipSearch.class);
-        verify(scholarshipService).list(search.capture(), anyInt(), anyInt());
-        assertThat(search.getValue().sort()).isEqualTo("deadline");
+        verify(scholarshipService).upcomingDeadlines(anyInt());
     }
 
     private void stubEmptyCatalog() {
         when(programService.publicList(any(), any(), any(), any(), any(), any(), any(), anyInt(), anyInt()))
                 .thenReturn(PageResponse.of(List.of(), 0, 3, 0));
-        when(scholarshipService.list(any(ScholarshipSearch.class), anyInt(), anyInt()))
+        when(scholarshipService.upcomingDeadlines(anyInt()))
                 .thenReturn(PageResponse.of(List.of(), 0, 3, 0));
     }
 }

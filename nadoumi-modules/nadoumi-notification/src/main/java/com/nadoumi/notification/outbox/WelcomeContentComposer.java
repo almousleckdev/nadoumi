@@ -14,7 +14,6 @@ import com.nadoumi.notification.render.NotificationRenderer;
 import com.nadoumi.notification.service.NotificationRequest;
 import com.nadoumi.notification.service.NotificationService;
 import com.nadoumi.program.service.ProgramService;
-import com.nadoumi.scholarship.mapper.ScholarshipSearch;
 import com.nadoumi.scholarship.service.ScholarshipService;
 import java.util.List;
 import java.util.Map;
@@ -139,10 +138,7 @@ public class WelcomeContentComposer {
     /** Published + active scholarships with the soonest deadline. */
     private List<ListItem> scholarshipItems() {
         try {
-            ScholarshipSearch bySoonestDeadline = new ScholarshipSearch(
-                    null, null, null, null, null, null, null, null, null, null, null, null,
-                    null, null, null, "deadline", null, null);
-            return scholarshipService.list(bySoonestDeadline, 0, SECTION_SIZE)
+            return scholarshipService.upcomingDeadlines(SECTION_SIZE)
                     .content().stream()
                     .map(s -> new ListItem(
                             s.title(),
