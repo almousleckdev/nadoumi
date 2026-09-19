@@ -1,7 +1,7 @@
 # P2 — Application Engine (backend) — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development or superpowers:executing-plans. Steps use `- [ ]`.
-> **Depends on P1** (`nadoumi-media` merged; migrations through V29). This plan adds **V30–V34**.
+> **Depends on P1** (`nadoumi-media` merged; migrations through V55). This plan adds **V56–V60**.
 > Task steps here are at task+interface+test granularity. Each task's executor writes the bite-sized RED/GREEN/commit steps following the exact pattern established in `2026-09-03-p1-media-storage-cloudinary.md` (write failing test → run → implement → run → install → commit, standard trailers, `git reset -q .claude .gitignore ry.sh`).
 
 **Goal:** The `nadoumi-application` module — data-driven workflow engine (`WorkflowService`), `nad_wf_*` definition tables, `nad_application*` instance tables, two seeded definitions (`PROGRAM_WITH_SCHOLARSHIP_V1`, `PROGRAM_ONLY_V1`), definition-validity checks, and the staff API. No public/student endpoints, no UI (P3/P4).
@@ -12,6 +12,20 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md` (Part II).
 
+## Re-check against the codebase (2026-09-19)
+
+The plan was written 2026-09-03; the following changed since and override the task text below.
+
+- **Migrations renumbered.** V30–V34 became **V56–V60** (V55 is the latest applied). Flyway totals: fresh **52 → 57**, baselined **51 → 56** after all five.
+- **Exceptions live in `nadoumi-common`** (`com.nadoumi.common.exception`: `NadBadRequestException`, `NadForbiddenException`, `NadNotFoundException`). **`NadConflictException` does not exist** — Task 10 adds it there and maps it to `409` in `NadApiExceptionHandler` (`nadoumi-identity`), with a handler test.
+- **Step 5 (outbox + notifications) is done.** Task 10 must **not** ship the `LoggingTransitionListener` stub. Emit through `OutboxWriter` using the existing `OutboxEventTypes.APPLICATION_SUBMITTED` / `APPLICATION_STATUS_CHANGED` (dispatcher mappings and `en` templates exist from V55). The dispatcher currently reads `recipientUserIds` from the payload for task events; confirm how application events should resolve the applicant and the assigned staff before writing the payload.
+- **Capabilities exist**: `ApplicantCapability.CREATE_APPLICATION` / `SUBMIT_APPLICATION` (`nadoumi-common`), so Task 9/10 authorization can call `NadoumiAccessService` as written.
+- **No `nad:application:*` menus/perms and no `workflow_definition_code` columns yet** — Tasks 4 and 13 stand as written.
+- **Roles:** `case_officer` and `ops_manager` exist; `document_reviewer` / `finance` do not (already handled by the no-op note below).
+- **Services:** `ProgramService`, `ScholarshipAdminService`, `ScholarshipService` exist in their modules; confirm the exact `get` method signatures when wiring Task 9.
+- **Java/Boot:** Java 21, Spring Boot 4.1 (`docs/PLATFORM_ARCHITECTURE.md`); MyBatis XML is under `src/main/resources/mapper/<module>/`.
+- **Unchanged and still owed:** Task 12's `REQUIREMENTS` snapshot depends on the document-requirement resolution in `WORKFLOW_PROGRAM_WITH_SCHOLARSHIP.md §6`; Step 7 (Documents) is not built, so document guards stay unbacked and the seeds gate on `DECISION_RECORDED` as designed.
+
 ## Global Constraints
 
 Same as P1's "Global Constraints" section, plus:
@@ -19,7 +33,7 @@ Same as P1's "Global Constraints" section, plus:
 - `current_status` on `nad_application` is written **only** by `WorkflowService` on stage entry. No other code path sets it.
 - `nad_application_stage_history` / `_event` / `_decision` mappers expose **no** update or delete statement.
 - Guard grammar: `guard_json` = `{"all":["PRED", "PRED:ARG", "PRED:ARG:OUTCOME", …]}`, AND-only. OR = two transitions. Argument encoding matches `GuardPredicate`'s Javadoc ("DECISION_RECORDED:UNIVERSITY_OFFER", "FIELD_SET:program_id").
-- Next migration after P1 is **V30**.
+- Next migration is **V56** (the latest applied is V55).
 - Roles referenced by seeds must exist: `ops_manager`, `case_officer` are seeded; `document_reviewer` / `finance` are **not** — a seed `insert … select` that matches nothing is fine (grants simply don't materialise), but note it in the migration comment. Do **not** invent role rows here.
 
 ## File Structure
@@ -43,18 +57,18 @@ Same as P1's "Global Constraints" section, plus:
 - `src/test/java/com/nadoumi/application/service/WorkflowServiceTest.java` (unit; mocked mappers) + `DefinitionValidatorTest.java` + `GuardEvaluatorTest.java`
 
 **New — migrations**
-- `ruoyi-admin/src/main/resources/db/migration/V30__nad_wf_definition.sql`
-- `V31__nad_application.sql`
-- `V32__nad_application_menu_seed.sql`
-- `V33__nad_wf_program_scholarship_v1_seed.sql`
-- `V34__nad_wf_program_only_v1_seed.sql`
+- `ruoyi-admin/src/main/resources/db/migration/V56__nad_wf_definition.sql`
+- `V57__nad_application.sql`
+- `V58__nad_application_menu_seed.sql`
+- `V59__nad_wf_program_scholarship_v1_seed.sql`
+- `V60__nad_wf_program_only_v1_seed.sql`
 
 **Modified — build wiring**
 - `nadoumi-modules/pom.xml` (add `nadoumi-application` after `nadoumi-scholarship`), root `pom.xml` `dependencyManagement`, `ruoyi-admin/pom.xml` (dep).
 
 **Modified — `ruoyi-admin` tests**
 - `AbstractNadIntegrationTest.baseSetup()` — clear the new tables in FK order.
-- `FlywayMigrationsIT` — counts 26 → **31** fresh / 25 → **30** baselined; assertions for V30–V34.
+- `FlywayMigrationsIT` — counts 52 → **57** fresh / 51 → **56** baselined; assertions for V56–V60.
 - New: `ruoyi-admin/src/test/java/com/ruoyi/nadoumi/StaffApplicationEngineTest.java`, `WorkflowDefinitionSeedTest.java`, `ApplicationAuthorizationTest.java`.
 
 **Modified — docs**
@@ -70,9 +84,9 @@ Same as P1's "Global Constraints" section, plus:
 
 ---
 
-## Task 2: V30 — `nad_wf_definition` / `_stage` / `_transition` / `_stage_task_template`
+## Task 2: V56 — `nad_wf_definition` / `_stage` / `_transition` / `_stage_task_template`
 
-**Files:** `V30__nad_wf_definition.sql`; `FlywayMigrationsIT` (27/26).
+**Files:** `V56__nad_wf_definition.sql`; `FlywayMigrationsIT` (53/52).
 **Interfaces:** columns exactly per `APPLICATION_WORKFLOW.md §3.1`:
 - `nad_wf_definition(id, code varchar(64), name, version int, status varchar(12), audit)` — unique `(code, version)`.
 - `nad_wf_stage(id, definition_id FK, code varchar(48), name, order_no int, stage_type varchar(12), status_label varchar(48), sla_hours int null)` — unique `(definition_id, code)`, index `(definition_id, order_no)`.
@@ -80,13 +94,13 @@ Same as P1's "Global Constraints" section, plus:
 - `nad_wf_stage_task_template(id, stage_id FK, title varchar(200), role_required varchar(64) null, mandatory tinyint, blocks_exit tinyint, order_no int)`.
 All FKs `ON DELETE CASCADE` within a definition. Header rollback comment.
 **Test:** `tableExists` × 4, `indexExists` for the uniques, count 27/26.
-**Commit:** `feat(application): V30 nad_wf_* definition tables`.
+**Commit:** `feat(application): V56 nad_wf_* definition tables`.
 
 ---
 
-## Task 3: V31 — `nad_application` + instance/history/event/decision/task/snapshot
+## Task 3: V57 — `nad_application` + instance/history/event/decision/task/snapshot
 
-**Files:** `V31__nad_application.sql`; `FlywayMigrationsIT` (28/27).
+**Files:** `V57__nad_application.sql`; `FlywayMigrationsIT` (54/53).
 **Interfaces:** per spec §II.2:
 - `nad_application(id, applicant_id FK→nad_applicant RESTRICT, application_type varchar(32), program_id FK→nad_program RESTRICT, scholarship_id bigint null FK→nad_scholarship RESTRICT, intake_id bigint null, workflow_instance_id bigint null, current_stage_id bigint null, current_status varchar(32) null, assignee_user_id bigint null, submitted_at datetime null, version int not null default 0, audit)`. Indexes: `(applicant_id)`, `(assignee_user_id)`, `(application_type, current_status)`, `(current_stage_id)`.
 - `nad_wf_instance(id, definition_id FK, definition_version int, application_id bigint not null unique, current_stage_id bigint null, status varchar(12), started_at datetime, closed_at datetime null)`.
@@ -96,16 +110,16 @@ All FKs `ON DELETE CASCADE` within a definition. Header rollback comment.
 - `nad_application_task(id, application_id FK CASCADE, wf_stage_task_template_id bigint null, stage_code varchar(48), title varchar(200), role_required varchar(64) null, mandatory tinyint, blocks_exit tinyint, status varchar(12), assignee_user_id bigint null, due_at datetime null, skip_reason varchar(1000) null, audit)` — index `(application_id, status)`.
 - `nad_application_snapshot(id, application_id FK CASCADE, kind varchar(16), payload_json longtext, created_at datetime)` — unique `(application_id, kind)`. **Append-only** (one row per kind, written once).
 **Test:** `tableExists` × 7, `columnExists("nad_application","version")`, unique on `nad_wf_instance.application_id`, count 28/27.
-**Commit:** `feat(application): V31 nad_application + instance/history/event/decision/task/snapshot`.
+**Commit:** `feat(application): V57 nad_application + instance/history/event/decision/task/snapshot`.
 
 ---
 
-## Task 4: V32 — menu + permission seed
+## Task 4: V58 — menu + permission seed
 
-**Files:** `V32__nad_application_menu_seed.sql`; `FlywayMigrationsIT` (29/28).
+**Files:** `V58__nad_application_menu_seed.sql`; `FlywayMigrationsIT` (55/54).
 **Interfaces:** `Applications` C-menu (`path='application'`, `perms='nad:application:list'`, next free `order_num` under the Nadoumi parent — check V20's pattern) + F-menus for the `nad:application:*` perms in `PERMISSION_CATALOGUE.md §3` (`view, list, create, edit, assign, claim, transition, withdraw, decide, note:view, note:internal:view, note:add, submission:record, export`). Grants: `insert into sys_role_menu … select r.role_id, m.menu_id from sys_role r join sys_menu m … where r.role_key in ('ops_manager','case_officer','document_reviewer','nadoumi_super_admin') and m.perms like 'nad:application:%'` — with the `document_reviewer` no-op noted in a comment. Idempotent (`on duplicate key`/guarded, like V17/V20).
 **Test:** `nad:application:transition` menu row exists; `ops_manager` has it.
-**Commit:** `feat(application): V32 Applications menu + nad:application:* perms`.
+**Commit:** `feat(application): V58 Applications menu + nad:application:* perms`.
 
 ---
 
@@ -216,9 +230,9 @@ Insert both via `ApplicationSnapshotMapper.insert` inside the `submit` transacti
 
 ---
 
-## Task 13: V33 — seed `PROGRAM_WITH_SCHOLARSHIP_V1`
+## Task 13: V59 — seed `PROGRAM_WITH_SCHOLARSHIP_V1`
 
-**Files:** `V33__nad_wf_program_scholarship_v1_seed.sql`; `FlywayMigrationsIT` (30/29); `WorkflowDefinitionSeedTest` (IT).
+**Files:** `V59__nad_wf_program_scholarship_v1_seed.sql`; `FlywayMigrationsIT` (56/55); `WorkflowDefinitionSeedTest` (IT).
 **Interfaces:** the 13 stages / 15 transitions / 19 task templates from `WORKFLOW_PROGRAM_WITH_SCHOLARSHIP.md §3–§5`, with DA3 guard substitution:
 - `submit` guard `{"all":["FIELD_SET:program_id","FIELD_SET:scholarship_id","FIELD_SET:intake_id"]}` (drop `ALL_REQUIRED_DOCUMENTS_ATTACHED`).
 - `docs_complete` guard `{"all":["DECISION_RECORDED:DOCUMENTS_COMPLETE:CONFIRMED","ALL_MANDATORY_TASKS_DONE"]}`.
@@ -228,16 +242,16 @@ Insert both via `ApplicationSnapshotMapper.insert` inside the `submit` transacti
 - `status='ACTIVE'` set directly in the seed (the seed represents an already-validated definition; `DefinitionValidatorTest` proves the shape is valid).
 Write with explicit `@id` variables (`set @def := last_insert_id();` pattern) or a deterministic sub-select so stage/transition FKs resolve. Idempotent guard (`insert … where not exists`).
 **Test:** `WorkflowDefinitionSeedTest` — `findActiveByCode("PROGRAM_WITH_SCHOLARSHIP_V1")` returns a def with 13 stages, 15 transitions; `DefinitionValidator.validate(...)` on the loaded rows → `ok`; each DECISION stage has ≥2 `DECISION_RECORDED` transitions.
-**Commit:** `feat(application): V33 seed PROGRAM_WITH_SCHOLARSHIP_V1 (+ workflow_definition_code routing columns)`.
+**Commit:** `feat(application): V59 seed PROGRAM_WITH_SCHOLARSHIP_V1 (+ workflow_definition_code routing columns)`.
 
 ---
 
-## Task 14: V34 — seed `PROGRAM_ONLY_V1`
+## Task 14: V60 — seed `PROGRAM_ONLY_V1`
 
-**Files:** `V34__nad_wf_program_only_v1_seed.sql`; `FlywayMigrationsIT` (31/30); `WorkflowDefinitionSeedTest` (extend).
+**Files:** `V60__nad_wf_program_only_v1_seed.sql`; `FlywayMigrationsIT` (57/56); `WorkflowDefinitionSeedTest` (extend).
 **Interfaces:** stages `DRAFT(START), SUBMITTED, ELIGIBILITY_REVIEW, DOCUMENT_COLLECTION, PACKAGE_PREPARATION, SUBMITTED_TO_UNIVERSITY, UNIVERSITY_DECISION(DECISION), OFFER_RESPONSE, PRE_DEPARTURE, ENROLLED(TERMINAL), UNSUCCESSFUL(TERMINAL), WITHDRAWN(TERMINAL)`. Transitions: as `PROGRAM_WITH_SCHOLARSHIP_V1` minus `sch_awarded` / `sch_declined_body`, with `uni_offer` retargeted `UNIVERSITY_DECISION → OFFER_RESPONSE` (guard unchanged: `DECISION_RECORDED:UNIVERSITY_OFFER:OFFER` — accepts `OFFER`/`CONDITIONAL_OFFER`). Task templates: drop the scholarship-form + scholarship-eligibility rows. `submit` guard drops `FIELD_SET:scholarship_id`.
 **Test:** seed test — 12 stages, no `SCHOLARSHIP_DECISION`; validates clean; `ProgramOnlyWorkflowTest` (Task 15) — `startDraft(PROGRAM_ONLY)` routes here.
-**Commit:** `feat(application): V34 seed PROGRAM_ONLY_V1`.
+**Commit:** `feat(application): V60 seed PROGRAM_ONLY_V1`.
 
 ---
 
@@ -261,7 +275,7 @@ Write with explicit `@id` variables (`set @def := last_insert_id();` pattern) or
 
 ## Task 16: `ruoyi-admin` ITs + base wiring + Flyway counts
 
-**Files:** `AbstractNadIntegrationTest` (baseSetup FK-order clears + `nad_application*`, `nad_wf_instance`, then leave `nad_wf_definition/stage/transition/task_template` — they're seed, keep them; but tests that `activate` a bespoke definition must clean up their own rows); `FlywayMigrationsIT` (final 31/30); new IT classes.
+**Files:** `AbstractNadIntegrationTest` (baseSetup FK-order clears + `nad_application*`, `nad_wf_instance`, then leave `nad_wf_definition/stage/transition/task_template` — they're seed, keep them; but tests that `activate` a bespoke definition must clean up their own rows); `FlywayMigrationsIT` (final 57/56); new IT classes.
 **Interfaces / test coverage (spec §II.11):**
 - `StaffApplicationEngineTest` — full `PROGRAM_WITH_SCHOLARSHIP_V1` happy path `DRAFT → … → ENROLLED` with a `case_officer` recording the required decisions (incl. `DOCUMENTS_COMPLETE`, `FEE_SETTLED`) and completing blocking tasks in order; asserts `current_status` transitions and history rows.
 - `WorkflowGuardTest` — `docs_complete` blocked without the `DOCUMENTS_COMPLETE` decision; `package_ready` blocked without `FEE_SETTLED`; `eligible` blocked without a `NADOUMI_INTERNAL` decision; wrong role → `403`; concurrent transition (two calls, same `version`) → one `200` + one `409`.
@@ -278,16 +292,16 @@ Write with explicit `@id` variables (`set @def := last_insert_id();` pattern) or
 
 ## Task 17: Documentation
 
-**Files:** `docs/APPLICATION_WORKFLOW.md` (EXISTING → what's built; DA3 substitution table; the `409`/`NadConflictException`), `docs/WORKFLOW_PROGRAM_WITH_SCHOLARSHIP.md` (seed applied; guard substitution; add a `PROGRAM_ONLY_V1` section), `docs/DATABASE_DESIGN.md` (V30–V34 + ledger; final count), `docs/API_DESIGN.md` (staff application surface), `docs/PERMISSION_CATALOGUE.md` (confirm granted `nad:application:*`), `docs/DOMAIN_MODEL.md` (Application aggregate → EXISTING), `docs/PLATFORM_ARCHITECTURE.md §8` (Step 6 → engine ✅, public/UI pending P3/P4).
+**Files:** `docs/APPLICATION_WORKFLOW.md` (EXISTING → what's built; DA3 substitution table; the `409`/`NadConflictException`), `docs/WORKFLOW_PROGRAM_WITH_SCHOLARSHIP.md` (seed applied; guard substitution; add a `PROGRAM_ONLY_V1` section), `docs/DATABASE_DESIGN.md` (V56–V60 + ledger; final count), `docs/API_DESIGN.md` (staff application surface), `docs/PERMISSION_CATALOGUE.md` (confirm granted `nad:application:*`), `docs/DOMAIN_MODEL.md` (Application aggregate → EXISTING), `docs/PLATFORM_ARCHITECTURE.md §8` (Step 6 → engine ✅, public/UI pending P3/P4).
 **Commit:** `docs: application engine — workflow, DB, API, permissions`.
 
 ---
 
 ## Task 18: Gate + memory
 
-- [ ] `mvn -o -pl ruoyi-admin -am verify` (background) green; final `FlywayMigrationsIT` **31 / 30**.
-- [ ] Update `docs/superpowers/specs/...` §II.2 migration numbers (V30–V34) if they drifted.
-- [ ] Update `phase-status.md` memory — P2 done, engine, V30–V34.
+- [ ] `mvn -o -pl ruoyi-admin -am verify` (background) green; final `FlywayMigrationsIT` **57 / 56**.
+- [ ] Update `docs/superpowers/specs/...` §II.2 migration numbers (V56–V60) if they drifted.
+- [ ] Update `phase-status.md` memory — P2 done, engine, V56–V60.
 - [ ] Commit `chore(application): P2 gate green`.
 
 ---
@@ -296,4 +310,4 @@ Write with explicit `@id` variables (`set @def := last_insert_id();` pattern) or
 
 - **Spec coverage:** module (T1), `nad_wf_*` (T2), `nad_application*` (T3), perms (T4), definition domain (T5), instance domain + append-only (T6), guard evaluator + provider SPIs (T7), validator + `activate` fail-closed (T8), `startDraft` (T9), `execute` + optimistic lock + auto-chain (T10), decisions/tasks/assign/claim (T11), snapshot (T12), seed V1 ×2 (T13–T14), staff API (T15), ITs incl. all §II.11 named tests (T16), docs (T17), gate (T18). Complete.
 - **Placeholders:** none — every task names files, interfaces (method signatures + params), and concrete test cases. Bite-sized RED/GREEN steps are delegated to the executor per the note at the top, following P1's worked pattern.
-- **Type consistency:** `Actor` record shape fixed in T9, used T10/T11. `compareAndBumpVersion(id, expected) -> int` (rows updated) consistent T6/T10. Migration totals V30→27/26 … V34→31/30 consistent T2–T4, T13–T14, T16, T18. `NadConflictException` (409) introduced in T10, referenced T16/T17 — flag: confirm it doesn't already exist in `com.nadoumi.identity.exception` before adding.
+- **Type consistency:** `Actor` record shape fixed in T9, used T10/T11. `compareAndBumpVersion(id, expected) -> int` (rows updated) consistent T6/T10. Migration totals V56→53/52 … V60→57/56 consistent T2–T4, T13–T14, T16, T18. `NadConflictException` (409) introduced in T10, referenced T16/T17 — flag: confirm it doesn't already exist in `com.nadoumi.identity.exception` before adding.
