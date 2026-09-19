@@ -267,6 +267,8 @@ export interface ApplicantDto {
   emailVerified: boolean
   /** The server's record that onboarding was finished (`onboarded_at`). */
   onboardingComplete: boolean
+  /** Onboarding is done but the welcome celebration has not been shown yet. */
+  welcomePending: boolean
 }
 
 export interface PassportMismatchDto {
@@ -305,12 +307,53 @@ export interface OnboardingStatusDto {
 export interface EducationDto {
   id: number
   institution: string
-  level: string | null
+  country: string
+  city: string | null
+  level: string
+  qualification: string | null
   field: string | null
   gpa: number | null
   gpaScale: number | null
   startDate: string | null
   endDate: string | null
+  current: boolean
+}
+
+export interface InterestDto {
+  desiredLevel: string
+  fields: string[]
+  cities: string[]
+  scholarshipInterest: string | null
+  intakeYear: number | null
+  intakeTerm: string | null
+  teachingLanguage: string | null
+  notes: string | null
+}
+
+export interface ResidenceDto {
+  inChina: boolean
+  country: string
+  city: string
+  address: string | null
+  chinaEducationLevel: string | null
+  chinaSchool: string | null
+  visaType: string | null
+  visaExpiryDate: string | null
+}
+
+export interface WorkDto {
+  id: number
+  employer: string
+  jobTitle: string
+  employmentType: string | null
+  country: string
+  city: string | null
+  startDate: string
+  endDate: string | null
+  current: boolean
+  description: string | null
+  workVisaType: string | null
+  workVisaExpiry: string | null
 }
 
 export interface TestScoreDto {
@@ -324,7 +367,7 @@ export interface TestScoreDto {
 
 export interface ContactDto {
   id: number
-  relation: 'GUARDIAN' | 'EMERGENCY' | 'OTHER'
+  relation: string
   name: string
   email: string | null
   phone: string | null

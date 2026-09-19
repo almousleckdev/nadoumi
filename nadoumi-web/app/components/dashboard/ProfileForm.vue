@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
 import type { SelfApplicantBody } from '~/composables/useApplicant'
-import { GENDERS, PROFILE_ERROR_KEYS } from '~/constants/profile'
+import { GENDERS } from '~/constants/profile'
 import { latestEligibleDob, validateProfile } from '~/utils/profileRules'
 
 const props = withDefaults(
@@ -34,18 +34,12 @@ const emailNeedsVerification = computed(() =>
   Boolean(props.modelValue) && (emailChanged.value || !props.modelValue?.emailVerified))
 const emailShownVerified = computed(() => Boolean(props.modelValue?.emailVerified) && !emailChanged.value)
 
-const submitted = ref(false)
-const errors = computed(() => {
-  if (!submitted.value) return {}
-  const codes = validateProfile(form, { emailNeedsVerification: emailNeedsVerification.value })
-  return Object.fromEntries(Object.entries(codes).map(([field, code]) => [field, t(PROFILE_ERROR_KEYS[code])]))
-})
+const { errors, submit: validateAndSubmit } = useValidatedForm(() =>
+  validateProfile(form, { emailNeedsVerification: emailNeedsVerification.value }))
 
 function submit() {
-  submitted.value = true
-  if (Object.keys(errors.value).length > 0) return
   // an unchanged email is sent as-is; a new one only ever arrives through verification
-  emit('submit', { ...form, email: props.modelValue ? savedEmail.value : form.email })
+  validateAndSubmit(() => emit('submit', { ...form, email: props.modelValue ? savedEmail.value : form.email }))
 }
 
 function onVerified(applicant: ApplicantDto) {

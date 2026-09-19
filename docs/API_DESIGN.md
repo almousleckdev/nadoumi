@@ -112,6 +112,7 @@ adds those fields plus `emailVerified` and `onboardingComplete`. Registration cr
 | `GET/PUT /residence` | `{inChina, country, city, address?, chinaEducationLevel?, chinaSchool?, visaType?, visaExpiryDate?}`; in China the level, visa type and an **unexpired** visa are required; the China fields are dropped when `inChina` is false; `GET` answers 204 until saved |
 | `GET/POST/PUT/DELETE /work[/{workId}]` | Optional and repeatable; `current` (default false) means no end date, otherwise an end date is required; work in **China requires `workVisaType`** (dropped for other countries) |
 | `/education` (existing) | Now requires `country` and `level` (`HIGH_SCHOOL, FOUNDATION, DIPLOMA, BACHELOR, MASTER, DOCTORATE, OTHER`); `current` optional; dates validated |
+| `GET/POST/PUT/DELETE /contacts[/{contactId}]` (existing, `PUT` new) | `{relation, name, email?, phone?}`; `GUARDIAN`/`EMERGENCY` need a phone; a student may only edit their own applicant's contact (`403` otherwise) |
 | `POST /onboarding/welcomed` | Records that the welcome celebration was seen; `ApplicantResponse.welcomePending` is true from completion until then |
 
 Onboarding sections are now `PROFILE, PHOTO, PASSPORT, EDUCATION, INTERESTS, LOCATION, CONTACT` (work experience is optional and not a section).

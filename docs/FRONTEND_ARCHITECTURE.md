@@ -455,6 +455,45 @@ on real documents.
 The onboarding gate reads the **server** flag (`ApplicantDto.onboardingComplete`) and **fails closed**
 (`useOnboarding`).
 
+#### Section forms and post-onboarding editors (IMPLEMENTED, onboarding v2 slices 3 and 4)
+
+One component per applicant section, reused by both the onboarding wizard (`pages/onboarding.vue`) and its
+own `/dashboard/*` editor page — there is exactly one implementation per section, not a wizard copy and a
+dashboard copy.
+
+| Piece | Where | Purpose |
+| --- | --- | --- |
+| `EducationSection`, `InterestsSection`, `ResidenceSection`, `WorkSection`, `ContactSection` | `components/applicant/` | Load + render one section: a list (`RecordList`, education/work/contacts) or a single record (interests/residence); emits `changed` so the wizard re-checks progress |
+| `EducationForm`, `InterestsForm`, `ResidenceForm`, `WorkForm`, `ContactForm` | `components/applicant/` | The field-level form for one section, validated by `utils/sectionRules.ts` |
+| `useApplicantRecord(id, api, onChanged)` | `composables/` | Load/save the *one* record a section holds (interests, residence) |
+| `useApplicantRecords(id, api, onChanged)` | `composables/` | Load/add/update/remove the *list* a section holds (education, work, contacts); every write reloads the list |
+| `useEnumOptions(group)` | `composables/` | Translated choices for a code list in `constants/applicantOptions.ts`, from `options.<group>.<code>`; a value with no translation (a student-typed custom city) shows as entered |
+| `useValidatedForm(validate)` | `composables/` | One `submitted` flag + translated field errors + "submit only if valid", used by every onboarding form (replaces the slice-1 per-form duplication) |
+| `constants/formErrors.ts` (`FORM_ERROR_KEYS`) | constants | The single error-code → i18n-key map every section shares (supersedes the old per-form `PROFILE_ERROR_KEYS` / `PASSPORT_ERROR_KEYS`) |
+| `constants/applicantOptions.ts` (`OPTION_GROUPS`) | constants | The code lists (education level, study level, fields of study, China cities, visa types, employment types, contact relations); labels live only in `options.*` i18n keys, never here |
+| `utils/sectionRules.ts`, `utils/sectionMappers.ts` | utils | Pure, unit-tested validation and form↔DTO mapping per section, mirroring the backend rules |
+| `FormTextareaField`, `FormActions`, `ChipMultiSelect`, `YesNoField`, `RecordList` | `components/form/` | Rest of the shared form kit: a textarea field, the submit/cancel row, a multi-select rendered as chips (with a custom-value option), a required yes/no question, and the add/edit/remove list shell every list-shaped section uses |
+| `ReviewStep`, `ReviewSection` | `components/onboarding/` | Step-by-step review of every section with an edit-jump back to it; a section shows **Complete** / **Incomplete** / **Optional** from the same server status the wizard uses to gate Next |
+| `OnboardingFinishing` | `components/onboarding/` | The `FINISH_HOLD_MS` (15 s) hold after Finish; the server already recorded `onboarded_at` before the hold starts, so closing the tab mid-hold still leaves the student onboarded |
+| `WelcomeCelebration` | `components/dashboard/` | One-time celebration on `/dashboard` when `ApplicantDto.welcomePending` is true; dismissing calls `POST /onboarding/welcomed` |
+
+`nuxt.config.ts`'s `components` list registers `components/form/` and `components/applicant/` with
+`pathPrefix: false` (same reasoning as `ui/`, `auth/`, `onboarding/`): several of these files (`RecordList`,
+`ChipMultiSelect`, `YesNoField`, `ContactForm`, `EducationForm`, …) do not start with their directory name,
+so the default Nuxt prefix would silently register them as `<FormRecordList>` / `<ApplicantContactForm>`
+etc. and every unprefixed `<RecordList>` / `<ContactForm>` reference in a template would fail to resolve.
+
+The wizard (`pages/onboarding.vue`) is eight steps — **Personal · Identity · Education · Interests ·
+Location · Contact · Work · Review** — each step's "Next" gated on `STEP_SECTIONS[step]` all being complete
+per `GET /onboarding` (`constants/onboarding.ts`); `work` has no server section (optional) so it never blocks.
+The same five section components back standalone editors at `/dashboard/education`, `/dashboard/interests`,
+`/dashboard/location`, `/dashboard/work` and `/dashboard/contacts`, linked from `DashboardShell`'s nav.
+
+`server/api/student-notifications/[...path].ts` is the same BFF passthrough pattern as
+`server/api/student/[...path].ts`, proxying to `/api/notifications/*` with the bearer from the httpOnly
+cookie. **Not yet consumed by the UI** — the dashboard header has no notification bell or unread-count
+composable yet; that is still open work.
+
 ## 5. Cross-cutting frontend rules (PLANNED)
 
 - **No security in the frontend.** Route guards, hidden fields, and disabled buttons

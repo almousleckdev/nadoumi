@@ -46,7 +46,8 @@
     "previous": "Previous",
     "next": "Next",
     "pagination": "Pagination",
-    "switchingLanguage": "Switching language…"
+    "switchingLanguage": "Switching language…",
+    "present": "Present"
   },
   "home": {
     "hero": {
@@ -221,7 +222,12 @@
     "sent": "Thanks, we’ll be in touch.",
     "errorTitle": "Message not sent",
     "errorBody": "Something went wrong sending your message. Please try again in a moment.",
-    "phoneTitle": "Phone"
+    "phoneTitle": "Phone",
+    "add": "Add contact",
+    "empty": "No contacts added yet.",
+    "name": "Full name",
+    "phoneHint": "Include the country code, for example +86…",
+    "relation": "Relationship"
   },
   "catalog": {
     "scholarshipsTitle": "Scholarships",
@@ -331,7 +337,10 @@
       "education": "Education",
       "testScores": "Test scores",
       "contacts": "Contacts",
-      "account": "Account"
+      "account": "Account",
+      "interests": "Interests",
+      "location": "Location",
+      "work": "Work"
     },
     "welcome": "Welcome, {name}",
     "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
@@ -387,7 +396,10 @@
     "savedOk": "Saved",
     "addedOk": "Added",
     "removedOk": "Removed",
-    "removeConfirm": "Remove this entry?"
+    "removeConfirm": "Remove this entry?",
+    "interestsTitle": "Study interests",
+    "locationTitle": "Current location",
+    "workTitle": "Work experience"
   },
   "validation": {
     "required": "This field is required.",
@@ -457,7 +469,8 @@
       "interests": "Interests",
       "location": "Location",
       "contact": "Contact",
-      "review": "Review"
+      "review": "Review",
+      "work": "Work"
     },
     "personal": {
       "title": "Create your profile",
@@ -487,7 +500,11 @@
     "review": {
       "title": "Review",
       "blurb": "Check what you have entered, then finish.",
-      "done": "Profile set up. You can refine any section from the dashboard."
+      "done": "Profile set up. You can refine any section from the dashboard.",
+      "complete": "Complete",
+      "optional": "Optional",
+      "missing": "Incomplete",
+      "nothingEntered": "Nothing entered yet."
     },
     "badge": {
       "plannedBackend": "Coming soon"
@@ -526,12 +543,27 @@
     "sectionName": {
       "PROFILE": "Profile",
       "PHOTO": "Photo",
-      "PASSPORT": "Passport"
+      "PASSPORT": "Passport",
+      "EDUCATION": "Education",
+      "INTERESTS": "Interests",
+      "LOCATION": "Location",
+      "CONTACT": "Contact"
     },
     "docStatus": {
       "done": "Complete",
       "pending": "Required",
       "attention": "Needs attention"
+    },
+    "work": {
+      "title": "Work experience",
+      "blurb": "Add any work experience, especially in China. This step is optional."
+    },
+    "finishing": {
+      "title": "Setting up your dashboard",
+      "hint": "This only takes a moment.",
+      "profile": "Saving your profile…",
+      "documents": "Checking your documents…",
+      "dashboard": "Preparing your dashboard…"
     }
   },
   "university": {
@@ -1780,7 +1812,8 @@
     "sectionContact": "Contact details"
   },
   "form": {
-    "select": "Select…"
+    "select": "Select…",
+    "chipsCount": "{n} of {max} selected"
   },
   "passport": {
     "title": "Passport",
@@ -1817,6 +1850,172 @@
       "onPassport": "On the passport",
       "inProfile": "In your profile",
       "editProfile": "Edit my profile"
+    }
+  },
+  "review": {
+    "name": "Name",
+    "photo": "Photo"
+  },
+  "welcome": {
+    "title": "Welcome, {name}!",
+    "body": "Your profile is complete. You can now start exploring universities, scholarships and your applications.",
+    "cta": "Go to my dashboard"
+  },
+  "education": {
+    "add": "Add education",
+    "empty": "No education history added yet.",
+    "institution": "Institution",
+    "level": "Level",
+    "country": "Country",
+    "city": "City",
+    "qualification": "Qualification",
+    "qualificationHint": "The name of the diploma or degree awarded, for example “High School Diploma”.",
+    "field": "Field of study",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "current": "I am currently studying here",
+    "gpa": "GPA",
+    "gpaScale": "GPA scale",
+    "gpaScaleHint": "For example, 4 or 100."
+  },
+  "interests": {
+    "sectionStudy": "What you want to study",
+    "sectionWhere": "Where you want to study",
+    "sectionWhen": "When you want to start",
+    "level": "Desired level",
+    "scholarship": "Scholarship interest",
+    "fields": "Fields of study",
+    "fieldsHint": "Choose up to twelve fields you are interested in.",
+    "cities": "Preferred cities",
+    "citiesHint": "Choose the Chinese cities you would consider studying in.",
+    "otherCity": "Add another city",
+    "teachingLanguage": "Teaching language",
+    "intakeYear": "Intake year",
+    "intakeTerm": "Intake term",
+    "notes": "Other preferences",
+    "notesHint": "Anything else that would help us match you with the right programme."
+  },
+  "location": {
+    "sectionWhere": "Where you are now",
+    "sectionChina": "While you are in China",
+    "inChina": "Are you currently in China?",
+    "country": "Country",
+    "city": "City",
+    "otherInfo": "Other information",
+    "otherInfoHint": "Anything else about your current location that might help us.",
+    "chinaNotice": "These questions only apply while you are studying or living in China.",
+    "currentLevel": "Current education level",
+    "school": "Current school",
+    "visaType": "Visa type",
+    "visaExpiry": "Visa expiry date"
+  },
+  "work": {
+    "add": "Add work experience",
+    "empty": "No work experience added yet.",
+    "employer": "Employer",
+    "jobTitle": "Job title",
+    "employmentType": "Employment type",
+    "country": "Country",
+    "city": "City",
+    "startDate": "Start date",
+    "endDate": "End date",
+    "current": "I currently work here",
+    "chinaNotice": "Working in China requires a valid work visa.",
+    "visaType": "Work visa type",
+    "visaExpiry": "Work visa expiry date",
+    "description": "Description"
+  },
+  "options": {
+    "educationLevel": {
+      "HIGH_SCHOOL": "High school",
+      "FOUNDATION": "Foundation programme",
+      "DIPLOMA": "Diploma",
+      "BACHELOR": "Bachelor's degree",
+      "MASTER": "Master's degree",
+      "DOCTORATE": "Doctorate",
+      "OTHER": "Other"
+    },
+    "studyLevel": {
+      "LANGUAGE": "Language programme",
+      "FOUNDATION": "Foundation programme",
+      "BACHELOR": "Bachelor's degree",
+      "MASTER": "Master's degree",
+      "DOCTORATE": "Doctorate"
+    },
+    "scholarshipInterest": {
+      "REQUIRED": "I need a scholarship",
+      "PREFERRED": "I would prefer a scholarship",
+      "NOT_NEEDED": "I do not need a scholarship"
+    },
+    "intakeTerm": {
+      "SPRING": "Spring",
+      "SUMMER": "Summer",
+      "FALL": "Fall",
+      "WINTER": "Winter"
+    },
+    "chinaVisaType": {
+      "X1": "X1 (long-term student)",
+      "X2": "X2 (short-term student)",
+      "Z": "Z (work)",
+      "F": "F (business or exchange)",
+      "L": "L (tourist)",
+      "S1": "S1 (long-term family visit)",
+      "S2": "S2 (short-term family visit)",
+      "OTHER": "Other"
+    },
+    "employmentType": {
+      "FULL_TIME": "Full-time",
+      "PART_TIME": "Part-time",
+      "INTERNSHIP": "Internship",
+      "FREELANCE": "Freelance"
+    },
+    "contactRelation": {
+      "GUARDIAN": "Guardian",
+      "EMERGENCY": "Emergency contact",
+      "OTHER": "Other"
+    },
+    "fieldOfStudy": {
+      "BUSINESS": "Business",
+      "ECONOMICS": "Economics",
+      "LAW": "Law",
+      "ENGINEERING": "Engineering",
+      "COMPUTER_SCIENCE": "Computer science",
+      "MEDICINE": "Medicine",
+      "NURSING": "Nursing",
+      "SCIENCE": "Science",
+      "EDUCATION": "Education",
+      "ARTS_DESIGN": "Arts and design",
+      "LANGUAGES": "Languages",
+      "SOCIAL_SCIENCES": "Social sciences",
+      "AGRICULTURE": "Agriculture",
+      "ARCHITECTURE": "Architecture",
+      "TOURISM": "Tourism"
+    },
+    "chinaCity": {
+      "Beijing": "Beijing",
+      "Shanghai": "Shanghai",
+      "Guangzhou": "Guangzhou",
+      "Shenzhen": "Shenzhen",
+      "Hangzhou": "Hangzhou",
+      "Nanjing": "Nanjing",
+      "Wuhan": "Wuhan",
+      "Chengdu": "Chengdu",
+      "Chongqing": "Chongqing",
+      "Xian": "Xi'an",
+      "Tianjin": "Tianjin",
+      "Suzhou": "Suzhou",
+      "Qingdao": "Qingdao",
+      "Dalian": "Dalian",
+      "Xiamen": "Xiamen",
+      "Changsha": "Changsha",
+      "Zhengzhou": "Zhengzhou",
+      "Harbin": "Harbin",
+      "Jinan": "Jinan",
+      "Hefei": "Hefei",
+      "Kunming": "Kunming",
+      "Shenyang": "Shenyang",
+      "Ningbo": "Ningbo",
+      "Fuzhou": "Fuzhou"
     }
   }
 }

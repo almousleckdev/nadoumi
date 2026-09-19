@@ -7,16 +7,3 @@ export type Gender = typeof GENDERS[number]
 export const REQUIRED_PROFILE_FIELDS = [
   'gender', 'nationality', 'countryOfOrigin', 'countryOfResidence', 'nativeLanguage', 'phone',
 ] as const satisfies readonly (keyof ApplicantDto)[]
-
-export type ProfileErrorCode =
-  | 'required' | 'nameInvalid' | 'dobFuture' | 'dobUnderage' | 'contactHandleRequired' | 'verifyBeforeSave'
-
-/** i18n key for each validation code, so copy lives in one place. */
-export const PROFILE_ERROR_KEYS: Record<ProfileErrorCode, string> = {
-  required: 'validation.required',
-  nameInvalid: 'profileForm.nameInvalid',
-  dobFuture: 'profileForm.dobFuture',
-  dobUnderage: 'profileForm.dobUnderage',
-  contactHandleRequired: 'profileForm.contactHandleRequired',
-  verifyBeforeSave: 'profileForm.verifyBeforeSave',
-}

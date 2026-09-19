@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { addMonths, isValidForAdmission, validatePassport, type PassportForm } from '~/utils/passportRules'
+import { addMonths } from '~/utils/dates'
+import { isValidForAdmission, validatePassport, type PassportForm } from '~/utils/passportRules'
 
 const TODAY = new Date(2026, 8, 19)
 const valid: PassportForm = {

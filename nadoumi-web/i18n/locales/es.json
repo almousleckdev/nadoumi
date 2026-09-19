@@ -46,7 +46,8 @@
     "previous": "Anterior",
     "next": "Siguiente",
     "pagination": "Paginación",
-    "switchingLanguage": "Cambiando de idioma…"
+    "switchingLanguage": "Cambiando de idioma…",
+    "present": "Actualidad"
   },
   "home": {
     "hero": {
@@ -221,7 +222,12 @@
     "sent": "Gracias, nos pondremos en contacto contigo.",
     "errorTitle": "Mensaje no enviado",
     "errorBody": "Algo salió mal al enviar tu mensaje. Inténtalo de nuevo en un momento.",
-    "phoneTitle": "Teléfono"
+    "phoneTitle": "Teléfono",
+    "add": "Añadir contacto",
+    "empty": "Aún no se ha añadido ningún contacto.",
+    "name": "Nombre completo",
+    "phoneHint": "Incluye el código de país, por ejemplo +86…",
+    "relation": "Relación"
   },
   "catalog": {
     "scholarshipsTitle": "Becas",
@@ -331,7 +337,10 @@
       "education": "Educación",
       "testScores": "Resultados de exámenes",
       "contacts": "Contactos",
-      "account": "Cuenta"
+      "account": "Cuenta",
+      "interests": "Intereses",
+      "location": "Ubicación",
+      "work": "Experiencia"
     },
     "welcome": "Bienvenido, {name}",
     "overviewBlurb": "Completa tu perfil de solicitante para que el equipo pueda empezar a proponerte oportunidades.",
@@ -387,7 +396,10 @@
     "savedOk": "Guardado",
     "addedOk": "Añadido",
     "removedOk": "Eliminado",
-    "removeConfirm": "¿Eliminar esta entrada?"
+    "removeConfirm": "¿Eliminar esta entrada?",
+    "interestsTitle": "Intereses académicos",
+    "locationTitle": "Ubicación actual",
+    "workTitle": "Experiencia laboral"
   },
   "validation": {
     "required": "Este campo es obligatorio.",
@@ -457,7 +469,8 @@
       "interests": "Intereses",
       "location": "Ubicación",
       "contact": "Contacto",
-      "review": "Revisión"
+      "review": "Revisión",
+      "work": "Experiencia"
     },
     "personal": {
       "title": "Crea tu perfil",
@@ -487,7 +500,11 @@
     "review": {
       "title": "Revisión",
       "blurb": "Revisa lo que has introducido y finaliza.",
-      "done": "Perfil configurado. Puedes ajustar cualquier sección desde el panel."
+      "done": "Perfil configurado. Puedes ajustar cualquier sección desde el panel.",
+      "complete": "Completo",
+      "optional": "Opcional",
+      "missing": "Incompleto",
+      "nothingEntered": "Aún no se ha ingresado nada."
     },
     "badge": {
       "plannedBackend": "Próximamente"
@@ -526,12 +543,27 @@
     "sectionName": {
       "PROFILE": "Perfil",
       "PHOTO": "Foto",
-      "PASSPORT": "Pasaporte"
+      "PASSPORT": "Pasaporte",
+      "EDUCATION": "Educación",
+      "INTERESTS": "Intereses",
+      "LOCATION": "Ubicación",
+      "CONTACT": "Contacto"
     },
     "docStatus": {
       "done": "Completado",
       "pending": "Obligatorio",
       "attention": "Requiere atención"
+    },
+    "work": {
+      "title": "Experiencia laboral",
+      "blurb": "Añade tu experiencia laboral, especialmente en China. Este paso es opcional."
+    },
+    "finishing": {
+      "title": "Preparando tu panel",
+      "hint": "Esto solo tomará un momento.",
+      "profile": "Guardando tu perfil…",
+      "documents": "Comprobando tus documentos…",
+      "dashboard": "Preparando tu panel…"
     }
   },
   "university": {
@@ -1780,7 +1812,8 @@
     "sectionContact": "Datos de contacto"
   },
   "form": {
-    "select": "Seleccionar…"
+    "select": "Seleccionar…",
+    "chipsCount": "{n} de {max} seleccionados"
   },
   "passport": {
     "title": "Pasaporte",
@@ -1817,6 +1850,172 @@
       "onPassport": "En el pasaporte",
       "inProfile": "En tu perfil",
       "editProfile": "Editar mi perfil"
+    }
+  },
+  "review": {
+    "name": "Nombre",
+    "photo": "Foto"
+  },
+  "welcome": {
+    "title": "¡Bienvenido, {name}!",
+    "body": "Tu perfil está completo. Ya puedes explorar universidades, becas y tus solicitudes.",
+    "cta": "Ir a mi panel"
+  },
+  "education": {
+    "add": "Añadir educación",
+    "empty": "Aún no se ha añadido ningún historial educativo.",
+    "institution": "Institución",
+    "level": "Nivel",
+    "country": "País",
+    "city": "Ciudad",
+    "qualification": "Título",
+    "qualificationHint": "El nombre del título o diploma obtenido, por ejemplo «Bachillerato».",
+    "field": "Área de estudio",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de finalización",
+    "current": "Actualmente estudio aquí",
+    "gpa": "Promedio (GPA)",
+    "gpaScale": "Escala del GPA",
+    "gpaScaleHint": "Por ejemplo, 4 o 100."
+  },
+  "interests": {
+    "sectionStudy": "Qué quieres estudiar",
+    "sectionWhere": "Dónde quieres estudiar",
+    "sectionWhen": "Cuándo quieres empezar",
+    "level": "Nivel deseado",
+    "scholarship": "Interés en una beca",
+    "fields": "Áreas de estudio",
+    "fieldsHint": "Elige hasta doce áreas que te interesen.",
+    "cities": "Ciudades preferidas",
+    "citiesHint": "Elige las ciudades chinas en las que considerarías estudiar.",
+    "otherCity": "Añadir otra ciudad",
+    "teachingLanguage": "Idioma de enseñanza",
+    "intakeYear": "Año de ingreso",
+    "intakeTerm": "Periodo de ingreso",
+    "notes": "Otras preferencias",
+    "notesHint": "Cualquier otra información que nos ayude a encontrar el programa adecuado para ti."
+  },
+  "location": {
+    "sectionWhere": "Dónde te encuentras ahora",
+    "sectionChina": "Mientras estás en China",
+    "inChina": "¿Estás actualmente en China?",
+    "country": "País",
+    "city": "Ciudad",
+    "otherInfo": "Otra información",
+    "otherInfoHint": "Cualquier otra información sobre tu ubicación actual que pueda sernos útil.",
+    "chinaNotice": "Estas preguntas solo se aplican mientras estudias o vives en China.",
+    "currentLevel": "Nivel educativo actual",
+    "school": "Escuela actual",
+    "visaType": "Tipo de visado",
+    "visaExpiry": "Fecha de vencimiento del visado"
+  },
+  "work": {
+    "add": "Añadir experiencia laboral",
+    "empty": "Aún no se ha añadido experiencia laboral.",
+    "employer": "Empleador",
+    "jobTitle": "Puesto",
+    "employmentType": "Tipo de empleo",
+    "country": "País",
+    "city": "Ciudad",
+    "startDate": "Fecha de inicio",
+    "endDate": "Fecha de finalización",
+    "current": "Actualmente trabajo aquí",
+    "chinaNotice": "Trabajar en China requiere un visado de trabajo válido.",
+    "visaType": "Tipo de visado de trabajo",
+    "visaExpiry": "Fecha de vencimiento del visado de trabajo",
+    "description": "Descripción"
+  },
+  "options": {
+    "educationLevel": {
+      "HIGH_SCHOOL": "Bachillerato",
+      "FOUNDATION": "Programa de fundamentos",
+      "DIPLOMA": "Diplomado",
+      "BACHELOR": "Licenciatura",
+      "MASTER": "Maestría",
+      "DOCTORATE": "Doctorado",
+      "OTHER": "Otro"
+    },
+    "studyLevel": {
+      "LANGUAGE": "Programa de idiomas",
+      "FOUNDATION": "Programa de fundamentos",
+      "BACHELOR": "Licenciatura",
+      "MASTER": "Maestría",
+      "DOCTORATE": "Doctorado"
+    },
+    "scholarshipInterest": {
+      "REQUIRED": "Necesito una beca",
+      "PREFERRED": "Preferiría una beca",
+      "NOT_NEEDED": "No necesito una beca"
+    },
+    "intakeTerm": {
+      "SPRING": "Primavera",
+      "SUMMER": "Verano",
+      "FALL": "Otoño",
+      "WINTER": "Invierno"
+    },
+    "chinaVisaType": {
+      "X1": "X1 (estudiante de larga duración)",
+      "X2": "X2 (estudiante de corta duración)",
+      "Z": "Z (trabajo)",
+      "F": "F (negocios o intercambio)",
+      "L": "L (turismo)",
+      "S1": "S1 (visita familiar de larga duración)",
+      "S2": "S2 (visita familiar de corta duración)",
+      "OTHER": "Otro"
+    },
+    "employmentType": {
+      "FULL_TIME": "Tiempo completo",
+      "PART_TIME": "Tiempo parcial",
+      "INTERNSHIP": "Prácticas",
+      "FREELANCE": "Autónomo"
+    },
+    "contactRelation": {
+      "GUARDIAN": "Tutor",
+      "EMERGENCY": "Contacto de emergencia",
+      "OTHER": "Otro"
+    },
+    "fieldOfStudy": {
+      "BUSINESS": "Negocios",
+      "ECONOMICS": "Economía",
+      "LAW": "Derecho",
+      "ENGINEERING": "Ingeniería",
+      "COMPUTER_SCIENCE": "Informática",
+      "MEDICINE": "Medicina",
+      "NURSING": "Enfermería",
+      "SCIENCE": "Ciencias",
+      "EDUCATION": "Educación",
+      "ARTS_DESIGN": "Arte y diseño",
+      "LANGUAGES": "Idiomas",
+      "SOCIAL_SCIENCES": "Ciencias sociales",
+      "AGRICULTURE": "Agricultura",
+      "ARCHITECTURE": "Arquitectura",
+      "TOURISM": "Turismo"
+    },
+    "chinaCity": {
+      "Beijing": "Pekín",
+      "Shanghai": "Shanghái",
+      "Guangzhou": "Cantón",
+      "Shenzhen": "Shenzhen",
+      "Hangzhou": "Hangzhou",
+      "Nanjing": "Nankín",
+      "Wuhan": "Wuhan",
+      "Chengdu": "Chengdu",
+      "Chongqing": "Chongqing",
+      "Xian": "Xi’an",
+      "Tianjin": "Tianjin",
+      "Suzhou": "Suzhou",
+      "Qingdao": "Qingdao",
+      "Dalian": "Dalian",
+      "Xiamen": "Xiamen",
+      "Changsha": "Changsha",
+      "Zhengzhou": "Zhengzhou",
+      "Harbin": "Harbin",
+      "Jinan": "Jinan",
+      "Hefei": "Hefei",
+      "Kunming": "Kunming",
+      "Shenyang": "Shenyang",
+      "Ningbo": "Ningbo",
+      "Fuzhou": "Fuzhou"
     }
   }
 }

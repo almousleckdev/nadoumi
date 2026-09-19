@@ -48,11 +48,19 @@ Frontend
 ## Slice 2: Identity documents
 Photo upload (crop, PROTECTED media). Passport upload, `PassportReader` SPI (browser MRZ implementation), passport number/issue/expiry, expiry > 6 months from today, server comparison of DOB / given / family name against the profile, mismatch message, edited-value flag for staff. `PassportNumber`/dates columns in V57.
 
-## Slice 3: Sections
+## Slice 3: Sections — DONE (backend and web)
 Education wizard form (multiple, high school to current). Interests + preferred level + preferred cities. Location (+ China branch: city, current level, visa expiry, ...). Guardian / emergency contact. Work experience (+ China work visa). Tables and endpoints per `APPLICANT_ONBOARDING.md` §5, adapted.
 
-## Slice 4: Review, finish, dashboard
-Step-by-step review with edit-jump, Finish -> 15 s loading state -> dashboard, welcome/celebration (once, tracked server-side). Student dashboard shell to admin quality: logo, sidebar, header with locale switcher, notifications, profile menu.
+## Slice 4: Review, finish, dashboard — DONE, with one gap
+Step-by-step review with edit-jump (`ReviewStep`/`ReviewSection`), Finish -> 15 s `OnboardingFinishing`
+hold -> dashboard, welcome/celebration (`WelcomeCelebration`, once, tracked server-side via
+`welcomePending` + `POST /onboarding/welcomed`). The five section components also back their own
+`/dashboard/*` editors, so nothing is duplicated between the wizard and the dashboard.
+
+**Not done:** the "student dashboard shell to admin quality" bullet's notification piece — the header
+still only has the locale switcher and account menu. `server/api/student-notifications/[...path].ts`
+proxies `/api/notifications/*`, but no bell icon, unread-count badge or notifications list page consumes
+it yet. Left for a follow-up pass rather than rushed here.
 
 ## Cross-cutting
 - Every slice: TDD, docs updated (`APPLICANT_ONBOARDING.md`, `DATABASE_DESIGN.md`, `API_DESIGN.md`, `SECURITY.md` where relevant), full verify green, one logical commit each.

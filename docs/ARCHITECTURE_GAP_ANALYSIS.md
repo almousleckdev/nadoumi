@@ -324,21 +324,25 @@ the enterprise marketing rebuild. No fake data to remove.
 
 ---
 
-## 7. Onboarding backend gaps
+## 7. Onboarding backend gaps (superseded — onboarding v2 slices 1-4 shipped)
 
-The wizard shell is on the frontend; persistence is only as deep as the backend.
+> This table described the Revision-3 wizard shell before onboarding v2. Every row below is now
+> implemented, backend and web; kept for history. Current status:
+> `docs/APPLICANT_ONBOARDING.md` (top note) and `docs/superpowers/plans/2026-09-19-student-onboarding.md`.
 
-| Step | Frontend | Backend today | Gap |
+| Step | Frontend | Backend today | Then-gap (now closed) |
 | --- | --- | --- | --- |
 | Personal / Identity | `ProfileForm` → saves | `nad_applicant` (given/family/dob/nationality/passport/email/phone/status) | none for these fields |
-| Education | `EducationList` → saves | `nad_applicant_education` | none |
-| Test scores | (not in wizard yet) | `nad_applicant_test_score` | wire into wizard later |
-| Contacts | shown as "not saved yet" | `nad_applicant_contact` exists | **wire endpoint into the Contact step** |
-| Interests | "not saved yet" | **no table** | **REQUIRES BACKEND** — `nad_applicant_interest` (fields of study, target degree, destinations, intake) |
-| Location | "not saved yet" | **no columns** | **REQUIRES BACKEND** — residence country/city, timezone on `nad_applicant` |
-| Passport upload | client-only preview, Upload disabled | **no document storage** | **REQUIRES BACKEND** — Document domain + object storage (see `DOCUMENT_MANAGEMENT.md`) |
-| Profile photo | client-only crop, Upload disabled | **no avatar storage for applicants** | **REQUIRES BACKEND** — same |
-| Review / submit | navigates to dashboard | no "onboarding complete" flag | **REQUIRES BACKEND** — `nad_applicant.onboarding_state` |
+| Education | `EducationSection` (`components/applicant/`) → saves | `nad_applicant_education` | none |
+| Test scores | (still not in the wizard) | `nad_applicant_test_score` | **still open** — no `TestScoreSection`, no `/dashboard/test-scores` page; `DashboardShell`'s nav link to it 404s |
+| Contacts | `ContactSection`, wizard step + `/dashboard/contacts` | `nad_applicant_contact`, now with student `PUT` | closed |
+| Interests | `InterestsSection`, wizard step + `/dashboard/interests` | `nad_applicant_interest` (+ choice table) | closed |
+| Location | `ResidenceSection`, wizard step + `/dashboard/location` | `nad_applicant_residence` | closed |
+| Work experience | `WorkSection`, wizard step + `/dashboard/work` | `nad_applicant_work` | closed (was not even in the Revision-3 table) |
+| Passport upload | `PassportUploadCard`, in-browser MRZ read, upload enabled | protected media storage (`nad_document`-style) | closed |
+| Profile photo | `PhotoUploadCard`, crop, upload enabled | protected media storage | closed |
+| Review / submit | `ReviewStep` → `POST /onboarding/complete` → `OnboardingFinishing` → dashboard | `nad_applicant.onboarded_at`, re-checked server-side | closed |
+| Notifications | dashboard header has no bell | `server/api/student-notifications/[...path].ts` proxy exists | **still open** — no bell UI, no unread-count composable |
 
 **Rule already followed:** PLANNED steps never fake a save (`no $fetch`, explicit
 "not saved yet"). This must hold as steps are wired.
@@ -357,6 +361,7 @@ table is authoritative; keep it in sync as each step lands.
 | `nadoumi-web` password rules | **single** `passwordChecks()` util, shared by register + reset + account |
 | `nadoumi-web` error mapping | **single** `authErrorMessage()` |
 | `nadoumi-admin` dashboard | composed from reusable `DashboardGroup` / `StatCard` / `ComingSoonCard` / `RecentApplicants`; no ad-hoc widgets |
+| `nadoumi-web` applicant sections | **single** `components/applicant/{Education,Interests,Residence,Work,Contact}Section.vue` per section, used by both the onboarding wizard and its `/dashboard/*` editor; the old ad-hoc `components/dashboard/EducationList.vue` (a second, less complete education editor) was deleted in favour of `EducationSection` |
 | Backend password policy | **single** `PasswordPolicy` (server) mirrored by one frontend util — intentional, not duplication |
 | Mail sender | one `MailSender` port, two adapters chosen by property — intentional |
 

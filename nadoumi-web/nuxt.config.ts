@@ -39,6 +39,13 @@ export default defineNuxtConfig({
     // catalog/ pieces for the public university / programme / scholarship pages
     // (<GalleryLightbox>, …) are referenced unprefixed by those pages.
     { path: '~/components/catalog', pathPrefix: false },
+    // form/ kit pieces (<FormTextField>, <RecordList>, <ChipMultiSelect>, …) are
+    // referenced unprefixed; without this, a name that doesn't already start
+    // with "Form" (e.g. RecordList) silently resolves to <FormRecordList>.
+    { path: '~/components/form', pathPrefix: false },
+    // applicant/ section + form components (<EducationSection>, <ContactForm>, …)
+    // used by the onboarding wizard and dashboard, referenced unprefixed.
+    { path: '~/components/applicant', pathPrefix: false },
     '~/components',
   ],
   fonts: {

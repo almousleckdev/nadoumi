@@ -7,7 +7,7 @@ const saved: ApplicantDto = {
   id: 1, givenName: 'SAM', familyName: 'LEE', dob: '2000-01-01', nationality: 'MY', passportNo: 'X1',
   email: 's@x.io', phone: '+601', status: 'ACTIVE', gender: 'MALE', countryOfOrigin: 'MY',
   countryOfResidence: 'CN', nativeLanguage: 'ms', wechatId: null, whatsapp: '+601',
-  emailVerified: true, onboardingComplete: false,
+  emailVerified: true, onboardingComplete: false, welcomePending: false,
 }
 
 const mountForm = (modelValue: ApplicantDto | null = saved) =>

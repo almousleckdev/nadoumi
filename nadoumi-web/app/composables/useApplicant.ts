@@ -1,5 +1,6 @@
 import type {
-  ApplicantDto, ContactDto, EducationDto, OnboardingStatusDto, PassportStatusDto, TestScoreDto,
+  ApplicantDto, ContactDto, EducationDto, InterestDto, OnboardingStatusDto, PassportStatusDto, ResidenceDto,
+  TestScoreDto, WorkDto,
 } from '~/types/catalog'
 
 export interface SelfApplicantBody {
@@ -16,14 +17,27 @@ export interface PassportBody {
 export interface SignedFileUrl { url: string; expiresAt: string }
 export interface EmailCodeSent { sent: boolean; throttled: boolean; retryAfter: number }
 export interface EducationBody {
-  institution: string; level?: string; field?: string
-  gpa?: number; gpaScale?: number; startDate?: string; endDate?: string
+  institution: string; country: string; level: string; city?: string; qualification?: string; field?: string
+  gpa?: number; gpaScale?: number; startDate?: string; endDate?: string; current: boolean
+}
+export interface InterestBody {
+  desiredLevel: string; fields: string[]; cities: string[]
+  scholarshipInterest?: string; intakeYear?: number; intakeTerm?: string; teachingLanguage?: string; notes?: string
+}
+export interface ResidenceBody {
+  inChina: boolean; country: string; city: string; address?: string
+  chinaEducationLevel?: string; chinaSchool?: string; visaType?: string; visaExpiryDate?: string
+}
+export interface WorkBody {
+  employer: string; jobTitle: string; country: string; startDate: string; current: boolean
+  employmentType?: string; city?: string; endDate?: string; description?: string
+  workVisaType?: string; workVisaExpiry?: string
 }
 export interface TestScoreBody {
   testType: string; score: string; subScoresJson?: string; takenOn?: string; expiresOn?: string
 }
 export interface ContactBody {
-  relation: 'GUARDIAN' | 'EMERGENCY' | 'OTHER'; name: string; email?: string; phone?: string
+  relation: string; name: string; email?: string; phone?: string
 }
 
 function clean<T extends object>(body: T): Partial<T> {
@@ -60,9 +74,21 @@ export function useApplicant() {
     passportStatus: (id: number) => p<PassportStatusDto>(`applicants/${id}/passport`, undefined),
     savePassport: (id: number, b: PassportBody) => p<PassportStatusDto>(`applicants/${id}/passport`, { method: 'PUT', body: b }),
 
+    /** 204 (nothing saved yet) reads as null. */
+    getInterests: (id: number) => p<InterestDto | undefined>(`applicants/${id}/interests`, undefined).then(r => r ?? null),
+    saveInterests: (id: number, b: InterestBody) => p<InterestDto>(`applicants/${id}/interests`, { method: 'PUT', body: clean(b) }),
+    getResidence: (id: number) => p<ResidenceDto | undefined>(`applicants/${id}/residence`, undefined).then(r => r ?? null),
+    saveResidence: (id: number, b: ResidenceBody) => p<ResidenceDto>(`applicants/${id}/residence`, { method: 'PUT', body: clean(b) }),
+
+    listWork: (id: number) => p<WorkDto[]>(`applicants/${id}/work`, undefined),
+    addWork: (id: number, b: WorkBody) => p<WorkDto>(`applicants/${id}/work`, { method: 'POST', body: clean(b) }),
+    updateWork: (id: number, workId: number, b: WorkBody) => p<WorkDto>(`applicants/${id}/work/${workId}`, { method: 'PUT', body: clean(b) }),
+    deleteWork: (id: number, workId: number): Promise<void> => p<undefined>(`applicants/${id}/work/${workId}`, { method: 'DELETE' }),
+
     onboardingStatus: (id: number) => p<OnboardingStatusDto>(`applicants/${id}/onboarding`, undefined),
     completeOnboarding: (id: number) =>
       p<OnboardingStatusDto>(`applicants/${id}/onboarding/complete`, { method: 'POST' }),
+    markWelcomed: (id: number): Promise<void> => p<undefined>(`applicants/${id}/onboarding/welcomed`, { method: 'POST' }),
 
     listEducation: (id: number) => p<EducationDto[]>(`applicants/${id}/education`, undefined),
     addEducation: (id: number, b: EducationBody) => p<EducationDto>(`applicants/${id}/education`, { method: 'POST', body: clean(b) }),
@@ -75,6 +101,7 @@ export function useApplicant() {
 
     listContacts: (id: number) => p<ContactDto[]>(`applicants/${id}/contacts`, undefined),
     addContact: (id: number, b: ContactBody) => p<ContactDto>(`applicants/${id}/contacts`, { method: 'POST', body: clean(b) }),
+    updateContact: (id: number, contactId: number, b: ContactBody) => p<ContactDto>(`applicants/${id}/contacts/${contactId}`, { method: 'PUT', body: clean(b) }),
     deleteContact: (id: number, contactId: number): Promise<void> => p<undefined>(`applicants/${id}/contacts/${contactId}`, { method: 'DELETE' }),
   }
 }

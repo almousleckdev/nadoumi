@@ -1,33 +1,34 @@
 <script setup lang="ts">
-import type { ApplicantDto, EducationDto } from '~/types/catalog'
-import type { SelfApplicantBody, EducationBody } from '~/composables/useApplicant'
-import { SECTION_PASSPORT, SECTION_PHOTO } from '~/constants/onboarding'
+import type { Component, ComputedRef } from 'vue'
+import type { ApplicantDto } from '~/types/catalog'
+import type { SelfApplicantBody } from '~/composables/useApplicant'
+import ContactSection from '~/components/applicant/ContactSection.vue'
+import EducationSection from '~/components/applicant/EducationSection.vue'
+import InterestsSection from '~/components/applicant/InterestsSection.vue'
+import ResidenceSection from '~/components/applicant/ResidenceSection.vue'
+import WorkSection from '~/components/applicant/WorkSection.vue'
+import { ONBOARDING_STEPS, STEP_SECTIONS, type OnboardingStep } from '~/constants/onboarding'
 
 definePageMeta({ layout: 'onboarding', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { activeApplicantId, refresh } = useSession()
 const { markComplete } = useOnboarding()
-const {
-  listMine, get, create, update, completeOnboarding, onboardingStatus,
-  listEducation, addEducation, updateEducation, deleteEducation,
-} = useApplicant()
+const { listMine, get, create, update, completeOnboarding, onboardingStatus } = useApplicant()
 
-const STEPS = [
-  { key: 'personal', label: () => t('onboarding.steps.personal') },
-  { key: 'identity', label: () => t('onboarding.steps.identity') },
-  { key: 'education', label: () => t('onboarding.steps.education') },
-  { key: 'interests', label: () => t('onboarding.steps.interests') },
-  { key: 'location', label: () => t('onboarding.steps.location') },
-  { key: 'contact', label: () => t('onboarding.steps.contact') },
-  { key: 'review', label: () => t('onboarding.steps.review') },
-] as const
+/** The steps that are a plain section component; personal, identity and review are laid out below. */
+const SECTION_STEPS: Partial<Record<OnboardingStep, Component>> = {
+  education: EducationSection, interests: InterestsSection, location: ResidenceSection,
+  contact: ContactSection, work: WorkSection,
+}
+
 const current = ref(0)
-const stepKey = computed(() => STEPS[current.value]!.key)
-const progressSteps = computed(() => STEPS.map(s => ({ key: s.key, label: s.label() })))
+const stepKey: ComputedRef<OnboardingStep> = computed(() => ONBOARDING_STEPS[current.value] as OnboardingStep)
+const progressSteps = computed(() => ONBOARDING_STEPS.map(key => ({ key, label: t(`onboarding.steps.${key}`) })))
+const sectionStep = computed(() => SECTION_STEPS[stepKey.value] ?? null)
 
 const applicant = ref<ApplicantDto | null>(null)
-const education = ref<EducationDto[]>([])
+const finishing = ref(false)
 const { busy, notice, error, run } = useAsyncAction()
 const progress = useOnboardingProgress(() => applicant.value?.id ?? null)
 
@@ -35,12 +36,11 @@ async function load() {
   const mine = await listMine().catch(() => [])
   const chosen = mine.find(a => a.id === activeApplicantId.value) ?? mine[0] ?? null
   applicant.value = chosen ? await get(chosen.id) : null
-  if (applicant.value) education.value = await listEducation(applicant.value.id).catch(() => [])
 }
 await load()
 await progress.refresh()
 
-async function saveIdentity(body: SelfApplicantBody) {
+async function saveProfile(body: SelfApplicantBody) {
   const saved = await run(async () => {
     if (applicant.value) applicant.value = await update(applicant.value.id, body)
     else { applicant.value = await create(body); await refresh() }
@@ -51,28 +51,13 @@ async function saveIdentity(body: SelfApplicantBody) {
   if (saved) next()
 }
 
-function onEmailVerified(updated: ApplicantDto) {
-  applicant.value = updated
-}
+/** A step may be left once the server says every section it owns is complete. */
+const canAdvance = computed(() => STEP_SECTIONS[stepKey.value].every(progress.isComplete))
 
-function runEdu(fn: () => Promise<unknown>) {
-  if (!applicant.value) return
-  return run(async () => { await fn(); education.value = await listEducation(applicant.value!.id).catch(() => []) })
-}
-const onEduAdd = (b: EducationBody) => runEdu(() => addEducation(applicant.value!.id, b))
-const onEduUpdate = (id: number, b: EducationBody) => runEdu(() => updateEducation(applicant.value!.id, id, b))
-const onEduRemove = (id: number) => runEdu(() => deleteEducation(applicant.value!.id, id))
+const goTo = (step: OnboardingStep) => { current.value = ONBOARDING_STEPS.indexOf(step) }
+const next = () => { if (current.value < ONBOARDING_STEPS.length - 1) current.value++ }
+const back = () => { if (current.value > 0) current.value-- }
 
-/** Photo and passport are done as far as the server is concerned (the passport also matches the profile). */
-const identityDone = computed(() => progress.isComplete(SECTION_PHOTO) && progress.isComplete(SECTION_PASSPORT))
-const canAdvance = computed(() => stepKey.value !== 'identity' || identityDone.value)
-
-function next() {
-  if (current.value < STEPS.length - 1) current.value++
-}
-function back() {
-  if (current.value > 0) current.value--
-}
 async function finish() {
   if (!applicant.value) return
   const id = applicant.value.id
@@ -81,26 +66,32 @@ async function finish() {
     await showMissingSections(id)
     return
   }
+  // the server has recorded it; from here closing the tab still leaves the student onboarded
   markComplete()
-  await navigateTo(localePath('/dashboard'))
+  finishing.value = true
 }
 
-/** The server refused Finish: name what is missing and take the student back to it. */
+const toDashboard = () => navigateTo(localePath('/dashboard'))
+
+/** The server refused Finish: name what is missing and take the student back to the first such step. */
 async function showMissingSections(id: number) {
   const status = await onboardingStatus(id).catch(() => null)
   const missing = status?.sections.filter(s => !s.complete) ?? []
   if (missing.length === 0) return
+  progress.status.value = status
   error.value = t('onboarding.incomplete', {
     sections: missing.map(s => t(`onboarding.sectionName.${s.key}`)).join(', '),
   })
-  if (missing.some(s => s.key === 'PROFILE')) current.value = 0
+  const firstStep = ONBOARDING_STEPS.find(step => STEP_SECTIONS[step].some(key => missing.some(s => s.key === key)))
+  if (firstStep) goTo(firstStep)
 }
 
 useSeo(t('onboarding.title'), t('onboarding.intro'))
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl">
+  <OnboardingFinishing v-if="finishing" @done="toDashboard" />
+  <div v-else class="mx-auto max-w-2xl">
     <header class="mb-6">
       <h1 class="font-display text-2xl font-bold text-slate-900">{{ t('onboarding.title') }}</h1>
       <p class="mt-1 text-sm text-slate-500">{{ t('onboarding.intro') }}</p>
@@ -112,93 +103,35 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
       <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
       <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
 
-      <OnboardingStep
-        v-if="stepKey === 'personal'"
-        :title="t('onboarding.personal.title')"
-        :blurb="t('onboarding.personal.blurb')"
-      >
+      <OnboardingStep v-if="stepKey === 'personal'" :title="t('onboarding.personal.title')" :blurb="t('onboarding.personal.blurb')">
         <ProfileForm
           :model-value="applicant"
           :busy="busy"
           :submit-label="t('profileForm.saveContinue')"
-          @submit="saveIdentity"
-          @email-verified="onEmailVerified"
+          @submit="saveProfile"
+          @email-verified="applicant = $event"
         />
       </OnboardingStep>
 
-      <OnboardingStep
-        v-else-if="stepKey === 'identity'"
-        :title="t('onboarding.identity.title')"
-        :blurb="t('onboarding.identity.blurb')"
-      >
+      <OnboardingStep v-else-if="stepKey === 'identity'" :title="t('onboarding.identity.title')" :blurb="t('onboarding.identity.blurb')">
         <div class="grid gap-4">
           <PhotoUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" />
-          <PassportUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" @edit-profile="current = 0" />
-          <NAlert v-if="!identityDone" tone="warning">{{ t('onboarding.identity.blocked') }}</NAlert>
+          <PassportUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" @edit-profile="goTo('personal')" />
+          <NAlert v-if="!canAdvance" tone="warning">{{ t('onboarding.identity.blocked') }}</NAlert>
         </div>
       </OnboardingStep>
 
-      <OnboardingStep
-        v-else-if="stepKey === 'education'"
-        :title="t('onboarding.education.title')"
-        :blurb="t('onboarding.education.blurb')"
-      >
+      <OnboardingStep v-else-if="stepKey === 'review'" :title="t('onboarding.review.title')" :blurb="t('onboarding.review.blurb')">
+        <SuspenseBoundary>
+          <ReviewStep v-if="applicant" :applicant="applicant" :status="progress.status.value" @edit="goTo" />
+        </SuspenseBoundary>
+      </OnboardingStep>
+
+      <OnboardingStep v-else :title="t(`onboarding.${stepKey}.title`)" :blurb="t(`onboarding.${stepKey}.blurb`)">
         <NAlert v-if="!applicant" tone="warning">{{ t('dashboard.createProfileBlurb') }}</NAlert>
-        <EducationList
-          v-else
-          :items="education"
-          :busy="busy"
-          @add="onEduAdd"
-          @update="onEduUpdate"
-          @remove="onEduRemove"
-        />
-      </OnboardingStep>
-
-      <OnboardingStep
-        v-else-if="stepKey === 'interests'"
-        :title="t('onboarding.interests.title')"
-        :blurb="t('onboarding.interests.blurb')"
-        planned
-      >
-        <p class="text-sm text-slate-500">
-          {{ t('onboarding.interests.blurb') }}
-        </p>
-      </OnboardingStep>
-
-      <OnboardingStep
-        v-else-if="stepKey === 'location'"
-        :title="t('onboarding.location.title')"
-        :blurb="t('onboarding.location.blurb')"
-        planned
-      >
-        <p class="text-sm text-slate-500">Are you currently in China? Yes or No</p>
-      </OnboardingStep>
-
-      <OnboardingStep
-        v-else-if="stepKey === 'contact'"
-        :title="t('onboarding.contact.title')"
-        :blurb="t('onboarding.contact.blurb')"
-        planned
-      >
-        <p class="text-sm text-slate-500">Guardian / emergency contact</p>
-      </OnboardingStep>
-
-      <OnboardingStep v-else :title="t('onboarding.review.title')" :blurb="t('onboarding.review.blurb')">
-        <dl class="grid gap-2 text-sm">
-          <div class="flex justify-between gap-4">
-            <dt class="text-slate-500">{{ t('dashboard.givenName') }}</dt>
-            <dd class="font-medium">{{ applicant?.givenName ?? '' }} {{ applicant?.familyName ?? '' }}</dd>
-          </div>
-          <div class="flex justify-between gap-4">
-            <dt class="text-slate-500">{{ t('dashboard.nationality') }}</dt>
-            <dd class="font-medium">{{ applicant?.nationality ?? '' }}</dd>
-          </div>
-          <div class="flex justify-between gap-4">
-            <dt class="text-slate-500">{{ t('onboarding.steps.education') }}</dt>
-            <dd class="font-medium">{{ education.length }}</dd>
-          </div>
-        </dl>
-        <p class="mt-4 text-sm text-slate-500">{{ t('onboarding.review.done') }}</p>
+        <SuspenseBoundary v-else>
+          <component :is="sectionStep" :key="stepKey" :applicant-id="applicant.id" @changed="progress.refresh" />
+        </SuspenseBoundary>
       </OnboardingStep>
 
       <div class="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">

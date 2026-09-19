@@ -11,7 +11,23 @@ Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md`
 > **Onboarding v2 (2026-09-19) supersedes the 7-step Revision 3 shell below.** Plan and slices:
 > `docs/superpowers/plans/2026-09-19-student-onboarding.md`. **Slice 1 (foundation and the gate) backend is
 > IMPLEMENTED:** server-side `onboarded_at` and completion endpoint, UPPERCASE names, 17+ date of birth,
-> new profile fields, verified contact email, prefilled applicant at registration. **Slice 2 (protected photo and passport scan, in-browser MRZ read behind a `PassportReader` SPI, passport details, six-month rule, profile comparison and mismatch message, `PHOTO`/`PASSPORT` completion sections) is IMPLEMENTED, backend and web.** **Slices 3 and 4 backend (education history, interests, location with the China branch, guardian contact, work experience, the once-only welcome record) are IMPLEMENTED.**
+> new profile fields, verified contact email, prefilled applicant at registration. **Slice 2 (protected photo and passport scan, in-browser MRZ read behind a `PassportReader` SPI, passport details, six-month rule, profile comparison and mismatch message, `PHOTO`/`PASSPORT` completion sections) is IMPLEMENTED, backend and web.** **Slices 3 and 4 (backend and web) are IMPLEMENTED**: the wizard is eight steps —
+> Personal · Identity · Education · Interests · Location · Contact · Work · Review — each real section
+> backed by its own endpoint, no "coming soon" placeholders remain. Shared frontend building blocks:
+> `useApplicantRecord` / `useApplicantRecords` (single-record vs list-shaped sections), `useEnumOptions`
+> (`options.<group>.<code>` i18n-driven code-list labels), `useValidatedForm` + one `FORM_ERROR_KEYS` map,
+> and a small form kit (`FormTextField`, `FormSelectField`, `FormTextareaField`, `FormActions`,
+> `ChipMultiSelect`, `YesNoField`, `RecordList`). The same section components
+> (`components/applicant/{Education,Interests,Residence,Work,Contact}Section.vue`) back both the onboarding
+> wizard and their own post-onboarding editors at `/dashboard/{education,interests,location,work,contacts}`,
+> so there is one implementation per section, not two. Finish shows a 15 s `OnboardingFinishing` hold (the
+> server already recorded completion before the hold starts) then redirects to `/dashboard`; a one-time
+> `WelcomeCelebration` shows there when `ApplicantDto.welcomePending` is true and calls
+> `POST /onboarding/welcomed`. Review is a step-by-step `ReviewStep` with an edit-jump back to any step.
+> **Still open:** the dashboard shell's header has no notification bell yet (only the locale switcher and
+> account menu — `server/api/student-notifications/[...path].ts` proxies `/api/notifications/*` but no
+> frontend composable or bell UI consumes it yet); non-English copy is machine-translated and needs native
+> review; Applications/Documents (Step 6/7 of the earlier plan) are unrelated, still-deferred work.
 
 ## Status legend
 

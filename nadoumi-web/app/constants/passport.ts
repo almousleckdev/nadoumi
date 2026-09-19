@@ -34,18 +34,6 @@ export const PHOTO_OUTPUT_TYPE = 'image/jpeg'
 /** Where the in-browser passport reading stands. */
 export type PassportReadState = 'idle' | 'reading' | 'read' | 'unreadable' | 'manual'
 
-export type PassportErrorCode =
-  | 'required' | 'nameInvalid' | 'numberInvalid' | 'issueFuture' | 'expiryBeforeIssue' | 'expiryTooSoon'
-
-export const PASSPORT_ERROR_KEYS: Record<PassportErrorCode, string> = {
-  required: 'validation.required',
-  nameInvalid: 'profileForm.nameInvalid',
-  numberInvalid: 'passport.errors.numberInvalid',
-  issueFuture: 'passport.errors.issueFuture',
-  expiryBeforeIssue: 'passport.errors.expiryBeforeIssue',
-  expiryTooSoon: 'passport.errors.expiryTooSoon',
-}
-
 /** Form fields the reader fills in; a difference from these means the student edited the reading. */
 export const PASSPORT_READ_FIELDS = ['passportNo', 'givenName', 'familyName', 'dob', 'expiryDate'] as const
 

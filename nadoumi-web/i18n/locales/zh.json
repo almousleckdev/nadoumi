@@ -46,7 +46,8 @@
     "previous": "上一步",
     "next": "下一步",
     "pagination": "分页",
-    "switchingLanguage": "正在切换语言…"
+    "switchingLanguage": "正在切换语言…",
+    "present": "至今"
   },
   "home": {
     "hero": {
@@ -221,7 +222,12 @@
     "sent": "感谢您的留言,我们会尽快与您联系。",
     "errorTitle": "留言发送失败",
     "errorBody": "发送留言时出现问题,请稍后重试。",
-    "phoneTitle": "电话"
+    "phoneTitle": "电话",
+    "add": "添加联系人",
+    "empty": "尚未添加联系人。",
+    "name": "姓名",
+    "phoneHint": "请注明国家/地区区号，例如 +86…",
+    "relation": "关系"
   },
   "catalog": {
     "scholarshipsTitle": "奖学金",
@@ -331,7 +337,10 @@
       "education": "教育经历",
       "testScores": "考试成绩",
       "contacts": "联系人",
-      "account": "账户"
+      "account": "账户",
+      "interests": "兴趣意向",
+      "location": "所在地",
+      "work": "工作经历"
     },
     "welcome": "欢迎回来，{name}",
     "overviewBlurb": "请完善您的申请人档案,以便工作人员为您匹配合适的申请机会。",
@@ -387,7 +396,10 @@
     "savedOk": "已保存",
     "addedOk": "已添加",
     "removedOk": "已移除",
-    "removeConfirm": "确定要移除该记录吗？"
+    "removeConfirm": "确定要移除该记录吗？",
+    "interestsTitle": "学习兴趣",
+    "locationTitle": "当前所在地",
+    "workTitle": "工作经历"
   },
   "validation": {
     "required": "此字段为必填项。",
@@ -457,7 +469,8 @@
       "interests": "兴趣方向",
       "location": "所在地",
       "contact": "联系人",
-      "review": "确认信息"
+      "review": "确认信息",
+      "work": "工作经历"
     },
     "personal": {
       "title": "创建您的个人资料",
@@ -487,7 +500,11 @@
     "review": {
       "title": "确认信息",
       "blurb": "请核对您填写的内容,然后完成提交。",
-      "done": "档案已完成设置,您可以随时在个人中心调整任意部分内容。"
+      "done": "档案已完成设置,您可以随时在个人中心调整任意部分内容。",
+      "complete": "已完成",
+      "optional": "可选",
+      "missing": "未完成",
+      "nothingEntered": "尚未填写任何内容。"
     },
     "badge": {
       "plannedBackend": "即将上线"
@@ -526,12 +543,27 @@
     "sectionName": {
       "PROFILE": "个人资料",
       "PHOTO": "照片",
-      "PASSPORT": "护照"
+      "PASSPORT": "护照",
+      "EDUCATION": "教育经历",
+      "INTERESTS": "兴趣意向",
+      "LOCATION": "所在地",
+      "CONTACT": "联系人"
     },
     "docStatus": {
       "done": "已完成",
       "pending": "必填",
       "attention": "需要处理"
+    },
+    "work": {
+      "title": "工作经历",
+      "blurb": "请填写您的工作经历，尤其是在中国的工作经历。此步骤为可选。"
+    },
+    "finishing": {
+      "title": "正在为您准备仪表盘",
+      "hint": "只需片刻即可完成。",
+      "profile": "正在保存您的个人资料…",
+      "documents": "正在检查您的文件…",
+      "dashboard": "正在准备您的仪表盘…"
     }
   },
   "university": {
@@ -1780,7 +1812,8 @@
     "sectionContact": "联系方式"
   },
   "form": {
-    "select": "请选择…"
+    "select": "请选择…",
+    "chipsCount": "已选择 {n}/{max} 项"
   },
   "passport": {
     "title": "护照",
@@ -1817,6 +1850,172 @@
       "onPassport": "护照上",
       "inProfile": "个人资料中",
       "editProfile": "修改我的资料"
+    }
+  },
+  "review": {
+    "name": "姓名",
+    "photo": "照片"
+  },
+  "welcome": {
+    "title": "欢迎您，{name}！",
+    "body": "您的资料已完善。现在您可以浏览大学、奖学金并查看您的申请了。",
+    "cta": "前往我的仪表盘"
+  },
+  "education": {
+    "add": "添加教育经历",
+    "empty": "尚未添加教育经历。",
+    "institution": "学校名称",
+    "level": "学历层次",
+    "country": "国家",
+    "city": "城市",
+    "qualification": "所获学位/证书",
+    "qualificationHint": "所获文凭或学位的名称，例如“高中毕业证书”。",
+    "field": "专业领域",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "current": "我目前正在此处就读",
+    "gpa": "平均绩点（GPA）",
+    "gpaScale": "绩点满分",
+    "gpaScaleHint": "例如 4 分制或 100 分制。"
+  },
+  "interests": {
+    "sectionStudy": "您希望学习的内容",
+    "sectionWhere": "您希望学习的地点",
+    "sectionWhen": "您希望的入学时间",
+    "level": "意向学历层次",
+    "scholarship": "奖学金意向",
+    "fields": "专业方向",
+    "fieldsHint": "最多可选择十二个感兴趣的专业方向。",
+    "cities": "意向城市",
+    "citiesHint": "请选择您考虑就读的中国城市。",
+    "otherCity": "添加其他城市",
+    "teachingLanguage": "授课语言",
+    "intakeYear": "入学年份",
+    "intakeTerm": "入学学期",
+    "notes": "其他偏好",
+    "notesHint": "任何有助于我们为您匹配合适项目的其他信息。"
+  },
+  "location": {
+    "sectionWhere": "您当前所在地",
+    "sectionChina": "在中国期间",
+    "inChina": "您目前是否在中国？",
+    "country": "国家",
+    "city": "城市",
+    "otherInfo": "其他信息",
+    "otherInfoHint": "有关您当前所在地的其他有用信息。",
+    "chinaNotice": "这些问题仅适用于您在中国学习或生活期间。",
+    "currentLevel": "当前学习层次",
+    "school": "当前就读学校",
+    "visaType": "签证类型",
+    "visaExpiry": "签证到期日期"
+  },
+  "work": {
+    "add": "添加工作经历",
+    "empty": "尚未添加工作经历。",
+    "employer": "雇主",
+    "jobTitle": "职位名称",
+    "employmentType": "工作类型",
+    "country": "国家",
+    "city": "城市",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "current": "我目前在此工作",
+    "chinaNotice": "在中国工作需要持有有效的工作签证。",
+    "visaType": "工作签证类型",
+    "visaExpiry": "工作签证到期日期",
+    "description": "工作描述"
+  },
+  "options": {
+    "educationLevel": {
+      "HIGH_SCHOOL": "高中",
+      "FOUNDATION": "预科课程",
+      "DIPLOMA": "大专文凭",
+      "BACHELOR": "学士学位",
+      "MASTER": "硕士学位",
+      "DOCTORATE": "博士学位",
+      "OTHER": "其他"
+    },
+    "studyLevel": {
+      "LANGUAGE": "语言课程",
+      "FOUNDATION": "预科课程",
+      "BACHELOR": "学士学位",
+      "MASTER": "硕士学位",
+      "DOCTORATE": "博士学位"
+    },
+    "scholarshipInterest": {
+      "REQUIRED": "我需要奖学金",
+      "PREFERRED": "我希望获得奖学金",
+      "NOT_NEEDED": "我不需要奖学金"
+    },
+    "intakeTerm": {
+      "SPRING": "春季",
+      "SUMMER": "夏季",
+      "FALL": "秋季",
+      "WINTER": "冬季"
+    },
+    "chinaVisaType": {
+      "X1": "X1（长期学生签证）",
+      "X2": "X2（短期学生签证）",
+      "Z": "Z（工作签证）",
+      "F": "F（商务或交流签证）",
+      "L": "L（旅游签证）",
+      "S1": "S1（长期探亲签证）",
+      "S2": "S2（短期探亲签证）",
+      "OTHER": "其他"
+    },
+    "employmentType": {
+      "FULL_TIME": "全职",
+      "PART_TIME": "兼职",
+      "INTERNSHIP": "实习",
+      "FREELANCE": "自由职业"
+    },
+    "contactRelation": {
+      "GUARDIAN": "监护人",
+      "EMERGENCY": "紧急联系人",
+      "OTHER": "其他"
+    },
+    "fieldOfStudy": {
+      "BUSINESS": "商科",
+      "ECONOMICS": "经济学",
+      "LAW": "法学",
+      "ENGINEERING": "工程学",
+      "COMPUTER_SCIENCE": "计算机科学",
+      "MEDICINE": "医学",
+      "NURSING": "护理学",
+      "SCIENCE": "理学",
+      "EDUCATION": "教育学",
+      "ARTS_DESIGN": "艺术与设计",
+      "LANGUAGES": "语言学",
+      "SOCIAL_SCIENCES": "社会科学",
+      "AGRICULTURE": "农学",
+      "ARCHITECTURE": "建筑学",
+      "TOURISM": "旅游管理"
+    },
+    "chinaCity": {
+      "Beijing": "北京",
+      "Shanghai": "上海",
+      "Guangzhou": "广州",
+      "Shenzhen": "深圳",
+      "Hangzhou": "杭州",
+      "Nanjing": "南京",
+      "Wuhan": "武汉",
+      "Chengdu": "成都",
+      "Chongqing": "重庆",
+      "Xian": "西安",
+      "Tianjin": "天津",
+      "Suzhou": "苏州",
+      "Qingdao": "青岛",
+      "Dalian": "大连",
+      "Xiamen": "厦门",
+      "Changsha": "长沙",
+      "Zhengzhou": "郑州",
+      "Harbin": "哈尔滨",
+      "Jinan": "济南",
+      "Hefei": "合肥",
+      "Kunming": "昆明",
+      "Shenyang": "沈阳",
+      "Ningbo": "宁波",
+      "Fuzhou": "福州"
     }
   }
 }

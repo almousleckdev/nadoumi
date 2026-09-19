@@ -5,12 +5,21 @@ definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { user } = useSession()
-const { listMine } = useApplicant()
+const { listMine, markWelcomed } = useApplicant()
 
 const { data, pending, error } = await useAsyncData('dash-applicants', () => listMine())
 const mine = computed<ApplicantDto[]>(() => data.value ?? [])
 const primary = computed(() => mine.value[0] ?? null)
 const loadError = computed(() => (error.value ? t('auth.genericError') : ''))
+
+const showWelcome = computed(() => primary.value?.welcomePending === true)
+async function dismissWelcome() {
+  const applicant = primary.value
+  if (!applicant) return
+  // Optimistic: hide immediately, the server call is best-effort and never shown again either way.
+  data.value = mine.value.map((a: ApplicantDto) => (a.id === applicant.id ? { ...a, welcomePending: false } : a))
+  await markWelcomed(applicant.id).catch(() => undefined)
+}
 
 const PROFILE_FIELDS: (keyof ApplicantDto)[] = [
   'givenName', 'familyName', 'dob', 'nationality', 'passportNo', 'email', 'phone',
@@ -32,6 +41,8 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 
 <template>
   <div class="grid gap-6">
+    <WelcomeCelebration v-if="showWelcome && primary" :name="primary.givenName" @dismiss="dismissWelcome" />
+
     <header class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h1 class="font-display text-2xl font-bold text-slate-900">

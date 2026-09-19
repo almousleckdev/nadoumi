@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { PASSPORT_ERROR_KEYS } from '~/constants/passport'
 import { validatePassport, type PassportForm } from '~/utils/passportRules'
 
 /** The passport's holder data, as read from the passport or typed off it, for the student to confirm. */
@@ -11,16 +10,10 @@ const EMPTY: PassportForm = { passportNo: '', givenName: '', familyName: '', dob
 const form = reactive<PassportForm>({ ...EMPTY })
 watch(() => props.initial, (value: PassportForm | null) => Object.assign(form, value ?? EMPTY), { immediate: true })
 
-const submitted = ref(false)
-const errors = computed(() => {
-  if (!submitted.value) return {}
-  return Object.fromEntries(Object.entries(validatePassport(form))
-    .map(([field, code]) => [field, t(PASSPORT_ERROR_KEYS[code])]))
-})
+const { errors, submit: validateAndSubmit } = useValidatedForm(() => validatePassport(form))
 
 function submit() {
-  submitted.value = true
-  if (Object.keys(errors.value).length === 0) emit('submit', { ...form })
+  validateAndSubmit(() => emit('submit', { ...form }))
 }
 </script>
 

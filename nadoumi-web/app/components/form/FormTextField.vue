@@ -11,6 +11,7 @@ withDefaults(defineProps<{
   maxlength?: number
   min?: string
   max?: string
+  disabled?: boolean
   /** Show the value in capitals as it is typed (the server stores it that way). */
   uppercase?: boolean
 }>(), {
@@ -31,6 +32,7 @@ const model = defineModel<string>({ required: true })
       :maxlength="maxlength"
       :min="min"
       :max="max"
+      :disabled="disabled"
       :invalid="!!error"
     >
       <template v-if="$slots.suffix" #suffix><slot name="suffix" /></template>

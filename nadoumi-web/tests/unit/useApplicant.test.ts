@@ -24,8 +24,11 @@ describe('useApplicant', () => {
 
   it('PUT applicants/{id}/education/{eduId}', async () => {
     studentFetch.mockResolvedValueOnce({ id: 9 })
-    await useApplicant().updateEducation(3, 9, { institution: 'X' })
-    expect(studentFetch).toHaveBeenCalledWith('applicants/3/education/9', { method: 'PUT', body: { institution: 'X' } })
+    await useApplicant().updateEducation(3, 9, { institution: 'X', country: 'US', level: 'BACHELOR', current: false })
+    expect(studentFetch).toHaveBeenCalledWith(
+      'applicants/3/education/9',
+      { method: 'PUT', body: { institution: 'X', country: 'US', level: 'BACHELOR', current: false } },
+    )
   })
 
   it('DELETE applicants/{id}/contacts/{cid}', async () => {

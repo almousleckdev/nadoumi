@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises, type VueWrapper } from '@vue/test-utils'
 import Onboarding from '~/pages/onboarding.vue'
+import { FINISH_HOLD_MS } from '~/constants/onboarding'
 
 const { nav, complete, status, applicant } = vi.hoisted(() => ({
   nav: vi.fn(),
@@ -38,6 +39,18 @@ vi.mock('~/composables/useApplicant', () => ({
     addEducation: vi.fn(),
     updateEducation: vi.fn(),
     deleteEducation: vi.fn(),
+    getInterests: vi.fn().mockResolvedValue(null),
+    saveInterests: vi.fn(),
+    getResidence: vi.fn().mockResolvedValue(null),
+    saveResidence: vi.fn(),
+    listContacts: vi.fn().mockResolvedValue([]),
+    addContact: vi.fn(),
+    updateContact: vi.fn(),
+    deleteContact: vi.fn(),
+    listWork: vi.fn().mockResolvedValue([]),
+    addWork: vi.fn(),
+    updateWork: vi.fn(),
+    deleteWork: vi.fn(),
   }),
 }))
 mockNuxtImport('navigateTo', () => nav)
@@ -46,7 +59,10 @@ mockNuxtImport('useLocalePath', () => () => (p: string) => p)
 const section = (key: string, complete: boolean) => ({ key, complete, missing: complete ? [] : ['x'] })
 const progress = (photo: boolean, passport: boolean) => ({
   complete: false, ready: photo && passport,
-  sections: [section('PROFILE', true), section('PHOTO', photo), section('PASSPORT', passport)],
+  sections: [
+    section('PROFILE', true), section('PHOTO', photo), section('PASSPORT', passport),
+    section('EDUCATION', true), section('INTERESTS', true), section('LOCATION', true), section('CONTACT', true),
+  ],
 })
 
 const button = (w: VueWrapper, label: string) =>
@@ -58,7 +74,7 @@ async function reviewStep() {
   await flushPromises()
   await w.find('form').trigger('submit') // Save and continue
   await flushPromises()
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 6; i++) {
     await button(w, 'next')?.trigger('click')
     await flushPromises()
   }
@@ -116,8 +132,15 @@ describe('onboarding wizard', () => {
     complete.mockResolvedValue({ complete: true, ready: true, sections: [] })
     const w = await reviewStep()
 
-    await button(w, 'Finish')!.trigger('click')
-    await flushPromises()
+    vi.useFakeTimers()
+    try {
+      await button(w, 'Finish')!.trigger('click')
+      await flushPromises()
+      // Finish only pauses on the "setting up your dashboard" screen; the server call already succeeded.
+      await vi.advanceTimersByTimeAsync(FINISH_HOLD_MS)
+    } finally {
+      vi.useRealTimers()
+    }
 
     expect(complete).toHaveBeenCalledWith(1)
     expect(nav).toHaveBeenCalledWith('/dashboard')
