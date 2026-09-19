@@ -17,7 +17,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.q || filters.status || filters.categoryId)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -144,8 +144,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.page"
-      v-model:size="filters.size"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -159,7 +159,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Plus, Search, ArrowDown } from '@element-plus/icons-vue'
@@ -177,6 +177,7 @@ import {
   EXPENSE_STATUSES, EXPENSE_TRANSITIONS,
   type Expense, type ExpenseStatus, type ExpenseCategory,
 } from '@/api/finance'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -184,14 +185,24 @@ const userStore = useUserStore()
 
 const canApprove = computed(() => userStore.hasPerm('nad:expense:approve'))
 
-const rows = ref<Expense[]>([])
 const categories = ref<ExpenseCategory[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
+const emptyFilters = () => ({ q: '', status: '', categoryId: undefined as number | undefined })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<Expense, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 1,
+    size: 20,
+    fetch: (f, { index, size }) => listExpenses({
+      q: f.q || undefined,
+      status: f.status || undefined,
+      categoryId: f.categoryId,
+      page: index,
+      size,
+    }),
+  })
+
 const drawerOpen = ref(false)
 const editingId = ref<number | undefined>()
-const filters = reactive({ q: '', status: '', categoryId: undefined as number | undefined, page: 1, size: 20 })
 
 const columns = computed(() => [
   { prop: 'title', label: t('expenses.expenseTitle'), minWidth: 240 },
@@ -220,32 +231,6 @@ function nextStates(e: Expense): ExpenseStatus[] {
   return all.filter(s => !approvalMoves.includes(s) || canApprove.value)
 }
 
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listExpenses({
-      q: filters.q || undefined,
-      status: filters.status || undefined,
-      categoryId: filters.categoryId,
-      page: filters.page - 1,
-      size: filters.size,
-    })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.page = 1; load() }
-function clearFilters() {
-  filters.q = ''; filters.status = ''; filters.categoryId = undefined
-  reload()
-}
 function openCreate() { editingId.value = undefined; drawerOpen.value = true }
 function openEdit(e: Expense) { editingId.value = e.id; drawerOpen.value = true }
 function onSaved() { drawerOpen.value = false; load() }

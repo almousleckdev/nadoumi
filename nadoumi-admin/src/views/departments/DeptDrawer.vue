@@ -60,10 +60,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import { useDrawerForm } from '@/composables/useDrawerForm'
 import {
   getDept, createDept, updateDept, deptTreeExcludeChild, listDepts, type SysDept,
 } from '@/api/system'
@@ -73,9 +73,6 @@ const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [] }>()
 const { t } = useI18n()
 
 const isEdit = computed(() => props.deptId != null)
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const saving = ref(false)
 const parentTree = ref<Array<{ id: number, label: string, children?: unknown[] }>>([])
 
 type DeptForm = Partial<SysDept> & { parentId: number }
@@ -83,7 +80,6 @@ const blank = (): DeptForm => ({
   parentId: props.parentId ?? 0,
   deptName: '', orderNum: 0, leader: '', phone: '', email: '', status: '0',
 })
-const form = reactive<DeptForm>(blank())
 const rules = { deptName: [{ required: true, trigger: 'blur', message: t('common.required') }] }
 
 function toNodes(flat: SysDept[]): SysDept[] {
@@ -103,10 +99,10 @@ function mapTree(nodes: SysDept[]): Array<{ id: number, label: string, children?
   }))
 }
 
-async function open() {
-  Object.assign(form, blank())
-  loading.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<DeptForm>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
     const flat = isEdit.value
       ? (await deptTreeExcludeChild(props.deptId!)).data
       : (await listDepts()).data
@@ -115,26 +111,11 @@ async function open() {
       const res = await getDept(props.deptId!)
       Object.assign(form, res.data)
     }
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+  },
+  submit: async (form) => {
     if (isEdit.value) await updateDept(form)
     else await createDept(form)
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
-
-function reset() { Object.assign(form, blank()) }
-watch(() => props.modelValue, (o) => { if (o) open() })
+  },
+  onSaved: () => emit('saved'),
+})
 </script>

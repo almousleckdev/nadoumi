@@ -70,10 +70,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import { useDrawerForm } from '@/composables/useDrawerForm'
 import { getTask, createTask, updateTask, type TaskInput } from '@/api/hr'
 import { listUsers, type SysUserRow } from '@/api/system'
 
@@ -82,21 +82,17 @@ const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [] }>()
 const { t } = useI18n()
 
 const isEdit = computed(() => props.taskId != null)
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const saving = ref(false)
 const staff = ref<SysUserRow[]>([])
 
 const blank = (): TaskInput => ({
   title: '', description: '', priority: 'MEDIUM', assigneeUserId: null, dueDate: null,
 })
-const form = reactive<TaskInput>(blank())
 const rules = { title: [{ required: true, trigger: 'blur', message: t('common.required') }] }
 
-async function open() {
-  Object.assign(form, blank())
-  loading.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<TaskInput>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
     staff.value = (await listUsers({ userType: '00', pageNum: 1, pageSize: 200 })).rows
     if (isEdit.value) {
       const task = await getTask(props.taskId!)
@@ -105,26 +101,11 @@ async function open() {
         assigneeUserId: task.assigneeUserId, dueDate: task.dueDate,
       })
     }
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+  },
+  submit: async (form) => {
     if (isEdit.value) await updateTask(props.taskId!, { ...form })
     else await createTask({ ...form })
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
-
-function reset() { Object.assign(form, blank()) }
-watch(() => props.modelValue, (o) => { if (o) open() })
+  },
+  onSaved: () => emit('saved'),
+})
 </script>

@@ -21,23 +21,23 @@
       @clear="clearFilters"
     >
       <SearchInput
-        v-model="query.q"
+        v-model="filters.q"
         :placeholder="t('scholarship.searchPlaceholder')"
-        @search="applyFilters"
+        @search="reload"
       />
       <el-input
-        v-model="query.country"
+        v-model="filters.country"
         :placeholder="t('scholarship.country')"
         maxlength="2"
         style="width: 110px"
-        @keyup.enter="applyFilters"
+        @keyup.enter="reload"
       />
       <el-select
-        v-model="query.funding"
+        v-model="filters.funding"
         :placeholder="t('scholarship.fundingModel')"
         clearable
         style="width: 160px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           v-for="f in FUNDING"
@@ -47,11 +47,11 @@
         />
       </el-select>
       <el-select
-        v-model="query.publishStatus"
+        v-model="filters.publishStatus"
         :placeholder="t('scholarship.publishStatus')"
         clearable
         style="width: 150px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           value="DRAFT"
@@ -71,14 +71,14 @@
       :loading="loading"
       :error="error"
       :total="total"
-      :page="query.page"
-      :page-size="query.size"
+      :page="page"
+      :page-size="size"
       clickable-rows
       :empty-title="t('scholarship.emptyTitle')"
       :empty-description="t('scholarship.emptyDesc')"
-      @update:page="(p: number) => { query.page = p; reload() }"
-      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
-      @retry="reload"
+      @update:page="(p: number) => { page = p; load() }"
+      @update:page-size="(s: number) => { size = s; page = 0; load() }"
+      @retry="load"
       @row-click="(row) => router.push(`/scholarships/${row.view.id}`)"
     >
       <template #cell-referenceCode="{ row }">
@@ -155,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -170,6 +170,7 @@ import DataTable from '@/components/ui/DataTable.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import type { DataTableColumn } from '@/components/ui/types'
 import ScholarshipDrawer from './ScholarshipDrawer.vue'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -177,6 +178,22 @@ const userStore = useUserStore()
 const { confirm } = useConfirm()
 
 const FUNDING = ['FULLY', 'PARTIAL', 'SELF'] as const
+const emptyFilters = () => ({ q: '', country: '', funding: '', publishStatus: '' })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<Scholarship, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 0,
+    size: 20,
+    fetch: (f, { page, size }) => listScholarships({
+      q: f.q || undefined,
+      country: f.country || undefined,
+      funding: f.funding || undefined,
+      publishStatus: f.publishStatus || undefined,
+      page,
+      size,
+    }),
+  })
+
 const columns: DataTableColumn[] = [
   { prop: 'referenceCode', label: t('scholarship.referenceCode'), width: 130 },
   { prop: 'title', label: t('scholarship.title'), minWidth: 240 },
@@ -188,43 +205,11 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: '', width: 130, align: 'right' },
 ]
 
-const loading = ref(false)
-const error = ref<string | null>(null)
-const rows = ref<Scholarship[]>([])
-const total = ref(0)
-const query = reactive({ q: '', country: '', funding: '', publishStatus: '', page: 0, size: 20 })
-const dirty = computed(() => Boolean(query.q || query.country || query.funding || query.publishStatus))
-
-async function reload() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listScholarships({
-      q: query.q || undefined,
-      country: query.country || undefined,
-      funding: query.funding || undefined,
-      publishStatus: query.publishStatus || undefined,
-      page: query.page,
-      size: query.size,
-    })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || t('state.errorTitle')
-  }
-  finally {
-    loading.value = false
-  }
-}
-function applyFilters() { query.page = 0; reload() }
-function clearFilters() { query.q = ''; query.country = ''; query.funding = ''; query.publishStatus = ''; applyFilters() }
-
 const drawerOpen = ref(false)
 const editing = ref<Scholarship | null>(null)
 function openCreate() { editing.value = null; drawerOpen.value = true }
 function openEdit(s: Scholarship) { editing.value = s; drawerOpen.value = true }
-function onSaved() { reload() }
+function onSaved() { load() }
 
 async function onDelete(s: Scholarship) {
   const ok = await confirm({
@@ -236,10 +221,10 @@ async function onDelete(s: Scholarship) {
   if (!ok) return
   await deleteScholarship(s.view.id)
   ElMessage.success(t('common.deleted'))
-  reload()
+  load()
 }
 
-onMounted(reload)
+onMounted(load)
 </script>
 
 <style scoped>

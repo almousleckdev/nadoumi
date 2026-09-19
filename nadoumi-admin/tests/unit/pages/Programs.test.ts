@@ -72,12 +72,12 @@ describe('Programs list', () => {
   it('re-queries from page 0 when a filter is applied', async () => {
     const w = mountList()
     await flushPromises()
-    const vm = w.vm as unknown as { query: { type: string, page: number }, applyFilters: () => void }
-    vm.query.type = 'MASTER'
-    vm.query.page = 2
-    vm.applyFilters()
+    const vm = w.vm as unknown as { filters: { type: string }, page: number, reload: () => void }
+    vm.filters.type = 'MASTER'
+    vm.page = 2
+    vm.reload()
     await flushPromises()
-    expect(vm.query.page).toBe(0)
+    expect(vm.page).toBe(0)
     expect(api.listPrograms).toHaveBeenLastCalledWith(expect.objectContaining({ type: 'MASTER', page: 0 }))
   })
 

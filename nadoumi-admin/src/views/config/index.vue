@@ -24,7 +24,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.configName || filters.configKey)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -83,8 +83,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.pageNum"
-      v-model:size="filters.pageSize"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -159,16 +159,24 @@ import {
   listConfigs, getConfig, createConfig, updateConfig, deleteConfigs, refreshConfigCache,
   type SysConfig,
 } from '@/api/system'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const rows = ref<SysConfig[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
-const filters = reactive({ configName: '', configKey: '', pageNum: 1, pageSize: 10 })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<SysConfig, { configName: string, configKey: string }>({
+    emptyFilters: () => ({ configName: '', configKey: '' }),
+    firstPage: 1,
+    size: 10,
+    fetch: (f, { page, size }) => listConfigs({
+      configName: f.configName || undefined,
+      configKey: f.configKey || undefined,
+      pageNum: page,
+      pageSize: size,
+    }),
+  })
 
 const drawerOpen = ref(false)
 const saving = ref(false)
@@ -189,29 +197,6 @@ const columns = computed(() => [
   { prop: 'configType', label: t('config.type'), width: 100, align: 'center' as const },
   { prop: 'actions', label: t('common.actions'), width: 150, align: 'right' as const },
 ])
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listConfigs({
-      configName: filters.configName || undefined,
-      configKey: filters.configKey || undefined,
-      pageNum: filters.pageNum,
-      pageSize: filters.pageSize,
-    })
-    rows.value = res.rows
-    total.value = res.total
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.pageNum = 1; load() }
-function clearFilters() { filters.configName = ''; filters.configKey = ''; reload() }
 
 async function open(id?: number) {
   editing.value = id

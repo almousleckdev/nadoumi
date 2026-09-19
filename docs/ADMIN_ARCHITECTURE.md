@@ -215,6 +215,20 @@ Shared prop types live in `ui/types.ts`. Dashboard widgets (`StatCard`,
 `DonutStat`, `ComingSoonCard`, `DashboardGroup`, `RecentApplicants`) build on the
 same primitives.
 
+### 2.3a Shared screen logic (EXISTING — `nadoumi-admin/src/composables/`)
+
+Screens do not re-implement the skeletons every list and drawer needs. Add behaviour here, not in a screen.
+
+| Piece | Use |
+| --- | --- |
+| `usePagedList` | Every list screen: rows, total, loading, error, filters, page and size, `load` (current page), `reload` (from the first page), `clearFilters`, `dirty`. A screen supplies only `emptyFilters` and a `fetch` that calls its endpoint; it accepts both list shapes (`{rows,total}` and `{content,totalElements}`) and gives a 0-based `index` |
+| `useDrawerForm` | Every create/edit drawer: reset and load on open, validate then save then confirm then notify, `loading`/`saving`. A drawer supplies `blank`, `load`, `submit`, `onSaved` (and `onReset`) |
+| `useConfirm`, `useResourceList` | Confirmation dialog; simple fetch-once lists inside detail tabs |
+| `components/ui/MoneyField` | An RMB amount input with the live USD equivalent and an optional FX note |
+| `utils/date.ts` (`todayIso`) | Today as `yyyy-mm-dd` |
+
+Screens still on their own list/drawer code (different lifecycles, not yet migrated): the Program, Scholarship and University drawers.
+
 ### 2.4 Media upload widget — `ImageUpload.vue` (EXISTING — P1, Cloudinary)
 
 `docs/superpowers/specs/2026-09-03-media-storage-and-application-engine-design.md`

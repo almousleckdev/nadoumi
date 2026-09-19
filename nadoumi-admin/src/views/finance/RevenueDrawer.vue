@@ -45,20 +45,12 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item
+      <MoneyField
+        v-model="form.amount"
         :label="t('revenue.amountRmb')"
         prop="amount"
-      >
-        <el-input-number
-          v-model="form.amount"
-          :min="0"
-          :precision="2"
-          :step="100"
-          controls-position="right"
-          style="width: 100%"
-        />
-        <span class="usd-hint">{{ usdPreview }}</span>
-      </el-form-item>
+        :note="t('revenue.fxNote')"
+      />
       <el-form-item
         :label="t('revenue.receivedOn')"
         prop="receivedOn"
@@ -91,86 +83,55 @@
           :rows="2"
         />
       </el-form-item>
-      <p class="fx-note">
-        {{ t('revenue.fxNote') }}
-      </p>
     </el-form>
   </Drawer>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import MoneyField from '@/components/ui/MoneyField.vue'
 import {
   getRevenue, createRevenue, updateRevenue, REVENUE_SOURCES, type RevenueInput,
 } from '@/api/finance'
-import { cnyToUsdRate } from '@/api/fx'
-import { usd } from '@/utils/money'
+import { useDrawerForm } from '@/composables/useDrawerForm'
+import { todayIso } from '@/utils/date'
 
 const props = defineProps<{ modelValue: boolean, revenueId?: number }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [] }>()
 const { t } = useI18n()
 
 const isEdit = computed(() => props.revenueId != null)
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const saving = ref(false)
-const fxRate = ref(0.1381)
 
 const blank = (): RevenueInput => ({
   source: 'SERVICE_FEE', title: '', description: '', amount: 0, currency: 'CNY',
-  receivedOn: new Date().toISOString().slice(0, 10), reference: '', notes: '',
+  receivedOn: todayIso(), reference: '', notes: '',
 })
-const form = reactive<RevenueInput>(blank())
 const rules = {
-  title: [{ required: true, trigger: 'blur', message: t('common.required') }],
   source: [{ required: true, trigger: 'change', message: t('common.required') }],
+  title: [{ required: true, trigger: 'blur', message: t('common.required') }],
   amount: [{ required: true, trigger: 'blur', message: t('common.required') }],
   receivedOn: [{ required: true, trigger: 'change', message: t('common.required') }],
 }
-const usdPreview = computed(() => form.amount ? `≈ ${usd(form.amount * fxRate.value)}` : '')
 
-async function open() {
-  Object.assign(form, blank())
-  loading.value = true
-  try {
-    fxRate.value = await cnyToUsdRate()
-    if (isEdit.value) {
-      const r = await getRevenue(props.revenueId!)
-      Object.assign(form, {
-        source: r.source, title: r.title, description: r.description ?? '',
-        amount: r.amount, currency: r.currency || 'CNY', receivedOn: r.receivedOn,
-        reference: r.reference ?? '', notes: r.notes ?? '',
-      })
-    }
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<RevenueInput>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
+    if (!isEdit.value) return
+    const r = await getRevenue(props.revenueId!)
+    Object.assign(form, {
+      source: r.source, title: r.title, description: r.description ?? '',
+      amount: r.amount, currency: r.currency || 'CNY', receivedOn: r.receivedOn,
+      reference: r.reference ?? '', notes: r.notes ?? '',
+    })
+  },
+  submit: async (form) => {
     const body: RevenueInput = { ...form, currency: 'CNY' }
     if (isEdit.value) await updateRevenue(props.revenueId!, body)
     else await createRevenue(body)
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
-
-function reset() { Object.assign(form, blank()) }
-watch(() => props.modelValue, (o) => { if (o) open() })
+  },
+  onSaved: () => emit('saved'),
+})
 </script>
-
-<style scoped>
-.usd-hint { display: block; margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft, #64748b); font-variant-numeric: tabular-nums; }
-.fx-note { margin: 4px 0 0; font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }
-</style>

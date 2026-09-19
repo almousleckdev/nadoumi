@@ -54,12 +54,12 @@ describe('Universities list', () => {
   it('re-queries from page 0 when a filter is applied', async () => {
     const w = mountList()
     await flushPromises()
-    const vm = w.vm as unknown as { query: { q: string, page: number }, applyFilters: () => void }
-    vm.query.q = 'fudan'
-    vm.query.page = 3
-    vm.applyFilters()
+    const vm = w.vm as unknown as { filters: { q: string }, page: number, reload: () => void }
+    vm.filters.q = 'fudan'
+    vm.page = 3
+    vm.reload()
     await flushPromises()
-    expect(vm.query.page).toBe(0)
+    expect(vm.page).toBe(0)
     expect(api.listUniversities).toHaveBeenLastCalledWith(expect.objectContaining({ q: 'fudan', page: 0 }))
   })
 

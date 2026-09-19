@@ -18,7 +18,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.title || filters.operName || filters.status)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -93,8 +93,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.pageNum"
-      v-model:size="filters.pageSize"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -123,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Delete, Search } from '@element-plus/icons-vue'
@@ -135,17 +135,29 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { listOperLogs, cleanOperLogs, type SysOperLog } from '@/api/monitor'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const rows = ref<SysOperLog[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
 const detail = ref<SysOperLog | null>(null)
-const filters = reactive({ title: '', operName: '', status: '', pageNum: 1, pageSize: 10 })
+
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<SysOperLog, { title: string, operName: string, status: string }>({
+    emptyFilters: () => ({ title: '', operName: '', status: '' }),
+    firstPage: 1,
+    size: 10,
+    fetch: (f, { page, size }) => listOperLogs({
+      title: f.title || undefined,
+      operName: f.operName || undefined,
+      status: f.status || undefined,
+      pageNum: page,
+      pageSize: size,
+      orderByColumn: 'operId',
+      isAsc: 'desc',
+    }),
+  })
 
 const columns = computed(() => [
   { prop: 'title', label: t('operlog.module'), minWidth: 130 },
@@ -157,32 +169,6 @@ const columns = computed(() => [
   { prop: 'operTime', label: t('operlog.time'), width: 170 },
   { prop: 'actions', label: t('common.actions'), width: 90, align: 'right' as const },
 ])
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listOperLogs({
-      title: filters.title || undefined,
-      operName: filters.operName || undefined,
-      status: filters.status || undefined,
-      pageNum: filters.pageNum,
-      pageSize: filters.pageSize,
-      orderByColumn: 'operId',
-      isAsc: 'desc',
-    })
-    rows.value = res.rows
-    total.value = res.total
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.pageNum = 1; load() }
-function clearFilters() { filters.title = ''; filters.operName = ''; filters.status = ''; reload() }
 
 async function clean() {
   if (!(await confirm({ title: t('operlog.clean'), message: t('operlog.cleanConfirm'), tone: 'danger' }))) return

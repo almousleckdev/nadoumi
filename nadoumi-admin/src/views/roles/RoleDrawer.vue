@@ -86,11 +86,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import type { ElTree } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import { useDrawerForm } from '@/composables/useDrawerForm'
 import {
   getRole, createRole, updateRole, roleMenuTreeselect, menuTreeselect,
   type SysMenu, type SysRole,
@@ -101,10 +101,7 @@ const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [] }>()
 const { t } = useI18n()
 
 const isEdit = computed(() => props.roleId != null)
-const formRef = ref<FormInstance>()
 const treeRef = ref<InstanceType<typeof ElTree>>()
-const loading = ref(false)
-const saving = ref(false)
 const menuTree = ref<Array<{ id: number, label: string, children?: unknown[] }>>([])
 const checkedKeys = ref<number[]>([])
 
@@ -122,7 +119,6 @@ const blank = (): RoleForm => ({
   roleName: '', roleKey: '', roleSort: 0, dataScope: '1', status: '0',
   menuCheckStrictly: true, remark: '',
 })
-const form = reactive<RoleForm>(blank())
 
 const rules = {
   roleName: [{ required: true, trigger: 'blur', message: t('common.required') }],
@@ -137,11 +133,10 @@ function mapTree(nodes: SysMenu[]): Array<{ id: number, label: string, children?
   }))
 }
 
-async function open() {
-  Object.assign(form, blank())
-  checkedKeys.value = []
-  loading.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<RoleForm>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
     if (isEdit.value) {
       const [detail, tree] = await Promise.all([getRole(props.roleId!), roleMenuTreeselect(props.roleId!)])
       const r = detail.data
@@ -157,22 +152,8 @@ async function open() {
       const tree = await menuTreeselect()
       menuTree.value = mapTree((tree as unknown as { data: SysMenu[] }).data)
     }
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-function collectMenuIds(): number[] {
-  const checked = (treeRef.value?.getCheckedKeys(false) ?? []) as number[]
-  const half = (treeRef.value?.getHalfCheckedKeys() ?? []) as number[]
-  return [...checked, ...half]
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+  },
+  submit: async (form) => {
     const body: Partial<SysRole> = {
       roleId: form.roleId,
       roleName: form.roleName,
@@ -186,20 +167,16 @@ async function save() {
     }
     if (isEdit.value) await updateRole(body)
     else await createRole(body)
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
+  },
+  onSaved: () => emit('saved'),
+  onReset: () => { checkedKeys.value = [] },
+})
 
-function reset() {
-  Object.assign(form, blank())
-  checkedKeys.value = []
+function collectMenuIds(): number[] {
+  const checked = (treeRef.value?.getCheckedKeys(false) ?? []) as number[]
+  const half = (treeRef.value?.getHalfCheckedKeys() ?? []) as number[]
+  return [...checked, ...half]
 }
-
-watch(() => props.modelValue, (o) => { if (o) open() })
 </script>
 
 <style scoped>

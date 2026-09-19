@@ -17,7 +17,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.roleName)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -82,8 +82,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.pageNum"
-      v-model:size="filters.pageSize"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -97,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
@@ -109,18 +109,26 @@ import RoleDrawer from './RoleDrawer.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { listRoles, deleteRoles, changeRoleStatus, type SysRole } from '@/api/system'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const rows = ref<SysRole[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<SysRole, { roleName: string }>({
+    emptyFilters: () => ({ roleName: '' }),
+    firstPage: 1,
+    size: 10,
+    fetch: (f, { page, size }) => listRoles({
+      roleName: f.roleName || undefined,
+      pageNum: page,
+      pageSize: size,
+    }),
+  })
+
 const drawerOpen = ref(false)
 const editingId = ref<number | undefined>()
-const filters = reactive({ roleName: '', pageNum: 1, pageSize: 10 })
 
 const columns = computed(() => [
   { prop: 'roleName', label: t('roles.name'), minWidth: 160 },
@@ -131,27 +139,6 @@ const columns = computed(() => [
   { prop: 'actions', label: t('common.actions'), width: 160, align: 'right' as const },
 ])
 
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listRoles({
-      roleName: filters.roleName || undefined,
-      pageNum: filters.pageNum,
-      pageSize: filters.pageSize,
-    })
-    rows.value = res.rows
-    total.value = res.total
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.pageNum = 1; load() }
-function clearFilters() { filters.roleName = ''; reload() }
 function openCreate() { editingId.value = undefined; drawerOpen.value = true }
 function openEdit(row: SysRole) { editingId.value = row.roleId; drawerOpen.value = true }
 function onSaved() { drawerOpen.value = false; load() }

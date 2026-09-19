@@ -21,16 +21,16 @@
       @clear="clearFilters"
     >
       <SearchInput
-        v-model="query.name"
+        v-model="filters.name"
         :placeholder="t('applicant.searchPlaceholder')"
-        @search="applyFilters"
+        @search="reload"
       />
       <el-select
-        v-model="query.status"
+        v-model="filters.status"
         :placeholder="t('applicant.status')"
         clearable
         style="width: 160px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           v-for="s in STATUSES"
@@ -40,11 +40,11 @@
         />
       </el-select>
       <el-input
-        v-model="query.nationality"
+        v-model="filters.nationality"
         :placeholder="t('applicant.nationality')"
         maxlength="2"
         style="width: 130px"
-        @keyup.enter="applyFilters"
+        @keyup.enter="reload"
       />
     </FilterBar>
 
@@ -55,14 +55,14 @@
       :loading="loading"
       :error="error"
       :total="total"
-      :page="query.page"
-      :page-size="query.size"
+      :page="page"
+      :page-size="size"
       clickable-rows
       :empty-title="t('applicant.emptyTitle')"
       :empty-description="t('applicant.emptyDesc')"
-      @update:page="(p: number) => { query.page = p; reload() }"
-      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
-      @retry="reload"
+      @update:page="(p: number) => { page = p; load() }"
+      @update:page-size="(s: number) => { size = s; page = 0; load() }"
+      @retry="load"
       @row-click="(row) => goToDetail(Number(row.id))"
     >
       <template #cell-givenName="{ row }">
@@ -153,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
@@ -172,6 +172,7 @@ import type { DataTableColumn } from '@/components/ui/types'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import Drawer from '@/components/ui/Drawer.vue'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -179,6 +180,21 @@ const userStore = useUserStore()
 const { confirm } = useConfirm()
 
 const MASK = '••••'
+const emptyFilters = () => ({ name: '', status: '', nationality: '' })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<Applicant, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 0,
+    size: 20,
+    fetch: (f, { page, size }) => listApplicants({
+      name: f.name || undefined,
+      status: f.status || undefined,
+      nationality: f.nationality || undefined,
+      page,
+      size,
+    }),
+  })
+
 const STATUSES: ApplicantStatus[] = ['DRAFT', 'ACTIVE', 'UNLINKED', 'ARCHIVED']
 
 const columns: DataTableColumn[] = [
@@ -190,14 +206,6 @@ const columns: DataTableColumn[] = [
   { prop: 'createdAt', label: t('applicant.registered'), width: 170 },
   { prop: 'actions', label: '', width: 110, align: 'right' },
 ]
-
-const loading = ref(false)
-const error = ref<string | null>(null)
-const rows = ref<Applicant[]>([])
-const total = ref(0)
-const query = reactive({ name: '', status: '', nationality: '', page: 0, size: 20 })
-
-const dirty = computed(() => Boolean(query.name || query.status || query.nationality))
 
 function titleCase(s: string) {
   return s.charAt(0) + s.slice(1).toLowerCase()
@@ -211,39 +219,6 @@ function goToDetail(id: number) {
   router.push(`/applicants/${id}`)
 }
 
-async function reload() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listApplicants({
-      name: query.name || undefined,
-      status: query.status || undefined,
-      nationality: query.nationality || undefined,
-      page: query.page,
-      size: query.size,
-    })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || t('state.errorTitle')
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-function applyFilters() {
-  query.page = 0
-  reload()
-}
-function clearFilters() {
-  query.name = ''
-  query.status = ''
-  query.nationality = ''
-  applyFilters()
-}
-
 async function onArchive(row: Applicant) {
   const ok = await confirm({
     title: t('applicant.archiveTitle'),
@@ -254,7 +229,7 @@ async function onArchive(row: Applicant) {
   if (!ok) return
   await archiveApplicant(row.id)
   ElMessage.success(t('applicant.archived'))
-  reload()
+  load()
 }
 
 // create
@@ -282,14 +257,14 @@ async function submitCreate() {
     ElMessage.success(t('applicant.createdOk'))
     createOpen.value = false
     Object.assign(createForm, { givenName: '', familyName: '', nationality: '', email: '', invitedEmail: '' })
-    applyFilters()
+    reload()
   }
   finally {
     creating.value = false
   }
 }
 
-onMounted(reload)
+onMounted(load)
 </script>
 
 <style scoped>

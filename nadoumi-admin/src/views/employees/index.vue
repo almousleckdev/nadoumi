@@ -17,7 +17,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.q || filters.employmentStatus)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -102,8 +102,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.page"
-      v-model:size="filters.size"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Plus, Search } from '@element-plus/icons-vue'
@@ -130,20 +130,30 @@ import EmployeeDrawer from './EmployeeDrawer.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { listEmployees, deleteEmployee, type Employee } from '@/api/hr'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
+const emptyFilters = () => ({ q: '', employmentStatus: '' })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<Employee, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 1,
+    size: 20,
+    fetch: (f, { index, size }) => listEmployees({
+      q: f.q || undefined,
+      employmentStatus: f.employmentStatus || undefined,
+      page: index,
+      size,
+    }),
+  })
+
 const STATUSES = ['PROBATION', 'ACTIVE', 'ON_LEAVE', 'SUSPENDED', 'TERMINATED']
 
-const rows = ref<Employee[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
 const drawerOpen = ref(false)
 const editingId = ref<number | undefined>()
-const filters = reactive({ q: '', employmentStatus: '', page: 1, size: 20 })
 
 const columns = computed(() => [
   { prop: 'nickName', label: t('employees.name'), minWidth: 200 },
@@ -164,28 +174,6 @@ function money(amount: number | null, ccy: string | null): string {
   return `${ccy || ''} ${Number(amount ?? 0).toLocaleString()}`.trim()
 }
 
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listEmployees({
-      q: filters.q || undefined,
-      employmentStatus: filters.employmentStatus || undefined,
-      page: filters.page - 1,
-      size: filters.size,
-    })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.page = 1; load() }
-function clearFilters() { filters.q = ''; filters.employmentStatus = ''; reload() }
 function openCreate() { editingId.value = undefined; drawerOpen.value = true }
 function openEdit(id: number) { editingId.value = id; drawerOpen.value = true }
 function onSaved() { drawerOpen.value = false; load() }

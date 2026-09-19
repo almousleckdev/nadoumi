@@ -127,10 +127,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import { useDrawerForm } from '@/composables/useDrawerForm'
 import {
   getUser, createUser, updateUser, userDeptTree,
   type SysRole, type SysPost, type SysDept, type SysUserForm,
@@ -146,9 +146,6 @@ const isStaff = computed(() => props.userType === '00')
 const drawerTitle = computed(() =>
   t(isEdit.value ? 'users.editTitle' : (isStaff.value ? 'users.newStaff' : 'users.newStudent')))
 
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const saving = ref(false)
 const roles = ref<SysRole[]>([])
 const posts = ref<SysPost[]>([])
 const deptTree = ref<Array<{ id: number, label: string, children?: unknown[] }>>([])
@@ -158,7 +155,6 @@ const blank = (): SysUserForm => ({
   sex: '0', status: '0', deptId: null, postIds: [], roleIds: [], remark: '',
   userType: props.userType,
 })
-const form = reactive<SysUserForm>(blank())
 
 const rules = {
   userName: [{ required: true, min: 2, max: 20, trigger: 'blur', message: t('users.userNameRule') }],
@@ -175,10 +171,10 @@ function mapTree(nodes: SysDept[]): Array<{ id: number, label: string, children?
   }))
 }
 
-async function open() {
-  Object.assign(form, blank())
-  loading.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<SysUserForm>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
     const res = await getUser(props.userId)
     roles.value = (res.roles || []).filter(r => !r.admin)
     posts.value = res.posts || []
@@ -201,30 +197,12 @@ async function open() {
     }
     const treeRes = await userDeptTree()
     deptTree.value = mapTree((treeRes as unknown as { data: SysDept[] }).data)
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+  },
+  submit: async (form) => {
     const body: SysUserForm = { ...form, userType: props.userType }
     if (isEdit.value) await updateUser(body)
     else await createUser(body)
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
-
-function reset() {
-  Object.assign(form, blank())
-}
-
-watch(() => props.modelValue, (open_) => { if (open_) open() })
+  },
+  onSaved: () => emit('saved'),
+})
 </script>

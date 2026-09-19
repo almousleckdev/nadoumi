@@ -261,10 +261,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import { useDrawerForm } from '@/composables/useDrawerForm'
 import FormSection from '@/components/ui/FormSection.vue'
 import {
   getEmployee, createEmployee, updateEmployee, type EmployeeInput,
@@ -283,9 +283,6 @@ const STATUSES = ['PROBATION', 'ACTIVE', 'ON_LEAVE', 'SUSPENDED', 'TERMINATED']
 const FREQS = ['MONTHLY', 'ANNUAL', 'WEEKLY', 'HOURLY']
 
 const isEdit = computed(() => props.employeeId != null)
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const saving = ref(false)
 const compensationVisible = ref(true)
 const positions = ref<SysPost[]>([])
 const managers = ref<SysUserRow[]>([])
@@ -302,7 +299,6 @@ const blank = (): EmployeeInput => ({
   emergencyContact: '', emergencyContactRelationship: '', emergencyContactPhone: '', emergencyContactEmail: '',
   notes: '',
 })
-const form = reactive<EmployeeInput>(blank())
 
 const rules = {
   userName: [{ required: true, min: 2, max: 20, trigger: 'blur', message: t('employees.userNameRule') }],
@@ -320,10 +316,10 @@ function mapTree(nodes: SysDept[]): Array<{ id: number, label: string, children?
   }))
 }
 
-async function open() {
-  Object.assign(form, blank())
-  loading.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<EmployeeInput>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
     const [posts, mgrs, roleRes, treeRes] = await Promise.all([
       listPosts({ pageNum: 1, pageSize: 200 }),
       listUsers({ userType: '00', pageNum: 1, pageSize: 200 }),
@@ -361,29 +357,14 @@ async function open() {
         notes: e.notes ?? '',
       })
     }
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+  },
+  submit: async (form) => {
     const body: EmployeeInput = { ...form }
     if (isEdit.value) await updateEmployee(props.employeeId!, body)
     else await createEmployee(body)
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
-
-function reset() { Object.assign(form, blank()) }
-watch(() => props.modelValue, (o) => { if (o) open() })
+  },
+  onSaved: () => emit('saved'),
+})
 </script>
 
 <style scoped>

@@ -97,8 +97,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.pageNum"
-      v-model:size="filters.pageSize"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -128,6 +128,7 @@ import { useUserStore } from '@/stores/user'
 import {
   listUsers, deleteUsers, resetUserPwd, changeUserStatus, type SysUserRow,
 } from '@/api/system'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -141,15 +142,22 @@ const canEditUser = computed(() => userStore.hasPerm('system:user:edit'))
 const canResetPwd = computed(() => userStore.hasPerm('system:user:resetPwd'))
 const canRemove = computed(() => userStore.hasPerm('system:user:remove'))
 
-const rows = ref<SysUserRow[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<SysUserRow, { userName: string, status: string }>({
+    emptyFilters: () => ({ userName: '', status: '' }),
+    firstPage: 1,
+    size: 10,
+    fetch: (f, { page, size }) => listUsers({
+      userType: userType.value,
+      userName: f.userName || undefined,
+      status: f.status || undefined,
+      pageNum: page,
+      pageSize: size,
+    }),
+  })
+
 const drawerOpen = ref(false)
 const editingId = ref<number | undefined>()
-
-const filters = reactive({ userName: '', status: '', pageNum: 1, pageSize: 10 })
-const dirty = computed(() => Boolean(filters.userName || filters.status))
 
 const columns = computed(() => [
   { prop: 'userName', label: t('users.userName'), minWidth: 130 },
@@ -160,39 +168,6 @@ const columns = computed(() => [
   { prop: 'createTime', label: t('users.created'), width: 170 },
   { prop: 'actions', label: t('common.actions'), width: 210, align: 'right' as const },
 ])
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listUsers({
-      userType: userType.value,
-      userName: filters.userName || undefined,
-      status: filters.status || undefined,
-      pageNum: filters.pageNum,
-      pageSize: filters.pageSize,
-    })
-    rows.value = res.rows
-    total.value = res.total
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-function reload() {
-  filters.pageNum = 1
-  load()
-}
-
-function clearFilters() {
-  filters.userName = ''
-  filters.status = ''
-  reload()
-}
 
 function openCreate() {
   editingId.value = undefined

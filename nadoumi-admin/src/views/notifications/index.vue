@@ -252,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Search } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -268,6 +268,7 @@ import {
 import { getTask, type Task } from '@/api/hr'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const userStore = useUserStore()
@@ -277,15 +278,19 @@ const mode = ref<'all' | 'mine'>(canOversee.value ? 'all' : 'mine')
 
 const TYPES = ['CONTACT_INQUIRY_RECEIVED', 'SCHOLARSHIP_PUBLISHED', 'UNIVERSITY_PUBLISHED', 'PROGRAM_PUBLISHED', 'TASK_PROGRESS']
 
-const rows = ref<NotificationView[]>([])
-const total = ref(0)
-const page = ref(1)
-const size = ref(15)
-const loading = ref(false)
-const error = ref<string | null>(null)
 const detail = ref<NotificationDetail | null>(null)
 const taskDetail = ref<Task | null>(null)
-const filters = reactive({ type: '' })
+
+const emptyFilters = () => ({ type: '' })
+const { rows, total, loading, error, filters, page, size, load, reload, clearFilters } =
+  usePagedList<NotificationView, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 1,
+    size: 15,
+    fetch: (f, { index, size }) => mode.value === 'mine'
+      ? listMyNotifications({ page: index, size })
+      : listStaffNotifications({ type: f.type || undefined, page: index, size }),
+  })
 
 const payloadObj = computed<Record<string, unknown>>(() => {
   try {
@@ -312,30 +317,6 @@ const lastError = computed(() =>
 function deliveryTone(status: string): string {
   return status === 'SENT' || status === 'DELIVERED' ? 'ACTIVE' : status === 'FAILED' || status === 'BOUNCED' ? 'FAILED' : 'PENDING'
 }
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = mode.value === 'mine'
-      ? await listMyNotifications({ page: page.value - 1, size: size.value })
-      : await listStaffNotifications({
-          type: filters.type || undefined,
-          page: page.value - 1,
-          size: size.value,
-        })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { page.value = 1; load() }
-function clearFilters() { filters.type = ''; reload() }
 
 async function openDetail(row: NotificationView) {
   taskDetail.value = null

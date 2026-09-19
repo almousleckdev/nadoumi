@@ -17,7 +17,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.postName)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -67,8 +67,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.pageNum"
-      v-model:size="filters.pageSize"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -139,16 +139,23 @@ import { useUserStore } from '@/stores/user'
 import {
   listPosts, getPost, createPost, updatePost, deletePosts, type SysPost,
 } from '@/api/system'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const rows = ref<SysPost[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
-const filters = reactive({ postName: '', pageNum: 1, pageSize: 10 })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<SysPost, { postName: string }>({
+    emptyFilters: () => ({ postName: '' }),
+    firstPage: 1,
+    size: 10,
+    fetch: (f, { page, size }) => listPosts({
+      postName: f.postName || undefined,
+      pageNum: page,
+      pageSize: size,
+    }),
+  })
 
 const drawerOpen = ref(false)
 const saving = ref(false)
@@ -168,28 +175,6 @@ const columns = computed(() => [
   { prop: 'status', label: t('posts.statusLabel'), width: 100, align: 'center' as const },
   { prop: 'actions', label: t('common.actions'), width: 150, align: 'right' as const },
 ])
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listPosts({
-      postName: filters.postName || undefined,
-      pageNum: filters.pageNum,
-      pageSize: filters.pageSize,
-    })
-    rows.value = res.rows
-    total.value = res.total
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.pageNum = 1; load() }
-function clearFilters() { filters.postName = ''; reload() }
 
 async function open(id?: number) {
   editing.value = id

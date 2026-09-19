@@ -18,7 +18,7 @@
     </PageHeader>
 
     <FilterBar
-      :dirty="Boolean(filters.userName || filters.status)"
+      :dirty="dirty"
       @clear="clearFilters"
     >
       <el-input
@@ -70,8 +70,8 @@
     </DataTable>
 
     <Pagination
-      v-model:page="filters.pageNum"
-      v-model:size="filters.pageSize"
+      v-model:page="page"
+      v-model:size="size"
       :total="total"
       @change="load"
     />
@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Delete, Search } from '@element-plus/icons-vue'
@@ -91,16 +91,26 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { listLoginLogs, cleanLoginLogs, type SysLogininfor } from '@/api/monitor'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const rows = ref<SysLogininfor[]>([])
-const total = ref(0)
-const loading = ref(false)
-const error = ref<string | null>(null)
-const filters = reactive({ userName: '', status: '', pageNum: 1, pageSize: 10 })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<SysLogininfor, { userName: string, status: string }>({
+    emptyFilters: () => ({ userName: '', status: '' }),
+    firstPage: 1,
+    size: 10,
+    fetch: (f, { page, size }) => listLoginLogs({
+      userName: f.userName || undefined,
+      status: f.status || undefined,
+      pageNum: page,
+      pageSize: size,
+      orderByColumn: 'infoId',
+      isAsc: 'desc',
+    }),
+  })
 
 const columns = computed(() => [
   { prop: 'userName', label: t('loginlog.user'), minWidth: 130 },
@@ -112,31 +122,6 @@ const columns = computed(() => [
   { prop: 'msg', label: t('loginlog.message'), minWidth: 140 },
   { prop: 'loginTime', label: t('loginlog.time'), width: 170 },
 ])
-
-async function load() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listLoginLogs({
-      userName: filters.userName || undefined,
-      status: filters.status || undefined,
-      pageNum: filters.pageNum,
-      pageSize: filters.pageSize,
-      orderByColumn: 'infoId',
-      isAsc: 'desc',
-    })
-    rows.value = res.rows
-    total.value = res.total
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || 'Could not load'
-  }
-  finally {
-    loading.value = false
-  }
-}
-function reload() { filters.pageNum = 1; load() }
-function clearFilters() { filters.userName = ''; filters.status = ''; reload() }
 
 async function clean() {
   if (!(await confirm({ title: t('loginlog.clean'), message: t('loginlog.cleanConfirm'), tone: 'danger' }))) return

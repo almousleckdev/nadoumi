@@ -21,17 +21,17 @@
       @clear="clearFilters"
     >
       <SearchInput
-        v-model="query.q"
+        v-model="filters.q"
         :placeholder="t('program.searchPlaceholder')"
-        @search="applyFilters"
+        @search="reload"
       />
       <el-select
-        v-model="query.universityId"
+        v-model="filters.universityId"
         :placeholder="t('program.university')"
         filterable
         clearable
         style="width: 220px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           v-for="u in universities"
@@ -41,11 +41,11 @@
         />
       </el-select>
       <el-select
-        v-model="query.type"
+        v-model="filters.type"
         :placeholder="t('program.type')"
         clearable
         style="width: 160px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           v-for="pt in PROGRAM_TYPES"
@@ -55,11 +55,11 @@
         />
       </el-select>
       <el-select
-        v-model="query.status"
+        v-model="filters.status"
         :placeholder="t('program.status')"
         clearable
         style="width: 140px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           v-for="s in STATUSES"
@@ -77,15 +77,15 @@
       :loading="loading"
       :error="error"
       :total="total"
-      :page="query.page"
-      :page-size="query.size"
+      :page="page"
+      :page-size="size"
       :clickable-rows="userStore.hasPerm('nad:program:edit')"
       :empty-title="t('program.emptyTitle')"
       :empty-description="t('program.emptyDesc')"
-      @update:page="(p: number) => { query.page = p; reload() }"
-      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
+      @update:page="(p: number) => { page = p; load() }"
+      @update:page-size="(s: number) => { size = s; page = 0; load() }"
       @row-click="(row) => openEdit(row as Program)"
-      @retry="reload"
+      @retry="load"
     >
       <template #cell-name="{ row }">
         <div class="p-name">
@@ -163,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
@@ -182,10 +182,27 @@ import DataTable from '@/components/ui/DataTable.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import type { DataTableColumn } from '@/components/ui/types'
 import ProgramDrawer from './ProgramDrawer.vue'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const userStore = useUserStore()
 const { confirm } = useConfirm()
+
+const emptyFilters = () => ({ q: '', universityId: undefined as number | undefined, type: '', status: '' })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<Program, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 0,
+    size: 20,
+    fetch: (f, { page, size }) => listPrograms({
+      q: f.q || undefined,
+      universityId: f.universityId,
+      type: f.type || undefined,
+      status: f.status || undefined,
+      page,
+      size,
+    }),
+  })
 
 const STATUSES: ProgramStatus[] = ['ACTIVE', 'INACTIVE']
 const columns: DataTableColumn[] = [
@@ -199,54 +216,11 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: t('common.actions'), width: 120, align: 'right' },
 ]
 
-const loading = ref(false)
-const error = ref<string | null>(null)
-const rows = ref<Program[]>([])
-const total = ref(0)
 const universities = ref<{ id: number, name: string }[]>([])
-const query = reactive({
-  q: '', universityId: undefined as number | undefined, type: '', status: '', page: 0, size: 20,
-})
-const dirty = computed(() =>
-  Boolean(query.q || query.universityId || query.type || query.status))
 
 listUniversities({ page: 0, size: 200 })
   .then(res => universities.value = res.content.map((u: University) => ({ id: u.id, name: u.name })))
   .catch(() => {})
-
-async function reload() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listPrograms({
-      q: query.q || undefined,
-      universityId: query.universityId,
-      type: query.type || undefined,
-      status: query.status || undefined,
-      page: query.page,
-      size: query.size,
-    })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || t('state.errorTitle')
-  }
-  finally {
-    loading.value = false
-  }
-}
-function applyFilters() {
-  query.page = 0
-  reload()
-}
-function clearFilters() {
-  query.q = ''
-  query.universityId = undefined
-  query.type = ''
-  query.status = ''
-  applyFilters()
-}
 
 const drawerOpen = ref(false)
 const editing = ref<Program | null>(null)
@@ -259,7 +233,7 @@ function openEdit(p: Program) {
   drawerOpen.value = true
 }
 function onSaved() {
-  reload()
+  load()
 }
 
 async function onDelete(p: Program) {
@@ -272,10 +246,10 @@ async function onDelete(p: Program) {
   if (!ok) return
   await deleteProgram(p.id)
   ElMessage.success(t('common.deleted'))
-  reload()
+  load()
 }
 
-onMounted(reload)
+onMounted(load)
 </script>
 
 <style scoped>

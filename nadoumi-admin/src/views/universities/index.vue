@@ -21,23 +21,23 @@
       @clear="clearFilters"
     >
       <SearchInput
-        v-model="query.q"
+        v-model="filters.q"
         :placeholder="t('university.searchPlaceholder')"
-        @search="applyFilters"
+        @search="reload"
       />
       <el-input
-        v-model="query.country"
+        v-model="filters.country"
         :placeholder="t('university.country')"
         maxlength="2"
         style="width: 120px"
-        @keyup.enter="applyFilters"
+        @keyup.enter="reload"
       />
       <el-select
-        v-model="query.status"
+        v-model="filters.status"
         :placeholder="t('university.status')"
         clearable
         style="width: 150px"
-        @change="applyFilters"
+        @change="reload"
       >
         <el-option
           v-for="s in STATUSES"
@@ -55,14 +55,14 @@
       :loading="loading"
       :error="error"
       :total="total"
-      :page="query.page"
-      :page-size="query.size"
+      :page="page"
+      :page-size="size"
       clickable-rows
       :empty-title="t('university.emptyTitle')"
       :empty-description="t('university.emptyDesc')"
-      @update:page="(p: number) => { query.page = p; reload() }"
-      @update:page-size="(s: number) => { query.size = s; query.page = 0; reload() }"
-      @retry="reload"
+      @update:page="(p: number) => { page = p; load() }"
+      @update:page-size="(s: number) => { size = s; page = 0; load() }"
+      @retry="load"
       @row-click="(row) => router.push(`/universities/${row.id}`)"
     >
       <template #cell-name="{ row }">
@@ -149,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
@@ -168,11 +168,27 @@ import DataTable from '@/components/ui/DataTable.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import type { DataTableColumn } from '@/components/ui/types'
 import UniversityDrawer from './UniversityDrawer.vue'
+import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 const { confirm } = useConfirm()
+
+const emptyFilters = () => ({ q: '', country: '', status: '' })
+const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
+  usePagedList<University, ReturnType<typeof emptyFilters>>({
+    emptyFilters,
+    firstPage: 0,
+    size: 20,
+    fetch: (f, { page, size }) => listUniversities({
+      q: f.q || undefined,
+      country: f.country || undefined,
+      status: f.status || undefined,
+      page,
+      size,
+    }),
+  })
 
 const STATUSES: UniversityStatus[] = ['ACTIVE', 'INACTIVE']
 const columns: DataTableColumn[] = [
@@ -185,47 +201,8 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: '', width: 130, align: 'right' },
 ]
 
-const loading = ref(false)
-const error = ref<string | null>(null)
-const rows = ref<University[]>([])
-const total = ref(0)
-const query = reactive({ q: '', country: '', status: '', page: 0, size: 20 })
-const dirty = computed(() => Boolean(query.q || query.country || query.status))
-
 function titleCase(s: string) {
   return s.charAt(0) + s.slice(1).toLowerCase()
-}
-
-async function reload() {
-  loading.value = true
-  error.value = null
-  try {
-    const res = await listUniversities({
-      q: query.q || undefined,
-      country: query.country || undefined,
-      status: query.status || undefined,
-      page: query.page,
-      size: query.size,
-    })
-    rows.value = res.content
-    total.value = res.totalElements
-  }
-  catch (e) {
-    error.value = (e as Error)?.message || t('state.errorTitle')
-  }
-  finally {
-    loading.value = false
-  }
-}
-function applyFilters() {
-  query.page = 0
-  reload()
-}
-function clearFilters() {
-  query.q = ''
-  query.country = ''
-  query.status = ''
-  applyFilters()
 }
 
 const drawerOpen = ref(false)
@@ -239,7 +216,7 @@ function openEdit(u: University) {
   drawerOpen.value = true
 }
 function onSaved() {
-  reload()
+  load()
 }
 
 async function onDelete(u: University) {
@@ -252,10 +229,10 @@ async function onDelete(u: University) {
   if (!ok) return
   await deleteUniversity(u.id)
   ElMessage.success(t('common.deleted'))
-  reload()
+  load()
 }
 
-onMounted(reload)
+onMounted(load)
 </script>
 
 <style scoped>

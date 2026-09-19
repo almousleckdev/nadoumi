@@ -57,6 +57,7 @@ declare module 'vue' {
     FormSection: typeof import('./src/components/ui/FormSection.vue')['default']
     ImageUpload: typeof import('./src/components/ui/ImageUpload.vue')['default']
     LoadingState: typeof import('./src/components/ui/LoadingState.vue')['default']
+    MoneyField: typeof import('./src/components/ui/MoneyField.vue')['default']
     PageHeader: typeof import('./src/components/PageHeader.vue')['default']
     Pagination: typeof import('./src/components/ui/Pagination.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

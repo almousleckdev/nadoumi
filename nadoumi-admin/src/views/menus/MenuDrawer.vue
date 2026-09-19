@@ -104,10 +104,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
 import Drawer from '@/components/ui/Drawer.vue'
+import { useDrawerForm } from '@/composables/useDrawerForm'
 import { getMenu, createMenu, updateMenu, menuTreeselect, type SysMenu } from '@/api/system'
 
 const props = defineProps<{ modelValue: boolean, menuId?: number, parentId?: number }>()
@@ -115,9 +115,6 @@ const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [] }>()
 const { t } = useI18n()
 
 const isEdit = computed(() => props.menuId != null)
-const formRef = ref<FormInstance>()
-const loading = ref(false)
-const saving = ref(false)
 const parentTree = ref<Array<{ id: number, label: string, children?: unknown[] }>>([])
 
 type MenuForm = Partial<SysMenu> & { menuType: 'M' | 'C' | 'F', parentId: number }
@@ -126,7 +123,6 @@ const blank = (): MenuForm => ({
   menuType: 'C', menuName: '', orderNum: 0, icon: '#', path: '', component: '',
   perms: '', visible: '0', status: '0', isFrame: '1', isCache: '0',
 })
-const form = reactive<MenuForm>(blank())
 const rules = { menuName: [{ required: true, trigger: 'blur', message: t('common.required') }] }
 
 function mapTree(nodes: SysMenu[]): Array<{ id: number, label: string, children?: unknown[] }> {
@@ -137,10 +133,10 @@ function mapTree(nodes: SysMenu[]): Array<{ id: number, label: string, children?
   }))
 }
 
-async function open() {
-  Object.assign(form, blank())
-  loading.value = true
-  try {
+const { formRef, form, loading, saving, save, reset } = useDrawerForm<MenuForm>({
+  isOpen: () => props.modelValue,
+  blank,
+  load: async (form) => {
     const tree = await menuTreeselect()
     parentTree.value = [
       { id: 0, label: t('menus.root'), children: mapTree((tree as unknown as { data: SysMenu[] }).data) },
@@ -149,26 +145,11 @@ async function open() {
       const res = await getMenu(props.menuId!)
       Object.assign(form, res.data)
     }
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
+  },
+  submit: async (form) => {
     if (isEdit.value) await updateMenu(form)
     else await createMenu(form)
-    ElMessage.success(t('common.saved'))
-    emit('saved')
-  }
-  finally {
-    saving.value = false
-  }
-}
-
-function reset() { Object.assign(form, blank()) }
-watch(() => props.modelValue, (o) => { if (o) open() })
+  },
+  onSaved: () => emit('saved'),
+})
 </script>
