@@ -11,6 +11,7 @@
         ref="formRef"
         :model="form"
         :rules="rules"
+        autocomplete="off"
         @keyup.enter="submit"
       >
         <el-form-item prop="username">
@@ -18,6 +19,7 @@
             v-model="form.username"
             :placeholder="t('common.username')"
             :prefix-icon="User"
+            autocomplete="off"
           />
         </el-form-item>
         <el-form-item prop="password">
@@ -27,6 +29,7 @@
             show-password
             :placeholder="t('common.password')"
             :prefix-icon="Lock"
+            autocomplete="new-password"
           />
         </el-form-item>
         <el-form-item
