@@ -92,10 +92,8 @@ export interface ScholarshipDocumentRequirementInput {
 }
 
 /** The student-safe view carried inside every ScholarshipResponse. */
-export interface ScholarshipView {
-  id: number
-  slug: string
-  referenceCode?: string | null
+/** The fields a scholarship has both as the API returns it and as staff enter it. */
+export interface ScholarshipFields {
   title: string
   summary?: string | null
   country: string
@@ -112,6 +110,12 @@ export interface ScholarshipView {
   requiresFinancialProof: boolean
   requiresFoundationYear: boolean
   deadline?: string | null
+}
+
+export interface ScholarshipView extends ScholarshipFields {
+  id: number
+  slug: string
+  referenceCode?: string | null
   applicationFee?: Money | null
   serviceFee?: Money | null
   slots?: number | null
@@ -167,23 +171,7 @@ export interface Scholarship {
   updatedAt?: string | null
 }
 
-export interface ScholarshipInput {
-  title: string
-  summary?: string | null
-  country: string
-  province?: string | null
-  city?: string | null
-  field?: string | null
-  teachingLanguage?: TeachingLanguage | null
-  fundingModel: FundingModel
-  hasStipend: boolean
-  nonDegreeDuration?: NonDegreeDuration | null
-  studyDurationMonths?: number | null
-  applicationChannel?: ApplicationChannel | null
-  agencyNumber?: string | null
-  requiresFinancialProof: boolean
-  requiresFoundationYear: boolean
-  deadline?: string | null
+export interface ScholarshipInput extends ScholarshipFields {
   benefits?: string | null
   requirements?: string | null
   policy?: string | null
