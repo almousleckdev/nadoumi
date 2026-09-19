@@ -61,6 +61,12 @@ public class ResourcesConfig implements WebMvcConfigurer
         config.addAllowedHeader("*");
         // 设置访问源请求方法
         config.addAllowedMethod("*");
+        // nadoumi-admin sends every request with withCredentials/cookies (the admin
+        // session cookie); without this, the browser blocks the preflight because
+        // Access-Control-Allow-Credentials is missing. Safe with a wildcard here
+        // specifically because addAllowedOriginPattern (not addAllowedOrigin) makes
+        // Spring echo the actual request origin rather than a literal "*".
+        config.setAllowCredentials(true);
         // 有效期 1800秒
         config.setMaxAge(1800L);
         // 添加映射路径，拦截一切请求
