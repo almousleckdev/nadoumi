@@ -108,10 +108,10 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
         <template v-if="step === 1">
           <div class="grid gap-4 sm:grid-cols-2">
             <NField :label="t('auth.givenName')" for="firstName" required>
-              <NInput id="firstName" v-model="form.firstName" class="uppercase" autocomplete="given-name" :maxlength="100" />
+              <NInput id="firstName" :model-value="form.firstName" autocomplete="given-name" :maxlength="100" @update:model-value="(v: string) => form.firstName = v.toUpperCase()" />
             </NField>
             <NField :label="t('auth.familyName')" for="lastName" required>
-              <NInput id="lastName" v-model="form.lastName" class="uppercase" autocomplete="family-name" :maxlength="100" />
+              <NInput id="lastName" :model-value="form.lastName" autocomplete="family-name" :maxlength="100" @update:model-value="(v: string) => form.lastName = v.toUpperCase()" />
             </NField>
           </div>
           <NAlert tone="info">{{ t('auth.passportNameHint') }}</NAlert>

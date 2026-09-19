@@ -29,15 +29,23 @@ beforeEach(() => {
 })
 
 describe('register: passport names', () => {
-  it('asks for given and family names and says they must match the passport, in UPPERCASE', async () => {
+  it('asks for given and family names and says they must match the passport', async () => {
     const w = await mountSuspended(Register)
 
     expect(w.text()).toContain('Given name')
     expect(w.text()).toContain('Family name')
     expect(w.text()).not.toContain('First name')
     expect(w.text()).toContain('exactly as they appear on your passport')
-    expect(w.text()).toContain('UPPERCASE')
-    expect(w.find('#firstName').element.closest('.uppercase')).not.toBeNull()
+  })
+
+  it('uppercases the given and family name as they are typed', async () => {
+    const w = await mountSuspended(Register)
+
+    await w.find('#firstName').setValue('ada')
+    await w.find('#lastName').setValue('lovelace')
+
+    expect((w.find('#firstName').element as HTMLInputElement).value).toBe('ADA')
+    expect((w.find('#lastName').element as HTMLInputElement).value).toBe('LOVELACE')
   })
 })
 
@@ -94,7 +102,7 @@ describe('register wizard (3 steps)', () => {
     const call = fetchImpl.mock.calls.find(c => c[0] === '/api/student-account')
     expect(call?.[1]).toMatchObject({
       method: 'POST',
-      body: expect.objectContaining({ firstName: 'Ada', lastName: 'Lovelace', email: 'ada@example.com', ticket: 'tkt_1' }),
+      body: expect.objectContaining({ firstName: 'ADA', lastName: 'LOVELACE', email: 'ada@example.com', ticket: 'tkt_1' }),
     })
     expect(nav).toHaveBeenCalledWith('/onboarding')
   })
