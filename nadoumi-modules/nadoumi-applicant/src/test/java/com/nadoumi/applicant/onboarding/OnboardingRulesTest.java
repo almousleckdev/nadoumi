@@ -26,7 +26,20 @@ class OnboardingRulesTest {
         a.setWhatsapp("+8613800000000");
         a.setEmail("a@example.com");
         a.setEmailVerifiedAt(LocalDateTime.now());
+        a.setDob(LocalDate.of(2004, 5, 1));
+        a.setPhotoMediaId(11L);
+        a.setPassportMediaId(12L);
+        a.setPassportNo("P1234567");
+        a.setPassportGivenName("AHMED");
+        a.setPassportFamilyName("HASSAN");
+        a.setPassportDob(LocalDate.of(2004, 5, 1));
+        a.setPassportIssueDate(TODAY.minusYears(2));
+        a.setPassportExpiryDate(TODAY.plusYears(8));
         return a;
+    }
+
+    private static OnboardingSection section(Applicant a, String key) {
+        return OnboardingRules.evaluate(a, TODAY).stream().filter(s -> s.key().equals(key)).findFirst().orElseThrow();
     }
 
     private static OnboardingSection profile(Applicant a) {
@@ -37,6 +50,38 @@ class OnboardingRulesTest {
         Applicant a = complete();
         change.accept(a);
         return a;
+    }
+
+    @Test
+    void shouldBeReady_onlyWhenProfilePhotoAndPassportAreAllSatisfied() {
+        assertThat(OnboardingRules.evaluate(complete(), TODAY)).allSatisfy(s -> assertThat(s.complete()).isTrue());
+        assertThat(OnboardingRules.evaluate(complete(), TODAY)).extracting(OnboardingSection::key)
+                .containsExactly("PROFILE", "PHOTO", "PASSPORT");
+    }
+
+    @Test
+    void shouldRequireAPhoto() {
+        assertThat(section(with(a -> a.setPhotoMediaId(null)), "PHOTO").missing()).containsExactly("photo");
+    }
+
+    @Test
+    void shouldRequireThePassportScanAndDetails() {
+        assertThat(section(with(a -> a.setPassportMediaId(null)), "PASSPORT").missing())
+                .containsExactly("passportScan");
+        assertThat(section(with(a -> { a.setPassportNo(null); a.setPassportExpiryDate(null); }), "PASSPORT").missing())
+                .containsExactly("passportDetails");
+    }
+
+    @Test
+    void shouldRejectAPassportThatExpiresWithinSixMonths() {
+        assertThat(section(with(a -> a.setPassportExpiryDate(TODAY.plusMonths(5))), "PASSPORT").missing())
+                .containsExactly("passportExpiry");
+    }
+
+    @Test
+    void shouldReopenThePassportSection_whenTheProfileNameNoLongerMatches() {
+        assertThat(section(with(a -> a.setGivenName("AHMAD")), "PASSPORT").missing())
+                .containsExactly("passportMatchesProfile");
     }
 
     @Test

@@ -24,6 +24,14 @@ public class Applicant {
     private String whatsapp;
     private LocalDateTime emailVerifiedAt;
     private LocalDateTime onboardedAt;
+    private Long passportMediaId;
+    private String passportGivenName;
+    private String passportFamilyName;
+    private LocalDate passportDob;
+    private LocalDate passportIssueDate;
+    private LocalDate passportExpiryDate;
+    private String passportReadMethod;
+    private boolean passportDataEdited;
     private ApplicantStatus status;
     private String createBy;
     private LocalDateTime createTime;
@@ -84,6 +92,34 @@ public class Applicant {
     /** Set only by the onboarding-complete endpoint; null = onboarding not finished. */
     public LocalDateTime getOnboardedAt() { return onboardedAt; }
     public void setOnboardedAt(LocalDateTime onboardedAt) { this.onboardedAt = onboardedAt; }
+
+    /** The scanned passport: a PROTECTED media asset, never a public URL. */
+    public Long getPassportMediaId() { return passportMediaId; }
+    public void setPassportMediaId(Long passportMediaId) { this.passportMediaId = passportMediaId; }
+
+    /** Holder data as read from, or typed off, the passport (compared with the profile). */
+    public String getPassportGivenName() { return passportGivenName; }
+    public void setPassportGivenName(String passportGivenName) { this.passportGivenName = passportGivenName; }
+
+    public String getPassportFamilyName() { return passportFamilyName; }
+    public void setPassportFamilyName(String passportFamilyName) { this.passportFamilyName = passportFamilyName; }
+
+    public LocalDate getPassportDob() { return passportDob; }
+    public void setPassportDob(LocalDate passportDob) { this.passportDob = passportDob; }
+
+    public LocalDate getPassportIssueDate() { return passportIssueDate; }
+    public void setPassportIssueDate(LocalDate passportIssueDate) { this.passportIssueDate = passportIssueDate; }
+
+    public LocalDate getPassportExpiryDate() { return passportExpiryDate; }
+    public void setPassportExpiryDate(LocalDate passportExpiryDate) { this.passportExpiryDate = passportExpiryDate; }
+
+    /** {@code MRZ} (read in the browser) or {@code MANUAL}. */
+    public String getPassportReadMethod() { return passportReadMethod; }
+    public void setPassportReadMethod(String passportReadMethod) { this.passportReadMethod = passportReadMethod; }
+
+    /** True when the student changed what the reader produced. */
+    public boolean isPassportDataEdited() { return passportDataEdited; }
+    public void setPassportDataEdited(boolean passportDataEdited) { this.passportDataEdited = passportDataEdited; }
 
     public ApplicantStatus getStatus() { return status; }
     public void setStatus(ApplicantStatus status) { this.status = status; }

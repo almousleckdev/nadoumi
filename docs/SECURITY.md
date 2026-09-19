@@ -237,6 +237,12 @@ Externals get **no** `sys_role`/`sys_menu` rows, so a student/agent token fails 
   section and requires `EDIT_PROFILE` on that applicant) can do it. `APPLICANT_EMAIL` one-time codes are issued only to
   an authenticated student for an applicant they can edit, never through the anonymous OTP routes. Tests:
   `StudentOnboardingFoundationTest`.
+- **Passport (IMPLEMENTED, onboarding v2 slice 2):** the scan is a PROTECTED `APPLICANT_PASSPORT` media asset, served only through a
+  short-lived signed URL with an access-log entry (a denied read is logged too). Staff need `nad:applicant:view` **and**
+  `nad:applicant:pii:view` for the scan; the passport number and date of birth are masked in API responses without the PII permission.
+  The browser-side MRZ read is a **consistency check, not identity verification**: the server compares the values the student confirms
+  with the profile, records whether they were read or typed (`passport_read_method`) and whether the student edited what was read
+  (`passport_data_edited`) so a reviewer can see it. A passport valid for six months or less is refused. Tests: `StudentPassportTest`.
 - **Scheduled jobs (IMPLEMENTED):** a `sys_job.invoke_target` is valid only as
   `<beanName>.run()` where the bean implements `SchedulableJob`
   (`ruoyi-common`). `JobRegistry` (`ruoyi-quartz`) resolves the bean from the

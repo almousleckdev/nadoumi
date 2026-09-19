@@ -86,7 +86,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(53); // V1 baseline + V2..V56
+        assertThat(applied).isEqualTo(54); // V1 baseline + V2..V57
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -194,6 +194,11 @@ class FlywayMigrationsIT {
                 + "AND table_name = 'nad_applicant' AND column_name IN ('gender','country_of_origin',"
                 + "'country_of_residence','native_language','wechat_id','whatsapp','email_verified_at','onboarded_at')"))
                 .isEqualTo("8");
+        // V57 — applicant passport data + protected scan
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_applicant' AND column_name IN ('passport_media_id','passport_given_name',"
+                + "'passport_family_name','passport_dob','passport_issue_date','passport_expiry_date',"
+                + "'passport_read_method','passport_data_edited')")).isEqualTo("8");
         // V29 — media reconciliation Quartz job, seeded paused
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'mediaReconciliationJob.run()'")).isEqualTo("1");
@@ -373,7 +378,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(52); // V2..V56
+        assertThat(applied).isEqualTo(53); // V2..V57
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

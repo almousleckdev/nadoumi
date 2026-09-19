@@ -32,6 +32,11 @@ public interface ApplicantMapper {
     /** Stamps onboarding complete once; a second call changes nothing. */
     int markOnboarded(@Param("id") long id);
 
+    int updatePassportMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
+
+    /** Writes the passport number and holder data; reads them from the given applicant's passport fields. */
+    int updatePassportData(Applicant applicant);
+
     int updatePhotoMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
 
     int updateStatus(

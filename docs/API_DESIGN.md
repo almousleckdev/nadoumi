@@ -88,6 +88,16 @@ Full design: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.m
 | `POST /api/student/applicants/{id}/email/otp` | `EDIT_PROFILE` | `{email}`; mails a code to the **new** address (IP rate-limited). `APPLICANT_EMAIL` codes are refused on the anonymous `/api/student/email-otp` routes |
 | `POST /api/student/applicants/{id}/email/verify` | `EDIT_PROFILE` | `{email, otp}`; stores the email and stamps `email_verified_at` |
 
+| `POST/GET /api/student/applicants/{id}/photo` | `EDIT_PROFILE` / `VIEW_PROFILE` | Protected profile photo: upload returns `{mediaId}`; GET returns `{url, expiresAt}` (`?json=1`) or a 302 to a short-lived signed URL |
+| `POST/GET /api/student/applicants/{id}/passport/scan` | `EDIT_PROFILE` / `VIEW_PROFILE` | Protected passport scan (JPEG, PNG or PDF, max 10 MB); same response shapes as the photo |
+| `PUT /api/student/applicants/{id}/passport` | `EDIT_PROFILE` | `{passportNo, givenName, familyName, dob, issueDate, expiryDate, readMethod: MRZ\|MANUAL, edited}`; **400** unless the passport is valid for **more than six months**; saved even when it disagrees with the profile and reports it |
+| `GET /api/student/applicants/{id}/passport` | `VIEW_PROFILE` | `{passportNo, givenName, familyName, dob, issueDate, expiryDate, readMethod, edited, scanUploaded, validForAdmission, matchesProfile, mismatches[{field, passportValue, profileValue}]}` |
+| `GET /api/staff/applicants/{id}/passport[/scan]` | `nad:applicant:view` (+ `nad:applicant:pii:view` for the scan) | Staff review; number and dates masked without the PII permission |
+
+Onboarding sections are now `PROFILE`, `PHOTO`, `PASSPORT`. `PASSPORT` is incomplete until the scan exists, the details are saved,
+the expiry is more than six months away, and the passport name and date of birth agree with the profile (re-checked at completion,
+so editing the profile afterwards re-opens it).
+
 `PUT /api/student/applicants/{id}` now accepts `gender` (`FEMALE|MALE|UNSPECIFIED`), `countryOfOrigin`,
 `countryOfResidence`, `nativeLanguage`, `wechatId`, `whatsapp`; stores names UPPERCASE; rejects a date of
 birth in the future or under 17; and rejects a changed email that has not been verified. `ApplicantResponse`

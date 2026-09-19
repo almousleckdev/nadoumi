@@ -38,6 +38,14 @@ class OnboardingServiceTest {
         a.setPhone("+8613800000000");
         a.setWhatsapp("+8613800000000");
         a.setEmailVerifiedAt(LocalDateTime.now());
+        a.setPhotoMediaId(11L);
+        a.setPassportMediaId(12L);
+        a.setPassportNo("P1234567");
+        a.setPassportGivenName("AHMED");
+        a.setPassportFamilyName("HASSAN");
+        a.setPassportDob(a.getDob());
+        a.setPassportIssueDate(LocalDate.now().minusYears(2));
+        a.setPassportExpiryDate(LocalDate.now().plusYears(8));
         return a;
     }
 

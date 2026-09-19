@@ -1,7 +1,11 @@
 package com.nadoumi.applicant.web;
 
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
+import com.nadoumi.applicant.service.ApplicantMediaKind;
+import com.nadoumi.applicant.service.ApplicantMediaService;
 import com.nadoumi.applicant.service.ApplicantService;
+import com.nadoumi.applicant.service.PassportService;
+import com.nadoumi.applicant.web.response.PassportStatusResponse;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
 import com.nadoumi.applicant.web.request.ContactRequest;
 import com.nadoumi.applicant.web.response.ContactResponse;
@@ -11,14 +15,10 @@ import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
 import com.nadoumi.applicant.web.request.TestScoreRequest;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
-import com.nadoumi.common.media.MediaAccessLogContext;
-import com.nadoumi.common.media.SignedUrl;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
-import com.ruoyi.common.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +40,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class StaffApplicantController {
 
     private final ApplicantService service;
+    private final ApplicantMediaService media;
+    private final PassportService passports;
 
-    public StaffApplicantController(ApplicantService service) {
+    public StaffApplicantController(ApplicantService service, ApplicantMediaService media, PassportService passports) {
         this.service = service;
+        this.media = media;
+        this.passports = passports;
     }
 
     @GetMapping
@@ -89,48 +93,36 @@ public class StaffApplicantController {
         service.archive(id);
     }
 
-    // ---- profile photo (PROTECTED) ----
+    // ---- protected files: profile photo and passport scan ----
 
     @PostMapping("/{id}/photo")
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     @Log(title = "Applicant photo", businessType = BusinessType.UPDATE)
-    public PhotoUploaded uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return new PhotoUploaded(service.uploadPhoto(id, file));
+    public ProtectedMediaResponses.Uploaded uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return new ProtectedMediaResponses.Uploaded(media.upload(id, ApplicantMediaKind.PHOTO, file));
     }
 
     @GetMapping("/{id}/photo")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
-    public ResponseEntity<PhotoUrl> photo(@PathVariable Long id,
-            @RequestParam(name = "json", required = false) String json,
-            HttpServletRequest request) {
-        MediaAccessLogContext ctx = new MediaAccessLogContext(
-                actorUserId(), null, null, null,
-                request.getRemoteAddr(), request.getHeader("User-Agent"));
-        SignedUrl signed = service.photoUrl(id, ctx);
-        String accept = request.getHeader("Accept");
-        boolean wantsJson = "1".equals(json) || (accept != null && accept.contains("application/json"));
-        if (wantsJson) {
-            return ResponseEntity.ok(new PhotoUrl(signed.url(), signed.expiresAt().toString()));
-        }
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(signed.url())).build();
+    public ResponseEntity<ProtectedMediaResponses.Url> photo(@PathVariable Long id,
+            @RequestParam(name = "json", required = false) String json, HttpServletRequest request) {
+        return ProtectedMediaResponses.signed(
+                media.signedUrl(id, ApplicantMediaKind.PHOTO, ProtectedMediaResponses.accessContext(request)), json, request);
     }
 
-    private static long actorUserId() {
-        try {
-            Long id = SecurityUtils.getUserId();
-            return id == null ? 0L : id;
-        }
-        catch (RuntimeException e) {
-            return 0L;
-        }
+    /** The passport scan is identity-document PII: staff need the PII permission as well as view. */
+    @GetMapping("/{id}/passport/scan")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:view') and @ss.hasPermi('nad:applicant:pii:view')")
+    public ResponseEntity<ProtectedMediaResponses.Url> passportScan(@PathVariable Long id,
+            @RequestParam(name = "json", required = false) String json, HttpServletRequest request) {
+        return ProtectedMediaResponses.signed(
+                media.signedUrl(id, ApplicantMediaKind.PASSPORT, ProtectedMediaResponses.accessContext(request)), json, request);
     }
 
-    /** {@code POST .../photo} result — the new media id only; PROTECTED bytes carry no URL here. */
-    public record PhotoUploaded(long mediaId) {
-    }
-
-    /** {@code GET .../photo?json=1} result. */
-    public record PhotoUrl(String url, String expiresAt) {
+    @GetMapping("/{id}/passport")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
+    public PassportStatusResponse passport(@PathVariable Long id) {
+        return passports.status(id);
     }
 
     @GetMapping("/{id}/education")

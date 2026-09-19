@@ -3,6 +3,11 @@ package com.nadoumi.applicant.web;
 import com.nadoumi.applicant.onboarding.OnboardingService;
 import com.nadoumi.applicant.onboarding.OnboardingStatus;
 import com.nadoumi.applicant.service.ApplicantEmailService;
+import com.nadoumi.applicant.service.ApplicantMediaKind;
+import com.nadoumi.applicant.service.ApplicantMediaService;
+import com.nadoumi.applicant.service.PassportService;
+import com.nadoumi.applicant.web.request.PassportRequest;
+import com.nadoumi.applicant.web.response.PassportStatusResponse;
 import com.nadoumi.applicant.service.ApplicantService;
 import com.nadoumi.applicant.web.request.EmailCodeRequest;
 import com.nadoumi.applicant.web.request.EmailVerifyRequest;
@@ -18,12 +23,8 @@ import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.request.SelfApplicantRequest;
 import com.nadoumi.applicant.web.request.TestScoreRequest;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
-import com.nadoumi.common.media.MediaAccessLogContext;
-import com.nadoumi.common.media.SignedUrl;
-import com.ruoyi.common.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,12 +48,16 @@ public class StudentApplicantController {
     private final ApplicantService service;
     private final ApplicantEmailService emailService;
     private final OnboardingService onboarding;
+    private final ApplicantMediaService media;
+    private final PassportService passports;
 
     public StudentApplicantController(ApplicantService service, ApplicantEmailService emailService,
-            OnboardingService onboarding) {
+            OnboardingService onboarding, ApplicantMediaService media, PassportService passports) {
         this.service = service;
         this.emailService = emailService;
         this.onboarding = onboarding;
+        this.media = media;
+        this.passports = passports;
     }
 
     @GetMapping
@@ -109,46 +114,51 @@ public class StudentApplicantController {
         return onboarding.complete(id);
     }
 
-    // ---- profile photo (PROTECTED) ----
+    // ---- protected files: profile photo and passport scan ----
 
     @PostMapping("/{id}/photo")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
-    public PhotoUploaded uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return new PhotoUploaded(service.uploadPhoto(id, file));
+    public ProtectedMediaResponses.Uploaded uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        return new ProtectedMediaResponses.Uploaded(media.upload(id, ApplicantMediaKind.PHOTO, file));
     }
 
     @GetMapping("/{id}/photo")
     @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
-    public ResponseEntity<PhotoUrl> photo(@PathVariable Long id,
-            @RequestParam(name = "json", required = false) String json,
-            HttpServletRequest request) {
-        MediaAccessLogContext ctx = new MediaAccessLogContext(
-                actorUserId(), null, null, null,
-                request.getRemoteAddr(), request.getHeader("User-Agent"));
-        SignedUrl signed = service.photoUrl(id, ctx);
-        String accept = request.getHeader("Accept");
-        boolean wantsJson = "1".equals(json) || (accept != null && accept.contains("application/json"));
-        if (wantsJson) {
-            return ResponseEntity.ok(new PhotoUrl(signed.url(), signed.expiresAt().toString()));
-        }
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(signed.url())).build();
+    public ResponseEntity<ProtectedMediaResponses.Url> photo(@PathVariable Long id,
+            @RequestParam(name = "json", required = false) String json, HttpServletRequest request) {
+        return ProtectedMediaResponses.signed(
+                media.signedUrl(id, ApplicantMediaKind.PHOTO, ProtectedMediaResponses.accessContext(request)), json, request);
     }
 
-    private static long actorUserId() {
-        try {
-            Long id = SecurityUtils.getUserId();
-            return id == null ? 0L : id;
-        }
-        catch (RuntimeException e) {
-            return 0L;
-        }
+    @PostMapping("/{id}/passport/scan")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public ProtectedMediaResponses.Uploaded uploadPassportScan(@PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        return new ProtectedMediaResponses.Uploaded(media.upload(id, ApplicantMediaKind.PASSPORT, file));
     }
 
-    public record PhotoUploaded(long mediaId) {
+    @GetMapping("/{id}/passport/scan")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
+    public ResponseEntity<ProtectedMediaResponses.Url> passportScan(@PathVariable Long id,
+            @RequestParam(name = "json", required = false) String json, HttpServletRequest request) {
+        return ProtectedMediaResponses.signed(
+                media.signedUrl(id, ApplicantMediaKind.PASSPORT, ProtectedMediaResponses.accessContext(request)), json, request);
     }
 
-    public record PhotoUrl(String url, String expiresAt) {
+    // ---- passport details ----
+
+    @GetMapping("/{id}/passport")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
+    public PassportStatusResponse passport(@PathVariable Long id) {
+        return passports.status(id);
+    }
+
+    @PutMapping("/{id}/passport")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public PassportStatusResponse savePassport(@PathVariable Long id, @Valid @RequestBody PassportRequest req) {
+        return passports.save(id, req);
     }
 
     @GetMapping("/{id}/education")

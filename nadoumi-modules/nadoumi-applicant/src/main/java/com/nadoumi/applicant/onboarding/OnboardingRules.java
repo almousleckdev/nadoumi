@@ -2,6 +2,7 @@ package com.nadoumi.applicant.onboarding;
 
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.rules.AgeRules;
+import com.nadoumi.applicant.rules.PassportRules;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +15,45 @@ import java.util.List;
 public final class OnboardingRules {
 
     public static final String PROFILE = "PROFILE";
+    public static final String PHOTO = "PHOTO";
+    public static final String PASSPORT = "PASSPORT";
 
     private OnboardingRules() {
     }
 
     public static List<OnboardingSection> evaluate(Applicant a, LocalDate today) {
-        return List.of(profile(a, today));
+        return List.of(profile(a, today), photo(a), passport(a, today));
+    }
+
+    private static OnboardingSection photo(Applicant a) {
+        return OnboardingSection.of(PHOTO, a.getPhotoMediaId() == null ? List.of("photo") : List.of());
+    }
+
+    /**
+     * The passport must be scanned, its details saved, valid for more than six months, and
+     * agree with the profile. Editing the profile names or date of birth afterwards
+     * re-opens this section, because the comparison is re-run here.
+     */
+    private static OnboardingSection passport(Applicant a, LocalDate today) {
+        List<String> missing = new ArrayList<>();
+        if (a.getPassportMediaId() == null) {
+            missing.add("passportScan");
+        }
+        boolean hasDetails = !isBlank(a.getPassportNo()) && a.getPassportIssueDate() != null
+                && a.getPassportExpiryDate() != null && a.getPassportGivenName() != null
+                && a.getPassportFamilyName() != null && a.getPassportDob() != null;
+        if (!hasDetails) {
+            missing.add("passportDetails");
+            return OnboardingSection.of(PASSPORT, missing);
+        }
+        if (!PassportRules.isValidForAdmission(a.getPassportExpiryDate(), today)) {
+            missing.add("passportExpiry");
+        }
+        if (!PassportRules.mismatches(a.getGivenName(), a.getFamilyName(), a.getDob(),
+                a.getPassportGivenName(), a.getPassportFamilyName(), a.getPassportDob()).isEmpty()) {
+            missing.add("passportMatchesProfile");
+        }
+        return OnboardingSection.of(PASSPORT, missing);
     }
 
     private static OnboardingSection profile(Applicant a, LocalDate today) {
