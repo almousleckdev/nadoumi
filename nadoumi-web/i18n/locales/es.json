@@ -1782,7 +1782,7 @@
     }
   },
   "profileForm": {
-    "nameNotice": "Escribe tus nombres exactamente como aparecen en tu pasaporte. Se guardan en MAYÚSCULAS, aunque los escribas en minúsculas.",
+    "nameNotice": "Escribe tus nombres exactamente como aparecen en tu pasaporte.",
     "nameInvalid": "Usa solo letras, espacios, guiones y apóstrofos.",
     "dobHint": "Debes tener al menos 17 años.",
     "dobFuture": "La fecha de nacimiento no puede ser futura.",

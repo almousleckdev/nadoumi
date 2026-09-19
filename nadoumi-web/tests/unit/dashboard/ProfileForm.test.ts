@@ -35,7 +35,18 @@ describe('ProfileForm', () => {
     const w = await mountForm()
 
     expect(w.text()).toContain('exactly as they appear on your passport')
+    expect(w.text()).not.toContain('UPPERCASE')
     expect(w.find('#dob').attributes('max')).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+  })
+
+  it('uppercases the given and family name as they are typed, not just on save', async () => {
+    const w = await mountForm(null)
+
+    await w.find('#givenName').setValue('sam')
+    await w.find('#familyName').setValue('lee')
+
+    expect((w.find('#givenName').element as HTMLInputElement).value).toBe('SAM')
+    expect((w.find('#familyName').element as HTMLInputElement).value).toBe('LEE')
   })
 
   it('rejects a date of birth under 17 and does not submit', async () => {

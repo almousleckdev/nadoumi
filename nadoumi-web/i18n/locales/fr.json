@@ -1782,7 +1782,7 @@
     }
   },
   "profileForm": {
-    "nameNotice": "Saisissez vos noms exactement comme ils figurent sur votre passeport. Ils sont enregistrés en MAJUSCULES, même si vous les saisissez en minuscules.",
+    "nameNotice": "Saisissez vos noms exactement comme ils figurent sur votre passeport.",
     "nameInvalid": "Utilisez uniquement des lettres, des espaces, des traits d'union et des apostrophes.",
     "dobHint": "Vous devez avoir au moins 17 ans.",
     "dobFuture": "La date de naissance ne peut pas être dans le futur.",
