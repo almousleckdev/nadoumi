@@ -1,5 +1,6 @@
 package com.nadoumi.notification.job;
 
+import com.ruoyi.common.core.job.SchedulableJob;
 import com.nadoumi.notification.dispatch.NotificationDeliveryDispatcher;
 
 /**
@@ -9,7 +10,7 @@ import com.nadoumi.notification.dispatch.NotificationDeliveryDispatcher;
  * Delegates straight to {@link NotificationDeliveryDispatcher} — the same query
  * serves fresh PENDING rows and backed-off retries.
  */
-public class NotificationDispatchJob {
+public class NotificationDispatchJob implements SchedulableJob {
 
     private final NotificationDeliveryDispatcher dispatcher;
 
@@ -17,6 +18,7 @@ public class NotificationDispatchJob {
         this.dispatcher = dispatcher;
     }
 
+    @Override
     public void run() {
         dispatcher.run();
     }

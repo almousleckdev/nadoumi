@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.ruoyi.common.annotation.Log;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
@@ -86,25 +85,9 @@ public class SysJobController extends BaseController
         {
             return error("Failed to add job '" + job.getJobName() + "': invalid cron expression");
         }
-        else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI))
+        else if (!ScheduleUtils.isRegisteredJob(job.getInvokeTarget()))
         {
-            return error("Failed to add job '" + job.getJobName() + "': 'rmi' invocation is not allowed");
-        }
-        else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.LOOKUP_LDAP, Constants.LOOKUP_LDAPS }))
-        {
-            return error("Failed to add job '" + job.getJobName() + "': 'ldap(s)' invocation is not allowed");
-        }
-        else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.HTTP, Constants.HTTPS }))
-        {
-            return error("Failed to add job '" + job.getJobName() + "': 'http(s)' invocation is not allowed");
-        }
-        else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), Constants.JOB_ERROR_STR))
-        {
-            return error("Failed to add job '" + job.getJobName() + "': the target string is not allowed");
-        }
-        else if (!ScheduleUtils.whiteList(job.getInvokeTarget()))
-        {
-            return error("Failed to add job '" + job.getJobName() + "': the target is not in the allow-list");
+            return error("Failed to add job '" + job.getJobName() + "': the target must be '<registeredJobBean>.run()'");
         }
         job.setCreateBy(getUsername());
         return toAjax(jobService.insertJob(job));
@@ -122,25 +105,9 @@ public class SysJobController extends BaseController
         {
             return error("Failed to update job '" + job.getJobName() + "': invalid cron expression");
         }
-        else if (StringUtils.containsIgnoreCase(job.getInvokeTarget(), Constants.LOOKUP_RMI))
+        else if (!ScheduleUtils.isRegisteredJob(job.getInvokeTarget()))
         {
-            return error("Failed to update job '" + job.getJobName() + "': 'rmi' invocation is not allowed");
-        }
-        else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.LOOKUP_LDAP, Constants.LOOKUP_LDAPS }))
-        {
-            return error("Failed to update job '" + job.getJobName() + "': 'ldap(s)' invocation is not allowed");
-        }
-        else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), new String[] { Constants.HTTP, Constants.HTTPS }))
-        {
-            return error("Failed to update job '" + job.getJobName() + "': 'http(s)' invocation is not allowed");
-        }
-        else if (StringUtils.containsAnyIgnoreCase(job.getInvokeTarget(), Constants.JOB_ERROR_STR))
-        {
-            return error("Failed to update job '" + job.getJobName() + "': the target string is not allowed");
-        }
-        else if (!ScheduleUtils.whiteList(job.getInvokeTarget()))
-        {
-            return error("Failed to update job '" + job.getJobName() + "': the target is not in the allow-list");
+            return error("Failed to update job '" + job.getJobName() + "': the target must be '<registeredJobBean>.run()'");
         }
         job.setUpdateBy(getUsername());
         return toAjax(jobService.updateJob(job));

@@ -222,6 +222,14 @@ Externals get **no** `sys_role`/`sys_menu` rows, so a student/agent token fails 
 - **Upload filter:** RuoYi blocks a denylist of extensions (incl. `.html` per commit
   history). See `docs/DOCUMENT_MANAGEMENT.md` for the Nadoumi-grade replacement.
 - **`@RepeatSubmit`** AOP guards double submits; `@RateLimiter` (Redis) available.
+- **Scheduled jobs (IMPLEMENTED):** a `sys_job.invoke_target` is valid only as
+  `<beanName>.run()` where the bean implements `SchedulableJob`
+  (`ruoyi-common`). `JobRegistry` (`ruoyi-quartz`) resolves the bean from the
+  injected registered set; classes by name, other methods and arguments are never
+  resolved. This replaced RuoYi's string-reflection invoker and its package
+  whitelist/blacklist, which any class under an allowed package could satisfy.
+  Adding a scheduled job means implementing `SchedulableJob` on a Spring bean.
+  Tests: `JobRegistryTest`, `JobRegistryWiringTest`.
 
 ## 5. Scholarship / University / Partnership confidentiality (BASELINE — scholarship layer BUILT & TESTED, R3)
 

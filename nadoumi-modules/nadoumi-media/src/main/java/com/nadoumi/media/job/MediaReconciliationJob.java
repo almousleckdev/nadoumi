@@ -1,5 +1,6 @@
 package com.nadoumi.media.job;
 
+import com.ruoyi.common.core.job.SchedulableJob;
 import com.nadoumi.common.media.MediaStorageService;
 import com.nadoumi.media.config.MediaProperties;
 import com.nadoumi.media.domain.MediaAsset;
@@ -27,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * one bad object never aborts the sweep. Logs counts only — never a URL or a
  * secret (spec §I.10).</p>
  */
-public class MediaReconciliationJob {
+public class MediaReconciliationJob implements SchedulableJob {
 
     private static final Logger log = LoggerFactory.getLogger(MediaReconciliationJob.class);
 
@@ -48,6 +49,7 @@ public class MediaReconciliationJob {
     }
 
     /** Quartz entry point. */
+    @Override
     public void run() {
         LocalDateTime before = LocalDateTime.now().minusDays(properties.getReconcileGraceDays());
         List<MediaAsset> candidates = assetMapper.findStaleDeleted(before);

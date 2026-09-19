@@ -1,5 +1,6 @@
 package com.nadoumi.notification.job;
 
+import com.ruoyi.common.core.job.SchedulableJob;
 import com.nadoumi.notification.domain.OutboxEvent;
 import com.nadoumi.notification.domain.OutboxStatus;
 import com.nadoumi.notification.mapper.OutboxEventMapper;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * error is logged for operational follow-up. Logs counts and event types only —
  * never the payload body ({@code docs/SECURITY.md} §6).</p>
  */
-public class OutboxPollerJob {
+public class OutboxPollerJob implements SchedulableJob {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxPollerJob.class);
 
@@ -48,6 +49,7 @@ public class OutboxPollerJob {
     }
 
     /** Quartz entry point. */
+    @Override
     public void run() {
         List<OutboxEvent> batch = mapper.findDispatchable(BATCH_SIZE);
         if (batch.isEmpty()) {

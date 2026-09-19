@@ -10,7 +10,6 @@ import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.TriggerBuilder;
 import org.quartz.TriggerKey;
-import com.ruoyi.common.constant.Constants;
 import com.ruoyi.common.constant.ScheduleConstants;
 import com.ruoyi.common.exception.job.TaskException;
 import com.ruoyi.common.exception.job.TaskException.Code;
@@ -120,22 +119,10 @@ public class ScheduleUtils
     }
 
     /**
-     * 检查包名是否为白名单配置
-     * 
-     * @param invokeTarget 目标字符串
-     * @return 结果
+     * Whether the target is a registered job in the form {@code <beanName>.run()}.
      */
-    public static boolean whiteList(String invokeTarget)
+    public static boolean isRegisteredJob(String invokeTarget)
     {
-        String packageName = StringUtils.substringBefore(invokeTarget, "(");
-        int count = StringUtils.countMatches(packageName, ".");
-        if (count > 1)
-        {
-            return StringUtils.startsWithAny(invokeTarget, Constants.JOB_WHITELIST_STR);
-        }
-        Object obj = SpringUtils.getBean(StringUtils.split(invokeTarget, ".")[0]);
-        String beanPackageName = obj.getClass().getPackage().getName();
-        return StringUtils.startsWithAny(beanPackageName, Constants.JOB_WHITELIST_STR)
-                && !StringUtils.startsWithAny(beanPackageName, Constants.JOB_ERROR_STR);
+        return SpringUtils.getBean(JobRegistry.class).isAllowed(invokeTarget);
     }
 }

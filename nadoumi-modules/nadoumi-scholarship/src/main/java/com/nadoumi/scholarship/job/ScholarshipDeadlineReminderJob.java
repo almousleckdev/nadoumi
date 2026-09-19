@@ -1,5 +1,6 @@
 package com.nadoumi.scholarship.job;
 
+import com.ruoyi.common.core.job.SchedulableJob;
 import com.alibaba.fastjson2.JSONObject;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * every active registered student — IN_APP always, EMAIL by preference.
  */
 @Component("scholarshipDeadlineReminderJob")
-public class ScholarshipDeadlineReminderJob {
+public class ScholarshipDeadlineReminderJob implements SchedulableJob {
 
     private static final Logger log = LoggerFactory.getLogger(ScholarshipDeadlineReminderJob.class);
 
@@ -38,6 +39,7 @@ public class ScholarshipDeadlineReminderJob {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public void run() {
         List<Scholarship> due = mapper.findDueForDeadlineReminder(REMINDER_WINDOW_DAYS);
         if (due.isEmpty()) {
