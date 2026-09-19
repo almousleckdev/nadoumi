@@ -8,11 +8,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.applicant.domain.Applicant;
+import com.nadoumi.applicant.domain.ApplicantContact;
+import com.nadoumi.applicant.domain.ApplicantEducation;
+import com.nadoumi.applicant.domain.ApplicantInterest;
+import com.nadoumi.applicant.domain.ApplicantResidence;
+import com.nadoumi.applicant.domain.enums.ContactRelation;
+import com.nadoumi.applicant.domain.enums.StudyLevel;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
+import com.nadoumi.applicant.service.ApplicantAccessGuard;
+import com.nadoumi.applicant.service.InterestService;
+import com.nadoumi.applicant.service.ResidenceService;
 import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.common.exception.NadBadRequestException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -22,7 +33,27 @@ class OnboardingServiceTest {
 
     private final ApplicantMapper mapper = mock(ApplicantMapper.class);
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
-    private final OnboardingService service = new OnboardingService(mapper, access);
+    private final InterestService interests = mock(InterestService.class);
+    private final ResidenceService residence = mock(ResidenceService.class);
+    private final OnboardingService service =
+            new OnboardingService(mapper, interests, residence, new ApplicantAccessGuard(access));
+
+    /** Every section other than the profile, photo and passport is satisfied by these. */
+    private void otherSectionsComplete() {
+        ApplicantInterest interest = new ApplicantInterest();
+        interest.setDesiredLevel(StudyLevel.MASTER);
+        interest.setFields(List.of("BUSINESS"));
+        interest.setCities(List.of("Beijing"));
+        ApplicantResidence home = new ApplicantResidence();
+        home.setInChina(false);
+        ApplicantContact guardian = new ApplicantContact();
+        guardian.setRelation(ContactRelation.GUARDIAN);
+        guardian.setPhone("+201000000");
+        when(mapper.findEducation(ID)).thenReturn(List.of(new ApplicantEducation()));
+        when(mapper.findContacts(ID)).thenReturn(List.of(guardian));
+        when(interests.load(ID)).thenReturn(Optional.of(interest));
+        when(residence.load(ID)).thenReturn(Optional.of(home));
+    }
 
     private static Applicant filled() {
         Applicant a = new Applicant();
@@ -55,6 +86,7 @@ class OnboardingServiceTest {
         Applicant before = filled();
         Applicant after = filled();
         after.setOnboardedAt(LocalDateTime.now());
+        otherSectionsComplete();
         when(mapper.findById(ID)).thenReturn(before, after);
 
         OnboardingStatus status = service.complete(ID);
@@ -89,6 +121,7 @@ class OnboardingServiceTest {
         when(access.canAccessApplicant(ID, "EDIT_PROFILE")).thenReturn(true);
         Applicant done = filled();
         done.setOnboardedAt(LocalDateTime.now().minusDays(1));
+        otherSectionsComplete();
         when(mapper.findById(ID)).thenReturn(done);
 
         assertThat(service.complete(ID).complete()).isTrue();
@@ -100,6 +133,7 @@ class OnboardingServiceTest {
         when(access.canAccessApplicant(ID, "VIEW_PROFILE")).thenReturn(true);
         Applicant incomplete = filled();
         incomplete.setPhone(null);
+        otherSectionsComplete();
         when(mapper.findById(ID)).thenReturn(incomplete);
 
         OnboardingStatus status = service.status(ID);

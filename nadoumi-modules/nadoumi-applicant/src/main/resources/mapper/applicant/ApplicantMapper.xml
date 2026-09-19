@@ -20,6 +20,7 @@
         <result property="whatsapp"    column="whatsapp"/>
         <result property="emailVerifiedAt" column="email_verified_at"/>
         <result property="onboardedAt" column="onboarded_at"/>
+        <result property="welcomedAt" column="welcomed_at"/>
         <result property="passportMediaId" column="passport_media_id"/>
         <result property="passportGivenName" column="passport_given_name"/>
         <result property="passportFamilyName" column="passport_family_name"/>
@@ -39,7 +40,7 @@
     <sql id="cols">
         id, given_name, family_name, dob, nationality, passport_no, email, phone, photo_media_id, status,
         gender, country_of_origin, country_of_residence, native_language, wechat_id, whatsapp,
-        email_verified_at, onboarded_at,
+        email_verified_at, onboarded_at, welcomed_at,
         passport_media_id, passport_given_name, passport_family_name, passport_dob, passport_issue_date,
         passport_expiry_date, passport_read_method, passport_data_edited,
         create_by, create_time, update_by, update_time, remark
@@ -101,6 +102,12 @@
         update nad_applicant set onboarded_at = now(), update_time = now() where id = #{id} and onboarded_at is null
     </update>
 
+    <!-- the celebration is shown once, and only to a student who has finished onboarding -->
+    <update id="markWelcomed">
+        update nad_applicant set welcomed_at = now(), update_time = now()
+        where id = #{id} and onboarded_at is not null and welcomed_at is null
+    </update>
+
     <update id="updatePassportMediaId">
         update nad_applicant set passport_media_id = #{mediaId}, update_time = now() where id = #{id}
     </update>
@@ -126,35 +133,46 @@
 
     <!-- education -->
     <resultMap id="education" type="com.nadoumi.applicant.domain.ApplicantEducation">
-        <id     property="id"          column="id"/>
-        <result property="applicantId" column="applicant_id"/>
-        <result property="institution" column="institution"/>
-        <result property="level"       column="level"/>
-        <result property="field"       column="field"/>
-        <result property="gpa"         column="gpa"/>
-        <result property="gpaScale"    column="gpa_scale"/>
-        <result property="startDate"   column="start_date"/>
-        <result property="endDate"     column="end_date"/>
+        <id     property="id"            column="id"/>
+        <result property="applicantId"   column="applicant_id"/>
+        <result property="institution"   column="institution"/>
+        <result property="country"       column="country"/>
+        <result property="city"          column="city"/>
+        <result property="level"         column="level"/>
+        <result property="qualification" column="qualification"/>
+        <result property="field"         column="field"/>
+        <result property="gpa"           column="gpa"/>
+        <result property="gpaScale"      column="gpa_scale"/>
+        <result property="startDate"     column="start_date"/>
+        <result property="endDate"       column="end_date"/>
+        <result property="current"       column="is_current"/>
     </resultMap>
 
+    <sql id="educationCols">
+        id, applicant_id, institution, country, city, level, qualification, field, gpa, gpa_scale, start_date, end_date,
+        is_current
+    </sql>
+
     <select id="findEducation" resultMap="education">
-        select id, applicant_id, institution, level, field, gpa, gpa_scale, start_date, end_date
-        from nad_applicant_education where applicant_id = #{applicantId} order by end_date desc, id desc
+        select <include refid="educationCols"/> from nad_applicant_education
+        where applicant_id = #{applicantId} order by is_current desc, end_date desc, start_date desc, id desc
     </select>
     <select id="findEducationById" resultMap="education">
-        select id, applicant_id, institution, level, field, gpa, gpa_scale, start_date, end_date
-        from nad_applicant_education where id = #{id}
+        select <include refid="educationCols"/> from nad_applicant_education where id = #{id}
     </select>
     <insert id="insertEducation" parameterType="com.nadoumi.applicant.domain.ApplicantEducation"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_applicant_education
-            (applicant_id, institution, level, field, gpa, gpa_scale, start_date, end_date, create_by, create_time)
-        values (#{applicantId}, #{institution}, #{level}, #{field}, #{gpa}, #{gpaScale}, #{startDate}, #{endDate}, '', now())
+            (applicant_id, institution, country, city, level, qualification, field, gpa, gpa_scale, start_date, end_date,
+             is_current, create_by, create_time)
+        values (#{applicantId}, #{institution}, #{country}, #{city}, #{level}, #{qualification}, #{field}, #{gpa},
+                #{gpaScale}, #{startDate}, #{endDate}, #{current}, '', now())
     </insert>
     <update id="updateEducation" parameterType="com.nadoumi.applicant.domain.ApplicantEducation">
         update nad_applicant_education set
-            institution = #{institution}, level = #{level}, field = #{field}, gpa = #{gpa},
-            gpa_scale = #{gpaScale}, start_date = #{startDate}, end_date = #{endDate}, update_time = now()
+            institution = #{institution}, country = #{country}, city = #{city}, level = #{level},
+            qualification = #{qualification}, field = #{field}, gpa = #{gpa}, gpa_scale = #{gpaScale},
+            start_date = #{startDate}, end_date = #{endDate}, is_current = #{current}, update_time = now()
         where id = #{id} and applicant_id = #{applicantId}
     </update>
     <delete id="deleteEducation">

@@ -29,6 +29,9 @@ public interface ApplicantMapper {
     /** Sets the contact email and stamps it verified. */
     int markEmailVerified(@Param("id") long id, @Param("email") String email);
 
+    /** Stamps the welcome celebration as seen, once, and only after onboarding is complete. */
+    int markWelcomed(@Param("id") long id);
+
     /** Stamps onboarding complete once; a second call changes nothing. */
     int markOnboarded(@Param("id") long id);
 

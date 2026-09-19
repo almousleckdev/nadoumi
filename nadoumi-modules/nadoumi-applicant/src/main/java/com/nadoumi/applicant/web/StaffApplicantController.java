@@ -4,6 +4,7 @@ import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.service.ApplicantMediaKind;
 import com.nadoumi.applicant.service.ApplicantMediaService;
 import com.nadoumi.applicant.service.ApplicantService;
+import com.nadoumi.applicant.service.EducationService;
 import com.nadoumi.applicant.service.PassportService;
 import com.nadoumi.applicant.web.response.PassportStatusResponse;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
@@ -42,11 +43,14 @@ public class StaffApplicantController {
     private final ApplicantService service;
     private final ApplicantMediaService media;
     private final PassportService passports;
+    private final EducationService education;
 
-    public StaffApplicantController(ApplicantService service, ApplicantMediaService media, PassportService passports) {
+    public StaffApplicantController(ApplicantService service, ApplicantMediaService media, PassportService passports,
+            EducationService education) {
         this.service = service;
         this.media = media;
         this.passports = passports;
+        this.education = education;
     }
 
     @GetMapping
@@ -128,14 +132,14 @@ public class StaffApplicantController {
     @GetMapping("/{id}/education")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
     public List<EducationResponse> education(@PathVariable Long id) {
-        return service.education(id);
+        return education.list(id);
     }
 
     @PostMapping("/{id}/education")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public EducationResponse addEducation(@PathVariable Long id, @Valid @RequestBody EducationRequest req) {
-        return service.addEducation(id, req);
+        return education.add(id, req);
     }
 
     @PutMapping("/{id}/education/{educationId}")
@@ -143,14 +147,14 @@ public class StaffApplicantController {
     @Log(title = "Applicant education", businessType = BusinessType.UPDATE)
     public EducationResponse updateEducation(@PathVariable Long id, @PathVariable Long educationId,
             @Valid @RequestBody EducationRequest req) {
-        return service.updateEducation(id, educationId, req);
+        return education.update(id, educationId, req);
     }
 
     @DeleteMapping("/{id}/education/{educationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public void deleteEducation(@PathVariable Long id, @PathVariable Long educationId) {
-        service.deleteEducation(id, educationId);
+        education.delete(id, educationId);
     }
 
     @GetMapping("/{id}/test-scores")

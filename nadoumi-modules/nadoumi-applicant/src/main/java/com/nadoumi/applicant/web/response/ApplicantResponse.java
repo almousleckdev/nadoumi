@@ -24,7 +24,8 @@ public record ApplicantResponse(
         String wechatId,
         String whatsapp,
         boolean emailVerified,
-        boolean onboardingComplete) {
+        boolean onboardingComplete,
+        boolean welcomePending) {
 
     private static final String MASK = "••••";
 
@@ -47,7 +48,8 @@ public record ApplicantResponse(
                 a.getWechatId(),
                 a.getWhatsapp(),
                 a.getEmailVerifiedAt() != null,
-                a.getOnboardedAt() != null);
+                a.getOnboardedAt() != null,
+                a.getOnboardedAt() != null && a.getWelcomedAt() == null);
     }
 
     private static String str(Object v) {

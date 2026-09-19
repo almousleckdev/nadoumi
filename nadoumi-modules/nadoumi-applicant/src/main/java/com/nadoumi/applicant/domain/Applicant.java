@@ -24,6 +24,7 @@ public class Applicant {
     private String whatsapp;
     private LocalDateTime emailVerifiedAt;
     private LocalDateTime onboardedAt;
+    private LocalDateTime welcomedAt;
     private Long passportMediaId;
     private String passportGivenName;
     private String passportFamilyName;
@@ -88,6 +89,10 @@ public class Applicant {
     /** When the contact email was proven by a one-time code; null = unverified. */
     public LocalDateTime getEmailVerifiedAt() { return emailVerifiedAt; }
     public void setEmailVerifiedAt(LocalDateTime emailVerifiedAt) { this.emailVerifiedAt = emailVerifiedAt; }
+
+    /** When the student saw the welcome celebration; null = not yet shown. */
+    public LocalDateTime getWelcomedAt() { return welcomedAt; }
+    public void setWelcomedAt(LocalDateTime welcomedAt) { this.welcomedAt = welcomedAt; }
 
     /** Set only by the onboarding-complete endpoint; null = onboarding not finished. */
     public LocalDateTime getOnboardedAt() { return onboardedAt; }

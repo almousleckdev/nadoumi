@@ -75,6 +75,24 @@ abstract class AbstractStudentIntegrationTest extends AbstractNadIntegrationTest
                 .header("Authorization", bearer(s.token())));
     }
 
+    /** Education, interests, location and a guardian: every section except profile, photo and passport. */
+    protected void fillProfileSections(Student s) throws Exception {
+        String auth = bearer(s.token());
+        mvc.perform(post(s.applicantUrl() + "/education").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"institution\":\"Cairo High School\",\"country\":\"EG\",\"level\":\"HIGH_SCHOOL\","
+                                + "\"startDate\":\"2018-09-01\",\"endDate\":\"2021-06-30\"}"))
+                .andExpect(status().isCreated());
+        mvc.perform(put(s.applicantUrl() + "/interests").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"desiredLevel\":\"MASTER\",\"fields\":[\"BUSINESS\"],\"cities\":[\"Beijing\"]}"))
+                .andExpect(status().isOk());
+        mvc.perform(put(s.applicantUrl() + "/residence").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"inChina\":false,\"country\":\"EG\",\"city\":\"Cairo\"}"))
+                .andExpect(status().isOk());
+        mvc.perform(post(s.applicantUrl() + "/contacts").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"relation\":\"GUARDIAN\",\"name\":\"Parent One\",\"phone\":\"+201000000\"}"))
+                .andExpect(status().isCreated());
+    }
+
     protected static String uniqueEmail() {
         return "stu" + SEQ.incrementAndGet() + "-" + System.nanoTime() + "@example.test";
     }

@@ -3,11 +3,9 @@ package com.nadoumi.applicant.service;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
 import com.nadoumi.common.access.ApplicantCapability;
-import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.identity.service.otp.OtpPurpose;
 import com.nadoumi.identity.service.otp.OtpService;
 import java.util.Locale;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,33 +17,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApplicantEmailService {
 
     private final ApplicantMapper mapper;
-    private final NadoumiAccessService access;
+    private final ApplicantAccessGuard guard;
     private final OtpService otp;
 
-    public ApplicantEmailService(ApplicantMapper mapper, NadoumiAccessService access, OtpService otp) {
+    public ApplicantEmailService(ApplicantMapper mapper, ApplicantAccessGuard guard, OtpService otp) {
         this.mapper = mapper;
-        this.access = access;
+        this.guard = guard;
         this.otp = otp;
     }
 
     public OtpService.IssueResult requestCode(Long applicantId, String email) {
-        requireEdit(applicantId);
+        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
         return otp.issue(normalize(email), OtpPurpose.APPLICANT_EMAIL, false);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public ApplicantResponse verify(Long applicantId, String email, String code) {
-        requireEdit(applicantId);
+        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
         String address = normalize(email);
         otp.verify(address, OtpPurpose.APPLICANT_EMAIL, code);
         mapper.markEmailVerified(applicantId, address);
         return ApplicantResponse.of(mapper.findById(applicantId), true);
-    }
-
-    private void requireEdit(Long applicantId) {
-        if (!access.canAccessApplicant(applicantId, ApplicantCapability.EDIT_PROFILE.name())) {
-            throw new AccessDeniedException("missing EDIT_PROFILE on applicant " + applicantId);
-        }
     }
 
     private static String normalize(String email) {

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.applicant.mapper.InterestMapper">
+
+    <resultMap id="interest" type="com.nadoumi.applicant.domain.ApplicantInterest">
+        <id     property="id"                  column="id"/>
+        <result property="applicantId"         column="applicant_id"/>
+        <result property="desiredLevel"        column="desired_level"/>
+        <result property="scholarshipInterest" column="scholarship_interest"/>
+        <result property="intakeYear"          column="intake_year"/>
+        <result property="intakeTerm"          column="intake_term"/>
+        <result property="teachingLanguage"    column="teaching_language"/>
+        <result property="notes"               column="notes"/>
+    </resultMap>
+
+    <select id="find" resultMap="interest">
+        select id, applicant_id, desired_level, scholarship_interest, intake_year, intake_term, teaching_language, notes
+        from nad_applicant_interest where applicant_id = #{applicantId}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.applicant.domain.ApplicantInterest"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_interest
+            (applicant_id, desired_level, scholarship_interest, intake_year, intake_term, teaching_language, notes,
+             create_by, create_time)
+        values
+            (#{applicantId}, #{desiredLevel}, #{scholarshipInterest}, #{intakeYear}, #{intakeTerm}, #{teachingLanguage},
+             #{notes}, '', now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.applicant.domain.ApplicantInterest">
+        update nad_applicant_interest set
+            desired_level = #{desiredLevel}, scholarship_interest = #{scholarshipInterest}, intake_year = #{intakeYear},
+            intake_term = #{intakeTerm}, teaching_language = #{teachingLanguage}, notes = #{notes}, update_time = now()
+        where applicant_id = #{applicantId}
+    </update>
+
+    <select id="findChoices" resultType="string">
+        select value from nad_applicant_interest_choice
+        where applicant_id = #{applicantId} and kind = #{kind} order by id
+    </select>
+
+    <delete id="deleteChoices">
+        delete from nad_applicant_interest_choice where applicant_id = #{applicantId}
+    </delete>
+
+    <insert id="insertChoices">
+        insert into nad_applicant_interest_choice (applicant_id, kind, value) values
+        <foreach collection="values" item="v" separator=",">(#{applicantId}, #{kind}, #{v})</foreach>
+    </insert>
+</mapper>

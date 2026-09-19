@@ -122,6 +122,7 @@ class StudentPassportTest extends AbstractStudentIntegrationTest {
         Student s = register("complete", "flow");
         String complete = s.applicantUrl() + "/onboarding/complete";
         update(s, profile(s, DOB)).andExpect(status().isOk());
+        fillProfileSections(s);
 
         mvc.perform(post(complete).header("Authorization", bearer(s.token()))).andExpect(status().isBadRequest());
         upload(s, "/photo", "me.png").andExpect(status().isCreated());

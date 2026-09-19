@@ -30,7 +30,7 @@ class ApplicantServiceTest {
     private final UserApplicantAccessService grants = mock(UserApplicantAccessService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final PermissionService rbac = mock(PermissionService.class);
-    private final ApplicantService service = new ApplicantService(mapper, access, grants, caller, rbac);
+    private final ApplicantService service = new ApplicantService(mapper, access, grants, caller, rbac, new ApplicantAccessGuard(access));
 
     private static Applicant saved() {
         Applicant a = new Applicant();

@@ -1,6 +1,9 @@
 package com.nadoumi.applicant.onboarding;
 
 import com.nadoumi.applicant.domain.Applicant;
+import com.nadoumi.applicant.domain.ApplicantInterest;
+import com.nadoumi.applicant.domain.ApplicantResidence;
+import com.nadoumi.applicant.domain.enums.ContactRelation;
 import com.nadoumi.applicant.rules.AgeRules;
 import com.nadoumi.applicant.rules.PassportRules;
 import java.time.LocalDate;
@@ -17,12 +20,56 @@ public final class OnboardingRules {
     public static final String PROFILE = "PROFILE";
     public static final String PHOTO = "PHOTO";
     public static final String PASSPORT = "PASSPORT";
+    public static final String EDUCATION = "EDUCATION";
+    public static final String INTERESTS = "INTERESTS";
+    public static final String LOCATION = "LOCATION";
+    public static final String CONTACT = "CONTACT";
 
     private OnboardingRules() {
     }
 
-    public static List<OnboardingSection> evaluate(Applicant a, LocalDate today) {
-        return List.of(profile(a, today), photo(a), passport(a, today));
+    public static List<OnboardingSection> evaluate(OnboardingData data, LocalDate today) {
+        Applicant a = data.applicant();
+        return List.of(profile(a, today), photo(a), passport(a, today), education(data), interests(data),
+                location(data, today), contact(data));
+    }
+
+    private static OnboardingSection education(OnboardingData data) {
+        return OnboardingSection.of(EDUCATION, data.education().isEmpty() ? List.of("educationRecord") : List.of());
+    }
+
+    private static OnboardingSection interests(OnboardingData data) {
+        ApplicantInterest interest = data.interest();
+        if (interest == null) {
+            return OnboardingSection.of(INTERESTS, List.of("interests"));
+        }
+        List<String> missing = new ArrayList<>();
+        if (interest.getFields() == null || interest.getFields().isEmpty()) {
+            missing.add("fields");
+        }
+        if (interest.getCities() == null || interest.getCities().isEmpty()) {
+            missing.add("cities");
+        }
+        return OnboardingSection.of(INTERESTS, missing);
+    }
+
+    /** A student in China must still hold a valid visa, so an expiry passing re-opens this section. */
+    private static OnboardingSection location(OnboardingData data, LocalDate today) {
+        ApplicantResidence residence = data.residence();
+        if (residence == null) {
+            return OnboardingSection.of(LOCATION, List.of("residence"));
+        }
+        boolean visaLapsed = residence.isInChina()
+                && (residence.getVisaExpiryDate() == null || !residence.getVisaExpiryDate().isAfter(today));
+        return OnboardingSection.of(LOCATION, visaLapsed ? List.of("visaExpiry") : List.of());
+    }
+
+    /** At least one guardian or emergency contact who can be reached by phone. */
+    private static OnboardingSection contact(OnboardingData data) {
+        boolean reachable = data.contacts().stream().anyMatch(c ->
+                (c.getRelation() == ContactRelation.GUARDIAN || c.getRelation() == ContactRelation.EMERGENCY)
+                        && !isBlank(c.getPhone()));
+        return OnboardingSection.of(CONTACT, reachable ? List.of() : List.of("guardianOrEmergencyContact"));
     }
 
     private static OnboardingSection photo(Applicant a) {

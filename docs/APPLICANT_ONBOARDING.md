@@ -11,7 +11,7 @@ Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md`
 > **Onboarding v2 (2026-09-19) supersedes the 7-step Revision 3 shell below.** Plan and slices:
 > `docs/superpowers/plans/2026-09-19-student-onboarding.md`. **Slice 1 (foundation and the gate) backend is
 > IMPLEMENTED:** server-side `onboarded_at` and completion endpoint, UPPERCASE names, 17+ date of birth,
-> new profile fields, verified contact email, prefilled applicant at registration. **Slice 2 (protected photo and passport scan, in-browser MRZ read behind a `PassportReader` SPI, passport details, six-month rule, profile comparison and mismatch message, `PHOTO`/`PASSPORT` completion sections) is IMPLEMENTED, backend and web.** Later slices are PLANNED.
+> new profile fields, verified contact email, prefilled applicant at registration. **Slice 2 (protected photo and passport scan, in-browser MRZ read behind a `PassportReader` SPI, passport details, six-month rule, profile comparison and mismatch message, `PHOTO`/`PASSPORT` completion sections) is IMPLEMENTED, backend and web.** **Slices 3 and 4 backend (education history, interests, location with the China branch, guardian contact, work experience, the once-only welcome record) are IMPLEMENTED.**
 
 ## Status legend
 

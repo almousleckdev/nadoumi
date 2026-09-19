@@ -36,7 +36,7 @@ class ApplicantMediaServiceTest {
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
     private final MediaGateway media = mock(MediaGateway.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
-    private final ApplicantMediaService service = new ApplicantMediaService(mapper, access, media, caller);
+    private final ApplicantMediaService service = new ApplicantMediaService(mapper, new ApplicantAccessGuard(access), media, caller);
 
     private static MockMultipartFile file() {
         return new MockMultipartFile("file", "scan.jpg", "image/jpeg", new byte[] { 1, 2, 3, 4 });

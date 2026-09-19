@@ -113,6 +113,10 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_media_asset");
         jdbc.update("delete from nad_user_applicant_access");
         jdbc.update("delete from nad_applicant_education");
+        jdbc.update("delete from nad_applicant_interest_choice");
+        jdbc.update("delete from nad_applicant_interest");
+        jdbc.update("delete from nad_applicant_residence");
+        jdbc.update("delete from nad_applicant_work");
         jdbc.update("delete from nad_applicant_test_score");
         jdbc.update("delete from nad_applicant_contact");
         jdbc.update("delete from nad_applicant");

@@ -3,7 +3,6 @@ package com.nadoumi.applicant.service;
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
 import com.nadoumi.common.access.ApplicantCapability;
-import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaAccessLogContext;
@@ -29,14 +28,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicantMediaService {
 
     private final ApplicantMapper mapper;
-    private final NadoumiAccessService access;
+    private final ApplicantAccessGuard guard;
     private final MediaGateway media;
     private final CurrentCaller caller;
 
-    public ApplicantMediaService(ApplicantMapper mapper, NadoumiAccessService access, MediaGateway media,
+    public ApplicantMediaService(ApplicantMapper mapper, ApplicantAccessGuard guard, MediaGateway media,
             CurrentCaller caller) {
         this.mapper = mapper;
-        this.access = access;
+        this.guard = guard;
         this.media = media;
         this.caller = caller;
     }
@@ -44,7 +43,7 @@ public class ApplicantMediaService {
     /** Stores the file and points the applicant at it. Returns the media id (never a URL). */
     @Transactional(rollbackFor = Exception.class)
     public long upload(long applicantId, ApplicantMediaKind kind, MultipartFile file) {
-        requireCapability(applicantId, ApplicantCapability.EDIT_PROFILE);
+        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
         MediaUploadResult result;
         try {
             result = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
@@ -72,7 +71,7 @@ public class ApplicantMediaService {
         }
         Long mediaId = kind.mediaIdOf(applicant);
         try {
-            requireCapability(applicantId, ApplicantCapability.VIEW_PROFILE);
+            guard.require(applicantId, ApplicantCapability.VIEW_PROFILE);
         }
         catch (AccessDeniedException e) {
             if (mediaId != null) {
@@ -84,12 +83,6 @@ public class ApplicantMediaService {
             throw new NadNotFoundException("applicant has no " + kind.name().toLowerCase());
         }
         return media.issueSignedUrl(mediaId, ctx);
-    }
-
-    private void requireCapability(long applicantId, ApplicantCapability capability) {
-        if (!access.canAccessApplicant(applicantId, capability.name())) {
-            throw new AccessDeniedException("missing " + capability + " on applicant " + applicantId);
-        }
     }
 
     private long currentUserId() {

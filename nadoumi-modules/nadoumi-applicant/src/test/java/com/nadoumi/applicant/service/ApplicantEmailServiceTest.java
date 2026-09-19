@@ -23,7 +23,7 @@ class ApplicantEmailServiceTest {
     private final ApplicantMapper mapper = mock(ApplicantMapper.class);
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
     private final OtpService otp = mock(OtpService.class);
-    private final ApplicantEmailService service = new ApplicantEmailService(mapper, access, otp);
+    private final ApplicantEmailService service = new ApplicantEmailService(mapper, new ApplicantAccessGuard(access), otp);
 
     @Test
     void shouldSendACode_toTheNormalisedNewAddress() {

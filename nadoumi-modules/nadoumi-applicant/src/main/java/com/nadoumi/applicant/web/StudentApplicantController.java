@@ -5,6 +5,7 @@ import com.nadoumi.applicant.onboarding.OnboardingStatus;
 import com.nadoumi.applicant.service.ApplicantEmailService;
 import com.nadoumi.applicant.service.ApplicantMediaKind;
 import com.nadoumi.applicant.service.ApplicantMediaService;
+import com.nadoumi.applicant.service.EducationService;
 import com.nadoumi.applicant.service.PassportService;
 import com.nadoumi.applicant.web.request.PassportRequest;
 import com.nadoumi.applicant.web.response.PassportStatusResponse;
@@ -50,14 +51,17 @@ public class StudentApplicantController {
     private final OnboardingService onboarding;
     private final ApplicantMediaService media;
     private final PassportService passports;
+    private final EducationService education;
 
     public StudentApplicantController(ApplicantService service, ApplicantEmailService emailService,
-            OnboardingService onboarding, ApplicantMediaService media, PassportService passports) {
+            OnboardingService onboarding, ApplicantMediaService media, PassportService passports,
+            EducationService education) {
         this.service = service;
         this.emailService = emailService;
         this.onboarding = onboarding;
         this.media = media;
         this.passports = passports;
+        this.education = education;
     }
 
     @GetMapping
@@ -114,6 +118,13 @@ public class StudentApplicantController {
         return onboarding.complete(id);
     }
 
+    @PostMapping("/{id}/onboarding/welcomed")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public void welcomed(@PathVariable Long id) {
+        onboarding.markWelcomed(id);
+    }
+
     // ---- protected files: profile photo and passport scan ----
 
     @PostMapping("/{id}/photo")
@@ -164,28 +175,28 @@ public class StudentApplicantController {
     @GetMapping("/{id}/education")
     @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
     public List<EducationResponse> education(@PathVariable Long id) {
-        return service.education(id);
+        return education.list(id);
     }
 
     @PostMapping("/{id}/education")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public EducationResponse addEducation(@PathVariable Long id, @Valid @RequestBody EducationRequest req) {
-        return service.addEducation(id, req);
+        return education.add(id, req);
     }
 
     @PutMapping("/{id}/education/{educationId}")
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public EducationResponse updateEducation(@PathVariable Long id, @PathVariable Long educationId,
             @Valid @RequestBody EducationRequest req) {
-        return service.updateEducation(id, educationId, req);
+        return education.update(id, educationId, req);
     }
 
     @DeleteMapping("/{id}/education/{educationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public void deleteEducation(@PathVariable Long id, @PathVariable Long educationId) {
-        service.deleteEducation(id, educationId);
+        education.delete(id, educationId);
     }
 
     @GetMapping("/{id}/test-scores")

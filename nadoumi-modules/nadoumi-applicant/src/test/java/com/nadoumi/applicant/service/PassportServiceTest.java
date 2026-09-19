@@ -30,7 +30,7 @@ class PassportServiceTest {
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final PermissionService rbac = mock(PermissionService.class);
-    private final PassportService service = new PassportService(mapper, access, caller, rbac);
+    private final PassportService service = new PassportService(mapper, new ApplicantAccessGuard(access), caller, rbac);
 
     private static Applicant profile() {
         Applicant a = new Applicant();

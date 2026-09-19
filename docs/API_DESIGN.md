@@ -104,7 +104,20 @@ birth in the future or under 17; and rejects a changed email that has not been v
 adds those fields plus `emailVerified` and `onboardingComplete`. Registration creates the primary applicant
 (names UPPERCASE, verified email) in the same transaction, so onboarding opens prefilled.
 
-**PROPOSED — later slices (photo, passport, residence, interests, work):**
+**IMPLEMENTED (slice 3 and 4)** — under `/api/student/applicants/{id}` (staff: read-only `GET` under `/api/staff/applicants/{id}`, `nad:applicant:view`):
+
+| Endpoint | Notes |
+| --- | --- |
+| `GET/PUT /interests` | `{desiredLevel, fields[1..12], cities[1..10], scholarshipInterest?, intakeYear?, intakeTerm?, teachingLanguage?, notes?}`; `GET` answers **204** until saved; choices are replaced as a whole and de-duplicated |
+| `GET/PUT /residence` | `{inChina, country, city, address?, chinaEducationLevel?, chinaSchool?, visaType?, visaExpiryDate?}`; in China the level, visa type and an **unexpired** visa are required; the China fields are dropped when `inChina` is false; `GET` answers 204 until saved |
+| `GET/POST/PUT/DELETE /work[/{workId}]` | Optional and repeatable; `current` (default false) means no end date, otherwise an end date is required; work in **China requires `workVisaType`** (dropped for other countries) |
+| `/education` (existing) | Now requires `country` and `level` (`HIGH_SCHOOL, FOUNDATION, DIPLOMA, BACHELOR, MASTER, DOCTORATE, OTHER`); `current` optional; dates validated |
+| `POST /onboarding/welcomed` | Records that the welcome celebration was seen; `ApplicantResponse.welcomePending` is true from completion until then |
+
+Onboarding sections are now `PROFILE, PHOTO, PASSPORT, EDUCATION, INTERESTS, LOCATION, CONTACT` (work experience is optional and not a section).
+`CONTACT` needs a GUARDIAN or EMERGENCY contact **with a phone**; `LOCATION` re-opens if a student in China's visa expires.
+
+**PROPOSED — later:**
 
 The full guided onboarding (identity extras, residence branch, interests, languages,
 work, certifications, profile photo, passport) adds a set of section endpoints under

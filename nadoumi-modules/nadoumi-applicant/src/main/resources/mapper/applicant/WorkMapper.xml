@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.applicant.mapper.WorkMapper">
+
+    <resultMap id="work" type="com.nadoumi.applicant.domain.ApplicantWork">
+        <id     property="id"             column="id"/>
+        <result property="applicantId"    column="applicant_id"/>
+        <result property="employer"       column="employer"/>
+        <result property="jobTitle"       column="job_title"/>
+        <result property="employmentType" column="employment_type"/>
+        <result property="country"        column="country"/>
+        <result property="city"           column="city"/>
+        <result property="startDate"      column="start_date"/>
+        <result property="endDate"        column="end_date"/>
+        <result property="current"        column="is_current"/>
+        <result property="description"    column="description"/>
+        <result property="workVisaType"   column="work_visa_type"/>
+        <result property="workVisaExpiry" column="work_visa_expiry"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, applicant_id, employer, job_title, employment_type, country, city, start_date, end_date, is_current,
+        description, work_visa_type, work_visa_expiry
+    </sql>
+
+    <select id="findByApplicant" resultMap="work">
+        select <include refid="cols"/> from nad_applicant_work
+        where applicant_id = #{applicantId} order by is_current desc, start_date desc, id desc
+    </select>
+
+    <select id="findById" resultMap="work">
+        select <include refid="cols"/> from nad_applicant_work where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.applicant.domain.ApplicantWork"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_work
+            (applicant_id, employer, job_title, employment_type, country, city, start_date, end_date, is_current,
+             description, work_visa_type, work_visa_expiry, create_by, create_time)
+        values
+            (#{applicantId}, #{employer}, #{jobTitle}, #{employmentType}, #{country}, #{city}, #{startDate}, #{endDate},
+             #{current}, #{description}, #{workVisaType}, #{workVisaExpiry}, '', now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.applicant.domain.ApplicantWork">
+        update nad_applicant_work set
+            employer = #{employer}, job_title = #{jobTitle}, employment_type = #{employmentType}, country = #{country},
+            city = #{city}, start_date = #{startDate}, end_date = #{endDate}, is_current = #{current},
+            description = #{description}, work_visa_type = #{workVisaType}, work_visa_expiry = #{workVisaExpiry},
+            update_time = now()
+        where id = #{id} and applicant_id = #{applicantId}
+    </update>
+
+    <delete id="delete">
+        delete from nad_applicant_work where id = #{id} and applicant_id = #{applicantId}
+    </delete>
+</mapper>

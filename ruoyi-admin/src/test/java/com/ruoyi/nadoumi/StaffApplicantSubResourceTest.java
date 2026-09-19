@@ -34,17 +34,17 @@ class StaffApplicantSubResourceTest extends AbstractNadIntegrationTest {
 
         String created = mvc.perform(post("/api/staff/applicants/{id}/education", id)
                         .header("Authorization", bearer(token)).contentType("application/json")
-                        .content("{\"institution\":\"Old School\",\"level\":\"BSC\"}"))
+                        .content("{\"institution\":\"Old School\",\"country\":\"EG\",\"level\":\"BACHELOR\"}"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         long eduId = ((Number) JsonPath.read(created, "$.id")).longValue();
 
         mvc.perform(put("/api/staff/applicants/{id}/education/{e}", id, eduId)
                         .header("Authorization", bearer(token)).contentType("application/json")
-                        .content("{\"institution\":\"New School\",\"level\":\"MSC\"}"))
+                        .content("{\"institution\":\"New School\",\"country\":\"EG\",\"level\":\"MASTER\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.institution").value("New School"))
-                .andExpect(jsonPath("$.level").value("MSC"));
+                .andExpect(jsonPath("$.level").value("MASTER"));
 
         mvc.perform(delete("/api/staff/applicants/{id}/education/{e}", id, eduId)
                         .header("Authorization", bearer(token)))
@@ -128,14 +128,14 @@ class StaffApplicantSubResourceTest extends AbstractNadIntegrationTest {
         long id = newApplicant(editor);
         String created = mvc.perform(post("/api/staff/applicants/{id}/education", id)
                         .header("Authorization", bearer(editor)).contentType("application/json")
-                        .content("{\"institution\":\"Uni\",\"level\":\"BSC\"}"))
+                        .content("{\"institution\":\"Uni\",\"country\":\"EG\",\"level\":\"BACHELOR\"}"))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long eduId = ((Number) JsonPath.read(created, "$.id")).longValue();
 
         String viewer = staffTokenFor("subres_viewer", "sub_view_only");
         mvc.perform(put("/api/staff/applicants/{id}/education/{e}", id, eduId)
                         .header("Authorization", bearer(viewer)).contentType("application/json")
-                        .content("{\"institution\":\"Hacked\",\"level\":\"PHD\"}"))
+                        .content("{\"institution\":\"Hacked\",\"country\":\"EG\",\"level\":\"DOCTORATE\"}"))
                 .andExpect(status().isForbidden());
         // ...but the same viewer can read it
         mvc.perform(get("/api/staff/applicants/{id}/education", id).header("Authorization", bearer(viewer)))

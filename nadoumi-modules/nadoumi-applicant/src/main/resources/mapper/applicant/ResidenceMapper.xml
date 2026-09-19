@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.applicant.mapper.ResidenceMapper">
+
+    <resultMap id="residence" type="com.nadoumi.applicant.domain.ApplicantResidence">
+        <id     property="id"                   column="id"/>
+        <result property="applicantId"          column="applicant_id"/>
+        <result property="inChina"              column="in_china"/>
+        <result property="country"              column="country"/>
+        <result property="city"                 column="city"/>
+        <result property="address"              column="address"/>
+        <result property="chinaEducationLevel"  column="china_education_level"/>
+        <result property="chinaSchool"          column="china_school"/>
+        <result property="visaType"             column="visa_type"/>
+        <result property="visaExpiryDate"       column="visa_expiry_date"/>
+    </resultMap>
+
+    <select id="find" resultMap="residence">
+        select id, applicant_id, in_china, country, city, address, china_education_level, china_school,
+               visa_type, visa_expiry_date
+        from nad_applicant_residence where applicant_id = #{applicantId}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.applicant.domain.ApplicantResidence"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_residence
+            (applicant_id, in_china, country, city, address, china_education_level, china_school, visa_type,
+             visa_expiry_date, create_by, create_time)
+        values
+            (#{applicantId}, #{inChina}, #{country}, #{city}, #{address}, #{chinaEducationLevel}, #{chinaSchool},
+             #{visaType}, #{visaExpiryDate}, '', now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.applicant.domain.ApplicantResidence">
+        update nad_applicant_residence set
+            in_china = #{inChina}, country = #{country}, city = #{city}, address = #{address},
+            china_education_level = #{chinaEducationLevel}, china_school = #{chinaSchool},
+            visa_type = #{visaType}, visa_expiry_date = #{visaExpiryDate}, update_time = now()
+        where applicant_id = #{applicantId}
+    </update>
+</mapper>
