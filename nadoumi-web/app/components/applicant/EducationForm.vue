@@ -22,7 +22,7 @@ watch(() => form.current, (current: boolean) => { if (current) form.endDate = ''
   <form class="grid gap-4 sm:grid-cols-2" novalidate @submit.prevent="submit(() => emit('submit', educationBody(form)))">
     <FormTextField id="edu-institution" v-model="form.institution" :label="t('education.institution')" :error="errors.institution" :maxlength="200" required />
     <FormSelectField id="edu-level" v-model="form.level" :label="t('education.level')" :options="levels" :error="errors.level" required />
-    <FormSelectField id="edu-country" v-model="form.country" :label="t('education.country')" :options="countries" :error="errors.country" required />
+    <FormComboboxField id="edu-country" v-model="form.country" :label="t('education.country')" :options="countries" :error="errors.country" required />
     <FormTextField id="edu-city" v-model="form.city" :label="t('education.city')" :maxlength="80" />
     <FormTextField id="edu-qualification" v-model="form.qualification" :label="t('education.qualification')" :hint="t('education.qualificationHint')" :maxlength="200" />
     <FormTextField id="edu-field" v-model="form.field" :label="t('education.field')" :maxlength="120" />

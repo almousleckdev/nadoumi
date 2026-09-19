@@ -226,7 +226,6 @@
     "add": "Añadir contacto",
     "empty": "Aún no se ha añadido ningún contacto.",
     "name": "Nombre completo",
-    "phoneHint": "Incluye el código de país, por ejemplo +86…",
     "relation": "Relación"
   },
   "catalog": {
@@ -269,7 +268,7 @@
     "fullName": "Nombre completo",
     "username": "Nombre de usuario",
     "usernameHint": "De 2 a 20 caracteres, se usa para iniciar sesión",
-    "passportNameHint": "Escribe tus nombres exactamente como aparecen en tu pasaporte. Se guardan en MAYÚSCULAS.",
+    "passportNameHint": "Escribe tus nombres exactamente como aparecen en tu pasaporte.",
     "step1Title": "Tus datos",
     "step2Title": "Establece una contraseña",
     "next": "Siguiente",
@@ -1797,7 +1796,6 @@
     "countryOfResidence": "País de residencia",
     "nativeLanguage": "Lengua materna",
     "contactNumber": "Número de contacto",
-    "contactNumberHint": "Incluye el prefijo del país, por ejemplo +86…",
     "wechatId": "ID de WeChat",
     "whatsapp": "Número de WhatsApp",
     "contactHandleHint": "Indica al menos uno: WeChat o WhatsApp.",
@@ -1809,11 +1807,14 @@
     "saveContinue": "Guardar y continuar",
     "sectionPerson": "Sobre ti",
     "sectionCountries": "Nacionalidad y residencia",
-    "sectionContact": "Datos de contacto"
+    "sectionContact": "Datos de contacto",
+    "countryCode": "Código de país"
   },
   "form": {
     "select": "Seleccionar…",
-    "chipsCount": "{n} de {max} seleccionados"
+    "chipsCount": "{n} de {max} seleccionados",
+    "search": "Buscar…",
+    "noMatches": "No se encontraron resultados."
   },
   "passport": {
     "title": "Pasaporte",

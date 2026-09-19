@@ -226,7 +226,6 @@
     "add": "Add contact",
     "empty": "No contacts added yet.",
     "name": "Full name",
-    "phoneHint": "Include the country code, for example +86…",
     "relation": "Relationship"
   },
   "catalog": {
@@ -269,7 +268,7 @@
     "fullName": "Full name",
     "username": "Username",
     "usernameHint": "2–20 characters, used to sign in",
-    "passportNameHint": "Enter your names exactly as they appear on your passport. They are saved in UPPERCASE.",
+    "passportNameHint": "Enter your names exactly as they appear on your passport.",
     "step1Title": "Your details",
     "step2Title": "Set a password",
     "next": "Next",
@@ -1797,7 +1796,6 @@
     "countryOfResidence": "Country of residence",
     "nativeLanguage": "Native language",
     "contactNumber": "Contact number",
-    "contactNumberHint": "Include the country code, for example +86…",
     "wechatId": "WeChat ID",
     "whatsapp": "WhatsApp number",
     "contactHandleHint": "Provide at least one: WeChat or WhatsApp.",
@@ -1809,11 +1807,14 @@
     "saveContinue": "Save and continue",
     "sectionPerson": "About you",
     "sectionCountries": "Nationality and residence",
-    "sectionContact": "Contact details"
+    "sectionContact": "Contact details",
+    "countryCode": "Country code"
   },
   "form": {
     "select": "Select…",
-    "chipsCount": "{n} of {max} selected"
+    "chipsCount": "{n} of {max} selected",
+    "search": "Search…",
+    "noMatches": "No matches found."
   },
   "passport": {
     "title": "Passport",

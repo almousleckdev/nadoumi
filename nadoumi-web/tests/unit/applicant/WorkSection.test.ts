@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import WorkSection from '~/components/applicant/WorkSection.vue'
+import { pickCombobox } from '../helpers/combobox'
 
 const { api } = vi.hoisted(() => ({
   api: {
@@ -41,7 +42,7 @@ describe('WorkSection', () => {
     await w.find('[data-test="add"]').trigger('click')
     await w.find('#work-employer').setValue('Globex')
     await w.find('#work-title').setValue('Analyst')
-    await w.find('#work-country').setValue('GB')
+    await pickCombobox(w, '#work-country', 'United Kingdom')
     await w.find('#work-start').setValue('2020-01-01')
     await w.find('#work-current').setValue(true)
     await w.find('form').trigger('submit')

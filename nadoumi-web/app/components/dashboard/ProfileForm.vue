@@ -59,10 +59,10 @@ function onVerified(applicant: ApplicantDto) {
     </FormSection>
 
     <FormSection :title="t('profileForm.sectionCountries')">
-      <FormSelectField id="nationality" v-model="form.nationality" :label="t('dashboard.nationality')" :options="countries" :error="errors.nationality" required />
-      <FormSelectField id="countryOfOrigin" v-model="form.countryOfOrigin" :label="t('profileForm.countryOfOrigin')" :options="countries" :error="errors.countryOfOrigin" required />
-      <FormSelectField id="countryOfResidence" v-model="form.countryOfResidence" :label="t('profileForm.countryOfResidence')" :options="countries" :error="errors.countryOfResidence" required />
-      <FormSelectField id="nativeLanguage" v-model="form.nativeLanguage" :label="t('profileForm.nativeLanguage')" :options="languages" :error="errors.nativeLanguage" required />
+      <FormComboboxField id="nationality" v-model="form.nationality" :label="t('dashboard.nationality')" :options="countries" :error="errors.nationality" required />
+      <FormComboboxField id="countryOfOrigin" v-model="form.countryOfOrigin" :label="t('profileForm.countryOfOrigin')" :options="countries" :error="errors.countryOfOrigin" required />
+      <FormComboboxField id="countryOfResidence" v-model="form.countryOfResidence" :label="t('profileForm.countryOfResidence')" :options="countries" :error="errors.countryOfResidence" required />
+      <FormComboboxField id="nativeLanguage" v-model="form.nativeLanguage" :label="t('profileForm.nativeLanguage')" :options="languages" :error="errors.nativeLanguage" required />
       <FormTextField id="passportNo" v-model="form.passportNo" :label="t('dashboard.passportNo')" :maxlength="64" uppercase />
     </FormSection>
 
@@ -88,7 +88,7 @@ function onVerified(applicant: ApplicantDto) {
           {{ t('profileForm.keepEmail', { email: savedEmail }) }}
         </button>
       </div>
-      <FormTextField id="phone" v-model="form.phone" type="tel" :label="t('profileForm.contactNumber')" :hint="t('profileForm.contactNumberHint')" :error="errors.phone" autocomplete="tel" :maxlength="32" required />
+      <FormPhoneField id="phone" v-model="form.phone" :label="t('profileForm.contactNumber')" :error="errors.phone" required />
       <div class="hidden sm:block" aria-hidden="true" />
       <FormTextField id="wechatId" v-model="form.wechatId" :label="t('profileForm.wechatId')" :error="errors.contactHandle" :maxlength="64" />
       <FormTextField id="whatsapp" v-model="form.whatsapp" type="tel" :label="t('profileForm.whatsapp')" :hint="t('profileForm.contactHandleHint')" :maxlength="32" />

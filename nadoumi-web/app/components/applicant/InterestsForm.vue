@@ -37,7 +37,7 @@ const years = Array.from({ length: INTAKE_YEAR_SPAN + 1 }, (_, i) => {
 
     <FormSection :title="t('interests.sectionWhere')">
       <ChipMultiSelect id="int-cities" v-model="form.cities" :label="t('interests.cities')" :hint="t('interests.citiesHint')" :options="cities" :max="MAX_INTEREST_CITIES" :custom-label="t('interests.otherCity')" :error="errors.cities" required />
-      <FormSelectField id="int-teaching" v-model="form.teachingLanguage" :label="t('interests.teachingLanguage')" :options="languages" />
+      <FormComboboxField id="int-teaching" v-model="form.teachingLanguage" :label="t('interests.teachingLanguage')" :options="languages" />
     </FormSection>
 
     <FormSection :title="t('interests.sectionWhen')">

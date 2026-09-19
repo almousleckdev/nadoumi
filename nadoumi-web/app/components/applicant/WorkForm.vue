@@ -26,7 +26,7 @@ watch(() => form.current, (current: boolean) => { if (current) form.endDate = ''
     <FormTextField id="work-employer" v-model="form.employer" :label="t('work.employer')" :error="errors.employer" :maxlength="200" required />
     <FormTextField id="work-title" v-model="form.jobTitle" :label="t('work.jobTitle')" :error="errors.jobTitle" :maxlength="150" required />
     <FormSelectField id="work-type" v-model="form.employmentType" :label="t('work.employmentType')" :options="employmentTypes" />
-    <FormSelectField id="work-country" v-model="form.country" :label="t('work.country')" :options="countries" :error="errors.country" required />
+    <FormComboboxField id="work-country" v-model="form.country" :label="t('work.country')" :options="countries" :error="errors.country" required />
     <FormTextField id="work-city" v-model="form.city" :label="t('work.city')" :maxlength="80" />
     <div class="hidden sm:block" aria-hidden="true" />
     <FormTextField id="work-start" v-model="form.startDate" type="date" :label="t('work.startDate')" :max="today" :error="errors.startDate" required />

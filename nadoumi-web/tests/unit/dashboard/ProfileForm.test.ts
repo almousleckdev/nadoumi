@@ -26,8 +26,8 @@ describe('ProfileForm', () => {
     const w = await mountForm()
 
     expect((w.find('#givenName').element as HTMLInputElement).value).toBe('SAM')
-    expect((w.find('#nationality').element as HTMLSelectElement).value).toBe('MY')
-    expect((w.find('#countryOfResidence').element as HTMLSelectElement).value).toBe('CN')
+    expect((w.find('#nationality').element as HTMLInputElement).value).toBe('Malaysia')
+    expect((w.find('#countryOfResidence').element as HTMLInputElement).value).toBe('China')
     expect((w.find('#whatsapp').element as HTMLInputElement).value).toBe('+601')
   })
 

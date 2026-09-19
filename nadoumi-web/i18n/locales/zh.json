@@ -226,7 +226,6 @@
     "add": "添加联系人",
     "empty": "尚未添加联系人。",
     "name": "姓名",
-    "phoneHint": "请注明国家/地区区号，例如 +86…",
     "relation": "关系"
   },
   "catalog": {
@@ -269,7 +268,7 @@
     "fullName": "姓名",
     "username": "用户名",
     "usernameHint": "2 至 20 个字符,用于登录",
-    "passportNameHint": "请按护照上的写法填写姓名，系统将统一保存为大写字母。",
+    "passportNameHint": "请按护照上的写法填写姓名。",
     "step1Title": "您的基本信息",
     "step2Title": "设置密码",
     "next": "下一步",
@@ -1797,7 +1796,6 @@
     "countryOfResidence": "居住国家",
     "nativeLanguage": "母语",
     "contactNumber": "联系电话",
-    "contactNumberHint": "请包含国家区号，例如 +86…",
     "wechatId": "微信号",
     "whatsapp": "WhatsApp 号码",
     "contactHandleHint": "至少填写一项：微信或 WhatsApp。",
@@ -1809,11 +1807,14 @@
     "saveContinue": "保存并继续",
     "sectionPerson": "关于您",
     "sectionCountries": "国籍与居住地",
-    "sectionContact": "联系方式"
+    "sectionContact": "联系方式",
+    "countryCode": "国家/地区代码"
   },
   "form": {
     "select": "请选择…",
-    "chipsCount": "已选择 {n}/{max} 项"
+    "chipsCount": "已选择 {n}/{max} 项",
+    "search": "搜索…",
+    "noMatches": "未找到匹配项。"
   },
   "passport": {
     "title": "护照",

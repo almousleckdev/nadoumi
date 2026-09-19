@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import EducationSection from '~/components/applicant/EducationSection.vue'
+import { pickCombobox } from '../helpers/combobox'
 
 const { api } = vi.hoisted(() => ({
   api: {
@@ -41,7 +42,7 @@ describe('EducationSection', () => {
     await w.find('[data-test="add"]').trigger('click')
     await w.find('#edu-institution').setValue('Oxford')
     await w.find('#edu-level').setValue('BACHELOR')
-    await w.find('#edu-country').setValue('GB')
+    await pickCombobox(w, '#edu-country', 'United Kingdom')
     await w.find('#edu-start').setValue('2020-01-01')
     await w.find('#edu-end').setValue('2023-01-01')
     await w.find('form').trigger('submit')

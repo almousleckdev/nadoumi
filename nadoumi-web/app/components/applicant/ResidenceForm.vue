@@ -34,7 +34,7 @@ const tomorrow = isoDate(new Date(Date.now() + 24 * 60 * 60 * 1000))
         <YesNoField id="loc-in-china" v-model="form.inChina" :label="t('location.inChina')" :error="errors.inChina" />
       </div>
       <template v-if="form.inChina !== null">
-        <FormSelectField v-if="!form.inChina" id="loc-country" v-model="form.country" :label="t('location.country')" :options="otherCountries" :error="errors.country" required />
+        <FormComboboxField v-if="!form.inChina" id="loc-country" v-model="form.country" :label="t('location.country')" :options="otherCountries" :error="errors.country" required />
         <FormTextField id="loc-city" v-model="form.city" :label="t('location.city')" :error="errors.city" autocomplete="address-level2" :maxlength="80" required />
         <div class="sm:col-span-2">
           <FormTextField id="loc-address" v-model="form.address" :label="t('location.otherInfo')" :hint="t('location.otherInfoHint')" :maxlength="255" />

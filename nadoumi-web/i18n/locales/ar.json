@@ -226,7 +226,6 @@
     "add": "إضافة جهة اتصال",
     "empty": "لم تتم إضافة أي جهة اتصال بعد.",
     "name": "الاسم الكامل",
-    "phoneHint": "أدرج رمز الدولة، مثل ‎+86…",
     "relation": "صلة القرابة"
   },
   "catalog": {
@@ -269,7 +268,7 @@
     "fullName": "الاسم الكامل",
     "username": "اسم المستخدم",
     "usernameHint": "من 2 إلى 20 حرفًا، يُستخدم لتسجيل الدخول",
-    "passportNameHint": "اكتب اسمك تمامًا كما يظهر في جواز سفرك. يتم حفظه بأحرف كبيرة.",
+    "passportNameHint": "أدخل اسمك تمامًا كما يظهر في جواز سفرك.",
     "step1Title": "بياناتك",
     "step2Title": "تعيين كلمة مرور",
     "next": "التالي",
@@ -1797,7 +1796,6 @@
     "countryOfResidence": "بلد الإقامة",
     "nativeLanguage": "اللغة الأم",
     "contactNumber": "رقم التواصل",
-    "contactNumberHint": "أضف رمز الدولة، مثل +86…",
     "wechatId": "معرّف WeChat",
     "whatsapp": "رقم واتساب",
     "contactHandleHint": "أدخل واحدًا على الأقل: WeChat أو واتساب.",
@@ -1809,11 +1807,14 @@
     "saveContinue": "حفظ ومتابعة",
     "sectionPerson": "عنك",
     "sectionCountries": "الجنسية والإقامة",
-    "sectionContact": "بيانات التواصل"
+    "sectionContact": "بيانات التواصل",
+    "countryCode": "رمز الدولة"
   },
   "form": {
     "select": "اختر…",
-    "chipsCount": "تم اختيار {n} من {max}"
+    "chipsCount": "تم اختيار {n} من {max}",
+    "search": "بحث…",
+    "noMatches": "لا توجد نتائج مطابقة."
   },
   "passport": {
     "title": "جواز السفر",

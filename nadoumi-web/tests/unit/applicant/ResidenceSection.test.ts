@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import ResidenceSection from '~/components/applicant/ResidenceSection.vue'
+import { pickCombobox } from '../helpers/combobox'
 
 const { api } = vi.hoisted(() => ({
   api: { getResidence: vi.fn(), saveResidence: vi.fn() },
@@ -42,7 +43,7 @@ describe('ResidenceSection', () => {
     const no = w.findAll('input[name="loc-in-china"]')[1]!
     ;(no.element as HTMLInputElement).checked = true
     await no.trigger('change')
-    await w.find('#loc-country').setValue('GB')
+    await pickCombobox(w, '#loc-country', 'United Kingdom')
     await w.find('#loc-city').setValue('London')
     await w.find('form').trigger('submit')
     await flushPromises()
