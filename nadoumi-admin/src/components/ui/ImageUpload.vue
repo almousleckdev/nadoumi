@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, type UploadProps, type UploadRawFile } from 'element-plus'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import request from '@/utils/request'
-import { getToken } from '@/utils/auth'
+import { CLIENT_HEADERS } from '@/utils/session'
 import { assetUrl } from '@/utils/asset'
 
 /**
@@ -59,7 +59,6 @@ const uploadUrl = computed(() => {
   const base = (import.meta.env.VITE_APP_BASE_API || '/dev-api').replace(/\/$/, '')
   return `${base}${props.action}`
 })
-const headers = computed(() => ({ Authorization: `Bearer ${getToken() ?? ''}` }))
 
 // URL from the most recent successful upload on this instance; takes precedence
 // over `previewUrl` so the picture updates the moment an upload lands.
@@ -209,7 +208,8 @@ defineExpose({ onSuccess, onError, clear, flush, hasPending })
     <el-upload
       v-else
       :action="uploadUrl"
-      :headers="headers"
+      :headers="CLIENT_HEADERS"
+      with-credentials
       :show-file-list="false"
       name="file"
       :accept="accept"

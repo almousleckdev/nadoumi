@@ -10,8 +10,9 @@ export interface LoginBody {
 export const getCaptcha = () =>
   request.get<any, { code: number; uuid: string; img: string; captchaEnabled: boolean }>('/captchaImage')
 
+/** Sets the httpOnly session cookie; the response carries no token. */
 export const login = (body: LoginBody) =>
-  request.post<any, { code: number; token: string }>('/login', body)
+  request.post<any, { code: number }>('/staff/session', body)
 
 export const getInfo = () =>
   request.get<any, {

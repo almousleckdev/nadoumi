@@ -1,7 +1,8 @@
 import axios, { type AxiosInstance } from 'axios'
 import { ElMessage } from 'element-plus'
-import { getToken, removeToken } from './auth'
+import { CLIENT_HEADERS } from './session'
 import router from '@/router'
+import { useUserStore } from '@/stores/user'
 
 /**
  * One client for two response styles:
@@ -11,16 +12,16 @@ import router from '@/router'
 const service: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_APP_BASE_API || '/dev-api',
   timeout: 15000,
-})
-
-service.interceptors.request.use((config) => {
-  const token = getToken()
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
+  // the session is an httpOnly cookie; the API is reached through a same-origin proxy
+  withCredentials: true,
+  headers: CLIENT_HEADERS,
 })
 
 function toLogin() {
-  removeToken()
+  const userStore = useUserStore()
+  userStore.reset()
+  // The start-up session probe also lands here on a 401; the router guard owns that redirect.
+  if (!userStore.loaded) return
   if (router.currentRoute.value.path !== '/login') {
     router.replace(`/login?redirect=${encodeURIComponent(router.currentRoute.value.fullPath)}`)
   }

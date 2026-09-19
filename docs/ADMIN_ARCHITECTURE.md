@@ -278,7 +278,14 @@ UI hiding is cosmetic; the backend enforces every token regardless (`SECURITY.md
 
 ## 4. Admin ↔ backend contract (BASELINE)
 
-- **Auth/session:** `POST /login` → JWT (cookie `nadoumi-admin-token`);
+- **Auth/session (IMPLEMENTED):** `POST /staff/session` sets an **httpOnly + Secure +
+  SameSite=Strict** cookie (`NAD_ADMIN_SESSION`); no token is returned or held in script.
+  Every request sends `withCredentials` and `X-Nadoumi-Client: admin`. The router guard
+  learns "signed in" by calling `GET /getInfo` once per page load (`userStore.restore()`).
+  Sign-out is `POST /logout`, which also clears the cookie. Production reaches the API
+  through the same-origin proxy `/backend/*` (`vercel.json`) so the cookie is first-party;
+  dev uses the Vite `/dev-api` proxy. `POST /login` (bearer token in the body) remains
+  for API clients and the legacy `ruoyi-ui`.
   `GET /getInfo` → user + roles + permission tokens. `/getRouters` is **not used**
   — navigation is the static `src/config/nav.ts` manifest (§2.2).
 - Existing RuoYi endpoints (`/system/**`, `/monitor/**`, `/tool/**`) stay unchanged;

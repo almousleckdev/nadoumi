@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { getInfo, login as loginApi, logout as logoutApi, type LoginBody } from '@/api/auth'
-import { getToken, removeToken, setToken } from '@/utils/auth'
 
 export const useUserStore = defineStore('user', () => {
-  const token = ref(getToken() || '')
+  // The session cookie is httpOnly, so "signed in" is learned by asking the server once.
+  const loaded = ref(false)
   const name = ref('')
   const nickName = ref('')
   const avatar = ref('')
@@ -13,9 +13,8 @@ export const useUserStore = defineStore('user', () => {
   const mustChangePassword = ref(false)
 
   async function login(body: LoginBody) {
-    const res = await loginApi(body)
-    token.value = res.token
-    setToken(res.token)
+    await loginApi(body)
+    await fetchInfo()
   }
 
   async function fetchInfo() {
@@ -29,6 +28,20 @@ export const useUserStore = defineStore('user', () => {
     mustChangePassword.value = Boolean(res.isDefaultModifyPwd || res.isPasswordExpired)
   }
 
+  /** Resolve the session once per page load; a missing or expired cookie just leaves it signed out. */
+  async function restore() {
+    if (loaded.value) return
+    try {
+      await fetchInfo()
+    }
+    catch {
+      // not signed in
+    }
+    finally {
+      loaded.value = true
+    }
+  }
+
   async function logout() {
     try {
       await logoutApi()
@@ -38,11 +51,11 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function reset() {
-    token.value = ''
     roles.value = []
     permissions.value = []
-    removeToken()
   }
+
+  const signedIn = computed(() => roles.value.length > 0)
 
   /** RuoYi convention: `*:*:*` (super admin) satisfies every check. */
   function hasPerm(perm?: string): boolean {
@@ -51,7 +64,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
-    token, name, nickName, avatar, roles, permissions, mustChangePassword,
-    login, fetchInfo, logout, reset, hasPerm,
+    loaded, name, nickName, avatar, roles, permissions, mustChangePassword, signedIn,
+    login, fetchInfo, restore, logout, reset, hasPerm,
   }
 })
