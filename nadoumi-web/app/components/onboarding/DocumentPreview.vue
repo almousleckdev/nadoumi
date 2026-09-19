@@ -25,7 +25,7 @@ const { transform, onPointerDown, onPointerMove, onPointerUp, zoomBy, rotate, re
         :src="src"
         :alt="name ?? t('onboarding.doc.previewAlt')"
         draggable="false"
-        class="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none"
+        class="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 select-none object-contain"
         :style="{ transform }"
       >
     </div>

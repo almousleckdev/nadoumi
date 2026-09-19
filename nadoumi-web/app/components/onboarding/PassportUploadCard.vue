@@ -13,7 +13,11 @@ import type { PassportForm } from '~/utils/passportRules'
  * then save. The server compares the confirmed details with the profile and refuses a
  * passport that is not valid for more than six months.
  */
-const props = defineProps<{ applicantId: number }>()
+const props = defineProps<{
+  applicantId: number
+  /** Already entered on the Personal step — prefilled here so the student is not asked again. */
+  profile: { givenName: string, familyName: string, dob: string | null }
+}>()
 const emit = defineEmits<{ changed: [], 'edit-profile': [] }>()
 const { t } = useI18n()
 const { uploadPassportScan, savePassport, passportStatus } = useApplicant()
@@ -66,9 +70,17 @@ async function onSelect(picked: File) {
 const wasEdited = (form: PassportForm) =>
   reading.value !== null && PASSPORT_READ_FIELDS.some(field => form[field] !== reading.value![field])
 
+/** Nothing read or saved yet: start from what the student already gave us on Personal. */
+function formFromProfile(): PassportForm {
+  return {
+    passportNo: '', givenName: props.profile.givenName, familyName: props.profile.familyName,
+    dob: props.profile.dob ?? '', issueDate: '', expiryDate: '',
+  }
+}
+
 onMounted(async () => {
   status.value = await passportStatus(props.applicantId).catch(() => null)
-  initial.value ??= formFrom(status.value)
+  initial.value ??= formFrom(status.value) ?? formFromProfile()
 })
 
 async function onSubmit(form: PassportForm) {

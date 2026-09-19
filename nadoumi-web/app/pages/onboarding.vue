@@ -116,7 +116,13 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
       <OnboardingStep v-else-if="stepKey === 'identity'" :title="t('onboarding.identity.title')" :blurb="t('onboarding.identity.blurb')">
         <div class="grid gap-4">
           <PhotoUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" />
-          <PassportUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" @edit-profile="goTo('personal')" />
+          <PassportUploadCard
+            v-if="applicant"
+            :applicant-id="applicant.id"
+            :profile="{ givenName: applicant.givenName, familyName: applicant.familyName, dob: applicant.dob }"
+            @changed="progress.refresh"
+            @edit-profile="goTo('personal')"
+          />
           <NAlert v-if="!canAdvance" tone="warning">{{ t('onboarding.identity.blocked') }}</NAlert>
         </div>
       </OnboardingStep>

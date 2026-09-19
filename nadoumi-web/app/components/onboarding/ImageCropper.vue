@@ -27,9 +27,13 @@ async function apply() {
   if (!ctx) return
   ctx.fillStyle = '#fff'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
+  // The preview shows the whole photo fitted into the frame at zoom 1 (see the
+  // template's object-contain sizing); mirror that here so the exported crop
+  // matches what was previewed instead of the image's raw pixel size.
+  const fitScale = Math.min(canvas.width / img.width, canvas.height / img.height)
   ctx.translate(canvas.width / 2 + offset.x, canvas.height / 2 + offset.y)
   ctx.rotate((rotation.value * Math.PI) / 180)
-  ctx.scale(zoom.value, zoom.value)
+  ctx.scale(fitScale * zoom.value, fitScale * zoom.value)
   ctx.drawImage(img, -img.width / 2, -img.height / 2)
   emit('crop', canvas.toDataURL('image/jpeg', 0.9))
 }
@@ -49,7 +53,7 @@ async function apply() {
         :src="src"
         alt=""
         draggable="false"
-        class="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none motion-safe:transition-transform motion-safe:duration-75"
+        class="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 select-none object-contain motion-safe:transition-transform motion-safe:duration-75"
         :style="{ transform }"
       >
     </div>

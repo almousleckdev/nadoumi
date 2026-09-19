@@ -30,8 +30,10 @@ const READING = {
   expiryDate: '2099-01-01', issuingCountry: null, nationality: null,
 }
 
+const PROFILE = { givenName: 'ANNA', familyName: 'ERIKSSON', dob: '1990-01-01' }
+
 async function mountCard() {
-  const w = await mountSuspended(PassportUploadCard, { props: { applicantId: 1 } })
+  const w = await mountSuspended(PassportUploadCard, { props: { applicantId: 1, profile: PROFILE } })
   await flushPromises()
   return w
 }
@@ -66,7 +68,7 @@ describe('PassportUploadCard', () => {
     expect(w.text()).toContain('We read these details')
   })
 
-  it('falls back to typing the details when the passport cannot be read', async () => {
+  it('falls back to typing the details when the passport cannot be read, prefilled from the profile', async () => {
     read.mockResolvedValue(null)
     const w = await mountCard()
 
@@ -76,6 +78,10 @@ describe('PassportUploadCard', () => {
     expect(w.text()).toContain('could not read the passport automatically')
     expect(w.find('#passportNo').exists()).toBe(true)
     expect(value(w, '#passportNo')).toBe('')
+    // Already given on the Personal step — the student should not have to retype these.
+    expect(value(w, '#passportGivenName')).toBe(PROFILE.givenName)
+    expect(value(w, '#passportFamilyName')).toBe(PROFILE.familyName)
+    expect(value(w, '#passportDob')).toBe(PROFILE.dob)
   })
 
   it('does not try to read a PDF', async () => {
