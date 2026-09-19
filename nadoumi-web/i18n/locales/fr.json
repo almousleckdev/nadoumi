@@ -261,11 +261,9 @@
     "loginTitle": "Se connecter",
     "registerTitle": "Créez votre profil",
     "fullName": "Nom complet",
-    "firstName": "Prénom",
-    "lastName": "Nom",
     "username": "Nom d'utilisateur",
     "usernameHint": "2 à 20 caractères, utilisé pour vous connecter",
-    "passportNameHint": "Saisissez votre nom exactement comme il apparaît sur votre passeport.",
+    "passportNameHint": "Saisissez vos noms exactement comme sur votre passeport. Ils sont enregistrés en MAJUSCULES.",
     "step1Title": "Vos informations",
     "step2Title": "Définir un mot de passe",
     "next": "Suivant",
@@ -322,7 +320,9 @@
       "password": "Mot de passe"
     },
     "newToNadoumi": "Nouveau sur Nadoumi ?",
-    "createProfile": "Créer un profil"
+    "createProfile": "Créer un profil",
+    "givenName": "Prénom",
+    "familyName": "Nom de famille"
   },
   "dashboard": {
     "nav": {
@@ -459,13 +459,12 @@
       "review": "Vérification"
     },
     "personal": {
-      "title": "Informations personnelles",
-      "blurb": "Votre nom tel qu'il apparaît sur votre passeport."
+      "title": "Créez votre profil",
+      "blurb": "Dites-nous qui vous êtes. Vos noms doivent correspondre à votre passeport."
     },
     "identity": {
       "title": "Identité",
-      "blurb": "Détails de passeport et de nationalité pour vos candidatures.",
-      "extras": "Le genre, le pays de résidence et la langue de contact préférée seront ajoutés ici."
+      "blurb": "Détails de passeport et de nationalité pour vos candidatures."
     },
     "education": {
       "title": "Parcours scolaire",
@@ -525,6 +524,10 @@
       "badType": "Choisissez une image JPEG, PNG ou WebP.",
       "badTypePassport": "Choisissez un fichier JPEG, PNG ou PDF.",
       "tooBig": "Le fichier dépasse {mb} Mo."
+    },
+    "incomplete": "Certaines informations obligatoires sont manquantes : {sections}.",
+    "sectionName": {
+      "PROFILE": "Profil"
     }
   },
   "university": {
@@ -1741,5 +1744,38 @@
         "summary": "Des réponses claires aux questions que se posent le plus souvent les étudiants avant de postuler."
       }
     }
+  },
+  "profileForm": {
+    "nameNotice": "Saisissez vos noms exactement comme ils figurent sur votre passeport. Ils sont enregistrés en MAJUSCULES, même si vous les saisissez en minuscules.",
+    "nameInvalid": "Utilisez uniquement des lettres, des espaces, des traits d'union et des apostrophes.",
+    "dobHint": "Vous devez avoir au moins 17 ans.",
+    "dobFuture": "La date de naissance ne peut pas être dans le futur.",
+    "dobUnderage": "Vous devez avoir au moins 17 ans pour candidater.",
+    "gender": "Genre",
+    "genderOption": {
+      "FEMALE": "Femme",
+      "MALE": "Homme",
+      "UNSPECIFIED": "Non précisé"
+    },
+    "countryOfOrigin": "Pays d'origine",
+    "countryOfResidence": "Pays de résidence",
+    "nativeLanguage": "Langue maternelle",
+    "contactNumber": "Numéro de contact",
+    "contactNumberHint": "Indiquez l'indicatif du pays, par exemple +86…",
+    "wechatId": "Identifiant WeChat",
+    "whatsapp": "Numéro WhatsApp",
+    "contactHandleHint": "Indiquez au moins l'un des deux : WeChat ou WhatsApp.",
+    "contactHandleRequired": "Ajoutez un identifiant WeChat ou un numéro WhatsApp.",
+    "emailVerified": "E-mail vérifié",
+    "verifyEmail": "Vérifier l'e-mail",
+    "verifyBeforeSave": "Vérifiez votre nouvelle adresse e-mail avant d'enregistrer.",
+    "keepEmail": "Conserver {email}",
+    "saveContinue": "Enregistrer et continuer",
+    "sectionPerson": "À propos de vous",
+    "sectionCountries": "Nationalité et résidence",
+    "sectionContact": "Coordonnées"
+  },
+  "form": {
+    "select": "Sélectionner…"
   }
 }

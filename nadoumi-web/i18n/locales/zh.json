@@ -261,11 +261,9 @@
     "loginTitle": "登录",
     "registerTitle": "创建您的档案",
     "fullName": "姓名",
-    "firstName": "名",
-    "lastName": "姓",
     "username": "用户名",
     "usernameHint": "2 至 20 个字符,用于登录",
-    "passportNameHint": "请输入与护照上完全一致的姓名。",
+    "passportNameHint": "请按护照上的写法填写姓名，系统将统一保存为大写字母。",
     "step1Title": "您的基本信息",
     "step2Title": "设置密码",
     "next": "下一步",
@@ -322,7 +320,9 @@
       "password": "密码"
     },
     "newToNadoumi": "还没有 Nadoumi 账户？",
-    "createProfile": "创建档案"
+    "createProfile": "创建档案",
+    "givenName": "名",
+    "familyName": "姓"
   },
   "dashboard": {
     "nav": {
@@ -459,13 +459,12 @@
       "review": "确认信息"
     },
     "personal": {
-      "title": "个人信息",
-      "blurb": "请填写与护照一致的姓名。"
+      "title": "创建您的个人资料",
+      "blurb": "请告诉我们您是谁。姓名必须与护照一致。"
     },
     "identity": {
       "title": "身份信息",
-      "blurb": "用于申请事务的护照及国籍信息。",
-      "extras": "性别、居住国家及偏好联系语言等信息将在此处添加。"
+      "blurb": "用于申请事务的护照及国籍信息。"
     },
     "education": {
       "title": "教育经历",
@@ -525,6 +524,10 @@
       "badType": "请选择 JPEG、PNG 或 WebP 格式的图片。",
       "badTypePassport": "请选择 JPEG、PNG 或 PDF 格式的文件。",
       "tooBig": "文件大小超过 {mb} MB。"
+    },
+    "incomplete": "缺少必填信息：{sections}。",
+    "sectionName": {
+      "PROFILE": "个人资料"
     }
   },
   "university": {
@@ -1741,5 +1744,38 @@
         "summary": "对学生在申请前最常提出的问题给出明确解答。"
       }
     }
+  },
+  "profileForm": {
+    "nameNotice": "请按护照上的写法填写姓名。系统会统一保存为大写字母，即使您输入的是小写。",
+    "nameInvalid": "只能使用字母、空格、连字符和撇号。",
+    "dobHint": "您必须年满 17 周岁。",
+    "dobFuture": "出生日期不能是未来的日期。",
+    "dobUnderage": "年满 17 周岁方可申请。",
+    "gender": "性别",
+    "genderOption": {
+      "FEMALE": "女",
+      "MALE": "男",
+      "UNSPECIFIED": "未说明"
+    },
+    "countryOfOrigin": "原籍国家",
+    "countryOfResidence": "居住国家",
+    "nativeLanguage": "母语",
+    "contactNumber": "联系电话",
+    "contactNumberHint": "请包含国家区号，例如 +86…",
+    "wechatId": "微信号",
+    "whatsapp": "WhatsApp 号码",
+    "contactHandleHint": "至少填写一项：微信或 WhatsApp。",
+    "contactHandleRequired": "请填写微信号或 WhatsApp 号码。",
+    "emailVerified": "邮箱已验证",
+    "verifyEmail": "验证邮箱",
+    "verifyBeforeSave": "保存前请先验证您的新邮箱。",
+    "keepEmail": "保留 {email}",
+    "saveContinue": "保存并继续",
+    "sectionPerson": "关于您",
+    "sectionCountries": "国籍与居住地",
+    "sectionContact": "联系方式"
+  },
+  "form": {
+    "select": "请选择…"
   }
 }

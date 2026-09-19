@@ -28,6 +28,19 @@ beforeEach(() => {
   nav.mockReset()
 })
 
+describe('register: passport names', () => {
+  it('asks for given and family names and says they must match the passport, in UPPERCASE', async () => {
+    const w = await mountSuspended(Register)
+
+    expect(w.text()).toContain('Given name')
+    expect(w.text()).toContain('Family name')
+    expect(w.text()).not.toContain('First name')
+    expect(w.text()).toContain('exactly as they appear on your passport')
+    expect(w.text()).toContain('UPPERCASE')
+    expect(w.find('#firstName').element.closest('.uppercase')).not.toBeNull()
+  })
+})
+
 async function reachPasswordStep(w: VueWrapper) {
   await w.find('#firstName').setValue('Ada')
   await w.find('#lastName').setValue('Lovelace')

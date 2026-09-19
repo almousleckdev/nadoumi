@@ -261,11 +261,9 @@
     "loginTitle": "Sign in",
     "registerTitle": "Create your profile",
     "fullName": "Full name",
-    "firstName": "First name",
-    "lastName": "Last name",
     "username": "Username",
     "usernameHint": "2–20 characters, used to sign in",
-    "passportNameHint": "Enter your name exactly as it appears on your passport.",
+    "passportNameHint": "Enter your names exactly as they appear on your passport. They are saved in UPPERCASE.",
     "step1Title": "Your details",
     "step2Title": "Set a password",
     "next": "Next",
@@ -322,7 +320,9 @@
       "password": "Password"
     },
     "newToNadoumi": "New to Nadoumi?",
-    "createProfile": "Create a profile"
+    "createProfile": "Create a profile",
+    "givenName": "Given name",
+    "familyName": "Family name"
   },
   "dashboard": {
     "nav": {
@@ -459,13 +459,12 @@
       "review": "Review"
     },
     "personal": {
-      "title": "Personal information",
-      "blurb": "Your name as it appears on your passport."
+      "title": "Create your profile",
+      "blurb": "Tell us who you are. Your names must match your passport."
     },
     "identity": {
       "title": "Identity",
-      "blurb": "Passport and nationality details for your applications.",
-      "extras": "Gender, country of residence and preferred contact language will be added here."
+      "blurb": "Passport and nationality details for your applications."
     },
     "education": {
       "title": "Education history",
@@ -525,6 +524,10 @@
       "badType": "Choose a JPEG, PNG or WebP image.",
       "badTypePassport": "Choose a JPEG, PNG or PDF file.",
       "tooBig": "File is larger than {mb} MB."
+    },
+    "incomplete": "Some required information is missing: {sections}.",
+    "sectionName": {
+      "PROFILE": "Profile"
     }
   },
   "university": {
@@ -1741,5 +1744,38 @@
         "summary": "Straight answers to the questions students ask most before applying."
       }
     }
+  },
+  "profileForm": {
+    "nameNotice": "Write your names exactly as they appear on your passport. They are saved in UPPERCASE, even if you type them in lowercase.",
+    "nameInvalid": "Use letters, spaces, hyphens and apostrophes only.",
+    "dobHint": "You must be at least 17 years old.",
+    "dobFuture": "Date of birth cannot be in the future.",
+    "dobUnderage": "You must be at least 17 years old to apply.",
+    "gender": "Gender",
+    "genderOption": {
+      "FEMALE": "Female",
+      "MALE": "Male",
+      "UNSPECIFIED": "Unspecified"
+    },
+    "countryOfOrigin": "Country of origin",
+    "countryOfResidence": "Country of residence",
+    "nativeLanguage": "Native language",
+    "contactNumber": "Contact number",
+    "contactNumberHint": "Include the country code, for example +86…",
+    "wechatId": "WeChat ID",
+    "whatsapp": "WhatsApp number",
+    "contactHandleHint": "Provide at least one: WeChat or WhatsApp.",
+    "contactHandleRequired": "Add a WeChat ID or a WhatsApp number.",
+    "emailVerified": "Email verified",
+    "verifyEmail": "Verify email",
+    "verifyBeforeSave": "Verify your new email address before saving.",
+    "keepEmail": "Keep {email}",
+    "saveContinue": "Save and continue",
+    "sectionPerson": "About you",
+    "sectionCountries": "Nationality and residence",
+    "sectionContact": "Contact details"
+  },
+  "form": {
+    "select": "Select…"
   }
 }

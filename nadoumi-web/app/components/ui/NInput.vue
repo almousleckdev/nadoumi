@@ -8,8 +8,10 @@ const props = withDefaults(defineProps<{
   autocomplete?: string
   placeholder?: string
   maxlength?: number
+  min?: string
+  max?: string
   disabled?: boolean
-}>(), { type: 'text', autocomplete: undefined, placeholder: undefined, maxlength: undefined })
+}>(), { type: 'text', autocomplete: undefined, placeholder: undefined, maxlength: undefined, min: undefined, max: undefined })
 defineEmits<{ 'update:modelValue': [value: string] }>()
 const slots = useSlots()
 
@@ -29,6 +31,8 @@ const borderClass = computed(() => {
       :value="modelValue"
       :placeholder="placeholder"
       :maxlength="maxlength"
+      :min="min"
+      :max="max"
       :disabled="disabled"
       :autocomplete="autocomplete"
       :aria-invalid="invalid ? 'true' : undefined"

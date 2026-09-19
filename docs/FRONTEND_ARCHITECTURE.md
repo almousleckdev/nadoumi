@@ -404,6 +404,24 @@ Part I, `docs/DOCUMENT_MANAGEMENT.md` §3.2.**
 Shared: OpenAPI-generated TypeScript types once `/api/v1/**` exists; a small shared
 API-client package.
 
+### 7.x Shared form building blocks (IMPLEMENTED, onboarding v2 slice 1)
+
+Forms in `nadoumi-web` are composed from shared pieces; a form must not re-declare a label + control + error
+block or hard-code an option list.
+
+| Piece | Where | Purpose |
+| --- | --- | --- |
+| `FormSection` | `app/components/form/` | Titled group on the shared two-column grid (labelled region) |
+| `FormTextField` | `app/components/form/` | `NField` + `NInput` with `v-model`, error, hint, `uppercase` display, optional suffix slot |
+| `FormSelectField` | `app/components/form/` | `NField` + `NSelect`; default placeholder from `form.select` |
+| `useLocaleOptions()` | `app/composables/` | Country and language options named in the active locale (`Intl.DisplayNames`, no data files) |
+| `useCooldown()` | `app/composables/` | Resend countdown shared by `useOtp` and the applicant email verification |
+| `app/constants/profile.ts` | constants | Gender values, required profile fields, validation-code to i18n-key map |
+| `validateProfile()` | `app/utils/profileRules.ts` | Pure, unit-tested field validation returning codes; the component translates them once |
+
+The onboarding gate reads the **server** flag (`ApplicantDto.onboardingComplete`) and **fails closed**
+(`useOnboarding`).
+
 ## 5. Cross-cutting frontend rules (PLANNED)
 
 - **No security in the frontend.** Route guards, hidden fields, and disabled buttons

@@ -261,11 +261,9 @@
     "loginTitle": "تسجيل الدخول",
     "registerTitle": "أنشئ ملفك التعريفي",
     "fullName": "الاسم الكامل",
-    "firstName": "الاسم الأول",
-    "lastName": "اسم العائلة",
     "username": "اسم المستخدم",
     "usernameHint": "من 2 إلى 20 حرفًا، يُستخدم لتسجيل الدخول",
-    "passportNameHint": "أدخل اسمك تمامًا كما يظهر في جواز سفرك.",
+    "passportNameHint": "اكتب اسمك تمامًا كما يظهر في جواز سفرك. يتم حفظه بأحرف كبيرة.",
     "step1Title": "بياناتك",
     "step2Title": "تعيين كلمة مرور",
     "next": "التالي",
@@ -322,7 +320,9 @@
       "password": "كلمة المرور"
     },
     "newToNadoumi": "جديد على Nadoumi؟",
-    "createProfile": "إنشاء ملف تعريفي"
+    "createProfile": "إنشاء ملف تعريفي",
+    "givenName": "الاسم الأول",
+    "familyName": "اسم العائلة"
   },
   "dashboard": {
     "nav": {
@@ -459,13 +459,12 @@
       "review": "المراجعة"
     },
     "personal": {
-      "title": "المعلومات الشخصية",
-      "blurb": "اسمك كما يظهر في جواز سفرك."
+      "title": "أنشئ ملفك الشخصي",
+      "blurb": "أخبرنا من أنت. يجب أن تتطابق أسماؤك مع جواز سفرك."
     },
     "identity": {
       "title": "الهوية",
-      "blurb": "تفاصيل جواز السفر والجنسية اللازمة لطلباتك.",
-      "extras": "سيُضاف هنا الجنس وبلد الإقامة ولغة التواصل المفضّلة."
+      "blurb": "تفاصيل جواز السفر والجنسية اللازمة لطلباتك."
     },
     "education": {
       "title": "المسيرة التعليمية",
@@ -525,6 +524,10 @@
       "badType": "اختر صورة بصيغة JPEG أو PNG أو WebP.",
       "badTypePassport": "اختر ملفًا بصيغة JPEG أو PNG أو PDF.",
       "tooBig": "حجم الملف أكبر من {mb} ميغابايت."
+    },
+    "incomplete": "بعض المعلومات المطلوبة ناقصة: {sections}.",
+    "sectionName": {
+      "PROFILE": "الملف الشخصي"
     }
   },
   "university": {
@@ -1741,5 +1744,38 @@
         "summary": "إجابات واضحة عن الأسئلة الأكثر شيوعًا لدى الطلاب قبل التقديم."
       }
     }
+  },
+  "profileForm": {
+    "nameNotice": "اكتب اسمك تمامًا كما يظهر في جواز سفرك. يتم حفظه بأحرف كبيرة (UPPERCASE) حتى لو كتبته بأحرف صغيرة.",
+    "nameInvalid": "استخدم الأحرف والمسافات والشرطات والفواصل العليا فقط.",
+    "dobHint": "يجب ألا يقل عمرك عن 17 عامًا.",
+    "dobFuture": "لا يمكن أن يكون تاريخ الميلاد في المستقبل.",
+    "dobUnderage": "يجب ألا يقل عمرك عن 17 عامًا للتقديم.",
+    "gender": "الجنس",
+    "genderOption": {
+      "FEMALE": "أنثى",
+      "MALE": "ذكر",
+      "UNSPECIFIED": "غير محدد"
+    },
+    "countryOfOrigin": "بلد المنشأ",
+    "countryOfResidence": "بلد الإقامة",
+    "nativeLanguage": "اللغة الأم",
+    "contactNumber": "رقم التواصل",
+    "contactNumberHint": "أضف رمز الدولة، مثل +86…",
+    "wechatId": "معرّف WeChat",
+    "whatsapp": "رقم واتساب",
+    "contactHandleHint": "أدخل واحدًا على الأقل: WeChat أو واتساب.",
+    "contactHandleRequired": "أضف معرّف WeChat أو رقم واتساب.",
+    "emailVerified": "تم التحقق من البريد",
+    "verifyEmail": "تحقق من البريد",
+    "verifyBeforeSave": "تحقق من بريدك الجديد قبل الحفظ.",
+    "keepEmail": "الإبقاء على {email}",
+    "saveContinue": "حفظ ومتابعة",
+    "sectionPerson": "عنك",
+    "sectionCountries": "الجنسية والإقامة",
+    "sectionContact": "بيانات التواصل"
+  },
+  "form": {
+    "select": "اختر…"
   }
 }

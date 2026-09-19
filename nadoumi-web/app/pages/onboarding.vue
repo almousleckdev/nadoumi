@@ -6,9 +6,9 @@ definePageMeta({ layout: 'onboarding', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { activeApplicantId, refresh } = useSession()
-const { invalidate: invalidateOnboarding } = useOnboarding()
+const { markComplete } = useOnboarding()
 const {
-  listMine, get, create, update,
+  listMine, get, create, update, completeOnboarding, onboardingStatus,
   listEducation, addEducation, updateEducation, deleteEducation,
 } = useApplicant()
 
@@ -38,11 +38,16 @@ async function load() {
 await load()
 
 async function saveIdentity(body: SelfApplicantBody) {
-  await run(async () => {
+  const saved = await run(async () => {
     if (applicant.value) applicant.value = await update(applicant.value.id, body)
     else { applicant.value = await create(body); await refresh() }
-    invalidateOnboarding()
+    return true
   }, t('onboarding.saved'))
+  if (saved) next()
+}
+
+function onEmailVerified(updated: ApplicantDto) {
+  applicant.value = updated
 }
 
 function runEdu(fn: () => Promise<unknown>) {
@@ -60,8 +65,26 @@ function back() {
   if (current.value > 0) current.value--
 }
 async function finish() {
-  invalidateOnboarding()
+  if (!applicant.value) return
+  const id = applicant.value.id
+  const status = await run(() => completeOnboarding(id))
+  if (!status) {
+    await showMissingSections(id)
+    return
+  }
+  markComplete()
   await navigateTo(localePath('/dashboard'))
+}
+
+/** The server refused Finish: name what is missing and take the student back to it. */
+async function showMissingSections(id: number) {
+  const status = await onboardingStatus(id).catch(() => null)
+  const missing = status?.sections.filter(s => !s.complete) ?? []
+  if (missing.length === 0) return
+  error.value = t('onboarding.incomplete', {
+    sections: missing.map(s => t(`onboarding.sectionName.${s.key}`)).join(', '),
+  })
+  if (missing.some(s => s.key === 'PROFILE')) current.value = 0
 }
 
 useSeo(t('onboarding.title'), t('onboarding.intro'))
@@ -81,19 +104,28 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
       <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
 
       <OnboardingStep
-        v-if="stepKey === 'personal' || stepKey === 'identity'"
-        :title="stepKey === 'personal' ? t('onboarding.personal.title') : t('onboarding.identity.title')"
-        :blurb="stepKey === 'personal' ? t('onboarding.personal.blurb') : t('onboarding.identity.blurb')"
-        show-legend
+        v-if="stepKey === 'personal'"
+        :title="t('onboarding.personal.title')"
+        :blurb="t('onboarding.personal.blurb')"
       >
-        <ProfileForm :model-value="applicant" :busy="busy" @submit="saveIdentity" />
-        <template v-if="stepKey === 'identity'">
-          <p class="mt-4 text-xs text-slate-400">{{ t('onboarding.identity.extras') }}</p>
-          <div class="mt-4 grid gap-4">
-            <ProfilePhotoUploadCard />
-            <PassportUploadCard />
-          </div>
-        </template>
+        <ProfileForm
+          :model-value="applicant"
+          :busy="busy"
+          :submit-label="t('profileForm.saveContinue')"
+          @submit="saveIdentity"
+          @email-verified="onEmailVerified"
+        />
+      </OnboardingStep>
+
+      <OnboardingStep
+        v-else-if="stepKey === 'identity'"
+        :title="t('onboarding.identity.title')"
+        :blurb="t('onboarding.identity.blurb')"
+      >
+        <div class="grid gap-4">
+          <ProfilePhotoUploadCard />
+          <PassportUploadCard />
+        </div>
       </OnboardingStep>
 
       <OnboardingStep
@@ -161,8 +193,8 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
 
       <div class="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
         <NButton variant="ghost" size="sm" :disabled="current === 0" @click="back">{{ t('onboarding.back') }}</NButton>
-        <NButton v-if="stepKey === 'review'" size="sm" @click="finish">{{ t('onboarding.finish') }}</NButton>
-        <NButton v-else size="sm" @click="next">{{ t('onboarding.next') }}</NButton>
+        <NButton v-if="stepKey === 'review'" size="sm" :loading="busy" @click="finish">{{ t('onboarding.finish') }}</NButton>
+        <NButton v-else-if="stepKey !== 'personal'" size="sm" @click="next">{{ t('onboarding.next') }}</NButton>
       </div>
     </NCard>
   </div>

@@ -7,27 +7,8 @@ export type OtpPurpose = 'REGISTER' | 'PASSWORD_RESET'
  * duplicated OTP logic.
  */
 export function useOtp() {
-  const cooldown = ref(0)
+  const { seconds: cooldown, start: startCooldown } = useCooldown()
   const busy = ref(false)
-  let timer: ReturnType<typeof setInterval> | null = null
-
-  function stopTimer() {
-    if (timer) {
-      clearInterval(timer)
-      timer = null
-    }
-  }
-
-  function startCooldown(seconds = 60) {
-    cooldown.value = seconds
-    stopTimer()
-    timer = setInterval(() => {
-      cooldown.value -= 1
-      if (cooldown.value <= 0) stopTimer()
-    }, 1000)
-  }
-
-  if (getCurrentScope()) onScopeDispose(stopTimer)
 
   /**
    * Ask the backend to email a code. The backend answers 200 whether or not a

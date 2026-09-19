@@ -258,6 +258,27 @@ export interface ApplicantDto {
   email: string | null
   phone: string | null
   status: 'DRAFT' | 'ACTIVE' | 'UNLINKED' | 'ARCHIVED'
+  gender: 'FEMALE' | 'MALE' | 'UNSPECIFIED' | null
+  countryOfOrigin: string | null
+  countryOfResidence: string | null
+  nativeLanguage: string | null
+  wechatId: string | null
+  whatsapp: string | null
+  emailVerified: boolean
+  /** The server's record that onboarding was finished (`onboarded_at`). */
+  onboardingComplete: boolean
+}
+
+export interface OnboardingSectionDto {
+  key: string
+  complete: boolean
+  missing: string[]
+}
+
+export interface OnboardingStatusDto {
+  complete: boolean
+  ready: boolean
+  sections: OnboardingSectionDto[]
 }
 
 export interface EducationDto {

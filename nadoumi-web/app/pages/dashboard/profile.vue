@@ -37,6 +37,6 @@ useSeo(t('dashboard.profileTitle'), t('dashboard.createProfileBlurb'))
     <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
     <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
     <p v-if="!current" class="mb-4 text-sm text-slate-600">{{ t('dashboard.createProfileBlurb') }}</p>
-    <ProfileForm :model-value="current" :busy="busy" @submit="onSubmit" />
+    <ProfileForm :model-value="current" :busy="busy" @submit="onSubmit" @email-verified="current = $event" />
   </SectionCard>
 </template>

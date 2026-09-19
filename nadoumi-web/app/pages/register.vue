@@ -107,14 +107,14 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
 
         <template v-if="step === 1">
           <div class="grid gap-4 sm:grid-cols-2">
-            <NField :label="t('auth.firstName')" for="firstName" required>
-              <NInput id="firstName" v-model="form.firstName" autocomplete="given-name" :maxlength="100" />
+            <NField :label="t('auth.givenName')" for="firstName" required>
+              <NInput id="firstName" v-model="form.firstName" class="uppercase" autocomplete="given-name" :maxlength="100" />
             </NField>
-            <NField :label="t('auth.lastName')" for="lastName" required>
-              <NInput id="lastName" v-model="form.lastName" autocomplete="family-name" :maxlength="100" />
+            <NField :label="t('auth.familyName')" for="lastName" required>
+              <NInput id="lastName" v-model="form.lastName" class="uppercase" autocomplete="family-name" :maxlength="100" />
             </NField>
           </div>
-          <p class="text-xs text-slate-500">{{ t('auth.passportNameHint') }}</p>
+          <NAlert tone="info">{{ t('auth.passportNameHint') }}</NAlert>
         </template>
 
         <EmailVerifyStep

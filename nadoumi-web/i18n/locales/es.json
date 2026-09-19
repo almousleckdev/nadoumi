@@ -261,11 +261,9 @@
     "loginTitle": "Iniciar sesión",
     "registerTitle": "Crea tu perfil",
     "fullName": "Nombre completo",
-    "firstName": "Nombre",
-    "lastName": "Apellido",
     "username": "Nombre de usuario",
     "usernameHint": "De 2 a 20 caracteres, se usa para iniciar sesión",
-    "passportNameHint": "Introduce tu nombre exactamente como aparece en tu pasaporte.",
+    "passportNameHint": "Escribe tus nombres exactamente como aparecen en tu pasaporte. Se guardan en MAYÚSCULAS.",
     "step1Title": "Tus datos",
     "step2Title": "Establece una contraseña",
     "next": "Siguiente",
@@ -322,7 +320,9 @@
       "password": "Contraseña"
     },
     "newToNadoumi": "¿Nuevo en Nadoumi?",
-    "createProfile": "Crear un perfil"
+    "createProfile": "Crear un perfil",
+    "givenName": "Nombre",
+    "familyName": "Apellidos"
   },
   "dashboard": {
     "nav": {
@@ -459,13 +459,12 @@
       "review": "Revisión"
     },
     "personal": {
-      "title": "Información personal",
-      "blurb": "Tu nombre tal como aparece en tu pasaporte."
+      "title": "Crea tu perfil",
+      "blurb": "Cuéntanos quién eres. Tus nombres deben coincidir con tu pasaporte."
     },
     "identity": {
       "title": "Identidad",
-      "blurb": "Datos de pasaporte y nacionalidad para tus solicitudes.",
-      "extras": "Aquí se añadirán el género, el país de residencia y el idioma de contacto preferido."
+      "blurb": "Datos de pasaporte y nacionalidad para tus solicitudes."
     },
     "education": {
       "title": "Historial académico",
@@ -525,6 +524,10 @@
       "badType": "Elige una imagen JPEG, PNG o WebP.",
       "badTypePassport": "Elige un archivo JPEG, PNG o PDF.",
       "tooBig": "El archivo supera los {mb} MB."
+    },
+    "incomplete": "Falta información obligatoria: {sections}.",
+    "sectionName": {
+      "PROFILE": "Perfil"
     }
   },
   "university": {
@@ -1741,5 +1744,38 @@
         "summary": "Respuestas claras a las preguntas que más hacen los estudiantes antes de postular."
       }
     }
+  },
+  "profileForm": {
+    "nameNotice": "Escribe tus nombres exactamente como aparecen en tu pasaporte. Se guardan en MAYÚSCULAS, aunque los escribas en minúsculas.",
+    "nameInvalid": "Usa solo letras, espacios, guiones y apóstrofos.",
+    "dobHint": "Debes tener al menos 17 años.",
+    "dobFuture": "La fecha de nacimiento no puede ser futura.",
+    "dobUnderage": "Debes tener al menos 17 años para postularte.",
+    "gender": "Género",
+    "genderOption": {
+      "FEMALE": "Mujer",
+      "MALE": "Hombre",
+      "UNSPECIFIED": "Sin especificar"
+    },
+    "countryOfOrigin": "País de origen",
+    "countryOfResidence": "País de residencia",
+    "nativeLanguage": "Lengua materna",
+    "contactNumber": "Número de contacto",
+    "contactNumberHint": "Incluye el prefijo del país, por ejemplo +86…",
+    "wechatId": "ID de WeChat",
+    "whatsapp": "Número de WhatsApp",
+    "contactHandleHint": "Indica al menos uno: WeChat o WhatsApp.",
+    "contactHandleRequired": "Añade un ID de WeChat o un número de WhatsApp.",
+    "emailVerified": "Correo verificado",
+    "verifyEmail": "Verificar correo",
+    "verifyBeforeSave": "Verifica tu nuevo correo antes de guardar.",
+    "keepEmail": "Mantener {email}",
+    "saveContinue": "Guardar y continuar",
+    "sectionPerson": "Sobre ti",
+    "sectionCountries": "Nacionalidad y residencia",
+    "sectionContact": "Datos de contacto"
+  },
+  "form": {
+    "select": "Seleccionar…"
   }
 }

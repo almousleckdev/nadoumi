@@ -1,9 +1,12 @@
-import type { ApplicantDto, ContactDto, EducationDto, TestScoreDto } from '~/types/catalog'
+import type { ApplicantDto, ContactDto, EducationDto, OnboardingStatusDto, TestScoreDto } from '~/types/catalog'
 
 export interface SelfApplicantBody {
   givenName: string; familyName: string
   dob?: string; nationality?: string; passportNo?: string; email?: string; phone?: string
+  gender?: string; countryOfOrigin?: string; countryOfResidence?: string; nativeLanguage?: string
+  wechatId?: string; whatsapp?: string
 }
+export interface EmailCodeSent { sent: boolean; throttled: boolean; retryAfter: number }
 export interface EducationBody {
   institution: string; level?: string; field?: string
   gpa?: number; gpaScale?: number; startDate?: string; endDate?: string
@@ -30,6 +33,15 @@ export function useApplicant() {
     create: (b: SelfApplicantBody) => p<ApplicantDto>('applicants', { method: 'POST', body: clean(b) }),
     get: (id: number) => p<ApplicantDto>(`applicants/${id}`, undefined),
     update: (id: number, b: SelfApplicantBody) => p<ApplicantDto>(`applicants/${id}`, { method: 'PUT', body: clean(b) }),
+
+    requestEmailCode: (id: number, email: string) =>
+      p<EmailCodeSent>(`applicants/${id}/email/otp`, { method: 'POST', body: { email } }),
+    verifyEmail: (id: number, email: string, otp: string) =>
+      p<ApplicantDto>(`applicants/${id}/email/verify`, { method: 'POST', body: { email, otp } }),
+
+    onboardingStatus: (id: number) => p<OnboardingStatusDto>(`applicants/${id}/onboarding`, undefined),
+    completeOnboarding: (id: number) =>
+      p<OnboardingStatusDto>(`applicants/${id}/onboarding/complete`, { method: 'POST' }),
 
     listEducation: (id: number) => p<EducationDto[]>(`applicants/${id}/education`, undefined),
     addEducation: (id: number, b: EducationBody) => p<EducationDto>(`applicants/${id}/education`, { method: 'POST', body: clean(b) }),
