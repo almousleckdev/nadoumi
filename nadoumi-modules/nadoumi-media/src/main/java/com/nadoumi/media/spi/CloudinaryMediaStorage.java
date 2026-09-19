@@ -2,16 +2,13 @@ package com.nadoumi.media.spi;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.nadoumi.common.media.MediaAccessClass;
 import com.nadoumi.common.media.MediaStorageService;
 import com.nadoumi.common.media.MediaUploadCommand;
 import com.nadoumi.common.media.ProxyStream;
 import com.nadoumi.common.media.SignedUrl;
-import com.nadoumi.common.media.StoredAsset;
 import com.nadoumi.media.config.MediaProperties;
 import com.nadoumi.media.domain.MediaAsset;
 import com.nadoumi.media.mapper.MediaAssetMapper;
-import com.nadoumi.media.policy.MediaCategoryPolicy;
 import com.nadoumi.media.policy.MediaCategoryPolicy.CategoryRule;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +20,6 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -46,28 +42,21 @@ import org.springframework.util.StringUtils;
  * <p>Logs {@code public_id} + byte size + owner only — never a delivery URL for a
  * PROTECTED/SENSITIVE asset, never the API secret (spec §I.10).</p>
  */
-public class CloudinaryMediaStorage implements MediaStorageService {
+public class CloudinaryMediaStorage extends AbstractMediaStorage {
 
     private static final Logger log = LoggerFactory.getLogger(CloudinaryMediaStorage.class);
 
     private static final String PROVIDER = "CLOUDINARY";
-    private static final String DELIVERY_UPLOAD = "upload";
-    private static final String DELIVERY_AUTHENTICATED = "authenticated";
-    private static final String STATUS_ACTIVE = "ACTIVE";
-    private static final String STATUS_SUPERSEDED = "SUPERSEDED";
-    private static final String STATUS_DELETED = "DELETED";
-    private static final String SYSTEM_ACTOR = "system";
     private static final int HTTP_OK = 200;
     private static final long INTERNAL_FETCH_TTL_SECONDS = 60L;
     private static final Duration HTTP_CONNECT_TIMEOUT = Duration.ofSeconds(10);
     private static final long UNKNOWN_LENGTH = -1L;
 
     private final Cloudinary cloudinary;
-    private final MediaAssetMapper assetMapper;
-    private final MediaProperties properties;
     private final HttpClient httpClient;
 
     public CloudinaryMediaStorage(Cloudinary cloudinary, MediaAssetMapper assetMapper, MediaProperties properties) {
+        super(assetMapper, properties);
         if (cloudinary == null
                 || !StringUtils.hasText(cloudinary.config.cloudName)
                 || !StringUtils.hasText(cloudinary.config.apiKey)
@@ -75,72 +64,59 @@ public class CloudinaryMediaStorage implements MediaStorageService {
             throw new IllegalStateException("CLOUDINARY_URL is not configured");
         }
         this.cloudinary = cloudinary;
-        this.assetMapper = assetMapper;
-        this.properties = properties;
         this.httpClient = HttpClient.newBuilder().connectTimeout(HTTP_CONNECT_TIMEOUT).build();
     }
 
     @Override
-    public StoredAsset put(MediaUploadCommand cmd) {
-        return MediaAssets.toStoredAsset(upload(cmd, resolveAccessClass(cmd)));
+    protected String provider() {
+        return PROVIDER;
     }
 
     @Override
-    public StoredAsset replace(long assetId, MediaUploadCommand cmd) {
-        MediaAsset existing = require(assetId);
-        MediaAccessClass accessClass = cmd.accessClass() != null
-                ? cmd.accessClass()
-                : existing.getAccessClassEnum();
-        MediaAsset created = upload(cmd, accessClass);
-        assetMapper.updateStatus(assetId, STATUS_SUPERSEDED, created.getId(), SYSTEM_ACTOR, null);
-        return MediaAssets.toStoredAsset(created);
+    protected StoredObject store(MediaUploadCommand cmd, byte[] bytes, String deliveryType, String folder,
+            CategoryRule rule) {
+        Map<?, ?> result;
+        try {
+            result = cloudinary.uploader().upload(bytes, ObjectUtils.asMap(
+                    "resource_type", rule.resourceType(),
+                    "type", deliveryType,
+                    "folder", folder,
+                    "use_filename", false,
+                    "unique_filename", true));
+        } catch (IOException e) {
+            throw new UncheckedIOException("Cloudinary upload failed for category " + cmd.category(), e);
+        }
+        return new StoredObject(
+                ObjectUtils.asString(result.get("public_id")),
+                ObjectUtils.asString(result.get("resource_type"), rule.resourceType()),
+                ObjectUtils.asString(result.get("asset_id"), null),
+                ObjectUtils.asLong(result.get("version"), null),
+                ObjectUtils.asString(result.get("secure_url"), null),
+                ObjectUtils.asLong(result.get("bytes"), (long) bytes.length),
+                ObjectUtils.asInteger(result.get("width"), null),
+                ObjectUtils.asInteger(result.get("height"), null));
     }
 
     @Override
-    public String publicUrl(long assetId) {
-        MediaAsset row = require(assetId);
-        requireAccessClass(row, assetId, MediaAccessClass.PUBLIC, "publicUrl");
-        return row.getSecureUrl();
-    }
-
-    @Override
-    public SignedUrl signedUrl(long assetId, Duration ttl) {
-        MediaAsset row = require(assetId);
-        requireAccessClass(row, assetId, MediaAccessClass.PROTECTED, "signedUrl");
+    protected SignedUrl signed(MediaAsset row, Duration ttl) {
         Instant expiresAt = Instant.now().plus(ttl);
         return new SignedUrl(providerDownloadUrl(row, expiresAt), expiresAt);
     }
 
     @Override
-    public ProxyStream openStream(long assetId) {
-        MediaAsset row = require(assetId);
-        MediaAccessClass accessClass = row.getAccessClassEnum();
-        if (accessClass != MediaAccessClass.PROTECTED && accessClass != MediaAccessClass.SENSITIVE) {
-            throw new IllegalArgumentException("openStream is only for PROTECTED/SENSITIVE assets; media asset "
-                    + assetId + " is " + accessClass);
-        }
+    protected ProxyStream openProviderStream(MediaAsset row) {
         String internalUrl = providerDownloadUrl(row, Instant.now().plusSeconds(INTERNAL_FETCH_TTL_SECONDS));
-        HttpResponse<InputStream> response = fetch(internalUrl, assetId);
+        HttpResponse<InputStream> response = fetch(internalUrl, row.getId());
         if (response.statusCode() != HTTP_OK) {
-            drainQuietly(response, assetId);
+            drainQuietly(response, row.getId());
             throw new IllegalStateException("provider returned HTTP " + response.statusCode()
-                    + " for media asset " + assetId);
+                    + " for media asset " + row.getId());
         }
         String contentType = response.headers().firstValue("content-type").orElse(row.getContentType());
         long contentLength = response.headers().firstValueAsLong("content-length")
                 .orElse(row.getByteSize() == null ? UNKNOWN_LENGTH : row.getByteSize());
-        log.info("media asset proxied: id={} public_id={} bytes={}", assetId, row.getPublicId(), contentLength);
+        log.info("media asset proxied: id={} public_id={} bytes={}", row.getId(), row.getPublicId(), contentLength);
         return new ProxyStream(response.body(), contentType, contentLength, row.getOriginalFilename());
-    }
-
-    @Override
-    public Optional<StoredAsset> find(long assetId) {
-        return Optional.ofNullable(assetMapper.findById(assetId)).map(MediaAssets::toStoredAsset);
-    }
-
-    @Override
-    public void softDelete(long assetId, long actorUserId) {
-        assetMapper.updateStatus(assetId, STATUS_DELETED, null, SYSTEM_ACTOR, actorUserId);
     }
 
     @Override
@@ -159,67 +135,10 @@ public class CloudinaryMediaStorage implements MediaStorageService {
                 assetId, row.getPublicId(), ObjectUtils.asString(result.get("result"), "unknown"));
     }
 
-    // ---- internals ----
-
-    private MediaAsset upload(MediaUploadCommand cmd, MediaAccessClass accessClass) {
-        CategoryRule rule = MediaCategoryPolicy.of(cmd.category());
-        byte[] bytes = readAll(cmd.source());
-        String deliveryType = accessClass == MediaAccessClass.PUBLIC ? DELIVERY_UPLOAD : DELIVERY_AUTHENTICATED;
-        String folder = MediaCategoryPolicy.folder(cmd.category(), properties.getEnv());
-
-        Map<?, ?> result;
-        try {
-            result = cloudinary.uploader().upload(bytes, ObjectUtils.asMap(
-                    "resource_type", rule.resourceType(),
-                    "type", deliveryType,
-                    "folder", folder,
-                    "use_filename", false,
-                    "unique_filename", true));
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cloudinary upload failed for category " + cmd.category(), e);
-        }
-
-        MediaAsset row = new MediaAsset();
-        row.setProvider(PROVIDER);
-        row.setAccessClass(accessClass.name());
-        row.setCategory(cmd.category().name());
-        row.setResourceType(ObjectUtils.asString(result.get("resource_type"), rule.resourceType()));
-        row.setDeliveryType(deliveryType);
-        row.setPublicId(ObjectUtils.asString(result.get("public_id")));
-        row.setAssetId(ObjectUtils.asString(result.get("asset_id"), null));
-        row.setCloudVersion(ObjectUtils.asLong(result.get("version"), null));
-        row.setSecureUrl(accessClass == MediaAccessClass.PUBLIC
-                ? ObjectUtils.asString(result.get("secure_url"), null)
-                : null);
-        row.setFolder(folder);
-        row.setOriginalFilename(cmd.originalFilename());
-        row.setContentType(cmd.declaredContentType());
-        row.setByteSize(ObjectUtils.asLong(result.get("bytes"), (long) bytes.length));
-        row.setWidth(ObjectUtils.asInteger(result.get("width"), null));
-        row.setHeight(ObjectUtils.asInteger(result.get("height"), null));
-        row.setChecksumSha256(cmd.checksumSha256());
-        row.setUploadedBy(cmd.uploadedBy());
-        row.setOwnerKind(cmd.owner().kind().name());
-        row.setOwnerId(cmd.owner().id());
-        row.setStatus(STATUS_ACTIVE);
-        row.setCreateBy(SYSTEM_ACTOR);
-
-        assetMapper.insert(row);
-        log.info("media asset stored: id={} public_id={} bytes={} owner={}:{} access={}",
-                row.getId(), row.getPublicId(), row.getByteSize(), row.getOwnerKind(), row.getOwnerId(), accessClass);
-        return row;
-    }
-
-    private MediaAccessClass resolveAccessClass(MediaUploadCommand cmd) {
-        return cmd.accessClass() != null
-                ? cmd.accessClass()
-                : MediaCategoryPolicy.of(cmd.category()).defaultAccessClass();
-    }
-
     /**
      * A signed, time-limited Cloudinary download URL for the original object
      * ({@code /<resource_type>/download?...expires_at=...}). Used verbatim as the
-     * PROTECTED signed URL, and internally (never surfaced) by {@link #openStream}.
+     * PROTECTED signed URL, and internally (never surfaced) by {@link #openProviderStream}.
      */
     private String providerDownloadUrl(MediaAsset row, Instant expiresAt) {
         try {
@@ -250,29 +169,6 @@ public class CloudinaryMediaStorage implements MediaStorageService {
             body.readAllBytes();
         } catch (IOException e) {
             log.debug("failed to drain error-response body for media asset {}", assetId, e);
-        }
-    }
-
-    private MediaAsset require(long assetId) {
-        MediaAsset row = assetMapper.findById(assetId);
-        if (row == null) {
-            throw new IllegalArgumentException("media asset not found: " + assetId);
-        }
-        return row;
-    }
-
-    private void requireAccessClass(MediaAsset row, long assetId, MediaAccessClass expected, String operation) {
-        if (row.getAccessClassEnum() != expected) {
-            throw new IllegalArgumentException(operation + " is only for " + expected + " assets; media asset "
-                    + assetId + " is " + row.getAccessClassEnum());
-        }
-    }
-
-    private static byte[] readAll(InputStream source) {
-        try (InputStream in = source) {
-            return in.readAllBytes();
-        } catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload bytes", e);
         }
     }
 }

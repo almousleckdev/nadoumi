@@ -99,7 +99,7 @@ impl split are dropped.
 
 | Layer | What it is | Where |
 | --- | --- | --- |
-| `MediaStorageService` | Low-level provider SPI: `put` / `replace` / `publicUrl` / `signedUrl` / `openStream` / `purge` / `find` / `softDelete`. Pure JDK types, no Cloudinary type in the signature. | interface in `nadoumi-common` (`com.nadoumi.common.media`); impl `CloudinaryMediaStorage` in the new `nadoumi-media` module (foundational, peer of `nadoumi-identity`) |
+| `MediaStorageService` | Low-level provider SPI: `put` / `replace` / `publicUrl` / `signedUrl` / `openStream` / `purge` / `find` / `softDelete`. Pure JDK types, no Cloudinary type in the signature. | interface in `nadoumi-common` (`com.nadoumi.common.media`); impls in the new `nadoumi-media` module (foundational, peer of `nadoumi-identity`): `CloudinaryMediaStorage` (production) and `LocalFilesystemMediaStorage` (dev), both on `AbstractMediaStorage`, which owns the `nad_media_asset` row, the access-class guards, supersede-on-replace and soft delete; a provider supplies only store / signed URL / stream / purge. `MediaStorageContractTest` holds the behaviour every implementation must share |
 | `MediaGateway` | Domain-facing façade: `upload` / `find` / `publicUrl` / `issueSignedUrl` / `openProxyStream` / `denyAndLog` / `softDelete`. This is what `nadoumi-document` (Step 7) and every catalog module call — never `MediaStorageService` directly. | interface in `nadoumi-common`; impl `MediaService` in `nadoumi-media` |
 | `nad_media_asset` | The metadata + provider-reference registry. `Document ≠ File ≠ Cloudinary Asset` (DM4) — a future `nad_document_version.media_asset_id` FK points here, never at raw storage_key/URL bytes. | `docs/DATABASE_DESIGN.md` §5.6a |
 
