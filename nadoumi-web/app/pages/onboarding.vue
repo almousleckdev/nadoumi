@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ApplicantDto, EducationDto } from '~/types/catalog'
 import type { SelfApplicantBody, EducationBody } from '~/composables/useApplicant'
+import { SECTION_PASSPORT, SECTION_PHOTO } from '~/constants/onboarding'
 
 definePageMeta({ layout: 'onboarding', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
@@ -28,6 +29,7 @@ const progressSteps = computed(() => STEPS.map(s => ({ key: s.key, label: s.labe
 const applicant = ref<ApplicantDto | null>(null)
 const education = ref<EducationDto[]>([])
 const { busy, notice, error, run } = useAsyncAction()
+const progress = useOnboardingProgress(() => applicant.value?.id ?? null)
 
 async function load() {
   const mine = await listMine().catch(() => [])
@@ -36,6 +38,7 @@ async function load() {
   if (applicant.value) education.value = await listEducation(applicant.value.id).catch(() => [])
 }
 await load()
+await progress.refresh()
 
 async function saveIdentity(body: SelfApplicantBody) {
   const saved = await run(async () => {
@@ -43,6 +46,8 @@ async function saveIdentity(body: SelfApplicantBody) {
     else { applicant.value = await create(body); await refresh() }
     return true
   }, t('onboarding.saved'))
+  // the profile feeds the passport comparison, so re-read what the server considers complete
+  await progress.refresh()
   if (saved) next()
 }
 
@@ -57,6 +62,10 @@ function runEdu(fn: () => Promise<unknown>) {
 const onEduAdd = (b: EducationBody) => runEdu(() => addEducation(applicant.value!.id, b))
 const onEduUpdate = (id: number, b: EducationBody) => runEdu(() => updateEducation(applicant.value!.id, id, b))
 const onEduRemove = (id: number) => runEdu(() => deleteEducation(applicant.value!.id, id))
+
+/** Photo and passport are done as far as the server is concerned (the passport also matches the profile). */
+const identityDone = computed(() => progress.isComplete(SECTION_PHOTO) && progress.isComplete(SECTION_PASSPORT))
+const canAdvance = computed(() => stepKey.value !== 'identity' || identityDone.value)
 
 function next() {
   if (current.value < STEPS.length - 1) current.value++
@@ -123,8 +132,9 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
         :blurb="t('onboarding.identity.blurb')"
       >
         <div class="grid gap-4">
-          <ProfilePhotoUploadCard />
-          <PassportUploadCard />
+          <PhotoUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" />
+          <PassportUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" @edit-profile="current = 0" />
+          <NAlert v-if="!identityDone" tone="warning">{{ t('onboarding.identity.blocked') }}</NAlert>
         </div>
       </OnboardingStep>
 
@@ -194,7 +204,7 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
       <div class="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
         <NButton variant="ghost" size="sm" :disabled="current === 0" @click="back">{{ t('onboarding.back') }}</NButton>
         <NButton v-if="stepKey === 'review'" size="sm" :loading="busy" @click="finish">{{ t('onboarding.finish') }}</NButton>
-        <NButton v-else-if="stepKey !== 'personal'" size="sm" @click="next">{{ t('onboarding.next') }}</NButton>
+        <NButton v-else-if="stepKey !== 'personal'" size="sm" :disabled="!canAdvance" @click="next">{{ t('onboarding.next') }}</NButton>
       </div>
     </NCard>
   </div>

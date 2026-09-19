@@ -423,7 +423,8 @@
     "captcha": "The captcha answer was incorrect. Please try again.",
     "registrationDisabled": "Registration is currently closed.",
     "invalidEmail": "Enter a valid email address.",
-    "loadSection": "This section could not be loaded. Please refresh."
+    "loadSection": "This section could not be loaded. Please refresh.",
+    "verifyEmailFirst": "Verify your new email address before saving."
   },
   "legal": {
     "draftNote": "Draft. Placeholder text pending legal review.",
@@ -464,7 +465,8 @@
     },
     "identity": {
       "title": "Identity",
-      "blurb": "Passport and nationality details for your applications."
+      "blurb": "Passport and nationality details for your applications.",
+      "blocked": "Add your photo and a matching passport to continue."
     },
     "education": {
       "title": "Education history",
@@ -506,28 +508,30 @@
       "title": "Profile photo",
       "guidance": "Face centred, plain background, even lighting. JPEG, PNG or WebP, up to 5 MB, at least 400x400.",
       "none": "No photo",
-      "tooSmall": "Image must be at least {px}x{px} pixels."
-    },
-    "passport": {
-      "title": "Passport",
-      "guidance": "Upload a clear photo or scan of your passport photo page. The details must be readable.",
-      "none": "No passport uploaded",
-      "confirmReadable": "I confirm the passport details are clearly readable.",
-      "formats": "JPEG, PNG or PDF, up to 10 MB"
+      "tooSmall": "Image must be at least {px}x{px} pixels.",
+      "saved": "Photo saved",
+      "current": "Current photo",
+      "save": "Save photo"
     },
     "upload": {
       "choose": "Choose file",
       "replace": "Replace",
       "remove": "Remove",
-      "save": "Upload",
-      "notYet": "Uploading will be available once document storage is enabled.",
       "badType": "Choose a JPEG, PNG or WebP image.",
       "badTypePassport": "Choose a JPEG, PNG or PDF file.",
-      "tooBig": "File is larger than {mb} MB."
+      "tooBig": "File is larger than {mb} MB.",
+      "failed": "The upload failed. Please try again."
     },
     "incomplete": "Some required information is missing: {sections}.",
     "sectionName": {
-      "PROFILE": "Profile"
+      "PROFILE": "Profile",
+      "PHOTO": "Photo",
+      "PASSPORT": "Passport"
+    },
+    "docStatus": {
+      "done": "Complete",
+      "pending": "Required",
+      "attention": "Needs attention"
     }
   },
   "university": {
@@ -1777,5 +1781,42 @@
   },
   "form": {
     "select": "Select…"
+  },
+  "passport": {
+    "title": "Passport",
+    "guidance": "Upload a clear photo or scan of your passport photo page. We read the details in your browser; the image is not sent to any third party.",
+    "none": "No passport uploaded",
+    "formats": "JPEG, PNG or PDF, up to 10 MB",
+    "reading": "Reading your passport…",
+    "readOk": "We read these details from your passport. Check each one and correct anything that is wrong.",
+    "readFailed": "We could not read the passport automatically. Enter the details exactly as they appear on the passport.",
+    "pdfManual": "PDF files cannot be read automatically. Enter the details exactly as they appear on the passport.",
+    "detailsTitle": "Passport details",
+    "fields": {
+      "passportNo": "Passport number",
+      "givenName": "Given name",
+      "familyName": "Family name",
+      "dob": "Date of birth",
+      "issueDate": "Issue date",
+      "expiryDate": "Expiry date"
+    },
+    "expiryHint": "Your passport must be valid for more than six months from today.",
+    "save": "Save passport",
+    "saved": "Passport saved",
+    "matches": "Your passport matches your profile.",
+    "errors": {
+      "numberInvalid": "Use 5 to 20 letters and numbers.",
+      "issueFuture": "The issue date cannot be in the future.",
+      "expiryBeforeIssue": "The expiry date must be after the issue date.",
+      "expiryTooSoon": "Your passport must be valid for more than six months from today."
+    },
+    "mismatch": {
+      "title": "Your passport and your profile do not match",
+      "body": "The details on your passport are not the same as the details you entered in your profile. Names and date of birth must match your passport exactly. Correct whichever is wrong, then save again.",
+      "field": "Field",
+      "onPassport": "On the passport",
+      "inProfile": "In your profile",
+      "editProfile": "Edit my profile"
+    }
   }
 }

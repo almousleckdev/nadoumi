@@ -156,6 +156,13 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 | Target runtime (Compose / ECS / K8s) | **OPEN** — ops decision, Phase 4+. |
 | Where `nadoumi-web` is hosted | **OPEN** — with the runtime decision. |
 
+### 4.0 Web build: OCR assets (onboarding v2 slice 2)
+
+`nadoumi-web` self-hosts the passport OCR engine. `pnpm install` runs `scripts/copy-ocr-assets.mjs` (via `postinstall`), which copies
+~12 MB into `nadoumi-web/public/vendor/ocr/` (git-ignored). The build must run after install so the files ship; they are served from the
+site's own origin with `Cache-Control: public, max-age=604800` and are only downloaded when a student reads a passport. If a CI cache
+restores `node_modules` without running `postinstall`, run `pnpm ocr:assets` before `nuxt build`.
+
 ### 4.1 Environment-variable contract (Phase 2 — implemented)
 
 Committed `application*.yml` carries **no environment secret**; every value below is

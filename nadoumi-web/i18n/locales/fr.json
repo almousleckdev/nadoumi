@@ -423,7 +423,8 @@
     "captcha": "La réponse au captcha était incorrecte. Veuillez réessayer.",
     "registrationDisabled": "Les inscriptions sont actuellement fermées.",
     "invalidEmail": "Saisissez une adresse e-mail valide.",
-    "loadSection": "Cette section n'a pas pu être chargée. Veuillez actualiser la page."
+    "loadSection": "Cette section n'a pas pu être chargée. Veuillez actualiser la page.",
+    "verifyEmailFirst": "Vérifiez votre nouvelle adresse e-mail avant d'enregistrer."
   },
   "legal": {
     "draftNote": "Brouillon. Texte provisoire en attente de révision juridique.",
@@ -464,7 +465,8 @@
     },
     "identity": {
       "title": "Identité",
-      "blurb": "Détails de passeport et de nationalité pour vos candidatures."
+      "blurb": "Détails de passeport et de nationalité pour vos candidatures.",
+      "blocked": "Ajoutez votre photo et un passeport correspondant pour continuer."
     },
     "education": {
       "title": "Parcours scolaire",
@@ -506,28 +508,30 @@
       "title": "Photo de profil",
       "guidance": "Visage centré, fond uni, éclairage homogène. JPEG, PNG ou WebP, jusqu'à 5 Mo, au moins 400x400.",
       "none": "Aucune photo",
-      "tooSmall": "L'image doit mesurer au moins {px}x{px} pixels."
-    },
-    "passport": {
-      "title": "Passeport",
-      "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport. Les informations doivent être lisibles.",
-      "none": "Aucun passeport téléversé",
-      "confirmReadable": "Je confirme que les informations du passeport sont clairement lisibles.",
-      "formats": "JPEG, PNG ou PDF, jusqu'à 10 Mo"
+      "tooSmall": "L'image doit mesurer au moins {px}x{px} pixels.",
+      "saved": "Photo enregistrée",
+      "current": "Photo actuelle",
+      "save": "Enregistrer la photo"
     },
     "upload": {
       "choose": "Choisir un fichier",
       "replace": "Remplacer",
       "remove": "Retirer",
-      "save": "Téléverser",
-      "notYet": "Le téléversement sera disponible une fois le stockage des documents activé.",
       "badType": "Choisissez une image JPEG, PNG ou WebP.",
       "badTypePassport": "Choisissez un fichier JPEG, PNG ou PDF.",
-      "tooBig": "Le fichier dépasse {mb} Mo."
+      "tooBig": "Le fichier dépasse {mb} Mo.",
+      "failed": "Le téléversement a échoué. Veuillez réessayer."
     },
     "incomplete": "Certaines informations obligatoires sont manquantes : {sections}.",
     "sectionName": {
-      "PROFILE": "Profil"
+      "PROFILE": "Profil",
+      "PHOTO": "Photo",
+      "PASSPORT": "Passeport"
+    },
+    "docStatus": {
+      "done": "Terminé",
+      "pending": "Requis",
+      "attention": "À corriger"
     }
   },
   "university": {
@@ -1777,5 +1781,42 @@
   },
   "form": {
     "select": "Sélectionner…"
+  },
+  "passport": {
+    "title": "Passeport",
+    "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport. Nous lisons les informations dans votre navigateur ; l'image n'est envoyée à aucun tiers.",
+    "none": "Aucun passeport téléversé",
+    "formats": "JPEG, PNG ou PDF, jusqu'à 10 Mo",
+    "reading": "Lecture de votre passeport…",
+    "readOk": "Nous avons lu ces informations sur votre passeport. Vérifiez chacune d'elles et corrigez ce qui est erroné.",
+    "readFailed": "Nous n'avons pas pu lire le passeport automatiquement. Saisissez les informations exactement comme elles figurent sur le passeport.",
+    "pdfManual": "Les fichiers PDF ne peuvent pas être lus automatiquement. Saisissez les informations exactement comme elles figurent sur le passeport.",
+    "detailsTitle": "Informations du passeport",
+    "fields": {
+      "passportNo": "Numéro de passeport",
+      "givenName": "Prénom",
+      "familyName": "Nom de famille",
+      "dob": "Date de naissance",
+      "issueDate": "Date de délivrance",
+      "expiryDate": "Date d'expiration"
+    },
+    "expiryHint": "Votre passeport doit être valide plus de six mois à compter d'aujourd'hui.",
+    "save": "Enregistrer le passeport",
+    "saved": "Passeport enregistré",
+    "matches": "Votre passeport correspond à votre profil.",
+    "errors": {
+      "numberInvalid": "Utilisez de 5 à 20 lettres et chiffres.",
+      "issueFuture": "La date de délivrance ne peut pas être dans le futur.",
+      "expiryBeforeIssue": "La date d'expiration doit être postérieure à la date de délivrance.",
+      "expiryTooSoon": "Votre passeport doit être valide plus de six mois à compter d'aujourd'hui."
+    },
+    "mismatch": {
+      "title": "Votre passeport et votre profil ne correspondent pas",
+      "body": "Les informations de votre passeport ne sont pas les mêmes que celles saisies dans votre profil. Les noms et la date de naissance doivent correspondre exactement au passeport. Corrigez ce qui est erroné, puis enregistrez à nouveau.",
+      "field": "Champ",
+      "onPassport": "Sur le passeport",
+      "inProfile": "Dans votre profil",
+      "editProfile": "Modifier mon profil"
+    }
   }
 }

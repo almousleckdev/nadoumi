@@ -240,6 +240,8 @@ Externals get **no** `sys_role`/`sys_menu` rows, so a student/agent token fails 
 - **Passport (IMPLEMENTED, onboarding v2 slice 2):** the scan is a PROTECTED `APPLICANT_PASSPORT` media asset, served only through a
   short-lived signed URL with an access-log entry (a denied read is logged too). Staff need `nad:applicant:view` **and**
   `nad:applicant:pii:view` for the scan; the passport number and date of birth are masked in API responses without the PII permission.
+  The passport image is read **in the browser** and is never sent to a third party: the OCR engine is self-hosted
+  (`public/vendor/ocr`), not fetched from a CDN. A reading is accepted only if the MRZ check digits validate.
   The browser-side MRZ read is a **consistency check, not identity verification**: the server compares the values the student confirms
   with the profile, records whether they were read or typed (`passport_read_method`) and whether the student edited what was read
   (`passport_data_edited`) so a reviewer can see it. A passport valid for six months or less is refused. Tests: `StudentPassportTest`.

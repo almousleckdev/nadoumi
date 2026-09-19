@@ -25,6 +25,10 @@ const DETAIL_RULES: [RegExp, string][] = [
   [/registration is disabled/i, 'errors.registrationDisabled'],
   [/captcha/i, 'errors.captcha'],
   [/staff must sign in/i, 'errors.badCredentials'],
+  [/more than six months/i, 'passport.errors.expiryTooSoon'],
+  [/passport issue date/i, 'passport.errors.issueFuture'],
+  [/expiry date must be after/i, 'passport.errors.expiryBeforeIssue'],
+  [/verify the new email/i, 'errors.verifyEmailFirst'],
 ]
 
 export function authErrorMessage(err: unknown, t: Translate): string {

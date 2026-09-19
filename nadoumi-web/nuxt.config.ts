@@ -49,6 +49,11 @@ export default defineNuxtConfig({
     ],
   },
   tailwindcss: { cssPath: '~/assets/css/main.css' },
+  // The self-hosted OCR engine (scripts/copy-ocr-assets.mjs) is ~12 MB but only fetched when a
+  // student's passport is read. Not content-hashed, so cached for a week rather than immutable.
+  routeRules: {
+    '/vendor/ocr/**': { headers: { 'cache-control': 'public, max-age=604800' } },
+  },
   runtimeConfig: {
     // server-only: where the BFF forwards /api/** calls.
     // Override at deploy time with NUXT_BACKEND_BASE_URL.

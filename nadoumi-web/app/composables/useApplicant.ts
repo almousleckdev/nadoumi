@@ -1,4 +1,6 @@
-import type { ApplicantDto, ContactDto, EducationDto, OnboardingStatusDto, TestScoreDto } from '~/types/catalog'
+import type {
+  ApplicantDto, ContactDto, EducationDto, OnboardingStatusDto, PassportStatusDto, TestScoreDto,
+} from '~/types/catalog'
 
 export interface SelfApplicantBody {
   givenName: string; familyName: string
@@ -6,6 +8,12 @@ export interface SelfApplicantBody {
   gender?: string; countryOfOrigin?: string; countryOfResidence?: string; nativeLanguage?: string
   wechatId?: string; whatsapp?: string
 }
+export interface PassportBody {
+  passportNo: string; givenName: string; familyName: string
+  dob: string; issueDate: string; expiryDate: string
+  readMethod: 'MRZ' | 'MANUAL'; edited: boolean
+}
+export interface SignedFileUrl { url: string; expiresAt: string }
 export interface EmailCodeSent { sent: boolean; throttled: boolean; retryAfter: number }
 export interface EducationBody {
   institution: string; level?: string; field?: string
@@ -24,6 +32,12 @@ function clean<T extends object>(body: T): Partial<T> {
   ) as Partial<T>
 }
 
+function fileForm(file: Blob, filename: string): FormData {
+  const form = new FormData()
+  form.append('file', file, filename)
+  return form
+}
+
 export function useApplicant() {
   const { studentFetch } = useApi()
   const p = <T>(path: string, opts?: Parameters<typeof studentFetch>[1]) => studentFetch<T>(path, opts)
@@ -38,6 +52,13 @@ export function useApplicant() {
       p<EmailCodeSent>(`applicants/${id}/email/otp`, { method: 'POST', body: { email } }),
     verifyEmail: (id: number, email: string, otp: string) =>
       p<ApplicantDto>(`applicants/${id}/email/verify`, { method: 'POST', body: { email, otp } }),
+
+    uploadPhoto: (id: number, file: Blob) => p<{ mediaId: number }>(`applicants/${id}/photo`, { method: 'POST', body: fileForm(file, 'photo.jpg') }),
+    photoUrl: (id: number) => p<SignedFileUrl>(`applicants/${id}/photo`, { query: { json: 1 } }),
+    uploadPassportScan: (id: number, file: File) => p<{ mediaId: number }>(`applicants/${id}/passport/scan`, { method: 'POST', body: fileForm(file, file.name) }),
+    passportScanUrl: (id: number) => p<SignedFileUrl>(`applicants/${id}/passport/scan`, { query: { json: 1 } }),
+    passportStatus: (id: number) => p<PassportStatusDto>(`applicants/${id}/passport`, undefined),
+    savePassport: (id: number, b: PassportBody) => p<PassportStatusDto>(`applicants/${id}/passport`, { method: 'PUT', body: b }),
 
     onboardingStatus: (id: number) => p<OnboardingStatusDto>(`applicants/${id}/onboarding`, undefined),
     completeOnboarding: (id: number) =>

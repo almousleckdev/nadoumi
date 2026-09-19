@@ -419,6 +419,29 @@ block or hard-code an option list.
 | `app/constants/profile.ts` | constants | Gender values, required profile fields, validation-code to i18n-key map |
 | `validateProfile()` | `app/utils/profileRules.ts` | Pure, unit-tested field validation returning codes; the component translates them once |
 
+#### Documents and the passport reader (IMPLEMENTED, onboarding v2 slice 2)
+
+| Piece | Where | Purpose |
+| --- | --- | --- |
+| `DocumentCard` | `components/onboarding/` | Shell for every onboarding document: title, guidance, status badge (`done`/`pending`/`attention`) |
+| `DocumentDropzone` | `components/onboarding/` | Pick or drop a file; validates type and size (`utils/files.ts`); one place for the messages |
+| `PhotoUploadCard` | `components/onboarding/` | Pick, check minimum size, crop square, save; shown through a signed URL |
+| `PassportUploadCard` | `components/onboarding/` | Choose scan, read in the browser, confirm details, save; shows the mismatch notice |
+| `PassportDetailsForm`, `PassportMismatchNotice` | `components/onboarding/` | Confirmable details (validated by `validatePassport`) and the field-by-field disagreement table |
+| `PassportReader` SPI | `services/passport/types.ts` | `read(image) -> PassportReading \| null`; `null` means "could not read", never a guess |
+| `parsePassportMrz` | `services/passport/mrz.ts` | Parses TD3 MRZ text with the `mrz` library; **accepts only when every check digit and both dates validate** |
+| `createMrzReader` | `services/passport/mrzReader.ts` | Tries the `MRZ_PASSES` (crop and scale) in order with an injected OCR function |
+| `createTesseractSession` | `services/passport/tesseractOcr.ts` | Browser OCR (tesseract.js, lazily imported), one worker per read; **self-hosted** in `public/vendor/ocr/` |
+| `usePassportReader()` | `composables/` | The reader onboarding uses; swap it here for a server-side reader |
+| `useOnboardingProgress()` | `composables/` | Server view of which sections are complete; gates Next on the identity step |
+
+**Self-hosted OCR.** tesseract.js would otherwise fetch its worker and core from a public CDN. `scripts/copy-ocr-assets.mjs`
+(run by `postinstall`, output git-ignored) copies the worker, the three LSTM cores and `eng.traineddata.gz` (~12 MB, fetched only when a
+passport is read) into `public/vendor/ocr/`, cached for a week. **Reading accuracy is best-effort:** OCR misreads some characters, so the
+reader returns null and the student types the details rather than accept an unvalidated read. On a synthetic page, 1 of 12 preprocessing
+variants validated, which is why several passes are tried; real OCR-B passports are expected to read better, but this has not been measured
+on real documents.
+
 The onboarding gate reads the **server** flag (`ApplicantDto.onboardingComplete`) and **fails closed**
 (`useOnboarding`).
 

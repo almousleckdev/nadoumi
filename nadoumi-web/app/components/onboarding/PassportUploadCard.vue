@@ -1,79 +1,134 @@
 <script setup lang="ts">
+import {
+  PASSPORT_ACCEPT, PASSPORT_MAX_MB, PASSPORT_MIME, PASSPORT_READ_FIELDS, type PassportReadState,
+} from '~/constants/passport'
+import type { Ref } from 'vue'
+import type { PassportStatusDto } from '~/types/catalog'
+import type { PassportReading } from '~/services/passport/types'
+import { readAsDataUrl } from '~/utils/files'
+import type { PassportForm } from '~/utils/passportRules'
+
 /**
- * Passport page: pick → validate → large readable preview (zoom / rotate) →
- * confirm readable. Client-only. Upload REQUIRES BACKEND (Document slice).
+ * Passport: choose the scan, read it in the browser, let the student confirm the details,
+ * then save. The server compares the confirmed details with the profile and refuses a
+ * passport that is not valid for more than six months.
  */
+const props = defineProps<{ applicantId: number }>()
+const emit = defineEmits<{ changed: [], 'edit-profile': [] }>()
 const { t } = useI18n()
+const { uploadPassportScan, savePassport, passportStatus } = useApplicant()
+const reader = usePassportReader()
+const { busy, error, notice, run } = useAsyncAction()
 
-const MAX_BYTES = 10 * 1024 * 1024
+const status = ref<PassportStatusDto | null>(null)
+const file = ref<File | null>(null)
+const preview = ref('')
+const readState: Ref<PassportReadState> = ref('idle')
+const reading = ref<PassportForm | null>(null)
+const initial = ref<PassportForm | null>(null)
 
-const src = ref('')
-const fileType = ref('')
-const fileName = ref('')
-const readable = ref(false)
-const error = ref('')
-
-async function onPick(event: Event) {
-  error.value = ''
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-  if (!/^(image\/(jpeg|png)|application\/pdf)$/.test(file.type)) { error.value = t('onboarding.upload.badTypePassport'); return }
-  if (file.size > MAX_BYTES) { error.value = t('onboarding.upload.tooBig', { mb: 10 }); return }
-  src.value = await readAsDataUrl(file)
-  fileType.value = file.type
-  fileName.value = file.name
-  readable.value = false
+function formFrom(saved: PassportStatusDto | null): PassportForm | null {
+  if (!saved?.passportNo) return null
+  return {
+    passportNo: saved.passportNo, givenName: saved.givenName ?? '', familyName: saved.familyName ?? '',
+    dob: saved.dob ?? '', issueDate: saved.issueDate ?? '', expiryDate: saved.expiryDate ?? '',
+  }
 }
-function remove() {
-  src.value = ''
-  fileType.value = ''
-  fileName.value = ''
-  readable.value = false
-  error.value = ''
+
+/** Expiry and issue dates are not in the reading, so those start empty for the student to fill. */
+function formFromReading(r: PassportReading): PassportForm {
+  return {
+    passportNo: r.documentNumber, givenName: r.givenNames, familyName: r.surname,
+    dob: r.dateOfBirth, issueDate: '', expiryDate: r.expiryDate,
+  }
 }
-function readAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader()
-    r.onload = () => resolve(r.result as string)
-    r.onerror = () => reject(r.error)
-    r.readAsDataURL(file)
+
+async function onSelect(picked: File) {
+  file.value = picked
+  preview.value = await readAsDataUrl(picked)
+  reading.value = null
+  if (picked.type === 'application/pdf') {
+    readState.value = 'manual'
+    return
+  }
+  readState.value = 'reading'
+  const result = await reader.read(picked).catch(() => null)
+  if (!result) {
+    readState.value = 'unreadable'
+    return
+  }
+  reading.value = formFromReading(result)
+  initial.value = reading.value
+  readState.value = 'read'
+}
+
+/** True when the student changed anything the reader produced. */
+const wasEdited = (form: PassportForm) =>
+  reading.value !== null && PASSPORT_READ_FIELDS.some(field => form[field] !== reading.value![field])
+
+onMounted(async () => {
+  status.value = await passportStatus(props.applicantId).catch(() => null)
+  initial.value ??= formFrom(status.value)
+})
+
+async function onSubmit(form: PassportForm) {
+  const saved = await run(async () => {
+    if (file.value) await uploadPassportScan(props.applicantId, file.value)
+    status.value = await savePassport(props.applicantId, {
+      ...form,
+      readMethod: reading.value ? 'MRZ' : 'MANUAL',
+      edited: wasEdited(form),
+    })
+    return true
   })
+  if (!saved) return
+  file.value = null
+  emit('changed')
 }
+
+const hasScan = computed(() => Boolean(file.value) || status.value?.scanUploaded === true)
+const showForm = computed(() => Boolean(file.value) || Boolean(status.value?.passportNo))
+const mismatches = computed(() => (status.value?.passportNo && !status.value.matchesProfile ? status.value.mismatches : []))
+const cardStatus = computed(() => {
+  if (!status.value?.passportNo) return 'pending'
+  return status.value.scanUploaded && status.value.validForAdmission && status.value.matchesProfile ? 'done' : 'attention'
+})
+const READ_MESSAGE_KEYS: Record<PassportReadState, string | null> = {
+  idle: null, reading: 'passport.reading', read: 'passport.readOk',
+  unreadable: 'passport.readFailed', manual: 'passport.pdfManual',
+}
+const readMessage = computed(() => {
+  const key = READ_MESSAGE_KEYS[readState.value]
+  return key ? t(key) : ''
+})
 </script>
 
 <template>
-  <NCard>
-    <div class="flex items-start justify-between gap-3">
-      <div>
-        <h3 class="font-display font-semibold text-slate-900">{{ t('onboarding.passport.title') }}</h3>
-        <p class="mt-1 text-sm text-slate-500">{{ t('onboarding.passport.guidance') }}</p>
-      </div>
-      <NBadge tone="warning">{{ t('onboarding.badge.plannedBackend') }}</NBadge>
-    </div>
+  <DocumentCard :title="t('passport.title')" :guidance="t('passport.guidance')" :status="cardStatus">
+    <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
+    <NAlert v-if="cardStatus === 'done'" tone="success">{{ t('passport.matches') }}</NAlert>
+    <PassportMismatchNotice v-if="mismatches.length" :mismatches="mismatches" @edit-profile="$emit('edit-profile')" />
 
-    <NAlert v-if="error" tone="danger" class="mt-4">{{ error }}</NAlert>
+    <DocumentPreview v-if="file" :src="preview" :type="file.type" :name="file.name" />
+    <p v-else-if="!status?.scanUploaded" class="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
+      {{ t('passport.none') }}
+    </p>
 
-    <div class="mt-4 grid gap-3">
-      <DocumentPreview v-if="src" :src="src" :type="fileType" :name="fileName" />
-      <div v-else class="flex h-40 items-center justify-center rounded-lg border border-dashed border-slate-300 text-sm text-slate-400">
-        {{ t('onboarding.passport.none') }}
-      </div>
+    <DocumentDropzone
+      :accept="PASSPORT_ACCEPT"
+      :mime="PASSPORT_MIME"
+      :max-mb="PASSPORT_MAX_MB"
+      :bad-type-message="t('onboarding.upload.badTypePassport')"
+      :hint="t('passport.formats')"
+      :replace="hasScan"
+      @select="onSelect"
+    />
 
-      <NCheckbox v-if="src && fileType !== 'application/pdf'" id="passport-readable" v-model="readable">
-        {{ t('onboarding.passport.confirmReadable') }}
-      </NCheckbox>
+    <p v-if="readMessage" class="flex items-center gap-2 text-sm" :class="readState === 'unreadable' ? 'text-amber-800' : 'text-slate-600'" role="status">
+      <NSpinner v-if="readState === 'reading'" />{{ readMessage }}
+    </p>
 
-      <div class="flex flex-wrap gap-2">
-        <label class="cursor-pointer">
-          <input type="file" accept="image/jpeg,image/png,application/pdf" class="sr-only" @change="onPick">
-          <span class="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold hover:bg-slate-50">
-            {{ src ? t('onboarding.upload.replace') : t('onboarding.upload.choose') }}
-          </span>
-        </label>
-        <NButton v-if="src" size="sm" variant="ghost" @click="remove">{{ t('onboarding.upload.remove') }}</NButton>
-        <NButton size="sm" disabled>{{ t('onboarding.upload.save') }}</NButton>
-      </div>
-      <p class="text-xs text-slate-400">{{ t('onboarding.upload.notYet') }} · {{ t('onboarding.passport.formats') }}</p>
-    </div>
-  </NCard>
+    <PassportDetailsForm v-if="showForm" :initial="initial" :busy="busy" :can-save="hasScan && readState !== 'reading'" @submit="onSubmit" />
+    <p v-if="notice" class="sr-only" role="status">{{ notice }}</p>
+  </DocumentCard>
 </template>

@@ -423,7 +423,8 @@
     "captcha": "La respuesta del captcha era incorrecta. Inténtalo de nuevo.",
     "registrationDisabled": "El registro está cerrado actualmente.",
     "invalidEmail": "Introduce una dirección de correo válida.",
-    "loadSection": "Esta sección no se pudo cargar. Actualiza la página."
+    "loadSection": "Esta sección no se pudo cargar. Actualiza la página.",
+    "verifyEmailFirst": "Verifica tu nuevo correo electrónico antes de guardar."
   },
   "legal": {
     "draftNote": "Borrador. Texto provisional pendiente de revisión legal.",
@@ -464,7 +465,8 @@
     },
     "identity": {
       "title": "Identidad",
-      "blurb": "Datos de pasaporte y nacionalidad para tus solicitudes."
+      "blurb": "Datos de pasaporte y nacionalidad para tus solicitudes.",
+      "blocked": "Añade tu foto y un pasaporte que coincida para continuar."
     },
     "education": {
       "title": "Historial académico",
@@ -506,28 +508,30 @@
       "title": "Foto de perfil",
       "guidance": "Rostro centrado, fondo liso, iluminación uniforme. JPEG, PNG o WebP, hasta 5 MB, mínimo 400x400.",
       "none": "Sin foto",
-      "tooSmall": "La imagen debe medir al menos {px}x{px} píxeles."
-    },
-    "passport": {
-      "title": "Pasaporte",
-      "guidance": "Sube una foto o escaneo nítido de la página con foto de tu pasaporte. Los datos deben ser legibles.",
-      "none": "No se ha subido ningún pasaporte",
-      "confirmReadable": "Confirmo que los datos del pasaporte son claramente legibles.",
-      "formats": "JPEG, PNG o PDF, hasta 10 MB"
+      "tooSmall": "La imagen debe medir al menos {px}x{px} píxeles.",
+      "saved": "Foto guardada",
+      "current": "Foto actual",
+      "save": "Guardar foto"
     },
     "upload": {
       "choose": "Elegir archivo",
       "replace": "Reemplazar",
       "remove": "Quitar",
-      "save": "Subir",
-      "notYet": "La subida estará disponible cuando se active el almacenamiento de documentos.",
       "badType": "Elige una imagen JPEG, PNG o WebP.",
       "badTypePassport": "Elige un archivo JPEG, PNG o PDF.",
-      "tooBig": "El archivo supera los {mb} MB."
+      "tooBig": "El archivo supera los {mb} MB.",
+      "failed": "La subida falló. Inténtalo de nuevo."
     },
     "incomplete": "Falta información obligatoria: {sections}.",
     "sectionName": {
-      "PROFILE": "Perfil"
+      "PROFILE": "Perfil",
+      "PHOTO": "Foto",
+      "PASSPORT": "Pasaporte"
+    },
+    "docStatus": {
+      "done": "Completado",
+      "pending": "Obligatorio",
+      "attention": "Requiere atención"
     }
   },
   "university": {
@@ -1777,5 +1781,42 @@
   },
   "form": {
     "select": "Seleccionar…"
+  },
+  "passport": {
+    "title": "Pasaporte",
+    "guidance": "Sube una foto o un escaneo nítido de la página de datos de tu pasaporte. Leemos los datos en tu navegador; la imagen no se envía a ningún tercero.",
+    "none": "Ningún pasaporte subido",
+    "formats": "JPEG, PNG o PDF, hasta 10 MB",
+    "reading": "Leyendo tu pasaporte…",
+    "readOk": "Hemos leído estos datos de tu pasaporte. Revisa cada uno y corrige lo que esté mal.",
+    "readFailed": "No pudimos leer el pasaporte automáticamente. Escribe los datos exactamente como aparecen en el pasaporte.",
+    "pdfManual": "Los archivos PDF no se pueden leer automáticamente. Escribe los datos exactamente como aparecen en el pasaporte.",
+    "detailsTitle": "Datos del pasaporte",
+    "fields": {
+      "passportNo": "Número de pasaporte",
+      "givenName": "Nombre",
+      "familyName": "Apellidos",
+      "dob": "Fecha de nacimiento",
+      "issueDate": "Fecha de expedición",
+      "expiryDate": "Fecha de caducidad"
+    },
+    "expiryHint": "Tu pasaporte debe ser válido durante más de seis meses a partir de hoy.",
+    "save": "Guardar pasaporte",
+    "saved": "Pasaporte guardado",
+    "matches": "Tu pasaporte coincide con tu perfil.",
+    "errors": {
+      "numberInvalid": "Usa entre 5 y 20 letras y números.",
+      "issueFuture": "La fecha de expedición no puede ser futura.",
+      "expiryBeforeIssue": "La fecha de caducidad debe ser posterior a la de expedición.",
+      "expiryTooSoon": "Tu pasaporte debe ser válido durante más de seis meses a partir de hoy."
+    },
+    "mismatch": {
+      "title": "Tu pasaporte y tu perfil no coinciden",
+      "body": "Los datos de tu pasaporte no son los mismos que los que introdujiste en tu perfil. Los nombres y la fecha de nacimiento deben coincidir exactamente con el pasaporte. Corrige lo que esté mal y guarda de nuevo.",
+      "field": "Campo",
+      "onPassport": "En el pasaporte",
+      "inProfile": "En tu perfil",
+      "editProfile": "Editar mi perfil"
+    }
   }
 }

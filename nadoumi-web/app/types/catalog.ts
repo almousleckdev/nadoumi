@@ -269,6 +269,27 @@ export interface ApplicantDto {
   onboardingComplete: boolean
 }
 
+export interface PassportMismatchDto {
+  field: 'givenName' | 'familyName' | 'dob'
+  passportValue: string | null
+  profileValue: string | null
+}
+
+export interface PassportStatusDto {
+  passportNo: string | null
+  givenName: string | null
+  familyName: string | null
+  dob: string | null
+  issueDate: string | null
+  expiryDate: string | null
+  readMethod: 'MRZ' | 'MANUAL' | null
+  edited: boolean
+  scanUploaded: boolean
+  validForAdmission: boolean
+  matchesProfile: boolean
+  mismatches: PassportMismatchDto[]
+}
+
 export interface OnboardingSectionDto {
   key: string
   complete: boolean

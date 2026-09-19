@@ -26,6 +26,14 @@ vi.mock('~/composables/useApplicant', () => ({
     update: vi.fn().mockResolvedValue(applicant),
     completeOnboarding: (...args: unknown[]) => complete(...args),
     onboardingStatus: (...args: unknown[]) => status(...args),
+    photoUrl: vi.fn().mockRejectedValue({ statusCode: 404 }),
+    uploadPhoto: vi.fn(),
+    passportStatus: vi.fn().mockResolvedValue({
+      passportNo: null, givenName: null, familyName: null, dob: null, issueDate: null, expiryDate: null,
+      readMethod: null, edited: false, scanUploaded: false, validForAdmission: false, matchesProfile: false, mismatches: [],
+    }),
+    uploadPassportScan: vi.fn(),
+    savePassport: vi.fn(),
     listEducation: vi.fn().mockResolvedValue([]),
     addEducation: vi.fn(),
     updateEducation: vi.fn(),
@@ -35,10 +43,17 @@ vi.mock('~/composables/useApplicant', () => ({
 mockNuxtImport('navigateTo', () => nav)
 mockNuxtImport('useLocalePath', () => () => (p: string) => p)
 
+const section = (key: string, complete: boolean) => ({ key, complete, missing: complete ? [] : ['x'] })
+const progress = (photo: boolean, passport: boolean) => ({
+  complete: false, ready: photo && passport,
+  sections: [section('PROFILE', true), section('PHOTO', photo), section('PASSPORT', passport)],
+})
+
 const button = (w: VueWrapper, label: string) =>
   w.findAll('button').find(b => b.text().toLowerCase() === label.toLowerCase())
 
 async function reviewStep() {
+  status.mockResolvedValue(progress(true, true))
   const w = await mountSuspended(Onboarding)
   await flushPromises()
   await w.find('form').trigger('submit') // Save and continue
@@ -53,7 +68,7 @@ async function reviewStep() {
 beforeEach(() => {
   nav.mockReset()
   complete.mockReset()
-  status.mockReset()
+  status.mockReset().mockResolvedValue(progress(false, false))
 })
 
 describe('onboarding wizard', () => {
@@ -72,8 +87,29 @@ describe('onboarding wizard', () => {
     await w.find('form').trigger('submit')
     await flushPromises()
 
+    expect(w.text()).toContain('Profile photo')
     expect(w.text()).toContain('Passport')
-    expect(button(w, 'Next')).toBeTruthy()
+  })
+
+  it('keeps Next disabled on the identity step until the server reports photo and passport complete', async () => {
+    const w = await mountSuspended(Onboarding)
+    await flushPromises()
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(button(w, 'Next')!.attributes('disabled')).toBeDefined()
+    expect(w.text()).toContain('Add your photo and a matching passport to continue.')
+  })
+
+  it('enables Next once the server reports photo and passport complete', async () => {
+    status.mockResolvedValue(progress(true, true))
+    const w = await mountSuspended(Onboarding)
+    await flushPromises()
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(button(w, 'Next')!.attributes('disabled')).toBeUndefined()
+    expect(w.text()).not.toContain('Add your photo and a matching passport to continue.')
   })
 
   it('leaves for the dashboard only after the server accepts Finish', async () => {
@@ -88,9 +124,9 @@ describe('onboarding wizard', () => {
   })
 
   it('stays put, names the missing section and returns to it when the server refuses Finish', async () => {
+    const w = await reviewStep()
     complete.mockRejectedValue({ statusCode: 400, data: { detail: 'onboarding is incomplete: PROFILE' } })
     status.mockResolvedValue({ complete: false, ready: false, sections: [{ key: 'PROFILE', complete: false, missing: ['phone'] }] })
-    const w = await reviewStep()
 
     await button(w, 'Finish')!.trigger('click')
     await flushPromises()

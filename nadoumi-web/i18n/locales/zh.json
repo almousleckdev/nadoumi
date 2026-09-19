@@ -423,7 +423,8 @@
     "captcha": "图形验证码输入错误,请重试。",
     "registrationDisabled": "注册功能目前已关闭。",
     "invalidEmail": "请输入有效的邮箱地址。",
-    "loadSection": "该栏目加载失败,请刷新页面重试。"
+    "loadSection": "该栏目加载失败,请刷新页面重试。",
+    "verifyEmailFirst": "保存前请先验证您的新邮箱。"
   },
   "legal": {
     "draftNote": "草案内容,待法务审核后正式生效。",
@@ -464,7 +465,8 @@
     },
     "identity": {
       "title": "身份信息",
-      "blurb": "用于申请事务的护照及国籍信息。"
+      "blurb": "用于申请事务的护照及国籍信息。",
+      "blocked": "请添加照片和与资料一致的护照后继续。"
     },
     "education": {
       "title": "教育经历",
@@ -506,28 +508,30 @@
       "title": "证件照",
       "guidance": "面部居中、背景简洁、光线均匀。支持 JPEG、PNG 或 WebP 格式,大小不超过 5 MB,分辨率至少为 400x400。",
       "none": "暂无照片",
-      "tooSmall": "图片尺寸至少需为 {px}x{px} 像素。"
-    },
-    "passport": {
-      "title": "护照",
-      "guidance": "请上传护照个人信息页的清晰照片或扫描件,确保信息可清晰辨认。",
-      "none": "尚未上传护照",
-      "confirmReadable": "我确认护照信息清晰可辨。",
-      "formats": "支持 JPEG、PNG 或 PDF 格式,大小不超过 10 MB"
+      "tooSmall": "图片尺寸至少需为 {px}x{px} 像素。",
+      "saved": "照片已保存",
+      "current": "当前照片",
+      "save": "保存照片"
     },
     "upload": {
       "choose": "选择文件",
       "replace": "替换",
       "remove": "移除",
-      "save": "上传",
-      "notYet": "文件上传功能将在证件存储服务启用后开放。",
       "badType": "请选择 JPEG、PNG 或 WebP 格式的图片。",
       "badTypePassport": "请选择 JPEG、PNG 或 PDF 格式的文件。",
-      "tooBig": "文件大小超过 {mb} MB。"
+      "tooBig": "文件大小超过 {mb} MB。",
+      "failed": "上传失败，请重试。"
     },
     "incomplete": "缺少必填信息：{sections}。",
     "sectionName": {
-      "PROFILE": "个人资料"
+      "PROFILE": "个人资料",
+      "PHOTO": "照片",
+      "PASSPORT": "护照"
+    },
+    "docStatus": {
+      "done": "已完成",
+      "pending": "必填",
+      "attention": "需要处理"
     }
   },
   "university": {
@@ -1777,5 +1781,42 @@
   },
   "form": {
     "select": "请选择…"
+  },
+  "passport": {
+    "title": "护照",
+    "guidance": "请上传清晰的护照资料页照片或扫描件。系统在您的浏览器中读取信息，图片不会发送给任何第三方。",
+    "none": "尚未上传护照",
+    "formats": "JPEG、PNG 或 PDF，最大 10 MB",
+    "reading": "正在读取您的护照…",
+    "readOk": "我们已从护照中读取以下信息。请逐项核对，并更正有误之处。",
+    "readFailed": "无法自动读取护照。请按护照上的内容准确填写。",
+    "pdfManual": "PDF 文件无法自动读取。请按护照上的内容准确填写。",
+    "detailsTitle": "护照信息",
+    "fields": {
+      "passportNo": "护照号码",
+      "givenName": "名",
+      "familyName": "姓",
+      "dob": "出生日期",
+      "issueDate": "签发日期",
+      "expiryDate": "有效期至"
+    },
+    "expiryHint": "护照自今天起有效期必须超过六个月。",
+    "save": "保存护照",
+    "saved": "护照已保存",
+    "matches": "您的护照与个人资料一致。",
+    "errors": {
+      "numberInvalid": "请使用 5 至 20 位字母和数字。",
+      "issueFuture": "签发日期不能是未来的日期。",
+      "expiryBeforeIssue": "有效期必须晚于签发日期。",
+      "expiryTooSoon": "护照自今天起有效期必须超过六个月。"
+    },
+    "mismatch": {
+      "title": "护照与个人资料不一致",
+      "body": "护照上的信息与您在个人资料中填写的信息不一致。姓名和出生日期必须与护照完全一致。请更正有误的一方，然后重新保存。",
+      "field": "项目",
+      "onPassport": "护照上",
+      "inProfile": "个人资料中",
+      "editProfile": "修改我的资料"
+    }
   }
 }
