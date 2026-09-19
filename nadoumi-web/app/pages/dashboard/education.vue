@@ -9,9 +9,7 @@ const { activeApplicantId } = useSession()
 const { listEducation, addEducation, updateEducation, deleteEducation } = useApplicant()
 
 const items = ref<EducationDto[]>([])
-const busy = ref(false)
-const notice = ref('')
-const error = ref('')
+const { busy, notice, error, run } = useAsyncAction()
 
 async function reload() {
   if (activeApplicantId.value == null) return
@@ -19,17 +17,14 @@ async function reload() {
 }
 await reload()
 
-async function run(fn: () => Promise<unknown>, ok: string) {
+function runEdu(fn: () => Promise<unknown>, ok: string) {
   if (activeApplicantId.value == null) return
-  busy.value = true; error.value = ''; notice.value = ''
-  try { await fn(); await reload(); notice.value = ok }
-  catch (err) { error.value = authErrorMessage(err, t) }
-  finally { busy.value = false }
+  return run(async () => { await fn(); await reload() }, ok)
 }
 
-const onAdd = (b: EducationBody) => run(() => addEducation(activeApplicantId.value!, b), t('dashboard.addedOk'))
-const onUpdate = (id: number, b: EducationBody) => run(() => updateEducation(activeApplicantId.value!, id, b), t('dashboard.savedOk'))
-const onRemove = (id: number) => run(() => deleteEducation(activeApplicantId.value!, id), t('dashboard.removedOk'))
+const onAdd = (b: EducationBody) => runEdu(() => addEducation(activeApplicantId.value!, b), t('dashboard.addedOk'))
+const onUpdate = (id: number, b: EducationBody) => runEdu(() => updateEducation(activeApplicantId.value!, id, b), t('dashboard.savedOk'))
+const onRemove = (id: number) => runEdu(() => deleteEducation(activeApplicantId.value!, id), t('dashboard.removedOk'))
 
 useSeo(t('dashboard.eduTitle'), t('dashboard.eduTitle'))
 </script>

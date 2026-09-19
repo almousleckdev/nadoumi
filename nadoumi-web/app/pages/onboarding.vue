@@ -27,9 +27,7 @@ const progressSteps = computed(() => STEPS.map(s => ({ key: s.key, label: s.labe
 
 const applicant = ref<ApplicantDto | null>(null)
 const education = ref<EducationDto[]>([])
-const busy = ref(false)
-const notice = ref('')
-const error = ref('')
+const { busy, notice, error, run } = useAsyncAction()
 
 async function load() {
   const mine = await listMine().catch(() => [])
@@ -40,23 +38,16 @@ async function load() {
 await load()
 
 async function saveIdentity(body: SelfApplicantBody) {
-  busy.value = true; error.value = ''; notice.value = ''
-  try {
+  await run(async () => {
     if (applicant.value) applicant.value = await update(applicant.value.id, body)
     else { applicant.value = await create(body); await refresh() }
     invalidateOnboarding()
-    notice.value = t('onboarding.saved')
-  }
-  catch (e) { error.value = authErrorMessage(e, t) }
-  finally { busy.value = false }
+  }, t('onboarding.saved'))
 }
 
-async function runEdu(fn: () => Promise<unknown>) {
+function runEdu(fn: () => Promise<unknown>) {
   if (!applicant.value) return
-  busy.value = true; error.value = ''
-  try { await fn(); education.value = await listEducation(applicant.value.id).catch(() => []) }
-  catch (e) { error.value = authErrorMessage(e, t) }
-  finally { busy.value = false }
+  return run(async () => { await fn(); education.value = await listEducation(applicant.value!.id).catch(() => []) })
 }
 const onEduAdd = (b: EducationBody) => runEdu(() => addEducation(applicant.value!.id, b))
 const onEduUpdate = (id: number, b: EducationBody) => runEdu(() => updateEducation(applicant.value!.id, id, b))

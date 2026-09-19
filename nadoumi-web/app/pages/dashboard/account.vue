@@ -2,28 +2,15 @@
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const { user, signOut } = useSession()
-
-const busy = ref(false)
-const notice = ref('')
-const error = ref('')
+const { busy, notice, error, run } = useAsyncAction()
 
 async function changePassword(payload: { current: string; next: string }) {
-  busy.value = true
-  notice.value = ''
-  error.value = ''
-  try {
+  await run(async () => {
     await $fetch('/api/student-password', {
       method: 'POST',
       body: { currentPassword: payload.current, newPassword: payload.next },
     })
-    notice.value = `${t('dashboard.pwUpdated')} ${t('dashboard.pwOtherSessionsEnded')}`
-  }
-  catch (e) {
-    error.value = authErrorMessage(e, t)
-  }
-  finally {
-    busy.value = false
-  }
+  }, `${t('dashboard.pwUpdated')} ${t('dashboard.pwOtherSessionsEnded')}`)
 }
 
 useSeo(t('dashboard.accountTitle'), t('dashboard.accountTitle'))

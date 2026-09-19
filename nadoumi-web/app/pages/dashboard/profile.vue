@@ -8,9 +8,7 @@ const { activeApplicantId, refresh } = useSession()
 const { listMine, get, create, update } = useApplicant()
 
 const current = ref<ApplicantDto | null>(null)
-const busy = ref(false)
-const notice = ref('')
-const error = ref('')
+const { busy, notice, error, run } = useAsyncAction()
 
 async function load() {
   const mine = await listMine().catch(() => [])
@@ -20,8 +18,7 @@ async function load() {
 await load()
 
 async function onSubmit(body: SelfApplicantBody) {
-  busy.value = true; error.value = ''; notice.value = ''
-  try {
+  await run(async () => {
     if (current.value) {
       current.value = await update(current.value.id, body)
     }
@@ -29,14 +26,7 @@ async function onSubmit(body: SelfApplicantBody) {
       current.value = await create(body)
       await refresh()
     }
-    notice.value = t('dashboard.savedOk')
-  }
-  catch (err) {
-    error.value = authErrorMessage(err, t)
-  }
-  finally {
-    busy.value = false
-  }
+  }, t('dashboard.savedOk'))
 }
 
 useSeo(t('dashboard.profileTitle'), t('dashboard.createProfileBlurb'))
