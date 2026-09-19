@@ -46,6 +46,17 @@ function submitSearch() {
   setFilter('q', searchText.value.trim() || undefined)
 }
 
+const FUNDING = ['FULLY', 'PARTIAL', 'SELF'] as const
+const LANGUAGES = ['ENGLISH', 'CHINESE', 'BOTH'] as const
+const fundingOptions = computed(() => [
+  { value: '', label: t('scholarships.anyFunding') },
+  ...FUNDING.map(v => ({ value: v, label: t(`scholarships.funding.${v}`) })),
+])
+const languageOptions = computed(() => [
+  { value: '', label: t('scholarships.anyLanguage') },
+  ...LANGUAGES.map(v => ({ value: v, label: t(`scholarships.lang.${v}`) })),
+])
+
 const sortOptions = computed(() => [
   { value: '', label: t('scholarships.sortRelevance') },
   { value: 'deadline', label: t('scholarships.sortDeadline') },
@@ -118,70 +129,50 @@ function clearAll() {
           :count-label="t('catalog.resultCount', { n: total })"
         >
           <template #search>
-            <form role="search" class="flex items-center gap-2" @submit.prevent="submitSearch">
-              <label for="sch-search" class="sr-only">{{ t('scholarships.searchLabel') }}</label>
-              <input
-                id="sch-search"
-                v-model="searchText"
-                type="search"
-                :placeholder="t('scholarships.searchPlaceholder')"
-                class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus-visible:border-brand-500"
-              >
-              <NButton type="submit" size="sm">{{ t('common.search') }}</NButton>
-            </form>
+            <CatalogSearchForm
+              id="sch-search"
+              v-model="searchText"
+              :label="t('scholarships.searchLabel')"
+              :placeholder="t('scholarships.searchPlaceholder')"
+              @submit="submitSearch"
+            />
           </template>
 
           <template #filters>
-            <input
-              :value="filters.country ?? ''"
-              type="text"
-              maxlength="2"
+            <FilterTextInput
+              :value="filters.country"
               :placeholder="t('catalog.country')"
-              class="w-24 rounded-md border border-slate-300 px-2.5 py-2 text-sm uppercase outline-none focus-visible:border-brand-500"
-              @change="setFilter('country', ($event.target as HTMLInputElement).value.trim().toUpperCase() || undefined)"
-            >
-            <select
-              :value="filters.funding ?? ''"
-              :aria-label="t('scholarships.anyFunding')"
-              class="rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
-              @change="setFilter('funding', ($event.target as HTMLSelectElement).value || undefined)"
-            >
-              <option value="">{{ t('scholarships.anyFunding') }}</option>
-              <option value="FULLY">{{ t('scholarships.funding.FULLY') }}</option>
-              <option value="PARTIAL">{{ t('scholarships.funding.PARTIAL') }}</option>
-              <option value="SELF">{{ t('scholarships.funding.SELF') }}</option>
-            </select>
-            <select
-              :value="filters.language ?? ''"
-              :aria-label="t('scholarships.anyLanguage')"
-              class="rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
-              @change="setFilter('language', ($event.target as HTMLSelectElement).value || undefined)"
-            >
-              <option value="">{{ t('scholarships.anyLanguage') }}</option>
-              <option value="ENGLISH">{{ t('scholarships.lang.ENGLISH') }}</option>
-              <option value="CHINESE">{{ t('scholarships.lang.CHINESE') }}</option>
-              <option value="BOTH">{{ t('scholarships.lang.BOTH') }}</option>
-            </select>
-            <label class="inline-flex items-center gap-1.5 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                :checked="filters.hasStipend === 'true'"
-                class="rounded border-slate-300 text-brand-600 focus-visible:ring-brand-500"
-                @change="setFilter('hasStipend', ($event.target as HTMLInputElement).checked ? 'true' : undefined)"
-              >
-              {{ t('scholarships.withStipend') }}
-            </label>
+              :maxlength="2"
+              uppercase
+              class="w-24"
+              @commit="setFilter('country', $event)"
+            />
+            <FilterSelect
+              :value="filters.funding"
+              :label="t('scholarships.anyFunding')"
+              :options="fundingOptions"
+              @commit="setFilter('funding', $event)"
+            />
+            <FilterSelect
+              :value="filters.language"
+              :label="t('scholarships.anyLanguage')"
+              :options="languageOptions"
+              @commit="setFilter('language', $event)"
+            />
+            <FilterToggle
+              :checked="filters.hasStipend === 'true'"
+              :label="t('scholarships.withStipend')"
+              @commit="setFilter('hasStipend', $event ? 'true' : undefined)"
+            />
           </template>
 
           <template #sort>
-            <select
+            <FilterSelect
               :value="sort"
-              :aria-label="t('scholarships.sortLabel')"
-              class="rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
-              @change="setSort(($event.target as HTMLSelectElement).value)"
-            >
-              <option v-for="o in sortOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
-            </select>
+              :label="t('scholarships.sortLabel')"
+              :options="sortOptions"
+              @commit="setSort"
+            />
           </template>
 
           <template #chips>

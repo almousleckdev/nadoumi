@@ -419,6 +419,16 @@ block or hard-code an option list.
 | `app/constants/profile.ts` | constants | Gender values, required profile fields, validation-code to i18n-key map |
 | `validateProfile()` | `app/utils/profileRules.ts` | Pure, unit-tested field validation returning codes; the component translates them once |
 
+#### More shared pieces (IMPLEMENTED)
+
+| Piece | Purpose |
+| --- | --- |
+| `usePanZoom` | Pan, zoom, rotate state and pointer handlers for an image in a frame (`ImageCropper`, `DocumentPreview`) |
+| `usePublicDetail(resource)` | The `[slug]` param and its cached record for the programme, scholarship and university detail pages; a missing record is `null` |
+| `CatalogSearchForm`, `FilterTextInput`, `FilterSelect`, `FilterToggle` | The search box and filter controls of the catalog list pages (`components/catalog/`); a page supplies values and an option list, not markup |
+| `useGuideItems(prefix)` | Term/detail rows for a guide section from its translation keys |
+| `LegalLink` | The Terms / Privacy link used in consent copy |
+
 #### Documents and the passport reader (IMPLEMENTED, onboarding v2 slice 2)
 
 | Piece | Where | Purpose |

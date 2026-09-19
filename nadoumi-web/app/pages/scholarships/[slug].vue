@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import type { ScholarshipDetail } from '~/types/catalog'
 
-const route = useRoute()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { status } = useSession()
-const slug = computed(() => String(route.params.slug))
-
-const { publicGet } = useApi()
-const { data: s } = await useAsyncData(
-  () => `scholarship-${slug.value}`,
-  () => publicGet<ScholarshipDetail>(`scholarships/${slug.value}`).catch(() => null),
-  { watch: [slug] },
-)
+const { data: s } = await usePublicDetail<ScholarshipDetail>('scholarships')
 
 useSeo(
   s.value?.title ?? t('catalog.scholarshipsTitle'),

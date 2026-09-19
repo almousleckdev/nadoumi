@@ -59,59 +59,47 @@ function clearAll() {
           :count-label="t('catalog.resultCount', { n: total })"
         >
           <template #search>
-            <form role="search" class="flex items-center gap-2" @submit.prevent="submitSearch">
-              <label for="uni-search" class="sr-only">{{ t('catalog.searchUniversities') }}</label>
-              <input
-                id="uni-search"
-                v-model="searchText"
-                type="search"
-                :placeholder="t('catalog.searchUniversitiesPlaceholder')"
-                class="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus-visible:border-brand-500"
-              >
-              <NButton type="submit" size="sm">{{ t('common.search') }}</NButton>
-            </form>
+            <CatalogSearchForm
+              id="uni-search"
+              v-model="searchText"
+              :label="t('catalog.searchUniversities')"
+              :placeholder="t('catalog.searchUniversitiesPlaceholder')"
+              @submit="submitSearch"
+            />
           </template>
 
           <template #filters>
-            <input
-              :value="filters.country ?? ''"
-              type="text"
-              maxlength="2"
+            <FilterTextInput
+              :value="filters.country"
               :placeholder="t('catalog.country')"
-              class="w-24 rounded-md border border-slate-300 px-2.5 py-2 text-sm uppercase outline-none focus-visible:border-brand-500"
-              @change="setFilter('country', ($event.target as HTMLInputElement).value.trim().toUpperCase() || undefined)"
-            >
-            <input
-              :value="filters.province ?? ''"
-              type="text"
+              :maxlength="2"
+              uppercase
+              class="w-24"
+              @commit="setFilter('country', $event)"
+            />
+            <FilterTextInput
+              :value="filters.province"
               :placeholder="t('catalog.province')"
-              class="w-32 rounded-md border border-slate-300 px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
-              @change="setFilter('province', ($event.target as HTMLInputElement).value.trim() || undefined)"
-            >
-            <input
-              :value="filters.city ?? ''"
-              type="text"
+              class="w-32"
+              @commit="setFilter('province', $event)"
+            />
+            <FilterTextInput
+              :value="filters.city"
               :placeholder="t('catalog.city')"
-              class="w-32 rounded-md border border-slate-300 px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
-              @change="setFilter('city', ($event.target as HTMLInputElement).value.trim() || undefined)"
-            >
-            <select
-              :value="filters.type ?? ''"
-              class="rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm outline-none focus-visible:border-brand-500"
-              :aria-label="t('catalog.anyType')"
-              @change="setFilter('type', ($event.target as HTMLSelectElement).value || undefined)"
-            >
-              <option v-for="o in typeOptions" :key="o.value" :value="o.value">{{ o.label }}</option>
-            </select>
-            <label class="inline-flex items-center gap-1.5 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                :checked="filters.featured === 'true'"
-                class="rounded border-slate-300 text-brand-600 focus-visible:ring-brand-500"
-                @change="setFilter('featured', ($event.target as HTMLInputElement).checked ? 'true' : undefined)"
-              >
-              {{ t('catalog.featured') }}
-            </label>
+              class="w-32"
+              @commit="setFilter('city', $event)"
+            />
+            <FilterSelect
+              :value="filters.type"
+              :label="t('catalog.anyType')"
+              :options="typeOptions"
+              @commit="setFilter('type', $event)"
+            />
+            <FilterToggle
+              :checked="filters.featured === 'true'"
+              :label="t('catalog.featured')"
+              @commit="setFilter('featured', $event ? 'true' : undefined)"
+            />
           </template>
 
           <template #chips>

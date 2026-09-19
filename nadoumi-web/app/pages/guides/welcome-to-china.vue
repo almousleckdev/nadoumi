@@ -1,16 +1,8 @@
 <script setup lang="ts">
-import type { GuideIconName } from '~/components/guides/icons'
-
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-function items(section: string, rows: { key: string, icon: GuideIconName }[]) {
-  return rows.map(({ key, icon }) => ({
-    icon,
-    term: t(`guides.welcomeToChina.${section}.${key}.term`),
-    detail: t(`guides.welcomeToChina.${section}.${key}.detail`),
-  }))
-}
+const items = useGuideItems('guides.welcomeToChina')
 
 const why = items('why', [
   { key: 'lowCost', icon: 'wallet' },

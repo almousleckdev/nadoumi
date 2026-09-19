@@ -1,18 +1,10 @@
 <script setup lang="ts">
 import type { ProgramDetail, ProgramMajor } from '~/types/catalog'
 
-const route = useRoute()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const { status } = useSession()
-const slug = computed(() => String(route.params.slug))
-
-const { publicGet } = useApi()
-const { data: p } = await useAsyncData(
-  () => `program-${slug.value}`,
-  () => publicGet<ProgramDetail>(`programs/${slug.value}`).catch(() => null),
-  { watch: [slug] },
-)
+const { data: p } = await usePublicDetail<ProgramDetail>('programs')
 
 useSeo(
   p.value?.name ?? t('program.fallbackTitle'),

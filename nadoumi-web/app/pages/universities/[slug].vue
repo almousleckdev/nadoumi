@@ -1,17 +1,10 @@
 <script setup lang="ts">
 import type { ProgramCard, UniversityDetail, UniversityHighlight } from '~/types/catalog'
 
-const route = useRoute()
 const { t } = useI18n()
 const localePath = useLocalePath()
-const slug = computed(() => String(route.params.slug))
-
 const { publicGet } = useApi()
-const { data: u } = await useAsyncData(
-  () => `university-${slug.value}`,
-  () => publicGet<UniversityDetail>(`universities/${slug.value}`).catch(() => null),
-  { watch: [slug] },
-)
+const { slug, data: u } = await usePublicDetail<UniversityDetail>('universities')
 const { data: programs } = await useAsyncData(
   () => `university-${slug.value}-programs`,
   () => publicGet<ProgramCard[]>(`universities/${slug.value}/programs`).catch(() => []),

@@ -11,40 +11,10 @@ const props = withDefaults(defineProps<{ src: string; aspect?: number; size?: nu
 const emit = defineEmits<{ crop: [dataUrl: string] }>()
 const { t } = useI18n()
 
-const zoom = ref(1)
-const rotation = ref(0)
-const offset = reactive({ x: 0, y: 0 })
-const dragging = ref(false)
-let start = { x: 0, y: 0 }
+const { zoom, rotation, offset, transform, onPointerDown, onPointerMove, onPointerUp, rotate, reset } = usePanZoom({ min: 1, max: 3 })
 
 const frameW = computed(() => props.size)
 const frameH = computed(() => Math.round(props.size / props.aspect))
-
-const transform = computed(() =>
-  `translate(${offset.x}px, ${offset.y}px) rotate(${rotation.value}deg) scale(${zoom.value})`)
-
-function onPointerDown(e: PointerEvent) {
-  dragging.value = true
-  start = { x: e.clientX - offset.x, y: e.clientY - offset.y }
-  ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-}
-function onPointerMove(e: PointerEvent) {
-  if (!dragging.value) return
-  offset.x = e.clientX - start.x
-  offset.y = e.clientY - start.y
-}
-function onPointerUp() {
-  dragging.value = false
-}
-function rotate() {
-  rotation.value = (rotation.value + 90) % 360
-}
-function reset() {
-  zoom.value = 1
-  rotation.value = 0
-  offset.x = 0
-  offset.y = 0
-}
 
 async function apply() {
   const img = new Image()

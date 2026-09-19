@@ -8,7 +8,6 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{ 'update:modelValue': [value: { terms: boolean; privacy: boolean }] }>()
 
 const { t } = useI18n()
-const localePath = useLocalePath()
 
 function set(part: 'terms' | 'privacy', checked: boolean) {
   emit('update:modelValue', { ...props.modelValue, [part]: checked })
@@ -28,10 +27,10 @@ function setBoth(checked: boolean) {
     >
       <i18n-t keypath="auth.acceptBothShort">
         <template #terms>
-          <NuxtLink :to="localePath('/terms')" class="text-brand-700 hover:underline">{{ t('footer.terms') }}</NuxtLink>
+          <LegalLink to="terms" />
         </template>
         <template #privacy>
-          <NuxtLink :to="localePath('/privacy')" class="text-brand-700 hover:underline">{{ t('footer.privacy') }}</NuxtLink>
+          <LegalLink to="privacy" />
         </template>
       </i18n-t>
     </NCheckbox>
@@ -40,14 +39,14 @@ function setBoth(checked: boolean) {
       <NCheckbox id="accept-terms" :model-value="modelValue.terms" @update:model-value="set('terms', $event)">
         <i18n-t keypath="auth.acceptTermsShort">
           <template #terms>
-            <NuxtLink :to="localePath('/terms')" class="text-brand-700 hover:underline">{{ t('footer.terms') }}</NuxtLink>
+            <LegalLink to="terms" />
           </template>
         </i18n-t>
       </NCheckbox>
       <NCheckbox id="accept-privacy" :model-value="modelValue.privacy" @update:model-value="set('privacy', $event)">
         <i18n-t keypath="auth.acceptPrivacyShort">
           <template #privacy>
-            <NuxtLink :to="localePath('/privacy')" class="text-brand-700 hover:underline">{{ t('footer.privacy') }}</NuxtLink>
+            <LegalLink to="privacy" />
           </template>
         </i18n-t>
       </NCheckbox>

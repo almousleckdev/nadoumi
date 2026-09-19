@@ -7,27 +7,7 @@ const props = defineProps<{ src: string; type: string; name?: string }>()
 const { t } = useI18n()
 
 const isPdf = computed(() => props.type === 'application/pdf' || props.src.startsWith('data:application/pdf'))
-const zoom = ref(1)
-const rotation = ref(0)
-const offset = reactive({ x: 0, y: 0 })
-const dragging = ref(false)
-let start = { x: 0, y: 0 }
-
-const transform = computed(() =>
-  `translate(${offset.x}px, ${offset.y}px) rotate(${rotation.value}deg) scale(${zoom.value})`)
-
-function down(e: PointerEvent) {
-  dragging.value = true
-  start = { x: e.clientX - offset.x, y: e.clientY - offset.y }
-  ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-}
-function move(e: PointerEvent) {
-  if (dragging.value) { offset.x = e.clientX - start.x; offset.y = e.clientY - start.y }
-}
-function up() { dragging.value = false }
-function zoomBy(d: number) { zoom.value = Math.min(4, Math.max(1, +(zoom.value + d).toFixed(2))) }
-function rotate() { rotation.value = (rotation.value + 90) % 360 }
-function fit() { zoom.value = 1; rotation.value = 0; offset.x = 0; offset.y = 0 }
+const { transform, onPointerDown, onPointerMove, onPointerUp, zoomBy, rotate, reset } = usePanZoom({ min: 1, max: 4 })
 </script>
 
 <template>
@@ -35,10 +15,10 @@ function fit() { zoom.value = 1; rotation.value = 0; offset.x = 0; offset.y = 0 
     <div
       v-if="!isPdf"
       class="relative h-72 overflow-hidden rounded-lg border border-slate-200 bg-slate-900/5 touch-none"
-      @pointerdown="down"
-      @pointermove="move"
-      @pointerup="up"
-      @pointercancel="up"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointercancel="onPointerUp"
       @wheel.prevent="zoomBy(-$event.deltaY * 0.001)"
     >
       <img
@@ -58,7 +38,7 @@ function fit() { zoom.value = 1; rotation.value = 0; offset.x = 0; offset.y = 0 
       <NButton size="sm" variant="secondary" @click="zoomBy(0.25)">{{ t('onboarding.doc.zoomIn') }}</NButton>
       <NButton size="sm" variant="secondary" @click="zoomBy(-0.25)">{{ t('onboarding.doc.zoomOut') }}</NButton>
       <NButton size="sm" variant="secondary" @click="rotate">{{ t('onboarding.crop.rotate') }}</NButton>
-      <NButton size="sm" variant="ghost" @click="fit">{{ t('onboarding.doc.fit') }}</NButton>
+      <NButton size="sm" variant="ghost" @click="reset">{{ t('onboarding.doc.fit') }}</NButton>
     </div>
   </div>
 </template>
