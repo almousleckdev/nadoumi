@@ -2,6 +2,7 @@ package com.nadoumi.applicant.web.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
@@ -19,5 +20,17 @@ public record SelfApplicantRequest(
         @Email @Size(max = 120)
         String email,
         @Size(max = 32)
-        String phone) {
+        String phone,
+        @Pattern(regexp = "FEMALE|MALE|UNSPECIFIED")
+        String gender,
+        @Size(min = 2, max = 2)
+        String countryOfOrigin,
+        @Size(min = 2, max = 2)
+        String countryOfResidence,
+        @Size(max = 8)
+        String nativeLanguage,
+        @Size(max = 64)
+        String wechatId,
+        @Size(max = 32)
+        String whatsapp) {
 }

@@ -16,7 +16,15 @@ public record ApplicantResponse(
         String email,
         String phone,
         String status,
-        String createdAt) {
+        String createdAt,
+        String gender,
+        String countryOfOrigin,
+        String countryOfResidence,
+        String nativeLanguage,
+        String wechatId,
+        String whatsapp,
+        boolean emailVerified,
+        boolean onboardingComplete) {
 
     private static final String MASK = "••••";
 
@@ -31,7 +39,15 @@ public record ApplicantResponse(
                 a.getEmail(),
                 a.getPhone(),
                 a.getStatus() == null ? null : a.getStatus().name(),
-                str(a.getCreateTime()));
+                str(a.getCreateTime()),
+                a.getGender(),
+                a.getCountryOfOrigin(),
+                a.getCountryOfResidence(),
+                a.getNativeLanguage(),
+                a.getWechatId(),
+                a.getWhatsapp(),
+                a.getEmailVerifiedAt() != null,
+                a.getOnboardedAt() != null);
     }
 
     private static String str(Object v) {

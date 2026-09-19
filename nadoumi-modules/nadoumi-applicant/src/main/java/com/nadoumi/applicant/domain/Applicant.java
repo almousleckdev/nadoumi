@@ -16,6 +16,14 @@ public class Applicant {
     private String email;
     private String phone;
     private Long photoMediaId;
+    private String gender;
+    private String countryOfOrigin;
+    private String countryOfResidence;
+    private String nativeLanguage;
+    private String wechatId;
+    private String whatsapp;
+    private LocalDateTime emailVerifiedAt;
+    private LocalDateTime onboardedAt;
     private ApplicantStatus status;
     private String createBy;
     private LocalDateTime createTime;
@@ -50,6 +58,32 @@ public class Applicant {
     /** {@code nad_applicant.photo_media_id} — a PROTECTED media asset; never a public URL. */
     public Long getPhotoMediaId() { return photoMediaId; }
     public void setPhotoMediaId(Long photoMediaId) { this.photoMediaId = photoMediaId; }
+
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+
+    public String getCountryOfOrigin() { return countryOfOrigin; }
+    public void setCountryOfOrigin(String countryOfOrigin) { this.countryOfOrigin = countryOfOrigin; }
+
+    public String getCountryOfResidence() { return countryOfResidence; }
+    public void setCountryOfResidence(String countryOfResidence) { this.countryOfResidence = countryOfResidence; }
+
+    public String getNativeLanguage() { return nativeLanguage; }
+    public void setNativeLanguage(String nativeLanguage) { this.nativeLanguage = nativeLanguage; }
+
+    public String getWechatId() { return wechatId; }
+    public void setWechatId(String wechatId) { this.wechatId = wechatId; }
+
+    public String getWhatsapp() { return whatsapp; }
+    public void setWhatsapp(String whatsapp) { this.whatsapp = whatsapp; }
+
+    /** When the contact email was proven by a one-time code; null = unverified. */
+    public LocalDateTime getEmailVerifiedAt() { return emailVerifiedAt; }
+    public void setEmailVerifiedAt(LocalDateTime emailVerifiedAt) { this.emailVerifiedAt = emailVerifiedAt; }
+
+    /** Set only by the onboarding-complete endpoint; null = onboarding not finished. */
+    public LocalDateTime getOnboardedAt() { return onboardedAt; }
+    public void setOnboardedAt(LocalDateTime onboardedAt) { this.onboardedAt = onboardedAt; }
 
     public ApplicantStatus getStatus() { return status; }
     public void setStatus(ApplicantStatus status) { this.status = status; }

@@ -1,5 +1,6 @@
 package com.nadoumi.identity.web;
 
+import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.identity.service.StudentAuthService;
 import com.nadoumi.identity.service.otp.OtpPurpose;
 import com.nadoumi.identity.service.otp.OtpService;
@@ -44,6 +45,7 @@ public class StudentEmailOtpController {
     @PostMapping
     @RateLimiter(time = 3600, count = 20, limitType = LimitType.IP)
     public OtpSentResponse request(@Valid @RequestBody EmailOtpRequest req) {
+        requireAnonymousPurpose(req.purpose());
         if (configService.selectCaptchaEnabled()) {
             loginService.validateCaptcha(req.email(), req.code(), req.uuid());
         }
@@ -56,6 +58,14 @@ public class StudentEmailOtpController {
     @PostMapping("/verify")
     @RateLimiter(time = 600, count = 10, limitType = LimitType.IP)
     public TicketResponse verify(@Valid @RequestBody EmailOtpVerifyRequest req) {
+        requireAnonymousPurpose(req.purpose());
         return new TicketResponse(otp.verify(req.email(), req.purpose(), req.otp()));
+    }
+
+    /** APPLICANT_EMAIL codes are issued only to an authenticated student, never through these anonymous routes. */
+    private static void requireAnonymousPurpose(OtpPurpose purpose) {
+        if (purpose == OtpPurpose.APPLICANT_EMAIL) {
+            throw new NadBadRequestException("this verification is not available here");
+        }
     }
 }

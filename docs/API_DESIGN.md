@@ -77,7 +77,24 @@ JS never holds the raw token. Revision 2 BFF passthroughs:
 `student-password-reset.post`, `student-password.post` (cookie-authed).
 Full design: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md` §15.
 
-### 4.2 Applicant onboarding endpoints (PROPOSED — later phase)
+### 4.2 Applicant onboarding endpoints (PARTLY IMPLEMENTED — onboarding v2, slice 1)
+
+**IMPLEMENTED (slice 1)** — all `@na.canAccessApplicant`, student audience:
+
+| Endpoint | Capability | Notes |
+| --- | --- | --- |
+| `GET /api/student/applicants/{id}/onboarding` | `VIEW_PROFILE` | `{complete, ready, sections[{key, complete, missing[]}]}`; `complete` is the server's `onboarded_at`, `ready` means every section is satisfied |
+| `POST /api/student/applicants/{id}/onboarding/complete` | `EDIT_PROFILE` | 400 with the incomplete section keys unless `ready`; sets `onboarded_at` once, idempotent |
+| `POST /api/student/applicants/{id}/email/otp` | `EDIT_PROFILE` | `{email}`; mails a code to the **new** address (IP rate-limited). `APPLICANT_EMAIL` codes are refused on the anonymous `/api/student/email-otp` routes |
+| `POST /api/student/applicants/{id}/email/verify` | `EDIT_PROFILE` | `{email, otp}`; stores the email and stamps `email_verified_at` |
+
+`PUT /api/student/applicants/{id}` now accepts `gender` (`FEMALE|MALE|UNSPECIFIED`), `countryOfOrigin`,
+`countryOfResidence`, `nativeLanguage`, `wechatId`, `whatsapp`; stores names UPPERCASE; rejects a date of
+birth in the future or under 17; and rejects a changed email that has not been verified. `ApplicantResponse`
+adds those fields plus `emailVerified` and `onboardingComplete`. Registration creates the primary applicant
+(names UPPERCASE, verified email) in the same transaction, so onboarding opens prefilled.
+
+**PROPOSED — later slices (photo, passport, residence, interests, work):**
 
 The full guided onboarding (identity extras, residence branch, interests, languages,
 work, certifications, profile photo, passport) adds a set of section endpoints under

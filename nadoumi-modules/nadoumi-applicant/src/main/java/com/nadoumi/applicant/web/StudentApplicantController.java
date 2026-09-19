@@ -1,6 +1,15 @@
 package com.nadoumi.applicant.web;
 
+import com.nadoumi.applicant.onboarding.OnboardingService;
+import com.nadoumi.applicant.onboarding.OnboardingStatus;
+import com.nadoumi.applicant.service.ApplicantEmailService;
 import com.nadoumi.applicant.service.ApplicantService;
+import com.nadoumi.applicant.web.request.EmailCodeRequest;
+import com.nadoumi.applicant.web.request.EmailVerifyRequest;
+import com.nadoumi.identity.service.otp.OtpService;
+import com.nadoumi.identity.web.response.OtpSentResponse;
+import com.ruoyi.common.annotation.RateLimiter;
+import com.ruoyi.common.enums.LimitType;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
 import com.nadoumi.applicant.web.request.ContactRequest;
 import com.nadoumi.applicant.web.response.ContactResponse;
@@ -36,9 +45,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class StudentApplicantController {
 
     private final ApplicantService service;
+    private final ApplicantEmailService emailService;
+    private final OnboardingService onboarding;
 
-    public StudentApplicantController(ApplicantService service) {
+    public StudentApplicantController(ApplicantService service, ApplicantEmailService emailService,
+            OnboardingService onboarding) {
         this.service = service;
+        this.emailService = emailService;
+        this.onboarding = onboarding;
     }
 
     @GetMapping
@@ -62,6 +76,37 @@ public class StudentApplicantController {
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public ApplicantResponse update(@PathVariable Long id, @Valid @RequestBody SelfApplicantRequest req) {
         return service.update(id, req);
+    }
+
+    // ---- contact email (must be proven before it is used) ----
+
+    @PostMapping("/{id}/email/otp")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    @RateLimiter(time = 3600, count = 10, limitType = LimitType.IP)
+    public OtpSentResponse requestEmailCode(@PathVariable Long id, @Valid @RequestBody EmailCodeRequest req) {
+        OtpService.IssueResult result = emailService.requestCode(id, req.email());
+        return new OtpSentResponse(true, !result.sent(), result.retryAfterSeconds());
+    }
+
+    @PostMapping("/{id}/email/verify")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    @RateLimiter(time = 600, count = 10, limitType = LimitType.IP)
+    public ApplicantResponse verifyEmail(@PathVariable Long id, @Valid @RequestBody EmailVerifyRequest req) {
+        return emailService.verify(id, req.email(), req.otp());
+    }
+
+    // ---- onboarding (server-side completion record) ----
+
+    @GetMapping("/{id}/onboarding")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
+    public OnboardingStatus onboardingStatus(@PathVariable Long id) {
+        return onboarding.status(id);
+    }
+
+    @PostMapping("/{id}/onboarding/complete")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public OnboardingStatus completeOnboarding(@PathVariable Long id) {
+        return onboarding.complete(id);
     }
 
     // ---- profile photo (PROTECTED) ----

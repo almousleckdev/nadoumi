@@ -232,6 +232,11 @@ Externals get **no** `sys_role`/`sys_menu` rows, so a student/agent token fails 
 - **Upload filter:** RuoYi blocks a denylist of extensions (incl. `.html` per commit
   history). See `docs/DOCUMENT_MANAGEMENT.md` for the Nadoumi-grade replacement.
 - **`@RepeatSubmit`** AOP guards double submits; `@RateLimiter` (Redis) available.
+- **Onboarding gate (IMPLEMENTED, slice 1 backend):** a student is onboarded only when the server has stamped
+  `nad_applicant.onboarded_at`, and only `POST /api/student/applicants/{id}/onboarding/complete` (which re-checks every
+  section and requires `EDIT_PROFILE` on that applicant) can do it. `APPLICANT_EMAIL` one-time codes are issued only to
+  an authenticated student for an applicant they can edit, never through the anonymous OTP routes. Tests:
+  `StudentOnboardingFoundationTest`.
 - **Scheduled jobs (IMPLEMENTED):** a `sys_job.invoke_target` is valid only as
   `<beanName>.run()` where the bean implements `SchedulableJob`
   (`ruoyi-common`). `JobRegistry` (`ruoyi-quartz`) resolves the bean from the

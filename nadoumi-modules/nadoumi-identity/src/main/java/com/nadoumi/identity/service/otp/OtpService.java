@@ -134,20 +134,36 @@ public class OtpService {
     }
 
     private EmailMessage otpMail(String email, OtpPurpose purpose, String code) {
-        boolean register = purpose == OtpPurpose.REGISTER;
-        String template = register ? "otp-register" : "otp-password-reset";
-        EmailContent content = EmailContent.builder(register ? "Verify your email address" : "Reset your password")
-                .preheader(register ? "Your Nadoumi verification code" : "Your Nadoumi password reset code")
-                .paragraph(templates.render(template, Map.of()).strip())
+        OtpCopy copy = copyFor(purpose);
+        EmailContent content = EmailContent.builder(copy.title())
+                .preheader(copy.preheader())
+                .paragraph(templates.render(copy.template(), Map.of()).strip())
                 .code(code)
                 .paragraph("This code expires in " + (TTL_SECONDS / 60) + " minutes and can be used once.")
-                .paragraph(register
-                        ? "If you didn't start creating a Nadoumi account, you can ignore this email."
-                        : "If you didn't ask to reset your password, you can ignore this email — nothing changes.")
+                .paragraph(copy.ignoreNote())
                 .build();
         EmailRender r = emailLayout.render(content);
-        String subject = register ? "Verify your email — Nadoumi" : "Reset your Nadoumi password";
-        return new EmailMessage(email, subject, r.text(), r.html());
+        return new EmailMessage(email, copy.subject(), r.text(), r.html());
+    }
+
+    private record OtpCopy(String template, String title, String preheader, String ignoreNote, String subject) {
+    }
+
+    private static OtpCopy copyFor(OtpPurpose purpose) {
+        return switch (purpose) {
+            case REGISTER -> new OtpCopy("otp-register", "Verify your email address",
+                    "Your Nadoumi verification code",
+                    "If you didn't start creating a Nadoumi account, you can ignore this email.",
+                    "Verify your email — Nadoumi");
+            case PASSWORD_RESET -> new OtpCopy("otp-password-reset", "Reset your password",
+                    "Your Nadoumi password reset code",
+                    "If you didn't ask to reset your password, you can ignore this email — nothing changes.",
+                    "Reset your Nadoumi password");
+            case APPLICANT_EMAIL -> new OtpCopy("otp-applicant-email", "Confirm your contact email",
+                    "Your Nadoumi email confirmation code",
+                    "If you didn't ask to use this address on a Nadoumi profile, you can ignore this email.",
+                    "Confirm your email — Nadoumi");
+        };
     }
 
     private EmailMessage accountExistsMail(String email) {

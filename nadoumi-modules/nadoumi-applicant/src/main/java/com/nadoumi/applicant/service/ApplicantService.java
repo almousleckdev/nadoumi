@@ -19,6 +19,8 @@ import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.common.access.ApplicantCapability;
+import com.nadoumi.applicant.rules.AgeRules;
+import com.nadoumi.common.rules.NameRules;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.common.media.MediaCategory;
@@ -29,6 +31,7 @@ import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.media.SignedUrl;
 import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.service.UserApplicantAccessService;
@@ -37,6 +40,8 @@ import com.ruoyi.framework.web.service.PermissionService;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.Locale;
 import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -76,8 +81,7 @@ public class ApplicantService {
             throw new AccessDeniedException("staff create applicants via /api/staff/applicants");
         }
         Applicant a = new Applicant();
-        apply(a, req.givenName(), req.familyName(), req.dob(), req.nationality(),
-                req.passportNo(), req.email(), req.phone());
+        applyProfile(a, req);
         a.setStatus(ApplicantStatus.ACTIVE);
         a.setCreateBy(String.valueOf(caller.requireUserId()));
         mapper.insert(a);
@@ -88,8 +92,9 @@ public class ApplicantService {
     @Transactional(rollbackFor = Exception.class)
     public ApplicantResponse createByStaff(StaffCreateApplicantRequest req) {
         Applicant a = new Applicant();
-        apply(a, req.givenName(), req.familyName(), req.dob(), req.nationality(),
-                req.passportNo(), req.email(), req.phone());
+        applyIdentity(a, req.givenName(), req.familyName(), req.dob(), req.nationality(), req.passportNo());
+        a.setEmail(req.email());
+        a.setPhone(req.phone());
         a.setStatus(ApplicantStatus.DRAFT);
         a.setCreateBy(String.valueOf(caller.requireUserId()));
         mapper.insert(a);
@@ -106,8 +111,8 @@ public class ApplicantService {
     public ApplicantResponse update(Long id, SelfApplicantRequest req) {
         requireCapability(id, ApplicantCapability.EDIT_PROFILE);
         Applicant a = load(id);
-        apply(a, req.givenName(), req.familyName(), req.dob(), req.nationality(),
-                req.passportNo(), req.email(), req.phone());
+        requireVerifiedEmailChange(a, req.email());
+        applyProfile(a, req);
         a.setUpdateBy(String.valueOf(caller.requireUserId()));
         mapper.update(a);
         return ApplicantResponse.of(a, includePii());
@@ -355,17 +360,48 @@ public class ApplicantService {
         }
     }
 
-    private static void apply(
-            Applicant a, String given,
-            String family, LocalDate dob,
-            String nationality, String passportNo,
-            String email, String phone) {
-        a.setGivenName(given);
-        a.setFamilyName(family);
+    /**
+     * A student cannot swap the contact email through a plain save: a different
+     * address must first be proven with a one-time code (see ApplicantEmailService).
+     * Staff edits are not subject to this.
+     */
+    private void requireVerifiedEmailChange(Applicant current, String requestedEmail) {
+        boolean changed = requestedEmail != null && !requestedEmail.isBlank()
+                && !requestedEmail.equalsIgnoreCase(current.getEmail());
+        if (changed && caller.isExternal()) {
+            throw new NadBadRequestException("verify the new email address before using it");
+        }
+    }
+
+    private static void applyProfile(Applicant a, SelfApplicantRequest req) {
+        applyIdentity(a, req.givenName(), req.familyName(), req.dob(), req.nationality(), req.passportNo());
+        if (a.getEmail() == null) {
+            a.setEmail(req.email());
+        }
+        a.setPhone(req.phone());
+        a.setGender(req.gender());
+        a.setCountryOfOrigin(upper(req.countryOfOrigin()));
+        a.setCountryOfResidence(upper(req.countryOfResidence()));
+        a.setNativeLanguage(req.nativeLanguage() == null ? null : req.nativeLanguage().toLowerCase(Locale.ROOT));
+        a.setWechatId(blankToNull(req.wechatId()));
+        a.setWhatsapp(blankToNull(req.whatsapp()));
+    }
+
+    private static void applyIdentity(Applicant a, String given, String family, LocalDate dob,
+            String nationality, String passportNo) {
+        AgeRules.requireAdultEnough(dob, LocalDate.now(ZoneOffset.UTC));
+        a.setGivenName(NameRules.normalize(given));
+        a.setFamilyName(NameRules.normalize(family));
         a.setDob(dob);
-        a.setNationality(nationality);
+        a.setNationality(upper(nationality));
         a.setPassportNo(passportNo);
-        a.setEmail(email);
-        a.setPhone(phone);
+    }
+
+    private static String upper(String value) {
+        return value == null ? null : value.toUpperCase(Locale.ROOT);
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 }

@@ -18,6 +18,8 @@ import com.nadoumi.identity.service.otp.TicketService;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.nadoumi.identity.web.request.StudentLoginRequest;
 import com.nadoumi.identity.web.request.StudentRegisterRequest;
+import com.nadoumi.identity.event.StudentRegisteredEvent;
+import com.nadoumi.common.rules.NameRules;
 import com.nadoumi.identity.web.response.AccessibleApplicant;
 import com.nadoumi.identity.web.response.StudentIdentityResponse;
 import com.nadoumi.identity.web.response.StudentRegisterResponse;
@@ -94,6 +96,8 @@ public class StudentAuthService {
         if (!verifiedEmail.equals(email)) {
             throw new NadBadRequestException("email verification does not match this address");
         }
+        String givenName = NameRules.normalize(req.firstName());
+        String familyName = NameRules.normalize(req.lastName());
         PasswordPolicy.violation(req.password(), null,
                         List.of(req.firstName(), req.lastName(), emailLocalPart(email)))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
@@ -103,7 +107,7 @@ public class StudentAuthService {
 
         SysUser user = new SysUser();
         user.setUserName(generateStudentHandle(email));
-        user.setNickName(req.firstName().trim() + " " + req.lastName().trim());
+        user.setNickName(givenName + " " + familyName);
         user.setEmail(email);
         user.setPassword(SecurityUtils.encryptPassword(req.password()));
         user.setPwdUpdateDate(DateUtils.getNowDate());
@@ -112,13 +116,14 @@ public class StudentAuthService {
         }
         identityMapper.updateUserType(user.getUserId(), STUDENT_USER_TYPE);
         identityMapper.markEmailVerified(user.getUserId());
+        events.publishEvent(new StudentRegisteredEvent(user.getUserId(), email, givenName, familyName));
 
         // Committed with the account row; the poller fans it to the Welcome email.
         JSONObject payload = new JSONObject();
         payload.put("userId", user.getUserId());
         payload.put("email", email);
         payload.put("firstName", req.firstName().trim());
-        payload.put("displayName", user.getNickName());
+        payload.put("displayName", req.firstName().trim() + " " + req.lastName().trim());
         payload.put("locale", "en");
         outbox.write("user", user.getUserId(), OutboxEventTypes.STUDENT_REGISTERED, payload.toJSONString());
 

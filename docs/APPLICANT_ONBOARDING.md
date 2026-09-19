@@ -8,6 +8,11 @@ University/Program/Scholarship catalog (`docs/DOMAIN_MODEL.md` §2.1).
 Related: `docs/superpowers/specs/2026-09-02-nadoumi-web-public-site-design.md`
 (§16 / Revision 3 D-R3-3), `docs/DOMAIN_MODEL.md` §4, `docs/DATABASE_DESIGN.md` §5.2.
 
+> **Onboarding v2 (2026-09-19) supersedes the 7-step Revision 3 shell below.** Plan and slices:
+> `docs/superpowers/plans/2026-09-19-student-onboarding.md`. **Slice 1 (foundation and the gate) backend is
+> IMPLEMENTED:** server-side `onboarded_at` and completion endpoint, UPPERCASE names, 17+ date of birth,
+> new profile fields, verified contact email, prefilled applicant at registration. Later slices are PLANNED.
+
 ## Status legend
 
 | Tag | Meaning |

@@ -12,6 +12,14 @@
         <result property="email"       column="email"/>
         <result property="phone"       column="phone"/>
         <result property="photoMediaId" column="photo_media_id"/>
+        <result property="gender"      column="gender"/>
+        <result property="countryOfOrigin" column="country_of_origin"/>
+        <result property="countryOfResidence" column="country_of_residence"/>
+        <result property="nativeLanguage" column="native_language"/>
+        <result property="wechatId"    column="wechat_id"/>
+        <result property="whatsapp"    column="whatsapp"/>
+        <result property="emailVerifiedAt" column="email_verified_at"/>
+        <result property="onboardedAt" column="onboarded_at"/>
         <result property="status"      column="status"/>
         <result property="createBy"    column="create_by"/>
         <result property="createTime"  column="create_time"/>
@@ -22,6 +30,8 @@
 
     <sql id="cols">
         id, given_name, family_name, dob, nationality, passport_no, email, phone, photo_media_id, status,
+        gender, country_of_origin, country_of_residence, native_language, wechat_id, whatsapp,
+        email_verified_at, onboarded_at,
         create_by, create_time, update_by, update_time, remark
     </sql>
 
@@ -52,10 +62,13 @@
     <insert id="insert" parameterType="com.nadoumi.applicant.domain.Applicant"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_applicant
-            (given_name, family_name, dob, nationality, passport_no, email, phone, status, create_by, create_time, remark)
+            (given_name, family_name, dob, nationality, passport_no, email, phone, status, create_by, create_time, remark,
+             gender, country_of_origin, country_of_residence, native_language, wechat_id, whatsapp, email_verified_at)
         values
             (#{givenName}, #{familyName}, #{dob}, #{nationality}, #{passportNo}, #{email}, #{phone},
-             #{status}, #{createBy}, now(), #{remark})
+             #{status}, #{createBy}, now(), #{remark},
+             #{gender}, #{countryOfOrigin}, #{countryOfResidence}, #{nativeLanguage}, #{wechatId}, #{whatsapp},
+             #{emailVerifiedAt})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.applicant.domain.Applicant">
@@ -63,8 +76,19 @@
             given_name = #{givenName}, family_name = #{familyName}, dob = #{dob},
             nationality = #{nationality}, passport_no = #{passportNo}, email = #{email}, phone = #{phone},
             photo_media_id = #{photoMediaId},
+            gender = #{gender}, country_of_origin = #{countryOfOrigin}, country_of_residence = #{countryOfResidence},
+            native_language = #{nativeLanguage}, wechat_id = #{wechatId}, whatsapp = #{whatsapp},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}
+    </update>
+
+    <update id="markEmailVerified">
+        update nad_applicant set email = #{email}, email_verified_at = now(), update_time = now() where id = #{id}
+    </update>
+
+    <!-- idempotent: the first completion time is kept -->
+    <update id="markOnboarded">
+        update nad_applicant set onboarded_at = now(), update_time = now() where id = #{id} and onboarded_at is null
     </update>
 
     <update id="updatePhotoMediaId">

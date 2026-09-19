@@ -26,6 +26,12 @@ public interface ApplicantMapper {
 
     int update(Applicant applicant);
 
+    /** Sets the contact email and stamps it verified. */
+    int markEmailVerified(@Param("id") long id, @Param("email") String email);
+
+    /** Stamps onboarding complete once; a second call changes nothing. */
+    int markOnboarded(@Param("id") long id);
+
     int updatePhotoMediaId(@Param("id") long id, @Param("mediaId") Long mediaId);
 
     int updateStatus(
