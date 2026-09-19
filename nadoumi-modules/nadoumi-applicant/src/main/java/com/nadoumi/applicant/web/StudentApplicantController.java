@@ -232,6 +232,13 @@ public class StudentApplicantController {
         return service.addContact(id, req);
     }
 
+    @PutMapping("/{id}/contacts/{contactId}")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public ContactResponse updateContact(@PathVariable Long id, @PathVariable Long contactId,
+            @Valid @RequestBody ContactRequest req) {
+        return service.updateContact(id, contactId, req);
+    }
+
     @DeleteMapping("/{id}/contacts/{contactId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")

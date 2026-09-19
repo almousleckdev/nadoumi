@@ -138,6 +138,26 @@ class StudentProfileSectionsTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
+    void shouldLetAStudentEditAContactButNotAnotherStudentsContact() throws Exception {
+        Student owner = register("edit", "contact");
+        Student other = register("edit", "stranger");
+        String created = mvc.perform(post(owner.applicantUrl() + "/contacts").header("Authorization", bearer(owner.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"relation\":\"GUARDIAN\",\"name\":\"Old Name\"}"))
+                .andReturn().getResponse().getContentAsString();
+        long contactId = ((Number) com.jayway.jsonpath.JsonPath.read(created, "$.id")).longValue();
+        String body = "{\"relation\":\"EMERGENCY\",\"name\":\"New Name\",\"phone\":\"+8613800000000\"}";
+
+        mvc.perform(put(owner.applicantUrl() + "/contacts/" + contactId).header("Authorization", bearer(other.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isForbidden());
+        mvc.perform(put(owner.applicantUrl() + "/contacts/" + contactId).header("Authorization", bearer(owner.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("New Name"))
+                .andExpect(jsonPath("$.relation").value("EMERGENCY"));
+    }
+
+    @Test
     void shouldShowTheWelcomeOnceAfterOnboardingIsComplete() throws Exception {
         Student s = register("wel", "come");
         update(s, profile(s, LocalDate.now().minusYears(20))).andExpect(status().isOk());
