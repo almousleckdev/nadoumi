@@ -70,6 +70,9 @@ public class TokenService
     @Autowired
     private RedisCache redisCache;
 
+    @Autowired
+    private AdminSessionCookie adminSessionCookie;
+
     @PostConstruct
     void validateSecret() {
         requireNonDefaultSecret(secret, devSecretAllowed);
@@ -267,7 +270,12 @@ public class TokenService
     private String getToken(HttpServletRequest request)
     {
         String token = request.getHeader(header);
-        if (StringUtils.isNotEmpty(token) && token.startsWith(Constants.TOKEN_PREFIX))
+        if (StringUtils.isEmpty(token))
+        {
+            // the admin console authenticates with an httpOnly cookie instead of a header
+            return adminSessionCookie.tokenFrom(request);
+        }
+        if (token.startsWith(Constants.TOKEN_PREFIX))
         {
             token = token.replace(Constants.TOKEN_PREFIX, "");
         }

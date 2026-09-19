@@ -141,6 +141,12 @@ spring:
 
 # Nadoumi-specific configuration
 nadoumi:
+  admin-session:
+    # httpOnly session cookie for the admin console (POST /staff/session)
+    cookie-name: ${NADOUMI_ADMIN_SESSION_COOKIE:NAD_ADMIN_SESSION}
+    # Secure by default. Chrome and Firefox accept it on http://localhost; Safari does
+    # not, so set NADOUMI_ADMIN_SESSION_SECURE=false for local admin work there.
+    secure: ${NADOUMI_ADMIN_SESSION_SECURE:true}
   mail:
     # log  = write rendered mails to logFile (no network); smtp = send via spring.mail.* above
     transport: ${NADOUMI_MAIL_TRANSPORT:log}

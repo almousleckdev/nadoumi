@@ -17,6 +17,7 @@ import com.ruoyi.common.utils.ServletUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.framework.manager.AsyncManager;
 import com.ruoyi.framework.manager.factory.AsyncFactory;
+import com.ruoyi.framework.web.service.AdminSessionCookie;
 import com.ruoyi.framework.web.service.TokenService;
 
 /**
@@ -29,6 +30,9 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler
 {
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private AdminSessionCookie adminSessionCookie;
 
     /**
      * 退出处理
@@ -48,6 +52,7 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler
             // 记录用户退出日志
             AsyncManager.me().execute(AsyncFactory.recordLogininfor(userName, Constants.LOGOUT, MessageUtils.message("user.logout.success")));
         }
+        adminSessionCookie.clear(response);
         ServletUtils.renderString(response, JSON.toJSONString(AjaxResult.success(MessageUtils.message("user.logout.success"))));
     }
 }

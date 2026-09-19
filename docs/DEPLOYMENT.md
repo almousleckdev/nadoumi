@@ -173,6 +173,7 @@ zero-config start working.
 | `SPRING_DATA_REDIS_SSL_ENABLED` | `false` | set `true` in non-local envs |
 | `TOKEN_SECRET` | 90-char in-repo placeholder | **must** override; ≥ 64 bytes (HS512). The context now fails to start with the placeholder value unless `token.dev-secret-allowed=true` is explicitly set (local/test only — `application-test.yml` and `config/application-druid.yml` set it) — closes the prior gap where anyone who had read this repo could forge a valid JWT for any user. |
 | `TOKEN_KID` / `TOKEN_HEADER` / `TOKEN_EXPIRE_TIME` | `v1` / `Authorization` / `30` | |
+| `NADOUMI_ADMIN_SESSION_SECURE` / `_COOKIE` | `true` / `NAD_ADMIN_SESSION` | admin console session cookie. Keep `Secure` on in every real env; `false` only for Safari on `http://localhost`. The admin must reach the API same-origin (Vercel rewrite `/backend/*` in `nadoumi-admin/vercel.json`, Vite proxy in dev) or the browser will not send the cookie. |
 | `DRUID_CONSOLE_USERNAME` / `DRUID_CONSOLE_PASSWORD` | `ruoyi` / `123456` | disable the servlet in prod |
 | `RUOYI_PROFILE` | `D:/ruoyi/uploadPath` | upload dir — set on macOS/Linux |
 | `NADOUMI_MAIL_TRANSPORT` | `log` | `log` (write `./mail-outbox.log`, no network) or `smtp`. **Revision 2** |

@@ -41,6 +41,16 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
   `LoginUser` from Redis → populate `SecurityContext`. Sliding renewal: if <20 min to
   expiry, refresh Redis TTL.
 - **Header:** `Authorization: Bearer <jwt>` (configurable `token.header`).
+- **Admin session cookie (IMPLEMENTED):** when no header is present, `TokenService` falls
+  back to the `NAD_ADMIN_SESSION` cookie (`AdminSessionCookie`, `ruoyi-framework`),
+  set by `POST /staff/session` as httpOnly + Secure + SameSite=Strict, so an XSS in
+  `nadoumi-admin` cannot read the token (it previously lived in a JS-readable cookie).
+  CSRF: the cookie is ignored on unsafe methods (anything but GET/HEAD/OPTIONS/TRACE)
+  unless the request carries `X-Nadoumi-Client: admin`, a header a cross-site form or
+  simple request cannot set; SameSite=Strict is the first line. `/logout` clears the
+  cookie. The header and cookie paths accept the same JWT, so authorization is unchanged.
+  Config: `nadoumi.admin-session.secure` (`NADOUMI_ADMIN_SESSION_SECURE`, default true;
+  Safari on http://localhost needs `false`). Tests: `StaffSessionCookieTest`.
 - **Logout:** `POST /logout` → `LogoutSuccessHandlerImpl` deletes the Redis token.
 - **Registration:** `POST /register` gated by `sys.account.registerUser` config.
 
