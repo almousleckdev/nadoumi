@@ -194,9 +194,10 @@
           :slices="uniChart"
           :caption="t('dashboard.k.totalProgrammes')"
         />
+        <DonutChartSkeleton v-else-if="catalogLoading" />
         <EmptyState
           v-else
-          :title="catalogLoading ? t('common.loading') : t('dashboard.noProgrammes')"
+          :title="t('dashboard.noProgrammes')"
           icon="Notebook"
         />
       </el-card>
@@ -220,9 +221,10 @@
           :slices="applicantChart"
           :caption="t('dashboard.byStatus')"
         />
+        <DonutChartSkeleton v-else-if="loading && !stats" />
         <EmptyState
           v-else
-          :title="loading && !stats ? t('common.loading') : t('dashboard.noApplicants')"
+          :title="t('dashboard.noApplicants')"
           icon="User"
         />
       </el-card>
@@ -253,9 +255,10 @@
           :slices="taskChart"
           :caption="t('dashboard.byPriority')"
         />
+        <DonutChartSkeleton v-else-if="tasksLoading" />
         <EmptyState
           v-else
-          :title="tasksLoading ? t('common.loading') : t('dashboard.noOpenTasks')"
+          :title="t('dashboard.noOpenTasks')"
           icon="Select"
         />
       </el-card>
@@ -278,9 +281,10 @@
           :slices="activityChart"
           :caption="t('dashboard.byType')"
         />
+        <DonutChartSkeleton v-else-if="activityLoading" />
         <EmptyState
           v-else
-          :title="activityLoading ? t('common.loading') : t('dashboard.noActivity')"
+          :title="t('dashboard.noActivity')"
           icon="Bell"
         />
       </el-card>
@@ -320,6 +324,7 @@ import DashboardGroup from '@/components/dashboard/DashboardGroup.vue'
 import StatCard from '@/components/dashboard/StatCard.vue'
 import ComingSoonCard from '@/components/dashboard/ComingSoonCard.vue'
 import DonutChart from '@/components/dashboard/DonutChart.vue'
+import DonutChartSkeleton from '@/components/dashboard/DonutChartSkeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 
 const { t } = useI18n()
