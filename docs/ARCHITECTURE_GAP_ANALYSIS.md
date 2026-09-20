@@ -339,8 +339,8 @@ the enterprise marketing rebuild. No fake data to remove.
 | Interests | `InterestsSection`, wizard step + `/dashboard/interests` | `nad_applicant_interest` (+ choice table) | closed |
 | Location | `ResidenceSection`, wizard step + `/dashboard/location` | `nad_applicant_residence` | closed |
 | Work experience | `WorkSection`, wizard step + `/dashboard/work` | `nad_applicant_work` | closed (was not even in the Revision-3 table) |
-| Passport upload | `PassportUploadCard`, in-browser MRZ read, upload enabled | protected media storage (`nad_document`-style) | closed |
-| Profile photo | `PhotoUploadCard`, crop, upload enabled | protected media storage | closed |
+| Passport upload | `PassportUploadCard`, plain file pick (no in-browser OCR — removed 2026-09-20), upload enabled | protected media storage (`nad_document`-style) | closed |
+| Profile photo | `PhotoUploadCard`, plain file pick (no crop — removed 2026-09-20), upload enabled | protected media storage | closed |
 | Review / submit | `ReviewStep` → `POST /onboarding/complete` → `OnboardingFinishing` → dashboard | `nad_applicant.onboarded_at`, re-checked server-side | closed |
 | Notifications | dashboard header has no bell | `server/api/student-notifications/[...path].ts` proxy exists | **still open** — no bell UI, no unread-count composable |
 

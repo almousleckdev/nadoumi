@@ -393,10 +393,9 @@ Part I, `docs/DOCUMENT_MANAGEMENT.md` §3.2.**
   Interests · Location · Contact · Review) with a persistent progress indicator.
   **EXISTING** steps save via the applicant/education/contact endpoints; **PLANNED /
   REQUIRES BACKEND** steps render disabled with "not saved yet" — no fake persistence.
-- `app/components/onboarding/` — `ImageCropper`, `DocumentPreview`,
-  `ProfilePhotoUploadCard`, `PassportUploadCard`: client-only crop/zoom/rotate/
-  preview/validate; upload disabled (REQUIRES BACKEND — Document slice). No OCR /
-  face-match claims.
+- `app/components/onboarding/` — `PhotoUploadCard`, `PassportUploadCard`: plain
+  file pick/drop, validate, preview (no crop/zoom/rotate — removed 2026-09-20 as
+  unnecessary complexity), upload. No OCR / face-match claims.
 
 `useApi()` only ever calls the BFF, never Spring directly. CI: `pnpm lint` +
 `pnpm test` + `pnpm build` + the hard-gated E2E job.
@@ -423,7 +422,6 @@ block or hard-code an option list.
 
 | Piece | Purpose |
 | --- | --- |
-| `usePanZoom` | Pan, zoom, rotate state and pointer handlers for an image in a frame (`ImageCropper`, `DocumentPreview`) |
 | `usePublicDetail(resource)` | The `[slug]` param and its cached record for the programme, scholarship and university detail pages; a missing record is `null` |
 | `CatalogSearchForm`, `FilterTextInput`, `FilterSelect`, `FilterToggle` | The search box and filter controls of the catalog list pages (`components/catalog/`); a page supplies values and an option list, not markup |
 | `useGuideItems(prefix)` | Term/detail rows for a guide section from its translation keys |
@@ -435,22 +433,19 @@ block or hard-code an option list.
 | --- | --- | --- |
 | `DocumentCard` | `components/onboarding/` | Shell for every onboarding document: title, guidance, status badge (`done`/`pending`/`attention`) |
 | `DocumentDropzone` | `components/onboarding/` | Pick or drop a file; validates type and size (`utils/files.ts`); one place for the messages |
-| `PhotoUploadCard` | `components/onboarding/` | Pick, check minimum size, crop square, save; shown through a signed URL |
-| `PassportUploadCard` | `components/onboarding/` | Choose scan, read in the browser, confirm details, save; shows the mismatch notice |
+| `PhotoUploadCard` | `components/onboarding/` | Pick, check minimum size, save as-is; shown through a signed URL |
+| `PassportUploadCard` | `components/onboarding/` | Choose scan, confirm details (always manual entry — see below), save; shows the mismatch notice |
 | `PassportDetailsForm`, `PassportMismatchNotice` | `components/onboarding/` | Confirmable details (validated by `validatePassport`) and the field-by-field disagreement table |
-| `PassportReader` SPI | `services/passport/types.ts` | `read(image) -> PassportReading \| null`; `null` means "could not read", never a guess |
-| `parsePassportMrz` | `services/passport/mrz.ts` | Parses TD3 MRZ text with the `mrz` library; **accepts only when every check digit and both dates validate** |
-| `createMrzReader` | `services/passport/mrzReader.ts` | Tries the `MRZ_PASSES` (crop and scale) in order with an injected OCR function |
-| `createTesseractSession` | `services/passport/tesseractOcr.ts` | Browser OCR (tesseract.js, lazily imported), one worker per read; **self-hosted** in `public/vendor/ocr/` |
-| `usePassportReader()` | `composables/` | The reader onboarding uses; swap it here for a server-side reader |
 | `useOnboardingProgress()` | `composables/` | Server view of which sections are complete; gates Next on the identity step |
 
-**Self-hosted OCR.** tesseract.js would otherwise fetch its worker and core from a public CDN. `scripts/copy-ocr-assets.mjs`
-(run by `postinstall`, output git-ignored) copies the worker, the three LSTM cores and `eng.traineddata.gz` (~12 MB, fetched only when a
-passport is read) into `public/vendor/ocr/`, cached for a week. **Reading accuracy is best-effort:** OCR misreads some characters, so the
-reader returns null and the student types the details rather than accept an unvalidated read. On a synthetic page, 1 of 12 preprocessing
-variants validated, which is why several passes are tried; real OCR-B passports are expected to read better, but this has not been measured
-on real documents.
+**No in-browser OCR (removed 2026-09-20).** The identity step shipped with onboarding v2 slice 2 included an
+in-browser MRZ reader (`services/passport/{mrzReader,tesseractOcr,mrz,types}.ts`, `usePassportReader()`,
+self-hosted tesseract.js assets in `public/vendor/ocr/`, a `scripts/copy-ocr-assets.mjs` postinstall step). It
+was removed as unnecessary complexity: `PassportDetailsForm` is now always manual entry, pre-filled with the
+given name / family name / date of birth already collected on the Personal step (`formFromProfile()` in
+`PassportUploadCard`) so the student is never asked to retype them — only passport number, issue date and
+expiry date are new. The backend `readMethod` field still accepts `MRZ | MANUAL` (unchanged contract); the
+web client now always sends `MANUAL`.
 
 The onboarding gate reads the **server** flag (`ApplicantDto.onboardingComplete`) and **fails closed**
 (`useOnboarding`).

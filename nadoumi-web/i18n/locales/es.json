@@ -480,8 +480,7 @@
     },
     "identity": {
       "title": "Identidad",
-      "blurb": "Datos de pasaporte y nacionalidad para tus solicitudes.",
-      "blocked": "Añade tu foto y un pasaporte que coincida para continuar."
+      "blurb": "Datos de pasaporte y nacionalidad para tus solicitudes."
     },
     "education": {
       "title": "Historial académico",
@@ -511,16 +510,7 @@
     "badge": {
       "plannedBackend": "Próximamente"
     },
-    "crop": {
-      "zoom": "Zoom",
-      "rotate": "Girar",
-      "reset": "Restablecer",
-      "apply": "Usar este recorte"
-    },
     "doc": {
-      "zoomIn": "Acercar",
-      "zoomOut": "Alejar",
-      "fit": "Ajustar",
       "previewAlt": "Documento subido"
     },
     "photo": {
@@ -1821,13 +1811,9 @@
   },
   "passport": {
     "title": "Pasaporte",
-    "guidance": "Sube una foto o un escaneo nítido de la página de datos de tu pasaporte. Leemos los datos en tu navegador; la imagen no se envía a ningún tercero.",
+    "guidance": "Sube una foto o un escaneo nítido de la página de datos de tu pasaporte y confirma los datos a continuación.",
     "none": "Ningún pasaporte subido",
     "formats": "JPEG, PNG o PDF, hasta 10 MB",
-    "reading": "Leyendo tu pasaporte…",
-    "readOk": "Hemos leído estos datos de tu pasaporte. Revisa cada uno y corrige lo que esté mal.",
-    "readFailed": "No pudimos leer el pasaporte automáticamente. Escribe los datos exactamente como aparecen en el pasaporte.",
-    "pdfManual": "Los archivos PDF no se pueden leer automáticamente. Escribe los datos exactamente como aparecen en el pasaporte.",
     "detailsTitle": "Datos del pasaporte",
     "fields": {
       "passportNo": "Número de pasaporte",

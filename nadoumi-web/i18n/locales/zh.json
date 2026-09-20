@@ -480,8 +480,7 @@
     },
     "identity": {
       "title": "身份信息",
-      "blurb": "用于申请事务的护照及国籍信息。",
-      "blocked": "请添加照片和与资料一致的护照后继续。"
+      "blurb": "用于申请事务的护照及国籍信息。"
     },
     "education": {
       "title": "教育经历",
@@ -511,16 +510,7 @@
     "badge": {
       "plannedBackend": "即将上线"
     },
-    "crop": {
-      "zoom": "缩放",
-      "rotate": "旋转",
-      "reset": "重置",
-      "apply": "应用此裁剪"
-    },
     "doc": {
-      "zoomIn": "放大",
-      "zoomOut": "缩小",
-      "fit": "适应窗口",
       "previewAlt": "已上传的文件"
     },
     "photo": {
@@ -1821,13 +1811,9 @@
   },
   "passport": {
     "title": "护照",
-    "guidance": "请上传清晰的护照资料页照片或扫描件。系统在您的浏览器中读取信息，图片不会发送给任何第三方。",
+    "guidance": "请上传清晰的护照资料页照片或扫描件，然后在下方确认信息。",
     "none": "尚未上传护照",
     "formats": "JPEG、PNG 或 PDF，最大 10 MB",
-    "reading": "正在读取您的护照…",
-    "readOk": "我们已从护照中读取以下信息。请逐项核对，并更正有误之处。",
-    "readFailed": "无法自动读取护照。请按护照上的内容准确填写。",
-    "pdfManual": "PDF 文件无法自动读取。请按护照上的内容准确填写。",
     "detailsTitle": "护照信息",
     "fields": {
       "passportNo": "护照号码",

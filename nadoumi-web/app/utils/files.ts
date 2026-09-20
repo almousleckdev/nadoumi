@@ -27,7 +27,3 @@ export function imageSize(src: string): Promise<{ width: number, height: number 
     image.src = src
   })
 }
-
-export async function dataUrlToBlob(dataUrl: string): Promise<Blob> {
-  return (await fetch(dataUrl)).blob()
-}

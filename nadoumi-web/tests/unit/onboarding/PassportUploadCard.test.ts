@@ -1,16 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
+import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import PassportUploadCard from '~/components/onboarding/PassportUploadCard.vue'
 import { fakeFile, pickFile } from '../helpers/files'
 
-const { api, read } = vi.hoisted(() => ({
-  read: vi.fn(),
+const { api } = vi.hoisted(() => ({
   api: { passportStatus: vi.fn(), uploadPassportScan: vi.fn(), savePassport: vi.fn() },
 }))
 vi.mock('~/composables/useApplicant', () => ({ useApplicant: () => api }))
-mockNuxtImport('usePassportReader', () => () => ({ read }))
-// FileReader completes on a later macro-task than the tests wait for, so it is replaced here
 vi.mock('~/utils/files', async (original) => ({
   ...(await original<typeof import('~/utils/files')>()),
   readAsDataUrl: async () => 'data:image/png;base64,AAAA',
@@ -22,12 +19,8 @@ const EMPTY = {
 }
 const SAVED_OK = {
   ...EMPTY, passportNo: 'L898902C3', givenName: 'ANNA', familyName: 'ERIKSSON', dob: '1990-01-01',
-  issueDate: '2024-01-01', expiryDate: '2099-01-01', readMethod: 'MRZ', scanUploaded: true,
+  issueDate: '2024-01-01', expiryDate: '2099-01-01', readMethod: 'MANUAL', scanUploaded: true,
   validForAdmission: true, matchesProfile: true,
-}
-const READING = {
-  documentNumber: 'L898902C3', surname: 'ERIKSSON', givenNames: 'ANNA', dateOfBirth: '1990-01-01',
-  expiryDate: '2099-01-01', issuingCountry: null, nationality: null,
 }
 
 const PROFILE = { givenName: 'ANNA', familyName: 'ERIKSSON', dob: '1990-01-01' }
@@ -41,7 +34,6 @@ const value = (w: Awaited<ReturnType<typeof mountCard>>, id: string) => (w.find(
 
 beforeEach(() => {
   Object.values(api).forEach(fn => fn.mockReset())
-  read.mockReset()
   api.passportStatus.mockResolvedValue(EMPTY)
   api.uploadPassportScan.mockResolvedValue({ mediaId: 5 })
   api.savePassport.mockResolvedValue(SAVED_OK)
@@ -55,91 +47,46 @@ describe('PassportUploadCard', () => {
     expect(w.find('#passportNo').exists()).toBe(false)
   })
 
-  it('reads the passport in the browser and prefills the details for the student to confirm', async () => {
-    read.mockResolvedValue(READING)
+  it('shows a plain preview and a details form prefilled from the profile — no re-typing name/dob', async () => {
     const w = await mountCard()
 
     await pickFile(w, fakeFile('passport.png', 'image/png'))
     await flushPromises()
 
-    expect(read).toHaveBeenCalledOnce()
-    expect(value(w, '#passportNo')).toBe('L898902C3')
-    expect(value(w, '#passportFamilyName')).toBe('ERIKSSON')
-    expect(w.text()).toContain('We read these details')
-  })
-
-  it('falls back to typing the details when the passport cannot be read, prefilled from the profile', async () => {
-    read.mockResolvedValue(null)
-    const w = await mountCard()
-
-    await pickFile(w, fakeFile('passport.png', 'image/png'))
-    await flushPromises()
-
-    expect(w.text()).toContain('could not read the passport automatically')
-    expect(w.find('#passportNo').exists()).toBe(true)
+    expect(w.find('img').attributes('src')).toBe('data:image/png;base64,AAAA')
     expect(value(w, '#passportNo')).toBe('')
-    // Already given on the Personal step — the student should not have to retype these.
     expect(value(w, '#passportGivenName')).toBe(PROFILE.givenName)
     expect(value(w, '#passportFamilyName')).toBe(PROFILE.familyName)
     expect(value(w, '#passportDob')).toBe(PROFILE.dob)
   })
 
-  it('does not try to read a PDF', async () => {
+  it('shows a file card, not an image preview, for a PDF', async () => {
     const w = await mountCard()
 
     await pickFile(w, fakeFile('passport.pdf', 'application/pdf'))
     await flushPromises()
 
-    expect(read).not.toHaveBeenCalled()
-    expect(w.text()).toContain('PDF files cannot be read automatically')
+    expect(w.find('img').exists()).toBe(false)
+    expect(w.text()).toContain('passport.pdf')
   })
 
-  it('uploads the scan then saves the details, recording that they were read and unedited', async () => {
-    read.mockResolvedValue(READING)
+  it('uploads the scan then saves the details as a manual entry', async () => {
     const w = await mountCard()
     await pickFile(w, fakeFile('passport.png', 'image/png'))
     await flushPromises()
-    await w.find('#passportIssueDate').setValue('2024-01-01')
-
-    await w.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(api.uploadPassportScan).toHaveBeenCalledOnce()
-    expect(api.savePassport).toHaveBeenCalledWith(1, expect.objectContaining({
-      passportNo: 'L898902C3', readMethod: 'MRZ', edited: false,
-    }))
-    expect(w.emitted('changed')).toHaveLength(1)
-    expect(w.text()).toContain('matches your profile')
-  })
-
-  it('records that the student edited what was read', async () => {
-    read.mockResolvedValue(READING)
-    const w = await mountCard()
-    await pickFile(w, fakeFile('passport.png', 'image/png'))
-    await flushPromises()
-    await w.find('#passportIssueDate').setValue('2024-01-01')
-    await w.find('#passportGivenName').setValue('ANNE')
-
-    await w.find('form').trigger('submit')
-    await flushPromises()
-
-    expect(api.savePassport).toHaveBeenCalledWith(1, expect.objectContaining({ readMethod: 'MRZ', edited: true }))
-  })
-
-  it('records a typed passport as manual', async () => {
-    read.mockResolvedValue(null)
-    const w = await mountCard()
-    await pickFile(w, fakeFile('passport.png', 'image/png'))
-    await flushPromises()
-    for (const [id, v] of [['#passportNo', 'L898902C3'], ['#passportGivenName', 'ANNA'], ['#passportFamilyName', 'ERIKSSON'],
-      ['#passportDob', '1990-01-01'], ['#passportIssueDate', '2024-01-01'], ['#passportExpiryDate', '2099-01-01']] as const) {
+    for (const [id, v] of [['#passportNo', 'L898902C3'], ['#passportIssueDate', '2024-01-01'], ['#passportExpiryDate', '2099-01-01']] as const) {
       await w.find(id).setValue(v)
     }
 
     await w.find('form').trigger('submit')
     await flushPromises()
 
-    expect(api.savePassport).toHaveBeenCalledWith(1, expect.objectContaining({ readMethod: 'MANUAL', edited: false }))
+    expect(api.uploadPassportScan).toHaveBeenCalledOnce()
+    expect(api.savePassport).toHaveBeenCalledWith(1, expect.objectContaining({
+      passportNo: 'L898902C3', readMethod: 'MANUAL', edited: false,
+    }))
+    expect(w.emitted('changed')).toHaveLength(1)
+    expect(w.text()).toContain('matches your profile')
   })
 
   it('tells the student when the passport and the profile do not match', async () => {
@@ -155,12 +102,13 @@ describe('PassportUploadCard', () => {
   })
 
   it('shows the server refusing a passport that expires within six months', async () => {
-    read.mockResolvedValue(READING)
     api.savePassport.mockRejectedValue({ statusCode: 400, data: { detail: 'passport must be valid for more than six months from today' } })
     const w = await mountCard()
     await pickFile(w, fakeFile('passport.png', 'image/png'))
     await flushPromises()
-    await w.find('#passportIssueDate').setValue('2024-01-01')
+    for (const [id, v] of [['#passportNo', 'L898902C3'], ['#passportIssueDate', '2024-01-01'], ['#passportExpiryDate', '2099-01-01']] as const) {
+      await w.find(id).setValue(v)
+    }
 
     await w.find('form').trigger('submit')
     await flushPromises()

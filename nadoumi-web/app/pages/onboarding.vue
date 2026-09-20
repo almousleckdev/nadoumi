@@ -123,7 +123,6 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
             @changed="progress.refresh"
             @edit-profile="goTo('personal')"
           />
-          <NAlert v-if="!canAdvance" tone="warning">{{ t('onboarding.identity.blocked') }}</NAlert>
         </div>
       </OnboardingStep>
 

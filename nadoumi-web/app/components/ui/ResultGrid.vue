@@ -20,10 +20,10 @@ const { t } = useI18n()
       :style="{ gridTemplateColumns: `repeat(auto-fill, minmax(${minCol}, 1fr))` }"
       aria-hidden="true"
     >
-      <div
+      <NSkeleton
         v-for="i in skeletonCount"
         :key="i"
-        class="h-64 animate-pulse rounded-xl bg-slate-100"
+        class="h-64 rounded-xl"
       />
     </div>
 
