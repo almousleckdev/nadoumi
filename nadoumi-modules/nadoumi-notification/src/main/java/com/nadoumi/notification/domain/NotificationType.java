@@ -49,7 +49,16 @@ public enum NotificationType {
     APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL)),
 
     /** A message was posted to a conversation — its other participants are told. */
-    MESSAGE_POSTED(false, "New message", Set.of());
+    MESSAGE_POSTED(false, "New message", Set.of()),
+
+    /** A student opened a support ticket -- staff who can view the queue are told. */
+    TICKET_OPENED(false, "New support ticket", Set.of()),
+
+    /** A support ticket was assigned to a staff member -- the assignee is told. */
+    TICKET_ASSIGNED(false, "Support ticket assigned", Set.of()),
+
+    /** A support ticket was resolved or is waiting on the student -- the opener is told. */
+    TICKET_STATUS_CHANGED(true, "Support ticket updated", Set.of());
 
     private final boolean transactional;
     private final String defaultTitle;

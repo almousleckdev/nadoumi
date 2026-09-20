@@ -49,6 +49,9 @@ through authorized queries.
 | `PaymentSettled` | payment | provider confirms / staff marks settled | workflow fee gate, Finance read models |
 | `RefundIssued` | payment | refund completed | Finance read models, student notification |
 | `MessagePosted` | conversation | `nad_message` insert | recipient SSE ping + notification if offline |
+| `TicketOpened` ✅ | support_ticket | `SupportTicketService.create` (same transaction as the ticket + `OPENED` event row) | staff holding `nad:support:ticket:view` — IN_APP. The payload carries `audiencePermission`, which `OutboxToNotificationDispatcher` uses instead of its default `nad:notification:list` audience. Payload: `ticketId, conversationId, subject, category, openedByName, audiencePermission`. |
+| `TicketAssigned` ✅ | support_ticket | staff (re)assigns a ticket (`nad:support:ticket:assign`); a replier claiming an unassigned ticket assigns themselves silently | the new assignee only (`recipientUserIds`) — IN_APP; no notification when assigning to oneself. Payload: `ticketId, conversationId, subject, assignedByName`. |
+| `TicketStatusChanged` ✅ | support_ticket | status moves to `RESOLVED` or `WAITING_ON_STUDENT` | the opener only (`recipientUserIds`) — IN_APP, status label only (never internal notes). Other transitions are internal triage and emit nothing. Payload: `ticketId, conversationId, subject, status`. |
 
 ## Rules
 

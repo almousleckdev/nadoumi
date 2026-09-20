@@ -76,6 +76,41 @@ class OutboxToNotificationDispatcherTest {
     }
 
     @Test
+    void ticketOpened_targetsTheAudiencePermissionNamedInThePayload_notTheDefault() {
+        when(audience.findStaffUserIdsWithPermission("nad:support:ticket:view")).thenReturn(List.of(3L, 4L));
+        when(renderer.render(eq(NotificationType.TICKET_OPENED), eq(NotificationChannelKind.IN_APP),
+                anyString(), any())).thenReturn(new NotificationRenderer.Rendered(null, "New ticket"));
+
+        dispatcher.dispatch(event(OutboxEventTypes.TICKET_OPENED,
+                "{\"ticketId\":7,\"conversationId\":9,\"subject\":\"Visa\",\"category\":\"APPLICATION\","
+                        + "\"openedByName\":\"Ada\",\"audiencePermission\":\"nad:support:ticket:view\"}"));
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
+        verify(notificationService).createBatch(batch.capture());
+        assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
+                .containsExactlyInAnyOrder(3L, 4L);
+        verify(audience, times(0)).findStaffUserIdsWithPermission("nad:notification:list");
+        verify(audience, times(0)).findActiveStudentUserIds();
+    }
+
+    @Test
+    void ticketStatusChanged_notifiesOnlyTheOpenerNamedInThePayload() {
+        when(renderer.render(eq(NotificationType.TICKET_STATUS_CHANGED), eq(NotificationChannelKind.IN_APP),
+                anyString(), any())).thenReturn(new NotificationRenderer.Rendered(null, "Resolved"));
+
+        dispatcher.dispatch(event(OutboxEventTypes.TICKET_STATUS_CHANGED,
+                "{\"ticketId\":7,\"conversationId\":9,\"subject\":\"Visa\",\"status\":\"RESOLVED\","
+                        + "\"recipientUserIds\":[1]}"));
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
+        verify(notificationService).createBatch(batch.capture());
+        assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId).containsExactly(1L);
+        assertThat(batch.getValue().get(0).conversationId()).isEqualTo(9L);
+    }
+
+    @Test
     void studentRegistered_isHandedToTheWelcomeComposer_notTheGenericFanOut() {
         OutboxEvent e = event(OutboxEventTypes.STUDENT_REGISTERED,
                 "{\"userId\":77,\"email\":\"stu@example.test\",\"firstName\":\"Amina\",\"locale\":\"en\"}");

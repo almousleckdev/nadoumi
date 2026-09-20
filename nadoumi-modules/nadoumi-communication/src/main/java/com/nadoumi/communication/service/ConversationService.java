@@ -104,6 +104,49 @@ public class ConversationService {
         return toMessageResponse(message);
     }
 
+    /**
+     * Opens a {@code SUPPORT}-typed conversation for the calling student, with no applicant
+     * profile required (a student may need help before onboarding is finished). Called by the
+     * Support/Ticketing module, which owns the ticket; {@link #open} stays the applicant-scoped
+     * path and still demands {@code MESSAGE_STAFF}.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResponse openSupport(String subject, String body) {
+        if (caller.isStaff()) {
+            throw new AccessDeniedException("students only");
+        }
+        long userId = caller.requireUserId();
+
+        Conversation conversation = new Conversation();
+        conversation.setSubject(subject);
+        conversation.setConversationType(ConversationType.SUPPORT);
+        conversation.setStatus(ConversationStatus.OPEN);
+        conversation.setCreateBy(AuditActor.username());
+        conversations.insert(conversation);
+
+        addParticipantRow(conversation.getId(), userId, ParticipantRole.APPLICANT);
+
+        Message message = publisher.publish(conversation.getId(), userId, body, List.of());
+        return toMessageResponse(message);
+    }
+
+    /**
+     * Staff-only read of a {@code SUPPORT} thread without joining it, so a staff member with
+     * ticket-view permission can inspect a pool ticket before claiming it. Refuses any other
+     * conversation type (application chats stay participant-only).
+     */
+    @Transactional(readOnly = true)
+    public List<MessageResponse> listSupportMessagesForStaff(long conversationId, long beforeId) {
+        requireStaff();
+        Conversation conversation = conversations.findById(conversationId);
+        if (conversation == null || conversation.getConversationType() != ConversationType.SUPPORT) {
+            throw new NadNotFoundException("support conversation not found");
+        }
+        return messages.listByConversation(conversationId, beforeId, PAGE_SIZE).stream()
+                .map(this::toMessageResponse)
+                .toList();
+    }
+
     /** Posts a message to a conversation the caller is an active participant of. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse post(long conversationId, PostMessageRequest req) {

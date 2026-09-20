@@ -97,6 +97,10 @@
         </dependency>
         <dependency>
             <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-hr</artifactId>
         </dependency>
         <dependency>

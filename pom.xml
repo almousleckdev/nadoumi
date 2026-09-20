@@ -263,6 +263,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nadoumi</groupId>
+                <artifactId>nadoumi-support</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nadoumi</groupId>
                 <artifactId>nadoumi-hr</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>
