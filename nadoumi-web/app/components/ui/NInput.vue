@@ -11,7 +11,9 @@ const props = withDefaults(defineProps<{
   min?: string
   max?: string
   disabled?: boolean
-}>(), { type: 'text', autocomplete: undefined, placeholder: undefined, maxlength: undefined, min: undefined, max: undefined })
+  /** Accessible name when the field has no visible label (placeholder-only inputs). */
+  ariaLabel?: string
+}>(), { type: 'text', autocomplete: undefined, placeholder: undefined, maxlength: undefined, min: undefined, max: undefined, ariaLabel: undefined })
 defineEmits<{ 'update:modelValue': [value: string] }>()
 const slots = useSlots()
 
@@ -37,10 +39,14 @@ const borderClass = computed(() => {
       :autocomplete="autocomplete"
       :aria-invalid="invalid ? 'true' : undefined"
       :aria-describedby="describedBy"
+      :aria-label="ariaLabel"
       class="w-full rounded-md border px-3 py-2 text-base outline-none transition-colors disabled:bg-slate-50 disabled:text-slate-400"
-      :class="[borderClass, slots.suffix ? 'pe-11' : '']"
+      :class="[borderClass, slots.suffix ? 'pe-11' : '', slots.prefix ? 'ps-10' : '']"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
     >
+    <div v-if="slots.prefix" class="pointer-events-none absolute inset-y-0 start-0 flex items-center ps-3 text-slate-400">
+      <slot name="prefix" />
+    </div>
     <div v-if="slots.suffix" class="absolute inset-y-0 end-0 flex items-center pe-2">
       <slot name="suffix" />
     </div>
