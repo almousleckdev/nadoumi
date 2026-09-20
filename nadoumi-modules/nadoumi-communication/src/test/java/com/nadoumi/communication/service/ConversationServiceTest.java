@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import com.nadoumi.common.access.ApplicantCapability;
 import com.nadoumi.common.access.NadoumiAccessService;
+import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.communication.domain.Conversation;
 import com.nadoumi.communication.domain.ConversationParticipant;
@@ -61,8 +62,7 @@ class ConversationServiceTest {
         when(access.canAccessApplicant(5L, ApplicantCapability.MESSAGE_STAFF.name())).thenReturn(false);
         var req = new OpenConversationRequest(5L, null, "Question", "Hi there");
 
-        assertThatThrownBy(() -> service.open(req)).isInstanceOf(org.springframework.security.access.AccessDeniedException.class)
-                .hasMessageContaining("NadForbiddenException").isInstanceOfAny(RuntimeException.class);
+        assertThatThrownBy(() -> service.open(req)).isInstanceOf(NadForbiddenException.class);
     }
 
     @Test
@@ -71,8 +71,17 @@ class ConversationServiceTest {
         when(caller.requireUserId()).thenReturn(1L);
         when(caller.isStaff()).thenReturn(false);
         when(grants.findActiveApplicantGrant(1L, 5L)).thenReturn(null);
+        org.mockito.Mockito.doAnswer(inv -> {
+            inv.<Conversation>getArgument(0).setId(9L);
+            return 1;
+        }).when(conversations).insert(any());
+        Message posted = new Message();
+        posted.setId(100L);
+        posted.setConversationId(9L);
+        posted.setSenderUserId(1L);
+        posted.setBody("Hi there");
         when(publisher.publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
-                org.mockito.ArgumentMatchers.eq("Hi there"), any())).thenReturn(new Message());
+                org.mockito.ArgumentMatchers.eq("Hi there"), any())).thenReturn(posted);
 
         var req = new OpenConversationRequest(5L, null, "Question", "Hi there");
         service.open(req);
