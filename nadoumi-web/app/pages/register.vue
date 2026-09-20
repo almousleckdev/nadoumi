@@ -16,9 +16,8 @@ const submitted = ref(false)
 const busy = ref(false)
 
 // The OTP verification is the email-ownership check — no separate confirm-email field.
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const step1Valid = computed(() =>
-  Boolean(form.firstName.trim() && form.lastName.trim() && EMAIL_RE.test(form.email)))
+  Boolean(form.firstName.trim() && form.lastName.trim() && isValidEmail(form.email)))
 
 const forbidden = computed(() => [form.firstName, form.lastName, form.email.split('@')[0] ?? ''])
 const passwordResult = computed(() =>
@@ -82,19 +81,20 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
 
 <template>
   <div>
-    <h1 class="mb-1 text-center font-display text-2xl font-bold text-slate-900">{{ t('auth.registerTitle') }}</h1>
-    <ol class="mb-6 flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
-      <li v-for="(s, i) in STEPS" :key="s" class="flex items-center gap-2">
-        <span
-          class="inline-flex h-6 w-6 items-center justify-center rounded-full border transition-colors"
-          :class="step >= i + 1 ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200'"
-        >{{ i + 1 }}</span>
-        <span :class="step >= i + 1 ? 'text-slate-700' : ''">{{ t(`auth.registerStep.${s}`) }}</span>
-        <span v-if="i < STEPS.length - 1" class="h-px w-6 bg-slate-200" />
-      </li>
-    </ol>
-
     <NCard>
+      <h1 class="mb-1 font-display text-2xl font-bold text-slate-900">{{ t('auth.registerTitle') }}</h1>
+      <p class="mb-5 text-sm text-slate-500">{{ t('auth.registerSubtitle') }}</p>
+      <ol class="mb-6 flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
+        <li v-for="(s, i) in STEPS" :key="s" class="flex items-center gap-2">
+          <span
+            class="inline-flex h-6 w-6 items-center justify-center rounded-full border transition-colors"
+            :class="step >= i + 1 ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200'"
+          >{{ i + 1 }}</span>
+          <span :class="step >= i + 1 ? 'text-slate-700' : ''">{{ t(`auth.registerStep.${s}`) }}</span>
+          <span v-if="i < STEPS.length - 1" class="h-px w-6 bg-slate-200" />
+        </li>
+      </ol>
+
       <!-- Steps 1 & 2 · Personal information + email verification.
            EmailVerifyStep is mounted once and owns the OTP UI; `step` (1 vs 2) only
            controls whether the name fields are shown above it. The OTP is the
@@ -156,7 +156,7 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
     </NCard>
 
     <p class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/login')" class="text-brand-700 hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
+      <NuxtLink :to="localePath('/login')" class="rounded-full bg-white/10 px-3 py-1 text-white/90 backdrop-blur-sm hover:bg-white/20 hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
     </p>
   </div>
 </template>

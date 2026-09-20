@@ -22,13 +22,12 @@ defineExpose({ enabled, reload: load })
 </script>
 
 <template>
-  <div v-if="enabled" class="grid gap-2">
-    <div class="flex items-center gap-3">
-      <img :src="`data:image/jpeg;base64,${img}`" alt="" class="h-10 rounded border border-slate-200">
-      <button type="button" class="text-sm text-brand-700 hover:underline" @click="load">{{ t('auth.captchaReload') }}</button>
+  <NField v-if="enabled" :label="t('auth.captcha')" for="captcha">
+    <div class="flex items-center gap-2">
+      <NInput id="captcha" class="flex-1" :model-value="code" autocomplete="off" @update:model-value="$emit('update:code', $event)" />
+      <button type="button" class="shrink-0" :aria-label="t('auth.captchaReload')" @click="load">
+        <img :src="`data:image/jpeg;base64,${img}`" alt="" class="h-10 rounded border border-slate-200">
+      </button>
     </div>
-    <NField :label="t('auth.captcha')" for="captcha">
-      <NInput id="captcha" :model-value="code" autocomplete="off" @update:model-value="$emit('update:code', $event)" />
-    </NField>
-  </div>
+  </NField>
 </template>

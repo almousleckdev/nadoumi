@@ -15,14 +15,13 @@ const state = ref<'idle' | 'sending' | 'sent' | 'error'>('idle')
 const errorMsg = ref('')
 
 const categories = ['GENERAL', 'SCHOLARSHIPS', 'UNIVERSITIES', 'APPLICATIONS', 'PARTNERSHIPS', 'OTHER']
-const emailOk = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
 
 function validate(): boolean {
   errors.firstName = form.firstName.trim() ? '' : t('validation.required')
   errors.lastName = form.lastName.trim() ? '' : t('validation.required')
   errors.email = !form.email.trim()
     ? t('validation.required')
-    : emailOk(form.email.trim()) ? '' : t('validation.email')
+    : isValidEmail(form.email.trim()) ? '' : t('validation.email')
   errors.message = form.message.trim() ? '' : t('validation.required')
   return !errors.firstName && !errors.lastName && !errors.email && !errors.message
 }

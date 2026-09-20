@@ -50,8 +50,8 @@ useSeo(t('auth.forgotTitle'), t('auth.reset.title'))
 
 <template>
   <div>
-    <h1 class="mb-6 text-center font-display text-2xl font-bold text-slate-900">{{ t('auth.forgotTitle') }}</h1>
     <NCard>
+      <h1 class="mb-6 font-display text-2xl font-bold text-slate-900">{{ t('auth.forgotTitle') }}</h1>
       <EmailVerifyStep
         v-if="stage === 'verify'"
         v-model:email="email"
@@ -85,7 +85,7 @@ useSeo(t('auth.forgotTitle'), t('auth.reset.title'))
       </div>
     </NCard>
     <p class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/login')" class="text-brand-700 hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
+      <NuxtLink :to="localePath('/login')" class="rounded-full bg-white/10 px-3 py-1 text-white/90 backdrop-blur-sm hover:bg-white/20 hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
     </p>
   </div>
 </template>

@@ -264,7 +264,9 @@
   },
   "auth": {
     "loginTitle": "Se connecter",
+    "loginSubtitle": "Connectez-vous pour continuer votre candidature",
     "registerTitle": "Créez votre profil",
+    "registerSubtitle": "Créez un profil pour démarrer votre candidature",
     "fullName": "Nom complet",
     "username": "Nom d'utilisateur",
     "usernameHint": "2 à 20 caractères, utilisé pour vous connecter",

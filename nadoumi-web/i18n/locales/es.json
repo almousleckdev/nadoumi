@@ -264,7 +264,9 @@
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
+    "loginSubtitle": "Inicia sesión para continuar tu solicitud",
     "registerTitle": "Crea tu perfil",
+    "registerSubtitle": "Crea un perfil para iniciar tu solicitud",
     "fullName": "Nombre completo",
     "username": "Nombre de usuario",
     "usernameHint": "De 2 a 20 caracteres, se usa para iniciar sesión",

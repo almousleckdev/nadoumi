@@ -264,7 +264,9 @@
   },
   "auth": {
     "loginTitle": "登录",
+    "loginSubtitle": "登录以继续您的申请",
     "registerTitle": "创建您的档案",
+    "registerSubtitle": "创建档案以开始您的申请",
     "fullName": "姓名",
     "username": "用户名",
     "usernameHint": "2 至 20 个字符,用于登录",

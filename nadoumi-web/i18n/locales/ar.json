@@ -264,7 +264,9 @@
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",
+    "loginSubtitle": "سجّل الدخول لمتابعة طلبك",
     "registerTitle": "أنشئ ملفك التعريفي",
+    "registerSubtitle": "أنشئ ملفًا تعريفيًا لبدء طلبك",
     "fullName": "الاسم الكامل",
     "username": "اسم المستخدم",
     "usernameHint": "من 2 إلى 20 حرفًا، يُستخدم لتسجيل الدخول",
