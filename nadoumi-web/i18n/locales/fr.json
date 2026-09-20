@@ -348,7 +348,8 @@
       "settings": "Paramètres",
       "interests": "Centres d’intérêt",
       "location": "Localisation",
-      "work": "Expérience"
+      "work": "Expérience",
+      "applications": "Mes candidatures"
     },
     "welcome": "Content de vous revoir, {name}",
     "overviewBlurb": "Complétez votre profil de candidat pour que l'équipe puisse commencer à vous proposer des opportunités.",
@@ -446,7 +447,53 @@
     "removeConfirm": "Retirer cette entrée ?",
     "interestsTitle": "Centres d’intérêt académiques",
     "locationTitle": "Localisation actuelle",
-    "workTitle": "Expérience professionnelle"
+    "workTitle": "Expérience professionnelle",
+    "applications": {
+      "title": "Mes candidatures",
+      "blurb": "Suivez chaque candidature commencée, du brouillon à la décision.",
+      "detailTitle": "Candidature",
+      "empty": "Vous n'avez pas encore commencé de candidature.",
+      "browse": "Parcourir les bourses",
+      "submittedOn": "Soumise le {date}",
+      "currentStage": "Étape actuelle : {stage}",
+      "backToList": "Retour à mes candidatures",
+      "notFound": "Nous n'avons pas trouvé cette candidature.",
+      "timeline": "Progression",
+      "timelineEmpty": "Aucune mise à jour pour le moment.",
+      "actions": "Actions",
+      "submit": "Soumettre la candidature",
+      "submitHint": "Cette candidature est encore un brouillon. Soumettez-la quand les informations sont prêtes.",
+      "submitted": "Votre candidature a été soumise.",
+      "withdraw": "Retirer la candidature",
+      "withdrawReason": "Pourquoi retirez-vous cette candidature ?",
+      "withdrawConfirm": "Confirmer le retrait",
+      "withdrawnNotice": "Votre candidature a été retirée.",
+      "type": {
+        "PROGRAM_WITH_SCHOLARSHIP": "Programme avec bourse",
+        "PROGRAM_ONLY": "Candidature à un programme",
+        "UNKNOWN": "Candidature"
+      },
+      "status": {
+        "DRAFT": "Brouillon",
+        "IN_REVIEW": "En cours d'examen",
+        "SUBMITTED_TO_UNIVERSITY": "Envoyée à l'université",
+        "DECISION": "En attente de décision",
+        "OFFER": "Offre reçue",
+        "PRE_DEPARTURE": "Avant le départ",
+        "CLOSED_SUCCESS": "Inscrit",
+        "CLOSED_UNSUCCESSFUL": "Non retenue",
+        "CLOSED_WITHDRAWN": "Retirée",
+        "unknown": "En cours"
+      },
+      "event": {
+        "created": "Candidature commencée",
+        "submitted": "Candidature soumise",
+        "withdrawn": "Candidature retirée",
+        "offerAccepted": "Vous avez accepté l'offre",
+        "offerDeclined": "Vous avez refusé l'offre",
+        "stageChanged": "Votre candidature est passée à l'étape suivante"
+      }
+    }
   },
   "validation": {
     "required": "Ce champ est obligatoire.",
