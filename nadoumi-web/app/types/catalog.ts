@@ -372,3 +372,17 @@ export interface ContactDto {
   email: string | null
   phone: string | null
 }
+
+export interface NotificationView {
+  id: number
+  type: string
+  title: string
+  body: string
+  dataJson: string | null
+  applicationId: number | null
+  conversationId: number | null
+  messageId: number | null
+  createdAt: string
+  readAt: string | null
+  read: boolean
+}

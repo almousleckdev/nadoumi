@@ -13,4 +13,11 @@
   /* Auth screens (login/register): fallback colour behind the background
      photo, mirrors nadoumi-admin's --nad-sidebar-bg. */
   --ink-900: #10192f;
+
+  /* Dashboard sidebar — mirrors nadoumi-admin's --nad-sidebar-* tokens so both
+     apps' shells share one visual language. */
+  --ink-800: #17223d;
+  --sidebar-fg: #aeb9d0;
+  --sidebar-fg-muted: #6b7794;
 }
+

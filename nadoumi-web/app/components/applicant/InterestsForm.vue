@@ -32,7 +32,7 @@ const years = Array.from({ length: INTAKE_YEAR_SPAN + 1 }, (_, i) => {
     <FormSection :title="t('interests.sectionStudy')">
       <FormSelectField id="int-level" v-model="form.desiredLevel" :label="t('interests.level')" :options="levels" :error="errors.desiredLevel" required />
       <FormSelectField id="int-scholarship" v-model="form.scholarshipInterest" :label="t('interests.scholarship')" :options="scholarship" />
-      <ChipMultiSelect id="int-fields" v-model="form.fields" :label="t('interests.fields')" :hint="t('interests.fieldsHint')" :options="fields" :max="MAX_INTEREST_FIELDS" :error="errors.fields" required />
+      <ChipMultiSelect id="int-fields" v-model="form.fields" :label="t('interests.fields')" :hint="t('interests.fieldsHint')" :options="fields" :max="MAX_INTEREST_FIELDS" :custom-label="t('interests.otherField')" :error="errors.fields" required />
     </FormSection>
 
     <FormSection :title="t('interests.sectionWhere')">
