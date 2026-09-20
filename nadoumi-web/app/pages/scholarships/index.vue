@@ -233,9 +233,13 @@ function clearAll() {
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              <tr v-if="pending">
-                <td colspan="8" class="px-4 py-10 text-center text-slate-400">{{ t('common.loading') }}…</td>
-              </tr>
+              <template v-if="pending">
+                <tr v-for="n in 6" :key="n">
+                  <td v-for="c in 8" :key="c" class="px-4 py-3">
+                    <NSkeleton class="h-3.5 rounded" :style="{ width: c === 8 ? '1.5rem' : '80%' }" />
+                  </td>
+                </tr>
+              </template>
               <tr v-else-if="error">
                 <td colspan="8" class="px-4 py-8 text-center">
                   <NAlert tone="danger">

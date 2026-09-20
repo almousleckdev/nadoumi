@@ -10,7 +10,7 @@ describe('DiscoverySection', () => {
       props: { ...base, pending: true },
       slots: { default: () => 'CARD' },
     })
-    expect(w.find('.animate-pulse').exists()).toBe(true)
+    expect(w.find('.n-skeleton').exists()).toBe(true)
     expect(w.findComponent({ name: 'CarouselArrows' }).exists()).toBe(false)
     expect(w.text()).not.toContain('CARD')
   })

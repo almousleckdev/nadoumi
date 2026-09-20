@@ -39,10 +39,10 @@ const carousel = ref<{ scrollPrev: () => void, scrollNext: () => void, atStart: 
 
     <div class="mt-6">
       <div v-if="pending" class="flex gap-4 overflow-hidden" aria-hidden="true">
-        <div
+        <NSkeleton
           v-for="i in 4"
           :key="i"
-          class="h-64 w-72 shrink-0 animate-pulse rounded-xl bg-slate-100"
+          class="h-64 w-72 shrink-0 rounded-xl"
         />
       </div>
       <NAlert v-else-if="error" tone="danger">{{ error }}</NAlert>
