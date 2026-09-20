@@ -103,7 +103,7 @@ in the nadoumi-web build**.
 | Operation logs | **IMPLEMENTED** (2026-09-06) | `views/logs/operlog.vue` — read-only table + detail dialog + clear-all. `/monitor/operlog/*`. |
 | Sign-in logs | **IMPLEMENTED** (2026-09-06) | `views/logs/logininfor.vue` — read-only table + clear-all. `/monitor/logininfor/*`. |
 | Notifications | **IMPLEMENTED** (2026-09-06) | `views/notifications/index.vue` — staff oversight of `GET /api/staff/notifications` (+ `/{id}` with per-channel delivery status), filter by type. Personal feed via the navbar bell (polls `GET /api/notifications/unread-count`, links to `/notifications`). |
-| Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend (Step 6). |
+| Applications (+ tasks / history / events / decisions) | **IMPLEMENTED** (2026-09-20; consumes `nadoumi-application`, PR #20) | `views/applications/index.vue` (filterable list) + `ApplicationDrawer.vue` (detail tabs; claim, assign, stage transition by code with the read `version`, record decision, complete/skip task), each control shown per its `nad:application:*` permission and re-checked by the backend. Not yet built: documents tab (Step 7), notes (no backend), an "available transitions" picker (no endpoint lists them, so the transition code is typed), stage filter. |
 | Partnerships | **PLANNED** — Phase D | No backend. |
 | Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | Greenfield modules (`nadoumi-payment` + `nadoumi-finance`, Step 9) — backend does not exist. |
 | Marketing-CMS / Communication / Reports / online-users / cache / server monitor | **PLANNED** — Phase F | |
@@ -168,7 +168,7 @@ Approved group order (`nav.groups`):
 | Group | Items (→ status) |
 | --- | --- |
 | _(top)_ | Dashboard → **implemented** |
-| Operations | Applicants → **implemented** · Applications · Documents |
+| Operations | Applicants → **implemented** · Applications → **implemented** · Documents |
 | Education | Universities → **implemented** · Programs → **implemented** · Scholarships → **implemented** |
 | _(top)_ | Partnerships |
 | People | Staff → **implemented** · Students → **implemented** · Roles → **implemented** · Menus & Permissions → **implemented** · Departments → **implemented** · Posts → **implemented** |
