@@ -34,26 +34,25 @@ const legal = [
           <img :src="logoUrl" alt="Nadoumi" class="h-10 w-auto" width="160" height="40">
           <p class="mt-3 text-sm text-slate-600">{{ t('footer.mission') }}</p>
 
-          <div class="mt-4 flex items-center gap-3">
+          <div class="mt-5 flex items-end gap-4">
             <a
               :href="whatsappHref"
               target="_blank"
               rel="noopener noreferrer"
               :aria-label="t('footer.whatsapp')"
-              class="inline-block rounded-md transition-transform duration-200 ease-out hover:scale-110"
+              class="group block"
             >
-              <img :src="whatsappIconUrl" alt="" width="32" height="32" class="h-8 w-8 rounded-md object-contain">
+              <div class="overflow-hidden rounded-lg border border-slate-200 bg-white p-1.5 shadow-xs transition-all duration-200 ease-out group-hover:-translate-y-1 group-hover:border-green-300 group-hover:shadow-md">
+                <img :src="whatsappIconUrl" alt="" width="96" height="102" class="h-28 w-auto object-contain">
+              </div>
+              <p class="mt-1.5 text-center text-xs font-medium text-slate-500 transition-colors duration-200 group-hover:text-slate-800">WhatsApp</p>
             </a>
 
-            <div class="group relative z-0 inline-block hover:z-20">
-              <img
-                :src="wechatQrUrl"
-                :alt="t('footer.wechat')"
-                :title="t('footer.wechat')"
-                width="22"
-                height="32"
-                class="h-8 w-auto origin-top-left rounded-md object-contain shadow-none transition-transform duration-200 ease-out group-hover:scale-[4] group-hover:shadow-xl"
-              >
+            <div class="group block" :title="t('footer.wechat')">
+              <div class="overflow-hidden rounded-lg border border-slate-200 bg-white p-1.5 shadow-xs transition-all duration-200 ease-out group-hover:-translate-y-1 group-hover:border-brand-300 group-hover:shadow-md">
+                <img :src="wechatQrUrl" :alt="t('footer.wechat')" width="96" height="143" class="h-28 w-auto object-contain">
+              </div>
+              <p class="mt-1.5 text-center text-xs font-medium text-slate-500 transition-colors duration-200 group-hover:text-slate-800">WeChat</p>
             </div>
           </div>
         </div>

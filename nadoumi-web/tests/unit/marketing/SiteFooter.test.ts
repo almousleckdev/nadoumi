@@ -20,4 +20,16 @@ describe('SiteFooter', () => {
     expect(qr).toBeTruthy()
     expect(qr!.element.closest('a')).toBeNull()
   })
+
+  it('shows both QR codes at a legible size, not a tiny illegible icon', async () => {
+    const w = await mountSuspended(SiteFooter)
+
+    const whatsappImg = w.findAll('img').find(img => img.attributes('src')?.includes('whatsapp'))
+    const wechatImg = w.findAll('img').find(img => img.attributes('src')?.includes('wechat'))
+    // both are real QR codes (not logo icons) — anything much smaller than this is unscannable noise
+    expect(whatsappImg!.classes()).toContain('h-28')
+    expect(wechatImg!.classes()).toContain('h-28')
+    expect(w.text()).toContain('WhatsApp')
+    expect(w.text()).toContain('WeChat')
+  })
 })
