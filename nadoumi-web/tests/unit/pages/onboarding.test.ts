@@ -114,7 +114,6 @@ describe('onboarding wizard', () => {
     await flushPromises()
 
     expect(button(w, 'Next')!.attributes('disabled')).toBeDefined()
-    expect(w.text()).toContain('Add your photo and a matching passport to continue.')
   })
 
   it('enables Next once the server reports photo and passport complete', async () => {
@@ -125,7 +124,6 @@ describe('onboarding wizard', () => {
     await flushPromises()
 
     expect(button(w, 'Next')!.attributes('disabled')).toBeUndefined()
-    expect(w.text()).not.toContain('Add your photo and a matching passport to continue.')
   })
 
   it('leaves for the dashboard only after the server accepts Finish', async () => {

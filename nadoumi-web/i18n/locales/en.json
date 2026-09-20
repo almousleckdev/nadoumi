@@ -480,8 +480,7 @@
     },
     "identity": {
       "title": "Identity",
-      "blurb": "Passport and nationality details for your applications.",
-      "blocked": "Add your photo and a matching passport to continue."
+      "blurb": "Passport and nationality details for your applications."
     },
     "education": {
       "title": "Education history",
@@ -511,16 +510,7 @@
     "badge": {
       "plannedBackend": "Coming soon"
     },
-    "crop": {
-      "zoom": "Zoom",
-      "rotate": "Rotate",
-      "reset": "Reset",
-      "apply": "Use this crop"
-    },
     "doc": {
-      "zoomIn": "Zoom in",
-      "zoomOut": "Zoom out",
-      "fit": "Fit",
       "previewAlt": "Uploaded document"
     },
     "photo": {
@@ -1821,13 +1811,9 @@
   },
   "passport": {
     "title": "Passport",
-    "guidance": "Upload a clear photo or scan of your passport photo page. We read the details in your browser; the image is not sent to any third party.",
+    "guidance": "Upload a clear photo or scan of your passport photo page, then confirm the details below.",
     "none": "No passport uploaded",
     "formats": "JPEG, PNG or PDF, up to 10 MB",
-    "reading": "Reading your passport…",
-    "readOk": "We read these details from your passport. Check each one and correct anything that is wrong.",
-    "readFailed": "We could not read the passport automatically. Enter the details exactly as they appear on the passport.",
-    "pdfManual": "PDF files cannot be read automatically. Enter the details exactly as they appear on the passport.",
     "detailsTitle": "Passport details",
     "fields": {
       "passportNo": "Passport number",

@@ -13,14 +13,10 @@ vi.mock('~/utils/files', async (original) => ({
   ...(await original<typeof import('~/utils/files')>()),
   readAsDataUrl: async () => 'data:image/png;base64,AAAA',
   imageSize: async () => size,
-  dataUrlToBlob: async () => new Blob(['x'], { type: 'image/jpeg' }),
 }))
 
-// the cropper's canvas work is out of scope here: it just hands back a cropped image
-const ImageCropper = { template: '<button data-test="crop" @click="$emit(\'crop\', \'data:image/jpeg;base64,BBBB\')">crop</button>', emits: ['crop'] }
-
 async function mountCard() {
-  const w = await mountSuspended(PhotoUploadCard, { props: { applicantId: 1 }, global: { stubs: { ImageCropper } } })
+  const w = await mountSuspended(PhotoUploadCard, { props: { applicantId: 1 } })
   await flushPromises()
   return w
 }
@@ -56,19 +52,21 @@ describe('PhotoUploadCard', () => {
     await flushPromises()
 
     expect(w.text()).toContain('at least 400x400')
-    expect(w.find('[data-test="crop"]').exists()).toBe(false)
+    expect(w.findAll('button').find(b => b.text() === 'Save photo')).toBeUndefined()
   })
 
-  it('crops, uploads and reports the change', async () => {
+  it('previews and uploads the picked file as-is, and reports the change', async () => {
     const w = await mountCard()
-    await pickFile(w, fakeFile('me.png', 'image/png'))
+    const file = fakeFile('me.png', 'image/png')
+    await pickFile(w, file)
     await flushPromises()
 
-    await w.find('[data-test="crop"]').trigger('click')
+    expect(w.find('img').attributes('src')).toBe('data:image/png;base64,AAAA')
+
     await w.findAll('button').find(b => b.text() === 'Save photo')!.trigger('click')
     await flushPromises()
 
-    expect(api.uploadPhoto).toHaveBeenCalledWith(1, expect.any(Blob))
+    expect(api.uploadPhoto).toHaveBeenCalledWith(1, file)
     expect(w.emitted('changed')).toHaveLength(1)
   })
 
@@ -77,7 +75,6 @@ describe('PhotoUploadCard', () => {
     const w = await mountCard()
     await pickFile(w, fakeFile('me.png', 'image/png'))
     await flushPromises()
-    await w.find('[data-test="crop"]').trigger('click')
 
     await w.findAll('button').find(b => b.text() === 'Save photo')!.trigger('click')
     await flushPromises()

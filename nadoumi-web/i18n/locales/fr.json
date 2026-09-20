@@ -480,8 +480,7 @@
     },
     "identity": {
       "title": "Identité",
-      "blurb": "Détails de passeport et de nationalité pour vos candidatures.",
-      "blocked": "Ajoutez votre photo et un passeport correspondant pour continuer."
+      "blurb": "Détails de passeport et de nationalité pour vos candidatures."
     },
     "education": {
       "title": "Parcours scolaire",
@@ -511,16 +510,7 @@
     "badge": {
       "plannedBackend": "Bientôt disponible"
     },
-    "crop": {
-      "zoom": "Zoom",
-      "rotate": "Pivoter",
-      "reset": "Réinitialiser",
-      "apply": "Utiliser ce cadrage"
-    },
     "doc": {
-      "zoomIn": "Zoomer",
-      "zoomOut": "Dézoomer",
-      "fit": "Ajuster",
       "previewAlt": "Document téléversé"
     },
     "photo": {
@@ -1821,13 +1811,9 @@
   },
   "passport": {
     "title": "Passeport",
-    "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport. Nous lisons les informations dans votre navigateur ; l'image n'est envoyée à aucun tiers.",
+    "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport, puis confirmez les informations ci-dessous.",
     "none": "Aucun passeport téléversé",
     "formats": "JPEG, PNG ou PDF, jusqu'à 10 Mo",
-    "reading": "Lecture de votre passeport…",
-    "readOk": "Nous avons lu ces informations sur votre passeport. Vérifiez chacune d'elles et corrigez ce qui est erroné.",
-    "readFailed": "Nous n'avons pas pu lire le passeport automatiquement. Saisissez les informations exactement comme elles figurent sur le passeport.",
-    "pdfManual": "Les fichiers PDF ne peuvent pas être lus automatiquement. Saisissez les informations exactement comme elles figurent sur le passeport.",
     "detailsTitle": "Informations du passeport",
     "fields": {
       "passportNo": "Numéro de passeport",

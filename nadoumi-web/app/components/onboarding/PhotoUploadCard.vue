@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { PHOTO_ACCEPT, PHOTO_MAX_MB, PHOTO_MIME, PHOTO_MIN_PX } from '~/constants/passport'
-import { dataUrlToBlob, imageSize, readAsDataUrl } from '~/utils/files'
+import { imageSize, readAsDataUrl } from '~/utils/files'
 
-/** Profile photo: pick, check size, crop to a square, save. Stored privately; shown through a signed URL. */
+/** Profile photo: pick, check size, save as-is. Stored privately; shown through a signed URL. */
 const props = defineProps<{ applicantId: number }>()
 const emit = defineEmits<{ changed: [] }>()
 const { t } = useI18n()
@@ -10,8 +10,8 @@ const { uploadPhoto, photoUrl } = useApplicant()
 const { busy, error, notice, run } = useAsyncAction()
 
 const savedUrl = ref('')
-const rawSrc = ref('')
-const croppedSrc = ref('')
+const picked = ref<File | null>(null)
+const previewSrc = ref('')
 const problem = ref('')
 
 async function loadSaved() {
@@ -27,19 +27,21 @@ async function onSelect(file: File) {
     problem.value = t('onboarding.photo.tooSmall', { px: PHOTO_MIN_PX })
     return
   }
-  rawSrc.value = source
-  croppedSrc.value = ''
+  picked.value = file
+  previewSrc.value = source
 }
 
 async function save() {
+  const file = picked.value
+  if (!file) return
   const saved = await run(async () => {
-    await uploadPhoto(props.applicantId, await dataUrlToBlob(croppedSrc.value))
+    await uploadPhoto(props.applicantId, file)
     await loadSaved()
     return true
   }, t('onboarding.photo.saved'))
   if (!saved) return
-  rawSrc.value = ''
-  croppedSrc.value = ''
+  picked.value = null
+  previewSrc.value = ''
   emit('changed')
 }
 
@@ -54,14 +56,13 @@ const status = computed(() => (savedUrl.value ? 'done' : 'pending'))
 
     <div class="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-start">
       <figure class="mx-auto h-28 w-28 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
-        <img v-if="croppedSrc || savedUrl" :src="croppedSrc || savedUrl" :alt="t('onboarding.photo.current')" class="h-full w-full object-cover">
+        <img v-if="previewSrc || savedUrl" :src="previewSrc || savedUrl" :alt="t('onboarding.photo.current')" class="h-full w-full object-cover">
         <figcaption v-else class="flex h-full w-full items-center justify-center text-xs text-slate-400">
           {{ t('onboarding.photo.none') }}
         </figcaption>
       </figure>
 
       <div class="grid gap-3">
-        <ImageCropper v-if="rawSrc && !croppedSrc" :src="rawSrc" :aspect="1" :size="240" @crop="croppedSrc = $event" />
         <DocumentDropzone
           :accept="PHOTO_ACCEPT"
           :mime="PHOTO_MIME"
@@ -70,7 +71,7 @@ const status = computed(() => (savedUrl.value ? 'done' : 'pending'))
           :replace="Boolean(savedUrl)"
           @select="onSelect"
         />
-        <div v-if="croppedSrc">
+        <div v-if="picked">
           <NButton size="sm" :loading="busy" @click="save">{{ t('onboarding.photo.save') }}</NButton>
         </div>
       </div>
