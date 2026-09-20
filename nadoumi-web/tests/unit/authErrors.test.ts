@@ -35,14 +35,23 @@ describe('authErrorMessage', () => {
       ['email verification does not match this address', 'errors.otpEmailMismatch'],
       ['student registration is disabled', 'errors.registrationDisabled'],
       ['Captcha code error', 'errors.captcha'],
+      ['name is required', 'validation.required'],
+      ['name may contain only letters, spaces, hyphens and apostrophes', 'profileForm.nameInvalid'],
     ]
     for (const [detail, key] of cases) {
       expect(authErrorMessage({ statusCode: 400, data: { detail } }, t)).toBe(key)
     }
   })
 
-  it('falls back to a generic message for anything unrecognised', () => {
-    expect(authErrorMessage({ statusCode: 400, data: { detail: 'something odd' } }, t)).toBe('errors.validation')
+  it('shows the backend detail for an unrecognised 400 instead of a content-free message', () => {
+    // NadApiExceptionHandler only ever puts safe, human-readable text in `detail`,
+    // so an unmapped one is still worth showing rather than hiding behind a generic key.
+    expect(authErrorMessage({ statusCode: 400, data: { detail: 'firstName must not be blank' } }, t))
+      .toBe('firstName must not be blank')
+  })
+
+  it('falls back to a generic message when there is no detail at all', () => {
+    expect(authErrorMessage({ statusCode: 400 }, t)).toBe('errors.validation')
     expect(authErrorMessage({}, t)).toBe('errors.generic')
     expect(authErrorMessage(undefined, t)).toBe('errors.generic')
   })

@@ -29,6 +29,8 @@ const DETAIL_RULES: [RegExp, string][] = [
   [/passport issue date/i, 'passport.errors.issueFuture'],
   [/expiry date must be after/i, 'passport.errors.expiryBeforeIssue'],
   [/verify the new email/i, 'errors.verifyEmailFirst'],
+  [/name is required/i, 'validation.required'],
+  [/name may contain only letters/i, 'profileForm.nameInvalid'],
 ]
 
 export function authErrorMessage(err: unknown, t: Translate): string {
@@ -62,6 +64,10 @@ export function authErrorMessage(err: unknown, t: Translate): string {
     if (status === 400 && /e-?mail/i.test(detail)) return t('errors.invalidEmail')
   }
 
-  // 6. Anything else.
+  // 6. An unrecognized 400: NadApiExceptionHandler only ever puts safe,
+  // human-readable text in `detail` (never a stack trace or SQL), so showing it is
+  // strictly more useful than a content-free "check the highlighted fields" — and
+  // it makes the next unmapped case reportable instead of a dead end.
+  if (status === 400 && detail) return detail
   return status === 400 ? t('errors.validation') : t('errors.generic')
 }
