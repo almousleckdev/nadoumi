@@ -336,12 +336,16 @@
     "nav": {
       "aria": "Navegación del panel",
       "toggleSidebar": "Mostrar/ocultar menú",
+      "groupProfile": "Perfil",
       "overview": "Resumen",
       "profile": "Perfil",
       "documents": "Documentos",
+      "scholarships": "Becas",
+      "notifications": "Notificaciones",
       "education": "Educación",
       "contacts": "Contactos",
       "account": "Cuenta",
+      "settings": "Configuración",
       "interests": "Intereses",
       "location": "Ubicación",
       "work": "Experiencia"
@@ -358,7 +362,7 @@
       "applicationsEmpty": "Todavía no has iniciado ninguna solicitud.",
       "browseScholarships": "Explorar becas",
       "recommended": "Becas recomendadas",
-      "recommendedEmpty": "Todavía no hay recomendaciones — vuelve pronto.",
+      "recommendedEmpty": "Todavía no hay recomendaciones. Vuelve pronto.",
       "viewAll": "Ver todo",
       "documents": "Documentos",
       "manageDocuments": "Gestionar documentos",
@@ -374,7 +378,7 @@
       "blurb": "Novedades sobre tus solicitudes y tu cuenta.",
       "aria": "Notificaciones",
       "markAllRead": "Marcar todo como leído",
-      "empty": "Estás al día — todavía no hay notificaciones."
+      "empty": "Estás al día. Todavía no hay notificaciones."
     },
     "applicantLabel": "Solicitante",
     "switchApplicant": "Cambiar de solicitante",
@@ -405,6 +409,31 @@
     "relationOTHER": "Otro",
     "accountTitle": "Cuenta",
     "accountUser": "Sesión iniciada como",
+    "account": {
+      "blurb": "Gestiona tu inicio de sesión, seguridad y cómo te contactamos.",
+      "personal": {
+        "title": "Información personal",
+        "blurb": "Tus datos de solicitante (nombre, fecha de nacimiento, nacionalidad y más) están en tu perfil."
+      },
+      "security": {
+        "title": "Seguridad",
+        "emailChangeBlurb": "Para cambiar el correo electrónico de tu cuenta, contacta a"
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "blurb": "Verás las actualizaciones de tu solicitud y cuenta en las notificaciones de tu panel."
+      },
+      "documents": {
+        "title": "Documentos e identidad",
+        "blurb": "Tu foto de perfil y pasaporte se gestionan en la página de Documentos."
+      },
+      "danger": {
+        "title": "Zona de peligro",
+        "blurb": "¿Necesitas eliminar tu cuenta? Lo gestionamos bajo solicitud, contacta a nuestro equipo de soporte y nos encargaremos.",
+        "cta": "Enviar correo a soporte",
+        "mailSubject": "Solicitud de eliminación de cuenta"
+      }
+    },
     "changePassword": "Cambiar contraseña",
     "pwCurrent": "Contraseña actual",
     "pwNew": "Nueva contraseña",
@@ -1832,6 +1861,7 @@
     "guidance": "Sube una foto o un escaneo nítido de la página de datos de tu pasaporte y confirma los datos a continuación.",
     "none": "Ningún pasaporte subido",
     "formats": "JPEG, PNG o PDF, hasta 10 MB",
+    "expiresOn": "Caduca el {date}",
     "detailsTitle": "Datos del pasaporte",
     "fields": {
       "passportNo": "Número de pasaporte",
