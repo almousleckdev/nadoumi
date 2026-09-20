@@ -14,9 +14,14 @@ event → one `nad_notification` per recipient (idempotent via
 `nad_notification.source_ref = outbox:<id>:<user>`), rendered from
 `nad_notification_template`, then `NotificationDeliveryDispatcher` /
 `notificationDispatchJob` (`V34`) sends the EMAIL channel via the `MailSender`
-port. **`ContactInquiryReceived`** (from `ContactService`) and
-**`ScholarshipPublished`** (from `ScholarshipAdminService`, on the transition to
-PUBLISHED) are wired and emit in the producer's own transaction. SSE fan-out
+port. **`ContactInquiryReceived`** (from `ContactService`), **`ScholarshipPublished`**
+(from `ScholarshipAdminService`, on the transition to PUBLISHED),
+**`UniversityPublished`** (`UniversityService`), **`ProgramPublished`**
+(`ProgramService`), and **`ScholarshipDeadlineReminder`**
+(`ScholarshipDeadlineReminderJob`) are wired and emit in the producer's own
+transaction (the last one from a scheduled job, not a request). Public catalog
+announcements additionally fan out to every active student, batched
+(`OutboxToNotificationDispatcher.isPublicCatalogAnnouncement`). SSE fan-out
 (slice 4) is deferred.
 
 ## Envelope
@@ -38,7 +43,10 @@ through authorized queries.
 | Event `type` | Aggregate | Emitted when | Primary consumers |
 | --- | --- | --- | --- |
 | `ContactInquiryReceived` ✅ | contact_inquiry | anonymous `POST /api/public/contact` accepts a submission | staff holding `nad:notification:list` — IN_APP + EMAIL (replaces the old direct support-inbox mail) |
-| `ScholarshipPublished` ✅ | scholarship | transition to `publish_status = PUBLISHED` (create or update) | v1: staff holding `nad:notification:list` (operational audit). Student targeting by eligibility/opt-in is deferred until a saved-search / opt-in surface exists. |
+| `ScholarshipPublished` ✅ | scholarship | transition to `publish_status = PUBLISHED` (create or update) | staff holding `nad:notification:list` (operational audit) **+ every active student** — IN_APP, batched fan-out. Targeting by eligibility/opt-in (narrower than "every student") is a later step. |
+| `UniversityPublished` ✅ | university | transition to `publish_status = PUBLISHED` | same audience as `ScholarshipPublished` — staff + every active student |
+| `ProgramPublished` ✅ | program | transition to `publish_status = PUBLISHED` | same audience as `ScholarshipPublished` — staff + every active student |
+| `ScholarshipDeadlineReminder` ✅ | scholarship | `ScholarshipDeadlineReminderJob` (scheduled) finds a soon-closing published scholarship | same audience as `ScholarshipPublished` — staff + every active student |
 | `TaskProgressChanged` ✅ | task | any task create / reassignment / priority change / status transition (`TaskService`) | the task creator, its assignee, and `nad:task:approve` holders — IN_APP + EMAIL; the actor is excluded. Recipients travel in the payload as `recipientUserIds`; `OutboxToNotificationDispatcher` uses that list instead of a permission query. |
 | `StudentRegistered` ✅ | user | `StudentAuthService.register` completes (email verified + account row + `user_type='10'`) | `WelcomeContentComposer` — one `WELCOME` notification for the new user: IN_APP via `NotificationService`, plus a personalised welcome **email** (featured programmes + soon-closing scholarships from the public catalog services, each section dropped when empty) composed with `EmailLayout` and sent directly through the `MailSender` port. Payload: `userId, email, firstName, displayName, locale`. |
 | `ApplicationSubmitted` ⏳ | application | student/agent submits (snapshots captured) | **template + `NotificationType.APPLICATION_SUBMITTED` + dispatcher mapping ship now (`V55`); no producer yet** — the Application module (Step 6) emits it with `recipientUserIds` + `applicationRef, opportunityTitle, firstName` in the payload → assign queue, applicant ack (IN_APP + EMAIL) |
