@@ -72,7 +72,17 @@ describe('student-notifications proxy', () => {
 
     await notifications({} as never)
 
-    expect(state.proxied).toBe('http://backend/api/notifications/?page=2')
+    expect(state.proxied).toBe('http://backend/api/notifications?page=2')
+  })
+
+  it('does not append a trailing slash for the bare list endpoint — Spring 6+ 404s on one', async () => {
+    state.token = 'jwt-abc'
+    state.path = ''
+    state.proxyImpl.mockResolvedValueOnce({ content: [], totalElements: 0 })
+
+    await notifications({} as never)
+
+    expect(state.proxied).toBe('http://backend/api/notifications')
   })
 
   it('rejects without a signed-in cookie and never proxies', async () => {

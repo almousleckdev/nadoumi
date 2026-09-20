@@ -7,7 +7,10 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, statusMessage: 'Not signed in' })
   }
   const search = getRequestURL(event).search
-  const target = `${backendBaseUrl(event)}/api/student/${path}${search}`
+  // Spring's default routing (trailing-slash matching disabled since Spring 6 /
+  // Boot 3+) 404s on a bare `/api/student/` — only append the slash when there
+  // is an actual sub-path.
+  const target = `${backendBaseUrl(event)}/api/student${path ? `/${path}` : ''}${search}`
   return proxyRequest(event, target, {
     headers: { authorization: `Bearer ${token}` },
   })
