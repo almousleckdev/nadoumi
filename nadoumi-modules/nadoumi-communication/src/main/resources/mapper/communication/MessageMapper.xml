@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.communication.mapper.MessageMapper">
+
+    <resultMap id="message" type="com.nadoumi.communication.domain.Message">
+        <id     property="id"             column="id"/>
+        <result property="conversationId" column="conversation_id"/>
+        <result property="senderUserId"   column="sender_user_id"/>
+        <result property="body"           column="body"/>
+        <result property="createdAt"      column="created_at"/>
+        <result property="editedAt"       column="edited_at"/>
+        <result property="deletedAt"      column="deleted_at"/>
+    </resultMap>
+
+    <sql id="cols">id, conversation_id, sender_user_id, body, created_at, edited_at, deleted_at</sql>
+
+    <select id="findById" resultMap="message">
+        select <include refid="cols"/> from nad_message where id = #{id}
+    </select>
+
+    <select id="findLatest" resultMap="message">
+        select <include refid="cols"/> from nad_message
+        where conversation_id = #{conversationId} and deleted_at is null
+        order by id desc limit 1
+    </select>
+
+    <select id="listByConversation" resultMap="message">
+        select <include refid="cols"/> from nad_message
+        where conversation_id = #{conversationId}
+        <if test="beforeId > 0">and id &lt; #{beforeId}</if>
+        order by id desc limit #{limit}
+    </select>
+
+    <select id="countAfter" resultType="long">
+        select count(*) from nad_message
+        where conversation_id = #{conversationId} and id > #{afterId} and deleted_at is null
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.communication.domain.Message"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_message (conversation_id, sender_user_id, body, created_at)
+        values (#{conversationId}, #{senderUserId}, #{body}, #{createdAt})
+    </insert>
+
+    <update id="softDelete">
+        update nad_message set deleted_at = #{deletedAt} where id = #{id}
+    </update>
+</mapper>

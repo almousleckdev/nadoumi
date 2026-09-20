@@ -78,10 +78,15 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
         String body = renderer.render(type, NotificationChannelKind.IN_APP,
                 NotificationRenderer.DEFAULT_LOCALE, context).body();
 
+        Long applicationId = longFromPayload(context, "applicationId");
+        Long conversationId = longFromPayload(context, "conversationId");
+        Long messageId = longFromPayload(context, "messageId");
+
         List<NotificationRequest> batch = new java.util.ArrayList<>(recipients.size());
         for (Long userId : recipients) {
             batch.add(NotificationRequest.fromEvent(userId, type, type.defaultTitle(), body,
-                    "outbox:" + event.getId() + ":" + userId, event.getPayloadJson()));
+                    "outbox:" + event.getId() + ":" + userId, applicationId, conversationId, messageId,
+                    event.getPayloadJson()));
         }
         notificationService.createBatch(batch);
     }
@@ -96,8 +101,20 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             case OutboxEventTypes.TASK_PROGRESS_CHANGED -> NotificationType.TASK_PROGRESS;
             case OutboxEventTypes.APPLICATION_SUBMITTED -> NotificationType.APPLICATION_SUBMITTED;
             case OutboxEventTypes.APPLICATION_STATUS_CHANGED -> NotificationType.APPLICATION_STATUS_CHANGED;
+            case OutboxEventTypes.MESSAGE_POSTED -> NotificationType.MESSAGE_POSTED;
             default -> null;
         };
+    }
+
+    /**
+     * A soft-reference id (e.g. {@code conversationId}) from the outbox payload, or
+     * {@code null} when the event type doesn't carry one — same soft-reference
+     * treatment as {@code nad_notification.application_id}/{@code conversation_id}/
+     * {@code message_id} themselves (no FK, populated only when present).
+     */
+    private static Long longFromPayload(Map<String, Object> context, String key) {
+        Object raw = context.get(key);
+        return raw == null ? null : Long.parseLong(String.valueOf(raw));
     }
 
     /** Types every registered student is told about, not just the staff audit audience. */

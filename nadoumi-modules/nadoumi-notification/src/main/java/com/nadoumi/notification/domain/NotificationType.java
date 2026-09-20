@@ -46,7 +46,10 @@ public enum NotificationType {
     APPLICATION_SUBMITTED(true, "Application submitted", Set.of(NotificationChannelKind.EMAIL)),
 
     /** An application's stage/status changed — the applicant's linked users are told. */
-    APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL));
+    APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL)),
+
+    /** A message was posted to a conversation — its other participants are told. */
+    MESSAGE_POSTED(false, "New message", Set.of());
 
     private final boolean transactional;
     private final String defaultTitle;

@@ -43,4 +43,7 @@ public final class OutboxEventTypes {
      * <p>PLANNED — no producer yet; the Application module (platform Step 6) emits this.</p>
      */
     public static final String APPLICATION_STATUS_CHANGED = "ApplicationStatusChanged";
+
+    /** A message was posted to a conversation. Aggregate: {@code conversation}. */
+    public static final String MESSAGE_POSTED = "MessagePosted";
 }

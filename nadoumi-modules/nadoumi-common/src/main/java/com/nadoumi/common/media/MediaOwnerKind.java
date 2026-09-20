@@ -8,5 +8,6 @@ public enum MediaOwnerKind {
     APPLICANT,
     APPLICATION,
     DOCUMENT,
+    MESSAGE,
     USER
 }

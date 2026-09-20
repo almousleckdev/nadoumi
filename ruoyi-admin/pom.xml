@@ -93,6 +93,10 @@
         </dependency>
         <dependency>
             <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-communication</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-hr</artifactId>
         </dependency>
         <dependency>
