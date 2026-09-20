@@ -39,25 +39,38 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
       <p class="mb-6 text-sm text-slate-500">{{ t('auth.loginSubtitle') }}</p>
       <form class="grid gap-4" @submit.prevent="submit">
         <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
-        <NField :label="t('auth.email')" for="email" required>
-          <NInput id="email" v-model="form.email" type="email" autocomplete="email" />
-        </NField>
+        <NInput
+          id="email"
+          v-model="form.email"
+          type="email"
+          autocomplete="email"
+          :placeholder="t('auth.email')"
+          :aria-label="t('auth.email')"
+        >
+          <template #prefix>
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <rect x="3" y="5" width="18" height="14" rx="2" />
+              <path d="m3 7 9 6 9-6" />
+            </svg>
+          </template>
+        </NInput>
         <PasswordField
           id="password"
           v-model="form.password"
           :label="t('auth.password')"
           autocomplete="current-password"
+          plain
         />
         <AuthCaptcha ref="captchaRef" v-model:code="form.code" v-model:uuid="form.uuid" />
         <NButton type="submit" :loading="busy" block>{{ t('auth.submitLogin') }}</NButton>
       </form>
     </NCard>
     <div class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/forgot-password')" class="rounded-full bg-white/10 px-3 py-1 text-white/90 backdrop-blur-sm hover:bg-white/20 hover:underline">{{ t('auth.forgot') }}</NuxtLink>
+      <NuxtLink :to="localePath('/forgot-password')" class="rounded-full bg-white/95 px-3 py-1 font-medium text-slate-700 shadow-sm hover:bg-white hover:underline">{{ t('auth.forgot') }}</NuxtLink>
     </div>
-    <div class="mt-5 rounded-xl border border-white/15 bg-white/10 p-4 text-center text-sm text-white/90 backdrop-blur-sm">
+    <div class="mt-5 rounded-xl bg-white/95 p-4 text-center text-sm text-slate-700 shadow-sm">
       {{ t('auth.newToNadoumi') }}
-      <NuxtLink :to="localePath('/register')" class="ms-1 font-semibold text-white hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
+      <NuxtLink :to="localePath('/register')" class="ms-1 font-semibold text-brand-700 hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
     </div>
   </div>
 </template>

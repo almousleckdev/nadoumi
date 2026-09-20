@@ -156,7 +156,7 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
     </NCard>
 
     <p class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/login')" class="rounded-full bg-white/10 px-3 py-1 text-white/90 backdrop-blur-sm hover:bg-white/20 hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
+      <NuxtLink :to="localePath('/login')" class="rounded-full bg-white/95 px-3 py-1 font-medium text-slate-700 shadow-sm hover:bg-white hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
     </p>
   </div>
 </template>

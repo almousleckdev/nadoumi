@@ -24,9 +24,13 @@ const activeIndex = ref(-1)
 const selectedLabel = computed(() => props.options.find(o => o.value === model.value)?.label ?? '')
 const displayValue = computed(() => (open.value ? query.value : selectedLabel.value))
 
+// Require typing before suggesting anything — for a long list (languages,
+// countries) dumping every option alphabetically on focus surfaces obscure
+// entries first (e.g. "Abkhazian", "Afar") instead of anything useful.
+const MIN_QUERY_LENGTH = 1
 const filtered = computed(() => {
   const q = query.value.trim().toLowerCase()
-  if (!q) return props.options
+  if (q.length < MIN_QUERY_LENGTH) return []
   return props.options.filter(o => o.label.toLowerCase().includes(q))
 })
 
@@ -37,7 +41,7 @@ const activeDescendant = computed(() => (open.value && activeIndex.value >= 0 ? 
 function openList() {
   open.value = true
   query.value = ''
-  activeIndex.value = filtered.value.findIndex((o: Option) => o.value === model.value)
+  activeIndex.value = -1
 }
 
 function onInput(event: Event) {
@@ -107,7 +111,9 @@ function onKeydown(event: KeyboardEvent) {
         role="listbox"
         class="absolute z-20 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-slate-200 bg-white py-1 shadow-lg"
       >
-        <li v-if="!filtered.length" class="px-3 py-2 text-sm text-slate-400">{{ t('form.noMatches') }}</li>
+        <li v-if="!filtered.length" class="px-3 py-2 text-sm text-slate-400">
+          {{ query.trim() ? t('form.noMatches') : t('form.typeToSearch') }}
+        </li>
         <li
           v-for="(o, i) in filtered"
           :id="optionId(i)"

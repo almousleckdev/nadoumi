@@ -99,7 +99,7 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
 
     <OnboardingProgress :steps="progressSteps" :current="current" />
 
-    <NCard>
+    <div>
       <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
       <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
 
@@ -139,11 +139,11 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
         </SuspenseBoundary>
       </OnboardingStep>
 
-      <div class="mt-6 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+      <div class="mt-8 flex items-center justify-between gap-3 border-t border-slate-200 pt-5">
         <NButton variant="ghost" size="sm" :disabled="current === 0" @click="back">{{ t('onboarding.back') }}</NButton>
         <NButton v-if="stepKey === 'review'" size="sm" :loading="busy" @click="finish">{{ t('onboarding.finish') }}</NButton>
         <NButton v-else-if="stepKey !== 'personal'" size="sm" :disabled="!canAdvance" @click="next">{{ t('onboarding.next') }}</NButton>
       </div>
-    </NCard>
+    </div>
   </div>
 </template>
