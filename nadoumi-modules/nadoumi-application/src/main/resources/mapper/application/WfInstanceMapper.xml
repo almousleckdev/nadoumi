@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.WfInstanceMapper">
+
+    <resultMap id="instance" type="com.nadoumi.application.domain.WfInstance">
+        <id     property="id"                column="id"/>
+        <result property="definitionId"      column="definition_id"/>
+        <result property="definitionVersion" column="definition_version"/>
+        <result property="applicationId"     column="application_id"/>
+        <result property="currentStageId"    column="current_stage_id"/>
+        <result property="status"            column="status"/>
+        <result property="startedAt"         column="started_at"/>
+        <result property="closedAt"          column="closed_at"/>
+    </resultMap>
+
+    <select id="findByApplicationId" resultMap="instance">
+        select * from nad_wf_instance where application_id = #{applicationId}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.WfInstance"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_wf_instance
+            (definition_id, definition_version, application_id, current_stage_id, status, started_at)
+        values
+            (#{definitionId}, #{definitionVersion}, #{applicationId}, #{currentStageId}, #{status}, now())
+    </insert>
+
+    <update id="updateStage">
+        update nad_wf_instance set current_stage_id = #{stageId} where application_id = #{applicationId}
+    </update>
+
+    <update id="close">
+        update nad_wf_instance set status = 'CLOSED', closed_at = now() where application_id = #{applicationId}
+    </update>
+
+</mapper>

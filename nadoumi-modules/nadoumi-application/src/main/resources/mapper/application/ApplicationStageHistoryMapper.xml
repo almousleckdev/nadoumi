@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationStageHistoryMapper">
+
+    <resultMap id="history" type="com.nadoumi.application.domain.ApplicationStageHistory">
+        <id     property="id"              column="id"/>
+        <result property="applicationId"   column="application_id"/>
+        <result property="fromStageId"     column="from_stage_id"/>
+        <result property="toStageId"       column="to_stage_id"/>
+        <result property="transitionCode"  column="transition_code"/>
+        <result property="changedBy"       column="changed_by"/>
+        <result property="changedAt"       column="changed_at"/>
+        <result property="reason"          column="reason"/>
+    </resultMap>
+
+    <select id="findByApplication" resultMap="history">
+        select * from nad_application_stage_history where application_id = #{applicationId} order by changed_at
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.ApplicationStageHistory"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_stage_history
+            (application_id, from_stage_id, to_stage_id, transition_code, changed_by, changed_at, reason)
+        values
+            (#{applicationId}, #{fromStageId}, #{toStageId}, #{transitionCode}, #{changedBy}, now(), #{reason})
+    </insert>
+
+</mapper>
