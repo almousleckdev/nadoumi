@@ -8,6 +8,8 @@ import type { PassportForm } from '~/utils/passportRules'
  * Passport: choose the scan, confirm the details (pre-filled from the profile so the
  * student is not asked to re-type them), then save. The server compares the confirmed
  * details with the profile and refuses a passport that is not valid for more than six months.
+ * Collapses to a compact summary once verified and matching — stays expanded whenever
+ * something needs the student's attention (nothing uploaded yet, or a mismatch/rejection).
  */
 const props = defineProps<{
   applicantId: number
@@ -23,6 +25,7 @@ const status = ref<PassportStatusDto | null>(null)
 const file = ref<File | null>(null)
 const preview = ref('')
 const initial = ref<PassportForm | null>(null)
+const expanded = ref(false)
 
 function formFrom(saved: PassportStatusDto | null): PassportForm | null {
   if (!saved?.passportNo) return null
@@ -52,6 +55,7 @@ function formFromProfileOrSaved(): PassportForm {
 onMounted(async () => {
   status.value = await passportStatus(props.applicantId).catch(() => null)
   initial.value ??= formFromProfileOrSaved()
+  expanded.value = cardStatus.value !== 'done'
 })
 
 async function onSubmit(form: PassportForm) {
@@ -62,6 +66,8 @@ async function onSubmit(form: PassportForm) {
   })
   if (!saved) return
   file.value = null
+  // Stay expanded so the student sees the confirmation; the Cancel button below
+  // (shown once cardStatus is 'done') lets them collapse it manually.
   emit('changed')
 }
 
@@ -75,27 +81,49 @@ const cardStatus = computed(() => {
 </script>
 
 <template>
-  <DocumentCard :title="t('passport.title')" :guidance="t('passport.guidance')" :status="cardStatus">
+  <DocumentCard :title="t('passport.title')" :guidance="expanded ? t('passport.guidance') : ''" :status="cardStatus">
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
     <NAlert v-if="cardStatus === 'done'" tone="success">{{ t('passport.matches') }}</NAlert>
-    <PassportMismatchNotice v-if="mismatches.length" :mismatches="mismatches" @edit-profile="$emit('edit-profile')" />
 
-    <DocumentPreview v-if="file" :src="preview" :type="file.type" :name="file.name" />
-    <p v-else-if="!status?.scanUploaded" class="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
-      {{ t('passport.none') }}
-    </p>
+    <div v-if="!expanded" class="flex items-center gap-3">
+      <div class="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-400">
+        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+          <rect x="4" y="3" width="16" height="18" rx="2" />
+          <circle cx="12" cy="9" r="2.5" />
+          <path d="M8 16h8" />
+        </svg>
+      </div>
+      <div class="flex-1 text-sm">
+        <p class="font-medium text-slate-700">{{ status?.passportNo }}</p>
+        <p class="text-slate-500">{{ t('passport.expiresOn', { date: status?.expiryDate }) }}</p>
+      </div>
+      <NButton size="sm" variant="secondary" @click="expanded = true">{{ t('common.edit') }}</NButton>
+    </div>
 
-    <DocumentDropzone
-      :accept="PASSPORT_ACCEPT"
-      :mime="PASSPORT_MIME"
-      :max-mb="PASSPORT_MAX_MB"
-      :bad-type-message="t('onboarding.upload.badTypePassport')"
-      :hint="t('passport.formats')"
-      :replace="hasScan"
-      @select="onSelect"
-    />
+    <template v-else>
+      <NAlert v-if="cardStatus === 'done'" tone="success">{{ t('passport.matches') }}</NAlert>
+      <PassportMismatchNotice v-if="mismatches.length" :mismatches="mismatches" @edit-profile="$emit('edit-profile')" />
 
-    <PassportDetailsForm v-if="showForm" :initial="initial" :busy="busy" :can-save="hasScan" @submit="onSubmit" />
-    <p v-if="notice" class="sr-only" role="status">{{ notice }}</p>
+      <DocumentPreview v-if="file" :src="preview" :type="file.type" :name="file.name" />
+      <p v-else-if="!status?.scanUploaded" class="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
+        {{ t('passport.none') }}
+      </p>
+
+      <DocumentDropzone
+        :accept="PASSPORT_ACCEPT"
+        :mime="PASSPORT_MIME"
+        :max-mb="PASSPORT_MAX_MB"
+        :bad-type-message="t('onboarding.upload.badTypePassport')"
+        :hint="t('passport.formats')"
+        :replace="hasScan"
+        @select="onSelect"
+      />
+
+      <PassportDetailsForm v-if="showForm" :initial="initial" :busy="busy" :can-save="hasScan" @submit="onSubmit" />
+      <div v-if="cardStatus === 'done'">
+        <NButton size="sm" variant="ghost" @click="expanded = false">{{ t('common.cancel') }}</NButton>
+      </div>
+      <p v-if="notice" class="sr-only" role="status">{{ notice }}</p>
+    </template>
   </DocumentCard>
 </template>

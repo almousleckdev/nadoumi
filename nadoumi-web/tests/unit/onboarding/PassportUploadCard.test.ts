@@ -89,6 +89,20 @@ describe('PassportUploadCard', () => {
     expect(w.text()).toContain('matches your profile')
   })
 
+  it('collapses to a compact summary once verified and matching, and Edit expands it', async () => {
+    api.passportStatus.mockResolvedValue(SAVED_OK)
+    const w = await mountCard()
+
+    expect(w.text()).toContain(SAVED_OK.passportNo)
+    expect(w.find('#passportNo').exists()).toBe(false)
+    const editButton = w.findAll('button').find(b => b.text() === 'Edit')
+    expect(editButton).toBeTruthy()
+
+    await editButton!.trigger('click')
+
+    expect(w.find('#passportNo').exists()).toBe(true)
+  })
+
   it('tells the student when the passport and the profile do not match', async () => {
     api.passportStatus.mockResolvedValue({
       ...SAVED_OK, matchesProfile: false,

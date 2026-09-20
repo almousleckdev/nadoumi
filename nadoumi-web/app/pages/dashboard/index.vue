@@ -5,14 +5,11 @@ import { DOCUMENT_STATUS_TONES, type DocumentStatus } from '~/constants/onboardi
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { user, activeApplicantId } = useSession()
-const { listMine, markWelcomed, photoUrl, passportStatus } = useApplicant()
+const { markWelcomed, photoUrl, passportStatus } = useApplicant()
 const { publicGet } = useApi()
 const { list: listNotifications } = useNotifications()
 
-const { data, pending, error } = await useAsyncData('dash-applicants', () => listMine())
-const mine = computed<ApplicantDto[]>(() => data.value ?? [])
-const primary = computed(() => mine.value.find((a: ApplicantDto) => a.id === activeApplicantId.value) ?? mine.value[0] ?? null)
+const { applicants: mine, primary, pending, error } = useMyApplicant()
 const loadError = computed(() => (error.value ? t('auth.genericError') : ''))
 
 const showWelcome = computed(() => primary.value?.welcomePending === true)
@@ -20,7 +17,7 @@ async function dismissWelcome() {
   const applicant = primary.value
   if (!applicant) return
   // Optimistic: hide immediately, the server call is best-effort and never shown again either way.
-  data.value = mine.value.map((a: ApplicantDto) => (a.id === applicant.id ? { ...a, welcomePending: false } : a))
+  mine.value = (mine.value ?? []).map((a: ApplicantDto) => (a.id === applicant.id ? { ...a, welcomePending: false } : a))
   await markWelcomed(applicant.id).catch(() => undefined)
 }
 
@@ -114,7 +111,7 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h1 class="font-display text-xl font-bold text-slate-900">
-                {{ t('dashboard.welcome', { name: user?.nickName ?? primary.givenName ?? user?.username ?? '' }) }}
+                {{ t('dashboard.welcome', { name: primary.givenName }) }}
               </h1>
               <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.home.subtitle') }}</p>
             </div>
