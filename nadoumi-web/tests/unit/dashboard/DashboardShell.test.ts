@@ -36,10 +36,10 @@ describe('DashboardShell', () => {
 
   it('shows the real, buildable sidebar sections — nothing linking to an unbuilt feature', async () => {
     const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
-    for (const label of ['Overview', 'Documents', 'Scholarships', 'Notifications', 'Education', 'Settings']) {
+    for (const label of ['Overview', 'Documents', 'Scholarships', 'Messages', 'Notifications', 'Education', 'Settings']) {
       expect(w.text()).toContain(label)
     }
-    for (const notYetBuilt of ['My Applications', 'Messages', 'Help & Support']) {
+    for (const notYetBuilt of ['My Applications', 'Help & Support']) {
       expect(w.text()).not.toContain(notYetBuilt)
     }
   })

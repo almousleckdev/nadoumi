@@ -46,6 +46,8 @@ export default defineNuxtConfig({
     // applicant/ section + form components (<EducationSection>, <ContactForm>, …)
     // used by the onboarding wizard and dashboard, referenced unprefixed.
     { path: '~/components/applicant', pathPrefix: false },
+    // messages/ chat pieces (<MessageComposer>) referenced unprefixed by the dashboard pages.
+    { path: '~/components/messages', pathPrefix: false },
     '~/components',
   ],
   fonts: {
