@@ -14,6 +14,7 @@ declare module 'vue' {
     DataTable: typeof import('./src/components/ui/DataTable.vue')['default']
     DescriptionList: typeof import('./src/components/ui/DescriptionList.vue')['default']
     DonutChart: typeof import('./src/components/dashboard/DonutChart.vue')['default']
+    DonutChartSkeleton: typeof import('./src/components/dashboard/DonutChartSkeleton.vue')['default']
     DonutStat: typeof import('./src/components/dashboard/DonutStat.vue')['default']
     Drawer: typeof import('./src/components/ui/Drawer.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']

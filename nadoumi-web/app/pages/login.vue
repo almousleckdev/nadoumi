@@ -34,8 +34,9 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
 
 <template>
   <div>
-    <h1 class="mb-6 text-center font-display text-2xl font-bold text-slate-900">{{ t('auth.loginTitle') }}</h1>
     <NCard>
+      <h1 class="mb-1 font-display text-2xl font-bold text-slate-900">{{ t('auth.loginTitle') }}</h1>
+      <p class="mb-6 text-sm text-slate-500">{{ t('auth.loginSubtitle') }}</p>
       <form class="grid gap-4" @submit.prevent="submit">
         <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
         <NField :label="t('auth.email')" for="email" required>
@@ -52,11 +53,11 @@ useSeo(t('auth.loginTitle'), t('auth.loginTitle'))
       </form>
     </NCard>
     <div class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/forgot-password')" class="text-slate-500 hover:underline">{{ t('auth.forgot') }}</NuxtLink>
+      <NuxtLink :to="localePath('/forgot-password')" class="rounded-full bg-white/10 px-3 py-1 text-white/90 backdrop-blur-sm hover:bg-white/20 hover:underline">{{ t('auth.forgot') }}</NuxtLink>
     </div>
-    <div class="mt-5 rounded-xl border border-slate-200 bg-slate-50/70 p-4 text-center text-sm text-slate-600">
+    <div class="mt-5 rounded-xl border border-white/15 bg-white/10 p-4 text-center text-sm text-white/90 backdrop-blur-sm">
       {{ t('auth.newToNadoumi') }}
-      <NuxtLink :to="localePath('/register')" class="ms-1 font-semibold text-brand-700 hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
+      <NuxtLink :to="localePath('/register')" class="ms-1 font-semibold text-white hover:underline">{{ t('auth.createProfile') }}</NuxtLink>
     </div>
   </div>
 </template>

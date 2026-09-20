@@ -9,4 +9,8 @@
   --surface-subtle: #f8fafc; /* slate-50 */
   --focus: #f97316;
   --radius-md: 10px;
+
+  /* Auth screens (login/register): fallback colour behind the background
+     photo, mirrors nadoumi-admin's --nad-sidebar-bg. */
+  --ink-900: #10192f;
 }

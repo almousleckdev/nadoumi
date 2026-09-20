@@ -264,7 +264,9 @@
   },
   "auth": {
     "loginTitle": "Iniciar sesión",
+    "loginSubtitle": "Inicia sesión para continuar tu solicitud",
     "registerTitle": "Crea tu perfil",
+    "registerSubtitle": "Crea un perfil para iniciar tu solicitud",
     "fullName": "Nombre completo",
     "username": "Nombre de usuario",
     "usernameHint": "De 2 a 20 caracteres, se usa para iniciar sesión",
@@ -461,6 +463,7 @@
     "legendRecommended": "Recomendado",
     "legendOptional": "Opcional",
     "comingSoon": "Próximamente. Esta sección se muestra como referencia y todavía no se guarda.",
+    "stepCount": "Paso {n} de {total}",
     "steps": {
       "personal": "Datos personales",
       "identity": "Identidad",

@@ -90,7 +90,7 @@ async function loadCaptcha() {
     const res = await getCaptcha()
     captchaEnabled.value = res.captchaEnabled !== false
     if (captchaEnabled.value) {
-      captchaImg.value = `data:image/gif;base64,${res.img}`
+      captchaImg.value = `data:image/jpeg;base64,${res.img}`
       form.uuid = res.uuid
     }
   } catch {
@@ -123,26 +123,22 @@ onMounted(loadCaptcha)
   align-items: center;
   justify-content: center;
   height: 100%;
-  background: #1f2a44 url('/logo/background.png') center / cover no-repeat;
-}
-.login::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(160deg, rgba(11, 95, 255, 0.55) 0%, rgba(31, 42, 68, 0.82) 100%);
+  background: var(--nad-auth-bg) url('/logo/background.png') center / cover no-repeat;
 }
 .login__card {
   position: relative;
   width: 360px;
+  border-radius: var(--nad-radius);
   backdrop-filter: blur(2px);
 }
 .login__title {
   margin: 0 0 4px;
   font-size: 20px;
+  color: var(--nad-ink);
 }
 .login__subtitle {
   margin: 0 0 20px;
-  color: #909399;
+  color: var(--nad-ink-faint);
   font-size: 13px;
 }
 .login__captcha {
@@ -152,7 +148,7 @@ onMounted(loadCaptcha)
 .login__captcha img {
   height: 40px;
   cursor: pointer;
-  border: 1px solid #dcdfe6;
+  border: 1px solid var(--nad-line);
   border-radius: 4px;
 }
 .login__submit {

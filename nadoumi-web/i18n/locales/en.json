@@ -264,7 +264,9 @@
   },
   "auth": {
     "loginTitle": "Sign in",
+    "loginSubtitle": "Sign in to continue your application",
     "registerTitle": "Create your profile",
+    "registerSubtitle": "Create a profile to start your application",
     "fullName": "Full name",
     "username": "Username",
     "usernameHint": "2–20 characters, used to sign in",
@@ -461,6 +463,7 @@
     "legendRecommended": "Recommended",
     "legendOptional": "Optional",
     "comingSoon": "Coming soon. This section is shown for reference and is not saved yet.",
+    "stepCount": "Step {n} of {total}",
     "steps": {
       "personal": "Personal",
       "identity": "Identity",

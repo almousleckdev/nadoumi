@@ -7,7 +7,9 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <NCard>
+  <!-- Only ever nested inside the onboarding step's own NCard (identity step) —
+       a plain bordered section here, not a second card, avoids double chrome. -->
+  <section class="rounded-lg border border-slate-200 p-4 sm:p-5">
     <div class="flex items-start justify-between gap-3">
       <div>
         <h3 class="font-display font-semibold text-slate-900">{{ title }}</h3>
@@ -18,5 +20,5 @@ const { t } = useI18n()
     <div class="mt-4 grid gap-4">
       <slot />
     </div>
-  </NCard>
+  </section>
 </template>

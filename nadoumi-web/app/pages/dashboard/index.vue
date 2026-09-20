@@ -60,6 +60,24 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
     </header>
 
     <AsyncState :pending="pending" :error="loadError">
+      <template #loading>
+        <div class="grid gap-6">
+          <div class="grid gap-6 sm:grid-cols-2">
+            <NCard v-for="n in 2" :key="n">
+              <template #header><NSkeleton class="h-4 w-32 rounded" /></template>
+              <NSkeleton class="h-2 w-full rounded-full" />
+              <NSkeleton class="mt-3 h-2 w-4/5 rounded-full" />
+            </NCard>
+          </div>
+          <div class="grid gap-6 sm:grid-cols-3">
+            <NCard v-for="n in 3" :key="n">
+              <template #header><NSkeleton class="h-4 w-24 rounded" /></template>
+              <NSkeleton class="h-3 w-3/4 rounded" />
+            </NCard>
+          </div>
+        </div>
+      </template>
+
       <SectionCard v-if="!primary" :title="t('dashboard.createProfileTitle')">
         <p class="text-sm text-slate-600">{{ t('dashboard.createProfileBlurb') }}</p>
         <NButton class="mt-4" :to="localePath('/dashboard/profile')">{{ t('dashboard.quickProfile') }}</NButton>

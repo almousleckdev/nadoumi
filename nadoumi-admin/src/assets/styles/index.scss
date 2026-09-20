@@ -31,6 +31,10 @@
   --nad-aside-w-collapsed: 68px;
   --nad-header-h: 60px;
 
+  /* Full-bleed auth screens (admin login, and mirrored in nadoumi-web): plain
+     background photo, this as a fallback colour only (matches sidebar navy). */
+  --nad-auth-bg: var(--nad-sidebar-bg);
+
   /* Element Plus primary → orange */
   --el-color-primary: var(--nad-brand-500);
   --el-color-primary-light-3: var(--nad-brand-400);
