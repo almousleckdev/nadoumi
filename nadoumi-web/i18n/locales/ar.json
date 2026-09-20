@@ -463,6 +463,7 @@
     "legendRecommended": "موصى به",
     "legendOptional": "اختياري",
     "comingSoon": "قريبًا. يُعرض هذا القسم للاطلاع فقط ولا يُحفظ بعد.",
+    "stepCount": "الخطوة {n} من {total}",
     "steps": {
       "personal": "البيانات الشخصية",
       "identity": "الهوية",

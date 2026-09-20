@@ -463,6 +463,7 @@
     "legendRecommended": "建议填写",
     "legendOptional": "选填",
     "comingSoon": "即将上线。该栏目仅供参考展示,暂不会被保存。",
+    "stepCount": "第 {n} 步,共 {total} 步",
     "steps": {
       "personal": "基本信息",
       "identity": "身份信息",

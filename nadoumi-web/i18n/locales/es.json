@@ -463,6 +463,7 @@
     "legendRecommended": "Recomendado",
     "legendOptional": "Opcional",
     "comingSoon": "Próximamente. Esta sección se muestra como referencia y todavía no se guarda.",
+    "stepCount": "Paso {n} de {total}",
     "steps": {
       "personal": "Datos personales",
       "identity": "Identidad",

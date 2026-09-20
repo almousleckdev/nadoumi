@@ -103,7 +103,7 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
       <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
       <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
 
-      <OnboardingStep v-if="stepKey === 'personal'" :title="t('onboarding.personal.title')" :blurb="t('onboarding.personal.blurb')">
+      <OnboardingStep v-if="stepKey === 'personal'" :key="stepKey" :title="t('onboarding.personal.title')" :blurb="t('onboarding.personal.blurb')">
         <ProfileForm
           :model-value="applicant"
           :busy="busy"
@@ -113,7 +113,7 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
         />
       </OnboardingStep>
 
-      <OnboardingStep v-else-if="stepKey === 'identity'" :title="t('onboarding.identity.title')" :blurb="t('onboarding.identity.blurb')">
+      <OnboardingStep v-else-if="stepKey === 'identity'" :key="stepKey" :title="t('onboarding.identity.title')" :blurb="t('onboarding.identity.blurb')">
         <div class="grid gap-4">
           <PhotoUploadCard v-if="applicant" :applicant-id="applicant.id" @changed="progress.refresh" />
           <PassportUploadCard
@@ -127,13 +127,13 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
         </div>
       </OnboardingStep>
 
-      <OnboardingStep v-else-if="stepKey === 'review'" :title="t('onboarding.review.title')" :blurb="t('onboarding.review.blurb')">
+      <OnboardingStep v-else-if="stepKey === 'review'" :key="stepKey" :title="t('onboarding.review.title')" :blurb="t('onboarding.review.blurb')">
         <SuspenseBoundary>
           <ReviewStep v-if="applicant" :applicant="applicant" :status="progress.status.value" @edit="goTo" />
         </SuspenseBoundary>
       </OnboardingStep>
 
-      <OnboardingStep v-else :title="t(`onboarding.${stepKey}.title`)" :blurb="t(`onboarding.${stepKey}.blurb`)">
+      <OnboardingStep v-else :key="stepKey" :title="t(`onboarding.${stepKey}.title`)" :blurb="t(`onboarding.${stepKey}.blurb`)">
         <NAlert v-if="!applicant" tone="warning">{{ t('dashboard.createProfileBlurb') }}</NAlert>
         <SuspenseBoundary v-else>
           <component :is="sectionStep" :key="stepKey" :applicant-id="applicant.id" @changed="progress.refresh" />

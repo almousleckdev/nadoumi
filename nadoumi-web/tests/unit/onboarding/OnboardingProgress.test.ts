@@ -9,11 +9,20 @@ const steps = [
 ]
 
 describe('OnboardingProgress', () => {
-  it('marks completed steps done and the current step with aria-current', async () => {
+  it('marks the current segment with aria-current and shows its label', async () => {
     const w = await mountSuspended(OnboardingProgress, { props: { steps, current: 1 } })
-    const markers = w.findAll('ol li span:first-child')
-    expect(markers[0]!.text()).toBe('✓') // done
-    expect(markers[1]!.attributes('aria-current')).toBe('step')
-    expect(markers[2]!.text()).toBe('3') // upcoming
+    const segments = w.findAll('ol li span')
+    expect(segments[1]!.attributes('aria-current')).toBe('step')
+    expect(segments[0]!.attributes('aria-current')).toBeUndefined()
+    expect(segments[2]!.attributes('aria-current')).toBeUndefined()
+    expect(w.text()).toContain('Identity')
+  })
+
+  it('fills segments up to and including the current step, not beyond', async () => {
+    const w = await mountSuspended(OnboardingProgress, { props: { steps, current: 1 } })
+    const segments = w.findAll('ol li span')
+    expect(segments[0]!.classes()).toContain('w-full') // done
+    expect(segments[1]!.classes()).toContain('w-full') // current
+    expect(segments[2]!.classes()).toContain('w-0') // upcoming
   })
 })
