@@ -5,8 +5,8 @@ import type { ApplicantDto } from '~/types/catalog'
 
 const saved: ApplicantDto = {
   id: 1, givenName: 'SAM', familyName: 'LEE', dob: '2000-01-01', nationality: 'MY', passportNo: 'X1',
-  email: 's@x.io', phone: '+601', status: 'ACTIVE', gender: 'MALE', countryOfOrigin: 'MY',
-  countryOfResidence: 'CN', nativeLanguage: 'ms', wechatId: null, whatsapp: '+601',
+  email: 's@x.io', phone: '+60123456789', status: 'ACTIVE', gender: 'MALE', countryOfOrigin: 'MY',
+  countryOfResidence: 'CN', nativeLanguage: 'ms', wechatId: null, whatsapp: '+60123456789',
   emailVerified: true, onboardingComplete: false, welcomePending: false,
 }
 
@@ -28,7 +28,7 @@ describe('ProfileForm', () => {
     expect((w.find('#givenName').element as HTMLInputElement).value).toBe('SAM')
     expect((w.find('#nationality').element as HTMLInputElement).value).toBe('Malaysia')
     expect((w.find('#countryOfResidence').element as HTMLInputElement).value).toBe('China')
-    expect((w.find('#whatsapp').element as HTMLInputElement).value).toBe('+601')
+    expect((w.find('#whatsapp').element as HTMLInputElement).value).toBe('123456789')
   })
 
   it('states the passport rule and caps the date of birth at 17 years ago', async () => {

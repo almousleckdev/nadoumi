@@ -91,7 +91,7 @@ function onVerified(applicant: ApplicantDto) {
       <FormPhoneField id="phone" v-model="form.phone" :label="t('profileForm.contactNumber')" :error="errors.phone" required />
       <div class="hidden sm:block" aria-hidden="true" />
       <FormTextField id="wechatId" v-model="form.wechatId" :label="t('profileForm.wechatId')" :error="errors.contactHandle" :maxlength="64" />
-      <FormTextField id="whatsapp" v-model="form.whatsapp" type="tel" :label="t('profileForm.whatsapp')" :hint="t('profileForm.contactHandleHint')" :maxlength="32" />
+      <FormPhoneField id="whatsapp" v-model="form.whatsapp" :label="t('profileForm.whatsapp')" :hint="t('profileForm.contactHandleHint')" />
     </FormSection>
 
     <div>

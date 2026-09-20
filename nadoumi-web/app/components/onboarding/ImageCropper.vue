@@ -3,7 +3,13 @@
  * Client-only image crop: zoom + rotate + pan a source image inside a fixed frame,
  * then emit the framed result as a data URL. No upload — the parent decides what to
  * do with the crop (today: preview only; REQUIRES BACKEND for persistence).
+ *
+ * Zoom is the actual natural-pixel-to-frame scale factor (not a multiplier on a
+ * CSS-fitted size): the image is shown at that scale via a plain transform, so the
+ * preview and the exported canvas always agree pixel-for-pixel.
  */
+import { imageSize } from '~/utils/files'
+
 const props = withDefaults(defineProps<{ src: string; aspect?: number; size?: number }>(), {
   aspect: 1,
   size: 320,
@@ -11,10 +17,39 @@ const props = withDefaults(defineProps<{ src: string; aspect?: number; size?: nu
 const emit = defineEmits<{ crop: [dataUrl: string] }>()
 const { t } = useI18n()
 
-const { zoom, rotation, offset, transform, onPointerDown, onPointerMove, onPointerUp, rotate, reset } = usePanZoom({ min: 1, max: 3 })
+const { zoom, rotation, offset, transform, onPointerDown, onPointerMove, onPointerUp, rotate: rotateFrame } = usePanZoom({ min: 0.01, max: 100 })
 
 const frameW = computed(() => props.size)
 const frameH = computed(() => Math.round(props.size / props.aspect))
+
+const naturalWidth = ref(0)
+const naturalHeight = ref(0)
+const ready = ref(false)
+
+/** Fills the frame with no letterboxing, like a standard avatar cropper — the sane starting point. */
+const coverScale = computed(() => {
+  if (!naturalWidth.value || !naturalHeight.value) return 1
+  return Math.max(frameW.value / naturalWidth.value, frameH.value / naturalHeight.value)
+})
+const minZoom = computed(() => coverScale.value / 2)
+const maxZoom = computed(() => coverScale.value * 4)
+
+function resetToFit() {
+  zoom.value = coverScale.value
+  rotation.value = 0
+  offset.x = 0
+  offset.y = 0
+}
+
+watch(() => props.src, async (src: string) => {
+  ready.value = false
+  if (!src) return
+  const { width, height } = await imageSize(src)
+  naturalWidth.value = width
+  naturalHeight.value = height
+  resetToFit()
+  ready.value = true
+}, { immediate: true })
 
 async function apply() {
   const img = new Image()
@@ -27,13 +62,9 @@ async function apply() {
   if (!ctx) return
   ctx.fillStyle = '#fff'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
-  // The preview shows the whole photo fitted into the frame at zoom 1 (see the
-  // template's object-contain sizing); mirror that here so the exported crop
-  // matches what was previewed instead of the image's raw pixel size.
-  const fitScale = Math.min(canvas.width / img.width, canvas.height / img.height)
   ctx.translate(canvas.width / 2 + offset.x, canvas.height / 2 + offset.y)
   ctx.rotate((rotation.value * Math.PI) / 180)
-  ctx.scale(fitScale * zoom.value, fitScale * zoom.value)
+  ctx.scale(zoom.value, zoom.value)
   ctx.drawImage(img, -img.width / 2, -img.height / 2)
   emit('crop', canvas.toDataURL('image/jpeg', 0.9))
 }
@@ -50,22 +81,23 @@ async function apply() {
       @pointercancel="onPointerUp"
     >
       <img
+        v-if="ready"
         :src="src"
         alt=""
         draggable="false"
-        class="absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 select-none object-contain motion-safe:transition-transform motion-safe:duration-75"
+        class="absolute left-1/2 top-1/2 max-w-none -translate-x-1/2 -translate-y-1/2 select-none motion-safe:transition-transform motion-safe:duration-75"
         :style="{ transform }"
       >
     </div>
 
     <label class="flex items-center gap-3 text-xs text-slate-600">
       {{ t('onboarding.crop.zoom') }}
-      <input v-model.number="zoom" type="range" min="1" max="3" step="0.05" class="flex-1 accent-brand-600">
+      <input v-model.number="zoom" type="range" :min="minZoom" :max="maxZoom" :step="(maxZoom - minZoom) / 100" class="flex-1 accent-brand-600">
     </label>
 
     <div class="flex flex-wrap gap-2">
-      <NButton size="sm" variant="secondary" @click="rotate">{{ t('onboarding.crop.rotate') }}</NButton>
-      <NButton size="sm" variant="ghost" @click="reset">{{ t('onboarding.crop.reset') }}</NButton>
+      <NButton size="sm" variant="secondary" @click="rotateFrame">{{ t('onboarding.crop.rotate') }}</NButton>
+      <NButton size="sm" variant="ghost" @click="resetToFit">{{ t('onboarding.crop.reset') }}</NButton>
       <NButton size="sm" class="ms-auto" @click="apply">{{ t('onboarding.crop.apply') }}</NButton>
     </div>
   </div>

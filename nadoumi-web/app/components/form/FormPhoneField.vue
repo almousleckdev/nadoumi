@@ -61,7 +61,9 @@ function applyFromValue(value: string) {
     national.value = parsed.nationalNumber
   }
   else {
-    national.value = value.replace(/^\+\d*/, '')
+    // Too short/malformed to parse (e.g. legacy data from before this field existed):
+    // show it as-is rather than silently discarding it.
+    national.value = value.replace(/^\+/, '')
   }
 }
 applyFromValue(model.value)

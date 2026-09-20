@@ -40,13 +40,13 @@ function onPick(event: Event) {
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
     <label
       :for="inputId"
-      class="flex cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-colors focus-within:border-brand-500 hover:bg-slate-50"
+      class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-colors focus-within:border-brand-500 hover:bg-slate-50"
       :class="over ? 'border-brand-500 bg-brand-50' : 'border-slate-300'"
       @dragover.prevent="over = true"
       @dragleave="over = false"
       @drop.prevent="over = false; handleFile($event.dataTransfer?.files?.[0])"
     >
-      <span class="text-sm font-semibold text-slate-800">
+      <span class="inline-flex items-center rounded-md bg-brand-600 px-4 py-2 text-sm font-semibold text-white">
         {{ replace ? t('onboarding.upload.replace') : t('onboarding.upload.choose') }}
       </span>
       <span v-if="hint" class="text-xs text-slate-500">{{ hint }}</span>
