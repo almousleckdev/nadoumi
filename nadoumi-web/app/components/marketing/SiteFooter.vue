@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import logoUrl from '~/assets/images/logo.jpg'
+import wechatQrUrl from '~/assets/images/wechat.png'
+import whatsappIconUrl from '~/assets/images/whatsapp.png'
 import { CONTACT, telHref } from '~/data/contact'
 import { GUIDES } from '~/data/guides'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
 const year = new Date().getFullYear()
+
+/** wa.me needs digits only, no `+` or spaces. */
+const whatsappHref = `https://wa.me/${CONTACT.phones[0].replace(/\D/g, '')}`
 
 const explore = [
   { to: '/scholarships', key: 'nav.scholarships' },
@@ -28,6 +33,29 @@ const legal = [
         <div class="max-w-xs">
           <img :src="logoUrl" alt="Nadoumi" class="h-10 w-auto" width="160" height="40">
           <p class="mt-3 text-sm text-slate-600">{{ t('footer.mission') }}</p>
+
+          <div class="mt-4 flex items-center gap-3">
+            <a
+              :href="whatsappHref"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="t('footer.whatsapp')"
+              class="inline-block rounded-md transition-transform duration-200 ease-out hover:scale-110"
+            >
+              <img :src="whatsappIconUrl" alt="" width="32" height="32" class="h-8 w-8 rounded-md object-contain">
+            </a>
+
+            <div class="group relative z-0 inline-block hover:z-20">
+              <img
+                :src="wechatQrUrl"
+                :alt="t('footer.wechat')"
+                :title="t('footer.wechat')"
+                width="22"
+                height="32"
+                class="h-8 w-auto origin-top-left rounded-md object-contain shadow-none transition-transform duration-200 ease-out group-hover:scale-[4] group-hover:shadow-xl"
+              >
+            </div>
+          </div>
         </div>
 
         <div class="text-sm">
