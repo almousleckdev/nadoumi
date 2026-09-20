@@ -46,6 +46,8 @@ export default defineNuxtConfig({
     // applicant/ section + form components (<EducationSection>, <ContactForm>, …)
     // used by the onboarding wizard and dashboard, referenced unprefixed.
     { path: '~/components/applicant', pathPrefix: false },
+    // documents/ student document list components (<DocumentRow>, <AddDocumentForm>).
+    { path: '~/components/documents', pathPrefix: false },
     '~/components',
   ],
   fonts: {
