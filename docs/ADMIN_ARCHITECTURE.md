@@ -174,7 +174,7 @@ Approved group order (`nav.groups`):
 | People | Staff → **implemented** · Students → **implemented** · Roles → **implemented** · Menus & Permissions → **implemented** · Departments → **implemented** · Posts → **implemented** |
 | Finance | Payments · Invoices · Revenue · Expenses · Payroll |
 | Growth | Marketing / CMS |
-| Communication | Conversations · Notifications → **implemented** |
+| Communication | Conversations · Support tickets → **implemented** · Notifications → **implemented** |
 | _(top)_ | Reports & Analytics |
 | System | Dictionaries → **implemented** · Configuration → **implemented** · Scheduled Jobs → **implemented** · Operation Logs → **implemented** · Sign-in Logs → **implemented** |
 

@@ -489,6 +489,14 @@ The same five section components back standalone editors at `/dashboard/educatio
 cookie. **Not yet consumed by the UI** — the dashboard header has no notification bell or unread-count
 composable yet; that is still open work.
 
+### 7.y Help & Support tickets (IMPLEMENTED UI, needs the Support backend)
+
+`/dashboard/support` (own tickets, status filter, new-ticket form) and `/dashboard/support/[id]` (thread and
+reply) via the `useSupport` composable, through the existing `/api/student/**` BFF passthrough. The student DTO
+omits priority and assignee, so the UI has nothing internal to hide. Replies are offered only while the ticket
+is OPEN, IN_PROGRESS or WAITING_ON_STUDENT (`canReplyToTicket`, mirroring the backend); RESOLVED and CLOSED show
+a notice to open a new ticket. The thread refreshes after a send and on a 30s poll; it does not use SSE.
+
 ## 5. Cross-cutting frontend rules (PLANNED)
 
 - **No security in the frontend.** Route guards, hidden fields, and disabled buttons
