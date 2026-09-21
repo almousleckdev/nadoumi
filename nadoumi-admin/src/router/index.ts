@@ -122,6 +122,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.notifications', i18n: true },
       },
       {
+        path: 'conversations',
+        name: 'Conversations',
+        component: () => import('@/views/conversations/index.vue'),
+        meta: { title: 'nav.items.conversations', i18n: true, perm: 'nad:conversation:participate' },
+      },
+      {
         path: 'dict',
         name: 'Dict',
         component: () => import('@/views/dict/index.vue'),

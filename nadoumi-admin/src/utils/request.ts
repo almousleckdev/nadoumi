@@ -1,5 +1,6 @@
 import axios, { type AxiosInstance } from 'axios'
 import { ElMessage } from 'element-plus'
+import { API_BASE } from './apiBase'
 import { CLIENT_HEADERS } from './session'
 import router from '@/router'
 import { useUserStore } from '@/stores/user'
@@ -10,7 +11,7 @@ import { useUserStore } from '@/stores/user'
  *  - Nadoumi `/api/**`: real status codes, bare bodies, RFC 9457 problem+json on errors
  */
 const service: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_APP_BASE_API || '/dev-api',
+  baseURL: API_BASE,
   timeout: 15000,
   // the session is an httpOnly cookie; the API is reached through a same-origin proxy
   withCredentials: true,
@@ -73,7 +74,8 @@ service.interceptors.response.use(
     else {
       msg = friendly(undefined, msg)
     }
-    notifyError(msg || 'Network error')
+    // `silent` requests probe an outcome the caller handles itself (e.g. "am I a participant?")
+    if (!(error.config as { silent?: boolean } | undefined)?.silent) notifyError(msg || 'Network error')
     return Promise.reject(error)
   },
 )

@@ -5,6 +5,7 @@ import { getInfo, login as loginApi, logout as logoutApi, type LoginBody } from 
 export const useUserStore = defineStore('user', () => {
   // The session cookie is httpOnly, so "signed in" is learned by asking the server once.
   const loaded = ref(false)
+  const userId = ref<number | null>(null)
   const name = ref('')
   const nickName = ref('')
   const avatar = ref('')
@@ -20,6 +21,7 @@ export const useUserStore = defineStore('user', () => {
   async function fetchInfo() {
     const res = await getInfo()
     const user = res.user || {}
+    userId.value = typeof user.userId === 'number' ? user.userId : null
     name.value = user.userName || ''
     nickName.value = user.nickName || user.userName || ''
     avatar.value = user.avatar || ''
@@ -51,6 +53,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   function reset() {
+    userId.value = null
     roles.value = []
     permissions.value = []
   }
@@ -64,7 +67,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   return {
-    loaded, name, nickName, avatar, roles, permissions, mustChangePassword, signedIn,
+    loaded, userId, name, nickName, avatar, roles, permissions, mustChangePassword, signedIn,
     login, fetchInfo, restore, logout, reset, hasPerm,
   }
 })
