@@ -44,6 +44,19 @@ describe('PhotoUploadCard', () => {
     expect(w.text()).toContain('Complete')
   })
 
+  it('collapses to a compact summary once a photo is saved, and Replace expands it', async () => {
+    api.photoUrl.mockResolvedValue({ url: 'https://signed.example/photo.jpg', expiresAt: 'x' })
+    const w = await mountCard()
+
+    expect(w.findAll('button').find(b => b.text() === 'Replace')).toBeTruthy()
+    expect(w.find('input[type="file"]').exists()).toBe(false)
+
+    await w.findAll('button').find(b => b.text() === 'Replace')!.trigger('click')
+
+    expect(w.findAll('button').find(b => b.text() === 'Replace')).toBeUndefined()
+    expect(w.find('input[type="file"]').exists()).toBe(true)
+  })
+
   it('rejects a photo that is too small', async () => {
     size.width = 300
     const w = await mountCard()

@@ -66,4 +66,15 @@ describe('i18n locale files', () => {
       expect({ name, hits }).toEqual({ name, hits: [] })
     }
   })
+
+  // Project rule: never use an em dash as a label/value separator. zh is exempt —
+  // "——" (doubled) is standard CJK prose punctuation, not the pattern this guards against.
+  it('no locale other than zh uses an em dash', () => {
+    for (const [name, loc] of Object.entries({ en, fr, es, ar })) {
+      const hits = Object.entries(flatten(loc as Record<string, unknown>))
+        .filter(([, v]) => v.includes('—'))
+        .map(([k]) => k)
+      expect({ name, hits }).toEqual({ name, hits: [] })
+    }
+  })
 })

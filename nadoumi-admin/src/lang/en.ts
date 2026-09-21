@@ -269,7 +269,7 @@ export default {
     logoImage: 'Logo',
     coverImage: 'Cover image',
     secGallery: 'Gallery',
-    galleryHint: 'Optional — up to 10 images shown on the public university page: campus, dormitory, campus life…',
+    galleryHint: 'Optional. Up to 10 images shown on the public university page: campus, dormitory, campus life…',
     galleryCaption: 'Caption',
     addGalleryImage: 'Add empty row',
     addGalleryImages: 'Add images',

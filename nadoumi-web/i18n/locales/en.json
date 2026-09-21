@@ -338,12 +338,16 @@
     "nav": {
       "aria": "Dashboard navigation",
       "toggleSidebar": "Toggle sidebar",
+      "groupProfile": "Profile",
       "overview": "Overview",
       "profile": "Profile",
       "documents": "Documents",
+      "scholarships": "Scholarships",
+      "notifications": "Notifications",
       "education": "Education",
       "contacts": "Contacts",
       "account": "Account",
+      "settings": "Settings",
       "interests": "Interests",
       "location": "Location",
       "work": "Work"
@@ -360,7 +364,7 @@
       "applicationsEmpty": "You haven't started an application yet.",
       "browseScholarships": "Browse scholarships",
       "recommended": "Recommended scholarships",
-      "recommendedEmpty": "No recommendations yet — check back soon.",
+      "recommendedEmpty": "No recommendations yet. Check back soon.",
       "viewAll": "View all",
       "documents": "Documents",
       "manageDocuments": "Manage documents",
@@ -376,7 +380,7 @@
       "blurb": "Updates on your applications and account.",
       "aria": "Notifications",
       "markAllRead": "Mark all as read",
-      "empty": "You're all caught up — no notifications yet."
+      "empty": "You're all caught up. No notifications yet."
     },
     "applicantLabel": "Applicant",
     "switchApplicant": "Switch applicant",
@@ -407,6 +411,31 @@
     "relationOTHER": "Other",
     "accountTitle": "Account",
     "accountUser": "Signed in as",
+    "account": {
+      "blurb": "Manage your sign-in, security, and how we reach you.",
+      "personal": {
+        "title": "Personal information",
+        "blurb": "Your applicant details (name, date of birth, nationality and more) live on your profile."
+      },
+      "security": {
+        "title": "Security",
+        "emailChangeBlurb": "To change the email address on your account, contact"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "blurb": "You'll see application and account updates in your dashboard notifications."
+      },
+      "documents": {
+        "title": "Documents & identity",
+        "blurb": "Your profile photo and passport are managed on the Documents page."
+      },
+      "danger": {
+        "title": "Danger zone",
+        "blurb": "Need to delete your account? We handle this by request, contact our support team and we'll take care of it.",
+        "cta": "Email support",
+        "mailSubject": "Account deletion request"
+      }
+    },
     "changePassword": "Change password",
     "pwCurrent": "Current password",
     "pwNew": "New password",
@@ -1834,6 +1863,7 @@
     "guidance": "Upload a clear photo or scan of your passport photo page, then confirm the details below.",
     "none": "No passport uploaded",
     "formats": "JPEG, PNG or PDF, up to 10 MB",
+    "expiresOn": "Expires {date}",
     "detailsTitle": "Passport details",
     "fields": {
       "passportNo": "Passport number",
