@@ -19,11 +19,10 @@ import org.slf4j.LoggerFactory;
  * created row carries {@code source_ref = outbox:<eventId>:<userId>}, so the
  * poller's at-least-once redelivery is a no-op the second time.
  *
- * <p>v1 audience for both wired events is <b>staff holding
- * {@code nad:notification:list}</b> — for {@code ContactInquiryReceived} that is
- * the support desk; for {@code ScholarshipPublished} it is an operational audit
- * note (student targeting by saved-search / opt-in is a later step, see
- * {@code docs/DOMAIN_EVENTS.md}).</p>
+ * <p>Default audience is <b>staff holding {@code nad:notification:list}</b> (the
+ * support desk for {@code ContactInquiryReceived}, an operational audit trail for
+ * the rest). Public catalog announcements ({@link #isPublicCatalogAnnouncement})
+ * additionally reach every active student — see {@code docs/DOMAIN_EVENTS.md}.</p>
  */
 public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 

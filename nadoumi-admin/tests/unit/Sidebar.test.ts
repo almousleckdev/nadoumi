@@ -37,9 +37,9 @@ describe('Sidebar', () => {
 
     const hrefs = w.findAll('a.side__link').map(l => l.attributes('href'))
     expect(hrefs.sort()).toEqual([
-      '/applicants', '/audit', '/config', '/dashboard', '/departments', '/dict', '/employees',
-      '/expenses', '/finance', '/jobs', '/loginlog', '/menus', '/notifications', '/payroll', '/posts',
-      '/programs', '/revenue', '/roles', '/scholarships', '/students', '/tasks', '/universities',
+      '/applicants', '/applications', '/audit', '/config', '/conversations', '/dashboard', '/departments', '/dict', '/documents',
+      '/employees', '/expenses', '/finance', '/jobs', '/loginlog', '/menus', '/notifications', '/payroll', '/posts',
+      '/programs', '/revenue', '/roles', '/scholarships', '/students', '/support', '/tasks', '/universities',
     ])
     expect(w.text()).not.toMatch(/planned/i)
     expect(w.text()).not.toContain('Payments')

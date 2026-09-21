@@ -5,14 +5,12 @@ import { DOCUMENT_STATUS_TONES, type DocumentStatus } from '~/constants/onboardi
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { user, activeApplicantId } = useSession()
-const { listMine, markWelcomed, photoUrl, passportStatus } = useApplicant()
+const { markWelcomed, photoUrl, passportStatus } = useApplicant()
 const { publicGet } = useApi()
 const { list: listNotifications } = useNotifications()
+const { list: listApplications } = useApplications()
 
-const { data, pending, error } = await useAsyncData('dash-applicants', () => listMine())
-const mine = computed<ApplicantDto[]>(() => data.value ?? [])
-const primary = computed(() => mine.value.find((a: ApplicantDto) => a.id === activeApplicantId.value) ?? mine.value[0] ?? null)
+const { applicants: mine, primary, pending, error } = useMyApplicant()
 const loadError = computed(() => (error.value ? t('auth.genericError') : ''))
 
 const showWelcome = computed(() => primary.value?.welcomePending === true)
@@ -20,7 +18,7 @@ async function dismissWelcome() {
   const applicant = primary.value
   if (!applicant) return
   // Optimistic: hide immediately, the server call is best-effort and never shown again either way.
-  data.value = mine.value.map((a: ApplicantDto) => (a.id === applicant.id ? { ...a, welcomePending: false } : a))
+  mine.value = (mine.value ?? []).map((a: ApplicantDto) => (a.id === applicant.id ? { ...a, welcomePending: false } : a))
   await markWelcomed(applicant.id).catch(() => undefined)
 }
 
@@ -70,6 +68,15 @@ const { data: recommendedData, pending: recommendedPending, error: recommendedEr
 )
 const recommended = computed(() => recommendedData.value?.content ?? [])
 
+/* ---- Applications: the student's real applications, newest first ---- */
+const APPLICATION_PREVIEW_COUNT = 3
+const { data: applicationsData, pending: applicationsPending, error: applicationsError } = useLazyAsyncData(
+  'dash-applications',
+  () => listApplications(),
+  { default: () => null },
+)
+const applications = computed(() => (applicationsData.value ?? []).slice(0, APPLICATION_PREVIEW_COUNT))
+
 /* ---- Recent activity: real notification feed ---- */
 const { data: activityData, pending: activityPending, error: activityError } = useLazyAsyncData(
   'dash-activity',
@@ -114,7 +121,7 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
           <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
               <h1 class="font-display text-xl font-bold text-slate-900">
-                {{ t('dashboard.welcome', { name: user?.nickName ?? primary.givenName ?? user?.username ?? '' }) }}
+                {{ t('dashboard.welcome', { name: primary.givenName }) }}
               </h1>
               <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.home.subtitle') }}</p>
             </div>
@@ -137,12 +144,32 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
           <!-- Main column -->
           <div class="grid gap-6 lg:col-span-2">
             <SectionCard :title="t('dashboard.home.applications')">
-              <div class="grid gap-3 py-2 text-center">
+              <template #actions>
+                <NuxtLink :to="localePath('/dashboard/applications')" class="text-sm font-medium text-brand-700 hover:underline">
+                  {{ t('dashboard.home.viewAll') }}
+                </NuxtLink>
+              </template>
+              <NSkeleton v-if="applicationsPending" class="h-20 w-full rounded-lg" />
+              <NAlert v-else-if="applicationsError" tone="danger">{{ t('errors.loadSection') }}</NAlert>
+              <div v-else-if="!applications.length" class="grid gap-3 py-2 text-center">
                 <p class="text-sm text-slate-500">{{ t('dashboard.home.applicationsEmpty') }}</p>
                 <div>
                   <NButton size="sm" :to="localePath('/scholarships')">{{ t('dashboard.home.browseScholarships') }}</NButton>
                 </div>
               </div>
+              <ul v-else class="grid gap-3" data-test="applications-summary">
+                <li v-for="a in applications" :key="a.id">
+                  <NuxtLink
+                    :to="localePath(`/dashboard/applications/${a.id}`)"
+                    class="flex items-center justify-between gap-3 text-sm no-underline hover:text-brand-700"
+                  >
+                    <span class="min-w-0 truncate text-slate-700">
+                      {{ t(`dashboard.applications.type.${a.applicationType ?? 'UNKNOWN'}`, t('dashboard.applications.type.UNKNOWN')) }}
+                    </span>
+                    <ApplicationStatusBadge :status="a.currentStatus" />
+                  </NuxtLink>
+                </li>
+              </ul>
             </SectionCard>
 
             <SectionCard :title="t('dashboard.home.recommended')">

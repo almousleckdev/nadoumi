@@ -31,6 +31,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.applicants', i18n: true, perm: 'nad:applicant:view' },
       },
       {
+        path: 'applications',
+        name: 'Applications',
+        component: () => import('@/views/applications/index.vue'),
+        meta: { title: 'nav.items.applications', i18n: true, perm: 'nad:application:list' },
+      },
+      {
         path: 'universities',
         name: 'Universities',
         component: () => import('@/views/universities/index.vue'),
@@ -59,6 +65,12 @@ export const routes: RouteRecordRaw[] = [
         name: 'ScholarshipDetail',
         component: () => import('@/views/scholarships/detail.vue'),
         meta: { title: 'nav.items.scholarships', i18n: true, perm: 'nad:scholarship:view' },
+      },
+      {
+        path: 'documents',
+        name: 'Documents',
+        component: () => import('@/views/documents/index.vue'),
+        meta: { title: 'nav.items.documents', i18n: true, perm: 'nad:document:view' },
       },
       {
         path: 'profile',
@@ -115,11 +127,23 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.posts', i18n: true, perm: 'system:post:list' },
       },
       {
+        path: 'support',
+        name: 'Support',
+        component: () => import('@/views/support/index.vue'),
+        meta: { title: 'nav.items.support', i18n: true, perm: 'nad:support:ticket:view' },
+      },
+      {
         path: 'notifications',
         name: 'Notifications',
         component: () => import('@/views/notifications/index.vue'),
         // any signed-in staff can see their own feed; oversight mode is gated in-screen
         meta: { title: 'nav.items.notifications', i18n: true },
+      },
+      {
+        path: 'conversations',
+        name: 'Conversations',
+        component: () => import('@/views/conversations/index.vue'),
+        meta: { title: 'nav.items.conversations', i18n: true, perm: 'nad:conversation:participate' },
       },
       {
         path: 'dict',

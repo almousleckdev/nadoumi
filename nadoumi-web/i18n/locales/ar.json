@@ -338,15 +338,22 @@
     "nav": {
       "aria": "التنقل في لوحة التحكم",
       "toggleSidebar": "إظهار/إخفاء الشريط الجانبي",
+      "groupProfile": "الملف التعريفي",
       "overview": "نظرة عامة",
       "profile": "الملف التعريفي",
       "documents": "المستندات",
+      "scholarships": "المنح الدراسية",
+      "notifications": "الإشعارات",
+      "support": "المساعدة والدعم",
+      "messages": "الرسائل",
       "education": "التعليم",
       "contacts": "جهات الاتصال",
       "account": "الحساب",
+      "settings": "الإعدادات",
       "interests": "الاهتمامات",
       "location": "الموقع",
-      "work": "العمل"
+      "work": "العمل",
+      "applications": "طلباتي"
     },
     "welcome": "مرحبًا بعودتك، {name}",
     "overviewBlurb": "أكمل ملفك التعريفي كمتقدم حتى يتمكن الفريق من البدء في مطابقتك بالفرص المناسبة.",
@@ -354,13 +361,44 @@
     "quickProfile": "تعديل الملف التعريفي",
     "documentsTitle": "المستندات",
     "documentsBlurb": "صورتك الشخصية وجواز سفرك، محدّثان دائمًا.",
+    "docs": {
+      "identityTitle": "وثائق الهوية",
+      "identityBlurb": "يتم التحقق من صورتك الشخصية وجواز سفرك تلقائيًا.",
+      "listTitle": "مستنداتك",
+      "listBlurb": "ارفع مستنداتك الداعمة. يراجع الفريق كل مستند ويخبرك إن كان يحتاج إلى تصحيح.",
+      "add": "إضافة مستند",
+      "typeLabel": "نوع المستند",
+      "typePlaceholder": "اختر النوع",
+      "typesUnavailable": "تعذّر تحميل أنواع المستندات، لذا لا يمكن إضافة مستندات جديدة الآن. يرجى المحاولة لاحقًا.",
+      "empty": "لم ترفع أي مستندات بعد.",
+      "hint": "PDF أو JPEG أو PNG، حتى 20 ميغابايت",
+      "badType": "يُقبل فقط ملفات PDF أو JPEG أو PNG.",
+      "version": "النسخة {n}",
+      "uploadedOn": "تم الرفع في {date}",
+      "expiresOn": "ينتهي في {date}",
+      "reason": "السبب: {reason}",
+      "download": "تنزيل",
+      "replace": "رفع نسخة جديدة",
+      "remove": "حذف",
+      "added": "تم رفع المستند.",
+      "replaced": "تم رفع النسخة الجديدة.",
+      "removed": "تم حذف المستند.",
+      "status": {
+        "DRAFT": "مسودة",
+        "SUBMITTED": "تم الرفع",
+        "IN_REVIEW": "بانتظار التحقق",
+        "VERIFIED": "تم التحقق",
+        "REJECTED": "مرفوض",
+        "EXPIRED": "منتهي الصلاحية"
+      }
+    },
     "home": {
       "subtitle": "إليك نظرة عامة على رحلتك في التقديم للمنح الدراسية.",
       "applications": "الطلبات",
       "applicationsEmpty": "لم تبدأ أي طلب بعد.",
       "browseScholarships": "تصفّح المنح الدراسية",
       "recommended": "منح دراسية موصى بها",
-      "recommendedEmpty": "لا توجد توصيات بعد — تحقق لاحقًا.",
+      "recommendedEmpty": "لا توجد توصيات بعد. تحقق لاحقًا.",
       "viewAll": "عرض الكل",
       "documents": "المستندات",
       "manageDocuments": "إدارة المستندات",
@@ -376,10 +414,33 @@
       "blurb": "آخر المستجدات حول طلباتك وحسابك.",
       "aria": "الإشعارات",
       "markAllRead": "تعليم الكل كمقروء",
-      "empty": "أنت على اطلاع بكل شيء — لا توجد إشعارات بعد."
+      "empty": "أنت على اطلاع بكل شيء. لا توجد إشعارات بعد."
     },
     "applicantLabel": "المتقدم",
     "switchApplicant": "تبديل المتقدم",
+    "messages": {
+      "title": "الرسائل",
+      "blurb": "تواصل مع فريق Nadoumi بخصوص طلباتك وأسئلتك.",
+      "empty": "لا توجد محادثات بعد. ابدأ محادثة عندما يكون لديك سؤال للفريق.",
+      "newMessage": "رسالة جديدة",
+      "subject": "الموضوع (اختياري)",
+      "body": "رسالتك",
+      "send": "إرسال",
+      "startConversation": "بدء المحادثة",
+      "noApplicant": "أنشئ ملف المتقدم أولاً، ثم يمكنك مراسلة الفريق.",
+      "forbidden": "لا يمكنك مراسلة الفريق لهذا الملف حتى الآن.",
+      "unread": "{count} غير مقروءة",
+      "closedBadge": "مغلقة",
+      "closedNotice": "هذه المحادثة مغلقة.",
+      "back": "كل المحادثات",
+      "you": "أنت",
+      "loadOlder": "تحميل الرسائل الأقدم",
+      "untitled": "محادثة",
+      "threadEmpty": "لا توجد رسائل بعد.",
+      "reconnecting": "جارٍ إعادة الاتصال بالتحديثات المباشرة",
+      "composer": "اكتب رسالة",
+      "attachment": "مرفق"
+    },
     "profileTitle": "الملف التعريفي للمتقدم",
     "createProfileTitle": "أنشئ ملفك التعريفي كمتقدم",
     "createProfileBlurb": "أخبرنا عن الشخص المقصود بهذا الطلب. يمكنك تعديل ذلك في أي وقت.",
@@ -407,19 +468,133 @@
     "relationOTHER": "أخرى",
     "accountTitle": "الحساب",
     "accountUser": "مسجّل الدخول باسم",
+    "account": {
+      "blurb": "إدارة تسجيل الدخول والأمان وطريقة تواصلنا معك.",
+      "personal": {
+        "title": "المعلومات الشخصية",
+        "blurb": "بيانات طلبك (الاسم وتاريخ الميلاد والجنسية وغيرها) موجودة في ملفك الشخصي."
+      },
+      "security": {
+        "title": "الأمان",
+        "emailChangeBlurb": "لتغيير البريد الإلكتروني المرتبط بحسابك، تواصل مع"
+      },
+      "notifications": {
+        "title": "الإشعارات",
+        "blurb": "ستظهر تحديثات الطلب والحساب في إشعارات لوحة التحكم الخاصة بك."
+      },
+      "documents": {
+        "title": "المستندات والهوية",
+        "blurb": "تُدار صورتك الشخصية وجواز سفرك من صفحة المستندات."
+      },
+      "danger": {
+        "title": "منطقة الخطر",
+        "blurb": "هل تحتاج إلى حذف حسابك؟ نتعامل مع هذا بناءً على الطلب، تواصل مع فريق الدعم وسنتولى الأمر.",
+        "cta": "مراسلة الدعم",
+        "mailSubject": "طلب حذف الحساب"
+      }
+    },
     "changePassword": "تغيير كلمة المرور",
     "pwCurrent": "كلمة المرور الحالية",
     "pwNew": "كلمة المرور الجديدة",
     "pwConfirm": "تأكيد كلمة المرور الجديدة",
     "pwUpdated": "تم تحديث كلمة المرور.",
     "pwOtherSessionsEnded": "تم تسجيل خروجك من أجهزتك الأخرى.",
+    "support": {
+      "title": "المساعدة والدعم",
+      "blurb": "اطرح سؤالاً على فريقنا وتابع الرد هنا.",
+      "newTicket": "تذكرة جديدة",
+      "yourTickets": "تذاكرك",
+      "empty": "ليست لديك تذاكر دعم بعد. افتح تذكرة عندما تحتاج إلى مساعدة.",
+      "allStatuses": "كل الحالات",
+      "filterStatus": "التصفية حسب الحالة",
+      "subject": "الموضوع",
+      "categoryLabel": "الفئة",
+      "categoryPlaceholder": "اختر فئة",
+      "message": "الرسالة",
+      "submit": "إرسال التذكرة",
+      "back": "العودة إلى التذاكر",
+      "conversation": "المحادثة",
+      "you": "أنت",
+      "staff": "فريق Nadoumi",
+      "replyLabel": "ردك",
+      "replyPlaceholder": "اكتب رداً",
+      "send": "إرسال",
+      "closedNotice": "انتهت هذه التذكرة. افتح تذكرة جديدة إذا احتجت إلى مزيد من المساعدة.",
+      "notFound": "تعذر العثور على هذه التذكرة.",
+      "errors": {
+        "subject": "الرجاء إدخال الموضوع.",
+        "category": "الرجاء اختيار فئة.",
+        "body": "الرجاء وصف سؤالك."
+      },
+      "category": {
+        "ACCOUNT": "الحساب",
+        "APPLICATION": "الطلب",
+        "DOCUMENT": "المستندات",
+        "PAYMENT": "الدفع",
+        "TECHNICAL": "مشكلة تقنية",
+        "OTHER": "أخرى"
+      },
+      "status": {
+        "OPEN": "مفتوحة",
+        "IN_PROGRESS": "قيد المعالجة",
+        "WAITING_ON_STUDENT": "بانتظار ردك",
+        "RESOLVED": "تم الحل",
+        "CLOSED": "مغلقة"
+      }
+    },
     "savedOk": "تم الحفظ",
     "addedOk": "تمت الإضافة",
     "removedOk": "تمت الإزالة",
     "removeConfirm": "هل تريد إزالة هذا العنصر؟",
     "interestsTitle": "الاهتمامات الدراسية",
     "locationTitle": "الموقع الحالي",
-    "workTitle": "الخبرة العملية"
+    "workTitle": "الخبرة العملية",
+    "applications": {
+      "title": "طلباتي",
+      "blurb": "تابع كل طلب بدأته، من المسودة حتى القرار.",
+      "detailTitle": "الطلب",
+      "empty": "لم تبدأ أي طلب بعد.",
+      "browse": "تصفح المنح الدراسية",
+      "submittedOn": "تم التقديم في {date}",
+      "currentStage": "المرحلة الحالية: {stage}",
+      "backToList": "العودة إلى طلباتي",
+      "notFound": "تعذر العثور على هذا الطلب.",
+      "timeline": "التقدم",
+      "timelineEmpty": "لا توجد تحديثات بعد.",
+      "actions": "الإجراءات",
+      "submit": "تقديم الطلب",
+      "submitHint": "هذا الطلب ما زال مسودة. قدّمه عندما تكون البيانات جاهزة.",
+      "submitted": "تم تقديم طلبك.",
+      "withdraw": "سحب الطلب",
+      "withdrawReason": "لماذا تسحب الطلب؟",
+      "withdrawConfirm": "تأكيد السحب",
+      "withdrawnNotice": "تم سحب طلبك.",
+      "type": {
+        "PROGRAM_WITH_SCHOLARSHIP": "برنامج مع منحة",
+        "PROGRAM_ONLY": "طلب التحاق ببرنامج",
+        "UNKNOWN": "طلب"
+      },
+      "status": {
+        "DRAFT": "مسودة",
+        "IN_REVIEW": "قيد المراجعة",
+        "SUBMITTED_TO_UNIVERSITY": "أُرسل إلى الجامعة",
+        "DECISION": "بانتظار القرار",
+        "OFFER": "تم استلام عرض",
+        "PRE_DEPARTURE": "قبل السفر",
+        "CLOSED_SUCCESS": "تم القبول والتسجيل",
+        "CLOSED_UNSUCCESSFUL": "غير ناجح",
+        "CLOSED_WITHDRAWN": "مسحوب",
+        "unknown": "قيد التنفيذ"
+      },
+      "event": {
+        "created": "بدأ الطلب",
+        "submitted": "تم تقديم الطلب",
+        "withdrawn": "تم سحب الطلب",
+        "offerAccepted": "قبلت العرض",
+        "offerDeclined": "رفضت العرض",
+        "stageChanged": "انتقل طلبك إلى المرحلة التالية"
+      }
+    }
   },
   "validation": {
     "required": "هذا الحقل مطلوب.",
@@ -1834,6 +2009,7 @@
     "guidance": "ارفع صورة أو مسحًا واضحًا لصفحة بيانات جواز سفرك، ثم أكّد البيانات أدناه.",
     "none": "لم يتم رفع جواز سفر",
     "formats": "JPEG أو PNG أو PDF، حتى 10 ميغابايت",
+    "expiresOn": "تنتهي الصلاحية في {date}",
     "detailsTitle": "بيانات جواز السفر",
     "fields": {
       "passportNo": "رقم جواز السفر",

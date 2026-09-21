@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { ApplicantDto } from '~/types/catalog'
+
 defineProps<{ collapsed: boolean }>()
 const emit = defineEmits<{ 'toggle-collapse': [], 'toggle-mobile': [] }>()
 
@@ -6,6 +8,8 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const { user, applicants, signOut } = useSession()
 const { unreadCount } = useNotifications()
+const { primary } = useMyApplicant()
+const { photoUrl } = useApplicant()
 
 const unread = ref(0)
 const POLL_MS = 60_000
@@ -19,6 +23,12 @@ async function refreshUnread() {
     /* silent — the bell is non-critical */
   }
 }
+
+const avatarUrl = ref('')
+watch(primary, async (applicant: ApplicantDto | null) => {
+  avatarUrl.value = applicant ? await photoUrl(applicant.id).then(r => r.url).catch(() => '') : ''
+}, { immediate: true })
+
 onMounted(() => {
   refreshUnread()
   timer = setInterval(refreshUnread, POLL_MS)
@@ -26,6 +36,8 @@ onMounted(() => {
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer)
 })
+
+const displayName = computed(() => primary.value?.givenName ?? user.value?.nickName ?? user.value?.username ?? '')
 </script>
 
 <template>
@@ -67,8 +79,8 @@ onBeforeUnmount(() => {
     <NDropdown trigger-test-id="account-menu">
       <template #trigger>
         <span class="flex items-center gap-2 rounded-full py-1 pe-2 ps-1 hover:bg-slate-100">
-          <NAvatar :name="user?.nickName ?? user?.username" />
-          <span class="hidden text-sm font-medium text-slate-700 sm:inline">{{ user?.nickName ?? user?.username }}</span>
+          <NAvatar :name="displayName" :src="avatarUrl" />
+          <span class="hidden text-sm font-medium text-slate-700 sm:inline">{{ displayName }}</span>
         </span>
       </template>
       <div class="px-3 py-2 text-xs text-slate-500">{{ user?.username }}</div>
