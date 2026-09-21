@@ -85,6 +85,7 @@ export const NAV: NavGroup[] = [
     key: 'communication',
     items: [
       { key: 'conversations', path: '/conversations', icon: 'ChatDotRound', perm: 'nad:conversation:view', status: 'planned' },
+      { key: 'support', path: '/support', icon: 'Headset', perm: 'nad:support:ticket:view', status: 'implemented' },
       { key: 'notifications', path: '/notifications', icon: 'Bell', status: 'implemented' },
     ],
   },

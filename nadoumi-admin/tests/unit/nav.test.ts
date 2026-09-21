@@ -9,7 +9,7 @@ describe('nav manifest', () => {
     expect(implementedPaths().sort()).toEqual([
       '/applicants', '/audit', '/config', '/dashboard', '/departments', '/dict', '/employees',
       '/expenses', '/finance', '/jobs', '/loginlog', '/menus', '/notifications', '/payroll', '/posts',
-      '/programs', '/revenue', '/roles', '/scholarships', '/students', '/tasks', '/universities',
+      '/programs', '/revenue', '/roles', '/scholarships', '/students', '/support', '/tasks', '/universities',
     ])
   })
 

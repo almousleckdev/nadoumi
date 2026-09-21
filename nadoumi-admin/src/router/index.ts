@@ -115,6 +115,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.posts', i18n: true, perm: 'system:post:list' },
       },
       {
+        path: 'support',
+        name: 'Support',
+        component: () => import('@/views/support/index.vue'),
+        meta: { title: 'nav.items.support', i18n: true, perm: 'nad:support:ticket:view' },
+      },
+      {
         path: 'notifications',
         name: 'Notifications',
         component: () => import('@/views/notifications/index.vue'),
