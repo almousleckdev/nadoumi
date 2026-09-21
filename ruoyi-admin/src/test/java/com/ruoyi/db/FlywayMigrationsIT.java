@@ -19,7 +19,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Runs the real {@code db/migration} chain (V1 baseline + the Nadoumi V2..V4
+ * Runs the real {@code db/migration} chain (V1 baseline + the Nadoumi V2..V89
  * migrations) against a throwaway MySQL, both on a fresh database and on one that
  * already carries the RuoYi schema. Auto-skips without Docker so {@code mvn package}
  * still passes locally; CI has a daemon.
@@ -86,7 +86,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(59); // V1 baseline + V2..V62
+        // V1 baseline + V2..V89 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
+        assertThat(applied).isEqualTo(80);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -248,7 +250,8 @@ class FlywayMigrationsIT {
         // 4 from V33 + 2 from V37 (TASK_PROGRESS) + 4 from V51 (UNIVERSITY/PROGRAM published)
         // + 2 from V53 (SCHOLARSHIP_DEADLINE_REMINDER) + 6 from V55 (WELCOME,
         // APPLICATION_SUBMITTED, APPLICATION_STATUS_CHANGED, each IN_APP + EMAIL)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("18");
+        // + 1 from V83 (MESSAGE_POSTED) + 3 from V89 (TICKET_OPENED/ASSIGNED/STATUS_CHANGED)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("22");
         // V34 — notification dispatch Quartz job, seeded active
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");
@@ -388,7 +391,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(58); // V2..V62
+        assertThat(applied).isEqualTo(79); // V2..V89, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
