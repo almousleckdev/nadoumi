@@ -342,7 +342,6 @@
       "overview": "Overview",
       "profile": "Profile",
       "documents": "Documents",
-      "scholarships": "Scholarships",
       "notifications": "Notifications",
       "support": "Help & Support",
       "messages": "Messages",
@@ -362,11 +361,10 @@
     "documentsTitle": "Documents",
     "documentsBlurb": "Your profile photo and passport, kept up to date.",
     "docs": {
-      "identityTitle": "Identity documents",
-      "identityBlurb": "Your profile photo and passport are checked automatically.",
       "listTitle": "Your documents",
-      "listBlurb": "Upload supporting documents. Staff review each one and tell you if anything needs fixing.",
+      "listBlurb": "Your profile photo and passport, plus any supporting documents staff ask for. We review each one and tell you if anything needs fixing.",
       "add": "Add a document",
+      "addBlurb": "Upload additional supporting documents, like transcripts or certificates.",
       "typeLabel": "Document type",
       "typePlaceholder": "Choose a type",
       "typesUnavailable": "Document types could not be loaded, so new documents cannot be added right now. Please try again later.",
@@ -421,14 +419,9 @@
     "messages": {
       "title": "Messages",
       "blurb": "Talk with the Nadoumi team about your applications and questions.",
-      "empty": "No conversations yet. Start one whenever you have a question for the team.",
-      "newMessage": "New message",
-      "subject": "Subject (optional)",
-      "body": "Your message",
+      "empty": "No conversations yet. The Nadoumi team will start one here when they need to reach you.",
       "send": "Send",
-      "startConversation": "Start conversation",
-      "noApplicant": "Create your applicant profile first, then you can message the team.",
-      "forbidden": "You cannot message the team for this profile yet.",
+      "noApplicant": "Create your applicant profile first. The team can then reach you here.",
       "unread": "{count} unread",
       "closedBadge": "Closed",
       "closedNotice": "This conversation is closed.",
@@ -476,20 +469,20 @@
       },
       "security": {
         "title": "Security",
-        "emailChangeBlurb": "To change the email address on your account, contact"
-      },
-      "notifications": {
-        "title": "Notifications",
-        "blurb": "You'll see application and account updates in your dashboard notifications."
-      },
-      "documents": {
-        "title": "Documents & identity",
-        "blurb": "Your profile photo and passport are managed on the Documents page."
+        "passwordBlurb": "Use a strong password you don't use anywhere else.",
+        "emailTitle": "Sign-in email",
+        "emailBlurb": "This is the address you sign in with. Changing it requires proving you control the new one.",
+        "currentEmail": "Current email:",
+        "newEmail": "New email address",
+        "sendCode": "Send code",
+        "confirmEmail": "Confirm email change",
+        "emailUpdated": "Your sign-in email was updated."
       },
       "danger": {
         "title": "Danger zone",
-        "blurb": "Need to delete your account? We handle this by request, contact our support team and we'll take care of it.",
-        "cta": "Email support",
+        "subtitle": "Permanently remove your account.",
+        "blurb": "Deleting your account removes your access permanently. Our team handles this by request so nothing tied to an active application is lost by mistake. Email us and we'll take care of it promptly.",
+        "cta": "Request account deletion",
         "mailSubject": "Account deletion request"
       }
     },
@@ -705,7 +698,9 @@
       "plannedBackend": "Coming soon"
     },
     "doc": {
-      "previewAlt": "Uploaded document"
+      "previewAlt": "Uploaded document",
+      "fileBadge": "FILE",
+      "viewFile": "View file"
     },
     "photo": {
       "title": "Profile photo",

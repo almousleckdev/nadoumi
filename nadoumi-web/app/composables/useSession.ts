@@ -9,9 +9,14 @@ export function useSession() {
   const applicants = useState<Applicant[]>('nad-session-applicants', () => [])
   const activeApplicantId = useState<number | null>('nad-session-active', () => null)
   const localePath = useLocalePath()
+  // The global $fetch does not carry the incoming request's cookies when this runs
+  // server-side (SSR, the session plugin, route middleware) — useRequestFetch() does,
+  // so the server sees the same auth state the browser has. Without this, every hard
+  // reload looks signed-out during SSR and the auth middleware bounces to /login.
+  const requestFetch = useRequestFetch()
 
   async function refresh() {
-    const s = await $fetch<SessionDto>('/api/student-session')
+    const s = await requestFetch<SessionDto>('/api/student-session')
     if (s.authenticated) {
       status.value = 'authed'
       user.value = s.user ?? null
@@ -31,7 +36,7 @@ export function useSession() {
   }
 
   async function signOut() {
-    await $fetch('/api/student-session', { method: 'DELETE' }).catch(() => undefined)
+    await requestFetch('/api/student-session', { method: 'DELETE' }).catch(() => undefined)
     status.value = 'guest'
     user.value = null
     applicants.value = []

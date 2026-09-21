@@ -342,7 +342,6 @@
       "overview": "Aperçu",
       "profile": "Profil",
       "documents": "Documents",
-      "scholarships": "Bourses",
       "notifications": "Notifications",
       "support": "Aide et support",
       "messages": "Messages",
@@ -362,11 +361,10 @@
     "documentsTitle": "Documents",
     "documentsBlurb": "Votre photo de profil et votre passeport, à jour.",
     "docs": {
-      "identityTitle": "Documents d'identité",
-      "identityBlurb": "Votre photo de profil et votre passeport sont vérifiés automatiquement.",
       "listTitle": "Vos documents",
-      "listBlurb": "Téléversez vos justificatifs. L'équipe examine chaque document et vous signale ce qui doit être corrigé.",
+      "listBlurb": "Votre photo de profil et votre passeport, ainsi que tout justificatif demandé par l'équipe. Nous examinons chaque document et signalons ce qui doit être corrigé.",
       "add": "Ajouter un document",
+      "addBlurb": "Téléversez des justificatifs supplémentaires, comme des relevés de notes ou des certificats.",
       "typeLabel": "Type de document",
       "typePlaceholder": "Choisir un type",
       "typesUnavailable": "Les types de documents n'ont pas pu être chargés, il est donc impossible d'ajouter un document pour le moment. Veuillez réessayer plus tard.",
@@ -421,14 +419,9 @@
     "messages": {
       "title": "Messages",
       "blurb": "Échangez avec l'équipe Nadoumi à propos de vos candidatures et de vos questions.",
-      "empty": "Aucune conversation pour le moment. Écrivez à l'équipe dès que vous avez une question.",
-      "newMessage": "Nouveau message",
-      "subject": "Objet (facultatif)",
-      "body": "Votre message",
+      "empty": "Aucune conversation pour le moment. L'équipe Nadoumi en démarrera une ici si besoin de vous contacter.",
       "send": "Envoyer",
-      "startConversation": "Démarrer la conversation",
-      "noApplicant": "Créez d'abord votre profil de candidat, vous pourrez ensuite écrire à l'équipe.",
-      "forbidden": "Vous ne pouvez pas encore écrire à l'équipe pour ce profil.",
+      "noApplicant": "Créez d'abord votre profil de candidat. L'équipe pourra ensuite vous contacter ici.",
       "unread": "{count} non lu(s)",
       "closedBadge": "Fermée",
       "closedNotice": "Cette conversation est fermée.",
@@ -476,20 +469,20 @@
       },
       "security": {
         "title": "Sécurité",
-        "emailChangeBlurb": "Pour changer l'adresse e-mail de votre compte, contactez"
-      },
-      "notifications": {
-        "title": "Notifications",
-        "blurb": "Vous verrez les mises à jour de candidature et de compte dans vos notifications du tableau de bord."
-      },
-      "documents": {
-        "title": "Documents et identité",
-        "blurb": "Votre photo de profil et votre passeport sont gérés sur la page Documents."
+        "passwordBlurb": "Utilisez un mot de passe fort que vous n'utilisez nulle part ailleurs.",
+        "emailTitle": "E-mail de connexion",
+        "emailBlurb": "C'est l'adresse avec laquelle vous vous connectez. La changer nécessite de prouver que vous contrôlez la nouvelle.",
+        "currentEmail": "E-mail actuel :",
+        "newEmail": "Nouvelle adresse e-mail",
+        "sendCode": "Envoyer le code",
+        "confirmEmail": "Confirmer le changement d'e-mail",
+        "emailUpdated": "Votre e-mail de connexion a été mis à jour."
       },
       "danger": {
         "title": "Zone de danger",
-        "blurb": "Besoin de supprimer votre compte ? Nous traitons cela sur demande, contactez notre équipe d'assistance et nous nous en occuperons.",
-        "cta": "Contacter le support",
+        "subtitle": "Supprimez définitivement votre compte.",
+        "blurb": "Supprimer votre compte retire définitivement votre accès. Notre équipe traite cela sur demande afin que rien lié à une candidature active ne soit perdu par erreur. Écrivez-nous et nous nous en occuperons rapidement.",
+        "cta": "Demander la suppression du compte",
         "mailSubject": "Demande de suppression de compte"
       }
     },
@@ -705,7 +698,9 @@
       "plannedBackend": "Bientôt disponible"
     },
     "doc": {
-      "previewAlt": "Document téléversé"
+      "previewAlt": "Document téléversé",
+      "fileBadge": "FICHIER",
+      "viewFile": "Voir le fichier"
     },
     "photo": {
       "title": "Photo de profil",

@@ -4,16 +4,22 @@
  * holds the raw JWT — the student token lives in an httpOnly cookie the BFF attaches.
  */
 export function useApi() {
+  // Nuxt's global $fetch does not forward the incoming request's cookies when called
+  // server-side (SSR/plugins/middleware) — useRequestFetch() is the request-bound
+  // equivalent that does, and behaves exactly like $fetch on the client. Without this,
+  // every SSR-time call to our own httpOnly-cookie-gated BFF routes looks unauthenticated.
+  const requestFetch = useRequestFetch()
+
   function publicGet<T>(path: string, query?: Record<string, unknown>) {
-    return $fetch<T>(`/api/public/${stripLeadingSlash(path)}`, { query })
+    return requestFetch<T>(`/api/public/${stripLeadingSlash(path)}`, { query })
   }
 
   function publicPost<T>(path: string, body: Record<string, unknown>) {
-    return $fetch<T>(`/api/public/${stripLeadingSlash(path)}`, { method: 'POST', body })
+    return requestFetch<T>(`/api/public/${stripLeadingSlash(path)}`, { method: 'POST', body })
   }
 
   function studentFetch<T>(path: string, opts?: Parameters<typeof $fetch>[1]) {
-    return $fetch<T>(`/api/student/${stripLeadingSlash(path)}`, opts)
+    return requestFetch<T>(`/api/student/${stripLeadingSlash(path)}`, opts)
   }
 
   return { publicGet, publicPost, studentFetch }

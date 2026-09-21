@@ -18,10 +18,11 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{ changed: [], 'edit-profile': [] }>()
 const { t } = useI18n()
-const { uploadPassportScan, savePassport, passportStatus } = useApplicant()
+const { uploadPassportScan, savePassport, passportStatus, passportScanUrl } = useApplicant()
 const { busy, error, notice, run } = useAsyncAction()
 
 const status = ref<PassportStatusDto | null>(null)
+const savedScanUrl = ref('')
 const file = ref<File | null>(null)
 const preview = ref('')
 const initial = ref<PassportForm | null>(null)
@@ -52,8 +53,15 @@ function formFromProfileOrSaved(): PassportForm {
   return formFrom(status.value) ?? formFromProfile()
 }
 
+async function loadSavedScan() {
+  savedScanUrl.value = status.value?.scanUploaded
+    ? await passportScanUrl(props.applicantId).then(r => r.url).catch(() => '')
+    : ''
+}
+
 onMounted(async () => {
   status.value = await passportStatus(props.applicantId).catch(() => null)
+  await loadSavedScan()
   initial.value ??= formFromProfileOrSaved()
   expanded.value = cardStatus.value !== 'done'
 })
@@ -66,6 +74,8 @@ async function onSubmit(form: PassportForm) {
   })
   if (!saved) return
   file.value = null
+  preview.value = ''
+  await loadSavedScan()
   // Stay expanded so the student sees the confirmation; the Cancel button below
   // (shown once cardStatus is 'done') lets them collapse it manually.
   emit('changed')
@@ -85,9 +95,12 @@ const cardStatus = computed(() => {
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
     <NAlert v-if="cardStatus === 'done'" tone="success">{{ t('passport.matches') }}</NAlert>
 
-    <div v-if="!expanded" class="flex items-center gap-3">
-      <div class="grid h-12 w-12 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-400">
-        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+    <div v-if="!expanded" class="flex items-center gap-4">
+      <figure v-if="savedScanUrl" class="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 sm:h-28 sm:w-28">
+        <img :src="savedScanUrl" :alt="t('passport.title')" class="h-full w-full object-cover">
+      </figure>
+      <div v-else class="grid h-24 w-24 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-400 sm:h-28 sm:w-28">
+        <svg viewBox="0 0 24 24" class="h-10 w-10" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
           <rect x="4" y="3" width="16" height="18" rx="2" />
           <circle cx="12" cy="9" r="2.5" />
           <path d="M8 16h8" />
@@ -96,8 +109,8 @@ const cardStatus = computed(() => {
       <div class="flex-1 text-sm">
         <p class="font-medium text-slate-700">{{ status?.passportNo }}</p>
         <p class="text-slate-500">{{ t('passport.expiresOn', { date: status?.expiryDate }) }}</p>
+        <NButton class="mt-2" size="sm" variant="secondary" @click="expanded = true">{{ t('common.edit') }}</NButton>
       </div>
-      <NButton size="sm" variant="secondary" @click="expanded = true">{{ t('common.edit') }}</NButton>
     </div>
 
     <template v-else>
@@ -105,6 +118,7 @@ const cardStatus = computed(() => {
       <PassportMismatchNotice v-if="mismatches.length" :mismatches="mismatches" @edit-profile="$emit('edit-profile')" />
 
       <DocumentPreview v-if="file" :src="preview" :type="file.type" :name="file.name" />
+      <DocumentPreview v-else-if="savedScanUrl" :src="savedScanUrl" :name="t('passport.title')" />
       <p v-else-if="!status?.scanUploaded" class="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
         {{ t('passport.none') }}
       </p>

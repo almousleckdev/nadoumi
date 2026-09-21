@@ -12,8 +12,10 @@ import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.identity.mapper.NadIdentityMapper;
 import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
+import com.nadoumi.identity.service.mail.EmailChangedEvent;
 import com.nadoumi.identity.service.mail.PasswordChangedEvent;
 import com.nadoumi.identity.service.otp.OtpPurpose;
+import com.nadoumi.identity.service.otp.OtpService;
 import com.nadoumi.identity.service.otp.TicketService;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.nadoumi.identity.web.request.StudentLoginRequest;
@@ -66,12 +68,13 @@ public class StudentAuthService {
     private final SessionRevoker sessionRevoker;
     private final ApplicationEventPublisher events;
     private final OutboxWriter outbox;
+    private final OtpService otp;
 
     public StudentAuthService(ISysConfigService configService, ISysUserService userService,
             SysLoginService loginService, TokenService tokenService, NadIdentityMapper identityMapper,
             UserApplicantAccessMapper accessMapper, UserApplicantAccessService grants, CurrentCaller caller,
             TicketService tickets, SessionRevoker sessionRevoker, ApplicationEventPublisher events,
-            OutboxWriter outbox) {
+            OutboxWriter outbox, OtpService otp) {
         this.configService = configService;
         this.userService = userService;
         this.loginService = loginService;
@@ -84,6 +87,7 @@ public class StudentAuthService {
         this.sessionRevoker = sessionRevoker;
         this.events = events;
         this.outbox = outbox;
+        this.otp = otp;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -196,6 +200,53 @@ public class StudentAuthService {
             tokenService.setLoginUser(me);
         }
         events.publishEvent(new PasswordChangedEvent(userId, user.getEmail()));
+    }
+
+    /**
+     * Signed-in student asking to change their sign-in email: a code is mailed to
+     * the new address, proving they control it, before anything changes.
+     */
+    public OtpService.IssueResult requestEmailChangeCode(String newEmail) {
+        caller.requireUserId();
+        String email = normalizeEmail(newEmail);
+        if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
+            throw new NadBadRequestException("that email is already in use");
+        }
+        return otp.issue(email, OtpPurpose.EMAIL_CHANGE, false);
+    }
+
+    /**
+     * Applies the change: verifies the current password (defense against a
+     * hijacked session, since email is the sign-in identity) and the OTP proving
+     * ownership of the new address, then updates the account and notifies the
+     * <em>previous</em> address in case this was not the account holder.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void changeEmail(HttpServletRequest request, String newEmail, String otpCode, String currentPassword) {
+        Long userId = caller.requireUserId();
+        SysUser user = userService.selectUserById(userId);
+        if (!SecurityUtils.matchesPassword(currentPassword, user.getPassword())) {
+            throw new NadBadRequestException("current password is incorrect");
+        }
+        String email = normalizeEmail(newEmail);
+        String previousEmail = user.getEmail();
+        if (email.equals(normalizeEmail(previousEmail == null ? "" : previousEmail))) {
+            throw new NadBadRequestException("that is already your sign-in email");
+        }
+        otp.verify(email, OtpPurpose.EMAIL_CHANGE, otpCode);
+        // The OTP proved ownership, but another account could have claimed the
+        // address in the meantime — re-check right before writing it.
+        if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
+            throw new NadBadRequestException("that email is already in use");
+        }
+        identityMapper.changeEmail(userId, email);
+
+        LoginUser me = tokenService.getLoginUser(request);
+        if (me != null) {
+            me.getUser().setEmail(email);
+            tokenService.setLoginUser(me);
+        }
+        events.publishEvent(new EmailChangedEvent(userId, previousEmail, email));
     }
 
     public StudentIdentityResponse me() {

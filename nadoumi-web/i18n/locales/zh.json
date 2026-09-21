@@ -342,7 +342,6 @@
       "overview": "概览",
       "profile": "档案",
       "documents": "文件",
-      "scholarships": "奖学金",
       "notifications": "通知",
       "support": "帮助与支持",
       "messages": "消息",
@@ -362,11 +361,10 @@
     "documentsTitle": "文件",
     "documentsBlurb": "您的证件照和护照，保持最新状态。",
     "docs": {
-      "identityTitle": "身份证件",
-      "identityBlurb": "您的头像照片和护照会被自动核验。",
       "listTitle": "您的文件",
-      "listBlurb": "上传您的证明文件。工作人员会逐一审核，并在需要修改时告知您。",
+      "listBlurb": "您的头像照片和护照，以及工作人员要求的其他证明文件。我们会逐一审核，并在需要修改时告知您。",
       "add": "添加文件",
+      "addBlurb": "上传其他证明文件，例如成绩单或证书。",
       "typeLabel": "文件类型",
       "typePlaceholder": "选择类型",
       "typesUnavailable": "无法加载文件类型，因此暂时无法添加新文件。请稍后再试。",
@@ -421,14 +419,9 @@
     "messages": {
       "title": "消息",
       "blurb": "就您的申请和问题与 Nadoumi 团队沟通。",
-      "empty": "还没有会话。有问题时可随时向团队发起会话。",
-      "newMessage": "新消息",
-      "subject": "主题（可选）",
-      "body": "您的消息",
+      "empty": "暂无会话。如需联系您，Nadoumi 团队会在此发起会话。",
       "send": "发送",
-      "startConversation": "发起会话",
-      "noApplicant": "请先创建您的申请人资料，之后即可给团队留言。",
-      "forbidden": "您暂时无法为该资料向团队发送消息。",
+      "noApplicant": "请先创建您的申请人资料，团队之后即可通过此处联系您。",
       "unread": "{count} 条未读",
       "closedBadge": "已关闭",
       "closedNotice": "该会话已关闭。",
@@ -476,20 +469,20 @@
       },
       "security": {
         "title": "安全",
-        "emailChangeBlurb": "如需更改账户邮箱，请联系"
-      },
-      "notifications": {
-        "title": "通知",
-        "blurb": "申请和账户更新会显示在您仪表盘的通知中。"
-      },
-      "documents": {
-        "title": "证件与身份",
-        "blurb": "您的头像照片和护照信息在“证件”页面管理。"
+        "passwordBlurb": "请使用一个不在其他地方使用的强密码。",
+        "emailTitle": "登录邮箱",
+        "emailBlurb": "这是您用来登录的邮箱地址。更改它需要证明您拥有新邮箱。",
+        "currentEmail": "当前邮箱：",
+        "newEmail": "新邮箱地址",
+        "sendCode": "发送验证码",
+        "confirmEmail": "确认更改邮箱",
+        "emailUpdated": "您的登录邮箱已更新。"
       },
       "danger": {
         "title": "危险操作区",
-        "blurb": "需要删除账户？我们通过人工请求处理，请联系我们的支持团队，我们将为您处理。",
-        "cta": "联系支持团队",
+        "subtitle": "永久删除您的账户。",
+        "blurb": "删除账户将永久移除您的访问权限。为避免误删与正在进行的申请相关的任何内容，此操作由我们团队按请求处理——请发邮件给我们，我们会尽快处理。",
+        "cta": "申请删除账户",
         "mailSubject": "账户删除请求"
       }
     },
@@ -705,7 +698,9 @@
       "plannedBackend": "即将上线"
     },
     "doc": {
-      "previewAlt": "已上传的文件"
+      "previewAlt": "已上传的文件",
+      "fileBadge": "文件",
+      "viewFile": "查看文件"
     },
     "photo": {
       "title": "证件照",

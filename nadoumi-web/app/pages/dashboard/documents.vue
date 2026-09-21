@@ -115,65 +115,74 @@ useSeo(t('dashboard.documentsTitle'), t('dashboard.documentsBlurb'))
         <NuxtLink :to="localePath('/dashboard/profile')" class="ms-1 underline">{{ t('dashboard.quickProfile') }}</NuxtLink>
       </NAlert>
 
-      <div v-else class="grid gap-8">
-        <section class="grid gap-4">
+      <div v-else class="grid gap-10">
+        <section class="grid gap-4 md:grid-cols-[240px_1fr] md:gap-10">
           <div>
-            <h2 class="font-display text-lg font-semibold text-slate-900">{{ t('dashboard.docs.identityTitle') }}</h2>
-            <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.docs.identityBlurb') }}</p>
-          </div>
-          <PhotoUploadCard :applicant-id="applicant.id" @changed="load" />
-          <PassportUploadCard
-            :applicant-id="applicant.id"
-            :profile="{ givenName: applicant.givenName, familyName: applicant.familyName, dob: applicant.dob }"
-            @changed="load"
-            @edit-profile="navigateTo(localePath('/dashboard/profile'))"
-          />
-        </section>
-
-        <section class="grid gap-4">
-          <div>
-            <h2 class="font-display text-lg font-semibold text-slate-900">{{ t('dashboard.docs.listTitle') }}</h2>
+            <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.docs.listTitle') }}</h2>
             <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.docs.listBlurb') }}</p>
           </div>
 
-          <NAlert v-if="notice" tone="success">{{ notice }}</NAlert>
-          <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
+          <div class="grid gap-6">
+            <NAlert v-if="notice" tone="success">{{ notice }}</NAlert>
+            <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
 
-          <AsyncState :pending="docsPending" :error="docsError" :empty="!docs.length">
-            <template #loading>
-              <div class="grid gap-3">
-                <NSkeleton class="h-28 w-full rounded-lg" />
-                <NSkeleton class="h-28 w-full rounded-lg" />
+            <!-- Profile photo + passport: the two identity documents every applicant needs,
+                 shown side by side so neither reads as an afterthought under the free-form list. -->
+            <div class="grid gap-4 sm:grid-cols-2">
+              <div class="rounded-xl border border-slate-200 bg-white p-5">
+                <PhotoUploadCard :applicant-id="applicant.id" @changed="load" />
               </div>
-            </template>
-            <template #error>
-              <NAlert tone="danger">
-                {{ docsError }}
-                <button type="button" class="ms-2 font-medium underline" @click="loadDocuments">{{ t('common.retry') }}</button>
-              </NAlert>
-            </template>
-            <template #empty>
-              <p class="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500" data-test="docs-empty">
-                {{ t('dashboard.docs.empty') }}
-              </p>
-            </template>
+              <div class="rounded-xl border border-slate-200 bg-white p-5">
+                <PassportUploadCard
+                  :applicant-id="applicant.id"
+                  :profile="{ givenName: applicant.givenName, familyName: applicant.familyName, dob: applicant.dob }"
+                  @changed="load"
+                  @edit-profile="navigateTo(localePath('/dashboard/profile'))"
+                />
+              </div>
+            </div>
 
-            <ul class="grid gap-3">
-              <DocumentRow
-                v-for="doc in docs"
-                :key="doc.id"
-                :doc="doc"
-                :type-label="labelFor(doc.docType)"
-                :busy="busy"
-                @download="onDownload(doc)"
-                @replace="onReplace(doc, $event)"
-                @remove="onRemove(doc)"
-              />
-            </ul>
-          </AsyncState>
+            <AsyncState :pending="docsPending" :error="docsError" :empty="!docs.length">
+              <template #loading>
+                <div class="grid gap-3">
+                  <NSkeleton class="h-28 w-full rounded-lg" />
+                  <NSkeleton class="h-28 w-full rounded-lg" />
+                </div>
+              </template>
+              <template #error>
+                <NAlert tone="danger">
+                  {{ docsError }}
+                  <button type="button" class="ms-2 font-medium underline" @click="loadDocuments">{{ t('common.retry') }}</button>
+                </NAlert>
+              </template>
+              <template #empty>
+                <p class="rounded-lg border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500" data-test="docs-empty">
+                  {{ t('dashboard.docs.empty') }}
+                </p>
+              </template>
 
-          <div class="rounded-lg border border-slate-200 bg-white p-4 sm:p-5">
-            <h3 class="mb-3 font-display font-semibold text-slate-900">{{ t('dashboard.docs.add') }}</h3>
+              <ul class="grid gap-3">
+                <DocumentRow
+                  v-for="doc in docs"
+                  :key="doc.id"
+                  :doc="doc"
+                  :type-label="labelFor(doc.docType)"
+                  :busy="busy"
+                  @download="onDownload(doc)"
+                  @replace="onReplace(doc, $event)"
+                  @remove="onRemove(doc)"
+                />
+              </ul>
+            </AsyncState>
+          </div>
+        </section>
+
+        <section class="grid gap-4 border-t border-slate-200 pt-10 md:grid-cols-[240px_1fr] md:gap-10">
+          <div>
+            <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.docs.add') }}</h2>
+            <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.docs.addBlurb') }}</p>
+          </div>
+          <div class="rounded-xl border border-slate-200 bg-white p-5">
             <NAlert v-if="typesUnavailable" tone="warning" data-test="types-unavailable">{{ t('dashboard.docs.typesUnavailable') }}</NAlert>
             <AddDocumentForm v-else :types="typeOptions" :busy="busy" @submit="onCreate" />
           </div>

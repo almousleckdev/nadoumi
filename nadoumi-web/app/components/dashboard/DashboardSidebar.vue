@@ -18,7 +18,6 @@ const groups: NavGroup[] = [
       { to: '/dashboard', key: 'dashboard.nav.overview', icon: 'overview' },
       { to: '/dashboard/applications', key: 'dashboard.nav.applications', icon: 'applications' },
       { to: '/dashboard/documents', key: 'dashboard.nav.documents', icon: 'documents' },
-      { to: '/scholarships', key: 'dashboard.nav.scholarships', icon: 'award' },
       { to: '/dashboard/messages', key: 'dashboard.nav.messages', icon: 'messages' },
       { to: '/dashboard/notifications', key: 'dashboard.nav.notifications', icon: 'bell' },
       { to: '/dashboard/support', key: 'dashboard.nav.support', icon: 'support' },

@@ -4,16 +4,26 @@ import { flushPromises } from '@vue/test-utils'
 import Account from '~/pages/dashboard/account.vue'
 
 const signOut = vi.fn()
+const refresh = vi.fn()
 vi.mock('~/composables/useSession', () => ({
   useSession: () => ({
     user: ref({ userId: 1, username: 'stu_sam', nickName: 'Sam', email: 'sam@example.com' }),
     signOut,
+    refresh,
+  }),
+}))
+vi.mock('~/composables/useEmailChange', () => ({
+  useEmailChange: () => ({
+    requestCode: vi.fn(),
+    confirm: vi.fn(),
+    cooldown: ref(0),
+    busy: ref(false),
   }),
 }))
 
 const fetchImpl = vi.fn((_url: string, _opts?: Record<string, unknown>) => Promise.resolve(undefined))
 vi.stubGlobal('$fetch', fetchImpl)
-beforeEach(() => { fetchImpl.mockClear(); signOut.mockReset() })
+beforeEach(() => { fetchImpl.mockClear(); signOut.mockReset(); refresh.mockReset() })
 
 describe('dashboard account page', () => {
   it('changes the password and shows the other-sessions notice', async () => {
@@ -37,17 +47,29 @@ describe('dashboard account page', () => {
     expect(signOut).toHaveBeenCalled()
   })
 
-  it('links out to the real Profile and Documents pages instead of duplicating them', async () => {
+  it('links out to the real Profile page, and does not duplicate Notifications/Documents nav with a dead shortcut card', async () => {
     const w = await mountSuspended(Account)
 
     expect(w.findAll('a').some(a => a.attributes('href')?.includes('/dashboard/profile'))).toBe(true)
-    expect(w.findAll('a').some(a => a.attributes('href')?.includes('/dashboard/documents'))).toBe(true)
+    expect(w.text()).not.toContain('Documents & identity')
+    expect(w.text()).not.toContain('Notifications')
   })
 
-  it('points email-change and account-deletion requests at support, not a fake self-service control', async () => {
+  it('offers real self-service sign-in email change, not a support mailto', async () => {
     const w = await mountSuspended(Account)
 
+    expect(w.text()).toContain('sam@example.com')
+    expect(w.find('#email-new').exists()).toBe(true)
     const mailLinks = w.findAll('a').filter(a => a.attributes('href')?.startsWith('mailto:support@nadoumi.com'))
-    expect(mailLinks.length).toBeGreaterThanOrEqual(2)
+    // only the danger-zone deletion request remains support-mediated
+    expect(mailLinks).toHaveLength(1)
+  })
+
+  it('still points account deletion at support — that stays staff-mediated', async () => {
+    const w = await mountSuspended(Account)
+
+    const deleteLink = w.findAll('a').find(a => a.attributes('href')?.startsWith('mailto:support@nadoumi.com'))
+    expect(deleteLink).toBeTruthy()
+    expect(w.text()).toContain('Danger zone')
   })
 })

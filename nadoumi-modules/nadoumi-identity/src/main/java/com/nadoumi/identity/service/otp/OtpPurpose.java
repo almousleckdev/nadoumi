@@ -5,5 +5,7 @@ public enum OtpPurpose {
     REGISTER,
     PASSWORD_RESET,
     /** Proves ownership of an applicant's contact email; issued only to an authenticated student. */
-    APPLICANT_EMAIL
+    APPLICANT_EMAIL,
+    /** Proves ownership of a new login email; issued only to an authenticated student. */
+    EMAIL_CHANGE
 }

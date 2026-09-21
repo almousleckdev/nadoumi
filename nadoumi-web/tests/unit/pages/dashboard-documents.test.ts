@@ -183,9 +183,15 @@ describe('dashboard documents page', () => {
     expect(w.text()).toContain('New version uploaded.')
   })
 
-  it('keeps the identity cards working next to the new list', async () => {
+  it('shows the identity cards (photo, passport) as part of Your documents, not a separate section', async () => {
     const w = await mountPage()
-    expect(w.text()).toContain('Identity documents')
+    expect(w.text()).toContain('Your documents')
     expect(w.text()).toContain('Passport')
+    expect(w.text()).not.toContain('Identity documents')
+  })
+
+  it('shows Add a document as its own left/right section, separate from the list', async () => {
+    const w = await mountPage()
+    expect(w.text()).toContain('Add a document')
   })
 })

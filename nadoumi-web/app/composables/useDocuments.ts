@@ -23,6 +23,9 @@ function filenameFrom(disposition: string | null): string {
  */
 export function useDocuments() {
   const { studentFetch } = useApi()
+  // See useApi.ts: useRequestFetch() forwards the incoming request's cookies during
+  // SSR, which the global $fetch does not.
+  const requestFetch = useRequestFetch()
 
   return {
     list: (applicantId: number, applicationId?: number) =>
@@ -41,7 +44,9 @@ export function useDocuments() {
     remove: (id: number): Promise<void> => studentFetch<undefined>(`documents/${id}`, { method: 'DELETE' }),
 
     async fileAccess(id: number, versionNo: number): Promise<DocumentFileAccess> {
-      const res = await $fetch.raw<Blob>(`/api/student/documents/${id}/versions/${versionNo}/content`, {
+      // useRequestFetch()'s type doesn't declare `.raw`, but it is the same ofetch
+      // instance as the global $fetch at runtime (Nuxt creates it via $fetch.create).
+      const res = await (requestFetch as typeof $fetch).raw<Blob>(`/api/student/documents/${id}/versions/${versionNo}/content`, {
         query: { json: 1 },
         responseType: 'blob',
       })
@@ -55,6 +60,6 @@ export function useDocuments() {
     },
 
     /** The configurable type dictionary; students have no other way to learn the valid codes. */
-    types: () => $fetch<DocumentTypeOption[]>('/api/student-document-types'),
+    types: () => requestFetch<DocumentTypeOption[]>('/api/student-document-types'),
   }
 }

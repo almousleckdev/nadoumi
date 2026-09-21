@@ -5,7 +5,7 @@ import PassportUploadCard from '~/components/onboarding/PassportUploadCard.vue'
 import { fakeFile, pickFile } from '../helpers/files'
 
 const { api } = vi.hoisted(() => ({
-  api: { passportStatus: vi.fn(), uploadPassportScan: vi.fn(), savePassport: vi.fn() },
+  api: { passportStatus: vi.fn(), uploadPassportScan: vi.fn(), savePassport: vi.fn(), passportScanUrl: vi.fn() },
 }))
 vi.mock('~/composables/useApplicant', () => ({ useApplicant: () => api }))
 vi.mock('~/utils/files', async (original) => ({
@@ -37,6 +37,7 @@ beforeEach(() => {
   api.passportStatus.mockResolvedValue(EMPTY)
   api.uploadPassportScan.mockResolvedValue({ mediaId: 5 })
   api.savePassport.mockResolvedValue(SAVED_OK)
+  api.passportScanUrl.mockResolvedValue({ url: 'https://cdn.example.com/passport-scan.jpg', expiresAt: '2099-01-01' })
 })
 
 describe('PassportUploadCard', () => {
@@ -101,6 +102,31 @@ describe('PassportUploadCard', () => {
     await editButton!.trigger('click')
 
     expect(w.find('#passportNo').exists()).toBe(true)
+  })
+
+  it('shows the already-saved scan (not just a freshly-picked file) — collapsed thumbnail', async () => {
+    api.passportStatus.mockResolvedValue(SAVED_OK)
+    const w = await mountCard()
+
+    expect(api.passportScanUrl).toHaveBeenCalledWith(1)
+    expect(w.find('img').attributes('src')).toBe('https://cdn.example.com/passport-scan.jpg')
+  })
+
+  it('shows the already-saved scan when expanded, with no file just picked', async () => {
+    api.passportStatus.mockResolvedValue(SAVED_OK)
+    const w = await mountCard()
+
+    await w.findAll('button').find(b => b.text() === 'Edit')!.trigger('click')
+
+    const images = w.findAll('img')
+    expect(images.some(img => img.attributes('src') === 'https://cdn.example.com/passport-scan.jpg')).toBe(true)
+  })
+
+  it('does not fetch a scan URL when nothing has been uploaded yet', async () => {
+    api.passportStatus.mockResolvedValue(EMPTY)
+    await mountCard()
+
+    expect(api.passportScanUrl).not.toHaveBeenCalled()
   })
 
   it('tells the student when the passport and the profile do not match', async () => {

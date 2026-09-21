@@ -163,6 +163,10 @@ public class OtpService {
                     "Your Nadoumi email confirmation code",
                     "If you didn't ask to use this address on a Nadoumi profile, you can ignore this email.",
                     "Confirm your email — Nadoumi");
+            case EMAIL_CHANGE -> new OtpCopy("otp-email-change", "Confirm your new sign-in email",
+                    "Your Nadoumi sign-in email change code",
+                    "If you didn't ask to change your Nadoumi sign-in email, you can ignore this email — nothing changes.",
+                    "Confirm your new email — Nadoumi");
         };
     }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
+import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import MessagesIndex from '~/pages/dashboard/messages/index.vue'
 import type { ConversationSummary } from '~/types/messages'
@@ -10,15 +10,13 @@ const C = (over: Partial<ConversationSummary> = {}): ConversationSummary => ({
 })
 
 const listConversations = vi.fn()
-const open = vi.fn()
 const primary = ref<{ id: number } | null>({ id: 5 })
-const { stream, navigate } = vi.hoisted(() => ({
+const { stream } = vi.hoisted(() => ({
   stream: { onPing: undefined as undefined | ((id: number) => void), onResync: undefined as undefined | (() => void) },
-  navigate: vi.fn(),
 }))
 
 vi.mock('~/composables/useMessages', () => ({
-  useMessages: () => ({ listConversations, open }),
+  useMessages: () => ({ listConversations }),
 }))
 vi.mock('~/composables/useMyApplicant', () => ({
   useMyApplicant: () => ({ primary }),
@@ -30,7 +28,6 @@ vi.mock('~/composables/useConversationStream', () => ({
     return { reconnecting: ref(false), connected: ref(true) }
   },
 }))
-mockNuxtImport('navigateTo', () => navigate)
 
 async function mountPage() {
   const w = await mountSuspended(MessagesIndex)
@@ -40,8 +37,6 @@ async function mountPage() {
 
 beforeEach(() => {
   listConversations.mockReset().mockResolvedValue([C()])
-  open.mockReset()
-  navigate.mockReset()
   primary.value = { id: 5 }
 })
 
@@ -54,12 +49,16 @@ describe('dashboard messages list', () => {
     expect(w.findAll('[data-test="conversation-row"]')).toHaveLength(0)
   })
 
-  it('asks for an applicant profile first when there is none, and offers no new-message button', async () => {
+  it('asks for an applicant profile first when there is none', async () => {
     listConversations.mockResolvedValue([])
     primary.value = null
     const w = await mountPage()
 
     expect(w.text()).toContain('Create your applicant profile first')
+  })
+
+  it('never offers a way for the student to start a new conversation — staff-initiated only', async () => {
+    const w = await mountPage()
     expect(w.find('[data-test="new-message"]').exists()).toBe(false)
   })
 
@@ -99,30 +98,4 @@ describe('dashboard messages list', () => {
     expect(w.text()).toContain('1 unread')
   })
 
-  it('opens a conversation for the active applicant and navigates to the thread', async () => {
-    open.mockResolvedValue({ id: 100, conversationId: 12 })
-    const w = await mountPage()
-
-    await w.find('[data-test="new-message"]').trigger('click')
-    await w.find('#msg-subject').setValue('Scholarship help')
-    await w.find('#msg-body').setValue('Which documents do I need?')
-    await w.find('#msg-body').element.closest('form')!.dispatchEvent(new Event('submit'))
-    await flushPromises()
-
-    expect(open).toHaveBeenCalledWith({ applicantId: 5, subject: 'Scholarship help', body: 'Which documents do I need?' })
-    expect(navigate).toHaveBeenCalledWith(expect.stringContaining('/dashboard/messages/12'))
-  })
-
-  it('explains a 403 (no MESSAGE_STAFF grant) instead of a generic failure', async () => {
-    open.mockRejectedValue({ statusCode: 403 })
-    const w = await mountPage()
-
-    await w.find('[data-test="new-message"]').trigger('click')
-    await w.find('#msg-body').setValue('Hello')
-    await w.find('#msg-body').element.closest('form')!.dispatchEvent(new Event('submit'))
-    await flushPromises()
-
-    expect(w.find('[data-test="forbidden"]').text()).toContain('cannot message the team')
-    expect(navigate).not.toHaveBeenCalled()
-  })
 })

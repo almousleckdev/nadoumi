@@ -4,11 +4,9 @@ import { formatMessageTime } from '~/utils/messages'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
-const HTTP_FORBIDDEN = 403
-
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
-const { listConversations, open } = useMessages()
+const { listConversations } = useMessages()
 const { primary } = useMyApplicant()
 
 const items = ref<ConversationSummary[]>([])
@@ -32,38 +30,6 @@ await load()
 
 const { reconnecting } = useConversationStream(() => load(true), () => load(true))
 
-const composing = ref(false)
-const subject = ref('')
-const draft = ref('')
-const { busy, error: sendError, run } = useAsyncAction()
-const forbidden = ref(false)
-
-async function startConversation() {
-  const applicant = primary.value
-  if (!applicant) return
-  forbidden.value = false
-  const sent = await run(async () => {
-    try {
-      return await open({ applicantId: applicant.id, subject: subject.value.trim() || undefined, body: draft.value.trim() })
-    }
-    catch (e) {
-      const status = (e as { statusCode?: number, status?: number }).statusCode ?? (e as { status?: number }).status
-      if (status === HTTP_FORBIDDEN) forbidden.value = true
-      throw e
-    }
-  })
-  if (!sent) return
-  await navigateTo(localePath(`/dashboard/messages/${sent.conversationId}`))
-}
-
-function cancelCompose() {
-  composing.value = false
-  subject.value = ''
-  draft.value = ''
-  sendError.value = ''
-  forbidden.value = false
-}
-
 const formatTime = (iso: string | null) => formatMessageTime(iso, locale.value)
 
 useSeo(t('dashboard.messages.title'), t('dashboard.messages.blurb'))
@@ -76,28 +42,9 @@ useSeo(t('dashboard.messages.title'), t('dashboard.messages.blurb'))
         <h1 class="font-display text-xl font-bold text-slate-900">{{ t('dashboard.messages.title') }}</h1>
         <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.messages.blurb') }}</p>
       </div>
-      <NButton v-if="primary && !composing" size="sm" data-test="new-message" @click="composing = true">
-        {{ t('dashboard.messages.newMessage') }}
-      </NButton>
     </header>
 
     <p v-if="reconnecting" class="text-xs text-amber-700" role="status">{{ t('dashboard.messages.reconnecting') }}</p>
-
-    <SectionCard v-if="composing" :title="t('dashboard.messages.newMessage')">
-      <NAlert v-if="forbidden" tone="warning" class="mb-4" data-test="forbidden">{{ t('dashboard.messages.forbidden') }}</NAlert>
-      <NAlert v-else-if="sendError" tone="danger" class="mb-4">{{ sendError }}</NAlert>
-      <div class="grid gap-3">
-        <NField :label="t('dashboard.messages.subject')" for="msg-subject">
-          <NInput id="msg-subject" v-model="subject" :maxlength="200" />
-        </NField>
-        <NField :label="t('dashboard.messages.body')" for="msg-body" required>
-          <MessageComposer id="msg-body" v-model="draft" :busy="busy" @submit="startConversation" />
-        </NField>
-        <div>
-          <NButton variant="ghost" size="sm" :disabled="busy" @click="cancelCompose">{{ t('common.cancel') }}</NButton>
-        </div>
-      </div>
-    </SectionCard>
 
     <AsyncState :pending="pending" :error="error" :empty="!items.length">
       <template #loading>

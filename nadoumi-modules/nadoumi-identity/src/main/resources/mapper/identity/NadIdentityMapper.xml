@@ -28,6 +28,10 @@
         update sys_user set email_verified = 1 where user_id = #{userId}
     </update>
 
+    <update id="changeEmail">
+        update sys_user set email = #{email}, email_verified = 1, update_time = now() where user_id = #{userId}
+    </update>
+
     <update id="touchPwdUpdateDate">
         update sys_user set pwd_update_date = now() where user_id = #{userId}
     </update>

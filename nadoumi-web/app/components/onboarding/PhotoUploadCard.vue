@@ -66,12 +66,14 @@ const status = computed(() => (savedUrl.value ? 'done' : 'pending'))
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
     <NAlert v-if="notice" tone="success">{{ notice }}</NAlert>
 
-    <div v-if="!expanded" class="flex items-center gap-3">
-      <figure class="h-12 w-12 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+    <div v-if="!expanded" class="flex items-center gap-4">
+      <figure class="h-24 w-24 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100 sm:h-28 sm:w-28">
         <img :src="savedUrl" :alt="t('onboarding.photo.current')" class="h-full w-full object-cover">
       </figure>
-      <p class="flex-1 text-sm text-slate-600">{{ t('onboarding.photo.current') }}</p>
-      <NButton size="sm" variant="secondary" @click="expanded = true">{{ t('onboarding.upload.replace') }}</NButton>
+      <div class="flex-1">
+        <p class="text-sm font-medium text-slate-700">{{ t('onboarding.photo.current') }}</p>
+        <NButton class="mt-2" size="sm" variant="secondary" @click="expanded = true">{{ t('onboarding.upload.replace') }}</NButton>
+      </div>
     </div>
 
     <div v-else class="grid gap-4 sm:grid-cols-[auto_1fr] sm:items-start">

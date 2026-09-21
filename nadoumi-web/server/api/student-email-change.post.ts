@@ -1,0 +1,22 @@
+// Cookie-authed passthrough: signed-in student applying a verified sign-in email
+// change. Attaches the bearer from the httpOnly cookie.
+export default defineEventHandler(async (event) => {
+  const token = studentToken(event)
+  if (!token) {
+    setResponseStatus(event, 401)
+    return { detail: 'Not signed in' }
+  }
+  const body = await readBody(event)
+  try {
+    return await $fetch<unknown>(`${backendBaseUrl(event)}/api/student/email/change`, {
+      method: 'POST',
+      body,
+      headers: { authorization: `Bearer ${token}` },
+    })
+  }
+  catch (err) {
+    const e = err as { statusCode?: number; data?: unknown }
+    setResponseStatus(event, e.statusCode ?? 502)
+    return e.data ?? { detail: 'Email change failed' }
+  }
+})

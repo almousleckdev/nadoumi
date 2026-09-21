@@ -342,7 +342,6 @@
       "overview": "Resumen",
       "profile": "Perfil",
       "documents": "Documentos",
-      "scholarships": "Becas",
       "notifications": "Notificaciones",
       "support": "Ayuda y soporte",
       "messages": "Mensajes",
@@ -362,11 +361,10 @@
     "documentsTitle": "Documentos",
     "documentsBlurb": "Tu foto de perfil y pasaporte, siempre actualizados.",
     "docs": {
-      "identityTitle": "Documentos de identidad",
-      "identityBlurb": "Tu foto de perfil y tu pasaporte se comprueban automáticamente.",
       "listTitle": "Tus documentos",
-      "listBlurb": "Sube tus documentos de apoyo. El equipo revisa cada uno y te avisa si algo debe corregirse.",
+      "listBlurb": "Tu foto de perfil y tu pasaporte, además de cualquier documento de apoyo que el equipo solicite. Revisamos cada uno y te avisamos si algo debe corregirse.",
       "add": "Añadir un documento",
+      "addBlurb": "Sube documentos de apoyo adicionales, como expedientes académicos o certificados.",
       "typeLabel": "Tipo de documento",
       "typePlaceholder": "Elige un tipo",
       "typesUnavailable": "No se pudieron cargar los tipos de documento, por lo que ahora no se pueden añadir documentos. Inténtalo de nuevo más tarde.",
@@ -421,14 +419,9 @@
     "messages": {
       "title": "Mensajes",
       "blurb": "Habla con el equipo de Nadoumi sobre tus solicitudes y dudas.",
-      "empty": "Aún no hay conversaciones. Inicia una cuando tengas una pregunta para el equipo.",
-      "newMessage": "Nuevo mensaje",
-      "subject": "Asunto (opcional)",
-      "body": "Tu mensaje",
+      "empty": "Aún no hay conversaciones. El equipo de Nadoumi iniciará una aquí si necesita contactarte.",
       "send": "Enviar",
-      "startConversation": "Iniciar conversación",
-      "noApplicant": "Crea primero tu perfil de solicitante y luego podrás escribir al equipo.",
-      "forbidden": "Todavía no puedes escribir al equipo para este perfil.",
+      "noApplicant": "Crea primero tu perfil de solicitante. El equipo podrá contactarte aquí.",
       "unread": "{count} sin leer",
       "closedBadge": "Cerrada",
       "closedNotice": "Esta conversación está cerrada.",
@@ -476,20 +469,20 @@
       },
       "security": {
         "title": "Seguridad",
-        "emailChangeBlurb": "Para cambiar el correo electrónico de tu cuenta, contacta a"
-      },
-      "notifications": {
-        "title": "Notificaciones",
-        "blurb": "Verás las actualizaciones de tu solicitud y cuenta en las notificaciones de tu panel."
-      },
-      "documents": {
-        "title": "Documentos e identidad",
-        "blurb": "Tu foto de perfil y pasaporte se gestionan en la página de Documentos."
+        "passwordBlurb": "Usa una contraseña segura que no uses en ningún otro sitio.",
+        "emailTitle": "Correo de inicio de sesión",
+        "emailBlurb": "Esta es la dirección con la que inicias sesión. Cambiarla requiere demostrar que controlas la nueva.",
+        "currentEmail": "Correo actual:",
+        "newEmail": "Nueva dirección de correo",
+        "sendCode": "Enviar código",
+        "confirmEmail": "Confirmar cambio de correo",
+        "emailUpdated": "Tu correo de inicio de sesión se actualizó."
       },
       "danger": {
         "title": "Zona de peligro",
-        "blurb": "¿Necesitas eliminar tu cuenta? Lo gestionamos bajo solicitud, contacta a nuestro equipo de soporte y nos encargaremos.",
-        "cta": "Enviar correo a soporte",
+        "subtitle": "Elimina tu cuenta de forma permanente.",
+        "blurb": "Eliminar tu cuenta quita tu acceso de forma permanente. Nuestro equipo gestiona esto bajo solicitud para que nada relacionado con una solicitud activa se pierda por error. Escríbenos y nos encargaremos rápidamente.",
+        "cta": "Solicitar eliminación de cuenta",
         "mailSubject": "Solicitud de eliminación de cuenta"
       }
     },
@@ -705,7 +698,9 @@
       "plannedBackend": "Próximamente"
     },
     "doc": {
-      "previewAlt": "Documento subido"
+      "previewAlt": "Documento subido",
+      "fileBadge": "ARCHIVO",
+      "viewFile": "Ver archivo"
     },
     "photo": {
       "title": "Foto de perfil",

@@ -22,5 +22,8 @@ public interface NadIdentityMapper {
 
     int markEmailVerified(@Param("userId") Long userId);
 
+    /** Sets the sign-in email to a new, already OTP-verified address in one statement. */
+    int changeEmail(@Param("userId") Long userId, @Param("email") String email);
+
     int touchPwdUpdateDate(@Param("userId") Long userId);
 }

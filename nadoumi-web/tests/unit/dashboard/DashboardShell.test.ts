@@ -36,8 +36,13 @@ describe('DashboardShell', () => {
 
   it('shows the real, buildable sidebar sections — nothing linking to an unbuilt feature', async () => {
     const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
-    for (const label of ['Overview', 'My Applications', 'Documents', 'Scholarships', 'Messages', 'Notifications', 'Help & Support', 'Education', 'Settings']) {
+    for (const label of ['Overview', 'My Applications', 'Documents', 'Messages', 'Notifications', 'Help & Support', 'Education', 'Settings']) {
       expect(w.text()).toContain(label)
     }
+  })
+
+  it('does not link to the public Scholarships page from the dashboard sidebar', async () => {
+    const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
+    expect(w.text()).not.toContain('Scholarships')
   })
 })
