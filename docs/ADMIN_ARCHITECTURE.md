@@ -103,6 +103,7 @@ in the nadoumi-web build**.
 | Operation logs | **IMPLEMENTED** (2026-09-06) | `views/logs/operlog.vue` — read-only table + detail dialog + clear-all. `/monitor/operlog/*`. |
 | Sign-in logs | **IMPLEMENTED** (2026-09-06) | `views/logs/logininfor.vue` — read-only table + clear-all. `/monitor/logininfor/*`. |
 | Notifications | **IMPLEMENTED** (2026-09-06) | `views/notifications/index.vue` — staff oversight of `GET /api/staff/notifications` (+ `/{id}` with per-channel delivery status), filter by type. Personal feed via the navbar bell (polls `GET /api/notifications/unread-count`, links to `/notifications`). |
+| Documents review | **IMPLEMENTED** (2026-09-21, consumes `nadoumi-document` API, PR #18) | `views/documents/index.vue` + `DocumentDrawer.vue`: queue over `GET /api/staff/documents` (applicant filter server-side; status/type filter and paging client-side because the endpoint is unpaged), detail with version history and audit events, verify / reject-with-reason gated by `nad:document:verify` / `:reject`, file access via `/versions/{n}/content` (`nad:document:download`; signed URL or streamed bytes chosen by the backend). Type labels from the `nad_document_type` dictionary. |
 | Applications (+ timeline / tasks / documents / decisions) | **PLANNED** — Phase C | No backend (Step 6). |
 | Partnerships | **PLANNED** — Phase D | No backend. |
 | Finance / Payments / Invoices / Revenue / Expenses / Payroll | **PLANNED** — Phase E | Greenfield modules (`nadoumi-payment` + `nadoumi-finance`, Step 9) — backend does not exist. |

@@ -38,7 +38,7 @@ export const NAV: NavGroup[] = [
     items: [
       { key: 'applicants', path: '/applicants', icon: 'User', perm: 'nad:applicant:list', status: 'implemented' },
       { key: 'applications', path: '/applications', icon: 'Tickets', perm: 'nad:application:list', status: 'planned' },
-      { key: 'documents', path: '/documents', icon: 'Folder', perm: 'nad:document:view', status: 'planned' },
+      { key: 'documents', path: '/documents', icon: 'Folder', perm: 'nad:document:view', status: 'implemented' },
     ],
   },
   {
