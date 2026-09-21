@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationMapper">
+
+    <resultMap id="application" type="com.nadoumi.application.domain.Application">
+        <id     property="id"                 column="id"/>
+        <result property="applicantId"        column="applicant_id"/>
+        <result property="applicationType"    column="application_type"/>
+        <result property="programId"          column="program_id"/>
+        <result property="scholarshipId"      column="scholarship_id"/>
+        <result property="intakeId"           column="intake_id"/>
+        <result property="workflowInstanceId" column="workflow_instance_id"/>
+        <result property="currentStageId"     column="current_stage_id"/>
+        <result property="currentStatus"      column="current_status"/>
+        <result property="assigneeUserId"     column="assignee_user_id"/>
+        <result property="submittedAt"        column="submitted_at"/>
+        <result property="version"            column="version"/>
+        <result property="createBy"           column="create_by"/>
+        <result property="createTime"         column="create_time"/>
+        <result property="updateBy"           column="update_by"/>
+        <result property="updateTime"         column="update_time"/>
+        <result property="remark"             column="remark"/>
+    </resultMap>
+
+    <select id="findById" resultMap="application">
+        select * from nad_application where id = #{id}
+    </select>
+
+    <select id="searchStaff" resultMap="application" parameterType="com.nadoumi.application.mapper.ApplicationSearch">
+        select * from nad_application
+        <where>
+            <if test="applicationType != null">and application_type = #{applicationType}</if>
+            <if test="currentStatus != null">and current_status = #{currentStatus}</if>
+            <if test="stageId != null">and current_stage_id = #{stageId}</if>
+            <if test="assigneeUserId != null">and assignee_user_id = #{assigneeUserId}</if>
+            <if test="scopeUserId != null">and (assignee_user_id = #{scopeUserId} or assignee_user_id is null)</if>
+            <if test="q != null and q != ''">and id = cast(#{q} as unsigned)</if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="findByApplicant" resultMap="application">
+        select * from nad_application where applicant_id = #{applicantId} order by create_time desc
+    </select>
+
+    <select id="findApplicantId" resultType="java.lang.Long">
+        select applicant_id from nad_application where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.Application"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application
+            (applicant_id, application_type, program_id, scholarship_id, intake_id,
+             workflow_instance_id, current_stage_id, current_status, version,
+             create_by, create_time)
+        values
+            (#{applicantId}, #{applicationType}, #{programId}, #{scholarshipId}, #{intakeId},
+             #{workflowInstanceId}, #{currentStageId}, #{currentStatus}, #{version},
+             #{createBy}, now())
+    </insert>
+
+    <update id="updateWithLock">
+        update nad_application
+           set current_stage_id  = #{app.currentStageId},
+               current_status    = #{app.currentStatus},
+               workflow_instance_id = #{app.workflowInstanceId},
+               assignee_user_id  = #{app.assigneeUserId},
+               submitted_at      = #{app.submittedAt},
+               version           = version + 1,
+               update_by         = #{app.updateBy},
+               update_time       = now()
+         where id = #{app.id}
+           and version = #{expectedVersion}
+    </update>
+
+    <update id="updateDraftFields" parameterType="com.nadoumi.application.domain.Application">
+        update nad_application
+           set program_id     = #{programId},
+               scholarship_id = #{scholarshipId},
+               intake_id      = #{intakeId},
+               update_by      = #{updateBy},
+               update_time    = now()
+         where id = #{id}
+    </update>
+
+    <update id="linkWorkflowInstance">
+        update nad_application set workflow_instance_id = #{workflowInstanceId} where id = #{id}
+    </update>
+
+</mapper>

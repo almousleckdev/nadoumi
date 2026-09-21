@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationTaskMapper">
+
+    <resultMap id="task" type="com.nadoumi.application.domain.ApplicationTask">
+        <id     property="id"                    column="id"/>
+        <result property="applicationId"         column="application_id"/>
+        <result property="wfStageTaskTemplateId" column="wf_stage_task_template_id"/>
+        <result property="title"                 column="title"/>
+        <result property="roleRequired"          column="role_required"/>
+        <result property="mandatory"             column="mandatory"/>
+        <result property="blocksExit"            column="blocks_exit"/>
+        <result property="status"                column="status"/>
+        <result property="assigneeUserId"        column="assignee_user_id"/>
+        <result property="dueAt"                 column="due_at"/>
+        <result property="skipReason"            column="skip_reason"/>
+        <result property="createBy"              column="create_by"/>
+        <result property="createTime"            column="create_time"/>
+        <result property="updateBy"              column="update_by"/>
+        <result property="updateTime"            column="update_time"/>
+    </resultMap>
+
+    <select id="findById" resultMap="task">
+        select * from nad_application_task where id = #{id}
+    </select>
+
+    <select id="findByApplication" resultMap="task">
+        select * from nad_application_task where application_id = #{applicationId} order by id
+    </select>
+
+    <select id="findByApplicationAndStatus" resultMap="task">
+        select * from nad_application_task where application_id = #{applicationId} and status = #{status}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.ApplicationTask"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_task
+            (application_id, wf_stage_task_template_id, title, role_required, mandatory, blocks_exit,
+             status, assignee_user_id, due_at, create_by, create_time)
+        values
+            (#{applicationId}, #{wfStageTaskTemplateId}, #{title}, #{roleRequired}, #{mandatory}, #{blocksExit},
+             #{status}, #{assigneeUserId}, #{dueAt}, #{createBy}, now())
+    </insert>
+
+    <update id="updateStatus">
+        update nad_application_task
+           set status = #{status}, skip_reason = #{skipReason}, update_by = #{updateBy}, update_time = now()
+         where id = #{id}
+    </update>
+
+</mapper>

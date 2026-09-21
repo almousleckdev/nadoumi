@@ -238,6 +238,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nadoumi</groupId>
+                <artifactId>nadoumi-application</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nadoumi</groupId>
                 <artifactId>nadoumi-document</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>

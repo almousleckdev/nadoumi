@@ -5,7 +5,7 @@ Status: **BASELINE** (Phase 1, approved). The first concrete
 `nad_application.application_type = 'PROGRAM_WITH_SCHOLARSHIP'`.
 
 > This is a **design artifact**. The seed rows in §8 are illustrative and are applied
-> as a Phase 3 Flyway migration (`V7`/`V8` region) — **not executed now**.
+> as a Phase 3 Flyway migration (`V66`/`V67`, renumbered from the original V7/V8 region) — **not executed now**.
 
 ---
 

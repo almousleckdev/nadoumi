@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationEventMapper">
+
+    <resultMap id="event" type="com.nadoumi.application.domain.ApplicationEvent">
+        <id     property="id"            column="id"/>
+        <result property="applicationId" column="application_id"/>
+        <result property="eventType"     column="event_type"/>
+        <result property="actorUserId"   column="actor_user_id"/>
+        <result property="at"            column="at"/>
+        <result property="detailJson"    column="detail_json"/>
+    </resultMap>
+
+    <select id="findByApplication" resultMap="event">
+        select * from nad_application_event where application_id = #{applicationId} order by `at`
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.ApplicationEvent"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_event (application_id, event_type, actor_user_id, `at`, detail_json)
+        values (#{applicationId}, #{eventType}, #{actorUserId}, now(), #{detailJson})
+    </insert>
+
+</mapper>

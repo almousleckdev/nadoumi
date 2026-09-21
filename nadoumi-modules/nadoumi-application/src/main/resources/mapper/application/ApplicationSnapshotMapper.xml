@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationSnapshotMapper">
+
+    <resultMap id="snapshot" type="com.nadoumi.application.domain.ApplicationSnapshot">
+        <id     property="id"            column="id"/>
+        <result property="applicationId" column="application_id"/>
+        <result property="kind"          column="kind"/>
+        <result property="payloadJson"   column="payload_json"/>
+        <result property="createdAt"     column="created_at"/>
+    </resultMap>
+
+    <select id="findByApplication" resultMap="snapshot">
+        select * from nad_application_snapshot where application_id = #{applicationId} order by created_at
+    </select>
+
+    <select id="findLatest" resultMap="snapshot">
+        select * from nad_application_snapshot
+        where application_id = #{applicationId} and kind = #{kind}
+        order by created_at desc limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.ApplicationSnapshot"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_snapshot (application_id, kind, payload_json, created_at)
+        values (#{applicationId}, #{kind}, #{payloadJson}, now())
+    </insert>
+
+</mapper>
