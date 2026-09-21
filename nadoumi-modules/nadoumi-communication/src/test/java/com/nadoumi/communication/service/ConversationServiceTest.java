@@ -91,6 +91,45 @@ class ConversationServiceTest {
                 org.mockito.ArgumentMatchers.eq("Hi there"), any());
     }
 
+    @Test
+    void openSupport_createsASupportConversationWithoutAnApplicantAndRejectsStaff() {
+        when(caller.isStaff()).thenReturn(false);
+        when(caller.requireUserId()).thenReturn(1L);
+        org.mockito.Mockito.doAnswer(inv -> {
+            inv.<Conversation>getArgument(0).setId(9L);
+            return 1;
+        }).when(conversations).insert(any());
+        Message posted = new Message();
+        posted.setId(100L);
+        posted.setConversationId(9L);
+        posted.setSenderUserId(1L);
+        posted.setBody("Help");
+        when(publisher.publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
+                org.mockito.ArgumentMatchers.eq("Help"), any())).thenReturn(posted);
+
+        var response = service.openSupport("Visa", "Help");
+
+        org.mockito.ArgumentCaptor<Conversation> saved = org.mockito.ArgumentCaptor.forClass(Conversation.class);
+        verify(conversations).insert(saved.capture());
+        assertThat(saved.getValue().getConversationType()).isEqualTo(ConversationType.SUPPORT);
+        assertThat(response.conversationId()).isEqualTo(9L);
+
+        when(caller.isStaff()).thenReturn(true);
+        assertThatThrownBy(() -> service.openSupport("Visa", "Help")).isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void listSupportMessagesForStaff_refusesAGeneralConversationAndANonStaffCaller() {
+        when(caller.isStaff()).thenReturn(true);
+        when(conversations.findById(9L)).thenReturn(conversation()); // GENERAL
+
+        assertThatThrownBy(() -> service.listSupportMessagesForStaff(9L, 0))
+                .isInstanceOf(com.nadoumi.common.exception.NadNotFoundException.class);
+
+        when(caller.isStaff()).thenReturn(false);
+        assertThatThrownBy(() -> service.listSupportMessagesForStaff(9L, 0)).isInstanceOf(AccessDeniedException.class);
+    }
+
     // ---- required security test: a non-participant cannot read or post to a conversation ----
 
     @Test

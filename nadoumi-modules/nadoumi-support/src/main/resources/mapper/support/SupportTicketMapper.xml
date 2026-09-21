@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.support.mapper.SupportTicketMapper">
+
+    <resultMap id="ticket" type="com.nadoumi.support.domain.SupportTicket">
+        <id     property="id"              column="id"/>
+        <result property="conversationId"  column="conversation_id"/>
+        <result property="applicantId"     column="applicant_id"/>
+        <result property="openedByUserId"  column="opened_by_user_id"/>
+        <result property="subject"         column="subject"/>
+        <result property="category"        column="category"/>
+        <result property="priority"        column="priority"/>
+        <result property="status"          column="status"/>
+        <result property="assignedStaffId" column="assigned_staff_id"/>
+        <result property="resolvedAt"      column="resolved_at"/>
+        <result property="closedAt"        column="closed_at"/>
+        <result property="createBy"        column="create_by"/>
+        <result property="createTime"      column="create_time"/>
+        <result property="updateTime"      column="update_time"/>
+    </resultMap>
+
+    <sql id="cols">id, conversation_id, applicant_id, opened_by_user_id, subject, category, priority, status,
+        assigned_staff_id, resolved_at, closed_at, create_by, create_time, update_time</sql>
+
+    <select id="findById" resultMap="ticket">
+        select <include refid="cols"/> from nad_support_ticket where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.support.domain.SupportTicket"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_support_ticket (conversation_id, applicant_id, opened_by_user_id, subject, category,
+                                        priority, status, assigned_staff_id, create_by, create_time)
+        values (#{conversationId}, #{applicantId}, #{openedByUserId}, #{subject}, #{category},
+                #{priority}, #{status}, #{assignedStaffId}, #{createBy}, now())
+    </insert>
+
+    <select id="listByOpener" resultMap="ticket">
+        select <include refid="cols"/> from nad_support_ticket
+        where opened_by_user_id = #{userId}
+        <if test="status != null">and status = #{status}</if>
+        order by id desc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="listForStaff" resultMap="ticket">
+        select <include refid="cols"/> from nad_support_ticket
+        <where>
+            <if test="status != null">and status = #{status}</if>
+            <if test="priority != null">and priority = #{priority}</if>
+            <if test="category != null">and category = #{category}</if>
+            <if test="assigneeId != null">and assigned_staff_id = #{assigneeId}</if>
+        </where>
+        order by id desc
+        limit #{limit} offset #{offset}
+    </select>
+
+    <update id="updateStatus">
+        update nad_support_ticket
+        set status = #{status},
+            resolved_at = case when #{status} = 'RESOLVED' then now() else resolved_at end,
+            closed_at = case when #{status} = 'CLOSED' then now() else closed_at end,
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id} and status = #{expected}
+    </update>
+
+    <update id="updateAssignee">
+        update nad_support_ticket set assigned_staff_id = #{assigneeId}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updatePriority">
+        update nad_support_ticket set priority = #{priority}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateCategory">
+        update nad_support_ticket set category = #{category}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+</mapper>

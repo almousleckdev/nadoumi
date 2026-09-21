@@ -28,6 +28,7 @@
         <module>nadoumi-program</module>
         <module>nadoumi-notification</module>
         <module>nadoumi-communication</module>
+        <module>nadoumi-support</module>
         <module>nadoumi-hr</module>
         <module>nadoumi-finance</module>
     </modules>
