@@ -348,7 +348,8 @@
       "settings": "Settings",
       "interests": "Interests",
       "location": "Location",
-      "work": "Work"
+      "work": "Work",
+      "applications": "My Applications"
     },
     "welcome": "Welcome back, {name}",
     "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
@@ -477,7 +478,53 @@
     "removeConfirm": "Remove this entry?",
     "interestsTitle": "Study interests",
     "locationTitle": "Current location",
-    "workTitle": "Work experience"
+    "workTitle": "Work experience",
+    "applications": {
+      "title": "My Applications",
+      "blurb": "Track every application you have started, from draft to decision.",
+      "detailTitle": "Application",
+      "empty": "You have not started an application yet.",
+      "browse": "Browse scholarships",
+      "submittedOn": "Submitted {date}",
+      "currentStage": "Current stage: {stage}",
+      "backToList": "Back to my applications",
+      "notFound": "We could not find this application.",
+      "timeline": "Progress",
+      "timelineEmpty": "No updates yet.",
+      "actions": "Actions",
+      "submit": "Submit application",
+      "submitHint": "This application is still a draft. Submit it when the details are ready.",
+      "submitted": "Your application has been submitted.",
+      "withdraw": "Withdraw application",
+      "withdrawReason": "Why are you withdrawing?",
+      "withdrawConfirm": "Confirm withdrawal",
+      "withdrawnNotice": "Your application has been withdrawn.",
+      "type": {
+        "PROGRAM_WITH_SCHOLARSHIP": "Programme with scholarship",
+        "PROGRAM_ONLY": "Programme application",
+        "UNKNOWN": "Application"
+      },
+      "status": {
+        "DRAFT": "Draft",
+        "IN_REVIEW": "In review",
+        "SUBMITTED_TO_UNIVERSITY": "Sent to university",
+        "DECISION": "Awaiting decision",
+        "OFFER": "Offer received",
+        "PRE_DEPARTURE": "Pre-departure",
+        "CLOSED_SUCCESS": "Enrolled",
+        "CLOSED_UNSUCCESSFUL": "Unsuccessful",
+        "CLOSED_WITHDRAWN": "Withdrawn",
+        "unknown": "In progress"
+      },
+      "event": {
+        "created": "Application started",
+        "submitted": "Application submitted",
+        "withdrawn": "Application withdrawn",
+        "offerAccepted": "You accepted the offer",
+        "offerDeclined": "You declined the offer",
+        "stageChanged": "Your application moved to the next stage"
+      }
+    }
   },
   "validation": {
     "required": "This field is required.",

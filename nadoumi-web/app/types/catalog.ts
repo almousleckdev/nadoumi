@@ -386,3 +386,21 @@ export interface NotificationView {
   readAt: string | null
   read: boolean
 }
+
+/**
+ * `/api/student/applications` — the student-safe view. It never carries internal notes,
+ * decision rationales, assignee identity or a university/partnership field.
+ * `timeline` is a list of plain, already-sanitised labels.
+ */
+export interface StudentApplicationDto {
+  id: number
+  applicationType: string | null
+  programId: number | null
+  scholarshipId: number | null
+  intakeId: number | null
+  currentStageName: string | null
+  currentStatus: string | null
+  /** `null` while the application is still a draft. */
+  submittedAt: string | null
+  timeline: string[]
+}

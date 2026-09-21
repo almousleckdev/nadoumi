@@ -348,7 +348,8 @@
       "settings": "Configuración",
       "interests": "Intereses",
       "location": "Ubicación",
-      "work": "Experiencia"
+      "work": "Experiencia",
+      "applications": "Mis solicitudes"
     },
     "welcome": "Bienvenido de nuevo, {name}",
     "overviewBlurb": "Completa tu perfil de solicitante para que el equipo pueda empezar a proponerte oportunidades.",
@@ -477,7 +478,53 @@
     "removeConfirm": "¿Eliminar esta entrada?",
     "interestsTitle": "Intereses académicos",
     "locationTitle": "Ubicación actual",
-    "workTitle": "Experiencia laboral"
+    "workTitle": "Experiencia laboral",
+    "applications": {
+      "title": "Mis solicitudes",
+      "blurb": "Sigue cada solicitud que has iniciado, desde el borrador hasta la decisión.",
+      "detailTitle": "Solicitud",
+      "empty": "Aún no has iniciado ninguna solicitud.",
+      "browse": "Explorar becas",
+      "submittedOn": "Enviada el {date}",
+      "currentStage": "Etapa actual: {stage}",
+      "backToList": "Volver a mis solicitudes",
+      "notFound": "No pudimos encontrar esta solicitud.",
+      "timeline": "Progreso",
+      "timelineEmpty": "Aún no hay novedades.",
+      "actions": "Acciones",
+      "submit": "Enviar solicitud",
+      "submitHint": "Esta solicitud sigue siendo un borrador. Envíala cuando los datos estén listos.",
+      "submitted": "Tu solicitud ha sido enviada.",
+      "withdraw": "Retirar solicitud",
+      "withdrawReason": "¿Por qué la retiras?",
+      "withdrawConfirm": "Confirmar retiro",
+      "withdrawnNotice": "Tu solicitud ha sido retirada.",
+      "type": {
+        "PROGRAM_WITH_SCHOLARSHIP": "Programa con beca",
+        "PROGRAM_ONLY": "Solicitud de programa",
+        "UNKNOWN": "Solicitud"
+      },
+      "status": {
+        "DRAFT": "Borrador",
+        "IN_REVIEW": "En revisión",
+        "SUBMITTED_TO_UNIVERSITY": "Enviada a la universidad",
+        "DECISION": "Esperando decisión",
+        "OFFER": "Oferta recibida",
+        "PRE_DEPARTURE": "Antes de la salida",
+        "CLOSED_SUCCESS": "Matriculado",
+        "CLOSED_UNSUCCESSFUL": "No aceptada",
+        "CLOSED_WITHDRAWN": "Retirada",
+        "unknown": "En curso"
+      },
+      "event": {
+        "created": "Solicitud iniciada",
+        "submitted": "Solicitud enviada",
+        "withdrawn": "Solicitud retirada",
+        "offerAccepted": "Aceptaste la oferta",
+        "offerDeclined": "Rechazaste la oferta",
+        "stageChanged": "Tu solicitud pasó a la siguiente etapa"
+      }
+    }
   },
   "validation": {
     "required": "Este campo es obligatorio.",

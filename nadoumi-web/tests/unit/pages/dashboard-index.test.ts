@@ -29,6 +29,7 @@ const listMine = vi.fn().mockResolvedValue([applicant])
 const markWelcomed = vi.fn()
 const publicGet = vi.fn().mockResolvedValue({ content: [], totalElements: 0, page: 0, size: 0, totalPages: 0 })
 const listNotifications = vi.fn().mockResolvedValue({ content: [], totalElements: 0 })
+const listApplications = vi.fn().mockResolvedValue([])
 
 vi.mock('~/composables/useSession', () => ({
   useSession: () => ({ user: ref({ userId: 1, username: 'ada', nickName: 'Ada' }), activeApplicantId: ref(1) }),
@@ -38,6 +39,9 @@ vi.mock('~/composables/useApplicant', () => ({
 }))
 vi.mock('~/composables/useNotifications', () => ({
   useNotifications: () => ({ list: listNotifications }),
+}))
+vi.mock('~/composables/useApplications', () => ({
+  useApplications: () => ({ list: listApplications }),
 }))
 mockNuxtImport('useApi', () => () => ({ publicGet, publicPost: vi.fn(), studentFetch: vi.fn() }))
 
@@ -88,5 +92,22 @@ describe('dashboard index', () => {
     })
     const w = await mountPage()
     expect(w.text()).toContain('Welcome to Nadoumi')
+  })
+
+  it('summarises the real applications, with their status, instead of the empty state', async () => {
+    listApplications.mockResolvedValueOnce([
+      { id: 7, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
+        currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-01T00:00:00', timeline: [] },
+    ])
+    const w = await mountPage()
+    expect(w.text()).toContain('Programme with scholarship')
+    expect(w.text()).toContain('In review')
+    expect(w.text()).not.toContain("You haven't started an application yet")
+  })
+
+  it('shows an inline error, not the empty state, when applications fail to load', async () => {
+    listApplications.mockRejectedValueOnce(new Error('boom'))
+    const w = await mountPage()
+    expect(w.text()).toContain('This section could not be loaded')
   })
 })

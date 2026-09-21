@@ -31,6 +31,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.applicants', i18n: true, perm: 'nad:applicant:view' },
       },
       {
+        path: 'applications',
+        name: 'Applications',
+        component: () => import('@/views/applications/index.vue'),
+        meta: { title: 'nav.items.applications', i18n: true, perm: 'nad:application:list' },
+      },
+      {
         path: 'universities',
         name: 'Universities',
         component: () => import('@/views/universities/index.vue'),
