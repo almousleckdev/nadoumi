@@ -250,7 +250,8 @@ class FlywayMigrationsIT {
         // 4 from V33 + 2 from V37 (TASK_PROGRESS) + 4 from V51 (UNIVERSITY/PROGRAM published)
         // + 2 from V53 (SCHOLARSHIP_DEADLINE_REMINDER) + 6 from V55 (WELCOME,
         // APPLICATION_SUBMITTED, APPLICATION_STATUS_CHANGED, each IN_APP + EMAIL)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("18");
+        // + 1 from V83 (MESSAGE_POSTED) + 3 from V89 (TICKET_OPENED/ASSIGNED/STATUS_CHANGED)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("22");
         // V34 — notification dispatch Quartz job, seeded active
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");
