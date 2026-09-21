@@ -88,6 +88,8 @@ public final class MediaCategoryPolicy {
                 MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 20 * MB, RESOURCE_RAW, "application/jw202"));
         RULES.put(MediaCategory.OTHER_ATTACHMENT, new CategoryRule(
                 MediaAccessClass.PROTECTED, DOCUMENT_MIME, 20 * MB, RESOURCE_RAW, "application/other"));
+        RULES.put(MediaCategory.MESSAGE_ATTACHMENT, new CategoryRule(
+                MediaAccessClass.PROTECTED, DOCUMENT_MIME, 15 * MB, RESOURCE_RAW, "message/attachment"));
 
         for (MediaCategory category : MediaCategory.values()) {
             if (!RULES.containsKey(category)) {

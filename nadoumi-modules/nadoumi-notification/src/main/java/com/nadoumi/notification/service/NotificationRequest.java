@@ -27,4 +27,16 @@ public record NotificationRequest(
             String body, String sourceRef, String dataJson) {
         return new NotificationRequest(recipientUserId, type, title, body, sourceRef, null, null, null, dataJson);
     }
+
+    /**
+     * Event-driven row that also carries the source aggregate's soft references
+     * ({@code application_id}/{@code conversation_id}/{@code message_id} on
+     * {@code nad_notification}) — populated when the outbox payload carries them,
+     * left {@code null} otherwise. See {@code docs/DOMAIN_EVENTS.md}.
+     */
+    public static NotificationRequest fromEvent(long recipientUserId, NotificationType type, String title,
+            String body, String sourceRef, Long applicationId, Long conversationId, Long messageId, String dataJson) {
+        return new NotificationRequest(recipientUserId, type, title, body, sourceRef,
+                applicationId, conversationId, messageId, dataJson);
+    }
 }

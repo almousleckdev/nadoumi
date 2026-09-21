@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.support.mapper.SupportTicketEventMapper">
+
+    <resultMap id="event" type="com.nadoumi.support.domain.SupportTicketEvent">
+        <id     property="id"          column="id"/>
+        <result property="ticketId"    column="ticket_id"/>
+        <result property="eventType"   column="event_type"/>
+        <result property="oldValue"    column="old_value"/>
+        <result property="newValue"    column="new_value"/>
+        <result property="actorUserId" column="actor_user_id"/>
+        <result property="createdAt"   column="created_at"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.nadoumi.support.domain.SupportTicketEvent"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_support_ticket_event (ticket_id, event_type, old_value, new_value, actor_user_id, created_at)
+        values (#{ticketId}, #{eventType}, #{oldValue}, #{newValue}, #{actorUserId}, now())
+    </insert>
+
+    <select id="listByTicket" resultMap="event">
+        select id, ticket_id, event_type, old_value, new_value, actor_user_id, created_at
+        from nad_support_ticket_event where ticket_id = #{ticketId} order by id asc
+    </select>
+</mapper>

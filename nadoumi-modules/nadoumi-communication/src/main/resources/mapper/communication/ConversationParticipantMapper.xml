@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.communication.mapper.ConversationParticipantMapper">
+
+    <resultMap id="participant" type="com.nadoumi.communication.domain.ConversationParticipant">
+        <id     property="id"                 column="id"/>
+        <result property="conversationId"     column="conversation_id"/>
+        <result property="userId"              column="user_id"/>
+        <result property="role"               column="role"/>
+        <result property="addedAt"            column="added_at"/>
+        <result property="removedAt"          column="removed_at"/>
+        <result property="lastReadMessageId"  column="last_read_message_id"/>
+        <result property="muted"              column="muted"/>
+    </resultMap>
+
+    <sql id="cols">id, conversation_id, user_id, role, added_at, removed_at, last_read_message_id, muted</sql>
+
+    <select id="findActive" resultMap="participant">
+        select <include refid="cols"/> from nad_conversation_participant
+        where conversation_id = #{conversationId} and user_id = #{userId} and removed_at is null
+    </select>
+
+    <select id="listActiveForUser" resultMap="participant">
+        select <include refid="cols"/> from nad_conversation_participant
+        where user_id = #{userId} and removed_at is null
+    </select>
+
+    <select id="listActiveForConversation" resultMap="participant">
+        select <include refid="cols"/> from nad_conversation_participant
+        where conversation_id = #{conversationId} and removed_at is null
+    </select>
+
+    <select id="hasActiveStaffParticipant" resultType="boolean">
+        select exists(
+            select 1 from nad_conversation_participant
+            where conversation_id = #{conversationId} and removed_at is null and role = 'STAFF'
+        )
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.communication.domain.ConversationParticipant"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_conversation_participant (conversation_id, user_id, role, added_at, muted)
+        values (#{conversationId}, #{userId}, #{role}, #{addedAt}, #{muted})
+    </insert>
+
+    <update id="remove">
+        update nad_conversation_participant set removed_at = #{removedAt}
+        where conversation_id = #{conversationId} and user_id = #{userId} and removed_at is null
+    </update>
+
+    <update id="updateLastRead">
+        update nad_conversation_participant set last_read_message_id = #{messageId}
+        where conversation_id = #{conversationId} and user_id = #{userId}
+    </update>
+</mapper>
