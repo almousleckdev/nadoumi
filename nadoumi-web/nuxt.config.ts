@@ -48,6 +48,8 @@ export default defineNuxtConfig({
     { path: '~/components/applicant', pathPrefix: false },
     // messages/ chat pieces (<MessageComposer>) referenced unprefixed by the dashboard pages.
     { path: '~/components/messages', pathPrefix: false },
+    // documents/ student document list components (<DocumentRow>, <AddDocumentForm>).
+    { path: '~/components/documents', pathPrefix: false },
     '~/components',
   ],
   fonts: {

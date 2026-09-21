@@ -31,6 +31,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.applicants', i18n: true, perm: 'nad:applicant:view' },
       },
       {
+        path: 'applications',
+        name: 'Applications',
+        component: () => import('@/views/applications/index.vue'),
+        meta: { title: 'nav.items.applications', i18n: true, perm: 'nad:application:list' },
+      },
+      {
         path: 'universities',
         name: 'Universities',
         component: () => import('@/views/universities/index.vue'),
@@ -59,6 +65,12 @@ export const routes: RouteRecordRaw[] = [
         name: 'ScholarshipDetail',
         component: () => import('@/views/scholarships/detail.vue'),
         meta: { title: 'nav.items.scholarships', i18n: true, perm: 'nad:scholarship:view' },
+      },
+      {
+        path: 'documents',
+        name: 'Documents',
+        component: () => import('@/views/documents/index.vue'),
+        meta: { title: 'nav.items.documents', i18n: true, perm: 'nad:document:view' },
       },
       {
         path: 'profile',
