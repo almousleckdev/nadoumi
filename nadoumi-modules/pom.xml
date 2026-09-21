@@ -24,11 +24,12 @@
         <module>nadoumi-identity</module>
         <module>nadoumi-applicant</module>
         <module>nadoumi-document</module>
-        <module>nadoumi-application</module>
         <module>nadoumi-university</module>
         <module>nadoumi-scholarship</module>
         <module>nadoumi-program</module>
         <module>nadoumi-notification</module>
+        <module>nadoumi-communication</module>
+        <module>nadoumi-support</module>
         <module>nadoumi-hr</module>
         <module>nadoumi-finance</module>
     </modules>

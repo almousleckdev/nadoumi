@@ -14,7 +14,7 @@ class MediaCategoryTest {
                         "UNIVERSITY_LOGO", "UNIVERSITY_BANNER", "UNIVERSITY_GALLERY",
                         "SCHOLARSHIP_HERO", "SCHOLARSHIP_COVER", "PROGRAM_IMAGE",
                         "APPLICANT_PHOTO", "APPLICANT_PASSPORT", "APPLICANT_DOCUMENT", "APPLICATION_DOCUMENT",
-                        "ADMISSION_DOCUMENT", "JW202", "OTHER_ATTACHMENT");
+                        "ADMISSION_DOCUMENT", "JW202", "OTHER_ATTACHMENT", "MESSAGE_ATTACHMENT");
     }
 
     @Test

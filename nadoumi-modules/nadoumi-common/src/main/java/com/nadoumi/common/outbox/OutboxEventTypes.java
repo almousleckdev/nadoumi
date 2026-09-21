@@ -43,4 +43,16 @@ public final class OutboxEventTypes {
      * <p>PLANNED — no producer yet; the Application module (platform Step 6) emits this.</p>
      */
     public static final String APPLICATION_STATUS_CHANGED = "ApplicationStatusChanged";
+
+    /** A message was posted to a conversation. Aggregate: {@code conversation}. */
+    public static final String MESSAGE_POSTED = "MessagePosted";
+
+    /** A student opened a support ticket. Aggregate: {@code support_ticket}. */
+    public static final String TICKET_OPENED = "TicketOpened";
+
+    /** A support ticket was assigned or reassigned to a staff member. Aggregate: {@code support_ticket}. */
+    public static final String TICKET_ASSIGNED = "TicketAssigned";
+
+    /** A support ticket the student is waiting on changed state (resolved / waiting on student). Aggregate: {@code support_ticket}. */
+    public static final String TICKET_STATUS_CHANGED = "TicketStatusChanged";
 }

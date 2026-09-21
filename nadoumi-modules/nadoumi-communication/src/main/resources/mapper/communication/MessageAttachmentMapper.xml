@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.communication.mapper.MessageAttachmentMapper">
+
+    <resultMap id="attachment" type="com.nadoumi.communication.domain.MessageAttachment">
+        <id     property="id"                  column="id"/>
+        <result property="messageId"           column="message_id"/>
+        <result property="mediaAssetId"        column="media_asset_id"/>
+        <result property="promotedDocumentId"  column="promoted_document_id"/>
+        <result property="createTime"          column="create_time"/>
+    </resultMap>
+
+    <sql id="cols">id, message_id, media_asset_id, promoted_document_id, create_time</sql>
+
+    <select id="findById" resultMap="attachment">
+        select <include refid="cols"/> from nad_message_attachment where id = #{id}
+    </select>
+
+    <select id="listByMessage" resultMap="attachment">
+        select <include refid="cols"/> from nad_message_attachment where message_id = #{messageId}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.communication.domain.MessageAttachment"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_message_attachment (message_id, media_asset_id, create_time)
+        values (#{messageId}, #{mediaAssetId}, now())
+    </insert>
+
+    <update id="setPromotedDocumentId">
+        update nad_message_attachment set promoted_document_id = #{documentId} where id = #{id}
+    </update>
+</mapper>
