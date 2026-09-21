@@ -36,4 +36,18 @@ describe('dashboard account page', () => {
     await w.find('[data-test="sign-out"]').trigger('click')
     expect(signOut).toHaveBeenCalled()
   })
+
+  it('links out to the real Profile and Documents pages instead of duplicating them', async () => {
+    const w = await mountSuspended(Account)
+
+    expect(w.findAll('a').some(a => a.attributes('href')?.includes('/dashboard/profile'))).toBe(true)
+    expect(w.findAll('a').some(a => a.attributes('href')?.includes('/dashboard/documents'))).toBe(true)
+  })
+
+  it('points email-change and account-deletion requests at support, not a fake self-service control', async () => {
+    const w = await mountSuspended(Account)
+
+    const mailLinks = w.findAll('a').filter(a => a.attributes('href')?.startsWith('mailto:support@nadoumi.com'))
+    expect(mailLinks.length).toBeGreaterThanOrEqual(2)
+  })
 })

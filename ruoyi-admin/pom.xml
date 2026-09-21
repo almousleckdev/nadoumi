@@ -77,6 +77,10 @@
         </dependency>
         <dependency>
             <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-document</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-university</artifactId>
         </dependency>
         <dependency>

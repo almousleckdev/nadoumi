@@ -27,4 +27,20 @@ describe('DashboardShell', () => {
     await w.find('[data-test="sign-out"]').trigger('click')
     expect(signOut).toHaveBeenCalled()
   })
+
+  it('also calls signOut from the sidebar', async () => {
+    const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
+    await w.find('[data-test="sidebar-sign-out"]').trigger('click')
+    expect(signOut).toHaveBeenCalled()
+  })
+
+  it('shows the real, buildable sidebar sections — nothing linking to an unbuilt feature', async () => {
+    const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
+    for (const label of ['Overview', 'Documents', 'Scholarships', 'Notifications', 'Education', 'Settings']) {
+      expect(w.text()).toContain(label)
+    }
+    for (const notYetBuilt of ['My Applications', 'Messages', 'Help & Support']) {
+      expect(w.text()).not.toContain(notYetBuilt)
+    }
+  })
 })

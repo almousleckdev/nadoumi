@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.document.mapper.DocumentMapper">
+
+    <resultMap id="document" type="com.nadoumi.document.domain.Document">
+        <id     property="id"               column="id"/>
+        <result property="applicantId"      column="applicant_id"/>
+        <result property="applicationId"    column="application_id"/>
+        <result property="docType"          column="doc_type"/>
+        <result property="status"           column="status"/>
+        <result property="currentVersionId" column="current_version_id"/>
+        <result property="reviewerUserId"   column="reviewer_user_id"/>
+        <result property="rejectionReason"  column="rejection_reason"/>
+        <result property="expiresOn"        column="expires_on"/>
+        <result property="createBy"         column="create_by"/>
+        <result property="createTime"       column="create_time"/>
+        <result property="updateBy"         column="update_by"/>
+        <result property="updateTime"       column="update_time"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, applicant_id, application_id, doc_type, status, current_version_id, reviewer_user_id,
+        rejection_reason, expires_on, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="findById" resultMap="document">
+        select <include refid="cols"/> from nad_document where id = #{id}
+    </select>
+
+    <select id="findByApplicant" resultMap="document">
+        select <include refid="cols"/> from nad_document
+        where applicant_id = #{applicantId}
+        <if test="applicationId != null">and application_id = #{applicationId}</if>
+        order by create_time desc, id desc
+    </select>
+
+    <select id="search" resultMap="document">
+        select <include refid="cols"/> from nad_document
+        <where>
+            <if test="applicantId != null">and applicant_id = #{applicantId}</if>
+            <if test="applicationId != null">and application_id = #{applicationId}</if>
+        </where>
+        order by create_time desc, id desc
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.document.domain.Document"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_document
+            (applicant_id, application_id, doc_type, status, create_by, create_time)
+        values
+            (#{applicantId}, #{applicationId}, #{docType}, #{status}, #{createBy}, now())
+    </insert>
+
+    <update id="updateCurrentVersion">
+        update nad_document set current_version_id = #{currentVersionId}, status = #{status},
+            update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        update nad_document set status = #{status}, reviewer_user_id = #{reviewerUserId},
+            rejection_reason = #{rejectionReason}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDraft">
+        delete from nad_document where id = #{id} and status = 'DRAFT'
+    </delete>
+</mapper>

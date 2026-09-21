@@ -13,7 +13,7 @@ const { t } = useI18n()
     <div class="flex items-start justify-between gap-3">
       <div>
         <h3 class="font-display font-semibold text-slate-900">{{ title }}</h3>
-        <p class="mt-1 text-sm text-slate-500">{{ guidance }}</p>
+        <p v-if="guidance" class="mt-1 text-sm text-slate-500">{{ guidance }}</p>
       </div>
       <NBadge :tone="DOCUMENT_STATUS_TONES[status]">{{ t(`onboarding.docStatus.${status}`) }}</NBadge>
     </div>

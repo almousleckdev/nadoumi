@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.document.mapper.DocumentEventMapper">
+
+    <resultMap id="event" type="com.nadoumi.document.domain.DocumentEvent">
+        <id     property="id"          column="id"/>
+        <result property="documentId"  column="document_id"/>
+        <result property="eventType"   column="event_type"/>
+        <result property="actorUserId" column="actor_user_id"/>
+        <result property="at"          column="at"/>
+        <result property="detailJson"  column="detail_json"/>
+    </resultMap>
+
+    <select id="findByDocument" resultMap="event">
+        select id, document_id, event_type, actor_user_id, at, detail_json
+        from nad_document_event where document_id = #{documentId} order by at desc, id desc
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.document.domain.DocumentEvent"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_document_event (document_id, event_type, actor_user_id, at, detail_json)
+        values (#{documentId}, #{eventType}, #{actorUserId}, now(), #{detailJson})
+    </insert>
+</mapper>

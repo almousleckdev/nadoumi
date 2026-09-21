@@ -57,7 +57,7 @@ describe('dashboard index', () => {
   it('shows the welcome header and real document status for the active applicant', async () => {
     const w = await mountPage()
     expect(w.text()).toContain('Welcome back')
-    expect(w.text()).toContain('Ada')
+    expect(w.text()).toContain('ADA') // the applicant's given name (uppercase, matches the passport-name convention), not the account nickname
     expect(w.text()).toContain('Profile photo')
     expect(w.text()).toContain('Passport')
     expect(w.text()).toContain('Required') // neither uploaded yet
