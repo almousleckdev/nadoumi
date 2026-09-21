@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.document.mapper.DocumentRequirementMapper">
+
+    <resultMap id="requirement" type="com.nadoumi.document.domain.DocumentRequirement">
+        <id     property="id"        column="id"/>
+        <result property="scope"     column="scope"/>
+        <result property="refId"     column="ref_id"/>
+        <result property="docType"   column="doc_type"/>
+        <result property="mandatory" column="mandatory"/>
+        <result property="waivable"  column="waivable"/>
+        <result property="notes"     column="notes"/>
+        <result property="createBy"  column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy"  column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, scope, ref_id, doc_type, mandatory, waivable, notes, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="findByScope" resultMap="requirement">
+        select <include refid="cols"/> from nad_document_requirement
+        where scope = #{scope} and ref_id = #{refId} order by id
+    </select>
+
+    <select id="findByScopeRefs" resultMap="requirement">
+        select <include refid="cols"/> from nad_document_requirement
+        where scope = #{scope} and ref_id in
+        <foreach collection="refIds" item="x" open="(" separator="," close=")">#{x}</foreach>
+        order by ref_id, id
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.document.domain.DocumentRequirement"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_document_requirement (scope, ref_id, doc_type, mandatory, waivable, notes, create_by, create_time)
+        values (#{scope}, #{refId}, #{docType}, #{mandatory}, #{waivable}, #{notes}, #{createBy}, now())
+    </insert>
+</mapper>

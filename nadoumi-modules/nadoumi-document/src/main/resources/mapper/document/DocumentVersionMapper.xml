@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.document.mapper.DocumentVersionMapper">
+
+    <resultMap id="version" type="com.nadoumi.document.domain.DocumentVersion">
+        <id     property="id"                 column="id"/>
+        <result property="documentId"         column="document_id"/>
+        <result property="versionNo"          column="version_no"/>
+        <result property="mediaAssetId"       column="media_asset_id"/>
+        <result property="contentType"        column="content_type"/>
+        <result property="sizeBytes"          column="size_bytes"/>
+        <result property="checksumSha256"     column="checksum_sha256"/>
+        <result property="uploadedBy"         column="uploaded_by"/>
+        <result property="uploadedAt"         column="uploaded_at"/>
+        <result property="verificationStatus" column="verification_status"/>
+        <result property="verifiedBy"         column="verified_by"/>
+        <result property="verifiedAt"         column="verified_at"/>
+        <result property="scanStatus"         column="scan_status"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, document_id, version_no, media_asset_id, content_type, size_bytes, checksum_sha256,
+        uploaded_by, uploaded_at, verification_status, verified_by, verified_at, scan_status
+    </sql>
+
+    <select id="findById" resultMap="version">
+        select <include refid="cols"/> from nad_document_version where id = #{id}
+    </select>
+
+    <select id="findByDocument" resultMap="version">
+        select <include refid="cols"/> from nad_document_version
+        where document_id = #{documentId} order by version_no desc
+    </select>
+
+    <select id="maxVersionNo" resultType="int">
+        select coalesce(max(version_no), 0) from nad_document_version where document_id = #{documentId}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.document.domain.DocumentVersion"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_document_version
+            (document_id, version_no, media_asset_id, content_type, size_bytes, checksum_sha256,
+             uploaded_by, uploaded_at, verification_status, scan_status)
+        values
+            (#{documentId}, #{versionNo}, #{mediaAssetId}, #{contentType}, #{sizeBytes}, #{checksumSha256},
+             #{uploadedBy}, now(), #{verificationStatus}, 'PENDING')
+    </insert>
+
+    <update id="updateVerification">
+        update nad_document_version set verification_status = #{status}, verified_by = #{verifiedBy}, verified_at = now()
+        where id = #{id}
+    </update>
+</mapper>
