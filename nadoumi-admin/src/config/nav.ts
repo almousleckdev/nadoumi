@@ -37,8 +37,8 @@ export const NAV: NavGroup[] = [
     key: 'operations',
     items: [
       { key: 'applicants', path: '/applicants', icon: 'User', perm: 'nad:applicant:list', status: 'implemented' },
-      { key: 'applications', path: '/applications', icon: 'Tickets', perm: 'nad:application:list', status: 'planned' },
-      { key: 'documents', path: '/documents', icon: 'Folder', perm: 'nad:document:view', status: 'planned' },
+      { key: 'applications', path: '/applications', icon: 'Tickets', perm: 'nad:application:list', status: 'implemented' },
+      { key: 'documents', path: '/documents', icon: 'Folder', perm: 'nad:document:view', status: 'implemented' },
     ],
   },
   {
@@ -84,7 +84,7 @@ export const NAV: NavGroup[] = [
   {
     key: 'communication',
     items: [
-      { key: 'conversations', path: '/conversations', icon: 'ChatDotRound', perm: 'nad:conversation:view', status: 'planned' },
+      { key: 'conversations', path: '/conversations', icon: 'ChatDotRound', perm: 'nad:conversation:participate', status: 'implemented' },
       { key: 'support', path: '/support', icon: 'Headset', perm: 'nad:support:ticket:view', status: 'implemented' },
       { key: 'notifications', path: '/notifications', icon: 'Bell', status: 'implemented' },
     ],
