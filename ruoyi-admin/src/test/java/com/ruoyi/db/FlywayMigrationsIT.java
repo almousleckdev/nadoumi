@@ -19,7 +19,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
- * Runs the real {@code db/migration} chain (V1 baseline + the Nadoumi V2..V89
+ * Runs the real {@code db/migration} chain (V1 baseline + the Nadoumi V2..V90
  * migrations) against a throwaway MySQL, both on a fresh database and on one that
  * already carries the RuoYi schema. Auto-skips without Docker so {@code mvn package}
  * still passes locally; CI has a daemon.
@@ -86,9 +86,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V89 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V90 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(80);
+        assertThat(applied).isEqualTo(81);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -354,14 +354,21 @@ class FlywayMigrationsIT {
                 + "WHERE invoke_target = 'scholarshipDeadlineReminderJob.run()'")).isEqualTo("0");
 
         // V54 — university catalog import (22 China universities as DRAFT / PROSPECT)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university WHERE create_by = 'import'")).isEqualTo("22");
+        // V90 — second catalog import (48 more China institutions, same convention).
+        // Both use create_by='import', so these counts are the combined total.
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university WHERE create_by = 'import'")).isEqualTo("70");
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_university "
                 + "WHERE create_by = 'import' AND (publish_status <> 'DRAFT' OR partner_status <> 'PROSPECT')")).isEqualTo("0");
-        assertThat(single(ds, "SELECT COUNT(DISTINCT reference_code) FROM nad_university WHERE create_by = 'import'")).isEqualTo("22");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT reference_code) FROM nad_university WHERE create_by = 'import'")).isEqualTo("70");
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_highlight h "
-                + "JOIN nad_university u ON u.id = h.university_id AND u.create_by = 'import'")).isEqualTo("430");
+                + "JOIN nad_university u ON u.id = h.university_id AND u.create_by = 'import'")).isEqualTo("1390");
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_ranking r "
-                + "JOIN nad_university u ON u.id = r.university_id AND u.create_by = 'import'")).isEqualTo("66");
+                + "JOIN nad_university u ON u.id = r.university_id AND u.create_by = 'import'")).isEqualTo("96");
+        // V90 spot-checks: a couple of the new rows exist with the expected identity
+        assertThat(single(ds, "SELECT type FROM nad_university WHERE name = 'Wuhan University' AND country = 'CN'"))
+                .isEqualTo("PUBLIC");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university WHERE name = 'Wenzhou-Kean University' AND country = 'CN'"))
+                .isEqualTo("1");
 
         // V5 — RuoYi demo data replaced by the Nadoumi baseline
         assertThat(single(ds, "SELECT user_type FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("00");
@@ -391,7 +398,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(79); // V2..V89, same gaps as above
+        assertThat(applied).isEqualTo(80); // V2..V90, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
