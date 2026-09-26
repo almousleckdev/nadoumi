@@ -20,4 +20,22 @@ describe('SiteFooter', () => {
     expect(qr).toBeTruthy()
     expect(qr!.element.closest('a')).toBeNull()
   })
+
+  it('renders clean hover popover cards for both WhatsApp and WeChat with QR codes', async () => {
+    const w = await mountSuspended(SiteFooter)
+
+    const waPopover = w.find('[data-test="whatsapp-popover"]')
+    expect(waPopover.exists()).toBe(true)
+    const waImg = waPopover.find('img')
+    expect(waImg.exists()).toBe(true)
+    expect(waImg.attributes('src')).toContain('whatsapp')
+    expect(waPopover.text()).toContain('WhatsApp')
+
+    const wcPopover = w.find('[data-test="wechat-popover"]')
+    expect(wcPopover.exists()).toBe(true)
+    const wcImg = wcPopover.find('img')
+    expect(wcImg.exists()).toBe(true)
+    expect(wcImg.attributes('src')).toContain('wechat')
+    expect(wcPopover.text()).toContain('WeChat')
+  })
 })

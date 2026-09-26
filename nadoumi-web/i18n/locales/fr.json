@@ -14,7 +14,10 @@
   "footer": {
     "mission": "Nadoumi aide les étudiants internationaux à découvrir et obtenir des opportunités d'études à l'étranger.",
     "whatsapp": "Discutez avec nous sur WhatsApp",
+    "whatsappScanHint": "Scannez le code QR ou cliquez ci-dessous pour discuter avec notre équipe",
+    "whatsappOpenChat": "Ouvrir la discussion WhatsApp",
     "wechat": "Scannez pour nous ajouter sur WeChat",
+    "wechatScanHint": "Scannez le code QR pour ajouter Nadoumi sur WeChat",
     "explore": "Explorer",
     "company": "Entreprise",
     "getStarted": "Commencer",

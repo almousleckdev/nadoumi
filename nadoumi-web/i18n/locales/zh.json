@@ -14,7 +14,10 @@
   "footer": {
     "mission": "Nadoumi 帮助国际学生发现并获得海外留学机会。",
     "whatsapp": "通过 WhatsApp 与我们联系",
+    "whatsappScanHint": "扫码或点击下方直接联系我们的团队",
+    "whatsappOpenChat": "打开 WhatsApp 对话",
     "wechat": "扫码添加我们的微信",
+    "wechatScanHint": "扫描二维码添加 Nadoumi 微信",
     "explore": "浏览",
     "company": "公司",
     "getStarted": "立即开始",
