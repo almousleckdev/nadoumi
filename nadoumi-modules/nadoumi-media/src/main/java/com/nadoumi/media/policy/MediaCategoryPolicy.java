@@ -39,6 +39,17 @@ public final class MediaCategoryPolicy {
     private static final Set<String> DOCUMENT_MIME = Set.of("application/pdf", "image/jpeg", "image/png");
 
     /**
+     * Message attachments additionally accept Word documents (CLAUDE.md's Messaging
+     * requirement is "photo, documents — PDF, Word, and so on"), and webp for photos.
+     * Scoped to this one category so it does not loosen ADMISSION_DOCUMENT / JW202 /
+     * OTHER_ATTACHMENT, which keep the narrower {@link #DOCUMENT_MIME} allow-list.
+     */
+    private static final Set<String> MESSAGE_ATTACHMENT_MIME = Set.of(
+            "application/pdf", "image/jpeg", "image/png", "image/webp",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
+    /**
      * Resolved policy for one {@link MediaCategory}.
      *
      * @param defaultAccessClass access class applied when the upload command does not override it
@@ -89,7 +100,7 @@ public final class MediaCategoryPolicy {
         RULES.put(MediaCategory.OTHER_ATTACHMENT, new CategoryRule(
                 MediaAccessClass.PROTECTED, DOCUMENT_MIME, 20 * MB, RESOURCE_RAW, "application/other"));
         RULES.put(MediaCategory.MESSAGE_ATTACHMENT, new CategoryRule(
-                MediaAccessClass.PROTECTED, DOCUMENT_MIME, 15 * MB, RESOURCE_RAW, "message/attachment"));
+                MediaAccessClass.PROTECTED, MESSAGE_ATTACHMENT_MIME, 15 * MB, RESOURCE_RAW, "message/attachment"));
 
         for (MediaCategory category : MediaCategory.values()) {
             if (!RULES.containsKey(category)) {

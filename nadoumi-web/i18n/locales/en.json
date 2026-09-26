@@ -432,7 +432,13 @@
       "threadEmpty": "No messages yet.",
       "reconnecting": "Reconnecting to live updates",
       "composer": "Write a message",
-      "attachment": "Attachment"
+      "attachment": "Attachment",
+      "attach": "Attach a file",
+      "attachmentBadType": "Only images, PDF or Word documents are accepted.",
+      "attachmentUploadFailed": "Upload failed. Remove it and try again.",
+      "removeAttachment": "Remove attachment",
+      "attachmentUnavailable": "Attachment unavailable",
+      "viewAttachment": "View"
     },
     "profileTitle": "Applicant profile",
     "createProfileTitle": "Create your applicant profile",

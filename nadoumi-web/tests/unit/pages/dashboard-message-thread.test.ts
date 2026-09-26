@@ -3,6 +3,7 @@ import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
 import Thread from '~/pages/dashboard/messages/[id].vue'
 import { MESSAGE_PAGE_SIZE, type ConversationMessage, type ConversationSummary } from '~/types/messages'
+import { fakeFile, pickFile } from '../helpers/files'
 
 const M = (id: number, over: Partial<ConversationMessage> = {}): ConversationMessage => ({
   id, conversationId: 9, senderUserId: 2, senderName: 'Staff Sam', body: `message ${id}`,
@@ -17,10 +18,12 @@ const listConversations = vi.fn()
 const listMessages = vi.fn()
 const post = vi.fn()
 const markRead = vi.fn()
+const uploadAttachment = vi.fn()
+const attachmentAccess = vi.fn()
 const stream = vi.hoisted(() => ({ onPing: undefined as undefined | ((id: number) => void) }))
 
 vi.mock('~/composables/useMessages', () => ({
-  useMessages: () => ({ listConversations, listMessages, post, markRead }),
+  useMessages: () => ({ listConversations, listMessages, post, markRead, uploadAttachment, attachmentAccess }),
 }))
 vi.mock('~/composables/useSession', () => ({
   useSession: () => ({ user: ref({ userId: 1, username: 'ada', nickName: 'Ada' }) }),
@@ -45,6 +48,8 @@ beforeEach(() => {
   listMessages.mockReset().mockResolvedValue([M(2), M(1)])
   post.mockReset()
   markRead.mockReset().mockResolvedValue(undefined)
+  uploadAttachment.mockReset()
+  attachmentAccess.mockReset()
 })
 
 describe('dashboard message thread', () => {
@@ -92,7 +97,7 @@ describe('dashboard message thread', () => {
     await w.find('form').trigger('submit')
     await flushPromises()
 
-    expect(post).toHaveBeenCalledWith(9, 'Thanks!')
+    expect(post).toHaveBeenCalledWith(9, 'Thanks!', [])
     expect(w.text()).toContain('Thanks!')
     expect((w.find('#thread-composer').element as HTMLTextAreaElement).value).toBe('')
   })
@@ -153,5 +158,76 @@ describe('dashboard message thread', () => {
 
     expect(w.find('[data-test="closed"]').exists()).toBe(true)
     expect(w.find('#thread-composer').exists()).toBe(false)
+  })
+
+  // ---- attachments (real-time chat: photos, PDFs, Word docs) ----
+
+  it('uploads a picked file then sends it as an attachment, with no caption required', async () => {
+    uploadAttachment.mockResolvedValue({ mediaId: 55 })
+    post.mockResolvedValue(M(3, { senderUserId: 1, senderName: 'Ada', body: '', attachments: [
+      { id: 1, mediaAssetId: 55, filename: 'scan.pdf', contentType: 'application/pdf', byteSize: 100 },
+    ] }))
+    const w = await mountThread()
+
+    await pickFile(w, fakeFile('scan.pdf', 'application/pdf'))
+    await flushPromises()
+    expect(uploadAttachment).toHaveBeenCalledWith(9, expect.any(File))
+    expect(w.find('[data-test="pending-attachment"]').text()).toContain('scan.pdf')
+
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(post).toHaveBeenCalledWith(9, '', [55])
+  })
+
+  it('lets the student remove a picked attachment before sending', async () => {
+    uploadAttachment.mockResolvedValue({ mediaId: 55 })
+    const w = await mountThread()
+
+    await pickFile(w, fakeFile('scan.pdf', 'application/pdf'))
+    await flushPromises()
+    expect(w.find('[data-test="pending-attachment"]').exists()).toBe(true)
+
+    await w.find('[data-test="pending-attachment"] button').trigger('click')
+
+    expect(w.find('[data-test="pending-attachment"]').exists()).toBe(false)
+  })
+
+  it('refuses an unsupported attachment type before it ever uploads', async () => {
+    const w = await mountThread()
+
+    await pickFile(w, fakeFile('movie.mp4', 'video/mp4'))
+    await flushPromises()
+
+    expect(uploadAttachment).not.toHaveBeenCalled()
+    expect(w.text()).toContain('Only images, PDF or Word documents are accepted.')
+  })
+
+  it('renders a received image attachment inline via a signed URL', async () => {
+    attachmentAccess.mockResolvedValue({ url: 'https://cdn.example.com/photo.jpg', expiresAt: '2099-01-01', filename: 'photo.jpg', contentType: 'image/jpeg' })
+    listMessages.mockResolvedValue([M(1, { body: '', attachments: [
+      { id: 9, mediaAssetId: 55, filename: 'photo.jpg', contentType: 'image/jpeg', byteSize: 100 },
+    ] })])
+    const w = await mountThread()
+    await flushPromises()
+
+    expect(attachmentAccess).toHaveBeenCalledWith(9, 9)
+    const img = w.find('img[alt="photo.jpg"]')
+    expect(img.exists()).toBe(true)
+    expect(img.attributes('src')).toBe('https://cdn.example.com/photo.jpg')
+  })
+
+  it('renders a received document attachment as a view link, not an image', async () => {
+    attachmentAccess.mockResolvedValue({ url: 'https://cdn.example.com/scan.pdf', expiresAt: '2099-01-01', filename: 'scan.pdf', contentType: 'application/pdf' })
+    listMessages.mockResolvedValue([M(1, { body: '', attachments: [
+      { id: 9, mediaAssetId: 55, filename: 'scan.pdf', contentType: 'application/pdf', byteSize: 100 },
+    ] })])
+    const w = await mountThread()
+    await flushPromises()
+
+    expect(w.find('img').exists()).toBe(false)
+    const link = w.findAll('a').find(a => a.attributes('href') === 'https://cdn.example.com/scan.pdf')
+    expect(link).toBeTruthy()
+    expect(link!.text()).toContain('scan.pdf')
   })
 })

@@ -432,7 +432,13 @@
       "threadEmpty": "لا توجد رسائل بعد.",
       "reconnecting": "جارٍ إعادة الاتصال بالتحديثات المباشرة",
       "composer": "اكتب رسالة",
-      "attachment": "مرفق"
+      "attachment": "مرفق",
+      "attach": "إرفاق ملف",
+      "attachmentBadType": "يُسمح فقط بالصور أو ملفات PDF أو مستندات Word.",
+      "attachmentUploadFailed": "فشل الرفع. احذفه وحاول مرة أخرى.",
+      "removeAttachment": "إزالة المرفق",
+      "attachmentUnavailable": "المرفق غير متاح",
+      "viewAttachment": "عرض"
     },
     "profileTitle": "الملف التعريفي للمتقدم",
     "createProfileTitle": "أنشئ ملفك التعريفي كمتقدم",

@@ -57,8 +57,11 @@ abstract class AbstractMediaStorage implements MediaStorageService {
     protected abstract StoredObject store(MediaUploadCommand cmd, byte[] bytes, String deliveryType, String folder,
             CategoryRule rule);
 
-    /** A short-lived download URL for a PROTECTED asset. */
+    /** A short-lived, forced-download URL for a PROTECTED asset. */
     protected abstract SignedUrl signed(MediaAsset row, Duration ttl);
+
+    /** A short-lived URL for a PROTECTED asset meant for inline rendering, never a forced download. */
+    protected abstract SignedUrl signedInline(MediaAsset row, Duration ttl);
 
     /** Opens the bytes of a PROTECTED / SENSITIVE asset for backend proxying. */
     protected abstract ProxyStream openProviderStream(MediaAsset row);
@@ -89,6 +92,13 @@ abstract class AbstractMediaStorage implements MediaStorageService {
         MediaAsset row = require(assetId);
         requireAccessClass(row, MediaAccessClass.PROTECTED, "signedUrl");
         return signed(row, ttl);
+    }
+
+    @Override
+    public SignedUrl inlineSignedUrl(long assetId, Duration ttl) {
+        MediaAsset row = require(assetId);
+        requireAccessClass(row, MediaAccessClass.PROTECTED, "inlineSignedUrl");
+        return signedInline(row, ttl);
     }
 
     @Override

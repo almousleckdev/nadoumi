@@ -72,6 +72,12 @@ public class LocalFilesystemMediaStorage extends AbstractMediaStorage {
         return new SignedUrl(baseUrl + URL_PREFIX + row.getPublicId(), Instant.now().plus(ttl));
     }
 
+    /** Static files carry no disposition header either way, so inline and download are the same URL here. */
+    @Override
+    protected SignedUrl signedInline(MediaAsset row, Duration ttl) {
+        return signed(row, ttl);
+    }
+
     @Override
     protected ProxyStream openProviderStream(MediaAsset row) {
         Path file = baseDir.resolve(row.getPublicId());

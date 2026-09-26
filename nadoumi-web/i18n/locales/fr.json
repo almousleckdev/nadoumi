@@ -432,7 +432,13 @@
       "threadEmpty": "Aucun message pour le moment.",
       "reconnecting": "Reconnexion aux mises à jour en direct",
       "composer": "Écrire un message",
-      "attachment": "Pièce jointe"
+      "attachment": "Pièce jointe",
+      "attach": "Joindre un fichier",
+      "attachmentBadType": "Seules les images, les PDF ou les documents Word sont acceptés.",
+      "attachmentUploadFailed": "Échec de l'envoi. Retirez-le et réessayez.",
+      "removeAttachment": "Retirer la pièce jointe",
+      "attachmentUnavailable": "Pièce jointe indisponible",
+      "viewAttachment": "Voir"
     },
     "profileTitle": "Profil du candidat",
     "createProfileTitle": "Créez votre profil de candidat",

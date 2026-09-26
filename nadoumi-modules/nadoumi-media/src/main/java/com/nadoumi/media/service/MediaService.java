@@ -119,6 +119,18 @@ public class MediaService implements MediaGateway {
     }
 
     @Override
+    public SignedUrl issueInlineSignedUrl(long assetId, MediaAccessLogContext ctx) {
+        StoredAsset asset = require(assetId);
+        if (asset.accessClass() != MediaAccessClass.PROTECTED) {
+            throw new IllegalArgumentException("issueInlineSignedUrl is only for PROTECTED assets; media asset "
+                    + assetId + " is " + asset.accessClass());
+        }
+        int ttlSeconds = properties.getSignedUrlTtlSeconds();
+        accessLog.granted(assetId, ctx, MediaAccessLogWriter.KIND_SIGNED_URL_ISSUED, ttlSeconds);
+        return storage.inlineSignedUrl(assetId, Duration.ofSeconds(ttlSeconds));
+    }
+
+    @Override
     public ProxyStream openProxyStream(long assetId, MediaAccessLogContext ctx) {
         StoredAsset asset = require(assetId);
         MediaAccessClass accessClass = asset.accessClass();

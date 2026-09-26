@@ -61,8 +61,9 @@ public class ApplicantMediaService {
     }
 
     /**
-     * A short-TTL signed URL, with a {@code nad_media_access_log} entry. A caller without
-     * {@code VIEW_PROFILE} gets a logged denial and a 403.
+     * A short-TTL signed URL meant for inline rendering (the photo/scan preview), with
+     * a {@code nad_media_access_log} entry. A caller without {@code VIEW_PROFILE} gets
+     * a logged denial and a 403.
      */
     public SignedUrl signedUrl(long applicantId, ApplicantMediaKind kind, MediaAccessLogContext ctx) {
         Applicant applicant = mapper.findById(applicantId);
@@ -82,7 +83,7 @@ public class ApplicantMediaService {
         if (mediaId == null) {
             throw new NadNotFoundException("applicant has no " + kind.name().toLowerCase());
         }
-        return media.issueSignedUrl(mediaId, ctx);
+        return media.issueInlineSignedUrl(mediaId, ctx);
     }
 
     private long currentUserId() {

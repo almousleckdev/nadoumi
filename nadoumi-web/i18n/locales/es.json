@@ -432,7 +432,13 @@
       "threadEmpty": "Aún no hay mensajes.",
       "reconnecting": "Reconectando con las actualizaciones en vivo",
       "composer": "Escribe un mensaje",
-      "attachment": "Adjunto"
+      "attachment": "Adjunto",
+      "attach": "Adjuntar un archivo",
+      "attachmentBadType": "Solo se aceptan imágenes, PDF o documentos Word.",
+      "attachmentUploadFailed": "Error al subir. Elimínalo e inténtalo de nuevo.",
+      "removeAttachment": "Quitar adjunto",
+      "attachmentUnavailable": "Adjunto no disponible",
+      "viewAttachment": "Ver"
     },
     "profileTitle": "Perfil del solicitante",
     "createProfileTitle": "Crea tu perfil de solicitante",

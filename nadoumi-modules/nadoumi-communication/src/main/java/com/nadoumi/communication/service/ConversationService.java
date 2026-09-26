@@ -3,11 +3,15 @@ package com.nadoumi.communication.service;
 import com.nadoumi.common.access.AccessRole;
 import com.nadoumi.common.access.ApplicantCapability;
 import com.nadoumi.common.access.NadoumiAccessService;
+import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
+import com.nadoumi.common.media.MediaAccessLogContext;
+import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
 import com.nadoumi.common.media.MediaOwnerRef;
+import com.nadoumi.common.media.StoredAsset;
 import com.nadoumi.communication.domain.Conversation;
 import com.nadoumi.communication.domain.ConversationParticipant;
 import com.nadoumi.communication.domain.Message;
@@ -22,6 +26,7 @@ import com.nadoumi.communication.mapper.MessageAttachmentMapper;
 import com.nadoumi.communication.mapper.MessageMapper;
 import com.nadoumi.communication.web.request.OpenConversationRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
+import com.nadoumi.communication.web.response.AttachmentAccessResponse;
 import com.nadoumi.communication.web.response.AttachmentResponse;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
@@ -37,6 +42,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -150,9 +156,26 @@ public class ConversationService {
     /** Posts a message to a conversation the caller is an active participant of. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse post(long conversationId, PostMessageRequest req) {
-        requireActiveParticipant(conversationId, caller.requireUserId());
-        Message message = publisher.publish(conversationId, caller.requireUserId(), req.body(),
-                req.attachmentMediaIdsOrEmpty());
+        long userId = caller.requireUserId();
+        requireActiveParticipant(conversationId, userId);
+        List<Long> attachmentMediaIds = req.attachmentMediaIdsOrEmpty();
+        if (req.body().isBlank() && attachmentMediaIds.isEmpty()) {
+            throw new NadBadRequestException("a message needs text, an attachment, or both");
+        }
+        for (Long mediaId : attachmentMediaIds) {
+            StoredAsset asset = media.find(mediaId)
+                    .orElseThrow(() -> new NadNotFoundException("media asset " + mediaId + " not found"));
+            if (asset.category() != MediaCategory.MESSAGE_ATTACHMENT) {
+                throw new NadBadRequestException("media asset " + mediaId + " is not a message attachment");
+            }
+            if (asset.owner() == null
+                    || asset.owner().kind() != MediaOwnerKind.MESSAGE
+                    || !Objects.equals(asset.owner().id(), conversationId)
+                    || asset.uploadedBy() != userId) {
+                throw new NadForbiddenException("media asset " + mediaId + " does not belong to this conversation");
+            }
+        }
+        Message message = publisher.publish(conversationId, userId, req.body(), attachmentMediaIds);
         return toMessageResponse(message);
     }
 
@@ -278,6 +301,29 @@ public class ConversationService {
         }
     }
 
+    /**
+     * A short-lived signed URL to view a PROTECTED attachment inline. The attachment
+     * must belong to a message actually posted in {@code conversationId} -- knowing an
+     * attachment id from one conversation must never unlock a read in another.
+     */
+    public AttachmentAccessResponse attachmentAccess(long conversationId, long attachmentId, MediaAccessLogContext ctx) {
+        requireActiveParticipant(conversationId, caller.requireUserId());
+        MessageAttachment attachment = attachments.findById(attachmentId);
+        if (attachment == null) {
+            throw new NadNotFoundException("attachment not found");
+        }
+        Message owner = messages.findById(attachment.getMessageId());
+        if (owner == null || owner.getConversationId() != conversationId) {
+            throw new NadNotFoundException("attachment not found");
+        }
+        var signed = media.issueInlineSignedUrl(attachment.getMediaAssetId(), ctx);
+        var asset = media.find(attachment.getMediaAssetId()).orElse(null);
+        return new AttachmentAccessResponse(
+                signed.url(), signed.expiresAt().toString(),
+                asset == null ? null : asset.originalFilename(),
+                asset == null ? null : asset.contentType());
+    }
+
     // ---- internals ----
 
     private void addParticipantRow(long conversationId, long userId, ParticipantRole role) {
@@ -324,7 +370,7 @@ public class ConversationService {
         long afterId = myParticipant == null || myParticipant.getLastReadMessageId() == null
                 ? 0 : myParticipant.getLastReadMessageId();
         long unread = messages.countAfter(c.getId(), afterId);
-        String preview = latest == null ? null : truncate(latest.getBody());
+        String preview = latest == null ? null : previewFor(latest);
         return new ConversationSummaryResponse(c.getId(), c.getSubject(), c.getApplicationId(),
                 c.getConversationType().name(), c.getStatus().name(), preview,
                 latest == null ? null : latest.getCreatedAt(), unread);
@@ -348,5 +394,14 @@ public class ConversationService {
 
     private static String truncate(String body) {
         return body.length() <= PREVIEW_LENGTH ? body : body.substring(0, PREVIEW_LENGTH) + "…";
+    }
+
+    /** An attachment-only message (no caption) still needs an honest, non-empty preview. */
+    private String previewFor(Message latest) {
+        if (!latest.getBody().isBlank()) {
+            return truncate(latest.getBody());
+        }
+        int count = attachments.listByMessage(latest.getId()).size();
+        return count == 1 ? "📎 Attachment" : "📎 " + count + " attachments";
     }
 }

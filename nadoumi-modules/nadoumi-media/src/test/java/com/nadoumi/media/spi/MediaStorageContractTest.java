@@ -116,6 +116,17 @@ abstract class MediaStorageContractTest {
     }
 
     @Test
+    void shouldIssueAnInlineSignedUrlOnlyForProtectedAssets() {
+        long publicId = storage().put(command(MediaCategory.UNIVERSITY_LOGO, null)).id();
+        long protectedId = storage().put(command(MediaCategory.APPLICANT_PHOTO, null)).id();
+
+        assertThatThrownBy(() -> storage().inlineSignedUrl(publicId, java.time.Duration.ofSeconds(60)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("inlineSignedUrl is only for PROTECTED assets");
+        assertThat(storage().inlineSignedUrl(protectedId, java.time.Duration.ofSeconds(60)).url()).isNotBlank();
+    }
+
+    @Test
     void shouldStreamOnlyProtectedOrSensitiveAssets() {
         long publicId = storage().put(command(MediaCategory.UNIVERSITY_LOGO, null)).id();
 

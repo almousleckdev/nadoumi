@@ -432,7 +432,13 @@
       "threadEmpty": "暂无消息。",
       "reconnecting": "正在重新连接实时更新",
       "composer": "输入消息",
-      "attachment": "附件"
+      "attachment": "附件",
+      "attach": "添加附件",
+      "attachmentBadType": "仅支持图片、PDF 或 Word 文档。",
+      "attachmentUploadFailed": "上传失败，请移除后重试。",
+      "removeAttachment": "移除附件",
+      "attachmentUnavailable": "附件不可用",
+      "viewAttachment": "查看"
     },
     "profileTitle": "申请人档案",
     "createProfileTitle": "创建您的申请人档案",

@@ -37,8 +37,17 @@ public interface MediaGateway {
     /** PUBLIC assets only — the stable delivery URL. Throws for PROTECTED / SENSITIVE. */
     String publicUrl(long assetId);
 
-    /** PROTECTED assets — a short-TTL signed URL; writes an access-log entry from {@code ctx}. */
+    /**
+     * PROTECTED assets — a short-TTL signed URL that forces a download; writes an
+     * access-log entry from {@code ctx}.
+     */
     SignedUrl issueSignedUrl(long assetId, MediaAccessLogContext ctx);
+
+    /**
+     * PROTECTED assets — a short-TTL signed URL meant for inline rendering (never a
+     * forced download); writes an access-log entry from {@code ctx}.
+     */
+    SignedUrl issueInlineSignedUrl(long assetId, MediaAccessLogContext ctx);
 
     /** PROTECTED / SENSITIVE assets — an open stream for backend proxying; writes an access-log entry. */
     ProxyStream openProxyStream(long assetId, MediaAccessLogContext ctx);

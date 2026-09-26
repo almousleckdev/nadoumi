@@ -96,9 +96,9 @@ async function loadOlder() {
 const draft = ref('')
 const { busy, error: sendError, run } = useAsyncAction()
 
-async function send() {
+async function send(attachmentMediaIds: number[]) {
   const body = draft.value.trim()
-  const sent = await run(() => post(conversationId, body))
+  const sent = await run(() => post(conversationId, body, attachmentMediaIds))
   if (!sent) return
   draft.value = ''
   messages.value = mergeMessages(messages.value, [sent])
@@ -165,10 +165,10 @@ useSeo(t('dashboard.messages.title'), t('dashboard.messages.blurb'))
               :class="isMine(m) ? 'bg-brand-600 text-white' : 'bg-slate-100 text-slate-800'"
             >
               <p class="text-xs font-semibold opacity-80">{{ isMine(m) ? t('dashboard.messages.you') : m.senderName }}</p>
-              <p class="mt-0.5 whitespace-pre-wrap break-words">{{ m.body }}</p>
-              <ul v-if="m.attachments.length" class="mt-1 grid gap-0.5 text-xs opacity-90">
-                <li v-for="a in m.attachments" :key="a.id">{{ t('dashboard.messages.attachment') }}: {{ a.filename }}</li>
-              </ul>
+              <p v-if="m.body" class="mt-0.5 whitespace-pre-wrap break-words">{{ m.body }}</p>
+              <div v-if="m.attachments.length" class="mt-1.5 grid gap-1.5">
+                <MessageAttachmentView v-for="a in m.attachments" :key="a.id" :conversation-id="conversationId" :attachment="a" />
+              </div>
               <p class="mt-1 text-end text-[11px] opacity-70">{{ formatTime(m.createdAt) }}</p>
             </div>
           </div>
@@ -178,7 +178,7 @@ useSeo(t('dashboard.messages.title'), t('dashboard.messages.blurb'))
           <p v-if="isClosed" class="text-sm text-slate-500" data-test="closed">{{ t('dashboard.messages.closedNotice') }}</p>
           <template v-else>
             <NAlert v-if="sendError" tone="danger" class="mb-3">{{ sendError }}</NAlert>
-            <MessageComposer id="thread-composer" v-model="draft" :busy="busy" @submit="send" />
+            <MessageComposer id="thread-composer" v-model="draft" :conversation-id="conversationId" :busy="busy" @submit="send" />
           </template>
         </div>
       </SectionCard>

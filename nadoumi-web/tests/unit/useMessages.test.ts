@@ -27,7 +27,39 @@ describe('useMessages', () => {
   it('POSTs a message body only', async () => {
     studentFetch.mockResolvedValueOnce({ id: 5 })
     await useMessages().post(9, 'hello')
-    expect(studentFetch).toHaveBeenCalledWith('conversations/9/messages', { method: 'POST', body: { body: 'hello' } })
+    expect(studentFetch).toHaveBeenCalledWith('conversations/9/messages', {
+      method: 'POST', body: { body: 'hello', attachmentMediaIds: undefined },
+    })
+  })
+
+  it('POSTs a message with attachment media ids', async () => {
+    studentFetch.mockResolvedValueOnce({ id: 5 })
+    await useMessages().post(9, 'see attached', [101, 102])
+    expect(studentFetch).toHaveBeenCalledWith('conversations/9/messages', {
+      method: 'POST', body: { body: 'see attached', attachmentMediaIds: [101, 102] },
+    })
+  })
+
+  it('uploads an attachment as multipart form data and returns the media id', async () => {
+    studentFetch.mockResolvedValueOnce({ mediaId: 55 })
+    const file = new File(['x'], 'scan.pdf', { type: 'application/pdf' })
+    const result = await useMessages().uploadAttachment(9, file)
+
+    expect(result).toEqual({ mediaId: 55 })
+    const [path, opts] = studentFetch.mock.calls[0]!
+    expect(path).toBe('conversations/9/attachments')
+    expect(opts.method).toBe('POST')
+    expect(opts.body).toBeInstanceOf(FormData)
+    const sent = (opts.body as FormData).get('file') as File
+    expect(sent.name).toBe('scan.pdf')
+    expect(sent.type).toBe('application/pdf')
+  })
+
+  it('fetches a signed URL for an attachment', async () => {
+    studentFetch.mockResolvedValueOnce({ url: 'https://cdn.example.com/x.pdf', expiresAt: '2026-01-01', filename: 'x.pdf', contentType: 'application/pdf' })
+    const access = await useMessages().attachmentAccess(9, 500)
+    expect(studentFetch).toHaveBeenCalledWith('conversations/9/attachments/500', { query: { json: 1 } })
+    expect(access.url).toBe('https://cdn.example.com/x.pdf')
   })
 
   it('opens a conversation for an applicant', async () => {

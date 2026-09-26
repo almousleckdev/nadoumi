@@ -106,6 +106,20 @@ class CloudinaryMediaStorageTest extends MediaStorageContractTest {
     }
 
     @Test
+    void shouldMintAnInlineUrlThatDoesNotGoThroughTheForcedDownloadEndpoint() throws Exception {
+        long id = storage.put(command(MediaCategory.APPLICANT_PHOTO, null)).id();
+
+        SignedUrl signed = storage.inlineSignedUrl(id, Duration.ofSeconds(180));
+
+        assertThat(signed.url())
+                .as("inline delivery must hit the CDN, never the Admin API /download endpoint that forces attachment")
+                .doesNotContain("api.cloudinary.com")
+                .contains("/authenticated/")
+                .contains(rows.get(id).getPublicId());
+        verify(cloudinary, org.mockito.Mockito.never()).privateDownload(any(), any(), anyMap());
+    }
+
+    @Test
     void shouldDestroyTheProviderObjectOnPurge() throws IOException {
         long id = storage.put(command(MediaCategory.APPLICANT_PHOTO, null)).id();
         when(uploader.destroy(any(), anyMap())).thenReturn(Map.of("result", "ok"));

@@ -112,6 +112,32 @@ class MediaServiceTest {
     }
 
     @Test
+    void issueInlineSignedUrlWritesGrantedLog() {
+        when(storage.find(5L)).thenReturn(Optional.of(asset(5L, MediaAccessClass.PROTECTED)));
+        when(storage.inlineSignedUrl(eq(5L), any()))
+                .thenReturn(new SignedUrl("https://signed-inline", Instant.now().plusSeconds(180)));
+
+        SignedUrl result = service.issueInlineSignedUrl(5L, ctx());
+
+        assertThat(result.url()).isEqualTo("https://signed-inline");
+        ArgumentCaptor<MediaAccessLog> row = ArgumentCaptor.forClass(MediaAccessLog.class);
+        verify(accessLogMapper).insert(row.capture());
+        assertThat(row.getValue().getResult()).isEqualTo("GRANTED");
+        assertThat(row.getValue().getAccessKind()).isEqualTo("SIGNED_URL_ISSUED");
+        assertThat(row.getValue().getMediaAssetId()).isEqualTo(5L);
+    }
+
+    @Test
+    void issueInlineSignedUrlRejectsPublicAsset() {
+        when(storage.find(5L)).thenReturn(Optional.of(asset(5L, MediaAccessClass.PUBLIC)));
+
+        assertThatThrownBy(() -> service.issueInlineSignedUrl(5L, ctx()))
+                .isInstanceOf(IllegalArgumentException.class);
+        verify(accessLogMapper, never()).insert(any());
+        verify(storage, never()).inlineSignedUrl(anyLong(), any());
+    }
+
+    @Test
     void openProxyStreamAllowsSensitive() {
         when(storage.find(9L)).thenReturn(Optional.of(asset(9L, MediaAccessClass.SENSITIVE)));
         ProxyStream stream = new ProxyStream(new ByteArrayInputStream(new byte[0]), "application/pdf", 0L, "f.pdf");

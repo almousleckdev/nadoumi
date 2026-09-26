@@ -36,6 +36,14 @@ export interface OpenConversationBody {
   body: string
 }
 
+/** A short-lived signed URL to view/download one attachment, plus its display metadata. */
+export interface AttachmentAccess {
+  url: string
+  expiresAt: string
+  filename: string | null
+  contentType: string | null
+}
+
 /** Size of one message page; the backend returns newest-first pages of exactly this many. */
 export const MESSAGE_PAGE_SIZE = 50
 export const MESSAGE_MAX_LENGTH = 4000

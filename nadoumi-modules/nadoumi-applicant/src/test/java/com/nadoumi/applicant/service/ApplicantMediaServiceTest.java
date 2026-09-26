@@ -99,7 +99,7 @@ class ApplicantMediaServiceTest {
         when(mapper.findById(ID)).thenReturn(applicantWith(kind, 9L));
         when(access.canAccessApplicant(ID, "VIEW_PROFILE")).thenReturn(true);
         SignedUrl signed = new SignedUrl("https://res.cloudinary.com/x/s.jpg?sig=abc", Instant.now().plusSeconds(120));
-        when(media.issueSignedUrl(eq(9L), any())).thenReturn(signed);
+        when(media.issueInlineSignedUrl(eq(9L), any())).thenReturn(signed);
 
         assertThat(service.signedUrl(ID, kind, ctx())).isSameAs(signed);
         verify(media, never()).denyAndLog(anyLong(), any(), any());
@@ -114,7 +114,7 @@ class ApplicantMediaServiceTest {
         assertThatThrownBy(() -> service.signedUrl(ID, kind, ctx())).isInstanceOf(NadForbiddenException.class);
 
         verify(media).denyAndLog(eq(9L), any(), eq("NO_APPLICANT_GRANT"));
-        verify(media, never()).issueSignedUrl(anyLong(), any());
+        verify(media, never()).issueInlineSignedUrl(anyLong(), any());
     }
 
     @ParameterizedTest
@@ -124,6 +124,6 @@ class ApplicantMediaServiceTest {
         when(access.canAccessApplicant(ID, "VIEW_PROFILE")).thenReturn(true);
 
         assertThatThrownBy(() -> service.signedUrl(ID, kind, ctx())).isInstanceOf(NadNotFoundException.class);
-        verify(media, never()).issueSignedUrl(anyLong(), any());
+        verify(media, never()).issueInlineSignedUrl(anyLong(), any());
     }
 }

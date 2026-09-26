@@ -26,10 +26,19 @@ public interface MediaStorageService {
     String publicUrl(long assetId);
 
     /**
-     * PROTECTED assets only — a freshly signed, short-TTL delivery URL. Throws for
-     * PUBLIC (use {@link #publicUrl}) and SENSITIVE (use {@link #openStream}).
+     * PROTECTED assets only — a freshly signed, short-TTL delivery URL that forces a
+     * download ({@code Content-Disposition: attachment}). Throws for PUBLIC (use
+     * {@link #publicUrl}) and SENSITIVE (use {@link #openStream}).
      */
     SignedUrl signedUrl(long assetId, Duration ttl);
+
+    /**
+     * PROTECTED assets only — a freshly signed, short-TTL delivery URL meant for
+     * inline rendering (e.g. an {@code <img>} tag or a browser-native PDF viewer),
+     * never forcing a download. Throws for PUBLIC (use {@link #publicUrl}) and
+     * SENSITIVE (use {@link #openStream}).
+     */
+    SignedUrl inlineSignedUrl(long assetId, Duration ttl);
 
     /**
      * PROTECTED or SENSITIVE — opens the provider object for backend proxying. The

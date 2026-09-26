@@ -32,8 +32,14 @@ import org.springframework.util.StringUtils;
  * <ul>
  *   <li>{@code PUBLIC} — {@code type=upload}; the {@code secure_url} is stored and
  *       returned directly.</li>
- *   <li>{@code PROTECTED} — {@code type=authenticated}; {@link #signedUrl} mints a
- *       short-TTL expiring download URL. No URL is ever stored.</li>
+ *   <li>{@code PROTECTED} — {@code type=authenticated}; {@link #signed} mints a
+ *       short-TTL expiring forced-download URL ({@code Content-Disposition:
+ *       attachment}), while {@link #signedInline} mints a signed delivery URL meant
+ *       for inline rendering (an {@code <img>} tag, a browser PDF viewer) with no
+ *       forced disposition. Cloudinary's URL signature does not itself expire — the
+ *       TTL communicated to the caller is enforced by requiring a fresh authorized
+ *       call to mint a new URL, not by the provider rejecting an old one. No URL is
+ *       ever stored.</li>
  *   <li>{@code SENSITIVE} — {@code type=authenticated}; {@link #openStream} fetches
  *       the bytes server-side through a 60-second internal URL that is never
  *       logged or surfaced to a client.</li>
@@ -104,6 +110,12 @@ public class CloudinaryMediaStorage extends AbstractMediaStorage {
     }
 
     @Override
+    protected SignedUrl signedInline(MediaAsset row, Duration ttl) {
+        Instant expiresAt = Instant.now().plus(ttl);
+        return new SignedUrl(providerInlineUrl(row), expiresAt);
+    }
+
+    @Override
     protected ProxyStream openProviderStream(MediaAsset row) {
         String internalUrl = providerDownloadUrl(row, Instant.now().plusSeconds(INTERNAL_FETCH_TTL_SECONDS));
         HttpResponse<InputStream> response = fetch(internalUrl, row.getId());
@@ -137,8 +149,12 @@ public class CloudinaryMediaStorage extends AbstractMediaStorage {
 
     /**
      * A signed, time-limited Cloudinary download URL for the original object
-     * ({@code /<resource_type>/download?...expires_at=...}). Used verbatim as the
-     * PROTECTED signed URL, and internally (never surfaced) by {@link #openProviderStream}.
+     * ({@code /<resource_type>/download?...expires_at=...}). This is the Admin API's
+     * dedicated download endpoint — it always answers with {@code Content-Disposition:
+     * attachment}, so it is only ever appropriate for a genuine "save this file"
+     * action ({@link #signed}) or the internal byte fetch in
+     * {@link #openProviderStream}. Never use it where the browser needs to render the
+     * bytes inline — see {@link #providerInlineUrl}.
      */
     private String providerDownloadUrl(MediaAsset row, Instant expiresAt) {
         try {
@@ -150,6 +166,22 @@ public class CloudinaryMediaStorage extends AbstractMediaStorage {
             // Cloudinary#privateDownload declares a checked Exception; wrap, never swallow.
             throw new IllegalStateException("failed to sign a delivery URL for media asset " + row.getId(), e);
         }
+    }
+
+    /**
+     * A signed Cloudinary delivery URL ({@code res.cloudinary.com/.../authenticated/...})
+     * for the original object, with no {@code Content-Disposition} override — the
+     * browser renders it inline (an image, a browser-native PDF view) the same way it
+     * would a PUBLIC asset. Unlike {@link #providerDownloadUrl}, this is not the Admin
+     * API's download endpoint, so it carries no {@code expires_at}.
+     */
+    private String providerInlineUrl(MediaAsset row) {
+        return cloudinary.url()
+                .resourceType(row.getResourceType())
+                .type(DELIVERY_AUTHENTICATED)
+                .signed(true)
+                .version(row.getCloudVersion() == null ? null : String.valueOf(row.getCloudVersion()))
+                .generate(row.getPublicId());
     }
 
     private HttpResponse<InputStream> fetch(String url, long assetId) {

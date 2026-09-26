@@ -13,10 +13,19 @@ import static org.mockito.Mockito.when;
 import com.nadoumi.common.access.ApplicantCapability;
 import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.common.exception.NadForbiddenException;
+import com.nadoumi.common.exception.NadNotFoundException;
+import com.nadoumi.common.media.MediaAccessClass;
+import com.nadoumi.common.media.MediaAccessLogContext;
+import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
+import com.nadoumi.common.media.MediaOwnerKind;
+import com.nadoumi.common.media.MediaOwnerRef;
+import com.nadoumi.common.media.SignedUrl;
+import com.nadoumi.common.media.StoredAsset;
 import com.nadoumi.communication.domain.Conversation;
 import com.nadoumi.communication.domain.ConversationParticipant;
 import com.nadoumi.communication.domain.Message;
+import com.nadoumi.communication.domain.MessageAttachment;
 import com.nadoumi.communication.domain.enums.ConversationStatus;
 import com.nadoumi.communication.domain.enums.ConversationType;
 import com.nadoumi.communication.domain.enums.ParticipantRole;
@@ -153,6 +162,89 @@ class ConversationServiceTest {
     }
 
     @Test
+    void post_rejectsABlankBodyWithNoAttachments() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+
+        assertThatThrownBy(() -> service.post(9L, new PostMessageRequest("   ", null)))
+                .isInstanceOf(com.nadoumi.common.exception.NadBadRequestException.class)
+                .hasMessageContaining("needs text, an attachment, or both");
+        verify(publisher, never()).publish(anyLong(), anyLong(), anyString(), any());
+    }
+
+    @Test
+    void post_acceptsABlankBodyWhenThereIsAtLeastOneAttachment_photoWithNoCaption() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        StoredAsset asset = new StoredAsset(7L, "LOCAL", MediaAccessClass.PROTECTED, MediaCategory.MESSAGE_ATTACHMENT,
+                "raw", "upload", "pub-id", "asset-id", null, null,
+                "photo.jpg", "image/jpeg", 100L, null, null, null, 1L,
+                new MediaOwnerRef(MediaOwnerKind.MESSAGE, 9L), "ACTIVE", java.time.Instant.now());
+        when(media.find(7L)).thenReturn(java.util.Optional.of(asset));
+        Message posted = new Message();
+        posted.setId(100L);
+        posted.setConversationId(9L);
+        posted.setSenderUserId(1L);
+        posted.setBody("");
+        when(publisher.publish(9L, 1L, "", java.util.List.of(7L))).thenReturn(posted);
+
+        var response = service.post(9L, new PostMessageRequest("", java.util.List.of(7L)));
+
+        assertThat(response.id()).isEqualTo(100L);
+        verify(publisher).publish(9L, 1L, "", java.util.List.of(7L));
+    }
+
+    @Test
+    void post_rejectsAttachmentBelongingToAnotherUser() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        StoredAsset asset = new StoredAsset(7L, "LOCAL", MediaAccessClass.PROTECTED, MediaCategory.MESSAGE_ATTACHMENT,
+                "raw", "upload", "pub-id", "asset-id", null, null,
+                "photo.jpg", "image/jpeg", 100L, null, null, null, 999L, // uploaded by another user
+                new MediaOwnerRef(MediaOwnerKind.MESSAGE, 9L), "ACTIVE", java.time.Instant.now());
+        when(media.find(7L)).thenReturn(java.util.Optional.of(asset));
+
+        assertThatThrownBy(() -> service.post(9L, new PostMessageRequest("", java.util.List.of(7L))))
+                .isInstanceOf(NadForbiddenException.class)
+                .hasMessageContaining("does not belong to this conversation");
+        verify(publisher, never()).publish(anyLong(), anyLong(), anyString(), any());
+    }
+
+    @Test
+    void post_rejectsAttachmentBelongingToAnotherConversation() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        StoredAsset asset = new StoredAsset(7L, "LOCAL", MediaAccessClass.PROTECTED, MediaCategory.MESSAGE_ATTACHMENT,
+                "raw", "upload", "pub-id", "asset-id", null, null,
+                "photo.jpg", "image/jpeg", 100L, null, null, null, 1L,
+                new MediaOwnerRef(MediaOwnerKind.MESSAGE, 42L), // different conversation
+                "ACTIVE", java.time.Instant.now());
+        when(media.find(7L)).thenReturn(java.util.Optional.of(asset));
+
+        assertThatThrownBy(() -> service.post(9L, new PostMessageRequest("", java.util.List.of(7L))))
+                .isInstanceOf(NadForbiddenException.class)
+                .hasMessageContaining("does not belong to this conversation");
+        verify(publisher, never()).publish(anyLong(), anyLong(), anyString(), any());
+    }
+
+    @Test
+    void post_rejectsUnknownMediaAsset() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        when(media.find(7L)).thenReturn(java.util.Optional.empty());
+
+        assertThatThrownBy(() -> service.post(9L, new PostMessageRequest("", java.util.List.of(7L))))
+                .isInstanceOf(NadNotFoundException.class)
+                .hasMessageContaining("media asset 7 not found");
+        verify(publisher, never()).publish(anyLong(), anyLong(), anyString(), any());
+    }
+
+    @Test
     void post_rejectsWhenTheConversationDoesNotExist() {
         when(caller.requireUserId()).thenReturn(2L);
         when(conversations.findById(9L)).thenReturn(null);
@@ -221,5 +313,78 @@ class ConversationServiceTest {
         service.markRead(9L);
 
         verify(participants, never()).updateLastRead(anyLong(), anyLong(), anyLong());
+    }
+
+    // ---- attachmentAccess ----
+
+    private static MessageAttachment attachment(long id, long messageId, long mediaAssetId) {
+        MessageAttachment a = new MessageAttachment();
+        a.setId(id);
+        a.setMessageId(messageId);
+        a.setMediaAssetId(mediaAssetId);
+        return a;
+    }
+
+    private static Message message(long id, long conversationId) {
+        Message m = new Message();
+        m.setId(id);
+        m.setConversationId(conversationId);
+        return m;
+    }
+
+    private static MediaAccessLogContext ctx() {
+        return new MediaAccessLogContext(1L, null, null, null, "127.0.0.1", "test-agent");
+    }
+
+    @Test
+    void attachmentAccess_rejectsACallerWhoIsNotAnActiveParticipant() {
+        when(caller.requireUserId()).thenReturn(2L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 2L)).thenReturn(null);
+
+        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, ctx())).isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void attachmentAccess_rejectsAnUnknownAttachment() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        when(attachments.findById(500L)).thenReturn(null);
+
+        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, ctx())).isInstanceOf(NadNotFoundException.class);
+    }
+
+    @Test
+    void attachmentAccess_rejectsAnAttachmentBelongingToADifferentConversation() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        when(attachments.findById(500L)).thenReturn(attachment(500L, 100L, 7L));
+        when(messages.findById(100L)).thenReturn(message(100L, 42L)); // a different conversation
+
+        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, ctx())).isInstanceOf(NadNotFoundException.class);
+    }
+
+    @Test
+    void attachmentAccess_returnsASignedUrlAndDisplayMetadataForAValidAttachment() {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+        when(attachments.findById(500L)).thenReturn(attachment(500L, 100L, 7L));
+        when(messages.findById(100L)).thenReturn(message(100L, 9L));
+        var expiry = java.time.Instant.parse("2026-02-03T09:15:00Z");
+        when(media.issueInlineSignedUrl(org.mockito.ArgumentMatchers.eq(7L), any()))
+                .thenReturn(new SignedUrl("https://cdn.example.com/scan.pdf", expiry));
+        StoredAsset asset = new StoredAsset(7L, "CLOUDINARY", MediaAccessClass.PROTECTED, MediaCategory.MESSAGE_ATTACHMENT,
+                "raw", "upload", "pub-id", "asset-id", null, null,
+                "transcript.pdf", "application/pdf", 1234L, null, null, null, 1L, null, "ACTIVE", expiry);
+        when(media.find(7L)).thenReturn(java.util.Optional.of(asset));
+
+        var access = service.attachmentAccess(9L, 500L, ctx());
+
+        assertThat(access.url()).isEqualTo("https://cdn.example.com/scan.pdf");
+        assertThat(access.filename()).isEqualTo("transcript.pdf");
+        assertThat(access.contentType()).isEqualTo("application/pdf");
     }
 }

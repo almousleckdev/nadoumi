@@ -126,6 +126,17 @@ public class FakeMediaStorage implements MediaStorageService {
     }
 
     @Override
+    public SignedUrl inlineSignedUrl(long assetId, Duration ttl) {
+        MediaAsset row = require(assetId);
+        if (row.getAccessClassEnum() != MediaAccessClass.PROTECTED) {
+            throw new IllegalArgumentException("inlineSignedUrl is only for PROTECTED assets; media asset " + assetId
+                    + " is " + row.getAccessClassEnum());
+        }
+        Instant expiresAt = Instant.now().plus(ttl);
+        return new SignedUrl(HOST + row.getPublicId() + "?inline=1&exp=" + expiresAt.getEpochSecond(), expiresAt);
+    }
+
+    @Override
     public ProxyStream openStream(long assetId) {
         MediaAsset row = require(assetId);
         if (row.getAccessClassEnum() == MediaAccessClass.PUBLIC) {
