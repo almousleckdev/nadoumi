@@ -7,6 +7,7 @@ const api = vi.hoisted(() => ({
   listInbox: vi.fn(),
   listMessages: vi.fn(),
   postMessage: vi.fn(),
+  uploadAttachment: vi.fn(),
   markConversationRead: vi.fn(),
   closeConversation: vi.fn(),
   addParticipant: vi.fn(),
@@ -157,8 +158,90 @@ describe('staff conversations', () => {
     await w.find('form').trigger('submit')
     await flushPromises()
 
-    expect(api.postMessage).toHaveBeenCalledWith(9, 'On it')
+    expect(api.postMessage).toHaveBeenCalledWith(9, 'On it', [])
     expect(w.text()).toContain('On it')
+  })
+
+  it('uploads an attachment and sends a reply with attachmentMediaIds', async () => {
+    api.uploadAttachment.mockResolvedValueOnce({ mediaId: 55 })
+    api.postMessage.mockResolvedValueOnce(
+      M(3, {
+        senderUserId: 1,
+        senderName: 'Me',
+        body: 'Here is your doc',
+        attachments: [{ id: 1, mediaAssetId: 55, filename: 'guide.pdf', contentType: 'application/pdf', byteSize: 1024, url: 'https://cdn.example.com/guide.pdf' }],
+      })
+    )
+    const w = await mountView()
+    await w.find('[data-test="conversation-row"]').trigger('click')
+    await flushPromises()
+
+    const file = new File(['dummy content'], 'guide.pdf', { type: 'application/pdf' })
+    const fileInput = w.find('input[data-test="file-input"]')
+
+    Object.defineProperty(fileInput.element, 'files', {
+      value: [file],
+      writable: true,
+    })
+    await fileInput.trigger('change')
+    await flushPromises()
+
+    expect(api.uploadAttachment).toHaveBeenCalledWith(9, file)
+    expect(w.find('[data-test="pending-attachments"]').exists()).toBe(true)
+    expect(w.find('[data-test="pending-attachment"]').text()).toContain('guide.pdf')
+
+    await w.find('textarea').setValue('Here is your doc')
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(api.postMessage).toHaveBeenCalledWith(9, 'Here is your doc', [55])
+    expect(w.find('[data-test="pending-attachments"]').exists()).toBe(false)
+  })
+
+  it('allows sending an attachment without text body', async () => {
+    api.uploadAttachment.mockResolvedValueOnce({ mediaId: 56 })
+    api.postMessage.mockResolvedValueOnce(M(3, { body: '' }))
+    const w = await mountView()
+    await w.find('[data-test="conversation-row"]').trigger('click')
+    await flushPromises()
+
+    const file = new File(['photo'], 'passport.png', { type: 'image/png' })
+    const fileInput = w.find('input[data-test="file-input"]')
+    Object.defineProperty(fileInput.element, 'files', {
+      value: [file],
+      writable: true,
+    })
+    await fileInput.trigger('change')
+    await flushPromises()
+
+    const sendBtn = w.find('button[data-test="send"]')
+    expect(sendBtn.attributes('disabled')).toBeUndefined()
+
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(api.postMessage).toHaveBeenCalledWith(9, '', [56])
+  })
+
+  it('removes pending attachment when remove button is clicked', async () => {
+    api.uploadAttachment.mockResolvedValueOnce({ mediaId: 57 })
+    const w = await mountView()
+    await w.find('[data-test="conversation-row"]').trigger('click')
+    await flushPromises()
+
+    const file = new File(['text'], 'notes.pdf', { type: 'application/pdf' })
+    const fileInput = w.find('input[data-test="file-input"]')
+    Object.defineProperty(fileInput.element, 'files', {
+      value: [file],
+      writable: true,
+    })
+    await fileInput.trigger('change')
+    await flushPromises()
+
+    expect(w.find('[data-test="pending-attachment"]').exists()).toBe(true)
+    await w.find('[data-test="remove-pending"]').trigger('click')
+
+    expect(w.find('[data-test="pending-attachments"]').exists()).toBe(false)
   })
 
   it('pulls in a new message on a live ping for the open conversation only', async () => {

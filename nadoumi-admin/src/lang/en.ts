@@ -749,6 +749,12 @@ export default {
     close: 'Close conversation', closeConfirm: 'Close this conversation? Nobody will be able to post in it.', closedOk: 'Conversation closed',
     closedNotice: 'This conversation is closed.', loadOlder: 'Load older messages', threadEmpty: 'No messages yet.',
     you: 'You', attachment: 'Attachment', composer: 'Write a reply (Ctrl+Enter to send)', send: 'Send',
+    attach: 'Attach file',
+    attachHint: 'Images or documents up to 15MB (max 5 files)',
+    attachTooBig: 'File exceeds 15MB limit',
+    attachUploadFailed: 'Failed to upload attachment',
+    attachMaxCount: 'Maximum 5 attachments allowed',
+    removeAttachment: 'Remove attachment',
   },
   documents: {
     title: 'Documents',

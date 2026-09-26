@@ -51,8 +51,17 @@ export const listInbox = () =>
 export const listMessages = (id: number, beforeId = 0, silent = false) =>
   request.get<unknown, ConversationMessage[]>(`/api/staff/conversations/${id}/messages`, { params: { beforeId }, silent } as object)
 
-export const postMessage = (id: number, body: string) =>
-  request.post<unknown, ConversationMessage>(`/api/staff/conversations/${id}/messages`, { body })
+export const postMessage = (id: number, body: string, attachmentMediaIds: number[] = []) =>
+  request.post<unknown, ConversationMessage>(`/api/staff/conversations/${id}/messages`, {
+    body,
+    attachmentMediaIds: attachmentMediaIds.length ? attachmentMediaIds : undefined,
+  })
+
+export const uploadAttachment = (conversationId: number, file: File): Promise<{ mediaId: number }> => {
+  const form = new FormData()
+  form.append('file', file)
+  return request.post<unknown, { mediaId: number }>(`/api/staff/conversations/${conversationId}/attachments`, form)
+}
 
 export const markConversationRead = (id: number) =>
   request.post<unknown, undefined>(`/api/staff/conversations/${id}/read`)

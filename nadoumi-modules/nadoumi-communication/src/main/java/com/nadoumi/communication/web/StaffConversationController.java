@@ -64,6 +64,14 @@ public class StaffConversationController {
         conversations.markRead(id);
     }
 
+    @PostMapping("/conversations/{id}/attachments")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
+    public java.util.Map<String, Long> uploadAttachment(@PathVariable Long id,
+            @org.springframework.web.bind.annotation.RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        return java.util.Map.of("mediaId", conversations.uploadAttachment(id, file));
+    }
+
     @GetMapping("/conversations/{id}/participants")
     @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
     public List<ParticipantResponse> participants(@PathVariable Long id) {

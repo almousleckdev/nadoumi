@@ -387,4 +387,36 @@ class ConversationServiceTest {
         assertThat(access.filename()).isEqualTo("transcript.pdf");
         assertThat(access.contentType()).isEqualTo("application/pdf");
     }
+
+    @Test
+    void uploadAttachment_rejectsWhenNotActiveParticipant() {
+        when(caller.requireUserId()).thenReturn(2L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 2L)).thenReturn(null);
+        org.springframework.web.multipart.MultipartFile file = mock(org.springframework.web.multipart.MultipartFile.class);
+
+        assertThatThrownBy(() -> service.uploadAttachment(9L, file)).isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void uploadAttachment_storesFileAndReturnsMediaIdWhenActiveParticipant() throws Exception {
+        when(caller.requireUserId()).thenReturn(1L);
+        when(conversations.findById(9L)).thenReturn(conversation());
+        when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
+
+        org.springframework.web.multipart.MultipartFile file = mock(org.springframework.web.multipart.MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("doc.pdf");
+        when(file.getContentType()).thenReturn("application/pdf");
+        when(file.getSize()).thenReturn(1024L);
+        when(file.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("fake".getBytes()));
+
+        com.nadoumi.common.media.MediaUploadResult uploaded = new com.nadoumi.common.media.MediaUploadResult(88L, null);
+        when(media.upload(any(), org.mockito.ArgumentMatchers.eq("doc.pdf"), org.mockito.ArgumentMatchers.eq("application/pdf"),
+                org.mockito.ArgumentMatchers.eq(1024L), org.mockito.ArgumentMatchers.eq(MediaCategory.MESSAGE_ATTACHMENT),
+                org.mockito.ArgumentMatchers.isNull(), any(), org.mockito.ArgumentMatchers.eq(1L)))
+                .thenReturn(uploaded);
+
+        long mediaId = service.uploadAttachment(9L, file);
+        assertThat(mediaId).isEqualTo(88L);
+    }
 }

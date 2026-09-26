@@ -221,6 +221,29 @@
                 v-else
                 @submit.prevent="onSend"
               >
+                <div v-if="pendingAttachments.length" class="conv__pending-attachments" data-test="pending-attachments">
+                  <div
+                    v-for="p in pendingAttachments"
+                    :key="p.key"
+                    class="conv__pending-chip"
+                    :class="{ 'is-error': !!p.error }"
+                    data-test="pending-attachment"
+                  >
+                    <span class="conv__pending-name">📎 {{ p.file.name }}</span>
+                    <el-icon v-if="p.uploading" class="is-loading" data-test="uploading-spinner"><Loading /></el-icon>
+                    <span v-else-if="p.error" class="conv__pending-error" data-test="pending-error">{{ p.error }}</span>
+                    <button
+                      type="button"
+                      class="conv__pending-remove"
+                      :aria-label="t('conversations.removeAttachment')"
+                      data-test="remove-pending"
+                      @click="removePending(p.key)"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+
                 <el-input
                   v-model="draft"
                   type="textarea"
@@ -231,12 +254,36 @@
                   @keydown.ctrl.enter.prevent="onSend"
                   @keydown.meta.enter.prevent="onSend"
                 />
-                <div class="conv__send">
+                <div class="conv__composer-actions">
+                  <div class="conv__composer-left">
+                    <input
+                      ref="fileInputRef"
+                      type="file"
+                      multiple
+                      accept="image/*,application/pdf,.doc,.docx"
+                      class="conv__file-input"
+                      :disabled="sending || pendingAttachments.length >= 5"
+                      data-test="file-input"
+                      @change="onFilePicked"
+                    >
+                    <el-button
+                      size="small"
+                      :icon="Paperclip"
+                      :disabled="sending || pendingAttachments.length >= 5"
+                      data-test="attach-button"
+                      @click="triggerFilePick"
+                    >
+                      {{ t('conversations.attach') }}
+                    </el-button>
+                    <span v-if="pendingAttachments.length" class="conv__attach-count" data-test="attach-count">
+                      {{ pendingAttachments.length }}/5
+                    </span>
+                  </div>
                   <el-button
                     type="primary"
                     native-type="submit"
                     :loading="sending"
-                    :disabled="!draft.trim()"
+                    :disabled="!canSend"
                     data-test="send"
                   >
                     {{ t('conversations.send') }}
@@ -252,16 +299,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Loading, Paperclip } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import {
   addParticipant, closeConversation, listInbox, listMessages, markConversationRead, postMessage,
+  uploadAttachment,
   MESSAGE_MAX_LENGTH, MESSAGE_PAGE_SIZE,
   type ConversationMessage, type ConversationSummary,
 } from '@/api/conversation'
@@ -363,6 +412,7 @@ function select(id: number) {
   selectedId.value = id
   router.replace({ query: { ...route.query, id: String(id) } })
   draft.value = ''
+  pendingAttachments.value = []
   void loadThread()
 }
 
@@ -402,14 +452,108 @@ const draft = ref('')
 const sending = ref(false)
 const joining = ref(false)
 
+interface PendingAttachment {
+  key: string
+  file: File
+  mediaId: number | null
+  uploading: boolean
+  error: string
+}
+
+const pendingAttachments = ref<PendingAttachment[]>([])
+const fileInputRef = ref<HTMLInputElement | null>(null)
+
+const isUploading = computed(() => pendingAttachments.value.some(p => p.uploading))
+const readyAttachmentIds = computed(() =>
+  pendingAttachments.value.filter(p => p.mediaId !== null).map(p => p.mediaId!)
+)
+
+const canSend = computed(() => {
+  if (sending.value || isUploading.value) return false
+  return draft.value.trim().length > 0 || readyAttachmentIds.value.length > 0
+})
+
+const MAX_ATTACHMENTS = 5
+const MAX_BYTES = 15 * 1024 * 1024
+const ALLOWED_MIME = new Set([
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+])
+
+function triggerFilePick() {
+  fileInputRef.value?.click()
+}
+
+async function onFilePicked(event: Event) {
+  const input = event.target as HTMLInputElement
+  const files = Array.from(input.files ?? [])
+  input.value = ''
+  if (!files.length || selectedId.value === null) return
+
+  const remainingSlots = MAX_ATTACHMENTS - pendingAttachments.value.length
+  if (remainingSlots <= 0) {
+    ElMessage.warning(t('conversations.attachMaxCount'))
+    return
+  }
+
+  const toAdd = files.slice(0, remainingSlots)
+  if (files.length > remainingSlots) {
+    ElMessage.warning(t('conversations.attachMaxCount'))
+  }
+
+  for (const file of toAdd) {
+    if (file.size > MAX_BYTES) {
+      ElMessage.warning(`${file.name}: ${t('conversations.attachTooBig')}`)
+      continue
+    }
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    const validByExt = ext === 'doc' || ext === 'docx' || ext === 'pdf' || ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'webp'
+    if (file.type && !ALLOWED_MIME.has(file.type) && !validByExt) {
+      ElMessage.warning(`${file.name}: invalid file type`)
+      continue
+    }
+
+    const item = reactive<PendingAttachment>({
+      key: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
+      file,
+      mediaId: null,
+      uploading: true,
+      error: '',
+    })
+    pendingAttachments.value.push(item)
+
+    const convId = selectedId.value
+    try {
+      const res = await uploadAttachment(convId, file)
+      item.mediaId = res.mediaId
+    }
+    catch {
+      item.error = t('conversations.attachUploadFailed')
+    }
+    finally {
+      item.uploading = false
+    }
+  }
+}
+
+function removePending(key: string) {
+  pendingAttachments.value = pendingAttachments.value.filter(p => p.key !== key)
+}
+
 async function onSend() {
   const id = selectedId.value
   const body = draft.value.trim()
-  if (id === null || !body || sending.value) return
+  const attachmentMediaIds = readyAttachmentIds.value
+  if (id === null || (!body && !attachmentMediaIds.length) || sending.value || isUploading.value) return
   sending.value = true
   try {
-    const sent = await postMessage(id, body)
+    const sent = await postMessage(id, body, attachmentMediaIds)
     draft.value = ''
+    pendingAttachments.value = []
     messages.value = mergeMessages(messages.value, [sent])
     scrollToEnd()
     void loadInbox(true)
@@ -521,6 +665,49 @@ onMounted(async () => {
 .conv__attach-link:hover { color: var(--el-color-primary-dark-2, #3730a3); }
 .conv__time { margin: 4px 0 0; text-align: end; font-size: 11px; color: var(--nad-ink-faint, #9ca3af); }
 .conv__composer { padding: 12px 16px; border-top: 1px solid var(--nad-line, #e5e7eb); margin-top: auto; }
+.conv__composer-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.conv__composer-left { display: flex; align-items: center; gap: 8px; }
+.conv__file-input { display: none; }
+.conv__attach-count { font-size: 12px; color: var(--nad-ink-soft, #64748b); }
+.conv__pending-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.conv__pending-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--nad-surface-2, #f1f5f9);
+  border: 1px solid var(--nad-line, #e2e8f0);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: var(--nad-ink, #1e293b);
+  max-width: 100%;
+}
+.conv__pending-chip.is-error {
+  border-color: var(--el-color-danger, #ef4444);
+  background: #fef2f2;
+  color: var(--el-color-danger, #ef4444);
+}
+.conv__pending-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.conv__pending-error {
+  font-size: 11px;
+}
+.conv__pending-remove {
+  background: none;
+  border: none;
+  color: var(--nad-ink-soft, #64748b);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+}
+.conv__pending-remove:hover {
+  color: var(--el-color-danger, #ef4444);
+}
 .conv__send { display: flex; justify-content: flex-end; margin-top: 8px; }
 .conv__join { display: grid; gap: 12px; justify-items: center; padding: 48px 24px; text-align: center; }
 .conv__hint { margin: 0; font-size: 13px; color: var(--nad-ink-soft, #64748b); }

@@ -749,6 +749,12 @@ export default {
     close: '关闭会话', closeConfirm: '确定关闭此会话吗？关闭后任何人都无法再发送消息。', closedOk: '会话已关闭',
     closedNotice: '该会话已关闭。', loadOlder: '加载更早的消息', threadEmpty: '暂无消息。',
     you: '我', attachment: '附件', composer: '输入回复（Ctrl+Enter 发送）', send: '发送',
+    attach: '添加附件',
+    attachHint: '支持图片或文档，单个文件最大 15MB（最多 5 个）',
+    attachTooBig: '文件大小超过 15MB 限制',
+    attachUploadFailed: '附件上传失败',
+    attachMaxCount: '最多允许上传 5 个附件',
+    removeAttachment: '移除附件',
   },
   documents: {
     title: '证件材料',
