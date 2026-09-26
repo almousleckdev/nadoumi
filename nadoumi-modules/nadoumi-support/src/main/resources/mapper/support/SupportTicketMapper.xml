@@ -37,7 +37,7 @@
     <select id="listByOpener" resultMap="ticket">
         select <include refid="cols"/> from nad_support_ticket
         where opened_by_user_id = #{userId}
-        <if test="status != null">and status = #{status}</if>
+        <if test="status != null and status != ''">and status = #{status}</if>
         order by id desc
         limit #{limit} offset #{offset}
     </select>
@@ -45,9 +45,9 @@
     <select id="listForStaff" resultMap="ticket">
         select <include refid="cols"/> from nad_support_ticket
         <where>
-            <if test="status != null">and status = #{status}</if>
-            <if test="priority != null">and priority = #{priority}</if>
-            <if test="category != null">and category = #{category}</if>
+            <if test="status != null and status != ''">and status = #{status}</if>
+            <if test="priority != null and priority != ''">and priority = #{priority}</if>
+            <if test="category != null and category != ''">and category = #{category}</if>
             <if test="assigneeId != null">and assigned_staff_id = #{assigneeId}</if>
         </where>
         order by id desc

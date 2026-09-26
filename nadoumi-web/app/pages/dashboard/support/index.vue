@@ -20,8 +20,7 @@ const pending = ref(true)
 const error = ref('')
 const statusFilter = ref('')
 
-const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }))
-const formatDate = (iso: string) => dtf.value.format(new Date(iso))
+const formatDate = (iso: string) => formatSupportDate(iso, locale.value)
 
 const statusOptions = computed(() => [
   { value: '', label: t('dashboard.support.allStatuses') },
@@ -42,10 +41,11 @@ async function load(reset = true) {
       page: page.value,
       size: PAGE_SIZE,
     })
-    items.value = reset ? rows : [...items.value, ...rows]
-    hasMore.value = rows.length === PAGE_SIZE
+    items.value = reset ? (rows || []) : [...items.value, ...(rows || [])]
+    hasMore.value = (rows || []).length === PAGE_SIZE
   }
-  catch {
+  catch (err) {
+    console.error('Failed to load student support tickets:', err)
     error.value = t('errors.loadSection')
   }
   finally {

@@ -20,3 +20,26 @@ const REPLYABLE: ReadonlySet<TicketStatus> = new Set<TicketStatus>(['OPEN', 'IN_
 export function canReplyToTicket(status: TicketStatus): boolean {
   return REPLYABLE.has(status)
 }
+
+/**
+ * Safely formats a ticket timestamp.
+ * Handles ISO-8601 strings and MySQL/Jackson 'YYYY-MM-DD HH:mm:ss' formatted strings cross-browser.
+ */
+export function formatSupportDate(
+  iso: string | null | undefined,
+  locale: string,
+  options: Intl.DateTimeFormatOptions = { dateStyle: 'medium' },
+): string {
+  if (!iso) return ''
+  const normalized = typeof iso === 'string' && iso.includes(' ') && !iso.includes('T')
+    ? iso.replace(' ', 'T')
+    : iso
+  const date = new Date(normalized)
+  if (Number.isNaN(date.getTime())) return ''
+  try {
+    return new Intl.DateTimeFormat(locale, options).format(date)
+  }
+  catch {
+    return ''
+  }
+}

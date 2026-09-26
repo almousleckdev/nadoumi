@@ -37,9 +37,17 @@ public class StudentSupportTicketController {
     }
 
     @GetMapping
-    public List<StudentTicketSummary> mine(@RequestParam(required = false) TicketStatus status,
+    public List<StudentTicketSummary> mine(@RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return tickets.listMine(status, page, size);
+        TicketStatus parsedStatus = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                parsedStatus = TicketStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                return List.of();
+            }
+        }
+        return tickets.listMine(parsedStatus, page, size);
     }
 
     @GetMapping("/{id}")

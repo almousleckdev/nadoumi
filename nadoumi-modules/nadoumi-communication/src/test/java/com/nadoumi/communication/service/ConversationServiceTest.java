@@ -101,6 +101,35 @@ class ConversationServiceTest {
     }
 
     @Test
+    void open_withTargetAdmin_enrollsAdminAsParticipant() {
+        when(access.canAccessApplicant(5L, ApplicantCapability.MESSAGE_STAFF.name())).thenReturn(true);
+        when(caller.requireUserId()).thenReturn(1L);
+        when(caller.isStaff()).thenReturn(false);
+        when(grants.findActiveApplicantGrant(1L, 5L)).thenReturn(null);
+        org.mockito.Mockito.doAnswer(inv -> {
+            inv.<Conversation>getArgument(0).setId(9L);
+            return 1;
+        }).when(conversations).insert(any());
+        Message posted = new Message();
+        posted.setId(100L);
+        posted.setConversationId(9L);
+        posted.setSenderUserId(1L);
+        posted.setBody("Hello Admin");
+        when(publisher.publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
+                org.mockito.ArgumentMatchers.eq("Hello Admin"), any())).thenReturn(posted);
+
+        var req = new OpenConversationRequest(5L, null, 88L, "Question", "Hello Admin");
+        service.open(req);
+
+        // Verify that participant insert is called for student and admin 88L
+        org.mockito.ArgumentCaptor<ConversationParticipant> captor =
+                org.mockito.ArgumentCaptor.forClass(ConversationParticipant.class);
+        verify(participants, org.mockito.Mockito.atLeast(2)).insert(captor.capture());
+        assertThat(captor.getAllValues()).extracting(ConversationParticipant::getUserId)
+                .contains(1L, 88L);
+    }
+
+    @Test
     void openSupport_createsASupportConversationWithoutAnApplicantAndRejectsStaff() {
         when(caller.isStaff()).thenReturn(false);
         when(caller.requireUserId()).thenReturn(1L);

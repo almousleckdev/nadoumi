@@ -16,8 +16,16 @@ public record StaffTicketSummary(
         LocalDateTime updateTime) {
 
     public static StaffTicketSummary from(SupportTicket t) {
-        return new StaffTicketSummary(t.getId(), t.getSubject(), t.getCategory().name(), t.getPriority().name(),
-                t.getStatus().name(), t.getOpenedByUserId(), t.getApplicantId(), t.getAssignedStaffId(),
-                t.getCreateTime(), t.getUpdateTime());
+        return new StaffTicketSummary(
+                t.getId(),
+                t.getSubject(),
+                t.getCategory() == null ? "OTHER" : t.getCategory().name(),
+                t.getPriority() == null ? "NORMAL" : t.getPriority().name(),
+                t.getStatus() == null ? "OPEN" : t.getStatus().name(),
+                t.getOpenedByUserId(),
+                t.getApplicantId(),
+                t.getAssignedStaffId(),
+                t.getCreateTime(),
+                t.getUpdateTime());
     }
 }

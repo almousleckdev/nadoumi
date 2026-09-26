@@ -13,7 +13,12 @@ public record StudentTicketSummary(
         LocalDateTime updateTime) {
 
     public static StudentTicketSummary from(SupportTicket t) {
-        return new StudentTicketSummary(t.getId(), t.getSubject(), t.getCategory().name(),
-                t.getStatus().name(), t.getCreateTime(), t.getUpdateTime());
+        return new StudentTicketSummary(
+                t.getId(),
+                t.getSubject(),
+                t.getCategory() == null ? "OTHER" : t.getCategory().name(),
+                t.getStatus() == null ? "OPEN" : t.getStatus().name(),
+                t.getCreateTime(),
+                t.getUpdateTime());
     }
 }

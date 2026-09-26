@@ -10,8 +10,13 @@ import jakarta.validation.constraints.Size;
  * has no applicant column, only the optional {@code applicationId} context.
  */
 public record OpenConversationRequest(
-        @NotNull Long applicantId,
+        Long applicantId,
         Long applicationId,
+        Long adminUserId,
         @Size(max = 200) String subject,
         @NotBlank @Size(max = 4000) String body) {
+
+    public OpenConversationRequest(Long applicantId, Long applicationId, String subject, String body) {
+        this(applicantId, applicationId, null, subject, body);
+    }
 }

@@ -18,8 +18,8 @@ const pending = ref(true)
 const error = ref('')
 const thread = ref<{ reset: () => void } | null>(null)
 
-const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }))
-const formatTime = (iso: string) => dtf.value.format(new Date(iso))
+const formatTime = (iso: string) =>
+  formatSupportDate(iso, locale.value, { dateStyle: 'medium', timeStyle: 'short' })
 
 async function load(silent = false) {
   if (!silent) pending.value = true
@@ -28,6 +28,7 @@ async function load(silent = false) {
     error.value = ''
   }
   catch (e) {
+    console.error('Failed to load support ticket detail:', e)
     const status = (e as { statusCode?: number }).statusCode
     if (!silent) error.value = status === 404 ? t('dashboard.support.notFound') : t('errors.loadSection')
   }

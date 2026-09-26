@@ -39,12 +39,36 @@ public class StaffSupportTicketController {
 
     @GetMapping
     @PreAuthorize("@ss.hasPermi('nad:support:ticket:view')")
-    public List<StaffTicketSummary> queue(@RequestParam(required = false) TicketStatus status,
-            @RequestParam(required = false) TicketPriority priority,
-            @RequestParam(required = false) TicketCategory category,
+    public List<StaffTicketSummary> queue(@RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String category,
             @RequestParam(required = false) Long assigneeId,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return tickets.list(status, priority, category, assigneeId, page, size);
+        TicketStatus parsedStatus = null;
+        if (status != null && !status.isBlank()) {
+            try {
+                parsedStatus = TicketStatus.valueOf(status.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                return List.of();
+            }
+        }
+        TicketPriority parsedPriority = null;
+        if (priority != null && !priority.isBlank()) {
+            try {
+                parsedPriority = TicketPriority.valueOf(priority.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                return List.of();
+            }
+        }
+        TicketCategory parsedCategory = null;
+        if (category != null && !category.isBlank()) {
+            try {
+                parsedCategory = TicketCategory.valueOf(category.trim().toUpperCase());
+            } catch (IllegalArgumentException ignored) {
+                return List.of();
+            }
+        }
+        return tickets.list(parsedStatus, parsedPriority, parsedCategory, assigneeId, page, size);
     }
 
     @GetMapping("/{id}")
