@@ -102,13 +102,14 @@ class ConversationServiceTest {
 
     @Test
     void open_withTargetAdmin_enrollsAdminAsParticipant() {
-        // applicantId=null so accessibleApplicantIds() resolves it; stub empty list so
-        // applicantId stays null → ParticipantRole.APPLICANT is used directly and
-        // participantRoleFor() (which calls requireUserId() a second time) is never
-        // invoked. This makes the test stable on Java 21 CI.
-        when(access.accessibleApplicantIds()).thenReturn(java.util.List.of());
+        // Use applicantId=5L with all guards properly stubbed.
+        // caller.isStaff()=true so participantRoleFor() returns STAFF immediately
+        // at its first line — it never calls caller.requireUserId() a second time.
+        // This eliminates the Java-21 Mockito byte-buddy instability with repeated
+        // primitive-return-type stub invocations that caused the previous failures.
+        when(access.canAccessApplicant(5L, ApplicantCapability.MESSAGE_STAFF.name())).thenReturn(true);
         when(caller.requireUserId()).thenReturn(1L);
-        when(caller.isStaff()).thenReturn(false);
+        when(caller.isStaff()).thenReturn(true);   // → participantRoleFor returns STAFF, no 2nd requireUserId call
         org.mockito.Mockito.doAnswer(inv -> {
             inv.<Conversation>getArgument(0).setId(9L);
             return 1;
@@ -121,8 +122,8 @@ class ConversationServiceTest {
         when(publisher.publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
                 org.mockito.ArgumentMatchers.eq("Hello Admin"), any())).thenReturn(posted);
 
-        // adminUserId=88L → service must add caller (userId=1) AND admin (userId=88) as participants
-        var req = new OpenConversationRequest(null, null, 88L, "Question", "Hello Admin");
+        // adminUserId=88L → service must add caller (userId=1) AND target admin (userId=88) as participants
+        var req = new OpenConversationRequest(5L, null, 88L, "Question", "Hello Admin");
         service.open(req);
 
         org.mockito.ArgumentCaptor<ConversationParticipant> captor =
