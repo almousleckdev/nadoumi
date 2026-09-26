@@ -98,6 +98,27 @@ describe('staff conversations', () => {
     expect(w.find('[data-test="composer"]').exists()).toBe(true)
   })
 
+  it('renders attachments with download link when url is present', async () => {
+    api.listMessages.mockResolvedValueOnce([
+      M(1, {
+        attachments: [
+          { id: 101, filename: 'transcript.pdf', contentType: 'application/pdf', byteSize: 2048, url: 'https://cdn.example.com/transcript.pdf' },
+          { id: 102, filename: 'notes.txt', contentType: 'text/plain', byteSize: 512, url: null },
+        ],
+      }),
+    ])
+    const w = await mountView()
+    await w.find('[data-test="conversation-row"]').trigger('click')
+    await flushPromises()
+
+    const link = w.find('a.conv__attach-link')
+    expect(link.exists()).toBe(true)
+    expect(link.attributes('href')).toBe('https://cdn.example.com/transcript.pdf')
+    expect(link.text()).toContain('transcript.pdf')
+
+    expect(w.text()).toContain('notes.txt')
+  })
+
   it('offers to join an unclaimed conversation when the thread is forbidden, and joins as STAFF', async () => {
     api.listMessages.mockRejectedValueOnce({ response: { status: 403 } })
     const w = await mountView()

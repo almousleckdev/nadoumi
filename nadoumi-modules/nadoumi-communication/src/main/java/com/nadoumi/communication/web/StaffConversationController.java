@@ -1,5 +1,6 @@
 package com.nadoumi.communication.web;
 
+import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.communication.domain.enums.ParticipantRole;
 import com.nadoumi.communication.service.ConversationService;
 import com.nadoumi.communication.web.request.AddParticipantRequest;
@@ -7,6 +8,8 @@ import com.nadoumi.communication.web.request.PostMessageRequest;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
 import com.nadoumi.communication.web.response.ParticipantResponse;
+import com.ruoyi.common.utils.SecurityUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -41,15 +44,17 @@ public class StaffConversationController {
     @GetMapping("/conversations/{id}/messages")
     @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
     public List<MessageResponse> messages(@PathVariable Long id,
-            @RequestParam(name = "beforeId", defaultValue = "0") long beforeId) {
-        return conversations.listMessages(id, beforeId);
+            @RequestParam(name = "beforeId", defaultValue = "0") long beforeId,
+            HttpServletRequest request) {
+        return conversations.listMessages(id, beforeId, accessContext(request));
     }
 
     @PostMapping("/conversations/{id}/messages")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
-    public MessageResponse post(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req) {
-        return conversations.post(id, req);
+    public MessageResponse post(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req,
+            HttpServletRequest request) {
+        return conversations.post(id, req, accessContext(request));
     }
 
     @PostMapping("/conversations/{id}/read")
@@ -98,5 +103,17 @@ public class StaffConversationController {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_IMPLEMENTED);
         problem.setDetail("promote-to-document ships with the Document domain (Step 7)");
         return problem;
+    }
+
+    private static MediaAccessLogContext accessContext(HttpServletRequest request) {
+        Long userId;
+        try {
+            userId = SecurityUtils.getUserId();
+        }
+        catch (RuntimeException e) {
+            userId = null;
+        }
+        return new MediaAccessLogContext(userId == null ? 0L : userId, null, null, null,
+                request.getRemoteAddr(), request.getHeader("User-Agent"));
     }
 }

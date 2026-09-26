@@ -188,7 +188,18 @@
                       v-for="a in m.attachments"
                       :key="a.id"
                     >
-                      {{ t('conversations.attachment') }}: {{ a.filename }}
+                      <a
+                        v-if="a.url"
+                        :href="a.url"
+                        target="_blank"
+                        rel="noopener"
+                        class="conv__attach-link"
+                      >
+                        📎 {{ a.filename || t('conversations.attachment') }}
+                      </a>
+                      <span v-else>
+                        📎 {{ a.filename || t('conversations.attachment') }}
+                      </span>
                     </li>
                   </ul>
                   <p class="conv__time">
@@ -506,6 +517,8 @@ onMounted(async () => {
 .conv__sender { margin: 0; font-size: 12px; font-weight: 600; color: var(--nad-ink-soft, #64748b); }
 .conv__body { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .conv__attach { margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--nad-ink-soft, #64748b); }
+.conv__attach-link { color: var(--el-color-primary, #4338ca); text-decoration: underline; word-break: break-all; }
+.conv__attach-link:hover { color: var(--el-color-primary-dark-2, #3730a3); }
 .conv__time { margin: 4px 0 0; text-align: end; font-size: 11px; color: var(--nad-ink-faint, #9ca3af); }
 .conv__composer { padding: 12px 16px; border-top: 1px solid var(--nad-line, #e5e7eb); margin-top: auto; }
 .conv__send { display: flex; justify-content: flex-end; margin-top: 8px; }

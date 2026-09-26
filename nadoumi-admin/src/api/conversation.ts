@@ -18,6 +18,7 @@ export interface MessageAttachment {
   filename: string | null
   contentType: string | null
   byteSize: number
+  url?: string | null
 }
 
 export interface ConversationMessage {
