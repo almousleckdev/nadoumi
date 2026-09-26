@@ -49,14 +49,16 @@ public class StudentConversationController {
 
     @GetMapping("/{id}/messages")
     public List<MessageResponse> messages(@PathVariable Long id,
-            @RequestParam(name = "beforeId", defaultValue = "0") long beforeId) {
-        return conversations.listMessages(id, beforeId);
+            @RequestParam(name = "beforeId", defaultValue = "0") long beforeId,
+            HttpServletRequest request) {
+        return conversations.listMessages(id, beforeId, accessContext(request));
     }
 
     @PostMapping("/{id}/messages")
     @ResponseStatus(HttpStatus.CREATED)
-    public MessageResponse post(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req) {
-        return conversations.post(id, req);
+    public MessageResponse post(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req,
+            HttpServletRequest request) {
+        return conversations.post(id, req, accessContext(request));
     }
 
     @PostMapping("/{id}/read")

@@ -8,11 +8,12 @@ const props = defineProps<{ conversationId: number, attachment: MessageAttachmen
 const { t } = useI18n()
 const { attachmentAccess } = useMessages()
 
-const url = ref('')
+const url = ref(props.attachment.url ?? '')
 const failed = ref(false)
-const pending = ref(true)
+const pending = ref(!props.attachment.url)
 
 onMounted(async () => {
+  if (url.value) return
   try {
     const access = await attachmentAccess(props.conversationId, props.attachment.id)
     url.value = access.url

@@ -156,6 +156,12 @@ public class ConversationService {
     /** Posts a message to a conversation the caller is an active participant of. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse post(long conversationId, PostMessageRequest req) {
+        return post(conversationId, req, null);
+    }
+
+    /** Posts a message and pre-signs attachment URLs for immediate rendering. */
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResponse post(long conversationId, PostMessageRequest req, MediaAccessLogContext ctx) {
         long userId = caller.requireUserId();
         requireActiveParticipant(conversationId, userId);
         List<Long> attachmentMediaIds = req.attachmentMediaIdsOrEmpty();
@@ -176,15 +182,21 @@ public class ConversationService {
             }
         }
         Message message = publisher.publish(conversationId, userId, req.body(), attachmentMediaIds);
-        return toMessageResponse(message);
+        return toMessageResponse(message, ctx);
     }
 
     /** Newest-first message page (cursor by id, exclusive), for a caller who is an active participant. */
     @Transactional(readOnly = true)
     public List<MessageResponse> listMessages(long conversationId, long beforeId) {
+        return listMessages(conversationId, beforeId, null);
+    }
+
+    /** Newest-first message page with pre-signed attachment URLs (eliminates N+1 fetch round-trips). */
+    @Transactional(readOnly = true)
+    public List<MessageResponse> listMessages(long conversationId, long beforeId, MediaAccessLogContext ctx) {
         requireActiveParticipant(conversationId, caller.requireUserId());
         return messages.listByConversation(conversationId, beforeId, PAGE_SIZE).stream()
-                .map(this::toMessageResponse)
+                .map(m -> toMessageResponse(m, ctx))
                 .toList();
     }
 
@@ -377,19 +389,34 @@ public class ConversationService {
     }
 
     private MessageResponse toMessageResponse(Message m) {
+        return toMessageResponse(m, null);
+    }
+
+    private MessageResponse toMessageResponse(Message m, MediaAccessLogContext ctx) {
         List<AttachmentResponse> attached = attachments.listByMessage(m.getId()).stream()
-                .map(this::toAttachmentResponse)
+                .map(a -> toAttachmentResponse(a, ctx))
                 .toList();
         String senderName = users.findDisplayName(m.getSenderUserId());
         return new MessageResponse(m.getId(), m.getConversationId(), m.getSenderUserId(), senderName,
                 m.getBody(), m.getCreatedAt(), m.getEditedAt(), attached);
     }
 
-    private AttachmentResponse toAttachmentResponse(MessageAttachment a) {
+    private AttachmentResponse toAttachmentResponse(MessageAttachment a, MediaAccessLogContext ctx) {
         return media.find(a.getMediaAssetId())
-                .map(asset -> new AttachmentResponse(a.getId(), a.getMediaAssetId(), asset.originalFilename(),
-                        asset.contentType(), asset.byteSize()))
-                .orElseGet(() -> new AttachmentResponse(a.getId(), a.getMediaAssetId(), null, null, 0));
+                .map(asset -> {
+                    String url = null;
+                    if (ctx != null) {
+                        try {
+                            url = media.issueInlineSignedUrl(a.getMediaAssetId(), ctx).url();
+                        }
+                        catch (Exception e) {
+                            // fall back to client fetching via attachmentAccess
+                        }
+                    }
+                    return new AttachmentResponse(a.getId(), a.getMediaAssetId(), asset.originalFilename(),
+                            asset.contentType(), asset.byteSize(), url);
+                })
+                .orElseGet(() -> new AttachmentResponse(a.getId(), a.getMediaAssetId(), null, null, 0, null));
     }
 
     private static String truncate(String body) {
