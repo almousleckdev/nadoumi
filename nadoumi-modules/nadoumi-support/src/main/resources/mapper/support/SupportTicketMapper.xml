@@ -77,4 +77,14 @@
         update nad_support_ticket set category = #{category}, update_by = #{updateBy}, update_time = now()
         where id = #{id}
     </update>
+
+    <update id="updateResolvedAt">
+        update nad_support_ticket set resolved_at = #{resolvedAt}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <update id="updateClosedAt">
+        update nad_support_ticket set closed_at = #{closedAt}, update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
 </mapper>

@@ -9,7 +9,20 @@ const localePath = useLocalePath()
 const route = useRoute()
 const { signOut } = useSession()
 
-interface NavItem { to: string, key: string, icon: DashboardIconName }
+const { listConversations } = useMessages()
+const { unreadCount: getUnreadNotifs } = useNotifications()
+
+const { data: badgeCounts } = useAsyncData('sidebar-badges', async () => {
+  const [convos, notifs] = await Promise.all([
+    listConversations().catch(() => []),
+    getUnreadNotifs().catch(() => ({ count: 0 }))
+  ])
+  const unreadMessages = convos.reduce((sum, c) => sum + (c.unreadCount || 0), 0)
+  return { messages: unreadMessages, notifications: notifs.count }
+})
+
+
+interface NavItem { to: string, key: string, icon: DashboardIconName, badge?: number }
 interface NavGroup { heading?: string, items: NavItem[] }
 
 const groups: NavGroup[] = [
@@ -68,7 +81,10 @@ const linkClass = (active: boolean) => [
         @click="emit('navigate')"
       >
         <DashboardIcon :name="item.icon" :size="18" class="shrink-0" />
-        <span v-show="!collapsed" class="truncate">{{ t(item.key) }}</span>
+        <span v-show="!collapsed" class="truncate flex-1">{{ t(item.key) }}</span>
+        <span v-if="!collapsed && (item.to === '/dashboard/messages' ? badgeCounts?.messages : item.to === '/dashboard/notifications' ? badgeCounts?.notifications : 0)" class="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-brand-500 px-2 text-[10px] font-bold text-white shadow-sm ring-1 ring-inset ring-brand-500/20">
+          {{ item.to === '/dashboard/messages' ? badgeCounts?.messages : badgeCounts?.notifications }}
+        </span>
       </NuxtLink>
     </div>
 

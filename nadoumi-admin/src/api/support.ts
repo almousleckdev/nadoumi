@@ -19,6 +19,8 @@ export interface StaffTicketSummary {
   assignedStaffId: number | null
   createTime: string
   updateTime: string
+  resolvedAt?: string
+  closedAt?: string
 }
 
 export interface TicketMessage {

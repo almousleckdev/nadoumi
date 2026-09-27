@@ -10,7 +10,9 @@ public record StudentTicketSummary(
         String category,
         String status,
         LocalDateTime createTime,
-        LocalDateTime updateTime) {
+        LocalDateTime updateTime,
+        LocalDateTime resolvedAt,
+        LocalDateTime closedAt) {
 
     public static StudentTicketSummary from(SupportTicket t) {
         return new StudentTicketSummary(
@@ -19,6 +21,8 @@ public record StudentTicketSummary(
                 t.getCategory() == null ? "OTHER" : t.getCategory().name(),
                 t.getStatus() == null ? "OPEN" : t.getStatus().name(),
                 t.getCreateTime(),
-                t.getUpdateTime());
+                t.getUpdateTime(),
+                t.getResolvedAt(),
+                t.getClosedAt());
     }
 }

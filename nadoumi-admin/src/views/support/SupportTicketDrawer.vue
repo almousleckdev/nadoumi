@@ -232,6 +232,17 @@ const assigneeLabel = computed(() => {
   return m ? m.nickName : String(id)
 })
 
+
+function computeSLA(t: any) {
+  const end = new Date(t.resolvedAt || t.closedAt || t.updateTime).getTime()
+  const start = new Date(t.createTime).getTime()
+  const diff = end - start
+  if (diff < 0) return '0h'
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  return `${hours}h ${minutes}m`
+}
+
 function eventText(e: TicketEvent): string {
   const key = `support.event.${e.eventType}`
   return t(key, { from: e.oldValue ?? '', to: e.newValue ?? '', actor: e.actorUserId })

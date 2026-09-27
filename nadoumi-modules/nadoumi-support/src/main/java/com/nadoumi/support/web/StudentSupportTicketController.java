@@ -60,4 +60,11 @@ public class StudentSupportTicketController {
     public MessageResponse reply(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req) {
         return tickets.reply(id, req);
     }
+
+    @PostMapping("/{id}/close")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void close(@PathVariable Long id) {
+        tickets.close(id);
+    }
+
 }

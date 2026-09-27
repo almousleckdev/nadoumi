@@ -16,9 +16,9 @@ public enum TicketStatus {
 
     public Set<TicketStatus> allowedNext() {
         return switch (this) {
-            case OPEN -> Set.of(IN_PROGRESS);
-            case IN_PROGRESS -> Set.of(WAITING_ON_STUDENT, RESOLVED);
-            case WAITING_ON_STUDENT -> Set.of(IN_PROGRESS, RESOLVED);
+            case OPEN -> Set.of(IN_PROGRESS, CLOSED);
+            case IN_PROGRESS -> Set.of(WAITING_ON_STUDENT, RESOLVED, CLOSED);
+            case WAITING_ON_STUDENT -> Set.of(IN_PROGRESS, RESOLVED, CLOSED);
             case RESOLVED -> Set.of(CLOSED);
             case CLOSED -> Set.of();
         };

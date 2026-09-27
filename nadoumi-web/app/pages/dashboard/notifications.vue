@@ -38,11 +38,28 @@ async function loadMore() {
   await load(false)
 }
 
+
+const router = useRouter()
+const localePath = useLocalePath()
+
 async function onOpen(n: NotificationView) {
-  if (n.read) return
-  n.read = true
-  n.readAt = new Date().toISOString()
-  await markRead(n.id).catch(() => { n.read = false; n.readAt = null })
+  if (!n.read) {
+    n.read = true
+    n.readAt = new Date().toISOString()
+    await markRead(n.id).catch(() => { n.read = false; n.readAt = null })
+  }
+  
+  // Deep-linking based on notification type
+  const t = n.type || ''
+  if (t === 'CONTACT_INQUIRY_RECEIVED' || t.includes('MESSAGE')) {
+    router.push(localePath('/dashboard/messages'))
+  } else if (t.includes('TICKET') || t.includes('SUPPORT')) {
+    router.push(localePath('/dashboard/support'))
+  } else if (t.includes('APPLICATION') || t === 'TASK_PROGRESS') {
+    router.push(localePath('/dashboard/applications'))
+  }
+}
+)
 }
 
 const unreadExists = computed(() => items.value.some((n: NotificationView) => !n.read))
@@ -91,8 +108,14 @@ useSeo(t('dashboard.notifications.title'), t('dashboard.notifications.blurb'))
                 :class="n.read ? 'bg-transparent' : 'bg-brand-600'"
                 aria-hidden="true"
               />
+              <span v-if="n.type && (n.type.includes('PUBLISHED') || n.type === 'PLATFORM_UPDATE')" class="mt-0.5 shrink-0 text-slate-400" title="System Announcement">
+                📢
+              </span>
               <span class="min-w-0 flex-1">
-                <span class="block text-sm" :class="n.read ? 'font-medium text-slate-700' : 'font-semibold text-slate-900'">{{ n.title }}</span>
+                <span class="block text-sm" :class="n.read ? 'font-medium text-slate-700' : 'font-semibold text-slate-900'">
+                  <span v-if="n.type && n.type.includes('PUBLISHED')" class="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 mr-2">System</span>
+                  {{ n.title }}
+                </span>
                 <span class="mt-0.5 block text-sm text-slate-500">{{ n.body }}</span>
                 <span class="mt-1 block text-xs text-slate-400">{{ formatCreatedAt(n.createdAt) }}</span>
               </span>

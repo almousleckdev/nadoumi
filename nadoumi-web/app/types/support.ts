@@ -12,6 +12,8 @@ export interface TicketSummary {
   status: TicketStatus
   createTime: string
   updateTime: string
+  resolvedAt?: string
+  closedAt?: string
 }
 
 export interface TicketAttachment {

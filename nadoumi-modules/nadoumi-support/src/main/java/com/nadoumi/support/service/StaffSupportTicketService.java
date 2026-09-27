@@ -69,7 +69,7 @@ public class StaffSupportTicketService {
         requirePermission(PERM_VIEW);
         SupportTicket ticket = find(id);
         return new StaffTicketDetail(StaffTicketSummary.from(ticket), ticket.getConversationId(),
-                conversations.listSupportMessagesForStaff(ticket.getConversationId(), 0),
+                conversations.listSupportMessagesForStaff(ticket.getConversationId(), 0).stream().sorted(java.util.Comparator.comparing(MessageResponse::createdAt)).toList(),
                 events.listByTicket(id).stream().map(TicketEventResponse::from).toList());
     }
 

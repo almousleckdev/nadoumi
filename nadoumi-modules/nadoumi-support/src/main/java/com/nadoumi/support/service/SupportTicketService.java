@@ -85,7 +85,7 @@ public class SupportTicketService {
     public StudentTicketDetail get(long id) {
         SupportTicket ticket = findOwned(id);
         return new StudentTicketDetail(StudentTicketSummary.from(ticket), ticket.getConversationId(),
-                conversations.listMessages(ticket.getConversationId(), 0));
+                conversations.listMessages(ticket.getConversationId(), 0).stream().sorted(java.util.Comparator.comparing(MessageResponse::createdAt)).toList());
     }
 
     /** Reply on the caller's own ticket. A reply to a ticket waiting on the student moves it back to IN_PROGRESS. */
@@ -100,6 +100,15 @@ public class SupportTicketService {
             workflow.changeStatus(ticket, TicketStatus.IN_PROGRESS, caller.requireUserId());
         }
         return posted;
+    }
+
+    
+    @Transactional(rollbackFor = Exception.class)
+    public void close(long id) {
+        SupportTicket ticket = findOwned(id);
+        if (ticket.getStatus() != TicketStatus.CLOSED && ticket.getStatus() != TicketStatus.RESOLVED) {
+            workflow.changeStatus(ticket, TicketStatus.CLOSED, caller.requireUserId());
+        }
     }
 
     private SupportTicket findOwned(long id) {

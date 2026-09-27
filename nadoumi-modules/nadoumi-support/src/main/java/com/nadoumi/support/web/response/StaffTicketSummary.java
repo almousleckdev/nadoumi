@@ -13,7 +13,9 @@ public record StaffTicketSummary(
         Long applicantId,
         Long assignedStaffId,
         LocalDateTime createTime,
-        LocalDateTime updateTime) {
+        LocalDateTime updateTime,
+        LocalDateTime resolvedAt,
+        LocalDateTime closedAt) {
 
     public static StaffTicketSummary from(SupportTicket t) {
         return new StaffTicketSummary(
@@ -26,6 +28,8 @@ public record StaffTicketSummary(
                 t.getApplicantId(),
                 t.getAssignedStaffId(),
                 t.getCreateTime(),
-                t.getUpdateTime());
+                t.getUpdateTime(),
+                t.getResolvedAt(),
+                t.getClosedAt());
     }
 }

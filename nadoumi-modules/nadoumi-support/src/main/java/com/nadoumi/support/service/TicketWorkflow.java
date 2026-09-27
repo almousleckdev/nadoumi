@@ -75,6 +75,16 @@ public class TicketWorkflow {
             throw new NadBadRequestException("ticket status changed concurrently, reload and retry");
         }
         ticket.setStatus(next);
+
+        if (next == TicketStatus.RESOLVED) {
+            tickets.updateResolvedAt(ticket.getId(), java.time.LocalDateTime.now(), AuditActor.username());
+            ticket.setResolvedAt(java.time.LocalDateTime.now());
+        }
+        if (next == TicketStatus.CLOSED) {
+            tickets.updateClosedAt(ticket.getId(), java.time.LocalDateTime.now(), AuditActor.username());
+            ticket.setClosedAt(java.time.LocalDateTime.now());
+        }
+
         recordEvent(ticket.getId(), TicketEventType.STATUS_CHANGED, current.name(), next.name(), actorId);
 
         if (STUDENT_VISIBLE.contains(next)) {

@@ -18,6 +18,17 @@ const pending = ref(true)
 const error = ref('')
 const thread = ref<{ reset: () => void } | null>(null)
 
+
+function computeSLA(t: any) {
+  const end = new Date(t.resolvedAt || t.closedAt || t.updateTime).getTime()
+  const start = new Date(t.createTime).getTime()
+  const diff = end - start
+  if (diff < 0) return '0h'
+  const hours = Math.floor(diff / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+  return `${hours}h ${minutes}m`
+}
+
 const formatTime = (iso: string) =>
   formatSupportDate(iso, locale.value, { dateStyle: 'medium', timeStyle: 'short' })
 
@@ -44,6 +55,13 @@ onMounted(() => { timer = setInterval(() => load(true), POLL_MS) })
 onBeforeUnmount(() => { if (timer) clearInterval(timer) })
 
 const closed = computed(() => (detail.value ? !canReplyToTicket(detail.value.ticket.status) : true))
+
+
+const { studentFetch } = useApi()
+async function closeTicket() {
+  const ok = await run(() => studentFetch(`/api/student/support/tickets/${id}/close`, { method: 'POST' }))
+  if (ok) await load(true)
+}
 
 async function onSend(body: string) {
   const sent = await run(() => reply(id, body))
@@ -83,10 +101,17 @@ useSeo(detail.value?.ticket.subject ?? t('dashboard.support.title'), t('dashboar
             <p class="mt-1 text-sm text-slate-500">
               {{ t(`dashboard.support.category.${detail.ticket.category}`) }} · {{ formatTime(detail.ticket.createTime) }}
             </p>
+            <p v-if="detail.ticket.resolvedAt || detail.ticket.closedAt" class="mt-1 text-xs font-semibold text-slate-500">
+              ⏱️ Time to Resolution: {{ computeSLA(detail.ticket) }}
+            </p>
+
           </div>
+          
           <NBadge :tone="ticketStatusTone(detail.ticket.status)" data-test="status">
             {{ t(`dashboard.support.status.${detail.ticket.status}`) }}
           </NBadge>
+          <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="secondary" size="sm" class="ml-auto" @click="closeTicket">{{ t('dashboard.support.action.CLOSED') || 'Close Ticket' }}</NButton>
+
         </header>
 
         <SectionCard :title="t('dashboard.support.conversation')">
