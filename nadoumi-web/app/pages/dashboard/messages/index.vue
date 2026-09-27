@@ -6,7 +6,6 @@ import { formatMessageTime, mergeMessages } from '~/utils/messages'
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t, locale } = useI18n()
-const localePath = useLocalePath()
 const route = useRoute()
 const router = useRouter()
 const { user } = useSession()

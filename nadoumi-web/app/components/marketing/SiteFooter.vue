@@ -58,7 +58,7 @@ const legal = [
                 data-test="whatsapp-popover"
               >
                 <!-- Bridge to prevent flicker -->
-                <div class="absolute -bottom-3 left-0 right-0 h-3"></div>
+                <div class="absolute -bottom-3 left-0 right-0 h-3" />
 
                 <div class="mb-2.5 flex items-center justify-between">
                   <div class="flex items-center gap-2">
@@ -94,7 +94,7 @@ const legal = [
                 </a>
 
                 <!-- Tooltip arrow -->
-                <div class="absolute -bottom-1.5 left-6 h-3 w-3 rotate-45 border-b border-r border-slate-200/90 bg-white"></div>
+                <div class="absolute -bottom-1.5 left-6 h-3 w-3 rotate-45 border-b border-r border-slate-200/90 bg-white" />
               </div>
             </div>
 
@@ -120,7 +120,7 @@ const legal = [
                 data-test="wechat-popover"
               >
                 <!-- Bridge to prevent flicker -->
-                <div class="absolute -bottom-3 left-0 right-0 h-3"></div>
+                <div class="absolute -bottom-3 left-0 right-0 h-3" />
 
                 <div class="mb-2.5 flex items-center justify-between">
                   <div class="flex items-center gap-2">
@@ -147,7 +147,7 @@ const legal = [
     </p>
 
     <!-- Tooltip arrow -->
-    <div class="absolute -bottom-1.5 left-6 h-3 w-3 rotate-45 border-b border-r border-slate-200/90 bg-white"></div>
+    <div class="absolute -bottom-1.5 left-6 h-3 w-3 rotate-45 border-b border-r border-slate-200/90 bg-white" />
   </div>
 </div>
           </div>
