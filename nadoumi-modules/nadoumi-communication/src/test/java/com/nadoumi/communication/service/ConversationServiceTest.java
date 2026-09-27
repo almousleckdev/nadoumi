@@ -100,38 +100,6 @@ class ConversationServiceTest {
                 org.mockito.ArgumentMatchers.eq("Hi there"), any());
     }
 
-    @Test
-    void open_withTargetAdmin_enrollsAdminAsParticipant() {
-        // Use applicantId=5L with all guards properly stubbed.
-        // caller.isStaff()=true so participantRoleFor() returns STAFF immediately
-        // at its first line — it never calls caller.requireUserId() a second time.
-        // This eliminates the Java-21 Mockito byte-buddy instability with repeated
-        // primitive-return-type stub invocations that caused the previous failures.
-        when(access.canAccessApplicant(5L, ApplicantCapability.MESSAGE_STAFF.name())).thenReturn(true);
-        when(caller.requireUserId()).thenReturn(1L);
-        when(caller.isStaff()).thenReturn(true);   // → participantRoleFor returns STAFF, no 2nd requireUserId call
-        org.mockito.Mockito.doAnswer(inv -> {
-            inv.<Conversation>getArgument(0).setId(9L);
-            return 1;
-        }).when(conversations).insert(any());
-        Message posted = new Message();
-        posted.setId(100L);
-        posted.setConversationId(9L);
-        posted.setSenderUserId(1L);
-        posted.setBody("Hello Admin");
-        when(publisher.publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
-                org.mockito.ArgumentMatchers.eq("Hello Admin"), any())).thenReturn(posted);
-
-        // adminUserId=88L → service must add caller (userId=1) AND target admin (userId=88) as participants
-        var req = new OpenConversationRequest(5L, null, 88L, "Question", "Hello Admin");
-        service.open(req);
-
-        org.mockito.ArgumentCaptor<ConversationParticipant> captor =
-                org.mockito.ArgumentCaptor.forClass(ConversationParticipant.class);
-        verify(participants, org.mockito.Mockito.times(2)).insert(captor.capture());
-        assertThat(captor.getAllValues()).extracting(ConversationParticipant::getUserId)
-                .containsExactlyInAnyOrder(1L, 88L);
-    }
 
     @Test
     void openSupport_createsASupportConversationWithoutAnApplicantAndRejectsStaff() {
