@@ -22,25 +22,40 @@ public class AddressUtils
     public static final String IP_URL = "https://whois.pconline.com.cn/ipJson.jsp";
 
     // 未知地址
-    public static final String UNKNOWN = "XX XX";
+    public static final String UNKNOWN = "Unknown Location";
 
-    public static String getRealAddressByIP(String ip)
+        public static String getRealAddressByIP(String ip)
     {
-        // 内网不查询
         if (IpUtils.internalIp(ip))
         {
-            return "内网IP";
+            return "Local Network";
         }
         if (RuoYiConfig.isAddressEnabled())
         {
             try
             {
-                String rspStr = HttpUtils.sendGet(IP_URL, "ip=" + ip + "&json=true", Constants.GBK);
+                String rspStr = HttpUtils.sendGet("http://ip-api.com/json/" + ip, "", com.ruoyi.common.constant.Constants.UTF8);
                 if (StringUtils.isEmpty(rspStr))
                 {
                     log.error("failed to resolve geolocation {}", ip);
-                    return UNKNOWN;
+                    return "Unknown Location";
                 }
+                JSONObject obj = JSON.parseObject(rspStr);
+                String country = obj.getString("country");
+                String city = obj.getString("city");
+                if (country != null && city != null) {
+                    return String.format("%s, %s", city, country);
+                } else {
+                    return "Unknown Location";
+                }
+            }
+            catch (Exception e)
+            {
+                log.error("failed to resolve geolocation {}", ip);
+            }
+        }
+        return "Unknown Location";
+    }
                 JSONObject obj = JSON.parseObject(rspStr);
                 String region = obj.getString("pro");
                 String city = obj.getString("city");

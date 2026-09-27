@@ -54,11 +54,18 @@
           
           @count="n => counts.education = n"
         />
-        <ScoresTab
-          v-else-if="tab === 'scores'"
+        <InterestsTab
+          v-else-if="tab === 'interests'"
           :id="id"
-          
-          
+        />
+        <LocationTab
+          v-else-if="tab === 'location'"
+          :id="id"
+        />
+        <WorkTab
+          v-else-if="tab === 'work'"
+          :id="id"
+          @count="n => counts.work = n"
         />
         <ContactsTab
           v-else-if="tab === 'contacts'"
@@ -94,6 +101,9 @@ import ErrorState from '@/components/ui/ErrorState.vue'
 import type { Tab } from '@/components/ui/types'
 import OverviewTab from './tabs/OverviewTab.vue'
 import EducationTab from './tabs/EducationTab.vue'
+import InterestsTab from './tabs/InterestsTab.vue'
+import LocationTab from './tabs/LocationTab.vue'
+import WorkTab from './tabs/WorkTab.vue'
 import ContactsTab from './tabs/ContactsTab.vue'
 import AccessTab from './tabs/AccessTab.vue'
 
@@ -118,14 +128,16 @@ const error = ref<string | null>(null)
 const userStore = useUserStore()
 const canViewAccess = computed(() => userStore.hasPerm('nad:applicant:access:view'))
 
-const tab = ref<'overview' | 'education' | 'scores' | 'contacts' | 'access'>('overview')
+const tab = ref<'overview' | 'education' | 'interests' | 'location' | 'work' | 'contacts' | 'access'>('overview')
 const counts = reactive<Record<string, number | undefined>>({})
 
 const tabs = computed<Tab[]>(() => {
   const base: Tab[] = [
     { key: 'overview', label: t('applicant.tabOverview') },
     { key: 'education', label: t('applicant.tabEducation'), count: counts.education },
-    { key: 'scores', label: t('applicant.tabScores'), count: counts.scores },
+    { key: 'interests', label: 'Interests' },
+    { key: 'location', label: 'Location' },
+    { key: 'work', label: 'Work', count: counts.work },
     { key: 'contacts', label: t('applicant.tabContacts'), count: counts.contacts },
   ]
   if (canViewAccess.value) {

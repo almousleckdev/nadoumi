@@ -186,3 +186,39 @@ export const uploadApplicantPhoto = (id: number | string, file: File): Promise<{
 /** Resolve a short-lived signed URL to display the applicant photo. */
 export const getApplicantPhotoUrl = (id: number | string) =>
   request.get<unknown, ApplicantPhotoUrl>(`${BASE}/${id}/photo`, { params: { json: 1 } })
+
+// ---- interests ----
+export interface ApplicantInterest {
+  primaryKind: string
+  preferredPrograms: string[]
+  preferredUniversities: string[]
+  preferredCountries: string[]
+}
+export const getInterests = (id: number | string) =>
+  request.get<unknown, ApplicantInterest>(`${BASE}/${id}/interests`)
+
+// ---- residence ----
+export interface ApplicantResidence {
+  countryOfResidence: string
+  addressLine1: string
+  addressLine2?: string
+  city: string
+  stateProvince: string
+  postalCode: string
+  currentSince: string
+}
+export const getResidence = (id: number | string) =>
+  request.get<unknown, ApplicantResidence>(`${BASE}/${id}/residence`)
+
+// ---- work ----
+export interface ApplicantWork {
+  id: number
+  employer: string
+  position: string
+  startDate: string
+  endDate?: string
+  current: boolean
+  description?: string
+}
+export const listWork = (id: number | string) =>
+  request.get<unknown, ApplicantWork[]>(`${BASE}/${id}/work`)

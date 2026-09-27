@@ -9,6 +9,9 @@ const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'm
 const formatCreatedAt = (iso: string) => dtf.value.format(new Date(iso))
 
 const PAGE_SIZE = 20
+const mode = ref('mine')
+const typeFilter = ref('')
+
 const items = ref<NotificationView[]>([])
 const page = ref(0)
 const total = ref(0)
@@ -19,7 +22,7 @@ async function load(reset = true) {
   if (reset) { pending.value = true; page.value = 0 }
   error.value = ''
   try {
-    const res = await list({ page: page.value, size: PAGE_SIZE })
+    const res = await list({ page: page.value, size: PAGE_SIZE, type: typeFilter.value || undefined })
     items.value = reset ? res.content : [...items.value, ...res.content]
     total.value = res.totalElements
   }
@@ -31,6 +34,11 @@ async function load(reset = true) {
   }
 }
 await load()
+
+watch([mode, typeFilter], () => {
+  load()
+})
+
 
 const hasMore = computed(() => items.value.length < total.value)
 async function loadMore() {
@@ -77,8 +85,24 @@ useSeo(t('dashboard.notifications.title'), t('dashboard.notifications.blurb'))
         <h1 class="font-display text-xl font-bold text-slate-900">{{ t('dashboard.notifications.title') }}</h1>
         <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.notifications.blurb') }}</p>
       </div>
-      <NButton v-if="unreadExists" variant="secondary" size="sm" @click="onMarkAll">{{ t('dashboard.notifications.markAllRead') }}</NButton>
+      <div class="flex items-center gap-3">
+        <div class="inline-flex rounded-md shadow-sm">
+          <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'" class="px-4 py-2 text-sm font-medium border border-slate-200 rounded-l-md focus:z-10 focus:ring-2 focus:ring-brand-500">All notifications</button>
+          <button type="button" @click="mode = 'mine'" :class="mode === 'mine' ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'" class="px-4 py-2 text-sm font-medium border-t border-b border-r border-slate-200 rounded-r-md focus:z-10 focus:ring-2 focus:ring-brand-500">My notifications</button>
+        </div>
+        <NButton v-if="mode === 'mine' && unreadExists" variant="secondary" size="sm" @click="onMarkAll">{{ t('dashboard.notifications.markAllRead') }}</NButton>
+      </div>
     </header>
+
+    <div v-if="mode === 'all'" class="flex items-center p-3 bg-slate-50 border border-slate-200 rounded-md">
+      <select v-model="typeFilter" class="block w-64 rounded-md border-0 py-1.5 pl-3 pr-10 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-brand-600 sm:text-sm sm:leading-6">
+        <option value="">All Types</option>
+        <option value="GENERAL">General</option>
+        <option value="APPLICATION">Application</option>
+        <option value="TICKET">Support Ticket</option>
+      </select>
+      <button v-if="typeFilter" @click="typeFilter = ''" class="ml-3 text-sm text-brand-600 hover:text-brand-700">Clear</button>
+    </div>
 
     <AsyncState :pending="pending" :error="error" :empty="!items.length">
       <template #error>
