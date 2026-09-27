@@ -2,6 +2,7 @@
 import { MESSAGE_PAGE_SIZE, type AdminContact, type ConversationMessage, type ConversationSummary } from '~/types/messages'
 import type { StudentApplicationDto } from '~/types/catalog'
 import { formatMessageTime, mergeMessages } from '~/utils/messages'
+import { useConversationStream } from '~/composables/useConversationStream'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 

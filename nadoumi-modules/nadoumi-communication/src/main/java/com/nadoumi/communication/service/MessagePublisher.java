@@ -73,6 +73,8 @@ public class MessagePublisher {
             attachments.insert(attachment);
         }
 
+        participants.updateLastRead(conversationId, senderUserId, message.getId());
+
         List<Long> otherParticipantIds = new ArrayList<>();
         List<Long> offlineRecipientIds = new ArrayList<>();
         for (ConversationParticipant p : participants.listActiveForConversation(conversationId)) {
