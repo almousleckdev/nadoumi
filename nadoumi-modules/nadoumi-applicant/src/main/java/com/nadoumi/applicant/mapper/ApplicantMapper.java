@@ -3,6 +3,7 @@ package com.nadoumi.applicant.mapper;
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.domain.ApplicantContact;
 import com.nadoumi.applicant.domain.ApplicantEducation;
+import com.nadoumi.applicant.domain.ApplicantTestScore;
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import java.util.Collection;
 import java.util.List;
@@ -53,6 +54,11 @@ public interface ApplicantMapper {
     int updateEducation(ApplicantEducation education);
     int deleteEducation(@Param("id") Long id, @Param("applicantId") Long applicantId);
 
+    List<ApplicantTestScore> findTestScores(@Param("applicantId") Long applicantId);
+    ApplicantTestScore findTestScoreById(@Param("id") Long id);
+    int insertTestScore(ApplicantTestScore score);
+    int updateTestScore(ApplicantTestScore score);
+    int deleteTestScore(@Param("id") Long id, @Param("applicantId") Long applicantId);
 
     List<ApplicantContact> findContacts(@Param("applicantId") Long applicantId);
     ApplicantContact findContactById(@Param("id") Long id);

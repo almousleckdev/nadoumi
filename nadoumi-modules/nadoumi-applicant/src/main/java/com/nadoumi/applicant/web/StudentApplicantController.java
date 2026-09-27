@@ -22,6 +22,8 @@ import com.nadoumi.applicant.web.response.ContactResponse;
 import com.nadoumi.applicant.web.request.EducationRequest;
 import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.request.SelfApplicantRequest;
+import com.nadoumi.applicant.web.request.TestScoreRequest;
+import com.nadoumi.applicant.web.response.TestScoreResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -195,6 +197,26 @@ public class StudentApplicantController {
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public void deleteEducation(@PathVariable Long id, @PathVariable Long educationId) {
         education.delete(id, educationId);
+    }
+
+    @GetMapping("/{id}/test-scores")
+    @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
+    public List<TestScoreResponse> testScores(@PathVariable Long id) {
+        return service.testScores(id);
+    }
+
+    @PostMapping("/{id}/test-scores")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public TestScoreResponse addTestScore(@PathVariable Long id, @Valid @RequestBody TestScoreRequest req) {
+        return service.addTestScore(id, req);
+    }
+
+    @DeleteMapping("/{id}/test-scores/{scoreId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
+    public void deleteTestScore(@PathVariable Long id, @PathVariable Long scoreId) {
+        service.deleteTestScore(id, scoreId);
     }
 
     @GetMapping("/{id}/contacts")

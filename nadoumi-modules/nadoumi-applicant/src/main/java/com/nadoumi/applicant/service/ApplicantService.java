@@ -4,14 +4,17 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.domain.ApplicantContact;
+import com.nadoumi.applicant.domain.ApplicantTestScore;
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
 import com.nadoumi.applicant.web.request.ContactRequest;
 import com.nadoumi.applicant.web.request.SelfApplicantRequest;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
+import com.nadoumi.applicant.web.request.TestScoreRequest;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
 import com.nadoumi.applicant.web.response.ContactResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
+import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.common.access.ApplicantCapability;
 import com.nadoumi.applicant.rules.AgeRules;
 import com.nadoumi.common.rules.NameRules;
@@ -128,6 +131,51 @@ public class ApplicantService {
             return List.of();
         }
         return mapper.findByIds(ids).stream().map(a -> ApplicantResponse.of(a, true)).toList();
+    }
+
+    // ---- test scores ----
+
+    public List<TestScoreResponse> testScores(Long applicantId) {
+        guard.require(applicantId, ApplicantCapability.VIEW_PROFILE);
+        return mapper.findTestScores(applicantId).stream().map(TestScoreResponse::of).toList();
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public TestScoreResponse addTestScore(Long applicantId, TestScoreRequest req) {
+        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
+        ApplicantTestScore s = new ApplicantTestScore();
+        s.setApplicantId(applicantId);
+        s.setTestType(req.testType());
+        s.setScore(req.score());
+        s.setSubScoresJson(req.subScoresJson());
+        s.setTakenOn(req.takenOn());
+        s.setExpiresOn(req.expiresOn());
+        mapper.insertTestScore(s);
+        return TestScoreResponse.of(s);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public TestScoreResponse updateTestScore(Long applicantId, Long scoreId, TestScoreRequest req) {
+        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
+        ApplicantTestScore s = mapper.findTestScoreById(scoreId);
+        if (s == null || !s.getApplicantId().equals(applicantId)) {
+            throw new NadNotFoundException("test score not found");
+        }
+        s.setTestType(req.testType());
+        s.setScore(req.score());
+        s.setSubScoresJson(req.subScoresJson());
+        s.setTakenOn(req.takenOn());
+        s.setExpiresOn(req.expiresOn());
+        mapper.updateTestScore(s);
+        return TestScoreResponse.of(s);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteTestScore(Long applicantId, Long scoreId) {
+        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
+        if (mapper.deleteTestScore(scoreId, applicantId) == 0) {
+            throw new NadNotFoundException("test score not found");
+        }
     }
 
     // ---- contacts ----
