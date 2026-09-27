@@ -88,7 +88,7 @@ class FlywayMigrationsIT {
 
         // V1 baseline + V2..V90 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(81);
+        assertThat(applied).isEqualTo(82);
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -289,7 +289,7 @@ class FlywayMigrationsIT {
 
         // V40 — editable CNY->USD display rate
         assertThat(single(ds, "SELECT config_value FROM sys_config WHERE config_key = 'nadoumi.fx.cny_usd'"))
-                .isEqualTo("0.1381");
+                .isEqualTo("0.1382");
         // V41 — confidential scholarship -> programme link
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_scholarship_internal' AND column_name = 'program_id'")).isEqualTo("1");
@@ -398,7 +398,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(80); // V2..V90, same gaps as above
+        assertThat(applied).isEqualTo(81); // V2..V90, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
