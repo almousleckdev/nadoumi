@@ -226,32 +226,36 @@
                 {{ t('conversations.threadEmpty') }}
               </p>
               <div
-                v-for="m in messages"
+                v-for="(m, index) in messages"
                 :key="m.id"
                 class="conv__msg"
-                :class="{ 'conv__msg--mine': isMine(m) }"
+                :class="{ 'conv__msg--mine': isMine(m), 'conv__msg--chained': index > 0 && messages[index - 1].senderUserId === m.senderUserId }"
                 data-test="message"
               >
                 <div class="conv__bubble">
-                  <p class="conv__sender">
+                  <p v-if="index === 0 || messages[index - 1].senderUserId !== m.senderUserId" class="conv__sender">
                     {{ isMine(m) ? t('conversations.you') : (m.senderName || `#${m.senderUserId}`) }}
                   </p>
                   <p class="conv__body">
                     {{ m.body }}
                   </p>
                   
-                  <div v-if="m.attachments.length" class="conv__attach-nice">
-                    <div v-for="a in m.attachments" :key="a.id" class="conv__attach-item">
-                      <a v-if="a.url && (a.filename && (a.filename.toLowerCase().endsWith('.jpg') || a.filename.toLowerCase().endsWith('.jpeg') || a.filename.toLowerCase().endsWith('.png') || a.filename.toLowerCase().endsWith('.webp')))" :href="a.url" target="_blank" rel="noopener" class="conv__attach-img-link">
-                        <img :src="a.url" :alt="a.filename || 'attachment'" class="conv__attach-img" />
-                      </a>
-                      <a v-else-if="a.url" :href="a.url" target="_blank" rel="noopener" class="conv__attach-card">
-                        <span class="conv__attach-icon">📎</span>
-                        <span class="conv__attach-name">{{ a.filename || t('conversations.attachment') }}</span>
-                        <span class="conv__attach-view">{{ t('conversations.viewAttachment') }}</span>
+                  <div v-if="m.attachments && m.attachments.length" class="conv__attachments">
+                    <div v-for="a in m.attachments" :key="a.id" class="conv__attachment-item">
+                      <el-image
+                        v-if="a.url && a.filename && a.filename.match(/\.(jpeg|jpg|gif|png|webp)$/i)"
+                        :src="a.url"
+                        class="conv__image-preview"
+                        :preview-src-list="[a.url]"
+                        fit="cover"
+                        lazy
+                      />
+                      <a v-else-if="a.url" :href="a.url" target="_blank" rel="noopener noreferrer" class="conv__file-card">
+                        <el-icon class="conv__file-icon"><Document /></el-icon>
+                        <span class="conv__file-name" :title="a.filename || 'Attachment'">{{ a.filename || 'Attachment' }}</span>
                       </a>
                       <span v-else class="conv__attach-missing">
-                        📎 {{ a.filename || t('conversations.attachment') }} ({{ t('conversations.attachmentUnavailable') }})
+                        <el-icon><Warning /></el-icon> {{ a.filename || 'Attachment' }} (Unavailable)
                       </span>
                     </div>
                   </div>
@@ -906,12 +910,17 @@ onMounted(async () => {
   .conv { grid-template-columns: 1fr; }
 }
 
-.conv__attach-nice { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-.conv__attach-img-link { display: block; max-width: 250px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); }
-.conv__attach-img { display: block; width: 100%; height: auto; object-fit: contain; }
-.conv__attach-card { display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.05); padding: 8px 12px; border-radius: 8px; text-decoration: none; border: 1px solid rgba(0,0,0,0.1); }
-.conv__attach-name { font-size: 13px; color: var(--nad-ink, #1e293b); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv__attach-view { font-size: 12px; color: var(--el-color-primary, #4338ca); text-decoration: underline; }
-.conv__attach-missing { font-size: 12px; color: var(--el-color-danger, #ef4444); font-style: italic; }
+
+
+
+.conv__msg--chained { margin-top: -6px; }
+.conv__msg--chained .conv__bubble { border-top-left-radius: 4px; border-top-right-radius: 4px; }
+.conv__attachments { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.conv__image-preview { border-radius: 8px; border: 1px solid var(--nad-line, #e2e8f0); max-width: 240px; max-height: 240px; display: block; }
+.conv__file-card { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--nad-surface, #ffffff); border: 1px solid var(--nad-line, #e2e8f0); border-radius: 8px; text-decoration: none; transition: background 0.2s; max-width: 280px; }
+.conv__file-card:hover { background: var(--nad-surface-2, #f8fafc); }
+.conv__file-icon { font-size: 18px; color: var(--el-color-primary, #4338ca); }
+.conv__file-name { font-size: 13px; color: var(--nad-ink, #1e293b); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.conv__attach-missing { font-size: 12px; color: var(--el-color-danger, #ef4444); font-style: italic; display: flex; align-items: center; gap: 4px; }
 
 </style>
