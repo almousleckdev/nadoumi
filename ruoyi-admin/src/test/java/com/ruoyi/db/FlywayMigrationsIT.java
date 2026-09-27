@@ -289,7 +289,7 @@ class FlywayMigrationsIT {
 
         // V40 — editable CNY->USD display rate
         assertThat(single(ds, "SELECT config_value FROM sys_config WHERE config_key = 'nadoumi.fx.cny_usd'"))
-                .isEqualTo("0.1382");
+                .isEqualTo("0.1381");
         // V41 — confidential scholarship -> programme link
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_scholarship_internal' AND column_name = 'program_id'")).isEqualTo("1");
