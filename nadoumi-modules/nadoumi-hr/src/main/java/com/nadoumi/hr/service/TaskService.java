@@ -169,7 +169,7 @@ public class TaskService {
         if (!from.canMoveTo(target)) {
             throw new NadBadRequestException("cannot move a task from " + from + " to " + target);
         }
-        if (target == TaskStatus.APPROVED && !isAdmin) {
+        if (target == TaskStatus.CLOSED && !isAdmin) {
             throw new NadBadRequestException("only an approver (nad:task:approve) can approve a completed task");
         }
 
@@ -181,7 +181,7 @@ public class TaskService {
         if (target == TaskStatus.COMPLETED) {
             t.setCompletedAt(now);
         }
-        if (target == TaskStatus.APPROVED) {
+        if (target == TaskStatus.CLOSED) {
             t.setApprovedByUserId(actorUserId);
             t.setApprovedAt(now);
         }
@@ -194,10 +194,23 @@ public class TaskService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void delete(long id) {
+    public void delete(long id, long actorUserId) {
+        Task t = require(id);
+        if (!java.util.Objects.equals(actorUserId, t.getCreatedByUserId())) {
+            throw new NadForbiddenException("Only the creator can delete a task");
+        }
         if (taskMapper.deleteById(id) == 0) {
             throw new NadNotFoundException("task not found");
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public TaskResponse addNote(long id, String note, long actorUserId, boolean isApprover) {
+        Task t = require(id);
+        assertCanView(t, actorUserId, isApprover);
+        writeEvent(id, "NOTE", null, null, actorUserId, nz(note));
+        emit(t, t.getStatus(), actorUserId);
+        return get(id);
     }
 
     // ---- internals ----
@@ -220,7 +233,7 @@ public class TaskService {
         if (t.getAssigneeUserId() != null) {
             recipients.add(t.getAssigneeUserId());
         }
-        recipients.addAll(audienceMapper.findStaffUserIdsWithPermission(APPROVE_PERMISSION));
+        // recipients.addAll(audienceMapper.findStaffUserIdsWithPermission(APPROVE_PERMISSION));
         recipients.remove(actorUserId); // don't notify the person who made the change
 
         JSONObject payload = new JSONObject();

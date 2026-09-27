@@ -90,11 +90,22 @@ public class StaffTaskController {
         return service.changeStatus(id, req.status(), req.note(), actor(), isApprover());
     }
 
+    @PostMapping("/{id}/notes")
+    @PreAuthorize("@ss.hasAnyPermi('nad:task:progress,nad:task:edit,nad:task:query')")
+    @Log(title = "Task note", businessType = BusinessType.INSERT)
+    public TaskResponse addNote(@PathVariable long id, @RequestBody java.util.Map<String, String> payload) {
+        String note = payload.get("note");
+        if (note == null || note.trim().isEmpty()) {
+            throw new com.nadoumi.common.exception.NadBadRequestException("Note cannot be empty");
+        }
+        return service.addNote(id, note.trim(), actor(), isApprover());
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:task:remove')")
     @Log(title = "Task", businessType = BusinessType.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable long id) {
-        service.delete(id);
+        service.delete(id, actor());
     }
 }
