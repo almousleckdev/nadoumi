@@ -19,7 +19,7 @@ const error = ref('')
 const thread = ref<{ reset: () => void } | null>(null)
 
 
-function computeSLA(t: any) {
+function computeSLA(t: TicketDetail['ticket']) {
   const end = new Date(t.resolvedAt || t.closedAt || t.updateTime).getTime()
   const start = new Date(t.createTime).getTime()
   const diff = end - start
@@ -85,8 +85,8 @@ async function bookMeeting() {
     })
     showMeetingModal.value = false
     await load(true)
-  } catch (e: any) {
-    meetingError.value = e.data?.detail || 'Failed to book meeting'
+  } catch (e) {
+    meetingError.value = (e as { data?: { detail?: string } }).data?.detail || 'Failed to book meeting'
   } finally {
     meetingBusy.value = false
   }
@@ -159,7 +159,7 @@ useSeo(detail.value?.ticket.subject ?? t('dashboard.support.title'), t('dashboar
 
         <!-- Meeting Modal -->
         <NModal v-model:open="showMeetingModal" title="Request a 1:1 Meeting">
-          <form @submit.prevent="bookMeeting" class="grid gap-4">
+          <form class="grid gap-4" @submit.prevent="bookMeeting">
             <p class="text-sm text-slate-500">Select a date, time, and duration for your 1:1 meeting. If the requested slot conflicts with the assigned staff member's calendar, it will be rejected.</p>
             
             <NAlert v-if="meetingError" tone="danger">{{ meetingError }}</NAlert>

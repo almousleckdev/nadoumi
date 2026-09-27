@@ -455,7 +455,7 @@ const inboxLoading = ref(true)
 const inboxError = ref('')
 
 const searchStudent = ref('')
-const EMOJIS = ['👍', '😂', '🔥', '❤️', '👏', '🎉', '😊', '🙌', '👀', '🤔', '✅', '🙏', '💯', '✨']
+
 const searchAppId = ref<number | undefined>()
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 

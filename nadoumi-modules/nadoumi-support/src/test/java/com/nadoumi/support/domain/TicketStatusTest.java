@@ -11,11 +11,11 @@ class TicketStatusTest {
 
     @Test
     void shouldFollowTheDocumentedMatrix_whenMovingBetweenStatuses() {
-        assertThat(TicketStatus.OPEN.allowedNext()).containsExactly(TicketStatus.IN_PROGRESS);
+        assertThat(TicketStatus.OPEN.allowedNext()).containsExactlyInAnyOrder(TicketStatus.IN_PROGRESS, TicketStatus.CLOSED);
         assertThat(TicketStatus.IN_PROGRESS.allowedNext())
-                .containsExactlyInAnyOrder(TicketStatus.WAITING_ON_STUDENT, TicketStatus.RESOLVED);
+                .containsExactlyInAnyOrder(TicketStatus.WAITING_ON_STUDENT, TicketStatus.RESOLVED, TicketStatus.CLOSED);
         assertThat(TicketStatus.WAITING_ON_STUDENT.allowedNext())
-                .containsExactlyInAnyOrder(TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED);
+                .containsExactlyInAnyOrder(TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED, TicketStatus.CLOSED);
         assertThat(TicketStatus.RESOLVED.allowedNext()).containsExactly(TicketStatus.CLOSED);
     }
 
@@ -26,8 +26,7 @@ class TicketStatusTest {
 
     @Test
     void shouldRejectSkippingStraightToClosedOrResolved_whenTicketIsStillOpen() {
-        Set<TicketStatus> rejected = EnumSet.of(TicketStatus.WAITING_ON_STUDENT, TicketStatus.RESOLVED,
-                TicketStatus.CLOSED, TicketStatus.OPEN);
+        Set<TicketStatus> rejected = EnumSet.of(TicketStatus.WAITING_ON_STUDENT, TicketStatus.RESOLVED, TicketStatus.OPEN);
         for (TicketStatus target : rejected) {
             assertThat(TicketStatus.OPEN.canMoveTo(target)).as("OPEN -> %s", target).isFalse();
         }

@@ -59,8 +59,6 @@ async function onOpen(n: NotificationView) {
     router.push(localePath('/dashboard/applications'))
   }
 }
-)
-}
 
 const unreadExists = computed(() => items.value.some((n: NotificationView) => !n.read))
 async function onMarkAll() {

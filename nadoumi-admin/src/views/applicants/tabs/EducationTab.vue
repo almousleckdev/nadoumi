@@ -1,37 +1,50 @@
 <template>
   <div class="edu">
-    <AsyncList ref="list" :fetch="() => listEducation(props.id)">
-      <template #default="{ items }">
-        <div v-if="items.length === 0" class="edu__empty">
-          {{ t('applicant.noEducation') }}
-        </div>
-        <div v-for="edu in items" :key="edu.id" class="edu__card">
-          <div class="edu__main">
-            <div class="edu__degree">{{ edu.degree }}</div>
-            <div class="edu__school">{{ edu.school }}</div>
-            <div class="edu__major">{{ edu.major }}</div>
-            <div class="edu__dates">
-              {{ edu.startDate }} — {{ edu.endDate ?? t('applicant.present') }}
-            </div>
-            <div class="edu__gpa" v-if="edu.gpa">
-              GPA: {{ edu.gpa }}
-            </div>
+    <div v-if="loading" class="p-4 text-center">Loading...</div>
+    <div v-else-if="error" class="p-4 text-red-500 text-center">{{ error }}</div>
+    <div v-else>
+      <div v-if="items.length === 0" class="edu__empty">
+        {{ t('applicant.noEducation') }}
+      </div>
+      <div v-for="edu in items" :key="edu.id" class="edu__card">
+        <div class="edu__main">
+          <div class="edu__degree">{{ edu.degree }}</div>
+          <div class="edu__school">{{ edu.school }}</div>
+          <div class="edu__major">{{ edu.major }}</div>
+          <div class="edu__dates">
+            {{ edu.startDate }} — {{ edu.endDate ?? t('applicant.present') }}
+          </div>
+          <div class="edu__gpa" v-if="edu.gpa">
+            GPA: {{ edu.gpa }}
           </div>
         </div>
-      </template>
-    </AsyncList>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { listEducation } from '@/api/applicant'
-import AsyncList from '@/components/ui/AsyncList.vue'
 
 const props = defineProps<{ id: string }>()
 const { t } = useI18n()
-const list = ref<InstanceType<typeof AsyncList>>()
+
+const items = ref<any[]>([])
+const loading = ref(true)
+const error = ref('')
+
+onMounted(async () => {
+  try {
+    const res = await listEducation(props.id)
+    items.value = res || []
+  } catch (e: any) {
+    error.value = e.message || 'Error fetching'
+  } finally {
+    loading.value = false
+  }
+})
 </script>
 
 <style scoped>
