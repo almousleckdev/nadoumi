@@ -20,7 +20,7 @@
 
     <select id="findLatest" resultMap="message">
         select <include refid="cols"/> from nad_message
-        where conversation_id = #{conversationId} and deleted_at is null
+        where conversation_id = #{conversationId} and deleted_at is null and sender_user_id != #{userId}
         order by id desc limit 1
     </select>
 
@@ -33,7 +33,7 @@
 
     <select id="countAfter" resultType="long">
         select count(*) from nad_message
-        where conversation_id = #{conversationId} and id > #{afterId} and deleted_at is null
+        where conversation_id = #{conversationId} and id > #{afterId} and deleted_at is null and sender_user_id != #{userId}
     </select>
 
     <insert id="insert" parameterType="com.nadoumi.communication.domain.Message"

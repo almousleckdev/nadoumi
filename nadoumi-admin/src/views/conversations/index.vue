@@ -233,9 +233,7 @@
                 data-test="message"
               >
                 <div class="conv__bubble">
-                  <p v-if="index === 0 || messages[index - 1].senderUserId !== m.senderUserId" class="conv__sender">
-                    {{ isMine(m) ? t('conversations.you') : (m.senderName || `#${m.senderUserId}`) }}
-                  </p>
+                  
                   <p class="conv__body">
                     {{ m.body }}
                   </p>
@@ -457,6 +455,7 @@ const inboxLoading = ref(true)
 const inboxError = ref('')
 
 const searchStudent = ref('')
+const EMOJIS = ['👍', '😂', '🔥', '❤️', '👏', '🎉', '😊', '🙌', '👀', '🤔', '✅', '🙏', '💯', '✨']
 const searchAppId = ref<number | undefined>()
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 

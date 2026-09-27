@@ -14,8 +14,6 @@ import com.nadoumi.applicant.web.request.EducationRequest;
 import com.nadoumi.applicant.web.response.EducationResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
-import com.nadoumi.applicant.web.request.TestScoreRequest;
-import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import jakarta.servlet.http.HttpServletRequest;
@@ -81,30 +79,7 @@ public class StaffApplicantController {
         return service.createByStaff(req);
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    @Log(title = "Applicant", businessType = BusinessType.UPDATE)
-    public ApplicantResponse update(@PathVariable Long id,
-            @Valid @RequestBody com.nadoumi.applicant.web.request.SelfApplicantRequest req) {
-        return service.update(id, req);
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:archive')")
-    @Log(title = "Applicant", businessType = BusinessType.UPDATE)
-    public void archive(@PathVariable Long id) {
-        service.archive(id);
-    }
-
     // ---- protected files: profile photo and passport scan ----
-
-    @PostMapping("/{id}/photo")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    @Log(title = "Applicant photo", businessType = BusinessType.UPDATE)
-    public ProtectedMediaResponses.Uploaded uploadPhoto(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
-        return new ProtectedMediaResponses.Uploaded(media.upload(id, ApplicantMediaKind.PHOTO, file));
-    }
 
     @GetMapping("/{id}/photo")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
@@ -135,81 +110,10 @@ public class StaffApplicantController {
         return education.list(id);
     }
 
-    @PostMapping("/{id}/education")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    public EducationResponse addEducation(@PathVariable Long id, @Valid @RequestBody EducationRequest req) {
-        return education.add(id, req);
-    }
-
-    @PutMapping("/{id}/education/{educationId}")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    @Log(title = "Applicant education", businessType = BusinessType.UPDATE)
-    public EducationResponse updateEducation(@PathVariable Long id, @PathVariable Long educationId,
-            @Valid @RequestBody EducationRequest req) {
-        return education.update(id, educationId, req);
-    }
-
-    @DeleteMapping("/{id}/education/{educationId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    public void deleteEducation(@PathVariable Long id, @PathVariable Long educationId) {
-        education.delete(id, educationId);
-    }
-
-    @GetMapping("/{id}/test-scores")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
-    public List<TestScoreResponse> testScores(@PathVariable Long id) {
-        return service.testScores(id);
-    }
-
-    @PostMapping("/{id}/test-scores")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    public TestScoreResponse addTestScore(@PathVariable Long id, @Valid @RequestBody TestScoreRequest req) {
-        return service.addTestScore(id, req);
-    }
-
-    @PutMapping("/{id}/test-scores/{scoreId}")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    @Log(title = "Applicant test score", businessType = BusinessType.UPDATE)
-    public TestScoreResponse updateTestScore(@PathVariable Long id, @PathVariable Long scoreId,
-            @Valid @RequestBody TestScoreRequest req) {
-        return service.updateTestScore(id, scoreId, req);
-    }
-
-    @DeleteMapping("/{id}/test-scores/{scoreId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    public void deleteTestScore(@PathVariable Long id, @PathVariable Long scoreId) {
-        service.deleteTestScore(id, scoreId);
-    }
-
     @GetMapping("/{id}/contacts")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
     public List<ContactResponse> contacts(@PathVariable Long id) {
         return service.contacts(id);
     }
 
-    @PostMapping("/{id}/contacts")
-    @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    public ContactResponse addContact(@PathVariable Long id, @Valid @RequestBody ContactRequest req) {
-        return service.addContact(id, req);
     }
-
-    @PutMapping("/{id}/contacts/{contactId}")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    @Log(title = "Applicant contact", businessType = BusinessType.UPDATE)
-    public ContactResponse updateContact(@PathVariable Long id, @PathVariable Long contactId,
-            @Valid @RequestBody ContactRequest req) {
-        return service.updateContact(id, contactId, req);
-    }
-
-    @DeleteMapping("/{id}/contacts/{contactId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
-    public void deleteContact(@PathVariable Long id, @PathVariable Long contactId) {
-        service.deleteContact(id, contactId);
-    }
-}

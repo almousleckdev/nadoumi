@@ -25,6 +25,15 @@
           {{ t('applicant.registered') }} {{ fmtDate(applicant.createdAt) }}
         </template>
         <template #actions>
+          <el-button size="small" @click="router.push(`/conversations?userId=${applicant.id}`)">
+            <el-icon><ChatDotRound /></el-icon> Contact
+          </el-button>
+          <el-button size="small" type="warning" plain @click="changeStatus('2')">
+            Suspend
+          </el-button>
+          <el-button size="small" type="danger" plain @click="changeStatus('1')">
+            Block
+          </el-button>
           <StatusBadge :status="applicant.status" />
         </template>
       </PageHeader>
@@ -36,25 +45,25 @@
         <OverviewTab
           v-if="tab === 'overview'"
           :applicant="applicant"
-          :can-edit="canEdit"
+          
           @updated="load"
         />
         <EducationTab
           v-else-if="tab === 'education'"
           :id="id"
-          :can-edit="canEdit"
+          
           @count="n => counts.education = n"
         />
         <ScoresTab
           v-else-if="tab === 'scores'"
           :id="id"
-          :can-edit="canEdit"
-          @count="n => counts.scores = n"
+          
+          
         />
         <ContactsTab
           v-else-if="tab === 'contacts'"
           :id="id"
-          :can-edit="canEdit"
+          
           @count="n => counts.contacts = n"
         />
         <AccessTab
@@ -69,11 +78,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
+import { ChatDotRound } from '@element-plus/icons-vue'
+import { changeUserStatus } from '@/api/system'
+import { useUserStore } from '@/stores/user'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft } from '@element-plus/icons-vue'
 import { getApplicant, type Applicant } from '@/api/applicant'
-import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
 import AppTabs from '@/components/ui/AppTabs.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
@@ -82,21 +94,28 @@ import ErrorState from '@/components/ui/ErrorState.vue'
 import type { Tab } from '@/components/ui/types'
 import OverviewTab from './tabs/OverviewTab.vue'
 import EducationTab from './tabs/EducationTab.vue'
-import ScoresTab from './tabs/ScoresTab.vue'
 import ContactsTab from './tabs/ContactsTab.vue'
 import AccessTab from './tabs/AccessTab.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
-const userStore = useUserStore()
+async function changeStatus(status: string) {
+  if (!applicant.value) return
+  await changeUserStatus(applicant.value.id, status)
+  ElMessage.success('Status updated successfully')
+  load()
+}
+
+
 
 const id = route.params.id as string
 const applicant = ref<Applicant | null>(null)
 const loading = ref(false)
 const error = ref<string | null>(null)
 
-const canEdit = computed(() => userStore.hasPerm('nad:applicant:edit'))
+
+const userStore = useUserStore()
 const canViewAccess = computed(() => userStore.hasPerm('nad:applicant:access:view'))
 
 const tab = ref<'overview' | 'education' | 'scores' | 'contacts' | 'access'>('overview')

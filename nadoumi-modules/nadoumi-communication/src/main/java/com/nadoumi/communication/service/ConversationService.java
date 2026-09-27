@@ -427,7 +427,7 @@ public class ConversationService {
         Message latest = messages.findLatest(c.getId());
         long afterId = myParticipant == null || myParticipant.getLastReadMessageId() == null
                 ? 0 : myParticipant.getLastReadMessageId();
-        long unread = messages.countAfter(c.getId(), afterId);
+        long unread = myParticipant == null ? 0 : messages.countAfter(c.getId(), afterId, myParticipant.getUserId());
         String preview = latest == null ? null : previewFor(latest);
 
         Long studentUserId = null;

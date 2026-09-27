@@ -180,40 +180,6 @@
     </delete>
 
     <!-- test scores -->
-    <resultMap id="testScore" type="com.nadoumi.applicant.domain.ApplicantTestScore">
-        <id     property="id"           column="id"/>
-        <result property="applicantId"  column="applicant_id"/>
-        <result property="testType"     column="test_type"/>
-        <result property="score"        column="score"/>
-        <result property="subScoresJson" column="sub_scores_json"/>
-        <result property="takenOn"      column="taken_on"/>
-        <result property="expiresOn"    column="expires_on"/>
-    </resultMap>
-
-    <select id="findTestScores" resultMap="testScore">
-        select id, applicant_id, test_type, score, sub_scores_json, taken_on, expires_on
-        from nad_applicant_test_score where applicant_id = #{applicantId} order by taken_on desc, id desc
-    </select>
-    <select id="findTestScoreById" resultMap="testScore">
-        select id, applicant_id, test_type, score, sub_scores_json, taken_on, expires_on
-        from nad_applicant_test_score where id = #{id}
-    </select>
-    <insert id="insertTestScore" parameterType="com.nadoumi.applicant.domain.ApplicantTestScore"
-            useGeneratedKeys="true" keyProperty="id">
-        insert into nad_applicant_test_score
-            (applicant_id, test_type, score, sub_scores_json, taken_on, expires_on, create_by, create_time)
-        values (#{applicantId}, #{testType}, #{score}, #{subScoresJson}, #{takenOn}, #{expiresOn}, '', now())
-    </insert>
-    <update id="updateTestScore" parameterType="com.nadoumi.applicant.domain.ApplicantTestScore">
-        update nad_applicant_test_score set
-            test_type = #{testType}, score = #{score}, sub_scores_json = #{subScoresJson},
-            taken_on = #{takenOn}, expires_on = #{expiresOn}, update_time = now()
-        where id = #{id} and applicant_id = #{applicantId}
-    </update>
-    <delete id="deleteTestScore">
-        delete from nad_applicant_test_score where id = #{id} and applicant_id = #{applicantId}
-    </delete>
-
     <!-- contacts -->
     <resultMap id="contact" type="com.nadoumi.applicant.domain.ApplicantContact">
         <id     property="id"          column="id"/>

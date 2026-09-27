@@ -6,7 +6,7 @@ import { useConversationStream } from '~/composables/useConversationStream'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const { user } = useSession()

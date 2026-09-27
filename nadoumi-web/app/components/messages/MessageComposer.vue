@@ -18,6 +18,8 @@ const inputId = useId()
 interface PendingAttachment { key: string, file: File, mediaId: number | null, uploading: boolean, error: string }
 const pending = ref<PendingAttachment[]>([])
 const pickError = ref('')
+const EMOJIS = ['👍', '😂', '🔥', '❤️', '👏', '🎉', '😊', '🙌', '👀', '🤔', '✅', '🙏', '💯', '✨']
+const showEmoji = ref(false)
 
 const uploading = computed(() => pending.value.some(p => p.uploading))
 const readyAttachmentIds = computed(() => pending.value.filter(p => p.mediaId !== null).map(p => p.mediaId!))
@@ -116,6 +118,14 @@ function submit() {
         <span class="sr-only">{{ t('dashboard.messages.attach') }}</span>
         <input :id="inputId" type="file" multiple :accept="MESSAGE_ATTACHMENT_ACCEPT" :disabled="disabled" class="sr-only" @change="onPick">
       </label>
+
+      <div class="relative">
+        <button type="button" @click="showEmoji = !showEmoji" class="inline-flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-lg hover:bg-slate-100" :title="t('dashboard.messages.emoji')">😀</button>
+        <div v-if="showEmoji" class="absolute bottom-full left-0 mb-2 w-48 rounded-lg border border-slate-200 bg-white p-2 shadow-lg grid grid-cols-5 gap-2 z-10">
+          <button v-for="e in EMOJIS" :key="e" type="button" class="text-xl hover:bg-slate-100 rounded" @click="draft += e; showEmoji = false">{{ e }}</button>
+        </div>
+      </div>
+
       <NButton type="submit" size="sm" :loading="busy" :disabled="!canSend">
         {{ t('dashboard.messages.send') }}
       </NButton>

@@ -16,7 +16,7 @@ public interface MessageMapper {
     List<Message> listByConversation(@Param("conversationId") long conversationId,
             @Param("beforeId") long beforeId, @Param("limit") int limit);
 
-    long countAfter(@Param("conversationId") long conversationId, @Param("afterId") long afterId);
+    long countAfter(@Param("conversationId") long conversationId, @Param("afterId") long afterId, @Param("userId") long userId);
 
     int insert(Message message);
 
