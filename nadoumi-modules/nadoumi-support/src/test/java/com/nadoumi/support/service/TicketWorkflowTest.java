@@ -121,8 +121,8 @@ class TicketWorkflowTest {
 
     @Test
     void shouldRejectAndWriteNothing_whenTransitionIsNotInTheMatrix() {
-        assertThatThrownBy(() -> workflow.changeStatus(ticket(TicketStatus.OPEN), TicketStatus.CLOSED, STAFF_A))
-                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("OPEN to CLOSED");
+        assertThatThrownBy(() -> workflow.changeStatus(ticket(TicketStatus.OPEN), TicketStatus.RESOLVED, STAFF_A))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("OPEN to RESOLVED");
         assertThatThrownBy(() -> workflow.changeStatus(ticket(TicketStatus.CLOSED), TicketStatus.OPEN, STAFF_A))
                 .isInstanceOf(NadBadRequestException.class);
 
