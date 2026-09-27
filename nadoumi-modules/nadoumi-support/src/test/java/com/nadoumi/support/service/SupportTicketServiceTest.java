@@ -40,7 +40,8 @@ class SupportTicketServiceTest {
     private final ConversationService conversations = mock(ConversationService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
-    private final SupportTicketService service = new SupportTicketService(tickets, workflow, conversations, caller, access);
+    private final com.nadoumi.support.mapper.SupportMeetingMapper meetingMapper = mock(com.nadoumi.support.mapper.SupportMeetingMapper.class);
+    private final SupportTicketService service = new SupportTicketService(tickets, conversations, caller, workflow, access, meetingMapper);
 
     private static SupportTicket ticket(long openedBy, TicketStatus status) {
         SupportTicket t = new SupportTicket();

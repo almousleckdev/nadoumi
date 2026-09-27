@@ -67,4 +67,11 @@ public class StudentSupportTicketController {
         tickets.close(id);
     }
 
+    @PostMapping("/{id}/meetings")
+    @ResponseStatus(HttpStatus.CREATED)
+    public com.nadoumi.support.domain.SupportMeeting bookMeeting(@PathVariable Long id, @Valid @RequestBody com.nadoumi.support.web.request.BookMeetingRequest req) {
+        return tickets.bookMeeting(id, req);
+    }
+
+
 }

@@ -10,6 +10,8 @@ import com.nadoumi.communication.web.request.PostMessageRequest;
 import com.nadoumi.communication.web.response.MessageResponse;
 import com.nadoumi.identity.access.CurrentCaller;
 import com.nadoumi.support.domain.SupportTicket;
+import com.nadoumi.support.domain.SupportMeeting;
+import com.nadoumi.support.mapper.SupportMeetingMapper;
 import com.nadoumi.support.domain.enums.TicketStatus;
 import com.nadoumi.support.mapper.SupportTicketMapper;
 import com.nadoumi.support.web.request.CreateTicketRequest;
@@ -38,14 +40,15 @@ public class SupportTicketService {
     private final ConversationService conversations;
     private final CurrentCaller caller;
     private final NadoumiAccessService access;
+    private final SupportMeetingMapper meetingMapper;
 
-    public SupportTicketService(SupportTicketMapper tickets, TicketWorkflow workflow,
-            ConversationService conversations, CurrentCaller caller, NadoumiAccessService access) {
+    public SupportTicketService(SupportTicketMapper tickets, ConversationService conversations, CurrentCaller caller, TicketWorkflow workflow, NadoumiAccessService access, SupportMeetingMapper meetingMapper) {
         this.tickets = tickets;
         this.workflow = workflow;
         this.conversations = conversations;
         this.caller = caller;
         this.access = access;
+        this.meetingMapper = meetingMapper;
     }
 
     /** Opens a ticket: creates the SUPPORT conversation + first message, then the ticket that owns it. */
@@ -109,6 +112,43 @@ public class SupportTicketService {
         if (ticket.getStatus() != TicketStatus.CLOSED && ticket.getStatus() != TicketStatus.RESOLVED) {
             workflow.changeStatus(ticket, TicketStatus.CLOSED, caller.requireUserId());
         }
+    }
+
+    
+    @Transactional(rollbackFor = Exception.class)
+    public SupportMeeting bookMeeting(long ticketId, com.nadoumi.support.web.request.BookMeetingRequest req) {
+        SupportTicket ticket = findOwned(ticketId);
+        if (ticket.getAssignedStaffId() == null) {
+            throw new com.nadoumi.common.exception.NadBadRequestException("Ticket must be assigned to a staff member before booking a meeting");
+        }
+        if (req.getStartTime().isBefore(java.time.LocalDateTime.now())) {
+            throw new com.nadoumi.common.exception.NadBadRequestException("Cannot book a meeting in the past");
+        }
+        
+        java.time.LocalDateTime end = req.getStartTime().plusMinutes(req.getDurationMinutes());
+        int staffConflicts = meetingMapper.countOverlappingStaffMeetings(ticket.getAssignedStaffId(), req.getStartTime(), end);
+        if (staffConflicts > 0) {
+            throw new com.nadoumi.common.exception.NadBadRequestException("The assigned staff member is busy at that time");
+        }
+        int studentConflicts = meetingMapper.countOverlappingStudentMeetings(ticket.getApplicantId(), req.getStartTime(), end);
+        if (studentConflicts > 0) {
+            throw new com.nadoumi.common.exception.NadBadRequestException("You already have a meeting scheduled at that time");
+        }
+        
+        SupportMeeting meeting = new SupportMeeting();
+        meeting.setTicketId(ticket.getId());
+        meeting.setStudentId(ticket.getApplicantId());
+        meeting.setStaffId(ticket.getAssignedStaffId());
+        meeting.setStartTime(req.getStartTime());
+        meeting.setDurationMinutes(req.getDurationMinutes());
+        meeting.setStatus(com.nadoumi.support.domain.enums.MeetingStatus.SCHEDULED);
+        meeting.setCreateBy(com.ruoyi.common.utils.AuditActor.username());
+        meetingMapper.insert(meeting);
+        
+        com.nadoumi.communication.web.request.PostMessageRequest msg = new com.nadoumi.communication.web.request.PostMessageRequest("System: A " + req.getDurationMinutes() + "-minute meeting has been scheduled for " + req.getStartTime() + ".", java.util.List.of());
+        conversations.post(ticket.getConversationId(), msg);
+        
+        return meeting;
     }
 
     private SupportTicket findOwned(long id) {

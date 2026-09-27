@@ -63,6 +63,35 @@ async function closeTicket() {
   if (ok) await load(true)
 }
 
+const showMeetingModal = ref(false)
+const meetingDate = ref('')
+const meetingTime = ref('')
+const meetingDuration = ref<number>(35)
+const meetingError = ref('')
+const meetingBusy = ref(false)
+
+async function bookMeeting() {
+  if (!meetingDate.value || !meetingTime.value) {
+    meetingError.value = 'Date and time are required'
+    return
+  }
+  const startTime = `${meetingDate.value}T${meetingTime.value}:00`
+  meetingBusy.value = true
+  meetingError.value = ''
+  try {
+    await studentFetch(`/api/student/support/tickets/${id}/meetings`, {
+      method: 'POST',
+      body: { startTime, durationMinutes: meetingDuration.value }
+    })
+    showMeetingModal.value = false
+    await load(true)
+  } catch (e: any) {
+    meetingError.value = e.data?.detail || 'Failed to book meeting'
+  } finally {
+    meetingBusy.value = false
+  }
+}
+
 async function onSend(body: string) {
   const sent = await run(() => reply(id, body))
   if (!sent) return
@@ -110,8 +139,10 @@ useSeo(detail.value?.ticket.subject ?? t('dashboard.support.title'), t('dashboar
           <NBadge :tone="ticketStatusTone(detail.ticket.status)" data-test="status">
             {{ t(`dashboard.support.status.${detail.ticket.status}`) }}
           </NBadge>
-          <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="secondary" size="sm" class="ml-auto" @click="closeTicket">{{ t('dashboard.support.action.CLOSED') || 'Close Ticket' }}</NButton>
-
+          <div class="ml-auto flex gap-2">
+            <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="primary" size="sm" @click="showMeetingModal = true">Request Meeting</NButton>
+            <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="secondary" size="sm" @click="closeTicket">{{ t('dashboard.support.action.CLOSED') || 'Close Ticket' }}</NButton>
+          </div>
         </header>
 
         <SectionCard :title="t('dashboard.support.conversation')">
@@ -125,6 +156,40 @@ useSeo(detail.value?.ticket.subject ?? t('dashboard.support.title'), t('dashboar
             @send="onSend"
           />
         </SectionCard>
+
+        <!-- Meeting Modal -->
+        <NModal v-model:open="showMeetingModal" title="Request a 1:1 Meeting">
+          <form @submit.prevent="bookMeeting" class="grid gap-4">
+            <p class="text-sm text-slate-500">Select a date, time, and duration for your 1:1 meeting. If the requested slot conflicts with the assigned staff member's calendar, it will be rejected.</p>
+            
+            <NAlert v-if="meetingError" tone="danger">{{ meetingError }}</NAlert>
+            
+            <div class="grid gap-2">
+              <label class="text-sm font-medium">Date</label>
+              <NInput v-model="meetingDate" type="date" required />
+            </div>
+            
+            <div class="grid gap-2">
+              <label class="text-sm font-medium">Time</label>
+              <NInput v-model="meetingTime" type="time" required />
+            </div>
+            
+            <div class="grid gap-2">
+              <label class="text-sm font-medium">Duration</label>
+              <select v-model="meetingDuration" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm sm:leading-6">
+                <option :value="35">35 minutes</option>
+                <option :value="45">45 minutes</option>
+                <option :value="60">1 hour</option>
+                <option :value="90">1.5 hours</option>
+              </select>
+            </div>
+            
+            <div class="mt-4 flex justify-end gap-3">
+              <NButton variant="secondary" @click="showMeetingModal = false">Cancel</NButton>
+              <NButton variant="primary" type="submit" :loading="meetingBusy">Book Meeting</NButton>
+            </div>
+          </form>
+        </NModal>
       </template>
     </AsyncState>
   </div>
