@@ -4,9 +4,6 @@ import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.service.ApplicantMediaKind;
 import com.nadoumi.applicant.service.ApplicantMediaService;
 import com.nadoumi.applicant.service.ApplicantService;
-import com.nadoumi.applicant.service.InterestService;
-import com.nadoumi.applicant.service.ResidenceService;
-import com.nadoumi.applicant.service.WorkService;
 import com.nadoumi.applicant.service.EducationService;
 import com.nadoumi.applicant.service.PassportService;
 import com.nadoumi.applicant.web.response.PassportStatusResponse;
@@ -47,19 +44,13 @@ public class StaffApplicantController {
     private final ApplicantMediaService media;
     private final PassportService passports;
     private final EducationService education;
-    private final InterestService interests;
-    private final ResidenceService residence;
-    private final WorkService work;
 
     public StaffApplicantController(ApplicantService service, ApplicantMediaService media, PassportService passports,
-            EducationService education, InterestService interests, ResidenceService residence, WorkService work) {
+            EducationService education) {
         this.service = service;
         this.media = media;
         this.passports = passports;
         this.education = education;
-        this.interests = interests;
-        this.residence = residence;
-        this.work = work;
     }
 
     @GetMapping
@@ -222,21 +213,6 @@ public class StaffApplicantController {
         service.deleteContact(id, contactId);
     }
     
-    @GetMapping("/{id}/interests")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
-    public com.nadoumi.applicant.web.response.InterestResponse interests(@PathVariable Long id) {
-        return interests.get(id).orElse(null);
-    }
     
-    @GetMapping("/{id}/residence")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
-    public com.nadoumi.applicant.web.response.ResidenceResponse residence(@PathVariable Long id) {
-        return residence.get(id).orElse(null);
-    }
     
-    @GetMapping("/{id}/work")
-    @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
-    public List<com.nadoumi.applicant.web.response.WorkResponse> work(@PathVariable Long id) {
-        return work.list(id);
-    }
 }
