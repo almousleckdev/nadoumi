@@ -17,6 +17,37 @@
 
     <div class="conv">
       <aside class="conv__list">
+        <div class="conv__search-bar">
+          <el-input
+            v-model="searchStudent"
+            placeholder="Search student or subject…"
+            clearable
+            size="small"
+            :prefix-icon="Search"
+            @input="debouncedSearch"
+            @clear="() => loadInbox()"
+          />
+          <div class="conv__search-actions">
+            <el-input
+              v-model.number="searchAppId"
+              placeholder="App ID"
+              clearable
+              size="small"
+              style="width: 80px"
+              @change="() => loadInbox()"
+              @clear="() => loadInbox()"
+            />
+            <el-button
+              type="primary"
+              size="small"
+              :icon="Plus"
+              @click="openNewConversation"
+            >
+              New
+            </el-button>
+          </div>
+        </div>
+
         <LoadingState
           v-if="inboxLoading"
           :rows="6"
@@ -51,7 +82,7 @@
                 <span
                   class="conv__row-title"
                   :class="{ 'conv__row-title--unread': c.unreadCount > 0 }"
-                >{{ c.subject || t('conversations.untitled') }}</span>
+                >{{ c.studentName || c.subject || t('conversations.untitled') }}</span>
                 <el-badge
                   v-if="c.unreadCount > 0"
                   :value="c.unreadCount"
@@ -59,10 +90,20 @@
                 />
               </span>
               <span
+                v-if="c.studentName && c.subject"
+                class="conv__row-sub"
+              >{{ c.subject }}</span>
+              <span
                 v-if="c.lastMessagePreview"
                 class="conv__row-preview"
               >{{ c.lastMessagePreview }}</span>
               <span class="conv__row-meta">
+                <el-tag
+                  v-if="c.applicationId"
+                  size="small"
+                  type="success"
+                  effect="plain"
+                >#app {{ c.applicationId }}</el-tag>
                 <el-tag
                   v-if="c.status === 'CLOSED'"
                   size="small"
@@ -84,17 +125,35 @@
         />
         <template v-else>
           <header class="conv__thread-head">
-            <div>
+            <div class="conv__thread-head-info">
               <h2 class="conv__thread-title">
                 {{ selected.subject || t('conversations.untitled') }}
               </h2>
-              <el-tag
-                v-if="isClosed"
-                size="small"
-                type="info"
-              >
-                {{ t('conversations.closed') }}
-              </el-tag>
+              <div class="conv__thread-badges">
+                <el-tag
+                  v-if="selected.studentName"
+                  size="small"
+                  type="primary"
+                  effect="plain"
+                >
+                  👤 {{ selected.studentName }}
+                </el-tag>
+                <el-tag
+                  v-if="selected.applicationId"
+                  size="small"
+                  type="success"
+                  effect="plain"
+                >
+                  Application #{{ selected.applicationId }}
+                </el-tag>
+                <el-tag
+                  v-if="isClosed"
+                  size="small"
+                  type="info"
+                >
+                  {{ t('conversations.closed') }}
+                </el-tag>
+              </div>
             </div>
             <el-button
               v-if="isParticipant && !isClosed"
@@ -295,6 +354,69 @@
         </template>
       </section>
     </div>
+    <!-- New Conversation with Student Dialog -->
+    <el-dialog
+      v-model="newConvOpen"
+      title="Start Conversation with Student"
+      width="540px"
+      destroy-on-close
+    >
+      <el-form label-position="top">
+        <el-form-item label="Select Student" required>
+          <el-select
+            v-model="newConvForm.studentUserId"
+            placeholder="Choose a registered student…"
+            filterable
+            :loading="loadingStudents"
+            style="width: 100%"
+          >
+            <el-option
+              v-for="s in studentOptions"
+              :key="s.userId"
+              :label="`${s.nickName || s.userName} (@${s.userName})${s.email ? ' · ' + s.email : ''}`"
+              :value="s.userId"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Application ID (optional)">
+          <el-input-number
+            v-model="newConvForm.applicationId"
+            :min="1"
+            placeholder="Related Application ID"
+            style="width: 100%"
+          />
+        </el-form-item>
+        <el-form-item label="Subject">
+          <el-input
+            v-model="newConvForm.subject"
+            placeholder="e.g. Question regarding your application"
+            maxlength="200"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="Initial Message" required>
+          <el-input
+            v-model="newConvForm.body"
+            type="textarea"
+            :rows="5"
+            placeholder="Write your message to the student…"
+            maxlength="4000"
+            show-word-limit
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="newConvOpen = false">Cancel</el-button>
+        <el-button
+          type="primary"
+          :loading="creatingConv"
+          :disabled="!newConvForm.studentUserId || !newConvForm.body.trim()"
+          @click="submitNewConversation"
+        >
+          Start Conversation
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -303,17 +425,18 @@ import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Loading, Paperclip } from '@element-plus/icons-vue'
+import { Loading, Paperclip, Plus, Search } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import {
   addParticipant, closeConversation, listInbox, listMessages, markConversationRead, postMessage,
-  uploadAttachment,
+  uploadAttachment, createConversation,
   MESSAGE_MAX_LENGTH, MESSAGE_PAGE_SIZE,
   type ConversationMessage, type ConversationSummary,
 } from '@/api/conversation'
+import { listUsers, type SysUserRow } from '@/api/system'
 import { useUserStore } from '@/stores/user'
 import { useConfirm } from '@/composables/useConfirm'
 import { useStaffStream } from '@/composables/useStaffStream'
@@ -334,17 +457,85 @@ const inbox = ref<ConversationSummary[]>([])
 const inboxLoading = ref(true)
 const inboxError = ref('')
 
+const searchStudent = ref('')
+const searchAppId = ref<number | undefined>()
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+
+function debouncedSearch() {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    void loadInbox()
+  }, 300)
+}
+
 async function loadInbox(silent = false) {
   if (!silent) inboxLoading.value = true
   inboxError.value = ''
   try {
-    inbox.value = await listInbox()
+    inbox.value = await listInbox({
+      studentName: searchStudent.value.trim() || undefined,
+      applicationId: searchAppId.value || undefined,
+    })
   }
   catch {
     if (!silent) inboxError.value = t('conversations.loadError')
   }
   finally {
     inboxLoading.value = false
+  }
+}
+
+// ---- new conversation ----
+const newConvOpen = ref(false)
+const studentOptions = ref<SysUserRow[]>([])
+const loadingStudents = ref(false)
+const newConvForm = reactive({
+  studentUserId: undefined as number | undefined,
+  applicationId: undefined as number | undefined,
+  subject: '',
+  body: '',
+})
+const creatingConv = ref(false)
+
+async function openNewConversation() {
+  newConvForm.studentUserId = undefined
+  newConvForm.applicationId = undefined
+  newConvForm.subject = ''
+  newConvForm.body = ''
+  newConvOpen.value = true
+  if (!studentOptions.value.length) {
+    loadingStudents.value = true
+    try {
+      const res = await listUsers({ userType: '10', pageSize: 100 })
+      studentOptions.value = res.rows || []
+    } catch {
+      // ignore
+    } finally {
+      loadingStudents.value = false
+    }
+  }
+}
+
+async function submitNewConversation() {
+  if (!newConvForm.studentUserId || !newConvForm.body.trim()) return
+  creatingConv.value = true
+  try {
+    const res = await createConversation({
+      studentUserId: newConvForm.studentUserId,
+      applicationId: newConvForm.applicationId || undefined,
+      subject: newConvForm.subject.trim() || 'Conversation with Nadoumi Administration',
+      body: newConvForm.body.trim(),
+    })
+    ElMessage.success('Conversation created successfully')
+    newConvOpen.value = false
+    await loadInbox()
+    if (res.conversationId) {
+      select(res.conversationId)
+    }
+  } catch (e) {
+    ElMessage.error((e as Error)?.message || 'Failed to create conversation')
+  } finally {
+    creatingConv.value = false
   }
 }
 
@@ -629,7 +820,9 @@ onMounted(async () => {
   border-radius: 12px;
   min-height: 420px;
 }
-.conv__list { padding: 8px; }
+.conv__list { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
+.conv__search-bar { display: flex; flex-direction: column; gap: 6px; padding: 4px; border-bottom: 1px solid var(--nad-line, #e5e7eb); margin-bottom: 4px; }
+.conv__search-actions { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .conv__rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 .conv__row {
   width: 100%;
@@ -647,11 +840,14 @@ onMounted(async () => {
 .conv__row-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .conv__row-title { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conv__row-title--unread { font-weight: 700; }
+.conv__row-sub { font-size: 12px; color: var(--el-color-primary, #4338ca); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conv__row-preview { font-size: 12px; color: var(--nad-ink-soft, #64748b); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .conv__row-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--nad-ink-faint, #9ca3af); }
 .conv__thread { display: flex; flex-direction: column; }
-.conv__thread-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--nad-line, #e5e7eb); }
-.conv__thread-title { margin: 0 8px 0 0; display: inline; font-size: 16px; }
+.conv__thread-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--nad-line, #e5e7eb); }
+.conv__thread-head-info { display: flex; flex-direction: column; gap: 4px; }
+.conv__thread-title { margin: 0; display: inline; font-size: 16px; font-weight: 600; }
+.conv__thread-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .conv__messages { display: grid; gap: 10px; align-content: start; max-height: 460px; min-height: 240px; overflow-y: auto; padding: 16px; }
 .conv__older { text-align: center; }
 .conv__msg { display: flex; justify-content: flex-start; }

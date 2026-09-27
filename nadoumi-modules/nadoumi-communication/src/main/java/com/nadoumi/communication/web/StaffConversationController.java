@@ -5,6 +5,7 @@ import com.nadoumi.communication.domain.enums.ParticipantRole;
 import com.nadoumi.communication.service.ConversationService;
 import com.nadoumi.communication.web.request.AddParticipantRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
+import com.nadoumi.communication.web.request.StaffCreateConversationRequest;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
 import com.nadoumi.communication.web.response.ParticipantResponse;
@@ -37,8 +38,17 @@ public class StaffConversationController {
 
     @GetMapping("/conversations")
     @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
-    public List<ConversationSummaryResponse> inbox() {
-        return conversations.listForStaff();
+    public List<ConversationSummaryResponse> inbox(
+            @RequestParam(required = false) String studentName,
+            @RequestParam(required = false) Long applicationId) {
+        return conversations.listForStaff(studentName, applicationId);
+    }
+
+    @PostMapping("/conversations")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
+    public MessageResponse create(@Valid @RequestBody StaffCreateConversationRequest req) {
+        return conversations.createByStaff(req);
     }
 
     @GetMapping("/conversations/{id}/messages")

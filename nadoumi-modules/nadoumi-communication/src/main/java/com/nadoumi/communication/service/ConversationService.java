@@ -26,6 +26,8 @@ import com.nadoumi.communication.mapper.MessageAttachmentMapper;
 import com.nadoumi.communication.mapper.MessageMapper;
 import com.nadoumi.communication.web.request.OpenConversationRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
+import com.nadoumi.communication.web.request.StaffCreateConversationRequest;
+import com.nadoumi.communication.web.response.AdminContactResponse;
 import com.nadoumi.communication.web.response.AttachmentAccessResponse;
 import com.nadoumi.communication.web.response.AttachmentResponse;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
@@ -91,8 +93,15 @@ public class ConversationService {
     /** Opens a conversation for the caller's applicant, adds them as the first participant, posts the first message. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse open(OpenConversationRequest req) {
-        if (!access.canAccessApplicant(req.applicantId(), ApplicantCapability.MESSAGE_STAFF.name())) {
-            throw new NadForbiddenException("missing MESSAGE_STAFF on applicant " + req.applicantId());
+        Long applicantId = req.applicantId();
+        if (applicantId == null) {
+            List<Long> ids = access.accessibleApplicantIds();
+            if (!ids.isEmpty()) {
+                applicantId = ids.get(0);
+            }
+        }
+        if (applicantId != null && !access.canAccessApplicant(applicantId, ApplicantCapability.MESSAGE_STAFF.name())) {
+            throw new NadForbiddenException("missing MESSAGE_STAFF on applicant " + applicantId);
         }
         long userId = caller.requireUserId();
 
@@ -104,10 +113,50 @@ public class ConversationService {
         conversation.setCreateBy(AuditActor.username());
         conversations.insert(conversation);
 
-        addParticipantRow(conversation.getId(), userId, participantRoleFor(req.applicantId()));
+        addParticipantRow(conversation.getId(), userId, applicantId == null ? ParticipantRole.APPLICANT : participantRoleFor(applicantId));
+
+        Long adminUserId = req.adminUserId();
+        if (adminUserId != null && adminUserId > 0) {
+            addParticipantRow(conversation.getId(), adminUserId, ParticipantRole.STAFF);
+        } else {
+            List<AdminContactResponse> admins = users.listStaffAdmins();
+            if (!admins.isEmpty()) {
+                addParticipantRow(conversation.getId(), admins.get(0).userId(), ParticipantRole.STAFF);
+            }
+        }
 
         Message message = publisher.publish(conversation.getId(), userId, req.body(), List.of());
         return toMessageResponse(message);
+    }
+
+    /** Initiates a conversation from staff to a student. */
+    @Transactional(rollbackFor = Exception.class)
+    public MessageResponse createByStaff(StaffCreateConversationRequest req) {
+        requireStaff();
+        long staffUserId = caller.requireUserId();
+        Long studentUserId = req.studentUserId();
+        if (studentUserId == null || studentUserId <= 0) {
+            throw new NadBadRequestException("studentUserId is required");
+        }
+
+        Conversation conversation = new Conversation();
+        conversation.setSubject(req.subject());
+        conversation.setApplicationId(req.applicationId());
+        conversation.setConversationType(ConversationType.GENERAL);
+        conversation.setStatus(ConversationStatus.OPEN);
+        conversation.setCreateBy(AuditActor.username());
+        conversations.insert(conversation);
+
+        addParticipantRow(conversation.getId(), staffUserId, ParticipantRole.STAFF);
+        addParticipantRow(conversation.getId(), studentUserId, ParticipantRole.APPLICANT);
+
+        Message message = publisher.publish(conversation.getId(), staffUserId, req.body(), List.of());
+        return toMessageResponse(message);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminContactResponse> listAdmins() {
+        return users.listStaffAdmins();
     }
 
     /**
@@ -264,32 +313,29 @@ public class ConversationService {
                 .toList();
     }
 
-    /** Unclaimed (no active STAFF participant) OPEN conversations plus the caller's own -- the staff inbox. */
+    /** Staff inbox: strictly the caller's assigned/participating conversations with optional search. */
     @Transactional(readOnly = true)
-    public List<ConversationSummaryResponse> listForStaff() {
+    public List<ConversationSummaryResponse> listForStaff(String studentName, Long applicationId) {
         requireStaff();
         long userId = caller.requireUserId();
-        List<ConversationParticipant> mine = participants.listActiveForUser(userId);
-        List<Conversation> unclaimed = conversations.findUnclaimed();
-
-        List<ConversationSummaryResponse> out = new ArrayList<>();
-        if (!mine.isEmpty()) {
-            List<Conversation> found = conversations.findByIds(mine.stream().map(ConversationParticipant::getConversationId).toList());
-            for (Conversation c : found) {
-                ConversationParticipant p = mine.stream().filter(m -> m.getConversationId().equals(c.getId())).findFirst().orElseThrow();
-                out.add(toSummary(c, p));
-            }
+        List<Conversation> found = conversations.searchForStaff(userId, studentName, applicationId);
+        if (found.isEmpty()) {
+            return List.of();
         }
-        List<Long> alreadyIncluded = out.stream().map(ConversationSummaryResponse::id).toList();
-        for (Conversation c : unclaimed) {
-            if (!alreadyIncluded.contains(c.getId())) {
-                out.add(toSummary(c, null));
-            }
+        List<ConversationSummaryResponse> out = new ArrayList<>(found.size());
+        for (Conversation c : found) {
+            ConversationParticipant myParticipant = participants.findActive(c.getId(), userId);
+            out.add(toSummary(c, myParticipant));
         }
         return out.stream()
                 .sorted(Comparator.comparing(ConversationSummaryResponse::lastMessageAt,
                         Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ConversationSummaryResponse> listForStaff() {
+        return listForStaff(null, null);
     }
 
     public List<ParticipantResponse> listParticipants(long conversationId) {
@@ -383,9 +429,31 @@ public class ConversationService {
                 ? 0 : myParticipant.getLastReadMessageId();
         long unread = messages.countAfter(c.getId(), afterId);
         String preview = latest == null ? null : previewFor(latest);
+
+        Long studentUserId = null;
+        String studentName = null;
+        Long adminUserId = null;
+        String adminName = null;
+
+        List<ConversationParticipant> allActive = participants.listActiveForConversation(c.getId());
+        for (ConversationParticipant p : allActive) {
+            if (p.getRole() == ParticipantRole.STAFF) {
+                if (adminUserId == null) {
+                    adminUserId = p.getUserId();
+                    adminName = users.findDisplayName(p.getUserId());
+                }
+            } else {
+                if (studentUserId == null) {
+                    studentUserId = p.getUserId();
+                    studentName = users.findDisplayName(p.getUserId());
+                }
+            }
+        }
+
         return new ConversationSummaryResponse(c.getId(), c.getSubject(), c.getApplicationId(),
                 c.getConversationType().name(), c.getStatus().name(), preview,
-                latest == null ? null : latest.getCreatedAt(), unread);
+                latest == null ? null : latest.getCreatedAt(), unread,
+                studentUserId, studentName, adminUserId, adminName);
     }
 
     private MessageResponse toMessageResponse(Message m) {

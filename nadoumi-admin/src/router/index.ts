@@ -66,12 +66,7 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/views/scholarships/detail.vue'),
         meta: { title: 'nav.items.scholarships', i18n: true, perm: 'nad:scholarship:view' },
       },
-      {
-        path: 'documents',
-        name: 'Documents',
-        component: () => import('@/views/documents/index.vue'),
-        meta: { title: 'nav.items.documents', i18n: true, perm: 'nad:document:view' },
-      },
+
       {
         path: 'profile',
         name: 'Profile',
@@ -99,7 +94,7 @@ export const routes: RouteRecordRaw[] = [
       {
         path: 'students',
         name: 'Students',
-        component: () => import('@/views/users/index.vue'),
+        component: () => import('@/views/students/index.vue'),
         meta: { title: 'nav.items.students', i18n: true, perm: 'system:user:list', userType: '10' },
       },
       {

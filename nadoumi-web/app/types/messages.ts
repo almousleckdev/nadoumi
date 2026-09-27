@@ -8,6 +8,10 @@ export interface ConversationSummary {
   lastMessagePreview: string | null
   lastMessageAt: string | null
   unreadCount: number
+  studentUserId?: number | null
+  studentName?: string | null
+  adminUserId?: number | null
+  adminName?: string | null
 }
 
 export interface MessageAttachment {
@@ -31,10 +35,18 @@ export interface ConversationMessage {
 }
 
 export interface OpenConversationBody {
-  applicantId: number
+  applicantId?: number
   applicationId?: number
+  adminUserId?: number
   subject?: string
   body: string
+}
+
+export interface AdminContact {
+  userId: number
+  name: string
+  email?: string | null
+  avatar?: string | null
 }
 
 /** A short-lived signed URL to view/download one attachment, plus its display metadata. */

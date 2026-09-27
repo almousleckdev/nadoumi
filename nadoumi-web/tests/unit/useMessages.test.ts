@@ -75,4 +75,11 @@ describe('useMessages', () => {
     await useMessages().markRead(9)
     expect(studentFetch).toHaveBeenCalledWith('conversations/9/read', { method: 'POST' })
   })
+
+  it('GETs admins available to contact', async () => {
+    studentFetch.mockResolvedValueOnce([{ userId: 1, name: 'Admin Staff' }])
+    const admins = await useMessages().listAdmins()
+    expect(studentFetch).toHaveBeenCalledWith('conversations/admins')
+    expect(admins).toEqual([{ userId: 1, name: 'Admin Staff' }])
+  })
 })

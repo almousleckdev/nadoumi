@@ -3,6 +3,7 @@ package com.nadoumi.notification.outbox;
 import com.alibaba.fastjson2.JSON;
 import com.nadoumi.common.notification.NotificationChannelKind;
 import com.nadoumi.common.outbox.OutboxEventTypes;
+import com.nadoumi.notification.domain.NotificationScope;
 import com.nadoumi.notification.domain.NotificationType;
 import com.nadoumi.notification.domain.OutboxEvent;
 import com.nadoumi.notification.mapper.NotificationAudienceMapper;
@@ -19,10 +20,9 @@ import org.slf4j.LoggerFactory;
  * created row carries {@code source_ref = outbox:<eventId>:<userId>}, so the
  * poller's at-least-once redelivery is a no-op the second time.
  *
- * <p>Default audience is <b>staff holding {@code nad:notification:list}</b> (the
- * support desk for {@code ContactInquiryReceived}, an operational audit trail for
- * the rest). Public catalog announcements ({@link #isPublicCatalogAnnouncement})
- * additionally reach every active student — see {@code docs/DOMAIN_EVENTS.md}.</p>
+ * <p>Strict scope isolation: {@link NotificationScope#TARGETED} notifications
+ * MUST have explicit recipient(s) and NEVER broadcast. Only {@link NotificationScope#GLOBAL}
+ * public catalog announcements reach every active student.</p>
  */
 public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 
@@ -59,18 +59,27 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 
         Map<String, Object> context = parseContext(event);
         List<Long> recipients = recipientsFromPayload(context);
-        if (recipients == null) {
-            java.util.LinkedHashSet<Long> set =
-                    new java.util.LinkedHashSet<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
-            if (isPublicCatalogAnnouncement(type)) {
-                // registered students hear about every new university / programme / scholarship
+        if (recipients == null || recipients.isEmpty()) {
+            if (type.scope() == NotificationScope.TARGETED) {
+                // If it's a contact inquiry or ticket opened without explicit assignees, resolve authorized staff
+                if (type == NotificationType.CONTACT_INQUIRY_RECEIVED || type == NotificationType.TICKET_OPENED) {
+                    recipients = new java.util.ArrayList<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
+                } else {
+                    log.warn("outbox event id={} type={} is TARGETED but has no recipient user ID — skipped to prevent leakage",
+                            event.getId(), type);
+                    return;
+                }
+            } else {
+                // GLOBAL catalog announcement: staff holding catalog permission + active registered students
+                java.util.LinkedHashSet<Long> set =
+                        new java.util.LinkedHashSet<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
                 set.addAll(audienceMapper.findActiveStudentUserIds());
+                recipients = new java.util.ArrayList<>(set);
             }
-            recipients = new java.util.ArrayList<>(set);
         }
         if (recipients.isEmpty()) {
-            log.warn("outbox event id={} type={} has no staff recipients ({})",
-                    event.getId(), type, AUDIENCE_PERMISSION);
+            log.warn("outbox event id={} type={} resolved to empty recipients",
+                    event.getId(), type);
             return;
         }
 
@@ -129,28 +138,31 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
         return raw == null || String.valueOf(raw).isBlank() ? AUDIENCE_PERMISSION : String.valueOf(raw);
     }
 
-    /** Types every registered student is told about, not just the staff audit audience. */
-    private static boolean isPublicCatalogAnnouncement(NotificationType type) {
-        return type == NotificationType.SCHOLARSHIP_PUBLISHED
-                || type == NotificationType.SCHOLARSHIP_DEADLINE_REMINDER
-                || type == NotificationType.UNIVERSITY_PUBLISHED
-                || type == NotificationType.PROGRAM_PUBLISHED;
-    }
-
     /**
-     * Explicit recipient list from a {@code recipientUserIds} array in the payload
-     * (used by task events); {@code null} means "resolve by permission instead".
+     * Explicit recipient list from a {@code recipientUserIds} array or single {@code recipientUserId} /
+     * {@code userId} in the payload; {@code null} means "resolve by permission/scope instead".
      */
     private static List<Long> recipientsFromPayload(Map<String, Object> context) {
         Object raw = context.get("recipientUserIds");
-        if (!(raw instanceof List<?> list)) {
-            return null;
+        if (raw instanceof List<?> list) {
+            List<Long> result = list.stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(v -> Long.parseLong(String.valueOf(v)))
+                    .distinct()
+                    .toList();
+            if (!result.isEmpty()) {
+                return result;
+            }
         }
-        return list.stream()
-                .filter(java.util.Objects::nonNull)
-                .map(v -> Long.parseLong(String.valueOf(v)))
-                .distinct()
-                .toList();
+        for (String key : List.of("recipientUserId", "userId", "studentUserId")) {
+            Object single = context.get(key);
+            if (single != null) {
+                try {
+                    return List.of(Long.parseLong(String.valueOf(single)));
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return null;
     }
 
     private static Map<String, Object> parseContext(OutboxEvent event) {

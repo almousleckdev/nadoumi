@@ -29,13 +29,27 @@
         order by id desc
     </select>
 
-    <select id="findUnclaimed" resultMap="conversation">
-        select <include refid="cols"/> from nad_conversation c
-        where c.status = 'OPEN'
-        and not exists (
-            select 1 from nad_conversation_participant p
-            where p.conversation_id = c.id and p.removed_at is null and p.role = 'STAFF'
-        )
+    <select id="searchForStaff" resultMap="conversation">
+        select c.id, c.subject, c.application_id, c.conversation_type, c.status, c.create_by, c.create_time
+        from nad_conversation c
+        inner join nad_conversation_participant p on p.conversation_id = c.id
+        where p.user_id = #{staffUserId}
+          and p.role = 'STAFF'
+          and p.removed_at is null
+          <if test="applicationId != null">
+              and c.application_id = #{applicationId}
+          </if>
+          <if test="studentName != null and studentName != ''">
+              and exists (
+                  select 1 from nad_conversation_participant sp
+                  join sys_user su on su.user_id = sp.user_id
+                  where sp.conversation_id = c.id
+                    and sp.removed_at is null
+                    and sp.role != 'STAFF'
+                    and (su.nick_name like concat('%', #{studentName}, '%')
+                         or su.user_name like concat('%', #{studentName}, '%'))
+              )
+          </if>
         order by c.id desc
     </select>
 

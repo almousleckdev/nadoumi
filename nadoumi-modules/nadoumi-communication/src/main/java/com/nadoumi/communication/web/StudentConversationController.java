@@ -4,6 +4,7 @@ import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.communication.service.ConversationService;
 import com.nadoumi.communication.web.request.OpenConversationRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
+import com.nadoumi.communication.web.response.AdminContactResponse;
 import com.nadoumi.communication.web.response.AttachmentAccessResponse;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
@@ -39,6 +40,11 @@ public class StudentConversationController {
     @GetMapping
     public List<ConversationSummaryResponse> mine() {
         return conversations.listForUser();
+    }
+
+    @GetMapping("/admins")
+    public List<AdminContactResponse> listAdmins() {
+        return conversations.listAdmins();
     }
 
     @PostMapping

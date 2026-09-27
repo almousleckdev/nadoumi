@@ -53,6 +53,11 @@
     <select id="search" resultMap="applicant">
         select <include refid="cols"/> from nad_applicant
         <where>
+            and exists (
+                select 1 from nad_application app
+                where app.applicant_id = nad_applicant.id
+                  and app.submitted_at is not null
+            )
             <if test="name != null and name != ''">
                 and (given_name like concat('%', #{name}, '%') or family_name like concat('%', #{name}, '%'))
             </if>

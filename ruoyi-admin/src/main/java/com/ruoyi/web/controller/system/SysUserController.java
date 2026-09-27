@@ -53,6 +53,9 @@ public class SysUserController extends BaseController
     @Autowired
     private ISysPostService postService;
 
+    @Autowired
+    private com.nadoumi.identity.access.SessionRevoker sessionRevoker;
+
     /**
      * 获取用户列表
      */
@@ -153,6 +156,11 @@ public class SysUserController extends BaseController
     {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
+        SysUser existing = userService.selectUserById(user.getUserId());
+        if (existing != null && "10".equals(existing.getUserType()))
+        {
+            return error("Administrators are not permitted to edit student personal or account information");
+        }
         deptService.checkDeptDataScope(user.getDeptId());
         roleService.checkRoleDataScope(user.getRoleIds());
         if (!userService.checkUserNameUnique(user))
@@ -196,6 +204,11 @@ public class SysUserController extends BaseController
     {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
+        SysUser existing = userService.selectUserById(user.getUserId());
+        if (existing != null && "10".equals(existing.getUserType()))
+        {
+            return error("Administrators are not permitted to change or reset student passwords");
+        }
         user.setPassword(SecurityUtils.encryptPassword(user.getPassword()));
         user.setUpdateBy(getUsername());
         return toAjax(userService.resetPwd(user));
@@ -212,7 +225,12 @@ public class SysUserController extends BaseController
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         user.setUpdateBy(getUsername());
-        return toAjax(userService.updateUserStatus(user));
+        int rows = userService.updateUserStatus(user);
+        if (rows > 0 && ("1".equals(user.getStatus()) || "2".equals(user.getStatus())))
+        {
+            sessionRevoker.revokeAll(user.getUserId(), null);
+        }
+        return toAjax(rows);
     }
 
     /**

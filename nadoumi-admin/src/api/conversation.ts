@@ -10,6 +10,10 @@ export interface ConversationSummary {
   lastMessagePreview: string | null
   lastMessageAt: string | null
   unreadCount: number
+  studentUserId?: number | null
+  studentName?: string | null
+  adminUserId?: number | null
+  adminName?: string | null
 }
 
 export interface MessageAttachment {
@@ -42,10 +46,27 @@ export interface Participant {
 export const MESSAGE_PAGE_SIZE = 50
 export const MESSAGE_MAX_LENGTH = 4000
 
+export interface InboxFilterParams {
+  studentName?: string
+  applicationId?: number
+}
+
+export interface StaffCreateConversationPayload {
+  studentUserId: number
+  applicationId?: number
+  subject: string
+  body: string
+}
+
 // ---- nad:conversation:participate ----
-/** The caller's own conversations plus OPEN ones no staff member has joined yet. */
-export const listInbox = () =>
-  request.get<unknown, ConversationSummary[]>('/api/staff/conversations')
+/** The caller's assigned conversations with optional student/application filter. */
+export const listInbox = (params?: InboxFilterParams) =>
+  params
+    ? request.get<unknown, ConversationSummary[]>('/api/staff/conversations', { params })
+    : request.get<unknown, ConversationSummary[]>('/api/staff/conversations')
+
+export const createConversation = (body: StaffCreateConversationPayload) =>
+  request.post<unknown, ConversationMessage>('/api/staff/conversations', body)
 
 /** Newest-first page; pass the oldest id already shown as `beforeId` to page backwards (0 = newest). */
 export const listMessages = (id: number, beforeId = 0, silent = false) =>

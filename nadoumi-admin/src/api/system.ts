@@ -26,6 +26,7 @@ export interface SysUserRow {
   email: string | null
   phonenumber: string | null
   sex: string | null
+  avatar?: string | null
   status: string
   deptId: number | null
   dept?: { deptName?: string } | null

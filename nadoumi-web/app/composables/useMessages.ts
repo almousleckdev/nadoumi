@@ -1,4 +1,4 @@
-import type { AttachmentAccess, ConversationMessage, ConversationSummary, OpenConversationBody } from '~/types/messages'
+import type { AdminContact, AttachmentAccess, ConversationMessage, ConversationSummary, OpenConversationBody } from '~/types/messages'
 
 /** The signed-in student's own conversations, via the BFF proxy to `/api/student/conversations`. */
 export function useMessages() {
@@ -6,6 +6,7 @@ export function useMessages() {
 
   return {
     listConversations: () => studentFetch<ConversationSummary[]>('conversations'),
+    listAdmins: () => studentFetch<AdminContact[]>('conversations/admins'),
     /** Newest-first page; pass the oldest id already shown as `beforeId` to page backwards. */
     listMessages: (conversationId: number, beforeId = 0) =>
       studentFetch<ConversationMessage[]>(`conversations/${conversationId}/messages`, { query: { beforeId } }),

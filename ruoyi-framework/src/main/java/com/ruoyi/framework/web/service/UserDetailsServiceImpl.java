@@ -48,10 +48,15 @@ public class UserDetailsServiceImpl implements UserDetailsService
             log.info("login user {} has been deleted.", username);
             throw new ServiceException(MessageUtils.message("user.password.delete"));
         }
-        else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
+        else if ("1".equals(user.getStatus()))
         {
-            log.info("login user {} is disabled.", username);
-            throw new ServiceException(MessageUtils.message("user.blocked"));
+            log.info("login user {} is suspended.", username);
+            throw new ServiceException("Your account has been suspended. Please contact Nadoumi support.");
+        }
+        else if ("2".equals(user.getStatus()))
+        {
+            log.info("login user {} is blocked.", username);
+            throw new ServiceException("Your account has been blocked. Access is denied.");
         }
 
         passwordService.validate(user);

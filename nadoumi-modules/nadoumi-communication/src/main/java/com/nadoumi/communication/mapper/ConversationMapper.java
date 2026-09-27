@@ -20,7 +20,11 @@ public interface ConversationMapper {
      * which staff could never discover a student-opened conversation to add
      * themselves to (see this fork's final report).
      */
-    List<Conversation> findUnclaimed();
+    List<Conversation> searchForStaff(
+            @Param("staffUserId") long staffUserId,
+            @Param("studentName") String studentName,
+            @Param("applicationId") Long applicationId
+    );
 
     int insert(Conversation conversation);
 

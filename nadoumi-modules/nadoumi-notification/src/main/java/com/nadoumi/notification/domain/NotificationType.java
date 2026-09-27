@@ -16,22 +16,22 @@ import java.util.Set;
 public enum NotificationType {
 
     /** A public contact-form inquiry was accepted — support staff must see it. */
-    CONTACT_INQUIRY_RECEIVED(true, "New contact inquiry", Set.of(NotificationChannelKind.EMAIL)),
+    CONTACT_INQUIRY_RECEIVED(true, "New contact inquiry", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 
     /** A scholarship was published — informational, preference-controllable. */
-    SCHOLARSHIP_PUBLISHED(false, "Scholarship published", Set.of(NotificationChannelKind.EMAIL)),
+    SCHOLARSHIP_PUBLISHED(false, "Scholarship published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
 
     /** A scholarship deadline is approaching — informational, preference-controllable. */
-    SCHOLARSHIP_DEADLINE_REMINDER(false, "Scholarship deadline", Set.of(NotificationChannelKind.EMAIL)),
+    SCHOLARSHIP_DEADLINE_REMINDER(false, "Scholarship deadline", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
 
     /** A university was published to the public catalog — informational. */
-    UNIVERSITY_PUBLISHED(false, "University published", Set.of(NotificationChannelKind.EMAIL)),
+    UNIVERSITY_PUBLISHED(false, "University published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
 
     /** A programme was published to the public catalog — informational. */
-    PROGRAM_PUBLISHED(false, "Programme published", Set.of(NotificationChannelKind.EMAIL)),
+    PROGRAM_PUBLISHED(false, "Programme published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
 
     /** A task changed status or assignment — the creator, assignee and admins are told. */
-    TASK_PROGRESS(true, "Task update", Set.of(NotificationChannelKind.EMAIL)),
+    TASK_PROGRESS(true, "Task update", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 
     /**
      * A student finished registration. Declares <b>no</b> secondary channel on
@@ -40,35 +40,37 @@ public enum NotificationType {
      * composed and sent by {@code WelcomeContentComposer}, not the generic
      * flat-string dispatch path.
      */
-    WELCOME(true, "Welcome to Nadoumi", Set.of()),
+    WELCOME(true, "Welcome to Nadoumi", Set.of(), NotificationScope.TARGETED),
 
     /** An application was submitted — the applicant's linked users are told. */
-    APPLICATION_SUBMITTED(true, "Application submitted", Set.of(NotificationChannelKind.EMAIL)),
+    APPLICATION_SUBMITTED(true, "Application submitted", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 
     /** An application's stage/status changed — the applicant's linked users are told. */
-    APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL)),
+    APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 
     /** A message was posted to a conversation — its other participants are told. */
-    MESSAGE_POSTED(false, "New message", Set.of()),
+    MESSAGE_POSTED(false, "New message", Set.of(), NotificationScope.TARGETED),
 
     /** A student opened a support ticket -- staff who can view the queue are told. */
-    TICKET_OPENED(false, "New support ticket", Set.of()),
+    TICKET_OPENED(false, "New support ticket", Set.of(), NotificationScope.TARGETED),
 
     /** A support ticket was assigned to a staff member -- the assignee is told. */
-    TICKET_ASSIGNED(false, "Support ticket assigned", Set.of()),
+    TICKET_ASSIGNED(false, "Support ticket assigned", Set.of(), NotificationScope.TARGETED),
 
     /** A support ticket was resolved or is waiting on the student -- the opener is told. */
-    TICKET_STATUS_CHANGED(true, "Support ticket updated", Set.of());
+    TICKET_STATUS_CHANGED(true, "Support ticket updated", Set.of(), NotificationScope.TARGETED);
 
     private final boolean transactional;
     private final String defaultTitle;
     private final Set<NotificationChannelKind> secondaryChannels;
+    private final NotificationScope scope;
 
     NotificationType(boolean transactional, String defaultTitle,
-            Set<NotificationChannelKind> secondaryChannels) {
+            Set<NotificationChannelKind> secondaryChannels, NotificationScope scope) {
         this.transactional = transactional;
         this.defaultTitle = defaultTitle;
         this.secondaryChannels = secondaryChannels;
+        this.scope = scope;
     }
 
     public boolean isTransactional() {
@@ -83,5 +85,10 @@ public enum NotificationType {
     /** Channels other than {@code IN_APP} this type delivers to when the preference allows. */
     public Set<NotificationChannelKind> secondaryChannels() {
         return secondaryChannels;
+    }
+
+    /** Target scope: GLOBAL platform broadcast or strictly TARGETED recipients. */
+    public NotificationScope scope() {
+        return scope;
     }
 }

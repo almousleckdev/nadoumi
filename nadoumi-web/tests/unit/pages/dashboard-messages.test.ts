@@ -57,9 +57,9 @@ describe('dashboard messages list', () => {
     expect(w.text()).toContain('Create your applicant profile first')
   })
 
-  it('never offers a way for the student to start a new conversation — staff-initiated only', async () => {
+  it('allows the student to start a new conversation with a Nadoumi admin', async () => {
     const w = await mountPage()
-    expect(w.find('[data-test="new-message"]').exists()).toBe(false)
+    expect(w.find('[data-test="new-message"]').exists()).toBe(true)
   })
 
   it('lists real conversations with preview and unread badge', async () => {
