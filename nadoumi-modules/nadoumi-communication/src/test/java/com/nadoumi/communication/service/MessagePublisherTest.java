@@ -42,6 +42,15 @@ class MessagePublisherTest {
     private final MessagePublisher publisher = new MessagePublisher(messages, attachments, participants,
             conversations, users, outbox, realtime, connections);
 
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUpMockId() {
+        org.mockito.Mockito.doAnswer(inv -> {
+            inv.<com.nadoumi.communication.domain.Message>getArgument(0).setId(50L);
+            return 1;
+        }).when(messages).insert(org.mockito.ArgumentMatchers.any());
+    }
+
     private static ConversationParticipant participant(long userId) {
         ConversationParticipant p = new ConversationParticipant();
         p.setUserId(userId);
@@ -64,10 +73,7 @@ class MessagePublisherTest {
         when(connections.hasLocalConnection(2L)).thenReturn(false);
         when(conversations.findById(9L)).thenReturn(conversation());
         when(users.findDisplayName(1L)).thenReturn("Ada");
-        org.mockito.Mockito.doAnswer(inv -> {
-            inv.<Message>getArgument(0).setId(50L);
-            return 1;
-        }).when(messages).insert(any());
+
 
         publisher.publish(9L, 1L, "hello", List.of());
 
