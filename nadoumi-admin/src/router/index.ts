@@ -92,6 +92,9 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.tasks', i18n: true, perm: 'nad:task:list' },
       },
       {
+        name: 'Students',
+      },
+      {
         path: 'roles',
         name: 'Roles',
         component: () => import('@/views/roles/index.vue'),
