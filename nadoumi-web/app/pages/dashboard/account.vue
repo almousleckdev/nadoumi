@@ -29,71 +29,50 @@ useSeo(t('dashboard.accountTitle'), t('dashboard.accountTitle'))
 </script>
 
 <template>
-  <div class="grid gap-6">
-    <header>
-      <h1 class="font-display text-xl font-bold text-slate-900">{{ t('dashboard.accountTitle') }}</h1>
-      <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.account.blurb') }}</p>
-    </header>
+  <div class="grid gap-6 md:grid-cols-[300px_1fr]">
+    <!-- Left Column (Identity) -->
+    <SectionCard class="h-fit">
+      <div class="flex flex-col items-center pb-6 border-b border-slate-100">
+        <div class="h-24 w-24 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-3xl font-medium mb-4">
+          {{ (user?.givenName?.[0] || user?.email?.[0] || '?').toUpperCase() }}
+        </div>
+        <h2 class="font-display text-lg font-bold text-slate-900">{{ user?.givenName }} {{ user?.familyName }}</h2>
+        <p class="text-sm text-slate-500">{{ user?.email ?? user?.username }}</p>
+        <div class="mt-4 flex gap-2">
+          <NButton size="sm" variant="secondary" :to="localePath('/dashboard/profile')">{{ t('dashboard.quickProfile') }}</NButton>
+          <NButton size="sm" variant="secondary" @click="signOut">{{ t('common.signOut') }}</NButton>
+        </div>
+      </div>
+      <div class="pt-6">
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">{{ t('dashboard.account.danger.title') }}</h3>
+        <p class="text-sm text-slate-600 mb-3">{{ t('dashboard.account.danger.blurb') }}</p>
+        <NButton size="sm" variant="danger" :to="supportMailto" class="w-full">{{ t('dashboard.account.danger.cta') }}</NButton>
+      </div>
+    </SectionCard>
 
-    <div class="grid gap-10">
-      <section class="grid gap-4 md:grid-cols-[240px_1fr] md:gap-10">
-        <div>
-          <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.account.personal.title') }}</h2>
-          <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.account.personal.blurb') }}</p>
-        </div>
-        <div class="rounded-xl border border-slate-200 bg-white p-5">
-          <p class="text-xs font-medium uppercase tracking-wide text-slate-400">{{ t('dashboard.accountUser') }}</p>
-          <p class="mt-1 font-medium text-slate-900">{{ user?.email ?? user?.nickName ?? user?.username }}</p>
-          <NButton class="mt-4" size="sm" variant="secondary" :to="localePath('/dashboard/profile')">
-            {{ t('dashboard.quickProfile') }}
-          </NButton>
-        </div>
-      </section>
-
-      <section class="grid gap-4 border-t border-slate-200 pt-10 md:grid-cols-[240px_1fr] md:gap-10">
-        <div>
-          <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.account.security.title') }}</h2>
-          <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.account.security.passwordBlurb') }}</p>
-        </div>
-        <div class="rounded-xl border border-slate-200 bg-white p-5">
-          <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
-          <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
-          <h3 class="mb-3 text-sm font-semibold text-slate-700">{{ t('dashboard.changePassword') }}</h3>
-          <PasswordChangeForm :busy="busy" @submit="changePassword" />
-        </div>
-      </section>
-
-      <section class="grid gap-4 border-t border-slate-200 pt-10 md:grid-cols-[240px_1fr] md:gap-10">
-        <div>
-          <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.account.security.emailTitle') }}</h2>
-          <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.account.security.emailBlurb') }}</p>
-        </div>
-        <div class="rounded-xl border border-slate-200 bg-white p-5">
-          <NAlert v-if="emailNotice" tone="success" class="mb-4">{{ emailNotice }}</NAlert>
-          <p class="mb-3 text-sm text-slate-600">
-            {{ t('dashboard.account.security.currentEmail') }}
-            <span class="font-medium text-slate-900">{{ user?.email }}</span>
-          </p>
+    <!-- Right Column (Forms) -->
+    <div class="grid gap-6">
+      <SectionCard :title="t('dashboard.account.security.emailTitle')">
+        <p class="text-sm text-slate-500 mb-4">{{ t('dashboard.account.security.emailBlurb') }}</p>
+        <NAlert v-if="emailNotice" tone="success" class="mb-4">{{ emailNotice }}</NAlert>
+        <div class="max-w-md">
           <EmailChangeForm :current-email="user?.email ?? ''" @changed="onEmailChanged" />
         </div>
-      </section>
+      </SectionCard>
 
-      <section class="grid gap-4 border-t border-slate-200 pt-10 md:grid-cols-[240px_1fr] md:gap-10">
-        <div>
-          <h2 class="font-display text-base font-semibold text-red-700">{{ t('dashboard.account.danger.title') }}</h2>
-          <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.account.danger.subtitle') }}</p>
+      <SectionCard :title="t('dashboard.account.security.title')">
+        <p class="text-sm text-slate-500 mb-4">{{ t('dashboard.account.security.passwordBlurb') }}</p>
+        <NAlert v-if="notice" tone="success" class="mb-4">{{ notice }}</NAlert>
+        <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
+        <div class="max-w-md">
+          <PasswordChangeForm :busy="busy" @submit="changePassword" />
         </div>
-        <div class="rounded-xl border border-red-200 bg-red-50/60 p-5">
-          <p class="text-sm text-red-900">{{ t('dashboard.account.danger.blurb') }}</p>
-          <NButton class="mt-4" size="sm" variant="secondary" :to="supportMailto">
-            {{ t('dashboard.account.danger.cta') }}
-          </NButton>
-        </div>
-      </section>
+      </SectionCard>
 
-      <div class="border-t border-slate-200 pt-8">
-        <NButton data-test="sign-out" variant="secondary" @click="signOut">{{ t('common.signOut') }}</NButton>
-      </div>
+      <SectionCard :title="t('dashboard.account.documents.title')">
+        <p class="text-sm text-slate-500 mb-4">{{ t('dashboard.account.documents.blurb') }}</p>
+        <NButton size="sm" variant="secondary" :to="localePath('/dashboard/documents')">{{ t('dashboard.documentsTitle') }}</NButton>
+      </SectionCard>
     </div>
   </div>
 </template>
