@@ -111,7 +111,7 @@ class TaskServiceTest {
     void changeStatus_rejectsAnIllegalTransition() {
         when(taskMapper.findById(50L)).thenReturn(stored(50L, "PENDING"));
 
-        assertThatThrownBy(() -> service.changeStatus(50L, "APPROVED", null, 7L, true))
+        assertThatThrownBy(() -> service.changeStatus(50L, "CLOSED", null, 7L, true))
                 .isInstanceOf(NadBadRequestException.class);
         verify(taskMapper, never()).update(any());
     }
@@ -120,14 +120,14 @@ class TaskServiceTest {
     void changeStatus_approveRequiresApproverRole() {
         when(taskMapper.findById(50L)).thenReturn(stored(50L, "COMPLETED"));
 
-        assertThatThrownBy(() -> service.changeStatus(50L, "APPROVED", null, 7L, false))
+        assertThatThrownBy(() -> service.changeStatus(50L, "CLOSED", null, 7L, false))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("approve");
 
-        service.changeStatus(50L, "APPROVED", "looks good", 3L, true);
+        service.changeStatus(50L, "CLOSED", "looks good", 3L, true);
         ArgumentCaptor<Task> task = ArgumentCaptor.forClass(Task.class);
         verify(taskMapper).update(task.capture());
-        assertThat(task.getValue().getStatus()).isEqualTo("APPROVED");
+        assertThat(task.getValue().getStatus()).isEqualTo("CLOSED");
         assertThat(task.getValue().getApprovedByUserId()).isEqualTo(3L);
         assertThat(task.getValue().getApprovedAt()).isNotNull();
     }
@@ -152,13 +152,13 @@ class TaskServiceTest {
     @Test
     void emit_excludesTheActorFromRecipients() {
         when(taskMapper.findById(50L)).thenReturn(stored(50L, "PENDING"));
-        // actor 7 is the assignee; creator is 3, approver audience is 9
+        // actor 7 is the assignee; creator is 3, approver audience is 9 (no longer notified)
         service.changeStatus(50L, "IN_PROGRESS", null, 7L, false);
 
         ArgumentCaptor<String> payload = ArgumentCaptor.forClass(String.class);
         verify(outbox).write(anyString(), anyLong(), anyString(), payload.capture());
         assertThat(payload.getValue()).contains("\"recipientUserIds\"");
         assertThat(payload.getValue()).doesNotContain(":7,").doesNotContain("[7]").doesNotContain("[7,");
-        assertThat(payload.getValue()).contains("3").contains("9");
+        assertThat(payload.getValue()).contains("3");
     }
 }
