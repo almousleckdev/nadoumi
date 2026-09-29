@@ -81,7 +81,7 @@
         <StatusBadge :status="value" />
       </template>
       <template #cell-createdAt="{ value }">
-        {{ fmtDate(value) }}
+        {{ formatDate(value) }}
       </template>
       <template #cell-actions="{ row }">
         <el-button
@@ -173,6 +173,8 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import Avatar from '@/components/ui/Avatar.vue'
 import Drawer from '@/components/ui/Drawer.vue'
 import { usePagedList } from '@/composables/usePagedList'
+import { formatDate } from '@/utils/date'
+import { titleCase } from '@/utils/text'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -207,14 +209,6 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: '', width: 110, align: 'right' },
 ]
 
-function titleCase(s: string) {
-  return s.charAt(0) + s.slice(1).toLowerCase()
-}
-function fmtDate(v: string | null): string {
-  if (!v) return ''
-  const d = new Date(v.replace(' ', 'T'))
-  return Number.isNaN(d.getTime()) ? v : d.toLocaleDateString()
-}
 function goToDetail(id: number) {
   router.push(`/applicants/${id}`)
 }

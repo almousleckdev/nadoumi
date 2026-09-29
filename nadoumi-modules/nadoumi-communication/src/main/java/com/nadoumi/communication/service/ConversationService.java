@@ -1,50 +1,35 @@
 package com.nadoumi.communication.service;
 
-import com.nadoumi.common.access.AccessRole;
 import com.nadoumi.common.access.ApplicantCapability;
 import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaAccessLogContext;
-import com.nadoumi.common.media.MediaCategory;
-import com.nadoumi.common.media.MediaGateway;
-import com.nadoumi.common.media.MediaOwnerKind;
-import com.nadoumi.common.media.MediaOwnerRef;
-import com.nadoumi.common.media.StoredAsset;
 import com.nadoumi.communication.domain.Conversation;
 import com.nadoumi.communication.domain.ConversationParticipant;
 import com.nadoumi.communication.domain.Message;
-import com.nadoumi.communication.domain.MessageAttachment;
 import com.nadoumi.communication.domain.enums.ConversationStatus;
 import com.nadoumi.communication.domain.enums.ConversationType;
 import com.nadoumi.communication.domain.enums.ParticipantRole;
 import com.nadoumi.communication.mapper.CommunicationUserMapper;
 import com.nadoumi.communication.mapper.ConversationMapper;
 import com.nadoumi.communication.mapper.ConversationParticipantMapper;
-import com.nadoumi.communication.mapper.MessageAttachmentMapper;
 import com.nadoumi.communication.mapper.MessageMapper;
 import com.nadoumi.communication.web.request.OpenConversationRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
 import com.nadoumi.communication.web.request.StaffCreateConversationRequest;
 import com.nadoumi.communication.web.response.AdminContactResponse;
 import com.nadoumi.communication.web.response.AttachmentAccessResponse;
-import com.nadoumi.communication.web.response.AttachmentResponse;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
 import com.nadoumi.communication.web.response.ParticipantResponse;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.identity.domain.UserApplicantAccess;
-import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
 import com.ruoyi.common.utils.AuditActor;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,34 +45,33 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ConversationService {
 
-    private static final int PREVIEW_LENGTH = 140;
     private static final int PAGE_SIZE = 50;
 
     private final ConversationMapper conversations;
     private final ConversationParticipantMapper participants;
     private final MessageMapper messages;
-    private final MessageAttachmentMapper attachments;
     private final CommunicationUserMapper users;
     private final NadoumiAccessService access;
     private final CurrentCaller caller;
-    private final UserApplicantAccessMapper grants;
     private final MessagePublisher publisher;
-    private final MediaGateway media;
+    private final ConversationGuard guard;
+    private final ConversationResponseAssembler assembler;
+    private final ConversationAttachments attachmentService;
 
     public ConversationService(ConversationMapper conversations, ConversationParticipantMapper participants,
-            MessageMapper messages, MessageAttachmentMapper attachments, CommunicationUserMapper users,
-            NadoumiAccessService access, CurrentCaller caller, UserApplicantAccessMapper grants,
-            MessagePublisher publisher, MediaGateway media) {
+            MessageMapper messages, CommunicationUserMapper users, NadoumiAccessService access,
+            CurrentCaller caller, MessagePublisher publisher, ConversationGuard guard,
+            ConversationResponseAssembler assembler, ConversationAttachments attachmentService) {
         this.conversations = conversations;
         this.participants = participants;
         this.messages = messages;
-        this.attachments = attachments;
         this.users = users;
         this.access = access;
         this.caller = caller;
-        this.grants = grants;
         this.publisher = publisher;
-        this.media = media;
+        this.guard = guard;
+        this.assembler = assembler;
+        this.attachmentService = attachmentService;
     }
 
     /** Opens a conversation for the caller's applicant, adds them as the first participant, posts the first message. */
@@ -105,15 +89,9 @@ public class ConversationService {
         }
         long userId = caller.requireUserId();
 
-        Conversation conversation = new Conversation();
-        conversation.setSubject(req.subject());
-        conversation.setApplicationId(req.applicationId());
-        conversation.setConversationType(ConversationType.GENERAL);
-        conversation.setStatus(ConversationStatus.OPEN);
-        conversation.setCreateBy(AuditActor.username());
-        conversations.insert(conversation);
+        Conversation conversation = newConversation(req.subject(), req.applicationId(), ConversationType.GENERAL);
 
-        addParticipantRow(conversation.getId(), userId, applicantId == null ? ParticipantRole.APPLICANT : participantRoleFor(applicantId));
+        addParticipantRow(conversation.getId(), userId, applicantId == null ? ParticipantRole.APPLICANT : guard.participantRoleFor(applicantId));
 
         Long adminUserId = req.adminUserId();
         if (adminUserId != null && adminUserId > 0) {
@@ -126,32 +104,26 @@ public class ConversationService {
         }
 
         Message message = publisher.publish(conversation.getId(), userId, req.body(), List.of());
-        return toMessageResponse(message);
+        return assembler.message(message);
     }
 
     /** Initiates a conversation from staff to a student. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse createByStaff(StaffCreateConversationRequest req) {
-        requireStaff();
+        guard.requireStaff();
         long staffUserId = caller.requireUserId();
         Long studentUserId = req.studentUserId();
         if (studentUserId == null || studentUserId <= 0) {
             throw new NadBadRequestException("studentUserId is required");
         }
 
-        Conversation conversation = new Conversation();
-        conversation.setSubject(req.subject());
-        conversation.setApplicationId(req.applicationId());
-        conversation.setConversationType(ConversationType.GENERAL);
-        conversation.setStatus(ConversationStatus.OPEN);
-        conversation.setCreateBy(AuditActor.username());
-        conversations.insert(conversation);
+        Conversation conversation = newConversation(req.subject(), req.applicationId(), ConversationType.GENERAL);
 
         addParticipantRow(conversation.getId(), staffUserId, ParticipantRole.STAFF);
         addParticipantRow(conversation.getId(), studentUserId, ParticipantRole.APPLICANT);
 
         Message message = publisher.publish(conversation.getId(), staffUserId, req.body(), List.of());
-        return toMessageResponse(message);
+        return assembler.message(message);
     }
 
     @Transactional(readOnly = true)
@@ -172,17 +144,12 @@ public class ConversationService {
         }
         long userId = caller.requireUserId();
 
-        Conversation conversation = new Conversation();
-        conversation.setSubject(subject);
-        conversation.setConversationType(ConversationType.SUPPORT);
-        conversation.setStatus(ConversationStatus.OPEN);
-        conversation.setCreateBy(AuditActor.username());
-        conversations.insert(conversation);
+        Conversation conversation = newConversation(subject, null, ConversationType.SUPPORT);
 
         addParticipantRow(conversation.getId(), userId, ParticipantRole.APPLICANT);
 
         Message message = publisher.publish(conversation.getId(), userId, body, List.of());
-        return toMessageResponse(message);
+        return assembler.message(message);
     }
 
     /**
@@ -192,13 +159,13 @@ public class ConversationService {
      */
     @Transactional(readOnly = true)
     public List<MessageResponse> listSupportMessagesForStaff(long conversationId, long beforeId) {
-        requireStaff();
+        guard.requireStaff();
         Conversation conversation = conversations.findById(conversationId);
         if (conversation == null || conversation.getConversationType() != ConversationType.SUPPORT) {
             throw new NadNotFoundException("support conversation not found");
         }
         return messages.listByConversation(conversationId, beforeId, PAGE_SIZE).stream()
-                .map(this::toMessageResponse)
+                .map(assembler::message)
                 .toList();
     }
 
@@ -212,26 +179,14 @@ public class ConversationService {
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse post(long conversationId, PostMessageRequest req, MediaAccessLogContext ctx) {
         long userId = caller.requireUserId();
-        requireActiveParticipant(conversationId, userId);
+        guard.requireActiveParticipant(conversationId, userId);
         List<Long> attachmentMediaIds = req.attachmentMediaIdsOrEmpty();
         if (req.body().isBlank() && attachmentMediaIds.isEmpty()) {
             throw new NadBadRequestException("a message needs text, an attachment, or both");
         }
-        for (Long mediaId : attachmentMediaIds) {
-            StoredAsset asset = media.find(mediaId)
-                    .orElseThrow(() -> new NadNotFoundException("media asset " + mediaId + " not found"));
-            if (asset.category() != MediaCategory.MESSAGE_ATTACHMENT) {
-                throw new NadBadRequestException("media asset " + mediaId + " is not a message attachment");
-            }
-            if (asset.owner() == null
-                    || asset.owner().kind() != MediaOwnerKind.MESSAGE
-                    || !Objects.equals(asset.owner().id(), conversationId)
-                    || asset.uploadedBy() != userId) {
-                throw new NadForbiddenException("media asset " + mediaId + " does not belong to this conversation");
-            }
-        }
+        attachmentService.requireOwned(attachmentMediaIds, conversationId, userId);
         Message message = publisher.publish(conversationId, userId, req.body(), attachmentMediaIds);
-        return toMessageResponse(message, ctx);
+        return assembler.message(message, ctx);
     }
 
     /** Newest-first message page (cursor by id, exclusive), for a caller who is an active participant. */
@@ -243,16 +198,16 @@ public class ConversationService {
     /** Newest-first message page with pre-signed attachment URLs (eliminates N+1 fetch round-trips). */
     @Transactional(readOnly = true)
     public List<MessageResponse> listMessages(long conversationId, long beforeId, MediaAccessLogContext ctx) {
-        requireActiveParticipant(conversationId, caller.requireUserId());
+        guard.requireActiveParticipant(conversationId, caller.requireUserId());
         return messages.listByConversation(conversationId, beforeId, PAGE_SIZE).stream()
-                .map(m -> toMessageResponse(m, ctx))
+                .map(m -> assembler.message(m, ctx))
                 .toList();
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void markRead(long conversationId) {
         long userId = caller.requireUserId();
-        requireActiveParticipant(conversationId, userId);
+        guard.requireActiveParticipant(conversationId, userId);
         Message latest = messages.findLatest(conversationId);
         if (latest != null) {
             participants.updateLastRead(conversationId, userId, latest.getId());
@@ -262,15 +217,15 @@ public class ConversationService {
     /** Staff-only: closes a conversation. Controller-level {@code nad:conversation:participate} gates this. */
     @Transactional(rollbackFor = Exception.class)
     public void close(long conversationId) {
-        requireStaff();
-        requireActiveParticipant(conversationId, caller.requireUserId());
+        guard.requireStaff();
+        guard.requireActiveParticipant(conversationId, caller.requireUserId());
         conversations.updateStatus(conversationId, ConversationStatus.CLOSED.name(), AuditActor.username());
     }
 
     /** Staff-only, gated by {@code nad:conversation:participant:manage} at the controller. */
     @Transactional(rollbackFor = Exception.class)
     public void addParticipant(long conversationId, long userId, ParticipantRole role) {
-        requireStaff();
+        guard.requireStaff();
         if (participants.findActive(conversationId, userId) != null) {
             return;
         }
@@ -280,7 +235,7 @@ public class ConversationService {
     /** Staff-only, gated by {@code nad:conversation:participant:manage} at the controller. */
     @Transactional(rollbackFor = Exception.class)
     public void removeParticipant(long conversationId, long userId) {
-        requireStaff();
+        guard.requireStaff();
         participants.remove(conversationId, userId, LocalDateTime.now());
     }
 
@@ -296,7 +251,7 @@ public class ConversationService {
         List<ConversationSummaryResponse> out = new ArrayList<>(found.size());
         for (Conversation c : found) {
             ConversationParticipant p = mine.stream().filter(m -> m.getConversationId().equals(c.getId())).findFirst().orElseThrow();
-            out.add(toSummary(c, p));
+            out.add(assembler.summary(c, p));
         }
         return out.stream()
                 .sorted(Comparator.comparing(ConversationSummaryResponse::lastMessageAt,
@@ -307,16 +262,16 @@ public class ConversationService {
     /** Staff-only: every conversation attached to one application (public API for other modules -- see class doc). */
     @Transactional(readOnly = true)
     public List<ConversationSummaryResponse> listForApplication(long applicationId) {
-        requireStaff();
+        guard.requireStaff();
         return conversations.findByApplicationId(applicationId).stream()
-                .map(c -> toSummary(c, null))
+                .map(c -> assembler.summary(c, null))
                 .toList();
     }
 
     /** Staff inbox: strictly the caller's assigned/participating conversations with optional search. */
     @Transactional(readOnly = true)
     public List<ConversationSummaryResponse> listForStaff(String studentName, Long applicationId) {
-        requireStaff();
+        guard.requireStaff();
         long userId = caller.requireUserId();
         List<Conversation> found = conversations.searchForStaff(userId, studentName, applicationId);
         if (found.isEmpty()) {
@@ -325,7 +280,7 @@ public class ConversationService {
         List<ConversationSummaryResponse> out = new ArrayList<>(found.size());
         for (Conversation c : found) {
             ConversationParticipant myParticipant = participants.findActive(c.getId(), userId);
-            out.add(toSummary(c, myParticipant));
+            out.add(assembler.summary(c, myParticipant));
         }
         return out.stream()
                 .sorted(Comparator.comparing(ConversationSummaryResponse::lastMessageAt,
@@ -339,7 +294,7 @@ public class ConversationService {
     }
 
     public List<ParticipantResponse> listParticipants(long conversationId) {
-        requireActiveParticipant(conversationId, caller.requireUserId());
+        guard.requireActiveParticipant(conversationId, caller.requireUserId());
         return participants.listActiveForConversation(conversationId).stream()
                 .map(p -> new ParticipantResponse(p.getUserId(), p.getRole().name(), p.getAddedAt()))
                 .toList();
@@ -347,42 +302,26 @@ public class ConversationService {
 
     /** Stores the file and returns its raw media id -- upload-then-attach, see {@code PostMessageRequest}. */
     public long uploadAttachment(long conversationId, MultipartFile file) {
-        requireActiveParticipant(conversationId, caller.requireUserId());
-        try (InputStream in = file.getInputStream()) {
-            var result = media.upload(in, file.getOriginalFilename(), file.getContentType(), file.getSize(),
-                    com.nadoumi.common.media.MediaCategory.MESSAGE_ATTACHMENT, null,
-                    new MediaOwnerRef(MediaOwnerKind.MESSAGE, conversationId), caller.requireUserId());
-            return result.mediaId();
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload", e);
-        }
+        return attachmentService.upload(conversationId, file);
     }
 
-    /**
-     * A short-lived signed URL to view a PROTECTED attachment inline. The attachment
-     * must belong to a message actually posted in {@code conversationId} -- knowing an
-     * attachment id from one conversation must never unlock a read in another.
-     */
+    /** A short-lived signed URL to view a PROTECTED attachment inline (see {@link ConversationAttachments#access}). */
     public AttachmentAccessResponse attachmentAccess(long conversationId, long attachmentId, MediaAccessLogContext ctx) {
-        requireActiveParticipant(conversationId, caller.requireUserId());
-        MessageAttachment attachment = attachments.findById(attachmentId);
-        if (attachment == null) {
-            throw new NadNotFoundException("attachment not found");
-        }
-        Message owner = messages.findById(attachment.getMessageId());
-        if (owner == null || owner.getConversationId() != conversationId) {
-            throw new NadNotFoundException("attachment not found");
-        }
-        var signed = media.issueInlineSignedUrl(attachment.getMediaAssetId(), ctx);
-        var asset = media.find(attachment.getMediaAssetId()).orElse(null);
-        return new AttachmentAccessResponse(
-                signed.url(), signed.expiresAt().toString(),
-                asset == null ? null : asset.originalFilename(),
-                asset == null ? null : asset.contentType());
+        return attachmentService.access(conversationId, attachmentId, ctx);
     }
 
     // ---- internals ----
+
+    private Conversation newConversation(String subject, Long applicationId, ConversationType type) {
+        Conversation conversation = new Conversation();
+        conversation.setSubject(subject);
+        conversation.setApplicationId(applicationId);
+        conversation.setConversationType(type);
+        conversation.setStatus(ConversationStatus.OPEN);
+        conversation.setCreateBy(AuditActor.username());
+        conversations.insert(conversation);
+        return conversation;
+    }
 
     private void addParticipantRow(long conversationId, long userId, ParticipantRole role) {
         ConversationParticipant p = new ConversationParticipant();
@@ -392,111 +331,5 @@ public class ConversationService {
         p.setAddedAt(LocalDateTime.now());
         p.setMuted(false);
         participants.insert(p);
-    }
-
-    private void requireActiveParticipant(long conversationId, long userId) {
-        if (conversations.findById(conversationId) == null) {
-            throw new NadNotFoundException("conversation not found");
-        }
-        if (participants.findActive(conversationId, userId) == null) {
-            throw new AccessDeniedException("not a participant of conversation " + conversationId);
-        }
-    }
-
-    private void requireStaff() {
-        if (!caller.isStaff()) {
-            throw new AccessDeniedException("staff only");
-        }
-    }
-
-    /** OWNER maps to APPLICANT (the applicant themselves); AGENT/GUARDIAN pass through. Staff never reach here. */
-    private ParticipantRole participantRoleFor(long applicantId) {
-        if (caller.isStaff()) {
-            return ParticipantRole.STAFF;
-        }
-        UserApplicantAccess grant = grants.findActiveApplicantGrant(caller.requireUserId(), applicantId);
-        AccessRole role = grant == null ? AccessRole.OWNER : grant.getAccessRole();
-        return switch (role) {
-            case AGENT -> ParticipantRole.AGENT;
-            case GUARDIAN -> ParticipantRole.GUARDIAN;
-            case OWNER, VIEWER -> ParticipantRole.APPLICANT;
-        };
-    }
-
-    private ConversationSummaryResponse toSummary(Conversation c, ConversationParticipant myParticipant) {
-        Message latest = messages.findLatest(c.getId());
-        long afterId = myParticipant == null || myParticipant.getLastReadMessageId() == null
-                ? 0 : myParticipant.getLastReadMessageId();
-        long unread = myParticipant == null ? 0 : messages.countAfter(c.getId(), afterId, myParticipant.getUserId());
-        String preview = latest == null ? null : previewFor(latest);
-
-        Long studentUserId = null;
-        String studentName = null;
-        Long adminUserId = null;
-        String adminName = null;
-
-        List<ConversationParticipant> allActive = participants.listActiveForConversation(c.getId());
-        for (ConversationParticipant p : allActive) {
-            if (p.getRole() == ParticipantRole.STAFF) {
-                if (adminUserId == null) {
-                    adminUserId = p.getUserId();
-                    adminName = users.findDisplayName(p.getUserId());
-                }
-            } else {
-                if (studentUserId == null) {
-                    studentUserId = p.getUserId();
-                    studentName = users.findDisplayName(p.getUserId());
-                }
-            }
-        }
-
-        return new ConversationSummaryResponse(c.getId(), c.getSubject(), c.getApplicationId(),
-                c.getConversationType().name(), c.getStatus().name(), preview,
-                latest == null ? null : latest.getCreatedAt(), unread,
-                studentUserId, studentName, adminUserId, adminName);
-    }
-
-    private MessageResponse toMessageResponse(Message m) {
-        return toMessageResponse(m, null);
-    }
-
-    private MessageResponse toMessageResponse(Message m, MediaAccessLogContext ctx) {
-        List<AttachmentResponse> attached = attachments.listByMessage(m.getId()).stream()
-                .map(a -> toAttachmentResponse(a, ctx))
-                .toList();
-        String senderName = users.findDisplayName(m.getSenderUserId());
-        return new MessageResponse(m.getId(), m.getConversationId(), m.getSenderUserId(), senderName,
-                m.getBody(), m.getCreatedAt(), m.getEditedAt(), attached);
-    }
-
-    private AttachmentResponse toAttachmentResponse(MessageAttachment a, MediaAccessLogContext ctx) {
-        return media.find(a.getMediaAssetId())
-                .map(asset -> {
-                    String url = null;
-                    if (ctx != null) {
-                        try {
-                            url = media.issueInlineSignedUrl(a.getMediaAssetId(), ctx).url();
-                        }
-                        catch (Exception e) {
-                            // fall back to client fetching via attachmentAccess
-                        }
-                    }
-                    return new AttachmentResponse(a.getId(), a.getMediaAssetId(), asset.originalFilename(),
-                            asset.contentType(), asset.byteSize(), url);
-                })
-                .orElseGet(() -> new AttachmentResponse(a.getId(), a.getMediaAssetId(), null, null, 0, null));
-    }
-
-    private static String truncate(String body) {
-        return body.length() <= PREVIEW_LENGTH ? body : body.substring(0, PREVIEW_LENGTH) + "…";
-    }
-
-    /** An attachment-only message (no caption) still needs an honest, non-empty preview. */
-    private String previewFor(Message latest) {
-        if (!latest.getBody().isBlank()) {
-            return truncate(latest.getBody());
-        }
-        int count = attachments.listByMessage(latest.getId()).size();
-        return count == 1 ? "📎 Attachment" : "📎 " + count + " attachments";
     }
 }

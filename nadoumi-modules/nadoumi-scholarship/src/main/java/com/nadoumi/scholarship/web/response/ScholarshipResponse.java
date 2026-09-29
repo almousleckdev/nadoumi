@@ -1,5 +1,6 @@
 package com.nadoumi.scholarship.web.response;
 
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.scholarship.domain.Scholarship;
 
 /**
@@ -25,11 +26,7 @@ public record ScholarshipResponse(
                 PublicScholarshipResponse.detail(s, heroUrl, coverUrl),
                 s.getStatus() == null ? null : s.getStatus().name(),
                 s.getPublishStatus() == null ? null : s.getPublishStatus().name(),
-                str(s.getPublishedAt()), s.getRemark(),
-                str(s.getCreateTime()), str(s.getUpdateTime()));
-    }
-
-    private static String str(Object v) {
-        return v == null ? null : v.toString();
+                Texts.stringOrNull(s.getPublishedAt()), s.getRemark(),
+                Texts.stringOrNull(s.getCreateTime()), Texts.stringOrNull(s.getUpdateTime()));
     }
 }

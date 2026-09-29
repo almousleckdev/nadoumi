@@ -53,8 +53,13 @@ class ConversationServiceTest {
     private final UserApplicantAccessMapper grants = mock(UserApplicantAccessMapper.class);
     private final MessagePublisher publisher = mock(MessagePublisher.class);
     private final MediaGateway media = mock(MediaGateway.class);
+    private final ConversationGuard guard = new ConversationGuard(conversations, participants, caller, grants);
+    private final ConversationResponseAssembler assembler =
+            new ConversationResponseAssembler(participants, messages, attachments, users, media);
+    private final ConversationAttachments attachmentService =
+            new ConversationAttachments(guard, attachments, messages, media, caller);
     private final ConversationService service = new ConversationService(conversations, participants, messages,
-            attachments, users, access, caller, grants, publisher, media);
+            users, access, caller, publisher, guard, assembler, attachmentService);
 
     private static Conversation conversation() {
         Conversation c = new Conversation();

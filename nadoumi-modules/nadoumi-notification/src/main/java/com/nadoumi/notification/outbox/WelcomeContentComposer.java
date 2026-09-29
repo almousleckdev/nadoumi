@@ -1,6 +1,7 @@
 package com.nadoumi.notification.outbox;
 
 import com.nadoumi.common.notification.NotificationChannelKind;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.identity.service.mail.BrandProperties;
 import com.nadoumi.identity.service.mail.EmailContent;
 import com.nadoumi.identity.service.mail.EmailContent.ListItem;
@@ -80,7 +81,7 @@ public class WelcomeContentComposer {
             return; // already handled on an earlier delivery — the email went out then
         }
 
-        String recipient = str(context.get("email"));
+        String recipient = Texts.stringOrNull(context.get("email"));
         if (recipient == null || recipient.isBlank()) {
             log.warn("StudentRegistered outbox event id={} has no email — in-app only", event.getId());
             notificationService.recordDirectEmailDelivery(notificationId, false, "no recipient address");
@@ -90,7 +91,7 @@ public class WelcomeContentComposer {
         boolean sent = true;
         String error = null;
         try {
-            mailSender.send(compose(recipient, str(context.get("firstName")), context));
+            mailSender.send(compose(recipient, Texts.stringOrNull(context.get("firstName")), context));
         } catch (RuntimeException e) {
             sent = false;
             error = e.toString();
@@ -174,9 +175,5 @@ public class WelcomeContentComposer {
         } catch (NumberFormatException e) {
             return null;
         }
-    }
-
-    private static String str(Object value) {
-        return value == null ? null : String.valueOf(value);
     }
 }

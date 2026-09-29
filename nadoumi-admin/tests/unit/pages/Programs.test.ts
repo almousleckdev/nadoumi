@@ -20,6 +20,8 @@ vi.mock('@/api/university', () => ({
   listDepartments: vi.fn().mockResolvedValue([]),
 }))
 
+vi.mock('@/api/fx', () => ({ cnyToUsdRate: vi.fn().mockResolvedValue(0.14), DEFAULT_CNY_USD_RATE: 0.1381 }))
+
 const confirm = vi.hoisted(() => vi.fn())
 vi.mock('@/composables/useConfirm', () => ({ useConfirm: () => ({ confirm }) }))
 

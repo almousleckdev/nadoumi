@@ -95,4 +95,26 @@ describe('student support ticket detail', () => {
     expect((w.find('#support-reply').element as HTMLTextAreaElement).value).toBe('one more thing')
     expect(w.find('[role="alert"]').exists()).toBe(true)
   })
+
+  it('opens the meeting request modal from the request button and can close it', async () => {
+    const w = await mountPage()
+    expect(document.body.textContent).not.toContain('Request a 1:1 Meeting')
+
+    await w.findAll('button').find(b => b.text() === 'Request Meeting')!.trigger('click')
+    await flushPromises()
+    expect(document.body.textContent).toContain('Request a 1:1 Meeting')
+    expect(document.querySelector('label[for="meeting-date"]')).not.toBeNull()
+    expect(document.querySelector('#meeting-date')).not.toBeNull()
+
+    const cancel = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Cancel')!
+    cancel.click()
+    await flushPromises()
+    expect(document.body.textContent).not.toContain('Request a 1:1 Meeting')
+  })
+
+  it('does not offer a meeting on a closed ticket', async () => {
+    get.mockResolvedValue(D('CLOSED'))
+    const w = await mountPage()
+    expect(w.findAll('button').map(b => b.text())).not.toContain('Request Meeting')
+  })
 })

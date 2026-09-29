@@ -1,5 +1,6 @@
 package com.nadoumi.scholarship.web;
 
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.scholarship.domain.ScholarshipCategory;
 import com.nadoumi.scholarship.domain.enums.FundingModel;
@@ -97,10 +98,10 @@ public class PublicScholarshipController {
             LocalDate deadlineBefore, String level, String category, String intake,
             Boolean featured, Boolean recommended, Boolean hot, String sort) {
         return new ScholarshipSearch(
-                trimToNull(q), upper(country), trimToNull(province), trimToNull(city), trimToNull(field),
+                Texts.blankToNull(q), upper(country), Texts.blankToNull(province), Texts.blankToNull(city), Texts.blankToNull(field),
                 language, funding, hasStipend, deadlineBefore,
                 csv(level), csv(category), csv(intake),
-                featured, recommended, hot, trimToNull(sort), null, null);
+                featured, recommended, hot, Texts.blankToNull(sort), null, null);
     }
 
     private static List<String> csv(String value) {
@@ -108,10 +109,6 @@ public class PublicScholarshipController {
             return List.of();
         }
         return Arrays.stream(value.split(",")).map(String::trim).filter(s -> !s.isEmpty()).toList();
-    }
-
-    private static String trimToNull(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
     }
 
     private static String upper(String s) {

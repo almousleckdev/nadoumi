@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { TicketCategory, TicketStatus, TicketSummary } from '~/types/support'
 import { TICKET_CATEGORIES, TICKET_STATUSES } from '~/types/support'
+import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
@@ -20,7 +21,7 @@ const pending = ref(true)
 const error = ref('')
 const statusFilter = ref('')
 
-const formatDate = (iso: string) => formatSupportDate(iso, locale.value)
+const formatDate = (iso: string) => formatTimestamp(iso, locale.value)
 
 const statusOptions = computed(() => [
   { value: '', label: t('dashboard.support.allStatuses') },

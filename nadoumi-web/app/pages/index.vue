@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Page, ProgramCard, ScholarshipCard, UniversitySummary } from '~/types/catalog'
 import { imagery } from '~/data/imagery'
 import profileImage from '~/assets/images/image1.png'
 import discoverImage from '~/assets/images/image.png'
@@ -8,57 +7,13 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 useSeo(t('home.hero.title'), t('home.hero.subtitle'))
 
-const { publicGet } = useApi()
+const { featured, recommended, newScholarships, fundedScholarships, hotProgrammes, partners } = useHomeFeeds()
 
-const { data: featured, pending: featuredPending, error: featuredError } = useLazyAsyncData(
-  'home-featured-universities',
-  () => publicGet<Page<UniversitySummary>>('universities', { featured: true, size: 12 }),
-  { default: () => null },
-)
-const { data: recommended, pending: recommendedPending, error: recommendedError } = useLazyAsyncData(
-  'home-recommended-universities',
-  () => publicGet<Page<UniversitySummary>>('universities', { recommended: true, size: 12 }),
-  { default: () => null },
-)
-
-const { data: newSch, pending: newSchPending, error: newSchError } = useLazyAsyncData(
-  'home-new-scholarships',
-  () => publicGet<Page<ScholarshipCard>>('scholarships', { sort: 'newest', size: 12 }),
-  { default: () => null },
-)
-const { data: fundedSch, pending: fundedSchPending, error: fundedSchError } = useLazyAsyncData(
-  'home-funded-scholarships',
-  () => publicGet<Page<ScholarshipCard>>('scholarships', { funding: 'FULLY', size: 12 }),
-  { default: () => null },
-)
-const { data: hotProg, pending: hotProgPending, error: hotProgError } = useLazyAsyncData(
-  'home-hot-programmes',
-  () => publicGet<Page<ProgramCard>>('programs', { hot: true, size: 12 }),
-  { default: () => null },
-)
-const { data: partners, pending: partnersPending } = useLazyAsyncData(
-  'home-partner-universities',
-  () => publicGet<Page<UniversitySummary>>('universities', { publicPartner: true, size: 24 }),
-  { default: () => null },
-)
-
-const featuredUnis = computed(() => featured.value?.content ?? [])
-const partnerUnis = computed(() => partners.value?.content ?? [])
-const recommendedUnis = computed(() => recommended.value?.content ?? [])
-const newScholarships = computed(() => newSch.value?.content ?? [])
-const fundedScholarships = computed(() => fundedSch.value?.content ?? [])
-const hotProgrammes = computed(() => hotProg.value?.content ?? [])
-
-const journey = computed(() => [
-  { title: t('home.journey.s1t'), body: t('home.journey.s1b') },
-  { title: t('home.journey.s2t'), body: t('home.journey.s2b') },
-  { title: t('home.journey.s3t'), body: t('home.journey.s3b') },
-  { title: t('home.journey.s4t'), body: t('home.journey.s4b') },
-  { title: t('home.journey.s5t'), body: t('home.journey.s5b') },
-  { title: t('home.journey.s6t'), body: t('home.journey.s6b') },
-  { title: t('home.journey.s7t'), body: t('home.journey.s7b') },
-  { title: t('home.journey.s8t'), body: t('home.journey.s8b') },
-])
+const JOURNEY_STEPS = 8
+const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => ({
+  title: t(`home.journey.s${i + 1}t`),
+  body: t(`home.journey.s${i + 1}b`),
+})))
 </script>
 
 <template>
@@ -73,13 +28,13 @@ const journey = computed(() => [
         :carousel-label="t('home.featuredUnis.title')"
         :view-all-to="localePath('/universities')"
         :view-all-label="t('catalog.viewAllUniversities')"
-        :pending="featuredPending"
-        :error="featuredError ? t('errors.loadSection') : ''"
-        :empty="!featuredUnis.length"
+        :pending="featured.pending.value"
+        :error="featured.error.value ? t('errors.loadSection') : ''"
+        :empty="!featured.items.value.length"
         :empty-text="t('home.featuredUnis.empty')"
       >
         <UniversityCard
-          v-for="u in featuredUnis"
+          v-for="u in featured.items.value"
           :key="u.id"
           :university="u"
           variant="carousel"
@@ -111,13 +66,13 @@ const journey = computed(() => [
         :carousel-label="t('home.newScholarships.title')"
         :view-all-to="localePath('/scholarships')"
         :view-all-label="t('scholarships.viewAll')"
-        :pending="newSchPending"
-        :error="newSchError ? t('errors.loadSection') : ''"
-        :empty="!newScholarships.length"
+        :pending="newScholarships.pending.value"
+        :error="newScholarships.error.value ? t('errors.loadSection') : ''"
+        :empty="!newScholarships.items.value.length"
         :empty-text="t('home.newScholarships.empty')"
       >
         <ScholarshipCard
-          v-for="sch in newScholarships"
+          v-for="sch in newScholarships.items.value"
           :key="sch.id"
           :scholarship="sch"
           variant="carousel"
@@ -148,13 +103,13 @@ const journey = computed(() => [
         :carousel-label="t('home.fundedScholarships.title')"
         :view-all-to="localePath('/scholarships?funding=FULLY')"
         :view-all-label="t('scholarships.viewAll')"
-        :pending="fundedSchPending"
-        :error="fundedSchError ? t('errors.loadSection') : ''"
-        :empty="!fundedScholarships.length"
+        :pending="fundedScholarships.pending.value"
+        :error="fundedScholarships.error.value ? t('errors.loadSection') : ''"
+        :empty="!fundedScholarships.items.value.length"
         :empty-text="t('home.fundedScholarships.empty')"
       >
         <ScholarshipCard
-          v-for="sch in fundedScholarships"
+          v-for="sch in fundedScholarships.items.value"
           :key="sch.id"
           :scholarship="sch"
           variant="carousel"
@@ -170,13 +125,13 @@ const journey = computed(() => [
         :carousel-label="t('home.programDiscovery.title')"
         :view-all-to="localePath('/universities')"
         :view-all-label="t('catalog.viewAllUniversities')"
-        :pending="hotProgPending"
-        :error="hotProgError ? t('errors.loadSection') : ''"
-        :empty="!hotProgrammes.length"
+        :pending="hotProgrammes.pending.value"
+        :error="hotProgrammes.error.value ? t('errors.loadSection') : ''"
+        :empty="!hotProgrammes.items.value.length"
         :empty-text="t('home.programDiscovery.empty')"
       >
         <ProgramCard
-          v-for="p in hotProgrammes"
+          v-for="p in hotProgrammes.items.value"
           :key="p.id"
           :program="p"
           variant="carousel"
@@ -192,13 +147,13 @@ const journey = computed(() => [
         :carousel-label="t('home.recommendedUnis.title')"
         :view-all-to="localePath('/universities')"
         :view-all-label="t('catalog.viewAllUniversities')"
-        :pending="recommendedPending"
-        :error="recommendedError ? t('errors.loadSection') : ''"
-        :empty="!recommendedUnis.length"
+        :pending="recommended.pending.value"
+        :error="recommended.error.value ? t('errors.loadSection') : ''"
+        :empty="!recommended.items.value.length"
         :empty-text="t('home.recommendedUnis.empty')"
       >
         <UniversityCard
-          v-for="u in recommendedUnis"
+          v-for="u in recommended.items.value"
           :key="u.id"
           :university="u"
           variant="carousel"
@@ -208,7 +163,7 @@ const journey = computed(() => [
 
     <NContainer>
       <section
-        v-if="partnersPending || partnerUnis.length"
+        v-if="partners.pending.value || partners.items.value.length"
         class="py-12 sm:py-16"
       >
         <SectionHeading
@@ -216,31 +171,7 @@ const journey = computed(() => [
           :title="t('home.partners.title')"
           :description="t('home.partners.description')"
         />
-        <ul class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-          <li
-            v-for="u in partnerUnis"
-            :key="u.id"
-          >
-            <NuxtLink
-              :to="localePath(`/universities/${u.slug}`)"
-              class="flex h-28 items-center justify-center rounded-xl border border-slate-200 bg-white p-5 no-underline transition-shadow hover:shadow-md"
-              :title="u.name"
-            >
-              <img
-                v-if="u.logoUrl || u.logoImageUrl"
-                :src="(u.logoUrl || u.logoImageUrl) as string"
-                :alt="u.name"
-                loading="lazy"
-                decoding="async"
-                class="max-h-16 max-w-full object-contain"
-              >
-              <span
-                v-else
-                class="text-center text-sm font-semibold text-slate-700"
-              >{{ u.name }}</span>
-            </NuxtLink>
-          </li>
-        </ul>
+        <PartnerLogos :universities="partners.items.value" />
       </section>
     </NContainer>
 

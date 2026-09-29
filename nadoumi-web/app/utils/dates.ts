@@ -16,3 +16,22 @@ export function formatPeriod(start: string | null, end: string | null, current: 
   const to = current ? present : month(end)
   return [month(start), to].filter(Boolean).join(' – ')
 }
+
+export const DATE_TIME: Intl.DateTimeFormatOptions = { dateStyle: 'medium', timeStyle: 'short' }
+
+export function formatTimestamp(
+  iso: string | null | undefined,
+  locale: string,
+  options: Intl.DateTimeFormatOptions = { dateStyle: 'medium' },
+): string {
+  if (!iso) return ''
+  const normalized = iso.includes(' ') && !iso.includes('T') ? iso.replace(' ', 'T') : iso
+  const date = new Date(normalized)
+  if (Number.isNaN(date.getTime())) return ''
+  try {
+    return new Intl.DateTimeFormat(locale, options).format(date)
+  }
+  catch {
+    return ''
+  }
+}

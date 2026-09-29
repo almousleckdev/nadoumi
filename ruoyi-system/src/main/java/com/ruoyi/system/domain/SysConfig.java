@@ -13,8 +13,7 @@ import com.ruoyi.common.core.domain.BaseEntity;
  * 
  * @author ruoyi
  */
-public class SysConfig extends BaseEntity
-{
+public class SysConfig extends BaseEntity {
     private static final long serialVersionUID = 1L;
 
     /** 参数主键 */

@@ -1,0 +1,28 @@
+.sec {
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.sec__title {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--nad-ink-faint);
+}
+.sec__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sec__head .sec__title {
+  margin-bottom: 0;
+}
+.sec__hint {
+  margin: 6px 0 12px;
+  font-size: 12px;
+  color: var(--nad-ink-soft);
+}
+.muted {
+  color: var(--nad-ink-faint);
+}

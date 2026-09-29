@@ -2,6 +2,7 @@ package com.nadoumi.finance.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Expense;
@@ -48,7 +49,7 @@ public class ExpenseService {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
-        List<Expense> rows = mapper.search(nz(q), nz(status), categoryId, from, to);
+        List<Expense> rows = mapper.search(Texts.blankToNull(q), Texts.blankToNull(status), categoryId, from, to);
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(ExpenseResponse::from).toList(), page, size, total);
     }
@@ -147,13 +148,13 @@ public class ExpenseService {
     private void apply(Expense e, ExpenseRequest req) {
         e.setCategoryId(resolveCategoryId(req));
         e.setTitle(req.title().trim());
-        e.setDescription(nz(req.description()));
+        e.setDescription(Texts.blankToNull(req.description()));
         e.setAmount(req.amount());
         e.setCurrency(req.currency().toUpperCase(Locale.ROOT));
         e.setSpentOn(req.spentOn());
-        e.setVendor(nz(req.vendor()));
-        e.setPaymentMethod(nz(req.paymentMethod()));
-        e.setNotes(nz(req.notes()));
+        e.setVendor(Texts.blankToNull(req.vendor()));
+        e.setPaymentMethod(Texts.blankToNull(req.paymentMethod()));
+        e.setNotes(Texts.blankToNull(req.notes()));
     }
 
     /**
@@ -164,7 +165,7 @@ public class ExpenseService {
         if (req.categoryId() != null) {
             return req.categoryId();
         }
-        String name = nz(req.categoryName());
+        String name = Texts.blankToNull(req.categoryName());
         if (name == null) {
             return null;
         }
@@ -198,9 +199,5 @@ public class ExpenseService {
         } catch (RuntimeException e) {
             throw new NadBadRequestException("unknown expense status: " + raw);
         }
-    }
-
-    private static String nz(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
     }
 }

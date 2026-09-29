@@ -1,0 +1,14 @@
+.dict__pane-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.dict__pane-head h3 {
+  margin: 0;
+  font-size: 15px;
+}
+.dict__sel {
+  font-weight: 700;
+  color: var(--nad-brand-600, #4f46e5);
+}

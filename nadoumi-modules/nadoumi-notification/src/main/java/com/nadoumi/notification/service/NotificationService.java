@@ -3,6 +3,7 @@ package com.nadoumi.notification.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.notification.NotificationChannelKind;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.notification.domain.DeliveryStatus;
@@ -155,11 +156,11 @@ public class NotificationService {
     // ---- recipient reads --------------------------------------------------
 
     @Transactional(readOnly = true)
-    public PageResponse<NotificationView> listForRecipient(long userId, boolean unreadOnly, int page, int size) {
+    public PageResponse<NotificationView> listForRecipient(long userId, boolean unreadOnly, String type, int page, int size) {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
-        List<Notification> rows = notificationMapper.findByRecipient(userId, unreadOnly);
+        List<Notification> rows = notificationMapper.findByRecipient(userId, unreadOnly, Texts.blankToNull(type));
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(NotificationView::from).toList(), page, size, total);
     }

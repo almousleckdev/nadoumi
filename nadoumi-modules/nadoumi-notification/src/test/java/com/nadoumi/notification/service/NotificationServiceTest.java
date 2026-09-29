@@ -93,4 +93,31 @@ class NotificationServiceTest {
         assertThat(capturedDeliveries(2))
                 .anyMatch(d -> "EMAIL".equals(d.getChannel()) && "PENDING".equals(d.getStatus()));
     }
+
+    @Test
+    void shouldFilterRecipientFeedByType_whenTypeProvided() {
+        when(notificationMapper.findByRecipient(7L, false, "SCHOLARSHIP_PUBLISHED")).thenReturn(List.of());
+
+        service.listForRecipient(7L, false, "SCHOLARSHIP_PUBLISHED", 0, 20);
+
+        verify(notificationMapper).findByRecipient(7L, false, "SCHOLARSHIP_PUBLISHED");
+    }
+
+    @Test
+    void shouldNotFilterRecipientFeed_whenTypeIsBlank() {
+        when(notificationMapper.findByRecipient(7L, true, null)).thenReturn(List.of());
+
+        service.listForRecipient(7L, true, "   ", 0, 20);
+
+        verify(notificationMapper).findByRecipient(7L, true, null);
+    }
+
+    @Test
+    void shouldTrimTypeBeforeFiltering() {
+        when(notificationMapper.findByRecipient(7L, false, "CONTACT_INQUIRY_RECEIVED")).thenReturn(List.of());
+
+        service.listForRecipient(7L, false, "  CONTACT_INQUIRY_RECEIVED ", 0, 20);
+
+        verify(notificationMapper).findByRecipient(7L, false, "CONTACT_INQUIRY_RECEIVED");
+    }
 }

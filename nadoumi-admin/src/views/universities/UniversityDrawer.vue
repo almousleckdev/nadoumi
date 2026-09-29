@@ -1,3 +1,92 @@
+<script setup lang="ts">
+import { provide, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { ElMessage, type FormInstance } from 'element-plus'
+import {
+  createUniversity, updateUniversity, getUniversity, listDepartments,
+  type University,
+} from '@/api/university'
+import Drawer from '@/components/ui/Drawer.vue'
+import { useDeferredImages } from '@/composables/useDeferredImages'
+import IdentitySections from './form/IdentitySections.vue'
+import ContentSections from './form/ContentSections.vue'
+import MediaSections from './form/MediaSections.vue'
+import PublishingSection from './form/PublishingSection.vue'
+import { syncDepartments } from './syncDepartments'
+import {
+  blankUniversityForm, buildUniversityPayload, formFromUniversity, universityFormKey,
+  type DeptRow,
+} from './universityForm'
+
+const props = defineProps<{ modelValue: boolean, university: University | null }>()
+const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [u: University] }>()
+
+const { t } = useI18n()
+
+const formRef = ref<FormInstance>()
+const saving = ref(false)
+const media = ref<InstanceType<typeof MediaSections>>()
+const deferredImages = useDeferredImages()
+
+// snapshot of the university's departments as loaded, to diff against on save
+const originalDepartments = ref<DeptRow[]>([])
+
+const form = reactive(blankUniversityForm())
+provide(universityFormKey, form)
+
+const rules = {
+  name: [{ required: true, trigger: 'blur', message: t('university.required') }],
+  country: [
+    { required: true, trigger: 'blur', message: t('university.required') },
+    { pattern: /^[A-Za-z]{2}$/, trigger: 'blur', message: t('university.countryFormat') },
+  ],
+  status: [{ required: true, message: t('university.required') }],
+  publishStatus: [{ required: true, message: t('university.required') }],
+}
+
+watch(() => props.modelValue, async (open) => {
+  if (!open) return
+  Object.assign(form, blankUniversityForm())
+  originalDepartments.value = []
+  if (!props.university) return
+  // The list row carries no child collections (rankings / highlights / gallery);
+  // fetch the full record so editing shows and preserves them.
+  let u: University = props.university
+  try {
+    u = await getUniversity(props.university.id)
+  }
+  catch { /* fall back to the row we already have */ }
+  Object.assign(form, formFromUniversity(u))
+  try {
+    const depts = await listDepartments(u.id)
+    form.departments = depts.map(d => ({ id: d.id, name: d.name, nameCn: d.nameCn ?? '' }))
+    originalDepartments.value = depts.map(d => ({ id: d.id, name: d.name, nameCn: d.nameCn ?? '' }))
+  }
+  catch { /* no permission or none yet — leave the list empty */ }
+}, { immediate: true })
+
+async function save() {
+  await formRef.value?.validate()
+  saving.value = true
+  try {
+    const saved = props.university
+      ? await updateUniversity(props.university.id, buildUniversityPayload(form))
+      : await createUniversity(buildUniversityPayload(form))
+    const imagesOk = props.university
+      ? true
+      : await deferredImages.flush(media.value?.uploadTasks(saved.id) ?? [])
+    const blocked = await syncDepartments(saved.id, form.departments, originalDepartments.value)
+    if (blocked > 0) ElMessage.warning(t('university.departmentsBlocked', { n: blocked }))
+    if (imagesOk) ElMessage.success(t('common.saved'))
+    emit('update:modelValue', false)
+    emit('saved', saved)
+  }
+  finally {
+    saving.value = false
+  }
+}
+</script>
+
 <template>
   <Drawer
     :model-value="modelValue"
@@ -13,793 +102,13 @@
       :rules="rules"
       label-position="top"
     >
-      <FormSection :title="t('university.secIdentity')">
-        <el-form-item
-          :label="t('university.name')"
-          prop="name"
-        >
-          <el-input v-model="form.name" />
-        </el-form-item>
-        <div class="row2">
-          <el-form-item :label="t('university.nameCn')">
-            <el-input v-model="form.nameCn" />
-          </el-form-item>
-          <el-form-item :label="t('university.type')">
-            <el-select
-              v-model="form.type"
-              clearable
-              style="width: 100%"
-            >
-              <el-option
-                v-for="ty in TYPES"
-                :key="ty"
-                :label="titleCase(ty)"
-                :value="ty"
-              />
-            </el-select>
-          </el-form-item>
-        </div>
-        <div class="row2">
-          <el-form-item
-            :label="t('university.country')"
-            prop="country"
-          >
-            <el-input
-              v-model="form.country"
-              maxlength="2"
-              placeholder="ISO alpha-2 (CN)"
-            />
-          </el-form-item>
-          <el-form-item :label="t('university.foundedYear')">
-            <el-input-number
-              v-model="form.foundedYear"
-              :min="800"
-              :max="thisYear"
-              :controls="false"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-        <div class="row2">
-          <el-form-item :label="t('university.city')">
-            <el-input v-model="form.city" />
-          </el-form-item>
-          <el-form-item :label="t('university.province')">
-            <el-input v-model="form.province" />
-          </el-form-item>
-        </div>
-      </FormSection>
-
-      <FormSection
-        :title="t('university.secDepartments')"
-        :description="t('university.departmentsHint')"
-      >
-        <div
-          v-for="(d, i) in form.departments"
-          :key="i"
-          class="repeat"
-        >
-          <el-input
-            v-model="d.name"
-            :placeholder="t('department.name')"
-            maxlength="120"
-          />
-          <el-input
-            v-model="d.nameCn"
-            :placeholder="t('department.nameCn')"
-            maxlength="120"
-          />
-          <el-button
-            :icon="Delete"
-            text
-            @click="form.departments.splice(i, 1)"
-          />
-        </div>
-        <el-button
-          size="small"
-          :icon="Plus"
-          @click="form.departments.push({ id: undefined, name: '', nameCn: '' })"
-        >
-          {{ t('university.addDepartment') }}
-        </el-button>
-      </FormSection>
-
-      <FormSection :title="t('university.secProfile')">
-        <div class="row3">
-          <el-form-item :label="t('university.totalStudents')">
-            <el-input-number
-              v-model="form.totalStudents"
-              :min="0"
-              :controls="false"
-              style="width: 100%"
-            />
-          </el-form-item>
-          <el-form-item :label="t('university.intlStudents')">
-            <el-input-number
-              v-model="form.internationalStudents"
-              :min="0"
-              :controls="false"
-              style="width: 100%"
-            />
-          </el-form-item>
-          <el-form-item :label="t('university.facultyCount')">
-            <el-input-number
-              v-model="form.facultyCount"
-              :min="0"
-              :controls="false"
-              style="width: 100%"
-            />
-          </el-form-item>
-        </div>
-        <div class="row2">
-          <el-form-item :label="t('university.website')">
-            <el-input
-              v-model="form.website"
-              placeholder="https://…"
-            />
-          </el-form-item>
-          <el-form-item :label="t('university.rankingTier')">
-            <el-input
-              v-model="form.rankingTier"
-              placeholder="e.g. Top 100"
-            />
-          </el-form-item>
-        </div>
-      </FormSection>
-
-      <FormSection :title="t('university.secContent')">
-        <el-form-item :label="t('university.introduction')">
-          <el-input
-            v-model="form.introduction"
-            type="textarea"
-            :rows="3"
-          />
-        </el-form-item>
-        <el-form-item :label="t('university.history')">
-          <el-input
-            v-model="form.history"
-            type="textarea"
-            :rows="2"
-          />
-        </el-form-item>
-        <el-form-item :label="t('university.campusInfo')">
-          <el-input
-            v-model="form.campusInfo"
-            type="textarea"
-            :rows="2"
-          />
-        </el-form-item>
-        <div class="row2">
-          <el-form-item :label="t('university.accommodationInfo')">
-            <el-input
-              v-model="form.accommodationInfo"
-              type="textarea"
-              :rows="2"
-              :placeholder="t('university.accommodationHint')"
-            />
-          </el-form-item>
-          <el-form-item :label="t('university.nearbyInfo')">
-            <el-input
-              v-model="form.nearbyInfo"
-              type="textarea"
-              :rows="2"
-              :placeholder="t('university.nearbyHint')"
-            />
-          </el-form-item>
-        </div>
-      </FormSection>
-
-      <FormSection
-        :title="t('university.secHighlights')"
-        :description="t('university.highlightsHint')"
-      >
-        <div
-          v-for="(h, i) in form.highlights"
-          :key="i"
-          class="repeat"
-        >
-          <el-select
-            v-model="h.kind"
-            style="width: 130px"
-          >
-            <el-option
-              v-for="k in KINDS"
-              :key="k"
-              :label="titleCase(k)"
-              :value="k"
-            />
-          </el-select>
-          <el-input
-            v-model="h.text"
-            :placeholder="t('university.highlightText')"
-          />
-          <el-button
-            :icon="Delete"
-            text
-            @click="form.highlights.splice(i, 1)"
-          />
-        </div>
-        <el-button
-          size="small"
-          :icon="Plus"
-          @click="form.highlights.push({ kind: 'HIGHLIGHT', text: '' })"
-        >
-          {{ t('university.addHighlight') }}
-        </el-button>
-      </FormSection>
-
-      <FormSection
-        :title="t('university.secRankings')"
-        :description="t('university.rankingsHint')"
-      >
-        <div
-          v-for="(r, i) in form.rankings"
-          :key="i"
-          class="repeat"
-        >
-          <el-input
-            v-model="r.source"
-            placeholder="QS / THE / ARWU"
-            style="width: 130px"
-          />
-          <el-input-number
-            v-model="r.rankPosition"
-            :min="1"
-            :controls="false"
-            :placeholder="t('university.rankPosition')"
-            style="width: 90px"
-          />
-          <el-input-number
-            v-model="r.rankYear"
-            :min="1900"
-            :max="thisYear + 1"
-            :controls="false"
-            :placeholder="t('university.rankYear')"
-            style="width: 90px"
-          />
-          <el-input
-            v-model="r.note"
-            :placeholder="t('common.actions')"
-          />
-          <el-button
-            :icon="Delete"
-            text
-            @click="form.rankings.splice(i, 1)"
-          />
-        </div>
-        <el-button
-          size="small"
-          :icon="Plus"
-          @click="form.rankings.push({ source: '', rankPosition: null, rankYear: thisYear, note: null })"
-        >
-          {{ t('university.addRanking') }}
-        </el-button>
-      </FormSection>
-
-      <FormSection :title="t('university.secImages')">
-        <div class="imgs">
-          <el-form-item :label="t('university.logoImage')">
-            <ImageUpload
-              ref="logoUp"
-              v-model="form.logoMediaId"
-              :action="`/api/staff/universities/${form.id}/logo`"
-              :resolve-action="(id) => `/api/staff/universities/${id}/logo`"
-              :deferred="!form.id"
-              :preview-url="university?.logoUrl ?? university?.logoImageUrl"
-              aspect="square"
-            />
-          </el-form-item>
-          <el-form-item :label="t('university.coverImage')">
-            <ImageUpload
-              ref="bannerUp"
-              v-model="form.bannerMediaId"
-              :action="`/api/staff/universities/${form.id}/banner`"
-              :resolve-action="(id) => `/api/staff/universities/${id}/banner`"
-              :deferred="!form.id"
-              :preview-url="university?.bannerUrl ?? university?.coverImageUrl"
-              aspect="wide"
-            />
-          </el-form-item>
-        </div>
-      </FormSection>
-
-      <FormSection
-        :title="t('university.secGallery')"
-        :description="t('university.galleryHint')"
-      >
-        <div
-          v-for="(g, i) in form.gallery"
-          :key="i"
-          class="repeat gal-row"
-        >
-          <ImageUpload
-            :ref="(el) => setGalUp(el, i)"
-            v-model="g.mediaId"
-            :action="`/api/staff/universities/${form.id}/gallery`"
-            :resolve-action="(id) => `/api/staff/universities/${id}/gallery`"
-            :deferred="!form.id"
-            :preview-url="g.url ?? g.imageUrl"
-            aspect="wide"
-          />
-          <el-input
-            v-model="g.caption"
-            :placeholder="t('university.galleryCaption')"
-            style="width: 180px"
-          />
-          <el-button
-            :icon="Delete"
-            text
-            @click="removeGalleryRow(i)"
-          />
-        </div>
-        <div
-          v-if="form.gallery.length < MAX_GALLERY"
-          class="gal-actions"
-        >
-          <input
-            ref="galleryPicker"
-            type="file"
-            accept="image/*"
-            multiple
-            hidden
-            @change="onGalleryFiles"
-          >
-          <el-button
-            size="small"
-            :icon="Plus"
-            @click="galleryPicker?.click()"
-          >
-            {{ t('university.addGalleryImages') }}
-          </el-button>
-          <el-button
-            size="small"
-            text
-            :icon="Plus"
-            @click="form.gallery.push({ imageUrl: null, mediaId: null, url: null, caption: null })"
-          >
-            {{ t('university.addGalleryImage') }}
-          </el-button>
-        </div>
-        <p
-          v-else
-          class="gal-max"
-        >
-          {{ t('university.galleryMax') }}
-        </p>
-      </FormSection>
-
-      <FormSection :title="t('university.secPublication')">
-        <div class="row2">
-          <el-form-item
-            :label="t('university.status')"
-            prop="status"
-          >
-            <el-select
-              v-model="form.status"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="s in STATUSES"
-                :key="s"
-                :label="titleCase(s)"
-                :value="s"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item
-            :label="t('university.publishStatus')"
-            prop="publishStatus"
-          >
-            <el-select
-              v-model="form.publishStatus"
-              style="width: 100%"
-            >
-              <el-option
-                v-for="s in PUBLISH"
-                :key="s"
-                :label="titleCase(s)"
-                :value="s"
-              />
-            </el-select>
-          </el-form-item>
-        </div>
-        <div class="flags">
-          <el-checkbox v-model="form.recommended">
-            {{ t('university.recommended') }}
-          </el-checkbox>
-          <el-checkbox v-model="form.featured">
-            {{ t('university.featured') }}
-          </el-checkbox>
-        </div>
-        <el-form-item :label="t('university.partnerStatus')">
-          <el-radio-group v-model="form.partnerStatus">
-            <el-radio-button
-              v-for="ps in PARTNER_STATUSES"
-              :key="ps"
-              :value="ps"
-            >
-              {{ t(`university.partnerMap.${ps}`) }}
-            </el-radio-button>
-          </el-radio-group>
-          <p class="hint">
-            {{ t('university.partnerHint') }}
-          </p>
-        </el-form-item>
-        <el-form-item :label="t('university.publicPartner')">
-          <el-switch v-model="form.publicPartner" />
-          <p class="hint">
-            {{ t('university.publicPartnerHint') }}
-          </p>
-        </el-form-item>
-        <div class="row2">
-          <el-form-item :label="t('university.admissionsEmail')">
-            <el-input v-model="form.admissionsEmail" />
-          </el-form-item>
-          <el-form-item :label="t('university.officePhone')">
-            <el-input v-model="form.officePhone" />
-          </el-form-item>
-        </div>
-        <el-form-item :label="t('university.remark')">
-          <el-input
-            v-model="form.remark"
-            type="textarea"
-            :rows="2"
-            maxlength="500"
-            show-word-limit
-          />
-        </el-form-item>
-      </FormSection>
+      <IdentitySections />
+      <ContentSections />
+      <MediaSections
+        ref="media"
+        :university="university"
+      />
+      <PublishingSection />
     </el-form>
   </Drawer>
 </template>
-
-<script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance } from 'element-plus'
-import { Plus, Delete } from '@element-plus/icons-vue'
-import {
-  createUniversity, updateUniversity, getUniversity, PARTNER_STATUSES,
-  listDepartments, createDepartment, updateDepartment, deleteDepartment,
-  type University, type UniversityInput, type PartnerStatus,
-} from '@/api/university'
-import Drawer from '@/components/ui/Drawer.vue'
-import FormSection from '@/components/ui/FormSection.vue'
-import ImageUpload from '@/components/ui/ImageUpload.vue'
-import request from '@/utils/request'
-
-/** Backend cap — keep in step with UniversityRequest.gallery @Size(max). */
-const MAX_GALLERY = 10
-const MAX_IMAGE_MB = 5
-
-const props = defineProps<{ modelValue: boolean, university: University | null }>()
-const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [u: University] }>()
-
-const { t } = useI18n()
-const thisYear = new Date().getFullYear()
-const TYPES = ['PUBLIC', 'PRIVATE'] as const
-const STATUSES = ['ACTIVE', 'INACTIVE'] as const
-const PUBLISH = ['DRAFT', 'PUBLISHED'] as const
-const KINDS = ['HIGHLIGHT', 'ADVANTAGE'] as const
-
-function titleCase(s: string) {
-  return s.charAt(0) + s.slice(1).toLowerCase()
-}
-
-const formRef = ref<FormInstance>()
-const saving = ref(false)
-
-// deferred image uploaders — in create mode the file is held until the record exists
-type Uploader = InstanceType<typeof ImageUpload>
-const logoUp = ref<Uploader>()
-const bannerUp = ref<Uploader>()
-const galUps = ref<Uploader[]>([])
-const galleryPicker = ref<HTMLInputElement>()
-function setGalUp(el: unknown, i: number) {
-  if (el) galUps.value[i] = el as Uploader
-}
-
-interface GalleryUploadResult { mediaId?: number, url?: string | null }
-
-/** Send one file to the gallery endpoint of a saved university. */
-async function uploadGalleryFile(universityId: number, file: File): Promise<GalleryUploadResult | null> {
-  const fd = new FormData()
-  fd.append('file', file)
-  try {
-    const { data } = await request.post<GalleryUploadResult>(`/api/staff/universities/${universityId}/gallery`, fd)
-    return typeof data?.mediaId === 'number' ? data : null
-  }
-  catch {
-    // request.ts already toasts the problem+json detail
-    return null
-  }
-}
-
-async function flushDeferredImages(id: number) {
-  await Promise.all([
-    logoUp.value?.flush(id),
-    bannerUp.value?.flush(id),
-    ...galUps.value.map(u => u?.flush(id)),
-  ])
-  // multi-picked rows held locally in create mode — send them now
-  for (const g of form.gallery) {
-    if (!g._file) continue
-    const res = await uploadGalleryFile(id, g._file)
-    if (res) {
-      g.mediaId = res.mediaId ?? null
-      g.imageUrl = res.url ?? null
-      if (g.url) URL.revokeObjectURL(g.url)
-      g.url = res.url ?? null
-    }
-    g._file = null
-  }
-}
-
-/** One "Add images" pick: validate, respect the cap, upload now (edit) or hold (create). */
-async function onGalleryFiles(e: Event) {
-  const input = e.target as HTMLInputElement
-  const files = Array.from(input.files ?? [])
-  input.value = ''
-  const room = MAX_GALLERY - form.gallery.length
-  if (room <= 0 || !files.length) return
-  if (files.length > room) ElMessage.warning(t('university.galleryTrimmed', { n: MAX_GALLERY }))
-  for (const file of files.slice(0, room)) {
-    if (!file.type.startsWith('image/')) {
-      ElMessage.error(t('imageUpload.badType'))
-      continue
-    }
-    if (file.size / 1024 / 1024 > MAX_IMAGE_MB) {
-      ElMessage.error(t('imageUpload.tooBig', { mb: MAX_IMAGE_MB }))
-      continue
-    }
-    if (form.id) {
-      const res = await uploadGalleryFile(form.id, file)
-      if (res) form.gallery.push({ imageUrl: res.url ?? null, mediaId: res.mediaId ?? null, url: res.url ?? null, caption: null })
-    }
-    else {
-      form.gallery.push({ imageUrl: null, mediaId: null, url: URL.createObjectURL(file), caption: null, _file: file })
-    }
-  }
-}
-
-function removeGalleryRow(i: number) {
-  const g = form.gallery[i]
-  if (g?._file && g.url) URL.revokeObjectURL(g.url)
-  form.gallery.splice(i, 1)
-}
-
-type GalleryRow = {
-  imageUrl: string | null
-  mediaId: number | null
-  url: string | null
-  caption: string | null
-  /** create-mode only: a multi-picked file held until the record exists */
-  _file?: File | null
-}
-type DeptRow = { id: number | undefined, name: string, nameCn: string | null }
-
-// snapshot of the university's departments as loaded, to diff against on save
-const originalDepartments = ref<DeptRow[]>([])
-
-function blankForm() {
-  return {
-    id: undefined as number | undefined,
-    name: '', nameCn: '', country: '', type: null as string | null,
-    city: '', province: '', foundedYear: null as number | null,
-    totalStudents: null as number | null, internationalStudents: null as number | null,
-    facultyCount: null as number | null, website: '', rankingTier: '',
-    introduction: '', history: '', campusInfo: '', accommodationInfo: '', nearbyInfo: '',
-    admissionsEmail: '', officePhone: '',
-    logoImageUrl: null as string | null, coverImageUrl: null as string | null,
-    logoMediaId: null as number | null, bannerMediaId: null as number | null,
-    recommended: false, featured: false, publicPartner: false,
-    partnerStatus: 'NONE' as PartnerStatus,
-    status: 'ACTIVE' as UniversityInput['status'],
-    publishStatus: 'DRAFT' as UniversityInput['publishStatus'],
-    remark: '',
-    highlights: [] as University['highlights'],
-    rankings: [] as University['rankings'],
-    gallery: [] as GalleryRow[],
-    departments: [] as DeptRow[],
-  }
-}
-const form = reactive(blankForm())
-
-const rules = {
-  name: [{ required: true, trigger: 'blur', message: t('university.required') }],
-  country: [
-    { required: true, trigger: 'blur', message: t('university.required') },
-    { pattern: /^[A-Za-z]{2}$/, trigger: 'blur', message: t('university.countryFormat') },
-  ],
-  status: [{ required: true, message: t('university.required') }],
-  publishStatus: [{ required: true, message: t('university.required') }],
-}
-
-watch(() => props.modelValue, async (open) => {
-  if (!open) return
-  Object.assign(form, blankForm())
-  originalDepartments.value = []
-  if (!props.university) return
-  // The list row carries no child collections (rankings / highlights / gallery);
-  // fetch the full record so editing shows and preserves them.
-  let u: University = props.university
-  try {
-    u = await getUniversity(props.university.id)
-  }
-  catch { /* fall back to the row we already have */ }
-  Object.assign(form, {
-    id: u.id,
-    name: u.name, nameCn: u.nameCn ?? '', country: u.country, type: u.type,
-    city: u.city ?? '', province: u.province ?? '', foundedYear: u.foundedYear,
-    totalStudents: u.totalStudents, internationalStudents: u.internationalStudents,
-    facultyCount: u.facultyCount, website: u.website ?? '', rankingTier: u.rankingTier ?? '',
-    introduction: u.introduction ?? '', history: u.history ?? '', campusInfo: u.campusInfo ?? '',
-    accommodationInfo: u.accommodationInfo ?? '', nearbyInfo: u.nearbyInfo ?? '',
-    admissionsEmail: u.admissionsEmail ?? '', officePhone: u.officePhone ?? '',
-    logoImageUrl: u.logoImageUrl ?? null, coverImageUrl: u.coverImageUrl ?? null,
-    logoMediaId: u.logoMediaId ?? null, bannerMediaId: u.bannerMediaId ?? null,
-    recommended: u.recommended, featured: u.featured, publicPartner: u.publicPartner ?? false,
-    partnerStatus: (u.partnerStatus ?? 'NONE') as PartnerStatus,
-    status: u.status, publishStatus: u.publishStatus, remark: u.remark ?? '',
-    highlights: (u.highlights ?? []).map(h => ({ ...h })),
-    rankings: (u.rankings ?? []).map(r => ({ ...r })),
-    gallery: (u.gallery ?? []).map(g => ({
-      imageUrl: g.imageUrl ?? null, mediaId: g.mediaId ?? null, url: g.url ?? null, caption: g.caption,
-    })),
-  })
-  try {
-    const depts = await listDepartments(u.id)
-    form.departments = depts.map(d => ({ id: d.id, name: d.name, nameCn: d.nameCn ?? '' }))
-    originalDepartments.value = depts.map(d => ({ id: d.id, name: d.name, nameCn: d.nameCn ?? '' }))
-  }
-  catch { /* no permission or none yet — leave the list empty */ }
-}, { immediate: true })
-
-/** Persist the department rows against a saved university id. Returns the count that failed to delete (in use). */
-async function syncDepartments(universityId: number): Promise<number> {
-  const rows = form.departments.filter(d => d.name.trim())
-  const keptIds = new Set(rows.filter(d => d.id != null).map(d => d.id))
-  let blocked = 0
-  // removed rows
-  for (const orig of originalDepartments.value) {
-    if (orig.id != null && !keptIds.has(orig.id)) {
-      try {
-        await deleteDepartment(universityId, orig.id)
-      }
-      catch {
-        blocked++
-      }
-    }
-  }
-  // new + changed rows
-  for (const d of rows) {
-    const body = { name: d.name.trim(), nameCn: d.nameCn?.trim() || null }
-    if (d.id == null) {
-      await createDepartment(universityId, body)
-    }
-    else {
-      const orig = originalDepartments.value.find(o => o.id === d.id)
-      if (!orig || orig.name !== body.name || (orig.nameCn || null) !== body.nameCn) {
-        await updateDepartment(universityId, d.id, body)
-      }
-    }
-  }
-  return blocked
-}
-
-function orNum(v: unknown): number | null {
-  return v === '' || v === null || v === undefined ? null : Number(v)
-}
-function orNull(v: string): string | null {
-  return v.trim() === '' ? null : v.trim()
-}
-
-function payload(): UniversityInput {
-  return {
-    name: form.name.trim(),
-    nameCn: orNull(form.nameCn),
-    country: form.country.trim().toUpperCase(),
-    type: (form.type as UniversityInput['type']) || null,
-    city: orNull(form.city),
-    province: orNull(form.province),
-    foundedYear: orNum(form.foundedYear),
-    totalStudents: orNum(form.totalStudents),
-    internationalStudents: orNum(form.internationalStudents),
-    facultyCount: orNum(form.facultyCount),
-    website: orNull(form.website),
-    rankingTier: orNull(form.rankingTier),
-    introduction: orNull(form.introduction),
-    history: orNull(form.history),
-    campusInfo: orNull(form.campusInfo),
-    accommodationInfo: orNull(form.accommodationInfo),
-    nearbyInfo: orNull(form.nearbyInfo),
-    admissionsEmail: orNull(form.admissionsEmail),
-    officePhone: orNull(form.officePhone),
-    logoImageUrl: form.logoImageUrl,
-    coverImageUrl: form.coverImageUrl,
-    logoMediaId: form.logoMediaId,
-    bannerMediaId: form.bannerMediaId,
-    recommended: form.recommended,
-    featured: form.featured,
-    publicPartner: form.publicPartner,
-    partnerStatus: form.partnerStatus,
-    status: form.status,
-    publishStatus: form.publishStatus,
-    remark: orNull(form.remark),
-    highlights: form.highlights
-      .filter(h => h.text.trim())
-      .map(h => ({ kind: h.kind, text: h.text.trim() })),
-    rankings: form.rankings
-      .filter(r => r.source.trim() && r.rankPosition)
-      .map(r => ({ source: r.source.trim(), rankPosition: Number(r.rankPosition), rankYear: orNum(r.rankYear), note: orNull(r.note ?? '') })),
-    gallery: form.gallery
-      .filter(g => g.mediaId != null || Boolean(g.imageUrl?.trim()))
-      .slice(0, MAX_GALLERY)
-      .map(g => ({
-        mediaId: g.mediaId ?? null,
-        imageUrl: g.imageUrl?.trim() || undefined,
-        caption: orNull(g.caption ?? ''),
-      })),
-  }
-}
-
-async function save() {
-  await formRef.value?.validate()
-  saving.value = true
-  try {
-    const saved = props.university
-      ? await updateUniversity(props.university.id, payload())
-      : await createUniversity(payload())
-    if (!props.university) await flushDeferredImages(saved.id)
-    const blocked = await syncDepartments(saved.id)
-    if (blocked > 0) ElMessage.warning(t('university.departmentsBlocked', { n: blocked }))
-    ElMessage.success(t('common.saved'))
-    emit('update:modelValue', false)
-    emit('saved', saved)
-  }
-  finally {
-    saving.value = false
-  }
-}
-</script>
-
-<style scoped>
-.row2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.row3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 10px;
-}
-.repeat {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.repeat > .el-input {
-  flex: 1;
-}
-.gal-row {
-  align-items: flex-start;
-}
-.gal-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.imgs {
-  display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-.flags {
-  display: flex;
-  gap: 20px;
-  margin: 4px 0 12px;
-}
-</style>

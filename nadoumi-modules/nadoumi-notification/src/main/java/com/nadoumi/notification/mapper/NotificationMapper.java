@@ -28,9 +28,12 @@ public interface NotificationMapper {
      */
     int insertBatch(@Param("rows") List<Notification> rows);
 
-    /** One recipient's feed, newest first; {@code unreadOnly} restricts to {@code read_at IS NULL}. */
+    /**
+     * One recipient's feed, newest first; {@code unreadOnly} restricts to {@code read_at IS NULL}
+     * and a non-null {@code type} restricts to that notification type.
+     */
     List<Notification> findByRecipient(@Param("recipientUserId") long recipientUserId,
-            @Param("unreadOnly") boolean unreadOnly);
+            @Param("unreadOnly") boolean unreadOnly, @Param("type") String type);
 
     long countUnread(@Param("recipientUserId") long recipientUserId);
 

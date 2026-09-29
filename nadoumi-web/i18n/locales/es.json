@@ -459,7 +459,12 @@
       "startConversationDesc": "¿Necesita ayuda con su solicitud? Envíe un mensaje directo a un asesor de Nadoumi.",
       "noResults": "No se encontraron conversaciones que coincidan con su búsqueda.",
       "onlineSupport": "Soporte de asesor directo",
-      "adminBadge": "Asesor oficial"
+      "adminBadge": "Asesor oficial",
+      "staffBadge": "Equipo",
+      "searchAria": "Buscar conversaciones",
+      "applicationRef": "Solicitud n.º {id}",
+      "applicationFallback": "Solicitud",
+      "draftFallback": "Borrador"
     },
     "profileTitle": "Perfil del solicitante",
     "createProfileTitle": "Crea tu perfil de solicitante",
@@ -560,6 +565,18 @@
         "WAITING_ON_STUDENT": "Esperando tu respuesta",
         "RESOLVED": "Resuelto",
         "CLOSED": "Cerrado"
+      },
+      "meeting": {
+        "request": "Solicitar reunión",
+        "title": "Solicitar una reunión individual",
+        "intro": "Elige una fecha, una hora y una duración para tu reunión individual. Si el horario solicitado coincide con la agenda del miembro del equipo asignado, será rechazado.",
+        "date": "Fecha",
+        "time": "Hora",
+        "duration": "Duración",
+        "minutes": "{n} minutos",
+        "hour": "1 hora",
+        "hourAndHalf": "1,5 horas",
+        "book": "Reservar reunión"
       }
     },
     "savedOk": "Guardado",

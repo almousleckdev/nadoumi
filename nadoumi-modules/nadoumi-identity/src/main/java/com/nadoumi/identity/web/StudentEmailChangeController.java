@@ -1,6 +1,6 @@
 package com.nadoumi.identity.web;
 
-import com.nadoumi.identity.service.StudentAuthService;
+import com.nadoumi.identity.service.StudentEmailChangeService;
 import com.nadoumi.identity.service.otp.OtpService;
 import com.nadoumi.identity.web.request.EmailChangeCodeRequest;
 import com.nadoumi.identity.web.request.EmailChangeRequest;
@@ -25,16 +25,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/student/email/change")
 public class StudentEmailChangeController {
 
-    private final StudentAuthService service;
+    private final StudentEmailChangeService service;
 
-    public StudentEmailChangeController(StudentAuthService service) {
+    public StudentEmailChangeController(StudentEmailChangeService service) {
         this.service = service;
     }
 
     @PostMapping("/otp")
     @RateLimiter(time = 3600, count = 10, limitType = LimitType.IP)
     public OtpSentResponse requestCode(@Valid @RequestBody EmailChangeCodeRequest req) {
-        OtpService.IssueResult result = service.requestEmailChangeCode(req.newEmail());
+        OtpService.IssueResult result = service.requestCode(req.newEmail());
         return new OtpSentResponse(true, !result.sent(), result.retryAfterSeconds());
     }
 
@@ -42,6 +42,6 @@ public class StudentEmailChangeController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @RateLimiter(time = 600, count = 10, limitType = LimitType.IP)
     public void change(HttpServletRequest request, @Valid @RequestBody EmailChangeRequest req) {
-        service.changeEmail(request, req.newEmail(), req.otp(), req.currentPassword());
+        service.change(request, req.newEmail(), req.otp(), req.currentPassword());
     }
 }

@@ -459,7 +459,12 @@
       "startConversationDesc": "Besoin d'aide avec votre dossier ? Écrivez directement à un conseiller Nadoumi.",
       "noResults": "Aucune conversation ne correspond à votre recherche.",
       "onlineSupport": "Support conseiller dédié",
-      "adminBadge": "Conseiller officiel"
+      "adminBadge": "Conseiller officiel",
+      "staffBadge": "Équipe",
+      "searchAria": "Rechercher des conversations",
+      "applicationRef": "Candidature n°{id}",
+      "applicationFallback": "Candidature",
+      "draftFallback": "Brouillon"
     },
     "profileTitle": "Profil du candidat",
     "createProfileTitle": "Créez votre profil de candidat",
@@ -560,6 +565,18 @@
         "WAITING_ON_STUDENT": "En attente de votre réponse",
         "RESOLVED": "Résolu",
         "CLOSED": "Fermé"
+      },
+      "meeting": {
+        "request": "Demander un rendez-vous",
+        "title": "Demander un rendez-vous individuel",
+        "intro": "Choisissez une date, une heure et une durée pour votre rendez-vous individuel. Si le créneau demandé entre en conflit avec l'agenda du membre de l'équipe assigné, il sera refusé.",
+        "date": "Date",
+        "time": "Heure",
+        "duration": "Durée",
+        "minutes": "{n} minutes",
+        "hour": "1 heure",
+        "hourAndHalf": "1 h 30",
+        "book": "Réserver le rendez-vous"
       }
     },
     "savedOk": "Enregistré",

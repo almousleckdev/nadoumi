@@ -9,6 +9,7 @@ import com.nadoumi.applicant.service.EducationService;
 import com.nadoumi.applicant.service.PassportService;
 import com.nadoumi.applicant.web.request.PassportRequest;
 import com.nadoumi.applicant.web.response.PassportStatusResponse;
+import com.nadoumi.applicant.service.ApplicantRecordsService;
 import com.nadoumi.applicant.service.ApplicantService;
 import com.nadoumi.applicant.web.request.EmailCodeRequest;
 import com.nadoumi.applicant.web.request.EmailVerifyRequest;
@@ -47,16 +48,18 @@ import org.springframework.web.multipart.MultipartFile;
 public class StudentApplicantController {
 
     private final ApplicantService service;
+    private final ApplicantRecordsService records;
     private final ApplicantEmailService emailService;
     private final OnboardingService onboarding;
     private final ApplicantMediaService media;
     private final PassportService passports;
     private final EducationService education;
 
-    public StudentApplicantController(ApplicantService service, ApplicantEmailService emailService,
+    public StudentApplicantController(ApplicantService service, ApplicantRecordsService records, ApplicantEmailService emailService,
             OnboardingService onboarding, ApplicantMediaService media, PassportService passports,
             EducationService education) {
         this.service = service;
+        this.records = records;
         this.emailService = emailService;
         this.onboarding = onboarding;
         this.media = media;
@@ -202,47 +205,47 @@ public class StudentApplicantController {
     @GetMapping("/{id}/test-scores")
     @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
     public List<TestScoreResponse> testScores(@PathVariable Long id) {
-        return service.testScores(id);
+        return records.testScores(id);
     }
 
     @PostMapping("/{id}/test-scores")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public TestScoreResponse addTestScore(@PathVariable Long id, @Valid @RequestBody TestScoreRequest req) {
-        return service.addTestScore(id, req);
+        return records.addTestScore(id, req);
     }
 
     @DeleteMapping("/{id}/test-scores/{scoreId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public void deleteTestScore(@PathVariable Long id, @PathVariable Long scoreId) {
-        service.deleteTestScore(id, scoreId);
+        records.deleteTestScore(id, scoreId);
     }
 
     @GetMapping("/{id}/contacts")
     @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
     public List<ContactResponse> contacts(@PathVariable Long id) {
-        return service.contacts(id);
+        return records.contacts(id);
     }
 
     @PostMapping("/{id}/contacts")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public ContactResponse addContact(@PathVariable Long id, @Valid @RequestBody ContactRequest req) {
-        return service.addContact(id, req);
+        return records.addContact(id, req);
     }
 
     @PutMapping("/{id}/contacts/{contactId}")
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public ContactResponse updateContact(@PathVariable Long id, @PathVariable Long contactId,
             @Valid @RequestBody ContactRequest req) {
-        return service.updateContact(id, contactId, req);
+        return records.updateContact(id, contactId, req);
     }
 
     @DeleteMapping("/{id}/contacts/{contactId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@na.canAccessApplicant(#id, 'EDIT_PROFILE')")
     public void deleteContact(@PathVariable Long id, @PathVariable Long contactId) {
-        service.deleteContact(id, contactId);
+        records.deleteContact(id, contactId);
     }
 }

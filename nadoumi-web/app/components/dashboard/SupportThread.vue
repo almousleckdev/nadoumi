@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TicketMessage } from '~/types/support'
+import { DATE_TIME, formatTimestamp } from '~/utils/dates'
 
 const props = defineProps<{
   messages: TicketMessage[]
@@ -15,8 +16,7 @@ const { t, locale } = useI18n()
 const MAX_BODY = 4000
 const draft = ref('')
 
-const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }))
-const formatTime = (iso: string) => dtf.value.format(new Date(iso))
+const formatTime = (iso: string) => formatTimestamp(iso, locale.value, DATE_TIME)
 const isOwn = (m: TicketMessage) => props.currentUserId !== null && m.senderUserId === props.currentUserId
 const canSend = computed(() => !props.closed && !props.busy && draft.value.trim().length > 0)
 

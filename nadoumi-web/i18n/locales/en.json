@@ -459,7 +459,12 @@
       "startConversationDesc": "Need help with your application or have questions? Send a direct message to a Nadoumi advisor.",
       "noResults": "No conversations match your search.",
       "onlineSupport": "Direct Advisor Support",
-      "adminBadge": "Staff Advisor"
+      "adminBadge": "Staff Advisor",
+      "staffBadge": "Staff",
+      "searchAria": "Search conversations",
+      "applicationRef": "Application #{id}",
+      "applicationFallback": "Application",
+      "draftFallback": "Draft"
     },
     "profileTitle": "Applicant profile",
     "createProfileTitle": "Create your applicant profile",
@@ -560,6 +565,18 @@
         "WAITING_ON_STUDENT": "Waiting for you",
         "RESOLVED": "Resolved",
         "CLOSED": "Closed"
+      },
+      "meeting": {
+        "request": "Request Meeting",
+        "title": "Request a 1:1 Meeting",
+        "intro": "Select a date, time, and duration for your 1:1 meeting. If the requested slot conflicts with the assigned staff member's calendar, it will be rejected.",
+        "date": "Date",
+        "time": "Time",
+        "duration": "Duration",
+        "minutes": "{n} minutes",
+        "hour": "1 hour",
+        "hourAndHalf": "1.5 hours",
+        "book": "Book Meeting"
       }
     },
     "savedOk": "Saved",

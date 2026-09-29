@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { NotificationView } from '~/types/catalog'
+import { DATE_TIME, formatTimestamp } from '~/utils/dates'
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t, locale } = useI18n()
 const { list, markRead, markAllRead } = useNotifications()
 
-const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }))
-const formatCreatedAt = (iso: string) => dtf.value.format(new Date(iso))
+const formatCreatedAt = (iso: string) => formatTimestamp(iso, locale.value, DATE_TIME)
 
 const PAGE_SIZE = 20
 const mode = ref('mine')
@@ -87,8 +87,8 @@ useSeo(t('dashboard.notifications.title'), t('dashboard.notifications.blurb'))
       </div>
       <div class="flex items-center gap-3">
         <div class="inline-flex rounded-md shadow-sm">
-          <button type="button" @click="mode = 'all'" :class="mode === 'all' ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'" class="px-4 py-2 text-sm font-medium border border-slate-200 rounded-l-md focus:z-10 focus:ring-2 focus:ring-brand-500">All notifications</button>
-          <button type="button" @click="mode = 'mine'" :class="mode === 'mine' ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'" class="px-4 py-2 text-sm font-medium border-t border-b border-r border-slate-200 rounded-r-md focus:z-10 focus:ring-2 focus:ring-brand-500">My notifications</button>
+          <button type="button" :class="mode === 'all' ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'" class="px-4 py-2 text-sm font-medium border border-slate-200 rounded-l-md focus:z-10 focus:ring-2 focus:ring-brand-500" @click="mode = 'all'">All notifications</button>
+          <button type="button" :class="mode === 'mine' ? 'bg-slate-100 text-slate-900' : 'bg-white text-slate-700 hover:bg-slate-50'" class="px-4 py-2 text-sm font-medium border-t border-b border-r border-slate-200 rounded-r-md focus:z-10 focus:ring-2 focus:ring-brand-500" @click="mode = 'mine'">My notifications</button>
         </div>
         <NButton v-if="mode === 'mine' && unreadExists" variant="secondary" size="sm" @click="onMarkAll">{{ t('dashboard.notifications.markAllRead') }}</NButton>
       </div>
@@ -101,7 +101,7 @@ useSeo(t('dashboard.notifications.title'), t('dashboard.notifications.blurb'))
         <option value="APPLICATION">Application</option>
         <option value="TICKET">Support Ticket</option>
       </select>
-      <button v-if="typeFilter" @click="typeFilter = ''" class="ml-3 text-sm text-brand-600 hover:text-brand-700">Clear</button>
+      <button v-if="typeFilter" class="ml-3 text-sm text-brand-600 hover:text-brand-700" @click="typeFilter = ''">Clear</button>
     </div>
 
     <AsyncState :pending="pending" :error="error" :empty="!items.length">

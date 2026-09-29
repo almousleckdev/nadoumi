@@ -2,6 +2,7 @@ package com.nadoumi.finance.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Revenue;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 /** Revenue records — plain CRUD; the finance summary derives net earnings from these. */
 @Service
@@ -33,7 +33,7 @@ public class RevenueService {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
-        List<Revenue> rows = mapper.search(nz(q), nz(source), from, to);
+        List<Revenue> rows = mapper.search(Texts.blankToNull(q), Texts.blankToNull(source), from, to);
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(RevenueResponse::from).toList(), page, size, total);
     }
@@ -80,17 +80,13 @@ public class RevenueService {
     private void apply(Revenue r, RevenueRequest req) {
         r.setSource(req.source().trim().toUpperCase(Locale.ROOT));
         r.setTitle(req.title().trim());
-        r.setDescription(nz(req.description()));
+        r.setDescription(Texts.blankToNull(req.description()));
         r.setAmount(req.amount());
         r.setCurrency(req.currency().toUpperCase(Locale.ROOT));
         r.setReceivedOn(req.receivedOn());
-        r.setReference(nz(req.reference()));
-        r.setRelatedType(nz(req.relatedType()));
+        r.setReference(Texts.blankToNull(req.reference()));
+        r.setRelatedType(Texts.blankToNull(req.relatedType()));
         r.setRelatedId(req.relatedId());
-        r.setNotes(nz(req.notes()));
-    }
-
-    private static String nz(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
+        r.setNotes(Texts.blankToNull(req.notes()));
     }
 }

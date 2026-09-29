@@ -41,6 +41,13 @@ describe('dashboard account page', () => {
     expect(w.text().toLowerCase()).toContain('signed out on your other devices')
   })
 
+  it('shows the signed-in student by name and email, never a blank heading', async () => {
+    const w = await mountSuspended(Account)
+    const heading = w.find('h2')
+    expect(heading.text()).toBe('Sam')
+    expect(w.text()).toContain('sam@example.com')
+  })
+
   it('signs out', async () => {
     const w = await mountSuspended(Account)
     await w.find('[data-test="sign-out"]').trigger('click')

@@ -7,17 +7,17 @@ import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
 import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.MediaUploadResult;
+import com.nadoumi.common.media.MediaUrls;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.UniversityGalleryImage;
-import com.nadoumi.university.domain.UniversityHighlight;
-import com.nadoumi.university.domain.UniversityRanking;
 import com.nadoumi.university.domain.enums.PublishStatus;
 import com.nadoumi.university.domain.enums.UniversityStatus;
 import com.nadoumi.university.domain.enums.UniversityType;
@@ -47,11 +47,14 @@ public class UniversityService {
     private final UniversityMapper mapper;
     private final MediaGateway media;
     private final OutboxWriter outbox;
+    private final UniversityChildrenWriter children;
 
-    public UniversityService(UniversityMapper mapper, MediaGateway media, OutboxWriter outbox) {
+    public UniversityService(UniversityMapper mapper, MediaGateway media, OutboxWriter outbox,
+            UniversityChildrenWriter children) {
         this.mapper = mapper;
         this.media = media;
         this.outbox = outbox;
+        this.children = children;
     }
 
     // ---- staff ----
@@ -79,7 +82,7 @@ public class UniversityService {
         u.setReferenceCode(nextReferenceCode());
         u.setCreateBy(AuditActor.username());
         mapper.insert(u);
-        replaceChildren(u.getId(), req);
+        children.replace(u.getId(), req.rankings(), req.highlights(), req.gallery());
         if (u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED) {
             emitPublished(u);
         }
@@ -95,7 +98,7 @@ public class UniversityService {
         u.setSlug(uniqueSlug(u.getName(), id));
         u.setUpdateBy(AuditActor.username());
         mapper.update(u);
-        replaceChildren(id, req);
+        children.replace(id, req.rankings(), req.highlights(), req.gallery());
         boolean nowLive = u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED;
         if (nowLive && !wasLive) {
             emitPublished(u);
@@ -216,65 +219,6 @@ public class UniversityService {
         return u;
     }
 
-    private void replaceChildren(Long universityId, UniversityRequest req) {
-        mapper.deleteRankings(universityId);
-        if (req.rankings() != null) {
-            for (UniversityRequest.RankingInput in : req.rankings()) {
-                UniversityRanking r = new UniversityRanking();
-                r.setUniversityId(universityId);
-                r.setSource(in.source().trim());
-                r.setRankPosition(in.rankPosition());
-                r.setRankYear(in.rankYear() == null ? null : in.rankYear().intValue());
-                r.setNote(blankToNull(in.note()));
-                mapper.insertRanking(r);
-            }
-        }
-        mapper.deleteHighlights(universityId);
-        if (req.highlights() != null) {
-            int order = 0;
-            for (UniversityRequest.HighlightInput in : req.highlights()) {
-                UniversityHighlight h = new UniversityHighlight();
-                h.setUniversityId(universityId);
-                h.setKind(in.kind());
-                h.setSortOrder(order++);
-                h.setText(in.text().trim());
-                mapper.insertHighlight(h);
-            }
-        }
-        mapper.deleteGallery(universityId);
-        if (req.gallery() != null) {
-            int order = 0;
-            for (UniversityRequest.GalleryInput in : req.gallery()) {
-                String url = galleryImageUrl(in);
-                if (url == null) {
-                    continue;
-                }
-                mapper.insertGalleryImage(universityId,
-                        new UniversityGalleryImage(null, url, in.mediaId(), blankToNull(in.caption())),
-                        order++);
-            }
-        }
-    }
-
-    /**
-     * The admin form sends uploaded rows as {@code mediaId} only, while
-     * {@code image_url} is NOT NULL, so the URL is resolved from the media asset.
-     * Returns null for the trailing empty rows the form can submit (no URL, no media).
-     */
-    private String galleryImageUrl(UniversityRequest.GalleryInput in) {
-        if (in.imageUrl() != null && !in.imageUrl().isBlank()) {
-            return in.imageUrl().trim();
-        }
-        if (in.mediaId() == null) {
-            return null;
-        }
-        String resolved = resolveUrl(in.mediaId(), null);
-        if (resolved == null) {
-            throw new NadBadRequestException("gallery image " + in.mediaId() + " is not available");
-        }
-        return resolved;
-    }
-
     private String uniqueSlug(String name, Long selfId) {
         return Slugs.unique(Slugs.slugify(name), selfId, mapper::findIdBySlug);
     }
@@ -289,45 +233,33 @@ public class UniversityService {
     /** Media id wins; the legacy {@code *_image_url} string is the deprecation-window fallback. */
     private UniversityResponse toResponse(University u) {
         return UniversityResponse.of(u,
-                resolveUrl(u.getLogoMediaId(), u.getLogoImageUrl()),
-                resolveUrl(u.getBannerMediaId(), u.getCoverImageUrl()),
-                g -> resolveUrl(g.mediaId(), g.imageUrl()));
-    }
-
-    private String resolveUrl(Long mediaId, String legacy) {
-        if (mediaId == null) {
-            return legacy;
-        }
-        try {
-            return media.publicUrl(mediaId);
-        }
-        catch (RuntimeException e) {
-            return legacy;
-        }
+                MediaUrls.resolve(media, u.getLogoMediaId(), u.getLogoImageUrl()),
+                MediaUrls.resolve(media, u.getBannerMediaId(), u.getCoverImageUrl()),
+                g -> MediaUrls.resolve(media, g.mediaId(), g.imageUrl()));
     }
 
     private static void apply(University u, UniversityRequest req) {
         u.setName(req.name().trim());
-        u.setNameCn(blankToNull(req.nameCn()));
+        u.setNameCn(Texts.blankToNull(req.nameCn()));
         u.setCountry(req.country().toUpperCase());
         u.setType(req.type());
-        u.setCity(blankToNull(req.city()));
-        u.setProvince(blankToNull(req.province()));
+        u.setCity(Texts.blankToNull(req.city()));
+        u.setProvince(Texts.blankToNull(req.province()));
         u.setFoundedYear(req.foundedYear());
         u.setTotalStudents(req.totalStudents());
         u.setInternationalStudents(req.internationalStudents());
         u.setFacultyCount(req.facultyCount());
-        u.setWebsite(blankToNull(req.website()));
-        u.setRankingTier(blankToNull(req.rankingTier()));
-        u.setIntroduction(blankToNull(req.introduction()));
-        u.setHistory(blankToNull(req.history()));
-        u.setCampusInfo(blankToNull(req.campusInfo()));
-        u.setAccommodationInfo(blankToNull(req.accommodationInfo()));
-        u.setNearbyInfo(blankToNull(req.nearbyInfo()));
-        u.setAdmissionsEmail(blankToNull(req.admissionsEmail()));
-        u.setOfficePhone(blankToNull(req.officePhone()));
-        u.setLogoImageUrl(blankToNull(req.logoImageUrl()));
-        u.setCoverImageUrl(blankToNull(req.coverImageUrl()));
+        u.setWebsite(Texts.blankToNull(req.website()));
+        u.setRankingTier(Texts.blankToNull(req.rankingTier()));
+        u.setIntroduction(Texts.blankToNull(req.introduction()));
+        u.setHistory(Texts.blankToNull(req.history()));
+        u.setCampusInfo(Texts.blankToNull(req.campusInfo()));
+        u.setAccommodationInfo(Texts.blankToNull(req.accommodationInfo()));
+        u.setNearbyInfo(Texts.blankToNull(req.nearbyInfo()));
+        u.setAdmissionsEmail(Texts.blankToNull(req.admissionsEmail()));
+        u.setOfficePhone(Texts.blankToNull(req.officePhone()));
+        u.setLogoImageUrl(Texts.blankToNull(req.logoImageUrl()));
+        u.setCoverImageUrl(Texts.blankToNull(req.coverImageUrl()));
         // Media ids are primarily set through the dedicated upload endpoints; only
         // overwrite from the request when the client actually sent a value.
         if (req.logoMediaId() != null) {
@@ -342,7 +274,7 @@ public class UniversityService {
         u.setPartnerStatus(normalizePartnerStatus(req.partnerStatus()));
         u.setStatus(req.status());
         u.setPublishStatus(req.publishStatus());
-        u.setRemark(blankToNull(req.remark()));
+        u.setRemark(Texts.blankToNull(req.remark()));
     }
 
     private static final java.util.Set<String> PARTNER_STATUSES =
@@ -365,9 +297,5 @@ public class UniversityService {
     private String nextReferenceCode() {
         Integer max = mapper.maxReferenceSeq(REFERENCE_PREFIX);
         return REFERENCE_PREFIX + String.format(java.util.Locale.ROOT, "%04d", (max == null ? 0 : max) + 1);
-    }
-
-    private static String blankToNull(String s) {
-        return s == null || s.isBlank() ? null : s.trim();
     }
 }

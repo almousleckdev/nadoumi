@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  variant?: 'primary' | 'secondary' | 'ghost' | 'link'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'link' | 'danger'
   size?: 'sm' | 'md' | 'lg'
   type?: 'button' | 'submit'
   loading?: boolean
@@ -26,6 +26,7 @@ const variants: Record<string, string> = {
   secondary: 'bg-white text-slate-900 border border-slate-200 hover:bg-slate-50',
   ghost: 'bg-transparent text-slate-700 hover:bg-slate-100',
   link: 'bg-transparent text-brand-700 hover:underline px-0 py-0',
+  danger: 'bg-white text-red-600 border border-red-200 hover:bg-red-50',
 }
 
 const classes = computed(() => [

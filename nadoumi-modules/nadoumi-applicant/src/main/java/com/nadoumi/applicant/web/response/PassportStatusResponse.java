@@ -2,6 +2,7 @@ package com.nadoumi.applicant.web.response;
 
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.rules.PassportRules;
+import com.nadoumi.common.text.Texts;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,9 +38,9 @@ public record PassportStatusResponse(
                 includePii ? a.getPassportNo() : mask(a.getPassportNo()),
                 a.getPassportGivenName(),
                 a.getPassportFamilyName(),
-                includePii ? str(a.getPassportDob()) : mask(a.getPassportDob()),
-                str(a.getPassportIssueDate()),
-                str(a.getPassportExpiryDate()),
+                includePii ? Texts.stringOrNull(a.getPassportDob()) : mask(a.getPassportDob()),
+                Texts.stringOrNull(a.getPassportIssueDate()),
+                Texts.stringOrNull(a.getPassportExpiryDate()),
                 a.getPassportReadMethod(),
                 a.isPassportDataEdited(),
                 a.getPassportMediaId() != null,
@@ -56,14 +57,10 @@ public record PassportStatusResponse(
                     case PassportRules.GIVEN_NAME -> new Mismatch(field, a.getPassportGivenName(), a.getGivenName());
                     case PassportRules.FAMILY_NAME -> new Mismatch(field, a.getPassportFamilyName(), a.getFamilyName());
                     default -> new Mismatch(field,
-                            includePii ? str(a.getPassportDob()) : mask(a.getPassportDob()),
-                            includePii ? str(a.getDob()) : mask(a.getDob()));
+                            includePii ? Texts.stringOrNull(a.getPassportDob()) : mask(a.getPassportDob()),
+                            includePii ? Texts.stringOrNull(a.getDob()) : mask(a.getDob()));
                 })
                 .toList();
-    }
-
-    private static String str(Object value) {
-        return value == null ? null : value.toString();
     }
 
     private static String mask(Object value) {

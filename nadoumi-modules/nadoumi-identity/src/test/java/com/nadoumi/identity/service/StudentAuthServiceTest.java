@@ -49,7 +49,9 @@ class StudentAuthServiceTest {
             mock(com.nadoumi.identity.service.otp.OtpService.class);
 
     private final StudentAuthService service = new StudentAuthService(configService, userService, loginService,
-            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker, events, outbox, otp);
+            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker, events, outbox);
+    private final StudentEmailChangeService emailChange =
+            new StudentEmailChangeService(identityMapper, userService, tokenService, caller, otp, events);
 
     private static StudentRegisterRequest register(String email, String password, String ticket) {
         return new StudentRegisterRequest("Ada", "Lovelace", email, password, ticket);
@@ -230,7 +232,7 @@ class StudentAuthServiceTest {
         when(identityMapper.selectUserIdByEmailAndType("taken@x.com", StudentAuthService.STUDENT_USER_TYPE))
                 .thenReturn(99L);
 
-        assertThatThrownBy(() -> service.requestEmailChangeCode("taken@x.com"))
+        assertThatThrownBy(() -> emailChange.requestCode("taken@x.com"))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("already in use");
     }
@@ -243,7 +245,7 @@ class StudentAuthServiceTest {
         var result = new com.nadoumi.identity.service.otp.OtpService.IssueResult(true, 60);
         when(otp.issue("new@x.com", OtpPurpose.EMAIL_CHANGE, false)).thenReturn(result);
 
-        assertThat(service.requestEmailChangeCode("New@X.com")).isSameAs(result);
+        assertThat(emailChange.requestCode("New@X.com")).isSameAs(result);
     }
 
     @Test
@@ -256,7 +258,7 @@ class StudentAuthServiceTest {
         when(caller.requireUserId()).thenReturn(7L);
         when(userService.selectUserById(7L)).thenReturn(user);
 
-        assertThatThrownBy(() -> service.changeEmail(request, "new@x.com", "123456", "WrongPass1!"))
+        assertThatThrownBy(() -> emailChange.change(request, "new@x.com", "123456", "WrongPass1!"))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("current password is incorrect");
     }
@@ -271,7 +273,7 @@ class StudentAuthServiceTest {
         when(caller.requireUserId()).thenReturn(7L);
         when(userService.selectUserById(7L)).thenReturn(user);
 
-        assertThatThrownBy(() -> service.changeEmail(request, "Same@X.com", "123456", "Pass1234!"))
+        assertThatThrownBy(() -> emailChange.change(request, "Same@X.com", "123456", "Pass1234!"))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("already your sign-in email");
     }
@@ -288,7 +290,7 @@ class StudentAuthServiceTest {
         when(identityMapper.selectUserIdByEmailAndType("new@x.com", StudentAuthService.STUDENT_USER_TYPE))
                 .thenReturn(99L);
 
-        assertThatThrownBy(() -> service.changeEmail(request, "new@x.com", "123456", "Pass1234!"))
+        assertThatThrownBy(() -> emailChange.change(request, "new@x.com", "123456", "Pass1234!"))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("already in use");
     }
@@ -309,7 +311,7 @@ class StudentAuthServiceTest {
         me.setToken("my-token");
         when(tokenService.getLoginUser(request)).thenReturn(me);
 
-        service.changeEmail(request, "New@X.com", "123456", "Pass1234!");
+        emailChange.change(request, "New@X.com", "123456", "Pass1234!");
 
         verify(otp).verify("new@x.com", OtpPurpose.EMAIL_CHANGE, "123456");
         verify(identityMapper).changeEmail(7L, "new@x.com");

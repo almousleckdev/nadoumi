@@ -1,11 +1,9 @@
 package com.nadoumi.application.service;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.nadoumi.applicant.service.ApplicantService;
 import com.nadoumi.application.domain.Application;
 import com.nadoumi.application.domain.ApplicationDecision;
 import com.nadoumi.application.domain.ApplicationEvent;
-import com.nadoumi.application.domain.ApplicationSnapshot;
 import com.nadoumi.application.domain.ApplicationStageHistory;
 import com.nadoumi.application.domain.ApplicationTask;
 import com.nadoumi.application.domain.WfDefinition;
@@ -15,14 +13,12 @@ import com.nadoumi.application.domain.WfStageTaskTemplate;
 import com.nadoumi.application.domain.WfTransition;
 import com.nadoumi.application.domain.enums.ApplicationTaskStatus;
 import com.nadoumi.application.domain.enums.ApplicationType;
-import com.nadoumi.application.domain.enums.WfDefinitionStatus;
 import com.nadoumi.application.domain.enums.WfInstanceStatus;
 import com.nadoumi.application.domain.enums.WfStageType;
 import com.nadoumi.application.exception.OptimisticLockException;
 import com.nadoumi.application.mapper.ApplicationDecisionMapper;
 import com.nadoumi.application.mapper.ApplicationEventMapper;
 import com.nadoumi.application.mapper.ApplicationMapper;
-import com.nadoumi.application.mapper.ApplicationSnapshotMapper;
 import com.nadoumi.application.mapper.ApplicationStageHistoryMapper;
 import com.nadoumi.application.mapper.ApplicationTaskMapper;
 import com.nadoumi.application.mapper.WfDefinitionMapper;
@@ -30,25 +26,12 @@ import com.nadoumi.application.mapper.WfInstanceMapper;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
-import com.nadoumi.common.outbox.OutboxEventTypes;
-import com.nadoumi.common.outbox.OutboxWriter;
-import com.nadoumi.identity.domain.UserApplicantAccess;
-import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.nadoumi.program.service.ProgramService;
 import com.nadoumi.program.web.response.ProgramResponse;
 import com.nadoumi.scholarship.service.ScholarshipAdminService;
-import com.nadoumi.scholarship.web.response.ScholarshipResponse;
 import com.ruoyi.common.utils.SecurityUtils;
 import java.time.LocalDateTime;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,21 +49,19 @@ public class WorkflowService {
     private final ApplicationStageHistoryMapper historyMapper;
     private final ApplicationEventMapper eventMapper;
     private final ApplicationDecisionMapper decisionMapper;
-    private final ApplicationSnapshotMapper snapshotMapper;
     private final GuardEvaluator guards;
-    private final OutboxWriter outboxWriter;
     private final ProgramService programService;
     private final ScholarshipAdminService scholarshipAdminService;
-    private final ApplicantService applicantService;
-    private final UserApplicantAccessService accessService;
+    private final WorkflowDefinitionService definitions;
+    private final ApplicationSnapshotWriter snapshots;
+    private final ApplicationOutboxEmitter emitter;
 
     public WorkflowService(WfDefinitionMapper definitionMapper, ApplicationMapper applicationMapper,
             WfInstanceMapper instanceMapper, ApplicationTaskMapper taskMapper,
             ApplicationStageHistoryMapper historyMapper, ApplicationEventMapper eventMapper,
-            ApplicationDecisionMapper decisionMapper, ApplicationSnapshotMapper snapshotMapper,
-            GuardEvaluator guards, OutboxWriter outboxWriter, ProgramService programService,
-            ScholarshipAdminService scholarshipAdminService, ApplicantService applicantService,
-            UserApplicantAccessService accessService) {
+            ApplicationDecisionMapper decisionMapper, GuardEvaluator guards, ProgramService programService,
+            ScholarshipAdminService scholarshipAdminService, WorkflowDefinitionService definitions,
+            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter) {
         this.definitionMapper = definitionMapper;
         this.applicationMapper = applicationMapper;
         this.instanceMapper = instanceMapper;
@@ -88,16 +69,15 @@ public class WorkflowService {
         this.historyMapper = historyMapper;
         this.eventMapper = eventMapper;
         this.decisionMapper = decisionMapper;
-        this.snapshotMapper = snapshotMapper;
         this.guards = guards;
-        this.outboxWriter = outboxWriter;
         this.programService = programService;
         this.scholarshipAdminService = scholarshipAdminService;
-        this.applicantService = applicantService;
-        this.accessService = accessService;
+        this.definitions = definitions;
+        this.snapshots = snapshots;
+        this.emitter = emitter;
     }
 
-    // ---- draft creation ----------------------------------------------------
+    // draft creation
 
     @Transactional(rollbackFor = Exception.class)
     public Application startDraft(long applicantId, ApplicationType type, long programId, Long scholarshipId,
@@ -155,7 +135,7 @@ public class WorkflowService {
         return applicationMapper.findById(application.getId());
     }
 
-    // ---- transitions ---------------------------------------------------------
+    //transitions
 
     /**
      * @param staffActor when {@code true}, the transition's {@code role_required}
@@ -228,11 +208,11 @@ public class WorkflowService {
         appendEvent(application.getId(), "STAGE_" + transition.getCode().toUpperCase(java.util.Locale.ROOT), actorUserId, reason);
 
         if (isSubmit) {
-            writeSubmitSnapshots(application.getId(), application.getApplicantId());
-            emitApplicationSubmitted(applicationMapper.findById(application.getId()));
+            snapshots.writeSubmitSnapshots(application.getId(), application.getApplicantId());
+            emitter.submitted(applicationMapper.findById(application.getId()));
         }
         else {
-            emitApplicationStatusChanged(applicationMapper.findById(application.getId()), toStage.getStatusLabel());
+            emitter.statusChanged(applicationMapper.findById(application.getId()), toStage.getStatusLabel());
         }
     }
 
@@ -306,87 +286,9 @@ public class WorkflowService {
 
     // ---- definition validity (activate) -----------------------------------------
 
-    /** The six §II.4 checks. Flips DRAFT to ACTIVE and retires any prior ACTIVE version of the same code. */
-    @Transactional(rollbackFor = Exception.class)
+    /** Delegates to {@link WorkflowDefinitionService#activate}: the six §II.4 structural checks. */
     public List<String> activate(long definitionId) {
-        WfDefinition definition = definitionMapper.findById(definitionId);
-        if (definition == null) {
-            throw new NadNotFoundException("workflow definition not found");
-        }
-        List<WfStage> stages = definitionMapper.findStages(definitionId);
-        List<WfTransition> transitions = definitionMapper.findTransitions(definitionId);
-        List<String> problems = new ArrayList<>();
-
-        List<WfStage> starts = stages.stream().filter(s -> s.getStageType() == WfStageType.START).toList();
-        if (starts.size() != 1) {
-            problems.add("exactly one START stage is required, found " + starts.size());
-        }
-        long terminalCount = stages.stream().filter(s -> s.getStageType() == WfStageType.TERMINAL).count();
-        if (terminalCount < 1) {
-            problems.add("at least one TERMINAL stage is required");
-        }
-        Set<Long> withOutgoing = transitions.stream().map(WfTransition::getFromStageId)
-                .filter(java.util.Objects::nonNull).collect(Collectors.toSet());
-        for (WfStage stage : stages) {
-            if (stage.getStageType() != WfStageType.TERMINAL && !withOutgoing.contains(stage.getId())) {
-                problems.add("stage '" + stage.getCode() + "' is non-terminal with no outgoing transition");
-            }
-        }
-        if (!starts.isEmpty()) {
-            Set<Long> reachable = reachableFrom(starts.get(0).getId(), transitions);
-            for (WfStage stage : stages) {
-                if (!reachable.contains(stage.getId())) {
-                    problems.add("stage '" + stage.getCode() + "' is unreachable from START");
-                }
-            }
-        }
-        for (WfStage stage : stages) {
-            if (stage.getStageType() != WfStageType.DECISION) {
-                continue;
-            }
-            long decisionGuarded = transitions.stream()
-                    .filter(t -> stage.getId().equals(t.getFromStageId()))
-                    .filter(t -> t.getGuardJson() != null && t.getGuardJson().contains("DECISION_RECORDED"))
-                    .count();
-            if (decisionGuarded < 2) {
-                problems.add("DECISION stage '" + stage.getCode() + "' needs >=2 outgoing DECISION_RECORDED-guarded transitions");
-            }
-        }
-        for (WfTransition transition : transitions) {
-            for (String unbacked : guards.unbackedPredicates(transition.getGuardJson())) {
-                problems.add("transition '" + transition.getCode() + "' references an unbacked predicate: " + unbacked);
-            }
-        }
-
-        if (!problems.isEmpty()) {
-            throw new NadBadRequestException("UNBACKED_GUARD_PREDICATE or structural validity failure: " + problems);
-        }
-
-        definitionMapper.findAllVersions(definition.getCode()).stream()
-                .filter(d -> d.getStatus() == WfDefinitionStatus.ACTIVE)
-                .forEach(d -> definitionMapper.updateStatus(d.getId(), WfDefinitionStatus.RETIRED.name()));
-        definitionMapper.updateStatus(definitionId, WfDefinitionStatus.ACTIVE.name());
-        return problems;
-    }
-
-    private static Set<Long> reachableFrom(long startId, List<WfTransition> transitions) {
-        Map<Long, List<Long>> edges = transitions.stream()
-                .filter(t -> t.getFromStageId() != null)
-                .collect(Collectors.groupingBy(WfTransition::getFromStageId,
-                        Collectors.mapping(WfTransition::getToStageId, Collectors.toList())));
-        Set<Long> visited = new HashSet<>();
-        Deque<Long> queue = new ArrayDeque<>();
-        queue.add(startId);
-        visited.add(startId);
-        while (!queue.isEmpty()) {
-            Long current = queue.poll();
-            for (Long next : edges.getOrDefault(current, List.of())) {
-                if (visited.add(next)) {
-                    queue.add(next);
-                }
-            }
-        }
-        return visited;
+        return definitions.activate(definitionId);
     }
 
     // ---- internals ---------------------------------------------------------------
@@ -429,71 +331,6 @@ public class WorkflowService {
         event.setActorUserId(actorUserId);
         event.setDetailJson(detail == null ? null : JSONObject.of("note", detail).toJSONString());
         eventMapper.insert(event);
-    }
-
-    /** DA4: PROFILE + REQUIREMENTS, written once at submit, never touched again. */
-    private void writeSubmitSnapshots(long applicationId, long applicantId) {
-        JSONObject profile = new JSONObject();
-        profile.put("applicant", applicantService.get(applicantId));
-        ApplicationSnapshot profileSnapshot = new ApplicationSnapshot();
-        profileSnapshot.setApplicationId(applicationId);
-        profileSnapshot.setKind("PROFILE");
-        profileSnapshot.setPayloadJson(profile.toJSONString());
-        snapshotMapper.insert(profileSnapshot);
-
-        Application application = applicationMapper.findById(applicationId);
-        JSONObject requirements = new JSONObject();
-        requirements.put("applicationType", application.getApplicationType());
-        requirements.put("programId", application.getProgramId());
-        requirements.put("scholarshipId", application.getScholarshipId());
-        requirements.put("intakeId", application.getIntakeId());
-        ApplicationSnapshot requirementsSnapshot = new ApplicationSnapshot();
-        requirementsSnapshot.setApplicationId(applicationId);
-        requirementsSnapshot.setKind("REQUIREMENTS");
-        requirementsSnapshot.setPayloadJson(requirements.toJSONString());
-        snapshotMapper.insert(requirementsSnapshot);
-    }
-
-    private void emitApplicationSubmitted(Application application) {
-        emitApplicationEvent(application, OutboxEventTypes.APPLICATION_SUBMITTED, null);
-    }
-
-    private void emitApplicationStatusChanged(Application application, String status) {
-        emitApplicationEvent(application, OutboxEventTypes.APPLICATION_STATUS_CHANGED, status);
-    }
-
-    /** Payload keys match the templates already seeded in V55 — do not rename without updating them too. */
-    private void emitApplicationEvent(Application application, String outboxType, String status) {
-        List<Long> recipients = accessService.listForApplicant(application.getApplicantId()).stream()
-                .filter(g -> g.getStatus() == com.nadoumi.common.access.AccessGrantStatus.ACTIVE)
-                .map(UserApplicantAccess::getUserId)
-                .collect(Collectors.toCollection(LinkedHashSet::new))
-                .stream().toList();
-        if (recipients.isEmpty()) {
-            return;
-        }
-        JSONObject payload = new JSONObject();
-        payload.put("applicationRef", "APP-" + application.getId());
-        payload.put("opportunityTitle", opportunityTitle(application));
-        if (status != null) {
-            payload.put("status", status);
-        }
-        payload.put("recipientUserIds", recipients);
-        outboxWriter.write("application", application.getId(), outboxType, payload.toJSONString());
-    }
-
-    private String opportunityTitle(Application application) {
-        try {
-            ProgramResponse program = programService.get(application.getProgramId());
-            if (application.getScholarshipId() != null) {
-                ScholarshipResponse scholarship = scholarshipAdminService.get(application.getScholarshipId());
-                return program.name() + " + " + scholarship.view().title();
-            }
-            return program.name();
-        }
-        catch (RuntimeException e) {
-            return "your application";
-        }
     }
 
     private static String actorName() {

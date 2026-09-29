@@ -34,13 +34,13 @@ useSeo(t('dashboard.accountTitle'), t('dashboard.accountTitle'))
     <SectionCard class="h-fit">
       <div class="flex flex-col items-center pb-6 border-b border-slate-100">
         <div class="h-24 w-24 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center text-3xl font-medium mb-4">
-          {{ (user?.givenName?.[0] || user?.email?.[0] || '?').toUpperCase() }}
+          {{ (user?.nickName?.[0] || user?.username?.[0] || user?.email?.[0] || '?').toUpperCase() }}
         </div>
-        <h2 class="font-display text-lg font-bold text-slate-900">{{ user?.givenName }} {{ user?.familyName }}</h2>
+        <h2 class="font-display text-lg font-bold text-slate-900">{{ user?.nickName || user?.username }}</h2>
         <p class="text-sm text-slate-500">{{ user?.email ?? user?.username }}</p>
         <div class="mt-4 flex gap-2">
           <NButton size="sm" variant="secondary" :to="localePath('/dashboard/profile')">{{ t('dashboard.quickProfile') }}</NButton>
-          <NButton size="sm" variant="secondary" @click="signOut">{{ t('common.signOut') }}</NButton>
+          <NButton size="sm" variant="secondary" data-test="sign-out" @click="signOut">{{ t('common.signOut') }}</NButton>
         </div>
       </div>
       <div class="pt-6">

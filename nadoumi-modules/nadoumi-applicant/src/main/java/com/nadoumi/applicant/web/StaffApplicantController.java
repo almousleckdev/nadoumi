@@ -3,6 +3,7 @@ package com.nadoumi.applicant.web;
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.service.ApplicantMediaKind;
 import com.nadoumi.applicant.service.ApplicantMediaService;
+import com.nadoumi.applicant.service.ApplicantRecordsService;
 import com.nadoumi.applicant.service.ApplicantService;
 import com.nadoumi.applicant.service.EducationService;
 import com.nadoumi.applicant.service.PassportService;
@@ -41,13 +42,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class StaffApplicantController {
 
     private final ApplicantService service;
+    private final ApplicantRecordsService records;
     private final ApplicantMediaService media;
     private final PassportService passports;
     private final EducationService education;
 
-    public StaffApplicantController(ApplicantService service, ApplicantMediaService media, PassportService passports,
-            EducationService education) {
+    public StaffApplicantController(ApplicantService service, ApplicantRecordsService records,
+            ApplicantMediaService media, PassportService passports, EducationService education) {
         this.service = service;
+        this.records = records;
         this.media = media;
         this.passports = passports;
         this.education = education;
@@ -160,14 +163,14 @@ public class StaffApplicantController {
     @GetMapping("/{id}/test-scores")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
     public List<TestScoreResponse> testScores(@PathVariable Long id) {
-        return service.testScores(id);
+        return records.testScores(id);
     }
 
     @PostMapping("/{id}/test-scores")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public TestScoreResponse addTestScore(@PathVariable Long id, @Valid @RequestBody TestScoreRequest req) {
-        return service.addTestScore(id, req);
+        return records.addTestScore(id, req);
     }
 
     @PutMapping("/{id}/test-scores/{scoreId}")
@@ -175,27 +178,27 @@ public class StaffApplicantController {
     @Log(title = "Applicant test score", businessType = BusinessType.UPDATE)
     public TestScoreResponse updateTestScore(@PathVariable Long id, @PathVariable Long scoreId,
             @Valid @RequestBody TestScoreRequest req) {
-        return service.updateTestScore(id, scoreId, req);
+        return records.updateTestScore(id, scoreId, req);
     }
 
     @DeleteMapping("/{id}/test-scores/{scoreId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public void deleteTestScore(@PathVariable Long id, @PathVariable Long scoreId) {
-        service.deleteTestScore(id, scoreId);
+        records.deleteTestScore(id, scoreId);
     }
 
     @GetMapping("/{id}/contacts")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
     public List<ContactResponse> contacts(@PathVariable Long id) {
-        return service.contacts(id);
+        return records.contacts(id);
     }
 
     @PostMapping("/{id}/contacts")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public ContactResponse addContact(@PathVariable Long id, @Valid @RequestBody ContactRequest req) {
-        return service.addContact(id, req);
+        return records.addContact(id, req);
     }
 
     @PutMapping("/{id}/contacts/{contactId}")
@@ -203,14 +206,14 @@ public class StaffApplicantController {
     @Log(title = "Applicant contact", businessType = BusinessType.UPDATE)
     public ContactResponse updateContact(@PathVariable Long id, @PathVariable Long contactId,
             @Valid @RequestBody ContactRequest req) {
-        return service.updateContact(id, contactId, req);
+        return records.updateContact(id, contactId, req);
     }
 
     @DeleteMapping("/{id}/contacts/{contactId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     public void deleteContact(@PathVariable Long id, @PathVariable Long contactId) {
-        service.deleteContact(id, contactId);
+        records.deleteContact(id, contactId);
     }
     
     

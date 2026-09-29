@@ -12,10 +12,8 @@ import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.identity.mapper.NadIdentityMapper;
 import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
-import com.nadoumi.identity.service.mail.EmailChangedEvent;
 import com.nadoumi.identity.service.mail.PasswordChangedEvent;
 import com.nadoumi.identity.service.otp.OtpPurpose;
-import com.nadoumi.identity.service.otp.OtpService;
 import com.nadoumi.identity.service.otp.TicketService;
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.nadoumi.identity.web.request.StudentLoginRequest;
@@ -36,7 +34,6 @@ import com.ruoyi.system.service.ISysUserService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,13 +65,12 @@ public class StudentAuthService {
     private final SessionRevoker sessionRevoker;
     private final ApplicationEventPublisher events;
     private final OutboxWriter outbox;
-    private final OtpService otp;
 
     public StudentAuthService(ISysConfigService configService, ISysUserService userService,
             SysLoginService loginService, TokenService tokenService, NadIdentityMapper identityMapper,
             UserApplicantAccessMapper accessMapper, UserApplicantAccessService grants, CurrentCaller caller,
             TicketService tickets, SessionRevoker sessionRevoker, ApplicationEventPublisher events,
-            OutboxWriter outbox, OtpService otp) {
+            OutboxWriter outbox) {
         this.configService = configService;
         this.userService = userService;
         this.loginService = loginService;
@@ -87,7 +83,6 @@ public class StudentAuthService {
         this.sessionRevoker = sessionRevoker;
         this.events = events;
         this.outbox = outbox;
-        this.otp = otp;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -95,7 +90,7 @@ public class StudentAuthService {
         if (!"true".equalsIgnoreCase(configService.selectConfigByKey(REGISTER_ENABLED_KEY))) {
             throw new NadForbiddenException("student registration is disabled");
         }
-        String email = normalizeEmail(req.email());
+        String email = StudentEmails.normalize(req.email());
         String verifiedEmail = tickets.consume(req.ticket(), OtpPurpose.REGISTER);
         if (!verifiedEmail.equals(email)) {
             throw new NadBadRequestException("email verification does not match this address");
@@ -103,7 +98,7 @@ public class StudentAuthService {
         String givenName = NameRules.normalize(req.firstName());
         String familyName = NameRules.normalize(req.lastName());
         PasswordPolicy.violation(req.password(), null,
-                        List.of(req.firstName(), req.lastName(), emailLocalPart(email)))
+                        List.of(req.firstName(), req.lastName(), StudentEmails.localPart(email)))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
         if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
             throw new NadBadRequestException("email already registered");
@@ -136,7 +131,7 @@ public class StudentAuthService {
 
     @Transactional(rollbackFor = Exception.class)
     public String login(StudentLoginRequest req) {
-        String email = normalizeEmail(req.email());
+        String email = StudentEmails.normalize(req.email());
         Long userId = identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE);
         if (userId == null) {
             // never disclose whether the address is registered
@@ -149,7 +144,7 @@ public class StudentAuthService {
     }
 
     public boolean studentEmailExists(String email) {
-        return identityMapper.selectUserIdByEmailAndType(normalizeEmail(email), STUDENT_USER_TYPE) != null;
+        return identityMapper.selectUserIdByEmailAndType(StudentEmails.normalize(email), STUDENT_USER_TYPE) != null;
     }
 
     /**
@@ -165,7 +160,7 @@ public class StudentAuthService {
             // ticket was valid but the account is gone - nothing to do, reveal nothing
             return;
         }
-        PasswordPolicy.violation(newPassword, null, List.of(emailLocalPart(email)))
+        PasswordPolicy.violation(newPassword, null, List.of(StudentEmails.localPart(email)))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
         userService.resetUserPwd(userId, SecurityUtils.encryptPassword(newPassword));
         identityMapper.touchPwdUpdateDate(userId);
@@ -200,53 +195,6 @@ public class StudentAuthService {
             tokenService.setLoginUser(me);
         }
         events.publishEvent(new PasswordChangedEvent(userId, user.getEmail()));
-    }
-
-    /**
-     * Signed-in student asking to change their sign-in email: a code is mailed to
-     * the new address, proving they control it, before anything changes.
-     */
-    public OtpService.IssueResult requestEmailChangeCode(String newEmail) {
-        caller.requireUserId();
-        String email = normalizeEmail(newEmail);
-        if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
-            throw new NadBadRequestException("that email is already in use");
-        }
-        return otp.issue(email, OtpPurpose.EMAIL_CHANGE, false);
-    }
-
-    /**
-     * Applies the change: verifies the current password (defense against a
-     * hijacked session, since email is the sign-in identity) and the OTP proving
-     * ownership of the new address, then updates the account and notifies the
-     * <em>previous</em> address in case this was not the account holder.
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void changeEmail(HttpServletRequest request, String newEmail, String otpCode, String currentPassword) {
-        Long userId = caller.requireUserId();
-        SysUser user = userService.selectUserById(userId);
-        if (!SecurityUtils.matchesPassword(currentPassword, user.getPassword())) {
-            throw new NadBadRequestException("current password is incorrect");
-        }
-        String email = normalizeEmail(newEmail);
-        String previousEmail = user.getEmail();
-        if (email.equals(normalizeEmail(previousEmail == null ? "" : previousEmail))) {
-            throw new NadBadRequestException("that is already your sign-in email");
-        }
-        otp.verify(email, OtpPurpose.EMAIL_CHANGE, otpCode);
-        // The OTP proved ownership, but another account could have claimed the
-        // address in the meantime — re-check right before writing it.
-        if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
-            throw new NadBadRequestException("that email is already in use");
-        }
-        identityMapper.changeEmail(userId, email);
-
-        LoginUser me = tokenService.getLoginUser(request);
-        if (me != null) {
-            me.getUser().setEmail(email);
-            tokenService.setLoginUser(me);
-        }
-        events.publishEvent(new EmailChangedEvent(userId, previousEmail, email));
     }
 
     public StudentIdentityResponse me() {
@@ -287,15 +235,6 @@ public class StudentAuthService {
         }
     }
 
-    private static String normalizeEmail(String email) {
-        return email.trim().toLowerCase(Locale.ROOT);
-    }
-
-    private static String emailLocalPart(String email) {
-        int at = email.indexOf('@');
-        return at > 0 ? email.substring(0, at) : email;
-    }
-
     /** Personal terms a password must not contain: name words + email local-part. */
     private static List<String> personalTerms(String displayName, String email) {
         List<String> terms = new ArrayList<>();
@@ -305,7 +244,7 @@ public class StudentAuthService {
             }
         }
         if (email != null && !email.isBlank()) {
-            terms.add(emailLocalPart(email));
+            terms.add(StudentEmails.localPart(email));
         }
         return terms;
     }

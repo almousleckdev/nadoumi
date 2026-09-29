@@ -4,6 +4,8 @@ import { mountOpts } from '../../helpers'
 import ImageUpload from '@/components/ui/ImageUpload.vue'
 
 const message = vi.hoisted(() => ({ error: vi.fn() }))
+const http = vi.hoisted(() => ({ post: vi.fn() }))
+vi.mock('@/utils/request', () => ({ default: { post: http.post } }))
 vi.mock('element-plus', async (orig) => {
   const actual = await orig<typeof import('element-plus')>()
   return { ...actual, ElMessage: { ...actual.ElMessage, error: message.error } }
@@ -12,6 +14,7 @@ vi.mock('element-plus', async (orig) => {
 type Exposed = {
   onSuccess: (res: unknown) => void
   clear: () => void
+  flush: (id: number) => Promise<boolean>
 }
 
 function mountUpload(props: Record<string, unknown> = {}) {
@@ -50,5 +53,28 @@ describe('ImageUpload', () => {
     const w = mountUpload({ disabled: true, disabledHint: 'Save first' })
     expect(w.text()).toContain('Save first')
     expect(w.find('.el-upload').exists()).toBe(false)
+  })
+
+  it('flush resolves true when nothing is pending', async () => {
+    const w = mountUpload({ deferred: true, resolveAction: (id: number | string) => `/x/${id}/logo` })
+    expect(await (w.vm as unknown as Exposed).flush(5)).toBe(true)
+    expect(http.post).not.toHaveBeenCalled()
+  })
+
+  it('flush resolves false when the upload request fails', async () => {
+    http.post.mockRejectedValueOnce(new Error('boom'))
+    const w = mountUpload({ deferred: true, resolveAction: (id: number | string) => `/x/${id}/logo` })
+    const file = new File(['x'], 'a.png', { type: 'image/png' })
+    await w.findComponent({ name: 'ElUpload' }).props('beforeUpload')?.(file)
+    expect(await (w.vm as unknown as Exposed).flush(5)).toBe(false)
+  })
+
+  it('flush resolves true and emits the media id when the upload succeeds', async () => {
+    http.post.mockResolvedValueOnce({ data: { mediaId: 77, url: 'https://res.cloudinary.com/y.png' } })
+    const w = mountUpload({ deferred: true, resolveAction: (id: number | string) => `/x/${id}/logo` })
+    const file = new File(['x'], 'a.png', { type: 'image/png' })
+    await w.findComponent({ name: 'ElUpload' }).props('beforeUpload')?.(file)
+    expect(await (w.vm as unknown as Exposed).flush(5)).toBe(true)
+    expect(w.emitted('update:modelValue')?.at(-1)).toEqual([77])
   })
 })

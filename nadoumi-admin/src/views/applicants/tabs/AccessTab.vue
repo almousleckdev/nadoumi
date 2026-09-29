@@ -55,7 +55,7 @@
         width="140"
       >
         <template #default="{ row }">
-          {{ fmtDate(row.grantedAt) }}
+          {{ formatDate(row.grantedAt) }}
         </template>
       </el-table-column>
       <el-table-column
@@ -63,7 +63,7 @@
         width="140"
       >
         <template #default="{ row }">
-          {{ fmtDate(row.expiresAt) }}
+          {{ formatDate(row.expiresAt) }}
         </template>
       </el-table-column>
       <el-table-column
@@ -85,6 +85,8 @@ import { listAccess, type AccessGrant } from '@/api/applicant'
 import { useResourceList } from '@/composables/useResourceList'
 import StatePanel from '@/components/ui/StatePanel.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import { formatDate } from '@/utils/date'
+import { titleCase } from '@/utils/text'
 
 const props = defineProps<{ id: string }>()
 const emit = defineEmits<{ count: [n: number] }>()
@@ -95,12 +97,6 @@ const list = useResourceList<AccessGrant>(() => listAccess(props.id))
 watch(list.items, v => emit('count', v.length))
 onMounted(list.load)
 
-function titleCase(s: string) {
-  return s ? s.charAt(0) + s.slice(1).toLowerCase() : s
-}
-function fmtDate(v: string | null): string {
-  return v ? new Date(v).toLocaleDateString() : ''
-}
 </script>
 
 <style scoped>

@@ -459,7 +459,12 @@
       "startConversationDesc": "هل تحتاج مساعدة في طلبك؟ أرسل رسالة مباشرة إلى مستشاري نادومي.",
       "noResults": "لم يتم العثور على محادثات مطابقة.",
       "onlineSupport": "دعم مباشر من المستشار",
-      "adminBadge": "مستشار معتمد"
+      "adminBadge": "مستشار معتمد",
+      "staffBadge": "الفريق",
+      "searchAria": "البحث في المحادثات",
+      "applicationRef": "الطلب رقم {id}",
+      "applicationFallback": "طلب",
+      "draftFallback": "مسودة"
     },
     "profileTitle": "الملف التعريفي للمتقدم",
     "createProfileTitle": "أنشئ ملفك التعريفي كمتقدم",
@@ -560,6 +565,18 @@
         "WAITING_ON_STUDENT": "بانتظار ردك",
         "RESOLVED": "تم الحل",
         "CLOSED": "مغلقة"
+      },
+      "meeting": {
+        "request": "طلب اجتماع",
+        "title": "طلب اجتماع فردي",
+        "intro": "اختر التاريخ والوقت والمدة لاجتماعك الفردي. إذا تعارض الموعد المطلوب مع جدول عضو الفريق المكلّف، فسيتم رفضه.",
+        "date": "التاريخ",
+        "time": "الوقت",
+        "duration": "المدة",
+        "minutes": "{n} دقيقة",
+        "hour": "ساعة واحدة",
+        "hourAndHalf": "ساعة ونصف",
+        "book": "حجز الاجتماع"
       }
     },
     "savedOk": "تم الحفظ",

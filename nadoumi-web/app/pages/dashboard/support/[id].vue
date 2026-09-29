@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { TicketDetail } from '~/types/support'
+import { DATE_TIME, formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
@@ -30,7 +31,7 @@ function computeSLA(t: TicketDetail['ticket']) {
 }
 
 const formatTime = (iso: string) =>
-  formatSupportDate(iso, locale.value, { dateStyle: 'medium', timeStyle: 'short' })
+  formatTimestamp(iso, locale.value, DATE_TIME)
 
 async function load(silent = false) {
   if (!silent) pending.value = true
@@ -140,7 +141,7 @@ useSeo(detail.value?.ticket.subject ?? t('dashboard.support.title'), t('dashboar
             {{ t(`dashboard.support.status.${detail.ticket.status}`) }}
           </NBadge>
           <div class="ml-auto flex gap-2">
-            <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="primary" size="sm" @click="showMeetingModal = true">Request Meeting</NButton>
+            <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="primary" size="sm" @click="showMeetingModal = true">{{ t('dashboard.support.meeting.request') }}</NButton>
             <NButton v-if="detail.ticket.status !== 'CLOSED' && detail.ticket.status !== 'RESOLVED'" variant="secondary" size="sm" @click="closeTicket">{{ t('dashboard.support.action.CLOSED') || 'Close Ticket' }}</NButton>
           </div>
         </header>
@@ -158,35 +159,35 @@ useSeo(detail.value?.ticket.subject ?? t('dashboard.support.title'), t('dashboar
         </SectionCard>
 
         <!-- Meeting Modal -->
-        <NModal v-model:open="showMeetingModal" title="Request a 1:1 Meeting">
+        <NModal v-model="showMeetingModal" :title="t('dashboard.support.meeting.title')">
           <form class="grid gap-4" @submit.prevent="bookMeeting">
-            <p class="text-sm text-slate-500">Select a date, time, and duration for your 1:1 meeting. If the requested slot conflicts with the assigned staff member's calendar, it will be rejected.</p>
+            <p class="text-sm text-slate-500">{{ t('dashboard.support.meeting.intro') }}</p>
             
             <NAlert v-if="meetingError" tone="danger">{{ meetingError }}</NAlert>
             
             <div class="grid gap-2">
-              <label class="text-sm font-medium">Date</label>
-              <NInput v-model="meetingDate" type="date" required />
+              <label class="text-sm font-medium" for="meeting-date">{{ t('dashboard.support.meeting.date') }}</label>
+              <NInput id="meeting-date" v-model="meetingDate" type="date" required />
             </div>
             
             <div class="grid gap-2">
-              <label class="text-sm font-medium">Time</label>
-              <NInput v-model="meetingTime" type="time" required />
+              <label class="text-sm font-medium" for="meeting-time">{{ t('dashboard.support.meeting.time') }}</label>
+              <NInput id="meeting-time" v-model="meetingTime" type="time" required />
             </div>
             
             <div class="grid gap-2">
-              <label class="text-sm font-medium">Duration</label>
-              <select v-model="meetingDuration" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm sm:leading-6">
-                <option :value="35">35 minutes</option>
-                <option :value="45">45 minutes</option>
-                <option :value="60">1 hour</option>
-                <option :value="90">1.5 hours</option>
+              <label class="text-sm font-medium" for="meeting-duration">{{ t('dashboard.support.meeting.duration') }}</label>
+              <select id="meeting-duration" v-model="meetingDuration" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-brand-600 sm:text-sm sm:leading-6">
+                <option :value="35">{{ t('dashboard.support.meeting.minutes', { n: 35 }) }}</option>
+                <option :value="45">{{ t('dashboard.support.meeting.minutes', { n: 45 }) }}</option>
+                <option :value="60">{{ t('dashboard.support.meeting.hour') }}</option>
+                <option :value="90">{{ t('dashboard.support.meeting.hourAndHalf') }}</option>
               </select>
             </div>
             
             <div class="mt-4 flex justify-end gap-3">
-              <NButton variant="secondary" @click="showMeetingModal = false">Cancel</NButton>
-              <NButton variant="primary" type="submit" :loading="meetingBusy">Book Meeting</NButton>
+              <NButton variant="secondary" @click="showMeetingModal = false">{{ t('common.cancel') }}</NButton>
+              <NButton variant="primary" type="submit" :loading="meetingBusy">{{ t('dashboard.support.meeting.book') }}</NButton>
             </div>
           </form>
         </NModal>

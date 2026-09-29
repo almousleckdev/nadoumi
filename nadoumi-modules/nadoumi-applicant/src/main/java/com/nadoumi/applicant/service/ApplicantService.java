@@ -3,21 +3,16 @@ package com.nadoumi.applicant.service;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.nadoumi.applicant.domain.Applicant;
-import com.nadoumi.applicant.domain.ApplicantContact;
-import com.nadoumi.applicant.domain.ApplicantTestScore;
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
-import com.nadoumi.applicant.web.request.ContactRequest;
 import com.nadoumi.applicant.web.request.SelfApplicantRequest;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
-import com.nadoumi.applicant.web.request.TestScoreRequest;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
-import com.nadoumi.applicant.web.response.ContactResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
-import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.common.access.ApplicantCapability;
 import com.nadoumi.applicant.rules.AgeRules;
 import com.nadoumi.common.rules.NameRules;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.identity.access.CurrentCaller;
@@ -133,94 +128,6 @@ public class ApplicantService {
         return mapper.findByIds(ids).stream().map(a -> ApplicantResponse.of(a, true)).toList();
     }
 
-    // ---- test scores ----
-
-    public List<TestScoreResponse> testScores(Long applicantId) {
-        guard.require(applicantId, ApplicantCapability.VIEW_PROFILE);
-        return mapper.findTestScores(applicantId).stream().map(TestScoreResponse::of).toList();
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public TestScoreResponse addTestScore(Long applicantId, TestScoreRequest req) {
-        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        ApplicantTestScore s = new ApplicantTestScore();
-        s.setApplicantId(applicantId);
-        s.setTestType(req.testType());
-        s.setScore(req.score());
-        s.setSubScoresJson(req.subScoresJson());
-        s.setTakenOn(req.takenOn());
-        s.setExpiresOn(req.expiresOn());
-        mapper.insertTestScore(s);
-        return TestScoreResponse.of(s);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public TestScoreResponse updateTestScore(Long applicantId, Long scoreId, TestScoreRequest req) {
-        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        ApplicantTestScore s = mapper.findTestScoreById(scoreId);
-        if (s == null || !s.getApplicantId().equals(applicantId)) {
-            throw new NadNotFoundException("test score not found");
-        }
-        s.setTestType(req.testType());
-        s.setScore(req.score());
-        s.setSubScoresJson(req.subScoresJson());
-        s.setTakenOn(req.takenOn());
-        s.setExpiresOn(req.expiresOn());
-        mapper.updateTestScore(s);
-        return TestScoreResponse.of(s);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteTestScore(Long applicantId, Long scoreId) {
-        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        if (mapper.deleteTestScore(scoreId, applicantId) == 0) {
-            throw new NadNotFoundException("test score not found");
-        }
-    }
-
-    // ---- contacts ----
-
-    public List<ContactResponse> contacts(Long applicantId) {
-        guard.require(applicantId, ApplicantCapability.VIEW_PROFILE);
-        return mapper.findContacts(applicantId).stream().map(ContactResponse::of).toList();
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public ContactResponse addContact(Long applicantId, ContactRequest req) {
-        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        ApplicantContact c = new ApplicantContact();
-        c.setApplicantId(applicantId);
-        c.setRelation(req.relation());
-        c.setName(req.name());
-        c.setEmail(req.email());
-        c.setPhone(req.phone());
-        mapper.insertContact(c);
-        return ContactResponse.of(c);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public ContactResponse updateContact(Long applicantId, Long contactId, ContactRequest req) {
-        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        ApplicantContact c = mapper.findContactById(contactId);
-        if (c == null || !c.getApplicantId().equals(applicantId)) {
-            throw new NadNotFoundException("contact not found");
-        }
-        c.setRelation(req.relation());
-        c.setName(req.name());
-        c.setEmail(req.email());
-        c.setPhone(req.phone());
-        mapper.updateContact(c);
-        return ContactResponse.of(c);
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteContact(Long applicantId, Long contactId) {
-        guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        if (mapper.deleteContact(contactId, applicantId) == 0) {
-            throw new NadNotFoundException("contact not found");
-        }
-    }
-
     // ---- internals ----
 
     private Applicant load(Long id) {
@@ -230,7 +137,6 @@ public class ApplicantService {
         }
         return a;
     }
-
 
     private boolean includePii() {
         return caller.isExternal() || rbac.hasPermi("nad:applicant:pii:view");
@@ -259,8 +165,8 @@ public class ApplicantService {
         a.setCountryOfOrigin(upper(req.countryOfOrigin()));
         a.setCountryOfResidence(upper(req.countryOfResidence()));
         a.setNativeLanguage(req.nativeLanguage() == null ? null : req.nativeLanguage().toLowerCase(Locale.ROOT));
-        a.setWechatId(blankToNull(req.wechatId()));
-        a.setWhatsapp(blankToNull(req.whatsapp()));
+        a.setWechatId(Texts.blankToNull(req.wechatId()));
+        a.setWhatsapp(Texts.blankToNull(req.whatsapp()));
     }
 
     private static void applyIdentity(Applicant a, String given, String family, LocalDate dob,
@@ -275,9 +181,5 @@ public class ApplicantService {
 
     private static String upper(String value) {
         return value == null ? null : value.toUpperCase(Locale.ROOT);
-    }
-
-    private static String blankToNull(String value) {
-        return value == null || value.isBlank() ? null : value.strip();
     }
 }

@@ -169,6 +169,7 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import type { DataTableColumn } from '@/components/ui/types'
 import UniversityDrawer from './UniversityDrawer.vue'
 import { usePagedList } from '@/composables/usePagedList'
+import { titleCase } from '@/utils/text'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -200,10 +201,6 @@ const columns: DataTableColumn[] = [
   { prop: 'status', label: t('university.status'), width: 120 },
   { prop: 'actions', label: '', width: 130, align: 'right' },
 ]
-
-function titleCase(s: string) {
-  return s.charAt(0) + s.slice(1).toLowerCase()
-}
 
 const drawerOpen = ref(false)
 const editing = ref<University | null>(null)

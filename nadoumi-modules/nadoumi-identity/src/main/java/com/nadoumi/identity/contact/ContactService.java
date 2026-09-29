@@ -3,6 +3,7 @@ package com.nadoumi.identity.contact;
 import com.alibaba.fastjson2.JSONObject;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.identity.contact.mapper.ContactInquiryMapper;
 import com.nadoumi.identity.web.request.ContactRequest;
 import org.slf4j.Logger;
@@ -50,11 +51,11 @@ public class ContactService {
         inquiry.setLastName(req.lastName().trim());
         inquiry.setName(req.fullName());
         inquiry.setEmail(req.email().trim());
-        inquiry.setPhone(blankToNull(req.phone()));
-        inquiry.setCategory(blankToNull(req.category()));
-        inquiry.setSubject(blankToNull(req.subject()));
+        inquiry.setPhone(Texts.blankToNull(req.phone()));
+        inquiry.setCategory(Texts.blankToNull(req.category()));
+        inquiry.setSubject(Texts.blankToNull(req.subject()));
         inquiry.setMessage(req.message().trim());
-        inquiry.setLocale(blankToNull(req.locale()));
+        inquiry.setLocale(Texts.blankToNull(req.locale()));
         inquiry.setIpAddress(ipAddress);
         inquiry.setUserAgent(clip(userAgent, 400));
         mapper.insert(inquiry);
@@ -70,10 +71,6 @@ public class ContactService {
         payload.put("inquiryName", inquiry.getName() == null ? inquiry.getEmail() : inquiry.getName());
         payload.put("inquiryCategory", inquiry.getCategory() == null ? CATEGORY_FALLBACK : inquiry.getCategory());
         return payload.toJSONString();
-    }
-
-    private static String blankToNull(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
     }
 
     private static String clip(String s, int max) {

@@ -7,17 +7,17 @@ import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
 import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.MediaUploadResult;
+import com.nadoumi.common.media.MediaUrls;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.common.text.Slugs;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.money.FxRates;
 import com.nadoumi.program.domain.Program;
-import com.nadoumi.program.domain.ProgramIntake;
-import com.nadoumi.program.domain.ProgramMajor;
 import com.nadoumi.program.domain.enums.ProgramStatus;
 import com.nadoumi.program.domain.enums.ProgramTeachingLanguage;
 import com.nadoumi.program.domain.enums.ProgramType;
@@ -27,7 +27,6 @@ import com.nadoumi.program.mapper.ProgramSearch;
 import com.nadoumi.program.web.request.ProgramRequest;
 import com.nadoumi.program.web.response.ProgramResponse;
 import com.nadoumi.program.web.response.PublicProgramResponse;
-import com.nadoumi.university.service.DepartmentService;
 import com.nadoumi.university.service.UniversityService;
 import com.ruoyi.common.utils.AuditActor;
 import java.io.IOException;
@@ -52,16 +51,16 @@ public class ProgramService {
 
     private final ProgramMapper mapper;
     private final UniversityService universityService;
-    private final DepartmentService departmentService;
+    private final ProgramChildrenWriter children;
     private final MediaGateway media;
     private final FxRates fx;
     private final OutboxWriter outbox;
 
     public ProgramService(ProgramMapper mapper, UniversityService universityService,
-            DepartmentService departmentService, MediaGateway media, FxRates fx, OutboxWriter outbox) {
+            ProgramChildrenWriter children, MediaGateway media, FxRates fx, OutboxWriter outbox) {
         this.mapper = mapper;
         this.universityService = universityService;
-        this.departmentService = departmentService;
+        this.children = children;
         this.media = media;
         this.fx = fx;
         this.outbox = outbox;
@@ -96,7 +95,7 @@ public class ProgramService {
         p.setSlug(uniqueSlug(universityName, p.getName(), null));
         p.setCreateBy(AuditActor.username());
         mapper.insert(p);
-        replaceChildren(p, req);
+        children.replace(p, req);
         if (isLive(p)) {
             emitPublished(p, universityName);
         }
@@ -114,7 +113,7 @@ public class ProgramService {
         p.setSlug(uniqueSlug(universityName, p.getName(), id));
         p.setUpdateBy(AuditActor.username());
         mapper.update(p);
-        replaceChildren(p, req);
+        children.replace(p, req);
         if (isLive(p) && !wasLive) {
             emitPublished(p, universityName);
         }
@@ -230,94 +229,12 @@ public class ProgramService {
         return p;
     }
 
-    private static final java.util.List<String> DEGREE_LEVELS =
-            java.util.List.of("DIPLOMA", "BACHELOR", "MASTER", "PHD");
-
     private Program loadWithChildren(Long id) {
         Program p = load(id);
         p.setLevels(mapper.findLevels(id));
         p.setMajors(mapper.findMajors(id));
         p.setIntakes(mapper.findIntakes(id));
         return p;
-    }
-
-    private void replaceChildren(Program program, ProgramRequest req) {
-        Long programId = program.getId();
-        boolean degree = program.getProgramType() != null && program.getProgramType().isDegree();
-
-        // Degree levels — one or more of DIPLOMA / BACHELOR / MASTER / PHD, ordered.
-        mapper.deleteLevels(programId);
-        java.util.List<String> levels = new java.util.ArrayList<>();
-        if (degree && req.levels() != null) {
-            for (String raw : req.levels()) {
-                if (raw == null || raw.isBlank()) {
-                    continue;
-                }
-                String lvl = raw.trim().toUpperCase();
-                if (!DEGREE_LEVELS.contains(lvl)) {
-                    throw new NadBadRequestException("unknown programme level: " + raw);
-                }
-                if (!levels.contains(lvl)) {
-                    levels.add(lvl);
-                }
-            }
-        }
-        if (degree && levels.isEmpty()) {
-            throw new NadBadRequestException("a degree programme needs at least one level");
-        }
-        levels.sort(java.util.Comparator.comparingInt(DEGREE_LEVELS::indexOf));
-        int lo = 0;
-        for (String lvl : levels) {
-            mapper.insertLevel(programId, lvl, lo++);
-        }
-        program.setLevels(levels);
-
-        mapper.deleteMajors(programId);
-        // Only degree programmes carry majors; LANGUAGE / NON_DEGREE use term_length.
-        if (degree && req.majors() != null) {
-            int order = 0;
-            for (ProgramRequest.MajorInput in : req.majors()) {
-                if (in.name() == null || in.name().isBlank()) {
-                    continue;
-                }
-                Long deptId = in.departmentId();
-                if (deptId != null
-                        && !departmentService.belongsToUniversity(deptId, program.getUniversityId())) {
-                    throw new NadBadRequestException(
-                            "department " + deptId + " is not part of this university");
-                }
-                String majorLevel = in.level() == null || in.level().isBlank()
-                        ? null : in.level().trim().toUpperCase();
-                if (majorLevel != null && !levels.contains(majorLevel)) {
-                    throw new NadBadRequestException(
-                            "major level " + majorLevel + " is not one of the programme's levels");
-                }
-                ProgramMajor m = new ProgramMajor();
-                m.setProgramId(programId);
-                m.setDepartmentId(deptId);
-                m.setLevel(majorLevel);
-                m.setName(in.name().trim());
-                m.setNameCn(blankToNull(in.nameCn()));
-                m.setSortOrder(order++);
-                mapper.insertMajor(m);
-            }
-        }
-        mapper.deleteIntakes(programId);
-        if (req.intakes() != null) {
-            int order = 0;
-            for (ProgramRequest.IntakeInput in : req.intakes()) {
-                if (in.term() == null || in.term().isBlank()) {
-                    continue;
-                }
-                ProgramIntake i = new ProgramIntake();
-                i.setProgramId(programId);
-                i.setTerm(in.term().trim());
-                i.setApplicationOpen(in.applicationOpen());
-                i.setApplicationClose(in.applicationClose());
-                i.setSortOrder(order++);
-                mapper.insertIntake(i);
-            }
-        }
     }
 
     /** Validates the university exists and returns its name (for the slug). */
@@ -386,23 +303,15 @@ public class ProgramService {
 
     /** Resolve {@code image_media_id} to a public delivery URL, or null when unset. */
     private String imageUrl(Program p) {
-        if (p.getImageMediaId() == null) {
-            return null;
-        }
-        try {
-            return media.publicUrl(p.getImageMediaId());
-        }
-        catch (RuntimeException e) {
-            return null;
-        }
+        return MediaUrls.resolve(media, p.getImageMediaId(), null);
     }
 
     private static void apply(Program p, ProgramRequest req) {
         p.setUniversityId(req.universityId());
         p.setName(req.name().trim());
-        p.setNameCn(blankToNull(req.nameCn()));
+        p.setNameCn(Texts.blankToNull(req.nameCn()));
         p.setProgramType(req.programType());
-        p.setField(blankToNull(req.field()));
+        p.setField(Texts.blankToNull(req.field()));
         // term_length is a LANGUAGE / NON_DEGREE concept only; degree types use majors.
         p.setTermLength(req.programType() != null && !req.programType().isDegree()
                 ? normalizeTermLength(req.termLength()) : null);
@@ -410,7 +319,7 @@ public class ProgramService {
         p.setDurationMonths(req.durationMonths());
         p.setTuitionAmount(req.tuitionAmount());
         p.setTuitionCurrency(upperOrNull(req.tuitionCurrency()));
-        p.setSummary(blankToNull(req.summary()));
+        p.setSummary(Texts.blankToNull(req.summary()));
         // Primarily set through the dedicated upload endpoint; only overwrite from
         // the request when the client actually sent a value.
         if (req.imageMediaId() != null) {
@@ -420,7 +329,7 @@ public class ProgramService {
         p.setHot(Boolean.TRUE.equals(req.hot()));
         p.setStatus(req.status());
         p.setPublishStatus(req.publishStatus());
-        p.setRemark(blankToNull(req.remark()));
+        p.setRemark(Texts.blankToNull(req.remark()));
     }
 
     private static final java.util.Set<String> TERM_LENGTHS = java.util.Set.of("ONE_SEMESTER", "ONE_YEAR");
@@ -434,10 +343,6 @@ public class ProgramService {
             throw new NadBadRequestException("term length must be ONE_SEMESTER or ONE_YEAR");
         }
         return v;
-    }
-
-    private static String blankToNull(String s) {
-        return s == null || s.isBlank() ? null : s.trim();
     }
 
     private static String upperOrNull(String s) {

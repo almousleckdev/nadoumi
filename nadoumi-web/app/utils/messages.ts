@@ -1,4 +1,4 @@
-import type { ConversationMessage } from '~/types/messages'
+import type { ConversationMessage, ConversationSummary } from '~/types/messages'
 
 /**
  * Union of two message lists, unique by id, oldest first. Used to fold a freshly
@@ -19,4 +19,13 @@ export function formatMessageTime(iso: string | null, locale: string, now: Date 
   if (Number.isNaN(date.getTime())) return ''
   const sameDay = date.toDateString() === now.toDateString()
   return new Intl.DateTimeFormat(locale, sameDay ? { timeStyle: 'short' } : { dateStyle: 'medium', timeStyle: 'short' }).format(date)
+}
+
+export function filterConversations(items: ConversationSummary[], query: string): ConversationSummary[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return items
+  return items.filter((c) => {
+    const haystack = [c.subject, c.adminName, c.lastMessagePreview, c.applicationId ? String(c.applicationId) : '']
+    return haystack.some(field => (field || '').toLowerCase().includes(q))
+  })
 }

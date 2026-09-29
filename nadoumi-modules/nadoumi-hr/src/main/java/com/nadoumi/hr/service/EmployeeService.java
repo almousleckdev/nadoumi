@@ -2,6 +2,7 @@ package com.nadoumi.hr.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.hr.domain.Employee;
@@ -47,7 +48,7 @@ public class EmployeeService {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
-        List<Employee> rows = mapper.search(blankToNull(q), deptId, blankToNull(status));
+        List<Employee> rows = mapper.search(Texts.blankToNull(q), deptId, Texts.blankToNull(status));
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(e -> EmployeeResponse.from(e, canViewComp)).toList(),
                 page, size, total);
@@ -89,8 +90,8 @@ public class EmployeeService {
             SysUser u = new SysUser();
             u.setUserId(req.userId());
             u.setNickName(req.nickName().trim());
-            u.setEmail(trimToNull(req.email()));
-            u.setPhonenumber(trimToNull(req.phone()));
+            u.setEmail(Texts.blankToNull(req.email()));
+            u.setPhonenumber(Texts.blankToNull(req.phone()));
             u.setDeptId(req.deptId());
             u.setStatus(StringUtils.hasText(req.userStatus()) ? req.userStatus() : existing.getStatus());
             if (req.roleIds() != null) {
@@ -105,8 +106,8 @@ public class EmployeeService {
             SysUser u = new SysUser();
             u.setUserName(req.userName().trim());
             u.setNickName(req.nickName().trim());
-            u.setEmail(trimToNull(req.email()));
-            u.setPhonenumber(trimToNull(req.phone()));
+            u.setEmail(Texts.blankToNull(req.email()));
+            u.setPhonenumber(Texts.blankToNull(req.phone()));
             u.setUserType(STAFF_USER_TYPE);
             u.setStatus(StringUtils.hasText(req.userStatus()) ? req.userStatus() : "0");
             u.setDeptId(req.deptId());
@@ -136,8 +137,8 @@ public class EmployeeService {
         SysUser u = new SysUser();
         u.setUserId(existing.getUserId());
         u.setNickName(req.nickName().trim());
-        u.setEmail(trimToNull(req.email()));
-        u.setPhonenumber(trimToNull(req.phone()));
+        u.setEmail(Texts.blankToNull(req.email()));
+        u.setPhonenumber(Texts.blankToNull(req.phone()));
         u.setDeptId(req.deptId());
         u.setStatus(StringUtils.hasText(req.userStatus()) ? req.userStatus() : existing.getUserStatus());
         if (req.roleIds() != null) {
@@ -162,7 +163,7 @@ public class EmployeeService {
 
     private static void applyEmployment(Employee e, EmployeeRequest req) {
         e.setPositionId(req.positionId());
-        e.setPositionTitle(trimToNull(req.positionTitle()));
+        e.setPositionTitle(Texts.blankToNull(req.positionTitle()));
         e.setDeptId(req.deptId());
         e.setManagerUserId(req.managerUserId());
         e.setEmploymentType(req.employmentType());
@@ -170,27 +171,19 @@ public class EmployeeService {
         e.setStartDate(req.startDate());
         e.setProbationEndDate(req.probationEndDate());
         e.setEndDate(req.endDate());
-        e.setWorkLocation(trimToNull(req.workLocation()));
+        e.setWorkLocation(Texts.blankToNull(req.workLocation()));
         e.setSalaryAmount(req.salaryAmount());
         e.setSalaryCurrency(req.salaryCurrency() == null ? null : req.salaryCurrency().toUpperCase(Locale.ROOT));
         e.setPayFrequency(StringUtils.hasText(req.payFrequency()) ? req.payFrequency() : "MONTHLY");
-        e.setEmergencyContact(trimToNull(req.emergencyContact()));
-        e.setEmergencyContactRelationship(trimToNull(req.emergencyContactRelationship()));
-        e.setEmergencyContactPhone(trimToNull(req.emergencyContactPhone()));
-        e.setEmergencyContactEmail(trimToNull(req.emergencyContactEmail()));
-        e.setNotes(trimToNull(req.notes()));
+        e.setEmergencyContact(Texts.blankToNull(req.emergencyContact()));
+        e.setEmergencyContactRelationship(Texts.blankToNull(req.emergencyContactRelationship()));
+        e.setEmergencyContactPhone(Texts.blankToNull(req.emergencyContactPhone()));
+        e.setEmergencyContactEmail(Texts.blankToNull(req.emergencyContactEmail()));
+        e.setNotes(Texts.blankToNull(req.notes()));
     }
 
     private String nextEmployeeNo() {
         Integer max = mapper.maxEmployeeSeq(EMPLOYEE_NO_PREFIX);
         return EMPLOYEE_NO_PREFIX + String.format(Locale.ROOT, "%04d", (max == null ? 0 : max) + 1);
-    }
-
-    private static String blankToNull(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
-    }
-
-    private static String trimToNull(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
     }
 }

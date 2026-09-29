@@ -1,14 +1,38 @@
 <template>
   <div class="space-y-6">
-    <div v-if="loading" class="text-sm text-slate-500">Loading work history...</div>
-    <div v-else-if="!data || data.length === 0" class="text-sm text-slate-500">No work history provided.</div>
-    <div v-else class="space-y-4">
-      <div v-for="w in data" :key="w.id" class="p-4 border rounded-md">
-        <h4 class="text-sm font-bold text-slate-900">{{ w.position }} at {{ w.employer }}</h4>
+    <div
+      v-if="loading"
+      class="text-sm text-slate-500"
+    >
+      Loading work history...
+    </div>
+    <div
+      v-else-if="!data || data.length === 0"
+      class="text-sm text-slate-500"
+    >
+      No work history provided.
+    </div>
+    <div
+      v-else
+      class="space-y-4"
+    >
+      <div
+        v-for="w in data"
+        :key="w.id"
+        class="p-4 border rounded-md"
+      >
+        <h4 class="text-sm font-bold text-slate-900">
+          {{ w.position }} at {{ w.employer }}
+        </h4>
         <p class="text-xs text-slate-500 mt-1">
           {{ w.startDate }} - {{ w.current ? 'Present' : w.endDate }}
         </p>
-        <p v-if="w.description" class="text-sm text-slate-600 mt-2">{{ w.description }}</p>
+        <p
+          v-if="w.description"
+          class="text-sm text-slate-600 mt-2"
+        >
+          {{ w.description }}
+        </p>
       </div>
     </div>
   </div>

@@ -10,13 +10,15 @@ const C = (over: Partial<ConversationSummary> = {}): ConversationSummary => ({
 })
 
 const listConversations = vi.fn()
+const listMessages = vi.fn()
+const markRead = vi.fn()
 const primary = ref<{ id: number } | null>({ id: 5 })
 const { stream } = vi.hoisted(() => ({
   stream: { onPing: undefined as undefined | ((id: number) => void), onResync: undefined as undefined | (() => void) },
 }))
 
 vi.mock('~/composables/useMessages', () => ({
-  useMessages: () => ({ listConversations }),
+  useMessages: () => ({ listConversations, listMessages, markRead }),
 }))
 vi.mock('~/composables/useMyApplicant', () => ({
   useMyApplicant: () => ({ primary }),
@@ -36,6 +38,8 @@ async function mountPage() {
 }
 
 beforeEach(() => {
+  listMessages.mockReset().mockResolvedValue([])
+  markRead.mockReset().mockResolvedValue(undefined)
   listConversations.mockReset().mockResolvedValue([C()])
   primary.value = { id: 5 }
 })
@@ -98,4 +102,40 @@ describe('dashboard messages list', () => {
     expect(w.text()).toContain('1 unread')
   })
 
+  it('opens a thread oldest first and marks the conversation read', async () => {
+    listConversations.mockResolvedValue([C({ unreadCount: 3 })])
+    listMessages.mockResolvedValue([
+      { id: 12, senderUserId: 1, senderName: 'Amina', body: 'Second message', createdAt: '2026-01-01T10:05:00', attachments: [] },
+      { id: 11, senderUserId: 1, senderName: 'Amina', body: 'First message', createdAt: '2026-01-01T10:00:00', attachments: [] },
+    ])
+    const w = await mountPage()
+
+    await w.find('[data-test="conversation-row"]').trigger('click')
+    await flushPromises()
+
+    const bodies = w.findAll('[data-test="message"]').map(m => m.text())
+    expect(bodies[0]).toContain('First message')
+    expect(bodies[1]).toContain('Second message')
+    expect(listMessages).toHaveBeenCalledWith(9)
+    expect(markRead).toHaveBeenCalledWith(9)
+  })
+
+  it('shows an error with retry in the thread when its messages fail to load', async () => {
+    listMessages.mockRejectedValueOnce(new Error('boom'))
+    const w = await mountPage()
+
+    await w.find('[data-test="conversation-row"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-test="thread-error"]').exists()).toBe(true)
+    expect(w.text()).not.toContain('No messages yet')
+
+    listMessages.mockResolvedValueOnce([
+      { id: 11, senderUserId: 1, senderName: 'Amina', body: 'Recovered message', createdAt: '2026-01-01T10:00:00', attachments: [] },
+    ])
+    await w.find('[data-test="thread-error"] button').trigger('click')
+    await flushPromises()
+
+    expect(w.find('[data-test="thread-error"]').exists()).toBe(false)
+    expect(w.text()).toContain('Recovered message')
+  })
 })

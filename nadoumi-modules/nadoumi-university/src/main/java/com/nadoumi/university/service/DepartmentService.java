@@ -2,6 +2,7 @@ package com.nadoumi.university.service;
 
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadNotFoundException;
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.university.domain.Department;
 import com.nadoumi.university.mapper.DepartmentMapper;
 import com.nadoumi.university.mapper.UniversityMapper;
@@ -11,7 +12,6 @@ import com.ruoyi.common.utils.AuditActor;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 /**
  * Academic departments of a university. Names are unique per university. A
@@ -81,7 +81,7 @@ public class DepartmentService {
 
     private void apply(Department d, DepartmentRequest req) {
         d.setName(req.name().trim());
-        d.setNameCn(blankToNull(req.nameCn()));
+        d.setNameCn(Texts.blankToNull(req.nameCn()));
         d.setSortOrder(req.sortOrder() == null ? 0 : req.sortOrder());
     }
 
@@ -104,9 +104,5 @@ public class DepartmentService {
         if (existing != null && !existing.equals(selfId)) {
             throw new NadBadRequestException("a department with this name already exists for that university");
         }
-    }
-
-    private static String blankToNull(String s) {
-        return StringUtils.hasText(s) ? s.trim() : null;
     }
 }

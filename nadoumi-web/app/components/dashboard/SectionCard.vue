@@ -1,10 +1,10 @@
 <script setup lang="ts">
-defineProps<{ title: string }>()
+defineProps<{ title?: string }>()
 </script>
 
 <template>
   <NCard>
-    <template #header>
+    <template v-if="title || $slots.actions" #header>
       <div class="flex items-center justify-between gap-3">
         <span>{{ title }}</span>
         <slot name="actions" />

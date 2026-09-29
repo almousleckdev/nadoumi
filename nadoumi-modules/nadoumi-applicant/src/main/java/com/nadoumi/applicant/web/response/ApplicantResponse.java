@@ -1,6 +1,7 @@
 package com.nadoumi.applicant.web.response;
 
 import com.nadoumi.applicant.domain.Applicant;
+import com.nadoumi.common.text.Texts;
 
 /**
  * Applicant on the wire. {@code dob} and {@code passportNo} are masked unless the
@@ -34,13 +35,13 @@ public record ApplicantResponse(
                 a.getId(),
                 a.getGivenName(),
                 a.getFamilyName(),
-                includePii ? str(a.getDob()) : mask(a.getDob()),
+                includePii ? Texts.stringOrNull(a.getDob()) : mask(a.getDob()),
                 a.getNationality(),
                 includePii ? a.getPassportNo() : mask(a.getPassportNo()),
                 a.getEmail(),
                 a.getPhone(),
                 a.getStatus() == null ? null : a.getStatus().name(),
-                str(a.getCreateTime()),
+                Texts.stringOrNull(a.getCreateTime()),
                 a.getGender(),
                 a.getCountryOfOrigin(),
                 a.getCountryOfResidence(),
@@ -50,10 +51,6 @@ public record ApplicantResponse(
                 a.getEmailVerifiedAt() != null,
                 a.getOnboardedAt() != null,
                 a.getOnboardedAt() != null && a.getWelcomedAt() == null);
-    }
-
-    private static String str(Object v) {
-        return v == null ? null : v.toString();
     }
 
     private static String mask(Object v) {

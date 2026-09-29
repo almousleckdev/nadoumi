@@ -6,7 +6,7 @@ export function useNotifications() {
   // SSR, which the global $fetch does not.
   const requestFetch = useRequestFetch()
 
-  function list(params: { unreadOnly?: boolean, page?: number, size?: number } = {}) {
+  function list(params: { unreadOnly?: boolean, type?: string, page?: number, size?: number } = {}) {
     return requestFetch<Page<NotificationView>>('/api/student-notifications', { query: params })
   }
   function unreadCount() {

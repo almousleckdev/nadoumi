@@ -2,6 +2,7 @@ package com.nadoumi.application.web.response;
 
 import com.nadoumi.application.domain.Application;
 import com.nadoumi.application.domain.WfStage;
+import com.nadoumi.common.text.Texts;
 
 /** List/summary shape — staff and student list endpoints. Never the persistence entity. */
 public record ApplicationResponse(
@@ -26,10 +27,6 @@ public record ApplicationResponse(
                 a.getProgramId(), a.getScholarshipId(), a.getIntakeId(),
                 stage == null ? null : stage.getCode(), stage == null ? null : stage.getName(),
                 a.getCurrentStatus(), a.getAssigneeUserId(),
-                str(a.getSubmittedAt()), a.getVersion(), str(a.getCreateTime()));
-    }
-
-    private static String str(Object v) {
-        return v == null ? null : v.toString();
+                Texts.stringOrNull(a.getSubmittedAt()), a.getVersion(), Texts.stringOrNull(a.getCreateTime()));
     }
 }

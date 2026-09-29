@@ -112,7 +112,7 @@ describe('staff conversations', () => {
     await w.find('[data-test="conversation-row"]').trigger('click')
     await flushPromises()
 
-    const link = w.find('a.conv__attach-link')
+    const link = w.find('a.conv__file-card')
     expect(link.exists()).toBe(true)
     expect(link.attributes('href')).toBe('https://cdn.example.com/transcript.pdf')
     expect(link.text()).toContain('transcript.pdf')

@@ -1,0 +1,8 @@
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 140px; }
+.row > .w-40 { flex: 0 0 10rem; min-width: 10rem; }
+.line { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.line > .w-44 { flex: 0 0 11rem; }
+.line > .w-32 { flex: 0 0 8rem; }
+.tuition-usd { color: var(--nad-ink-soft, #64748b); font-variant-numeric: tabular-nums; }
+.fx-note { margin: 4px 0 0; font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }

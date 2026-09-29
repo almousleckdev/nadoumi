@@ -459,7 +459,12 @@
       "startConversationDesc": "在申请过程中遇到疑问？直接向纳豆米顾问发送消息咨询。",
       "noResults": "未找到匹配的对话。",
       "onlineSupport": "专属顾问支持",
-      "adminBadge": "官方顾问"
+      "adminBadge": "官方顾问",
+      "staffBadge": "团队",
+      "searchAria": "搜索会话",
+      "applicationRef": "申请 #{id}",
+      "applicationFallback": "申请",
+      "draftFallback": "草稿"
     },
     "profileTitle": "申请人档案",
     "createProfileTitle": "创建您的申请人档案",
@@ -560,6 +565,18 @@
         "WAITING_ON_STUDENT": "等待您回复",
         "RESOLVED": "已解决",
         "CLOSED": "已关闭"
+      },
+      "meeting": {
+        "request": "预约会面",
+        "title": "预约一对一会面",
+        "intro": "请选择一对一会面的日期、时间和时长。如果所选时段与指定工作人员的日程冲突，将被拒绝。",
+        "date": "日期",
+        "time": "时间",
+        "duration": "时长",
+        "minutes": "{n} 分钟",
+        "hour": "1 小时",
+        "hourAndHalf": "1.5 小时",
+        "book": "预约会面"
       }
     },
     "savedOk": "已保存",

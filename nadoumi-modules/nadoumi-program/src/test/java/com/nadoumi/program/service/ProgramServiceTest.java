@@ -38,7 +38,7 @@ class ProgramServiceTest {
     private final FxRates fx = mock(FxRates.class);
     private final com.nadoumi.common.outbox.OutboxWriter outbox = mock(com.nadoumi.common.outbox.OutboxWriter.class);
     private final ProgramService service =
-            new ProgramService(mapper, universityService, departmentService, media, fx, outbox);
+            new ProgramService(mapper, universityService, new ProgramChildrenWriter(mapper, departmentService), media, fx, outbox);
 
     private static ProgramRequest req(Long universityId, String name,
             List<ProgramRequest.MajorInput> majors, List<ProgramRequest.IntakeInput> intakes) {

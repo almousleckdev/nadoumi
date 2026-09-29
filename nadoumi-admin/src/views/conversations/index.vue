@@ -1,461 +1,38 @@
-<template>
-  <div class="nad-page">
-    <PageHeader
-      :title="t('conversations.title')"
-      :subtitle="t('conversations.subtitle')"
-    >
-      <template #actions>
-        <el-tag
-          v-if="reconnecting"
-          type="warning"
-          effect="plain"
-        >
-          {{ t('conversations.reconnecting') }}
-        </el-tag>
-      </template>
-    </PageHeader>
-
-    <div class="conv">
-      <aside class="conv__list">
-        <div class="conv__search-bar">
-          <el-input
-            v-model="searchStudent"
-            placeholder="Search student or subject…"
-            clearable
-            size="small"
-            :prefix-icon="Search"
-            @input="debouncedSearch"
-            @clear="() => loadInbox()"
-          />
-          <div class="conv__search-actions">
-            <el-input
-              v-model.number="searchAppId"
-              placeholder="App ID"
-              clearable
-              size="small"
-              style="width: 80px"
-              @change="() => loadInbox()"
-              @clear="() => loadInbox()"
-            />
-            <el-button
-              type="primary"
-              size="small"
-              :icon="Plus"
-              @click="openNewConversation"
-            >
-              New
-            </el-button>
-          </div>
-        </div>
-
-        <LoadingState
-          v-if="inboxLoading"
-          :rows="6"
-        />
-        <ErrorState
-          v-else-if="inboxError"
-          :message="inboxError"
-          @retry="loadInbox()"
-        />
-        <EmptyState
-          v-else-if="!inbox.length"
-          :title="t('conversations.emptyTitle')"
-          :description="t('conversations.emptyDesc')"
-          icon="ChatDotRound"
-        />
-        <ul
-          v-else
-          class="conv__rows"
-        >
-          <li
-            v-for="c in inbox"
-            :key="c.id"
-          >
-            <button
-              type="button"
-              class="conv__row"
-              :class="{ 'conv__row--active': c.id === selectedId }"
-              data-test="conversation-row"
-              @click="select(c.id)"
-            >
-              <span class="conv__row-head">
-                <span
-                  class="conv__row-title"
-                  :class="{ 'conv__row-title--unread': c.unreadCount > 0 }"
-                >{{ c.studentName || c.subject || t('conversations.untitled') }}</span>
-                <el-badge
-                  v-if="c.unreadCount > 0"
-                  :value="c.unreadCount"
-                  type="primary"
-                />
-              </span>
-              <span
-                v-if="c.studentName && c.subject"
-                class="conv__row-sub"
-              >{{ c.subject }}</span>
-              <span
-                v-if="c.lastMessagePreview"
-                class="conv__row-preview"
-              >{{ c.lastMessagePreview }}</span>
-              <span class="conv__row-meta">
-                <el-tag
-                  v-if="c.applicationId"
-                  size="small"
-                  type="success"
-                  effect="plain"
-                >#app {{ c.applicationId }}</el-tag>
-                <el-tag
-                  v-if="c.status === 'CLOSED'"
-                  size="small"
-                  type="info"
-                >{{ t('conversations.closed') }}</el-tag>
-                <span v-if="c.lastMessageAt">{{ formatTime(c.lastMessageAt) }}</span>
-              </span>
-            </button>
-          </li>
-        </ul>
-      </aside>
-
-      <section class="conv__thread">
-        <EmptyState
-          v-if="!selected"
-          :title="t('conversations.pickTitle')"
-          :description="t('conversations.pickDesc')"
-          icon="ChatDotRound"
-        />
-        <template v-else>
-          <header class="conv__thread-head">
-            <div class="conv__thread-head-info">
-              <h2 class="conv__thread-title">
-                {{ selected.subject || t('conversations.untitled') }}
-              </h2>
-              <div class="conv__thread-badges">
-                <el-tag
-                  v-if="selected.studentName"
-                  size="small"
-                  type="primary"
-                  effect="plain"
-                >
-                  👤 {{ selected.studentName }}
-                </el-tag>
-                <el-tag
-                  v-if="selected.applicationId"
-                  size="small"
-                  type="success"
-                  effect="plain"
-                >
-                  Application #{{ selected.applicationId }}
-                </el-tag>
-                <el-tag
-                  v-if="isClosed"
-                  size="small"
-                  type="info"
-                >
-                  {{ t('conversations.closed') }}
-                </el-tag>
-              </div>
-            </div>
-            <el-button
-              v-if="isParticipant && !isClosed"
-              size="small"
-              data-test="close"
-              @click="onClose"
-            >
-              {{ t('conversations.close') }}
-            </el-button>
-          </header>
-
-          <LoadingState
-            v-if="threadLoading"
-            :rows="6"
-          />
-          <ErrorState
-            v-else-if="threadError"
-            :message="threadError"
-            @retry="loadThread()"
-          />
-
-          <div
-            v-else-if="notParticipant"
-            class="conv__join"
-            data-test="join-panel"
-          >
-            <p>{{ t('conversations.notParticipant') }}</p>
-            <el-button
-              v-if="canManage"
-              type="primary"
-              :loading="joining"
-              data-test="join"
-              @click="onJoin"
-            >
-              {{ t('conversations.join') }}
-            </el-button>
-            <p
-              v-else
-              class="conv__hint"
-              data-test="join-denied"
-            >
-              {{ t('conversations.joinDenied') }}
-            </p>
-          </div>
-
-          <template v-else>
-            <div
-              ref="scroller"
-              class="conv__messages"
-              data-test="thread"
-            >
-              <div
-                v-if="hasOlder"
-                class="conv__older"
-              >
-                <el-button
-                  size="small"
-                  text
-                  :loading="loadingOlder"
-                  data-test="load-older"
-                  @click="loadOlder"
-                >
-                  {{ t('conversations.loadOlder') }}
-                </el-button>
-              </div>
-              <p
-                v-if="!messages.length"
-                class="conv__hint"
-              >
-                {{ t('conversations.threadEmpty') }}
-              </p>
-              <div
-                v-for="(m, index) in messages"
-                :key="m.id"
-                class="conv__msg"
-                :class="{ 'conv__msg--mine': isMine(m), 'conv__msg--chained': index > 0 && messages[index - 1].senderUserId === m.senderUserId }"
-                data-test="message"
-              >
-                <div class="conv__bubble">
-                  
-                  <p class="conv__body">
-                    {{ m.body }}
-                  </p>
-                  
-                  <div v-if="m.attachments && m.attachments.length" class="conv__attachments">
-                    <div v-for="a in m.attachments" :key="a.id" class="conv__attachment-item">
-                      <el-image
-                        v-if="a.url && a.filename && a.filename.match(/\.(jpeg|jpg|gif|png|webp)$/i)"
-                        :src="a.url"
-                        class="conv__image-preview"
-                        :preview-src-list="[a.url]"
-                        fit="cover"
-                        lazy
-                      />
-                      <a v-else-if="a.url" :href="a.url" target="_blank" rel="noopener noreferrer" class="conv__file-card">
-                        <el-icon class="conv__file-icon"><Document /></el-icon>
-                        <span class="conv__file-name" :title="a.filename || 'Attachment'">{{ a.filename || 'Attachment' }}</span>
-                      </a>
-                      <span v-else class="conv__attach-missing">
-                        <el-icon><Warning /></el-icon> {{ a.filename || 'Attachment' }} (Unavailable)
-                      </span>
-                    </div>
-                  </div>
-
-                  <p class="conv__time">
-                    {{ formatTime(m.createdAt) }}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <footer class="conv__composer">
-              <p
-                v-if="isClosed"
-                class="conv__hint"
-                data-test="closed-notice"
-              >
-                {{ t('conversations.closedNotice') }}
-              </p>
-              <form
-                v-else
-                @submit.prevent="onSend"
-              >
-                <div v-if="pendingAttachments.length" class="conv__pending-attachments" data-test="pending-attachments">
-                  <div
-                    v-for="p in pendingAttachments"
-                    :key="p.key"
-                    class="conv__pending-chip"
-                    :class="{ 'is-error': !!p.error }"
-                    data-test="pending-attachment"
-                  >
-                    <span class="conv__pending-name">📎 {{ p.file.name }}</span>
-                    <el-icon v-if="p.uploading" class="is-loading" data-test="uploading-spinner"><Loading /></el-icon>
-                    <span v-else-if="p.error" class="conv__pending-error" data-test="pending-error">{{ p.error }}</span>
-                    <button
-                      type="button"
-                      class="conv__pending-remove"
-                      :aria-label="t('conversations.removeAttachment')"
-                      data-test="remove-pending"
-                      @click="removePending(p.key)"
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-
-                <el-input
-                  v-model="draft"
-                  type="textarea"
-                  :rows="3"
-                  :maxlength="MESSAGE_MAX_LENGTH"
-                  :placeholder="t('conversations.composer')"
-                  data-test="composer"
-                  @keydown.ctrl.enter.prevent="onSend"
-                  @keydown.meta.enter.prevent="onSend"
-                />
-                <div class="conv__composer-actions">
-                  <div class="conv__composer-left">
-                    <input
-                      ref="fileInputRef"
-                      type="file"
-                      multiple
-                      accept="image/*,application/pdf,.doc,.docx"
-                      class="conv__file-input"
-                      :disabled="sending || pendingAttachments.length >= 5"
-                      data-test="file-input"
-                      @change="onFilePicked"
-                    >
-                    <el-button
-                      size="small"
-                      :icon="Paperclip"
-                      :disabled="sending || pendingAttachments.length >= 5"
-                      data-test="attach-button"
-                      @click="triggerFilePick"
-                    >
-                      {{ t('conversations.attach') }}
-                    </el-button>
-                    <span v-if="pendingAttachments.length" class="conv__attach-count" data-test="attach-count">
-                      {{ pendingAttachments.length }}/5
-                    </span>
-                  </div>
-                  <el-button
-                    type="primary"
-                    native-type="submit"
-                    :loading="sending"
-                    :disabled="!canSend"
-                    data-test="send"
-                  >
-                    {{ t('conversations.send') }}
-                  </el-button>
-                </div>
-              </form>
-            </footer>
-          </template>
-        </template>
-      </section>
-    </div>
-    <!-- New Conversation with Student Dialog -->
-    <el-dialog
-      v-model="newConvOpen"
-      title="Start Conversation with Student"
-      width="540px"
-      destroy-on-close
-    >
-      <el-form label-position="top">
-        <el-form-item label="Select Student" required>
-          <el-select
-            v-model="newConvForm.studentUserId"
-            placeholder="Choose a registered student…"
-            filterable
-            :loading="loadingStudents"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="s in studentOptions"
-              :key="s.userId"
-              :label="`${s.nickName || s.userName} (@${s.userName})${s.email ? ' · ' + s.email : ''}`"
-              :value="s.userId"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="Application ID (optional)">
-          <el-input-number
-            v-model="newConvForm.applicationId"
-            :min="1"
-            placeholder="Related Application ID"
-            style="width: 100%"
-          />
-        </el-form-item>
-        <el-form-item label="Subject">
-          <el-input
-            v-model="newConvForm.subject"
-            placeholder="e.g. Question regarding your application"
-            maxlength="200"
-            show-word-limit
-          />
-        </el-form-item>
-        <el-form-item label="Initial Message" required>
-          <el-input
-            v-model="newConvForm.body"
-            type="textarea"
-            :rows="5"
-            placeholder="Write your message to the student…"
-            maxlength="4000"
-            show-word-limit
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="newConvOpen = false">Cancel</el-button>
-        <el-button
-          type="primary"
-          :loading="creatingConv"
-          :disabled="!newConvForm.studentUserId || !newConvForm.body.trim()"
-          @click="submitNewConversation"
-        >
-          Start Conversation
-        </el-button>
-      </template>
-    </el-dialog>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Loading, Paperclip, Plus, Search } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
-import LoadingState from '@/components/ui/LoadingState.vue'
-import ErrorState from '@/components/ui/ErrorState.vue'
-import EmptyState from '@/components/ui/EmptyState.vue'
 import {
   addParticipant, closeConversation, listInbox, listMessages, markConversationRead, postMessage,
-  uploadAttachment, createConversation,
-  MESSAGE_MAX_LENGTH, MESSAGE_PAGE_SIZE,
+  MESSAGE_PAGE_SIZE,
   type ConversationMessage, type ConversationSummary,
 } from '@/api/conversation'
-import { listUsers, type SysUserRow } from '@/api/system'
 import { useUserStore } from '@/stores/user'
 import { useConfirm } from '@/composables/useConfirm'
 import { useStaffStream } from '@/composables/useStaffStream'
-import { formatMessageTime, mergeMessages } from '@/utils/messages'
+import { mergeMessages } from '@/utils/messages'
+import ConversationList from './ConversationList.vue'
+import ConversationThread from './ConversationThread.vue'
+import NewConversationDialog from './NewConversationDialog.vue'
 
 const HTTP_FORBIDDEN = 403
+const SEARCH_DEBOUNCE_MS = 300
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const { confirm } = useConfirm()
 
 const canManage = computed(() => userStore.hasPerm('nad:conversation:participant:manage'))
+const thread = ref<InstanceType<typeof ConversationThread>>()
 
-// ---- inbox ----
 const inbox = ref<ConversationSummary[]>([])
 const inboxLoading = ref(true)
 const inboxError = ref('')
-
 const searchStudent = ref('')
-
 const searchAppId = ref<number | undefined>()
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -463,7 +40,7 @@ function debouncedSearch() {
   if (searchTimer) clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
     void loadInbox()
-  }, 300)
+  }, SEARCH_DEBOUNCE_MS)
 }
 
 async function loadInbox(silent = false) {
@@ -483,79 +60,22 @@ async function loadInbox(silent = false) {
   }
 }
 
-// ---- new conversation ----
-const newConvOpen = ref(false)
-const studentOptions = ref<SysUserRow[]>([])
-const loadingStudents = ref(false)
-const newConvForm = reactive({
-  studentUserId: undefined as number | undefined,
-  applicationId: undefined as number | undefined,
-  subject: '',
-  body: '',
-})
-const creatingConv = ref(false)
+const newConversationOpen = ref(false)
 
-async function openNewConversation() {
-  newConvForm.studentUserId = undefined
-  newConvForm.applicationId = undefined
-  newConvForm.subject = ''
-  newConvForm.body = ''
-  newConvOpen.value = true
-  if (!studentOptions.value.length) {
-    loadingStudents.value = true
-    try {
-      const res = await listUsers({ userType: '10', pageSize: 100 })
-      studentOptions.value = res.rows || []
-    } catch {
-      // ignore
-    } finally {
-      loadingStudents.value = false
-    }
-  }
+async function onConversationCreated(id: number) {
+  await loadInbox()
+  select(id)
 }
 
-async function submitNewConversation() {
-  if (!newConvForm.studentUserId || !newConvForm.body.trim()) return
-  creatingConv.value = true
-  try {
-    const res = await createConversation({
-      studentUserId: newConvForm.studentUserId,
-      applicationId: newConvForm.applicationId || undefined,
-      subject: newConvForm.subject.trim() || 'Conversation with Nadoumi Administration',
-      body: newConvForm.body.trim(),
-    })
-    ElMessage.success('Conversation created successfully')
-    newConvOpen.value = false
-    await loadInbox()
-    if (res.conversationId) {
-      select(res.conversationId)
-    }
-  } catch (e) {
-    ElMessage.error((e as Error)?.message || 'Failed to create conversation')
-  } finally {
-    creatingConv.value = false
-  }
-}
-
-// ---- selected thread ----
 const selectedId = ref<number | null>(Number(route.query.id) || null)
 const selected = computed(() => inbox.value.find(c => c.id === selectedId.value) ?? null)
-const isClosed = computed(() => selected.value?.status === 'CLOSED')
 
 const messages = ref<ConversationMessage[]>([])
 const hasOlder = ref(false)
 const threadLoading = ref(false)
 const threadError = ref('')
 const notParticipant = ref(false)
-const isParticipant = computed(() => Boolean(selected.value) && !notParticipant.value && !threadLoading.value && !threadError.value)
 const loadingOlder = ref(false)
-const scroller = ref<HTMLElement | null>(null)
-
-function scrollToEnd() {
-  nextTick(() => {
-    if (scroller.value) scroller.value.scrollTop = scroller.value.scrollHeight
-  })
-}
 
 function acknowledge(id: number) {
   const row = inbox.value.find(c => c.id === id)
@@ -584,7 +104,7 @@ async function loadThread() {
     messages.value = mergeMessages([], page)
     hasOlder.value = page.length === MESSAGE_PAGE_SIZE
     acknowledge(id)
-    scrollToEnd()
+    thread.value?.scrollToEnd()
   }
   catch (e) {
     // An unclaimed conversation is listed in the inbox but its thread is only readable once joined.
@@ -600,8 +120,6 @@ function select(id: number) {
   if (id === selectedId.value) return
   selectedId.value = id
   router.replace({ query: { ...route.query, id: String(id) } })
-  draft.value = ''
-  pendingAttachments.value = []
   void loadThread()
 }
 
@@ -613,7 +131,7 @@ async function syncLatest() {
     messages.value = mergeMessages(messages.value, await listMessages(id, 0, true))
     if (messages.value.length !== before) {
       acknowledge(id)
-      scrollToEnd()
+      thread.value?.scrollToEnd()
     }
   }
   catch {
@@ -636,115 +154,18 @@ async function loadOlder() {
   }
 }
 
-// ---- actions ----
-const draft = ref('')
 const sending = ref(false)
 const joining = ref(false)
 
-interface PendingAttachment {
-  key: string
-  file: File
-  mediaId: number | null
-  uploading: boolean
-  error: string
-}
-
-const pendingAttachments = ref<PendingAttachment[]>([])
-const fileInputRef = ref<HTMLInputElement | null>(null)
-
-const isUploading = computed(() => pendingAttachments.value.some(p => p.uploading))
-const readyAttachmentIds = computed(() =>
-  pendingAttachments.value.filter(p => p.mediaId !== null).map(p => p.mediaId!)
-)
-
-const canSend = computed(() => {
-  if (sending.value || isUploading.value) return false
-  return draft.value.trim().length > 0 || readyAttachmentIds.value.length > 0
-})
-
-const MAX_ATTACHMENTS = 5
-const MAX_BYTES = 15 * 1024 * 1024
-const ALLOWED_MIME = new Set([
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-])
-
-function triggerFilePick() {
-  fileInputRef.value?.click()
-}
-
-async function onFilePicked(event: Event) {
-  const input = event.target as HTMLInputElement
-  const files = Array.from(input.files ?? [])
-  input.value = ''
-  if (!files.length || selectedId.value === null) return
-
-  const remainingSlots = MAX_ATTACHMENTS - pendingAttachments.value.length
-  if (remainingSlots <= 0) {
-    ElMessage.warning(t('conversations.attachMaxCount'))
-    return
-  }
-
-  const toAdd = files.slice(0, remainingSlots)
-  if (files.length > remainingSlots) {
-    ElMessage.warning(t('conversations.attachMaxCount'))
-  }
-
-  for (const file of toAdd) {
-    if (file.size > MAX_BYTES) {
-      ElMessage.warning(`${file.name}: ${t('conversations.attachTooBig')}`)
-      continue
-    }
-    const ext = file.name.split('.').pop()?.toLowerCase()
-    const validByExt = ext === 'doc' || ext === 'docx' || ext === 'pdf' || ext === 'jpg' || ext === 'jpeg' || ext === 'png' || ext === 'webp'
-    if (file.type && !ALLOWED_MIME.has(file.type) && !validByExt) {
-      ElMessage.warning(`${file.name}: invalid file type`)
-      continue
-    }
-
-    const item = reactive<PendingAttachment>({
-      key: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
-      file,
-      mediaId: null,
-      uploading: true,
-      error: '',
-    })
-    pendingAttachments.value.push(item)
-
-    const convId = selectedId.value
-    try {
-      const res = await uploadAttachment(convId, file)
-      item.mediaId = res.mediaId
-    }
-    catch {
-      item.error = t('conversations.attachUploadFailed')
-    }
-    finally {
-      item.uploading = false
-    }
-  }
-}
-
-function removePending(key: string) {
-  pendingAttachments.value = pendingAttachments.value.filter(p => p.key !== key)
-}
-
-async function onSend() {
+async function onSend(payload: { body: string, attachmentMediaIds: number[] }) {
   const id = selectedId.value
-  const body = draft.value.trim()
-  const attachmentMediaIds = readyAttachmentIds.value
-  if (id === null || (!body && !attachmentMediaIds.length) || sending.value || isUploading.value) return
+  if (id === null || sending.value) return
   sending.value = true
   try {
-    const sent = await postMessage(id, body, attachmentMediaIds)
-    draft.value = ''
-    pendingAttachments.value = []
+    const sent = await postMessage(id, payload.body, payload.attachmentMediaIds)
+    thread.value?.resetComposer()
     messages.value = mergeMessages(messages.value, [sent])
-    scrollToEnd()
+    thread.value?.scrollToEnd()
     void loadInbox(true)
   }
   finally {
@@ -783,7 +204,6 @@ async function onClose() {
   await loadInbox(true)
 }
 
-// ---- realtime ----
 const { reconnecting } = useStaffStream(
   (refId) => {
     void loadInbox(true)
@@ -795,14 +215,70 @@ const { reconnecting } = useStaffStream(
   },
 )
 
-const isMine = (m: ConversationMessage) => m.senderUserId === userStore.userId
-const formatTime = (iso: string) => formatMessageTime(iso, locale.value)
-
 onMounted(async () => {
   await loadInbox()
   if (selectedId.value !== null) await loadThread()
 })
 </script>
+
+<template>
+  <div class="nad-page">
+    <PageHeader
+      :title="t('conversations.title')"
+      :subtitle="t('conversations.subtitle')"
+    >
+      <template #actions>
+        <el-tag
+          v-if="reconnecting"
+          type="warning"
+          effect="plain"
+        >
+          {{ t('conversations.reconnecting') }}
+        </el-tag>
+      </template>
+    </PageHeader>
+
+    <div class="conv">
+      <ConversationList
+        v-model:student="searchStudent"
+        v-model:application-id="searchAppId"
+        :inbox="inbox"
+        :loading="inboxLoading"
+        :error="inboxError"
+        :selected-id="selectedId"
+        @typing="debouncedSearch"
+        @apply="loadInbox()"
+        @select="select"
+        @retry="loadInbox()"
+        @create="newConversationOpen = true"
+      />
+      <ConversationThread
+        ref="thread"
+        :selected="selected"
+        :messages="messages"
+        :has-older="hasOlder"
+        :loading-older="loadingOlder"
+        :loading="threadLoading"
+        :error="threadError"
+        :not-participant="notParticipant"
+        :can-manage="canManage"
+        :joining="joining"
+        :sending="sending"
+        :current-user-id="userStore.userId"
+        @close="onClose"
+        @retry="loadThread()"
+        @join="onJoin"
+        @load-older="loadOlder"
+        @send="onSend"
+      />
+    </div>
+
+    <NewConversationDialog
+      v-model="newConversationOpen"
+      @created="onConversationCreated"
+    />
+  </div>
+</template>
 
 <style scoped>
 .conv {
@@ -818,108 +294,7 @@ onMounted(async () => {
   border-radius: 12px;
   min-height: 420px;
 }
-.conv__list { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
-.conv__search-bar { display: flex; flex-direction: column; gap: 6px; padding: 4px; border-bottom: 1px solid var(--nad-line, #e5e7eb); margin-bottom: 4px; }
-.conv__search-actions { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.conv__rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-.conv__row {
-  width: 100%;
-  display: grid;
-  gap: 4px;
-  padding: 10px 12px;
-  text-align: start;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  cursor: pointer;
-}
-.conv__row:hover { background: var(--nad-surface-2, #f8fafc); }
-.conv__row--active { background: var(--nad-surface-2, #f1f5f9); }
-.conv__row-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.conv__row-title { font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv__row-title--unread { font-weight: 700; }
-.conv__row-sub { font-size: 12px; color: var(--el-color-primary, #4338ca); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv__row-preview { font-size: 12px; color: var(--nad-ink-soft, #64748b); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv__row-meta { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--nad-ink-faint, #9ca3af); }
-.conv__thread { display: flex; flex-direction: column; }
-.conv__thread-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--nad-line, #e5e7eb); }
-.conv__thread-head-info { display: flex; flex-direction: column; gap: 4px; }
-.conv__thread-title { margin: 0; display: inline; font-size: 16px; font-weight: 600; }
-.conv__thread-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.conv__messages { display: grid; gap: 10px; align-content: start; max-height: 460px; min-height: 240px; overflow-y: auto; padding: 16px; }
-.conv__older { text-align: center; }
-.conv__msg { display: flex; justify-content: flex-start; }
-.conv__msg--mine { justify-content: flex-end; }
-.conv__bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; background: var(--nad-surface-2, #f1f5f9); font-size: 14px; }
-.conv__msg--mine .conv__bubble { background: var(--el-color-primary-light-9, #eef4ff); }
-.conv__sender { margin: 0; font-size: 12px; font-weight: 600; color: var(--nad-ink-soft, #64748b); }
-.conv__body { margin: 2px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.conv__attach { margin: 4px 0 0; padding: 0; list-style: none; font-size: 12px; color: var(--nad-ink-soft, #64748b); }
-.conv__attach-link { color: var(--el-color-primary, #4338ca); text-decoration: underline; word-break: break-all; }
-.conv__attach-link:hover { color: var(--el-color-primary-dark-2, #3730a3); }
-.conv__time { margin: 4px 0 0; text-align: end; font-size: 11px; color: var(--nad-ink-faint, #9ca3af); }
-.conv__composer { padding: 12px 16px; border-top: 1px solid var(--nad-line, #e5e7eb); margin-top: auto; }
-.conv__composer-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
-.conv__composer-left { display: flex; align-items: center; gap: 8px; }
-.conv__file-input { display: none; }
-.conv__attach-count { font-size: 12px; color: var(--nad-ink-soft, #64748b); }
-.conv__pending-attachments { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-.conv__pending-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--nad-surface-2, #f1f5f9);
-  border: 1px solid var(--nad-line, #e2e8f0);
-  border-radius: 6px;
-  padding: 2px 8px;
-  font-size: 12px;
-  color: var(--nad-ink, #1e293b);
-  max-width: 100%;
-}
-.conv__pending-chip.is-error {
-  border-color: var(--el-color-danger, #ef4444);
-  background: #fef2f2;
-  color: var(--el-color-danger, #ef4444);
-}
-.conv__pending-name {
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.conv__pending-error {
-  font-size: 11px;
-}
-.conv__pending-remove {
-  background: none;
-  border: none;
-  color: var(--nad-ink-soft, #64748b);
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1;
-  padding: 0 2px;
-}
-.conv__pending-remove:hover {
-  color: var(--el-color-danger, #ef4444);
-}
-.conv__send { display: flex; justify-content: flex-end; margin-top: 8px; }
-.conv__join { display: grid; gap: 12px; justify-items: center; padding: 48px 24px; text-align: center; }
-.conv__hint { margin: 0; font-size: 13px; color: var(--nad-ink-soft, #64748b); }
 @media (max-width: 900px) {
   .conv { grid-template-columns: 1fr; }
 }
-
-
-
-
-.conv__msg--chained { margin-top: -6px; }
-.conv__msg--chained .conv__bubble { border-top-left-radius: 4px; border-top-right-radius: 4px; }
-.conv__attachments { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
-.conv__image-preview { border-radius: 8px; border: 1px solid var(--nad-line, #e2e8f0); max-width: 240px; max-height: 240px; display: block; }
-.conv__file-card { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--nad-surface, #ffffff); border: 1px solid var(--nad-line, #e2e8f0); border-radius: 8px; text-decoration: none; transition: background 0.2s; max-width: 280px; }
-.conv__file-card:hover { background: var(--nad-surface-2, #f8fafc); }
-.conv__file-icon { font-size: 18px; color: var(--el-color-primary, #4338ca); }
-.conv__file-name { font-size: 13px; color: var(--nad-ink, #1e293b); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.conv__attach-missing { font-size: 12px; color: var(--el-color-danger, #ef4444); font-style: italic; display: flex; align-items: center; gap: 4px; }
-
 </style>

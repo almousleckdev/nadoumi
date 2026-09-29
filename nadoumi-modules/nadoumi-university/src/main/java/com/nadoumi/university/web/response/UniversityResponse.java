@@ -1,5 +1,6 @@
 package com.nadoumi.university.web.response;
 
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
@@ -95,13 +96,9 @@ public record UniversityResponse(
                 u.isRecommended(), u.isFeatured(), u.isPublicPartner(),
                 u.getStatus() == null ? null : u.getStatus().name(),
                 u.getPublishStatus() == null ? null : u.getPublishStatus().name(),
-                u.getRemark(), str(u.getCreateTime()), str(u.getUpdateTime()),
+                u.getRemark(), Texts.stringOrNull(u.getCreateTime()), Texts.stringOrNull(u.getUpdateTime()),
                 u.getRankings().stream().map(Ranking::of).toList(),
                 u.getHighlights().stream().map(Highlight::of).toList(),
                 u.getGallery().stream().map(g -> GalleryImage.of(g, galleryUrl)).toList());
-    }
-
-    private static String str(Object v) {
-        return v == null ? null : v.toString();
     }
 }

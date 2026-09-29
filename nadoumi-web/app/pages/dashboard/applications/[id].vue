@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { StudentApplicationDto } from '~/types/catalog'
 import { isClosed, safeTimeline } from '~/utils/applicationView'
+import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
@@ -11,8 +12,7 @@ const { get, submit, withdraw } = useApplications()
 const { busy, notice, error: actionError, run } = useAsyncAction()
 
 const id = Number(route.params.id)
-const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }))
-const formatDate = (iso: string) => dtf.value.format(new Date(iso))
+const formatDate = (iso: string) => formatTimestamp(iso, locale.value)
 
 const application = ref<StudentApplicationDto | null>(null)
 const pending = ref(true)

@@ -41,264 +41,13 @@
         </template>
       </PageHeader>
 
-      <FormSection
-        v-if="heroSrc || coverSrc"
-        :title="t('scholarship.secMedia')"
-      >
-        <div class="imgs">
-          <figure v-if="heroSrc">
-            <img
-              :src="heroSrc"
-              alt=""
-            >
-            <figcaption>{{ t('scholarship.heroImage') }}</figcaption>
-          </figure>
-          <figure v-if="coverSrc">
-            <img
-              :src="coverSrc"
-              alt=""
-            >
-            <figcaption>{{ t('scholarship.coverImage') }}</figcaption>
-          </figure>
-        </div>
-      </FormSection>
-
-      <FormSection :title="t('scholarship.secIdentity')">
-        <DescriptionList
-          :items="[
-            { label: t('scholarship.referenceCode'), value: s.view.referenceCode || t('scholarship.refPending') },
-            { label: t('scholarship.slug'), value: s.view.slug },
-            { label: t('scholarship.field'), value: s.view.field || '' },
-            { label: t('scholarship.teachingLanguage'), value: s.view.teachingLanguage ? t(`scholarship.lang.${s.view.teachingLanguage}`) : '' },
-            { label: t('scholarship.deadline'), value: s.view.deadline || t('scholarship.rolling') },
-            { label: t('scholarship.levels'), value: s.view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '' },
-            { label: t('scholarship.nonDegreeDuration'), value: s.view.nonDegreeDuration ? t(`scholarship.nonDegree.${s.view.nonDegreeDuration}`) : '' },
-            { label: t('scholarship.studyDurationMonths'), value: s.view.studyDurationMonths ?? '' },
-            { label: t('scholarship.applicationChannel'), value: s.view.applicationChannel ? t(`scholarship.channel.${s.view.applicationChannel}`) : '' },
-            { label: t('scholarship.agencyNumber'), value: s.view.agencyNumber || '' },
-            { label: t('scholarship.requiresFinancialProof'), value: s.view.requiresFinancialProof ? t('common.yes') : t('common.no') },
-            { label: t('scholarship.requiresFoundationYear'), value: s.view.requiresFoundationYear ? t('common.yes') : t('common.no') },
-            { label: t('scholarship.categories'), value: s.view.categories.join(', ') || '' },
-            { label: t('scholarship.slots'), value: s.view.slots ?? '' },
-          ]"
-        />
-        <p
-          v-if="s.view.summary"
-          class="prose"
-        >
-          {{ s.view.summary }}
-        </p>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.eligibility"
-        :title="t('scholarship.secEligibility')"
-      >
-        <DescriptionList :items="eligibilityItems" />
-        <p
-          v-if="s.view.eligibility.notes"
-          class="prose"
-        >
-          {{ s.view.eligibility.notes }}
-        </p>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.fees.length || s.view.applicationFee || s.view.serviceFee"
-        :title="t('scholarship.secFees')"
-      >
-        <el-table
-          :data="feeRows"
-          size="small"
-        >
-          <el-table-column
-            prop="label"
-            :label="t('scholarship.feeKind')"
-          />
-          <el-table-column
-            prop="amount"
-            :label="t('scholarship.amount')"
-            align="right"
-          />
-        </el-table>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.stipends.length"
-        :title="t('scholarship.secStipend')"
-      >
-        <el-table
-          :data="s.view.stipends"
-          size="small"
-        >
-          <el-table-column
-            :label="t('scholarship.level')"
-            width="120"
-          >
-            <template #default="{ row }">
-              {{ t(`scholarship.level.${row.level}`) }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            :label="t('scholarship.amount')"
-            align="right"
-          >
-            <template #default="{ row }">
-              {{ dual(row.amountRmb, row.amountUsd) }} / {{ t(`scholarship.freq.${row.frequency}`) }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            :label="t('scholarship.durationMonths')"
-            width="120"
-            align="right"
-          >
-            <template #default="{ row }">
-              {{ row.durationMonths ?? '' }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            :label="t('scholarship.stipendConditions')"
-            prop="conditions"
-          />
-        </el-table>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.accommodation.length"
-        :title="t('scholarship.secAccommodation')"
-      >
-        <el-table
-          :data="s.view.accommodation"
-          size="small"
-        >
-          <el-table-column
-            :label="t('scholarship.accommodationNote')"
-            prop="note"
-          >
-            <template #default="{ row }">
-              <strong>{{ t(`scholarship.room.${row.roomType}`) }}</strong>
-              <span
-                v-if="row.note"
-                class="muted"
-              > · {{ row.note }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            :label="t('scholarship.amount')"
-            align="right"
-            width="200"
-          >
-            <template #default="{ row }">
-              {{ dual(row.amountRmb, row.amountUsd) }}
-            </template>
-          </el-table-column>
-        </el-table>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.coverage.length"
-        :title="t('scholarship.secCoverage')"
-      >
-        <ul class="list">
-          <li
-            v-for="(c, i) in s.view.coverage"
-            :key="i"
-          >
-            <strong>{{ t(`scholarship.coverageKind.${c.kind}`, c.kind) }}</strong>
-            <span
-              v-if="c.detail"
-              class="muted"
-            > · {{ c.detail }}</span>
-          </li>
-        </ul>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.renewalConditions"
-        :title="t('scholarship.renewalConditions')"
-      >
-        <p class="prose">
-          {{ s.view.renewalConditions }}
-        </p>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.intakes.length"
-        :title="t('scholarship.secIntakes')"
-      >
-        <ul class="list">
-          <li
-            v-for="(it, i) in s.view.intakes"
-            :key="i"
-          >
-            {{ t(`scholarship.intake.${it.term}`) }}
-            <span
-              v-if="it.applicationClose"
-              class="muted"
-            > · {{ t('scholarship.closes') }} {{ it.applicationClose }}</span>
-          </li>
-        </ul>
-      </FormSection>
-
-      <FormSection
-        v-if="s.view.documentRequirements.length"
-        :title="t('scholarship.secDocuments')"
-      >
-        <ul class="list">
-          <li
-            v-for="(d, i) in s.view.documentRequirements"
-            :key="i"
-          >
-            {{ t(`scholarship.doc.${d.docType}`, d.docType) }}
-            <el-tag
-              size="small"
-              :type="d.mandatory ? 'danger' : 'info'"
-              effect="plain"
-            >
-              {{ d.mandatory ? t('scholarship.mandatory') : t('scholarship.optionalDoc') }}
-            </el-tag>
-            <span
-              v-if="d.note"
-              class="muted"
-            > · {{ d.note }}</span>
-          </li>
-        </ul>
-      </FormSection>
-
-      <FormSection
-        v-for="p in prose"
-        :key="p.label"
-        :title="p.label"
-      >
-        <p class="prose">
-          {{ p.value }}
-        </p>
-      </FormSection>
-
-      <FormSection
-        v-if="userStore.hasPerm('nad:scholarship:internal:view')"
-        :title="t('scholarship.secInternal')"
-        :description="t('scholarship.internalHint')"
-      >
-        <DescriptionList
-          :items="[
-            { label: t('scholarship.partnerUniversity'), value: internal?.universityName || (internal?.universityId ? `#${internal.universityId}` : '') },
-            { label: t('scholarship.linkedProgram'), value: linkedProgramLabel },
-            { label: t('scholarship.internalStatus'), value: internal?.internalStatus || 'DRAFT' },
-            { label: t('scholarship.operationalNotes'), value: internal?.operationalNotes || '' },
-            { label: t('scholarship.confidentialTerms'), value: internal?.confidentialTerms || '' },
-          ]"
-        />
-        <el-button
-          v-if="userStore.hasPerm('nad:scholarship:internal:edit')"
-          size="small"
-          :icon="Edit"
-          style="margin-top: 8px"
-          @click="internalOpen = true"
-        >
-          {{ t('scholarship.editInternal') }}
-        </el-button>
-      </FormSection>
+      <OverviewSections :view="s.view" />
+      <CostSections :view="s.view" />
+      <ConditionsSections :view="s.view" />
+      <InternalPanel
+        ref="internalPanel"
+        :scholarship-id="id"
+      />
     </template>
 
     <ScholarshipDrawer
@@ -306,103 +55,25 @@
       :scholarship="s"
       @saved="onSaved"
     />
-
-    <el-dialog
-      v-model="internalOpen"
-      :title="t('scholarship.editInternal')"
-      width="480"
-    >
-      <el-form label-position="top">
-        <el-form-item :label="t('scholarship.partnerUniversityId')">
-          <el-input-number
-            v-model="internalForm.universityId"
-            :min="1"
-            controls-position="right"
-            @change="onInternalUniversityChange"
-          />
-        </el-form-item>
-        <el-form-item :label="t('scholarship.linkedProgram')">
-          <el-select
-            v-model="internalForm.programId"
-            clearable
-            filterable
-            :disabled="!internalForm.universityId"
-            :placeholder="internalForm.universityId ? t('scholarship.linkedProgramPlaceholder') : t('scholarship.linkedProgramNeedsUniversity')"
-            style="width: 100%"
-          >
-            <el-option
-              v-for="p in programOptions"
-              :key="p.id"
-              :value="p.id"
-              :label="p.name"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="t('scholarship.internalStatus')">
-          <el-input
-            v-model="internalForm.internalStatus"
-            maxlength="24"
-          />
-        </el-form-item>
-        <el-form-item :label="t('scholarship.operationalNotes')">
-          <el-input
-            v-model="internalForm.operationalNotes"
-            type="textarea"
-            :rows="3"
-          />
-        </el-form-item>
-        <el-form-item :label="t('scholarship.confidentialTerms')">
-          <el-input
-            v-model="internalForm.confidentialTerms"
-            type="textarea"
-            :rows="2"
-          />
-        </el-form-item>
-        <el-form-item :label="t('scholarship.commissionModelJson')">
-          <el-input
-            v-model="internalForm.commissionModelJson"
-            type="textarea"
-            :rows="2"
-            placeholder="{&quot;rate&quot;:0.15}"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="internalOpen = false">
-          {{ t('common.cancel') }}
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="savingInternal"
-          @click="saveInternal"
-        >
-          {{ t('common.save') }}
-        </el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import { ArrowLeft, Edit } from '@element-plus/icons-vue'
-import {
-  getScholarship, getScholarshipInternal, putScholarshipInternal,
-  type Scholarship, type ScholarshipInternal,
-} from '@/api/scholarship'
-import { listPrograms } from '@/api/program'
+import { getScholarship, type Scholarship } from '@/api/scholarship'
 import { useUserStore } from '@/stores/user'
 import PageHeader from '@/components/PageHeader.vue'
-import DescriptionList from '@/components/ui/DescriptionList.vue'
-import FormSection from '@/components/ui/FormSection.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import ScholarshipDrawer from './ScholarshipDrawer.vue'
-import { assetUrl } from '@/utils/asset'
+import OverviewSections from './detail/OverviewSections.vue'
+import CostSections from './detail/CostSections.vue'
+import ConditionsSections from './detail/ConditionsSections.vue'
+import InternalPanel from './detail/InternalPanel.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -413,87 +84,15 @@ const id = computed(() => String(route.params.id))
 const loading = ref(true)
 const error = ref<string | null>(null)
 const s = ref<Scholarship | null>(null)
-const internal = ref<ScholarshipInternal | null>(null)
 const drawerOpen = ref(false)
-const internalOpen = ref(false)
-
-const heroSrc = computed(() => assetUrl(s.value?.view.heroUrl ?? s.value?.view.heroImageUrl))
-const coverSrc = computed(() => assetUrl(s.value?.view.coverUrl ?? s.value?.view.coverImageUrl))
-const savingInternal = ref(false)
-const internalForm = reactive({
-  universityId: null as number | null, programId: null as number | null, internalStatus: '',
-  operationalNotes: '', confidentialTerms: '', commissionModelJson: '',
-})
-// programmes of the linked university, for the confidential programme picker
-const programOptions = ref<{ id: number, name: string }[]>([])
-async function loadProgramOptions(universityId: number | null) {
-  if (!universityId) { programOptions.value = []; return }
-  try {
-    const res = await listPrograms({ universityId, page: 0, size: 200 })
-    programOptions.value = res.content.map(p => ({ id: p.id, name: p.name }))
-  }
-  catch { programOptions.value = [] }
-}
-function onInternalUniversityChange() {
-  internalForm.programId = null
-  loadProgramOptions(internalForm.universityId)
-}
-const linkedProgramLabel = computed(() => {
-  if (!internal.value?.programId) return ''
-  const hit = programOptions.value.find(p => p.id === internal.value?.programId)
-  return hit ? hit.name : `#${internal.value.programId}`
-})
-
-const eligibilityItems = computed(() => {
-  const e = s.value?.view.eligibility
-  if (!e) return []
-  const items: { label: string, value: string | number }[] = []
-  if (e.ageMin != null || e.ageMax != null) items.push({ label: t('scholarship.age'), value: `${e.ageMin ?? ''} to ${e.ageMax ?? ''}`.trim() })
-  items.push({ label: t('scholarship.nationality'), value: nationalityText(e) })
-  if (e.inChina != null) items.push({ label: t('scholarship.inChina'), value: e.inChina ? t('common.yes') : t('common.no') })
-  if (e.gpaMin != null) items.push({ label: 'GPA', value: `≥ ${e.gpaMin}` })
-  if (e.ieltsMin != null) items.push({ label: 'IELTS', value: `≥ ${e.ieltsMin}` })
-  if (e.toeflMin != null) items.push({ label: 'TOEFL', value: `≥ ${e.toeflMin}` })
-  if (e.hskMin != null) items.push({ label: 'HSK', value: `≥ ${e.hskMin}` })
-  return items
-})
-function nationalityText(e: NonNullable<Scholarship['view']['eligibility']>) {
-  if (e.nationalityScope === 'INCLUDE') return `${t('scholarship.scope.INCLUDE')}: ${e.acceptedCountries || ''}`
-  if (e.nationalityScope === 'EXCLUDE') return `${t('scholarship.scope.EXCLUDE')}: ${e.acceptedCountries || ''}`
-  return t('scholarship.scope.ANY')
-}
-
-function dual(rmb: number | null | undefined, usd: number | null | undefined): string {
-  if (rmb == null && usd == null) return ''
-  return `¥${(rmb ?? 0).toLocaleString('en')} · $${(usd ?? 0).toLocaleString('en')}`
-}
-const feeRows = computed(() => {
-  const v = s.value?.view
-  if (!v) return []
-  const rows = v.fees.map(f => ({ label: t(`scholarship.fee.${f.kind}`), amount: dual(f.amountRmb, f.amountUsd) }))
-  if (v.applicationFee) rows.unshift({ label: t('scholarship.fee.APPLICATION'), amount: dual(v.applicationFee.amountRmb, v.applicationFee.amountUsd) })
-  if (v.serviceFee) rows.push({ label: t('scholarship.fee.NADOUMI_SERVICE'), amount: dual(v.serviceFee.amountRmb, v.serviceFee.amountUsd) })
-  return rows
-})
-const prose = computed(() => {
-  const v = s.value?.view
-  if (!v) return []
-  return [
-    { label: t('scholarship.benefits'), value: v.benefits },
-    { label: t('scholarship.requirements'), value: v.requirements },
-    { label: t('scholarship.policy'), value: v.policy },
-  ].filter(p => p.value) as { label: string, value: string }[]
-})
+const internalPanel = ref<InstanceType<typeof InternalPanel>>()
 
 async function load() {
   loading.value = true
   error.value = null
   try {
     s.value = await getScholarship(id.value)
-    if (userStore.hasPerm('nad:scholarship:internal:view')) {
-      internal.value = await getScholarshipInternal(id.value).catch(() => null)
-      if (internal.value?.programId) await loadProgramOptions(internal.value.universityId ?? null)
-    }
+    await internalPanel.value?.reload()
   }
   catch (e) {
     error.value = (e as Error)?.message || t('state.errorTitle')
@@ -504,45 +103,9 @@ async function load() {
 }
 function onSaved() { load() }
 
-watch(internalOpen, (open) => {
-  if (!open) return
-  internalForm.universityId = internal.value?.universityId ?? null
-  internalForm.programId = internal.value?.programId ?? null
-  internalForm.internalStatus = internal.value?.internalStatus ?? ''
-  internalForm.operationalNotes = internal.value?.operationalNotes ?? ''
-  internalForm.confidentialTerms = internal.value?.confidentialTerms ?? ''
-  internalForm.commissionModelJson = internal.value?.commissionModelJson ?? ''
-  loadProgramOptions(internalForm.universityId)
-})
-async function saveInternal() {
-  savingInternal.value = true
-  try {
-    internal.value = await putScholarshipInternal(id.value, {
-      universityId: internalForm.universityId,
-      programId: internalForm.universityId ? internalForm.programId : null,
-      internalStatus: internalForm.internalStatus || null,
-      operationalNotes: internalForm.operationalNotes || null,
-      confidentialTerms: internalForm.confidentialTerms || null,
-      commissionModelJson: internalForm.commissionModelJson || null,
-    })
-    ElMessage.success(t('common.saved'))
-    internalOpen.value = false
-  }
-  finally {
-    savingInternal.value = false
-  }
-}
-
 onMounted(load)
 </script>
 
 <style scoped>
 .back { display: inline-flex; align-items: center; gap: 4px; margin-bottom: 12px; background: none; border: 0; cursor: pointer; color: var(--nad-ink-soft); font-size: 13px; }
-.prose { margin: 8px 0 0; white-space: pre-line; line-height: 1.6; color: var(--nad-ink-soft); }
-.list { margin: 4px 0 0; padding-left: 18px; line-height: 1.9; }
-.muted { color: var(--nad-ink-faint); }
-.imgs { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
-.imgs figure { margin: 0; }
-.imgs img { width: 280px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--nad-border, #e5e7eb); }
-.imgs figcaption { margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft); }
 </style>

@@ -1,0 +1,12 @@
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.row > * { flex: 1; min-width: 140px; }
+.row > .w-28 { flex: 0 0 7rem; min-width: 7rem; }
+.row > .w-24 { flex: 0 0 6rem; min-width: 6rem; }
+.imgs { display: flex; gap: 24px; flex-wrap: wrap; }
+.line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+.usd { font-size: 12px; color: var(--nad-ink-soft); font-variant-numeric: tabular-nums; min-width: 4rem; }
+.line > .w-20 { flex: 0 0 5rem; }
+.line > .w-44 { flex: 0 0 11rem; }
+.line > .w-52 { flex: 0 0 13rem; }
+.line > .w-56 { flex: 0 0 14rem; }
+.hint { margin: 2px 0 8px; font-size: 12px; color: var(--nad-ink-soft); }

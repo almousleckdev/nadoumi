@@ -16,7 +16,6 @@ import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.hr.domain.Task;
 import com.nadoumi.hr.domain.TaskEvent;
-import com.nadoumi.hr.mapper.HrAudienceMapper;
 import com.nadoumi.hr.mapper.TaskEventMapper;
 import com.nadoumi.hr.mapper.TaskMapper;
 import com.nadoumi.hr.web.request.TaskRequest;
@@ -31,14 +30,12 @@ class TaskServiceTest {
 
     private final TaskMapper taskMapper = mock(TaskMapper.class);
     private final TaskEventMapper eventMapper = mock(TaskEventMapper.class);
-    private final HrAudienceMapper audienceMapper = mock(HrAudienceMapper.class);
     private final OutboxWriter outbox = mock(OutboxWriter.class);
-    private final TaskService service = new TaskService(taskMapper, eventMapper, audienceMapper, outbox);
+    private final TaskService service = new TaskService(taskMapper, eventMapper, new TaskEventRecorder(eventMapper, outbox));
 
     TaskServiceTest() {
         doAnswer(inv -> { inv.getArgument(0, Task.class).setId(50L); return null; })
                 .when(taskMapper).insert(any(Task.class));
-        when(audienceMapper.findStaffUserIdsWithPermission(anyString())).thenReturn(List.of(9L));
         when(eventMapper.findByTask(anyLong())).thenReturn(List.of());
     }
 

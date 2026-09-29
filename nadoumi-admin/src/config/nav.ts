@@ -58,6 +58,7 @@ export const NAV: NavGroup[] = [
     items: [
       { key: 'employees', path: '/employees', icon: 'UserFilled', perm: 'nad:employee:list', status: 'implemented' },
       { key: 'tasks', path: '/tasks', icon: 'Tickets', perm: 'nad:task:list', status: 'implemented' },
+      { key: 'students', path: '/students', icon: 'User', perm: 'system:user:list', status: 'implemented' },
       { key: 'roles', path: '/roles', icon: 'Lock', perm: 'system:role:list', status: 'implemented' },
       { key: 'departments', path: '/departments', icon: 'OfficeBuilding', perm: 'system:dept:list', status: 'implemented' },
       { key: 'posts', path: '/posts', icon: 'Postcard', perm: 'system:post:list', status: 'implemented' },

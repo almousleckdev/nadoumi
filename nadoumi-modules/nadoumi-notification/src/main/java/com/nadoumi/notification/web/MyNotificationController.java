@@ -30,9 +30,10 @@ public class MyNotificationController {
     @GetMapping
     public PageResponse<NotificationView> list(
             @RequestParam(defaultValue = "false") boolean unreadOnly,
+            @RequestParam(required = false) String type,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return service.listForRecipient(SecurityUtils.getUserId(), unreadOnly, page, size);
+        return service.listForRecipient(SecurityUtils.getUserId(), unreadOnly, type, page, size);
     }
 
     @GetMapping("/unread-count")

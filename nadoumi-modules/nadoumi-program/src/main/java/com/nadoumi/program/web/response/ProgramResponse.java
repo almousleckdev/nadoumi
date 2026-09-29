@@ -1,5 +1,6 @@
 package com.nadoumi.program.web.response;
 
+import com.nadoumi.common.text.Texts;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.ProgramIntake;
 import com.nadoumi.program.domain.ProgramMajor;
@@ -72,12 +73,8 @@ public record ProgramResponse(
                 p.getSummary(), p.getImageMediaId(), imageUrl, p.isFeatured(), p.isHot(),
                 p.getStatus() == null ? null : p.getStatus().name(),
                 p.getPublishStatus() == null ? null : p.getPublishStatus().name(),
-                p.getRemark(), str(p.getCreateTime()), str(p.getUpdateTime()),
+                p.getRemark(), Texts.stringOrNull(p.getCreateTime()), Texts.stringOrNull(p.getUpdateTime()),
                 p.getMajors().stream().map(Major::of).toList(),
                 p.getIntakes().stream().map(Intake::of).toList());
-    }
-
-    private static String str(Object v) {
-        return v == null ? null : v.toString();
     }
 }

@@ -28,7 +28,7 @@ class UniversityServiceTest {
     private final UniversityMapper mapper = mock(UniversityMapper.class);
     private final MediaGateway media = mock(MediaGateway.class);
     private final com.nadoumi.common.outbox.OutboxWriter outbox = mock(com.nadoumi.common.outbox.OutboxWriter.class);
-    private final UniversityService service = new UniversityService(mapper, media, outbox);
+    private final UniversityService service = new UniversityService(mapper, media, outbox, new UniversityChildrenWriter(mapper, media));
 
     private static UniversityRequest req(String name, String country,
             List<UniversityRequest.RankingInput> rankings,

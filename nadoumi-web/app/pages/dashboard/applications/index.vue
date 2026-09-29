@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { StudentApplicationDto } from '~/types/catalog'
+import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
@@ -7,8 +8,7 @@ const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { list } = useApplications()
 
-const dtf = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }))
-const formatDate = (iso: string) => dtf.value.format(new Date(iso))
+const formatDate = (iso: string) => formatTimestamp(iso, locale.value)
 
 const items = ref<StudentApplicationDto[]>([])
 const pending = ref(true)

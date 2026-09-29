@@ -21,8 +21,8 @@ const pickError = ref('')
 const EMOJIS = ['👍', '😂', '🔥', '❤️', '👏', '🎉', '😊', '🙌', '👀', '🤔', '✅', '🙏', '💯', '✨']
 const showEmoji = ref(false)
 
-const uploading = computed(() => pending.value.some(p => p.uploading))
-const readyAttachmentIds = computed(() => pending.value.filter(p => p.mediaId !== null).map(p => p.mediaId!))
+const uploading = computed(() => pending.value.some((p: PendingAttachment) => p.uploading))
+const readyAttachmentIds = computed(() => pending.value.filter((p: PendingAttachment) => p.mediaId !== null).map((p: PendingAttachment) => p.mediaId!))
 const canSend = computed(() =>
   !props.busy && !props.disabled && !uploading.value
   && (draft.value.trim().length > 0 || readyAttachmentIds.value.length > 0))
@@ -61,7 +61,7 @@ function onPick(event: Event) {
 }
 
 function removePending(key: string) {
-  pending.value = pending.value.filter(p => p.key !== key)
+  pending.value = pending.value.filter((p: PendingAttachment) => p.key !== key)
 }
 
 function submit() {

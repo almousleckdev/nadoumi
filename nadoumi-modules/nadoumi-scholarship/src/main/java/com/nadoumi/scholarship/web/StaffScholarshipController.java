@@ -7,6 +7,7 @@ import com.nadoumi.scholarship.domain.enums.PublishStatus;
 import com.nadoumi.scholarship.domain.enums.ScholarshipStatus;
 import com.nadoumi.scholarship.mapper.ScholarshipSearch;
 import com.nadoumi.scholarship.service.ScholarshipAdminService;
+import com.nadoumi.scholarship.service.ScholarshipInternalService;
 import com.nadoumi.scholarship.web.request.ScholarshipInternalRequest;
 import com.nadoumi.scholarship.web.request.ScholarshipRequest;
 import com.nadoumi.scholarship.web.response.ScholarshipInternalResponse;
@@ -39,9 +40,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class StaffScholarshipController {
 
     private final ScholarshipAdminService service;
+    private final ScholarshipInternalService internalService;
 
-    public StaffScholarshipController(ScholarshipAdminService service) {
+    public StaffScholarshipController(ScholarshipAdminService service, ScholarshipInternalService internalService) {
         this.service = service;
+        this.internalService = internalService;
     }
 
     @GetMapping
@@ -109,7 +112,7 @@ public class StaffScholarshipController {
     @GetMapping("/{id}/internal")
     @PreAuthorize("@ss.hasPermi('nad:scholarship:internal:view')")
     public ScholarshipInternalResponse getInternal(@PathVariable Long id) {
-        return service.getInternal(id);
+        return internalService.get(id);
     }
 
     @PutMapping("/{id}/internal")
@@ -117,6 +120,6 @@ public class StaffScholarshipController {
     @Log(title = "Scholarship linkage", businessType = BusinessType.UPDATE)
     public ScholarshipInternalResponse putInternal(@PathVariable Long id,
             @Valid @RequestBody ScholarshipInternalRequest req) {
-        return service.putInternal(id, req);
+        return internalService.put(id, req);
     }
 }

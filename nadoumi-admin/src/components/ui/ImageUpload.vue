@@ -147,27 +147,27 @@ function hasPending(): boolean {
 }
 
 /**
- * Send a deferred file now that the parent record exists. Errors are surfaced as
- * a toast but never rejected — the record is already saved, the image is a
- * secondary concern the user can retry from the edit view.
+ * Send a deferred file now that the parent record exists. Resolves true when
+ * there was nothing to send or the upload landed, false when it failed, so the
+ * parent can report it instead of claiming success.
  */
-async function flush(id: number | string): Promise<void> {
-  if (!pendingRaw.value) return
+async function flush(id: number | string): Promise<boolean> {
+  if (!pendingRaw.value) return true
   const target = props.resolveAction ? props.resolveAction(id) : props.action
   const fd = new FormData()
   fd.append('file', pendingRaw.value)
   try {
     const res = await request.post<UploadResult>(target, fd)
     const body = res.data
-    if (typeof body?.mediaId === 'number') {
-      freshUrl.value = body.url ?? null
-      emit('update:modelValue', body.mediaId)
-    }
+    if (typeof body?.mediaId !== 'number') return false
+    freshUrl.value = body.url ?? null
+    emit('update:modelValue', body.mediaId)
     revokePending()
     pendingRaw.value = null
+    return true
   }
   catch {
-    // request.ts already toasts the problem+json detail
+    return false
   }
 }
 

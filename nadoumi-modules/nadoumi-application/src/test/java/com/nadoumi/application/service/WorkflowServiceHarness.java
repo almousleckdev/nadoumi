@@ -50,9 +50,15 @@ class WorkflowServiceHarness {
 
     final GuardEvaluator guards = new GuardEvaluator(taskMapper, decisionMapper, Optional.empty(), Optional.empty());
 
+    final WorkflowDefinitionService definitions = new WorkflowDefinitionService(definitionMapper, guards);
+    final ApplicationSnapshotWriter snapshots =
+            new ApplicationSnapshotWriter(snapshotMapper, applicationMapper, applicantService);
+    final ApplicationOutboxEmitter emitter = new ApplicationOutboxEmitter(
+            outboxWriter, accessService, programService, scholarshipAdminService);
+
     final WorkflowService service = new WorkflowService(definitionMapper, applicationMapper, instanceMapper,
-            taskMapper, historyMapper, eventMapper, decisionMapper, snapshotMapper, guards, outboxWriter,
-            programService, scholarshipAdminService, applicantService, accessService);
+            taskMapper, historyMapper, eventMapper, decisionMapper, guards, programService,
+            scholarshipAdminService, definitions, snapshots, emitter);
 
     /** Everything defaults to "there is nothing to materialise / notify" so a test only stubs what it asserts on. */
     void stubQuietDefaults() {
