@@ -245,17 +245,34 @@ public class UniversityService {
         if (req.gallery() != null) {
             int order = 0;
             for (UniversityRequest.GalleryInput in : req.gallery()) {
-                // The admin form can submit trailing rows the user added but never
-                // filled — skip anything without a usable image URL.
-                if (in.imageUrl() == null || in.imageUrl().isBlank()) {
+                String url = galleryImageUrl(in);
+                if (url == null) {
                     continue;
                 }
                 mapper.insertGalleryImage(universityId,
-                        new UniversityGalleryImage(null, in.imageUrl().trim(), in.mediaId(),
-                                blankToNull(in.caption())),
+                        new UniversityGalleryImage(null, url, in.mediaId(), blankToNull(in.caption())),
                         order++);
             }
         }
+    }
+
+    /**
+     * The admin form sends uploaded rows as {@code mediaId} only, while
+     * {@code image_url} is NOT NULL, so the URL is resolved from the media asset.
+     * Returns null for the trailing empty rows the form can submit (no URL, no media).
+     */
+    private String galleryImageUrl(UniversityRequest.GalleryInput in) {
+        if (in.imageUrl() != null && !in.imageUrl().isBlank()) {
+            return in.imageUrl().trim();
+        }
+        if (in.mediaId() == null) {
+            return null;
+        }
+        String resolved = resolveUrl(in.mediaId(), null);
+        if (resolved == null) {
+            throw new NadBadRequestException("gallery image " + in.mediaId() + " is not available");
+        }
+        return resolved;
     }
 
     private String uniqueSlug(String name, Long selfId) {

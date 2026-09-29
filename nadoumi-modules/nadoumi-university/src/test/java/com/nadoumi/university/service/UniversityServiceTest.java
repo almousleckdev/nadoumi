@@ -214,6 +214,44 @@ class UniversityServiceTest {
     }
 
     @Test
+    void shouldPersistGalleryRowsAndResolveUrl_whenRequestCarriesOnlyMediaIds() {
+        University existing = new University();
+        existing.setId(8L);
+        when(mapper.findById(8L)).thenReturn(existing);
+        when(mapper.findIdByNameAndCountry("Zhejiang University", "CN")).thenReturn(8L);
+        when(media.publicUrl(71L)).thenReturn("https://res.cloudinary.com/x/71.jpg");
+        when(media.publicUrl(73L)).thenReturn("https://res.cloudinary.com/x/73.jpg");
+
+        // The admin form sends uploaded rows as {mediaId, caption} with no imageUrl.
+        List<UniversityRequest.GalleryInput> gallery = List.of(
+                new UniversityRequest.GalleryInput(null, 71L, null),
+                new UniversityRequest.GalleryInput(null, 73L, "Library"));
+
+        service.update(8L, reqWithGallery("Zhejiang University", "CN", gallery));
+
+        var saved = org.mockito.ArgumentCaptor.forClass(com.nadoumi.university.domain.UniversityGalleryImage.class);
+        verify(mapper, org.mockito.Mockito.times(2))
+                .insertGalleryImage(any(), saved.capture(), org.mockito.ArgumentMatchers.anyInt());
+        assertThat(saved.getAllValues()).extracting(g -> g.mediaId()).containsExactly(71L, 73L);
+        assertThat(saved.getAllValues()).extracting(g -> g.imageUrl())
+                .containsExactly("https://res.cloudinary.com/x/71.jpg", "https://res.cloudinary.com/x/73.jpg");
+    }
+
+    @Test
+    void shouldRejectRequest_whenGalleryMediaCannotBeResolved() {
+        University existing = new University();
+        existing.setId(8L);
+        when(mapper.findById(8L)).thenReturn(existing);
+        when(mapper.findIdByNameAndCountry("Zhejiang University", "CN")).thenReturn(8L);
+        when(media.publicUrl(99L)).thenThrow(new IllegalStateException("not public"));
+
+        List<UniversityRequest.GalleryInput> gallery = List.of(new UniversityRequest.GalleryInput(null, 99L, null));
+
+        assertThatThrownBy(() -> service.update(8L, reqWithGallery("Zhejiang University", "CN", gallery)))
+                .isInstanceOf(NadBadRequestException.class);
+    }
+
+    @Test
     void uploadLogoStoresMediaIdAndReturnsUrl() {
         University row = new University();
         row.setId(4L);

@@ -65,9 +65,10 @@ public record UniversityRequest(
 
     /**
      * A gallery row. {@code imageUrl} is optional at the bean-validation layer on
-     * purpose: the admin form can submit trailing empty rows the user added but
-     * never filled. {@code UniversityService#replaceChildren} drops any row whose
-     * {@code imageUrl} is blank, so only real images are persisted.
+     * purpose: uploaded rows carry only a {@code mediaId} (the service resolves the
+     * URL from the media asset), and the admin form can submit trailing empty rows.
+     * {@code UniversityService#replaceChildren} drops rows with neither, so only
+     * real images are persisted.
      */
     public record GalleryInput(
             @Size(max = 500) String imageUrl,
