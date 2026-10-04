@@ -10,8 +10,11 @@ import com.nadoumi.notification.mapper.NotificationAudienceMapper;
 import com.nadoumi.notification.render.NotificationRenderer;
 import com.nadoumi.notification.service.NotificationRequest;
 import com.nadoumi.notification.service.NotificationService;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +25,8 @@ import org.slf4j.LoggerFactory;
  *
  * <p>Strict scope isolation: {@link NotificationScope#TARGETED} notifications
  * MUST have explicit recipient(s) and NEVER broadcast. Only {@link NotificationScope#GLOBAL}
- * public catalog announcements reach every active student.</p>
+ * public catalog announcements reach staff and students, and {@link NotificationScope#STUDENTS}
+ * announcements (news) reach active students only.</p>
  */
 public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 
@@ -63,18 +67,20 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             if (type.scope() == NotificationScope.TARGETED) {
                 // If it's a contact inquiry or ticket opened without explicit assignees, resolve authorized staff
                 if (type == NotificationType.CONTACT_INQUIRY_RECEIVED || type == NotificationType.TICKET_OPENED) {
-                    recipients = new java.util.ArrayList<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
+                    recipients = new ArrayList<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
                 } else {
                     log.warn("outbox event id={} type={} is TARGETED but has no recipient user ID — skipped to prevent leakage",
                             event.getId(), type);
                     return;
                 }
+            } else if (type.scope() == NotificationScope.STUDENTS) {
+                recipients = audienceMapper.findActiveStudentUserIds();
             } else {
                 // GLOBAL catalog announcement: staff holding catalog permission + active registered students
-                java.util.LinkedHashSet<Long> set =
-                        new java.util.LinkedHashSet<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
+                LinkedHashSet<Long> set =
+                        new LinkedHashSet<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
                 set.addAll(audienceMapper.findActiveStudentUserIds());
-                recipients = new java.util.ArrayList<>(set);
+                recipients = new ArrayList<>(set);
             }
         }
         if (recipients.isEmpty()) {
@@ -90,7 +96,7 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
         Long conversationId = longFromPayload(context, "conversationId");
         Long messageId = longFromPayload(context, "messageId");
 
-        List<NotificationRequest> batch = new java.util.ArrayList<>(recipients.size());
+        List<NotificationRequest> batch = new ArrayList<>(recipients.size());
         for (Long userId : recipients) {
             batch.add(NotificationRequest.fromEvent(userId, type, type.defaultTitle(), body,
                     "outbox:" + event.getId() + ":" + userId, applicationId, conversationId, messageId,
@@ -106,6 +112,7 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             case OutboxEventTypes.SCHOLARSHIP_DEADLINE_REMINDER -> NotificationType.SCHOLARSHIP_DEADLINE_REMINDER;
             case OutboxEventTypes.UNIVERSITY_PUBLISHED -> NotificationType.UNIVERSITY_PUBLISHED;
             case OutboxEventTypes.PROGRAM_PUBLISHED -> NotificationType.PROGRAM_PUBLISHED;
+            case OutboxEventTypes.ARTICLE_PUBLISHED -> NotificationType.ARTICLE_PUBLISHED;
             case OutboxEventTypes.TASK_PROGRESS_CHANGED -> NotificationType.TASK_PROGRESS;
             case OutboxEventTypes.APPLICATION_SUBMITTED -> NotificationType.APPLICATION_SUBMITTED;
             case OutboxEventTypes.APPLICATION_STATUS_CHANGED -> NotificationType.APPLICATION_STATUS_CHANGED;
@@ -146,7 +153,7 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
         Object raw = context.get("recipientUserIds");
         if (raw instanceof List<?> list) {
             List<Long> result = list.stream()
-                    .filter(java.util.Objects::nonNull)
+                    .filter(Objects::nonNull)
                     .map(v -> Long.parseLong(String.valueOf(v)))
                     .distinct()
                     .toList();

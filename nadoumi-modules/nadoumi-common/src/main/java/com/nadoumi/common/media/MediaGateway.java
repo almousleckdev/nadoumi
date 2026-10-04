@@ -1,6 +1,8 @@
 package com.nadoumi.common.media;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.Optional;
 
 /**
@@ -31,6 +33,30 @@ public interface MediaGateway {
                              MediaAccessClass accessClassOrNull,
                              MediaOwnerRef owner,
                              long uploadedBy);
+
+    /** Opens the upload's bytes; lets a caller pass {@code multipartFile::getInputStream} without handling {@link IOException}. */
+    @FunctionalInterface
+    interface UploadSource {
+        InputStream open() throws IOException;
+    }
+
+    /** As {@link #upload(InputStream, String, String, long, MediaCategory, MediaAccessClass, MediaOwnerRef, long)}, opening the source here. */
+    default MediaUploadResult upload(UploadSource source,
+                                     String originalFilename,
+                                     String declaredContentType,
+                                     long byteSize,
+                                     MediaCategory category,
+                                     MediaAccessClass accessClassOrNull,
+                                     MediaOwnerRef owner,
+                                     long uploadedBy) {
+        try {
+            return upload(source.open(), originalFilename, declaredContentType, byteSize, category,
+                    accessClassOrNull, owner, uploadedBy);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("failed to read upload", e);
+        }
+    }
 
     Optional<StoredAsset> find(long assetId);
 

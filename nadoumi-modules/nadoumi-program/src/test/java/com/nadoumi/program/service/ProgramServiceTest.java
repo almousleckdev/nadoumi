@@ -179,7 +179,7 @@ class ProgramServiceTest {
     @Test
     void uploadImageStoresMediaId() {
         when(mapper.findById(4L)).thenReturn(newProgram(4L, 1L));
-        when(media.upload(any(), any(), any(), org.mockito.ArgumentMatchers.anyLong(), any(), any(), any(),
+        when(media.upload(any(MediaGateway.UploadSource.class), any(), any(), org.mockito.ArgumentMatchers.anyLong(), any(), any(), any(),
                 org.mockito.ArgumentMatchers.anyLong()))
                 .thenReturn(new MediaUploadResult(88L, "https://res.cloudinary.com/x/p.png"));
 

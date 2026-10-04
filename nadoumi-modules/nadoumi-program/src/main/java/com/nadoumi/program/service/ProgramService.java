@@ -1,7 +1,10 @@
 package com.nadoumi.program.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
@@ -14,8 +17,6 @@ import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
-import com.nadoumi.common.exception.NadBadRequestException;
-import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.money.FxRates;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.enums.ProgramStatus;
@@ -29,12 +30,11 @@ import com.nadoumi.program.web.response.ProgramResponse;
 import com.nadoumi.program.web.response.PublicProgramResponse;
 import com.nadoumi.university.service.UniversityService;
 import com.ruoyi.common.utils.AuditActor;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -126,7 +126,7 @@ public class ProgramService {
 
     /** Announce a newly public programme to staff + registered students (safe scalars only). */
     private void emitPublished(Program p, String universityName) {
-        com.alibaba.fastjson2.JSONObject payload = new com.alibaba.fastjson2.JSONObject();
+        JSONObject payload = new JSONObject();
         payload.put("programId", p.getId());
         payload.put("programName", p.getName());
         payload.put("programSlug", p.getSlug() == null ? "" : p.getSlug());
@@ -147,15 +147,9 @@ public class ProgramService {
     @Transactional(rollbackFor = Exception.class)
     public MediaUploadResult uploadImage(long id, MultipartFile file) {
         load(id);
-        MediaUploadResult result;
-        try {
-            result = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+        MediaUploadResult result = media.upload(file::getInputStream, file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), MediaCategory.PROGRAM_IMAGE, null,
                     new MediaOwnerRef(MediaOwnerKind.PROGRAM, id), AuditActor.userId());
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload", e);
-        }
         mapper.updateImageMediaId(id, result.mediaId());
         return result;
     }
@@ -332,7 +326,7 @@ public class ProgramService {
         p.setRemark(Texts.blankToNull(req.remark()));
     }
 
-    private static final java.util.Set<String> TERM_LENGTHS = java.util.Set.of("ONE_SEMESTER", "ONE_YEAR");
+    private static final Set<String> TERM_LENGTHS = Set.of("ONE_SEMESTER", "ONE_YEAR");
 
     private static String normalizeTermLength(String raw) {
         if (raw == null || raw.isBlank()) {

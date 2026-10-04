@@ -278,6 +278,11 @@
             </dependency>
             <dependency>
                 <groupId>com.nadoumi</groupId>
+                <artifactId>nadoumi-content</artifactId>
+                <version>${ruoyi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nadoumi</groupId>
                 <artifactId>nadoumi-hr</artifactId>
                 <version>${ruoyi.version}</version>
             </dependency>

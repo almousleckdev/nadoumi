@@ -9,15 +9,19 @@ import com.nadoumi.communication.service.ConversationService;
 import com.nadoumi.communication.web.request.PostMessageRequest;
 import com.nadoumi.communication.web.response.MessageResponse;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.support.domain.SupportTicket;
 import com.nadoumi.support.domain.SupportMeeting;
-import com.nadoumi.support.mapper.SupportMeetingMapper;
+import com.nadoumi.support.domain.SupportTicket;
+import com.nadoumi.support.domain.enums.MeetingStatus;
 import com.nadoumi.support.domain.enums.TicketStatus;
+import com.nadoumi.support.mapper.SupportMeetingMapper;
 import com.nadoumi.support.mapper.SupportTicketMapper;
+import com.nadoumi.support.web.request.BookMeetingRequest;
 import com.nadoumi.support.web.request.CreateTicketRequest;
 import com.nadoumi.support.web.response.StudentTicketDetail;
 import com.nadoumi.support.web.response.StudentTicketSummary;
+import com.ruoyi.common.utils.AuditActor;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import org.springframework.stereotype.Service;
@@ -88,7 +92,7 @@ public class SupportTicketService {
     public StudentTicketDetail get(long id) {
         SupportTicket ticket = findOwned(id);
         return new StudentTicketDetail(StudentTicketSummary.from(ticket), ticket.getConversationId(),
-                conversations.listMessages(ticket.getConversationId(), 0).stream().sorted(java.util.Comparator.comparing(MessageResponse::createdAt)).toList());
+                conversations.listMessages(ticket.getConversationId(), 0).stream().sorted(Comparator.comparing(MessageResponse::createdAt)).toList());
     }
 
     /** Reply on the caller's own ticket. A reply to a ticket waiting on the student moves it back to IN_PROGRESS. */
@@ -116,23 +120,23 @@ public class SupportTicketService {
 
     
     @Transactional(rollbackFor = Exception.class)
-    public SupportMeeting bookMeeting(long ticketId, com.nadoumi.support.web.request.BookMeetingRequest req) {
+    public SupportMeeting bookMeeting(long ticketId, BookMeetingRequest req) {
         SupportTicket ticket = findOwned(ticketId);
         if (ticket.getAssignedStaffId() == null) {
-            throw new com.nadoumi.common.exception.NadBadRequestException("Ticket must be assigned to a staff member before booking a meeting");
+            throw new NadBadRequestException("Ticket must be assigned to a staff member before booking a meeting");
         }
-        if (req.getStartTime().isBefore(java.time.LocalDateTime.now())) {
-            throw new com.nadoumi.common.exception.NadBadRequestException("Cannot book a meeting in the past");
+        if (req.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new NadBadRequestException("Cannot book a meeting in the past");
         }
         
-        java.time.LocalDateTime end = req.getStartTime().plusMinutes(req.getDurationMinutes());
+        LocalDateTime end = req.getStartTime().plusMinutes(req.getDurationMinutes());
         int staffConflicts = meetingMapper.countOverlappingStaffMeetings(ticket.getAssignedStaffId(), req.getStartTime(), end);
         if (staffConflicts > 0) {
-            throw new com.nadoumi.common.exception.NadBadRequestException("The assigned staff member is busy at that time");
+            throw new NadBadRequestException("The assigned staff member is busy at that time");
         }
         int studentConflicts = meetingMapper.countOverlappingStudentMeetings(ticket.getApplicantId(), req.getStartTime(), end);
         if (studentConflicts > 0) {
-            throw new com.nadoumi.common.exception.NadBadRequestException("You already have a meeting scheduled at that time");
+            throw new NadBadRequestException("You already have a meeting scheduled at that time");
         }
         
         SupportMeeting meeting = new SupportMeeting();
@@ -141,11 +145,11 @@ public class SupportTicketService {
         meeting.setStaffId(ticket.getAssignedStaffId());
         meeting.setStartTime(req.getStartTime());
         meeting.setDurationMinutes(req.getDurationMinutes());
-        meeting.setStatus(com.nadoumi.support.domain.enums.MeetingStatus.SCHEDULED);
-        meeting.setCreateBy(com.ruoyi.common.utils.AuditActor.username());
+        meeting.setStatus(MeetingStatus.SCHEDULED);
+        meeting.setCreateBy(AuditActor.username());
         meetingMapper.insert(meeting);
         
-        com.nadoumi.communication.web.request.PostMessageRequest msg = new com.nadoumi.communication.web.request.PostMessageRequest("System: A " + req.getDurationMinutes() + "-minute meeting has been scheduled for " + req.getStartTime() + ".", java.util.List.of());
+        PostMessageRequest msg = new PostMessageRequest("System: A " + req.getDurationMinutes() + "-minute meeting has been scheduled for " + req.getStartTime() + ".", List.of());
         conversations.post(ticket.getConversationId(), msg);
         
         return meeting;

@@ -1,7 +1,10 @@
 package com.nadoumi.university.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
@@ -14,8 +17,6 @@ import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
-import com.nadoumi.common.exception.NadBadRequestException;
-import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.enums.PublishStatus;
@@ -27,9 +28,9 @@ import com.nadoumi.university.web.request.UniversityRequest;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.nadoumi.university.web.response.UniversityResponse;
 import com.ruoyi.common.utils.AuditActor;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -108,7 +109,7 @@ public class UniversityService {
 
     /** Announce a newly public university to staff + registered students (safe scalars only). */
     private void emitPublished(University u) {
-        com.alibaba.fastjson2.JSONObject payload = new com.alibaba.fastjson2.JSONObject();
+        JSONObject payload = new JSONObject();
         payload.put("universityId", u.getId());
         payload.put("universityName", u.getName());
         payload.put("universitySlug", u.getSlug() == null ? "" : u.getSlug());
@@ -156,14 +157,9 @@ public class UniversityService {
     }
 
     private MediaUploadResult uploadFor(long universityId, MultipartFile file, MediaCategory category) {
-        try {
-            return media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+        return media.upload(file::getInputStream, file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), category, null,
                     new MediaOwnerRef(MediaOwnerKind.UNIVERSITY, universityId), AuditActor.userId());
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload", e);
-        }
     }
 
     // ---- public (published + active only) ----
@@ -277,8 +273,8 @@ public class UniversityService {
         u.setRemark(Texts.blankToNull(req.remark()));
     }
 
-    private static final java.util.Set<String> PARTNER_STATUSES =
-            java.util.Set.of("NONE", "PROSPECT", "PARTNER");
+    private static final Set<String> PARTNER_STATUSES =
+            Set.of("NONE", "PROSPECT", "PARTNER");
 
     /** INTERNAL flag: NONE (catalog only) / PROSPECT (talking) / PARTNER (active relationship). */
     private static String normalizePartnerStatus(String raw) {
@@ -296,6 +292,6 @@ public class UniversityService {
 
     private String nextReferenceCode() {
         Integer max = mapper.maxReferenceSeq(REFERENCE_PREFIX);
-        return REFERENCE_PREFIX + String.format(java.util.Locale.ROOT, "%04d", (max == null ? 0 : max) + 1);
+        return REFERENCE_PREFIX + String.format(Locale.ROOT, "%04d", (max == null ? 0 : max) + 1);
     }
 }

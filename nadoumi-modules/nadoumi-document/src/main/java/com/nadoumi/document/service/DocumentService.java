@@ -21,8 +21,6 @@ import com.nadoumi.document.mapper.DocumentEventMapper;
 import com.nadoumi.document.mapper.DocumentMapper;
 import com.nadoumi.document.mapper.DocumentVersionMapper;
 import com.nadoumi.identity.access.CurrentCaller;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,15 +86,9 @@ public class DocumentService {
                 ? MediaCategory.APPLICATION_DOCUMENT
                 : MediaCategory.APPLICANT_DOCUMENT;
         MediaAccessClass override = DocumentTypeAccess.overrideFor(doc.getDocType());
-        MediaUploadResult uploaded;
-        try {
-            uploaded = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+        MediaUploadResult uploaded = media.upload(file::getInputStream, file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), category, override,
                     new MediaOwnerRef(MediaOwnerKind.DOCUMENT, doc.getId()), currentUserId());
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload", e);
-        }
         StoredAsset asset = media.find(uploaded.mediaId())
                 .orElseThrow(() -> new IllegalStateException("uploaded asset " + uploaded.mediaId() + " not found immediately after upload"));
 

@@ -13,6 +13,7 @@ const links = [
   { to: '/scholarships', key: 'nav.scholarships' },
   { to: '/universities', key: 'nav.universities' },
   { to: '/programs', key: 'nav.programs' },
+  { to: '/news', key: 'nav.news' },
   { to: '/about', key: 'nav.about' },
   { to: '/contact', key: 'nav.contact' },
 ]

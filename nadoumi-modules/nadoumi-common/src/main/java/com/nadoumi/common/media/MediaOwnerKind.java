@@ -5,6 +5,7 @@ public enum MediaOwnerKind {
     UNIVERSITY,
     SCHOLARSHIP,
     PROGRAM,
+    ARTICLE,
     APPLICANT,
     APPLICATION,
     DOCUMENT,

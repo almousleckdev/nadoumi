@@ -1,5 +1,6 @@
 package com.nadoumi.hr.domain;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -19,7 +20,7 @@ public enum TaskStatus {
     CLOSED,
     CANCELLED;
 
-    private static final java.util.Map<TaskStatus, Set<TaskStatus>> ALLOWED = java.util.Map.of(
+    private static final Map<TaskStatus, Set<TaskStatus>> ALLOWED = Map.of(
             PENDING, Set.of(IN_PROGRESS, CANCELLED),
             IN_PROGRESS, Set.of(COMPLETED, PENDING, CANCELLED),
             COMPLETED, Set.of(CLOSED, IN_PROGRESS, CANCELLED),

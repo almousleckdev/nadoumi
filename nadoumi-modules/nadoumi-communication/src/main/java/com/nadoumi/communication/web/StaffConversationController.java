@@ -13,6 +13,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,9 +78,9 @@ public class StaffConversationController {
     @PostMapping("/conversations/{id}/attachments")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
-    public java.util.Map<String, Long> uploadAttachment(@PathVariable Long id,
+    public Map<String, Long> uploadAttachment(@PathVariable Long id,
             @org.springframework.web.bind.annotation.RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
-        return java.util.Map.of("mediaId", conversations.uploadAttachment(id, file));
+        return Map.of("mediaId", conversations.uploadAttachment(id, file));
     }
 
     @GetMapping("/conversations/{id}/participants")

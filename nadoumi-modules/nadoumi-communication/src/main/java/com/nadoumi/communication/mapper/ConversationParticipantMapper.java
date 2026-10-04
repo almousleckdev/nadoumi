@@ -1,6 +1,7 @@
 package com.nadoumi.communication.mapper;
 
 import com.nadoumi.communication.domain.ConversationParticipant;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -20,7 +21,7 @@ public interface ConversationParticipantMapper {
     int insert(ConversationParticipant participant);
 
     int remove(@Param("conversationId") long conversationId, @Param("userId") long userId,
-            @Param("removedAt") java.time.LocalDateTime removedAt);
+            @Param("removedAt") LocalDateTime removedAt);
 
     int updateLastRead(@Param("conversationId") long conversationId, @Param("userId") long userId,
             @Param("messageId") long messageId);

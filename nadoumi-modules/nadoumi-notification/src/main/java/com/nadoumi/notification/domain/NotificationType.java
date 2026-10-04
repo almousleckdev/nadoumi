@@ -30,6 +30,9 @@ public enum NotificationType {
     /** A programme was published to the public catalog — informational. */
     PROGRAM_PUBLISHED(false, "Programme published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
 
+    /** A news article was published — students only, informational, preference-controllable. */
+    ARTICLE_PUBLISHED(false, "New article", Set.of(NotificationChannelKind.EMAIL), NotificationScope.STUDENTS),
+
     /** A task changed status or assignment — the creator, assignee and admins are told. */
     TASK_PROGRESS(true, "Task update", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 

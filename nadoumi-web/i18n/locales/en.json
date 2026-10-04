@@ -4,6 +4,7 @@
     "scholarships": "Scholarships",
     "universities": "Universities",
     "programs": "Programs",
+    "news": "News",
     "about": "About",
     "contact": "Contact",
     "signIn": "Sign in",
@@ -2246,5 +2247,34 @@
       "Ningbo": "Ningbo",
       "Fuzhou": "Fuzhou"
     }
+  },
+  "news": {
+    "title": "News",
+    "subtitle": "Stories, guides and updates from Nadoumi.",
+    "searchLabel": "Search news",
+    "searchPlaceholder": "Search articles",
+    "emptyTitle": "No articles yet",
+    "emptyBody": "Check back soon for stories and updates.",
+    "readTime": "{n} min read",
+    "by": "By {name}",
+    "comments": "Comments",
+    "count": "1 comment | {n} comments",
+    "noComments": "No comments yet. Start the conversation.",
+    "placeholder": "Share your thoughts",
+    "replyPlaceholder": "Write a reply",
+    "post": "Post comment",
+    "posting": "Posting…",
+    "reply": "Reply",
+    "cancel": "Cancel",
+    "signIn": "Sign in",
+    "signInPrompt": "Sign in to join the discussion.",
+    "deleted": "This comment was deleted.",
+    "postError": "We could not post your comment. Please try again.",
+    "notFoundTitle": "Article not found",
+    "notFoundBody": "This article may have been unpublished or moved.",
+    "back": "Back to news",
+    "replyingTo": "Replying to {name}",
+    "hideReplies": "Hide replies",
+    "showReplies": "Show replies"
   }
 }

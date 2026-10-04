@@ -4,6 +4,7 @@
     "scholarships": "奖学金",
     "universities": "院校",
     "programs": "专业项目",
+    "news": "新闻",
     "about": "关于我们",
     "contact": "联系我们",
     "signIn": "登录",
@@ -2246,5 +2247,34 @@
       "Ningbo": "宁波",
       "Fuzhou": "福州"
     }
+  },
+  "news": {
+    "title": "新闻",
+    "subtitle": "来自 Nadoumi 的故事、指南和最新动态。",
+    "searchLabel": "搜索新闻",
+    "searchPlaceholder": "搜索文章",
+    "emptyTitle": "暂无文章",
+    "emptyBody": "请稍后再来查看故事和动态。",
+    "readTime": "阅读约 {n} 分钟",
+    "by": "作者:{name}",
+    "comments": "评论",
+    "count": "{n} 条评论",
+    "noComments": "暂无评论,来发表第一条吧。",
+    "placeholder": "分享你的想法",
+    "replyPlaceholder": "写下回复",
+    "post": "发表评论",
+    "posting": "发布中…",
+    "reply": "回复",
+    "cancel": "取消",
+    "signIn": "登录",
+    "signInPrompt": "登录后参与讨论。",
+    "deleted": "该评论已被删除。",
+    "postError": "评论发布失败,请重试。",
+    "notFoundTitle": "未找到文章",
+    "notFoundBody": "该文章可能已下线或已移动。",
+    "back": "返回新闻",
+    "replyingTo": "回复 {name}",
+    "hideReplies": "收起回复",
+    "showReplies": "展开回复"
   }
 }

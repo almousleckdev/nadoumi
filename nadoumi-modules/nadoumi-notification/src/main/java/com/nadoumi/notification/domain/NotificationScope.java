@@ -7,6 +7,8 @@ package com.nadoumi.notification.domain;
 public enum NotificationScope {
     /** Broad platform announcements: all active students and staff holding catalogue view. */
     GLOBAL,
+    /** Announcements for students only: every active registered student, no staff. */
+    STUDENTS,
     /** Strictly targeted notification: must have explicit intended recipient(s). Never broadcasts. */
     TARGETED
 }

@@ -17,6 +17,7 @@ import com.nadoumi.support.web.response.StaffTicketDetail;
 import com.nadoumi.support.web.response.StaffTicketSummary;
 import com.nadoumi.support.web.response.TicketEventResponse;
 import com.ruoyi.framework.web.service.PermissionService;
+import java.util.Comparator;
 import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class StaffSupportTicketService {
         requirePermission(PERM_VIEW);
         SupportTicket ticket = find(id);
         return new StaffTicketDetail(StaffTicketSummary.from(ticket), ticket.getConversationId(),
-                conversations.listSupportMessagesForStaff(ticket.getConversationId(), 0).stream().sorted(java.util.Comparator.comparing(MessageResponse::createdAt)).toList(),
+                conversations.listSupportMessagesForStaff(ticket.getConversationId(), 0).stream().sorted(Comparator.comparing(MessageResponse::createdAt)).toList(),
                 events.listByTicket(id).stream().map(TicketEventResponse::from).toList());
     }
 

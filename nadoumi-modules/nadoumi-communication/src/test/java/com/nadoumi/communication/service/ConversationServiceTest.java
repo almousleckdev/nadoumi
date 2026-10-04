@@ -417,7 +417,7 @@ class ConversationServiceTest {
         when(file.getInputStream()).thenReturn(new java.io.ByteArrayInputStream("fake".getBytes()));
 
         com.nadoumi.common.media.MediaUploadResult uploaded = new com.nadoumi.common.media.MediaUploadResult(88L, null);
-        when(media.upload(any(), org.mockito.ArgumentMatchers.eq("doc.pdf"), org.mockito.ArgumentMatchers.eq("application/pdf"),
+        when(media.upload(any(java.io.InputStream.class), org.mockito.ArgumentMatchers.eq("doc.pdf"), org.mockito.ArgumentMatchers.eq("application/pdf"),
                 org.mockito.ArgumentMatchers.eq(1024L), org.mockito.ArgumentMatchers.eq(MediaCategory.MESSAGE_ATTACHMENT),
                 org.mockito.ArgumentMatchers.isNull(), any(), org.mockito.ArgumentMatchers.eq(1L)))
                 .thenReturn(uploaded);

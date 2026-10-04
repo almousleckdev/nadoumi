@@ -1,7 +1,10 @@
 package com.nadoumi.scholarship.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaOwnerKind;
@@ -14,8 +17,6 @@ import com.nadoumi.common.text.Slugs;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
-import com.nadoumi.common.exception.NadBadRequestException;
-import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
 import com.nadoumi.scholarship.domain.enums.PublishStatus;
 import com.nadoumi.scholarship.mapper.ScholarshipMapper;
@@ -24,8 +25,8 @@ import com.nadoumi.scholarship.web.request.ScholarshipRequest;
 import com.nadoumi.scholarship.web.response.ScholarshipResponse;
 import com.nadoumi.university.service.UniversityService;
 import com.ruoyi.common.utils.AuditActor;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Service;
@@ -79,7 +80,7 @@ public class ScholarshipAdminService {
         s.setCreateBy(AuditActor.username());
         boolean publishing = req.publishStatus() == PublishStatus.PUBLISHED;
         if (publishing) {
-            s.setPublishedAt(java.time.LocalDateTime.now());
+            s.setPublishedAt(LocalDateTime.now());
             assignReferenceCode(s);
         }
         mapper.insert(s);
@@ -119,7 +120,7 @@ public class ScholarshipAdminService {
      * confidential linkage never leaves the aggregate.
      */
     private void emitPublished(Scholarship s) {
-        com.alibaba.fastjson2.JSONObject payload = new com.alibaba.fastjson2.JSONObject();
+        JSONObject payload = new JSONObject();
         payload.put("scholarshipId", s.getId());
         payload.put("scholarshipTitle", s.getTitle());
         payload.put("scholarshipSlug", s.getSlug() == null ? "" : s.getSlug());
@@ -154,14 +155,9 @@ public class ScholarshipAdminService {
     }
 
     private MediaUploadResult uploadFor(long scholarshipId, MultipartFile file, MediaCategory category) {
-        try {
-            return media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+        return media.upload(file::getInputStream, file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), category, null,
                     new MediaOwnerRef(MediaOwnerKind.SCHOLARSHIP, scholarshipId), AuditActor.userId());
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload", e);
-        }
     }
 
     private ScholarshipResponse toResponse(Scholarship s) {
@@ -246,7 +242,7 @@ public class ScholarshipAdminService {
         if (s.getReferenceCode() != null && !s.getReferenceCode().isBlank()) {
             return;
         }
-        String prefix = "NAC-" + java.time.Year.now().getValue() + "-";
+        String prefix = "NAC-" + Year.now().getValue() + "-";
         Integer max = mapper.maxReferenceSeq(prefix);
         s.setReferenceCode(prefix + String.format(Locale.ROOT, "%04d", (max == null ? 0 : max) + 1));
     }

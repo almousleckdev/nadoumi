@@ -5,6 +5,7 @@ import com.nadoumi.common.notification.NotificationChannel;
 import com.nadoumi.common.notification.NotificationChannelKind;
 import com.nadoumi.common.notification.NotificationSendResult;
 import com.nadoumi.common.notification.NotificationSendStatus;
+import com.nadoumi.notification.channel.EmailNotificationChannel;
 import com.nadoumi.notification.domain.DeliveryStatus;
 import com.nadoumi.notification.domain.Notification;
 import com.nadoumi.notification.domain.NotificationDelivery;
@@ -123,7 +124,7 @@ public class NotificationDeliveryDispatcher {
 
     private static String providerFor(NotificationChannelKind kind) {
         return kind == NotificationChannelKind.EMAIL
-                ? com.nadoumi.notification.channel.EmailNotificationChannel.PROVIDER
+                ? EmailNotificationChannel.PROVIDER
                 : kind.name().toLowerCase();
     }
 

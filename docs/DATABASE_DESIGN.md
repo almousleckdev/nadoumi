@@ -362,3 +362,11 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 | sub | Temporal type for new columns | **APPROVED** — match RuoYi (`datetime` + `GMT+8`) in v1. |
 | sub | `nad_partnership_program` (per-programme commission) | **OPEN** — deferred; commission stays at partnership level until a real need. |
 | sub | PII column encryption (`passport_no`, `national_id`) + data residency | **OPEN** — SECURITY §6; needs security/legal input; not a Phase 2 blocker. |
+
+
+## News — EXISTING (V92 DDL, V93 menu/permissions)
+
+- `nad_article` — `slug` unique; `status` `DRAFT|PUBLISHED|UNPUBLISHED`; `body_md` Markdown (image binaries stay in object storage, referenced by absolute media URL); `cover_media_id`; `published_at` set on first publish; `author_id` → `sys_user` (no FK, as elsewhere).
+- `nad_article_image` — images uploaded for an article body (`ON DELETE CASCADE` from the article).
+- `nad_article_comment` — self-referencing `parent_id` (threads of any depth); `status` `VISIBLE|DELETED` with `deleted_by` / `deleted_time`. Both FKs are `ON DELETE CASCADE`: a thread is owned by its article, and cascading through a `RESTRICT` parent FK made article deletion fail.
+- Decision (user, 2026-10-04): one language per article (`language` column), Markdown content, comments visible immediately.

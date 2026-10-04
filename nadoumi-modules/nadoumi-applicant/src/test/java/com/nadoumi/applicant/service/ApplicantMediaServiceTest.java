@@ -63,13 +63,13 @@ class ApplicantMediaServiceTest {
     void shouldStoreTheMediaIdAndUseTheKindsCategory_whenUploading(ApplicantMediaKind kind) {
         when(access.canAccessApplicant(ID, "EDIT_PROFILE")).thenReturn(true);
         when(caller.requireUserId()).thenReturn(1L);
-        when(media.upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong()))
+        when(media.upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong()))
                 .thenReturn(new MediaUploadResult(77L, null));
 
         long mediaId = service.upload(ID, kind, file());
 
         assertThat(mediaId).isEqualTo(77L);
-        verify(media).upload(any(), any(), any(), anyLong(), eq(kind.category()), any(), any(), anyLong());
+        verify(media).upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), eq(kind.category()), any(), any(), anyLong());
         if (kind == ApplicantMediaKind.PHOTO) {
             verify(mapper).updatePhotoMediaId(ID, 77L);
         }
@@ -90,7 +90,7 @@ class ApplicantMediaServiceTest {
         when(access.canAccessApplicant(ID, "EDIT_PROFILE")).thenReturn(false);
 
         assertThatThrownBy(() -> service.upload(ID, kind, file())).isInstanceOf(AccessDeniedException.class);
-        verify(media, never()).upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong());
+        verify(media, never()).upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong());
     }
 
     @ParameterizedTest

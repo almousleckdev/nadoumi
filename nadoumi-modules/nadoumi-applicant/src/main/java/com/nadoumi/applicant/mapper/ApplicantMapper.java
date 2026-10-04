@@ -5,6 +5,7 @@ import com.nadoumi.applicant.domain.ApplicantContact;
 import com.nadoumi.applicant.domain.ApplicantEducation;
 import com.nadoumi.applicant.domain.ApplicantTestScore;
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
@@ -17,7 +18,7 @@ public interface ApplicantMapper {
     List<Applicant> search(@Param("name") String name,
                            @Param("status") ApplicantStatus status,
                            @Param("nationality") String nationality,
-                           @Param("createdAfter") java.time.LocalDateTime createdAfter);
+                           @Param("createdAfter") LocalDateTime createdAfter);
 
     /** Student list — restricted to the caller's accessible applicant ids. Empty ids -> empty. */
     List<Applicant> findByIds(@Param("ids") Collection<Long> ids);

@@ -406,3 +406,19 @@ upload controller, including the catalog controllers.
 | Error format (`problem+json`) scope | **APPROVED** — all `/api/**`; existing console endpoints keep `AjaxResult`. |
 | Student auth via `/api/student/login` + capability authz | **APPROVED** (D7/D10). |
 | Per-environment CORS origins | **OPEN** — deploy-time config, not design. |
+
+
+## News (`nadoumi-content`) — EXISTING (2026-10-04)
+
+| Audience | Endpoint | Notes |
+|---|---|---|
+| Public (anonymous) | `GET /api/public/news?q&language&page&size` | PUBLISHED articles only, as `ArticleSummary` |
+| Public (anonymous) | `GET /api/public/news/{slug}` | `PublicArticleDetail`: article, Markdown body, nested comment tree. Draft / unpublished → 404 |
+| Student (signed in) | `POST /api/student/news/{slug}/comments` | `{parentId?, body}`; replies nest to any depth; parent must be a visible comment of the same article; 5 comments per user per minute |
+| Staff | `GET/POST /api/staff/news`, `GET/PUT /api/staff/news/{id}` | `nad:article:list/view/create/edit` |
+| Staff | `POST /api/staff/news/{id}/publish`, `/unpublish` | `nad:article:publish`; publishing requires a cover image; the first publish notifies active students |
+| Staff | `POST /api/staff/news/{id}/cover`, `/images` | multipart `file`; `/images` returns the URL to embed as Markdown |
+| Staff | `GET /api/staff/news/{id}/comments`, `DELETE /api/staff/news/comments/{commentId}` | `nad:article:comment:remove`; soft delete |
+| Staff | `DELETE /api/staff/news/{id}` | `nad:article:remove`; a PUBLISHED article must be unpublished first |
+
+Public comment nodes of a deleted comment carry no body and no author; the body is kept for staff (audit).

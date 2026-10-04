@@ -2,12 +2,13 @@ package com.nadoumi.scholarship.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.common.media.MediaUrls;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
-import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.scholarship.domain.Scholarship;
+import com.nadoumi.scholarship.domain.ScholarshipCategory;
 import com.nadoumi.scholarship.mapper.ScholarshipMapper;
 import com.nadoumi.scholarship.mapper.ScholarshipSearch;
 import com.nadoumi.scholarship.web.response.PublicScholarshipResponse;
@@ -81,7 +82,7 @@ public class ScholarshipService {
         return MediaUrls.resolve(media, s.getCoverMediaId(), s.getCoverImageUrl());
     }
 
-    public java.util.List<com.nadoumi.scholarship.domain.ScholarshipCategory> categories() {
+    public List<ScholarshipCategory> categories() {
         return mapper.allCategories();
     }
 

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.content.mapper.ArticleCommentMapper">
+
+    <resultMap id="comment" type="com.nadoumi.content.domain.ArticleComment">
+        <id     property="id"          column="id"/>
+        <result property="articleId"   column="article_id"/>
+        <result property="parentId"    column="parent_id"/>
+        <result property="authorId"    column="author_id"/>
+        <result property="authorName"  column="author_name"/>
+        <result property="body"        column="body"/>
+        <result property="status"      column="status"/>
+        <result property="deletedBy"   column="deleted_by"/>
+        <result property="deletedTime" column="deleted_time"/>
+        <result property="createTime"  column="create_time"/>
+    </resultMap>
+
+    <sql id="cols">
+        c.id, c.article_id, c.parent_id, c.author_id, coalesce(nullif(u.nick_name, ''), u.user_name) as author_name,
+        c.body, c.status, c.deleted_by, c.deleted_time, c.create_time
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_article_comment (article_id, parent_id, author_id, body, status, create_time)
+        values (#{articleId}, #{parentId}, #{authorId}, #{body}, #{status}, now())
+    </insert>
+
+    <select id="findById" resultMap="comment">
+        select <include refid="cols"/>
+        from nad_article_comment c left join sys_user u on u.user_id = c.author_id
+        where c.id = #{id}
+    </select>
+
+    <select id="findByArticle" resultMap="comment">
+        select <include refid="cols"/>
+        from nad_article_comment c left join sys_user u on u.user_id = c.author_id
+        where c.article_id = #{articleId}
+        order by c.create_time asc, c.id asc
+    </select>
+
+    <select id="countByAuthorSince" resultType="int">
+        select count(*) from nad_article_comment where author_id = #{authorId} and create_time >= #{since}
+    </select>
+
+    <update id="markDeleted">
+        update nad_article_comment
+        set status = 'DELETED', deleted_by = #{deletedBy}, deleted_time = now()
+        where id = #{id} and status = 'VISIBLE'
+    </update>
+</mapper>

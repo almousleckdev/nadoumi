@@ -1,5 +1,6 @@
 package com.nadoumi.hr.web;
 
+import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.hr.service.TaskService;
 import com.nadoumi.hr.web.request.TaskRequest;
@@ -9,6 +10,7 @@ import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.SecurityUtils;
 import jakarta.validation.Valid;
+import java.util.Map;
 import java.util.Set;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -93,10 +95,10 @@ public class StaffTaskController {
     @PostMapping("/{id}/notes")
     @PreAuthorize("@ss.hasAnyPermi('nad:task:progress,nad:task:edit,nad:task:query')")
     @Log(title = "Task note", businessType = BusinessType.INSERT)
-    public TaskResponse addNote(@PathVariable long id, @RequestBody java.util.Map<String, String> payload) {
+    public TaskResponse addNote(@PathVariable long id, @RequestBody Map<String, String> payload) {
         String note = payload.get("note");
         if (note == null || note.trim().isEmpty()) {
-            throw new com.nadoumi.common.exception.NadBadRequestException("Note cannot be empty");
+            throw new NadBadRequestException("Note cannot be empty");
         }
         return service.addNote(id, note.trim(), actor(), isApprover());
     }

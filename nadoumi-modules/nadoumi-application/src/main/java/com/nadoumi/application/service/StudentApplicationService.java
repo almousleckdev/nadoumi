@@ -14,6 +14,7 @@ import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.ruoyi.common.utils.AuditActor;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +81,7 @@ public class StudentApplicationService {
         application.setProgramId(req.programId());
         application.setScholarshipId(req.scholarshipId());
         application.setIntakeId(req.intakeId());
-        application.setUpdateBy(com.ruoyi.common.utils.AuditActor.username());
+        application.setUpdateBy(AuditActor.username());
         applicationMapper.updateDraftFields(application);
         return toResponse(applicationMapper.findById(id));
     }

@@ -2,8 +2,10 @@ package com.nadoumi.support.web;
 
 import com.nadoumi.communication.web.request.PostMessageRequest;
 import com.nadoumi.communication.web.response.MessageResponse;
+import com.nadoumi.support.domain.SupportMeeting;
 import com.nadoumi.support.domain.enums.TicketStatus;
 import com.nadoumi.support.service.SupportTicketService;
+import com.nadoumi.support.web.request.BookMeetingRequest;
 import com.nadoumi.support.web.request.CreateTicketRequest;
 import com.nadoumi.support.web.response.StudentTicketDetail;
 import com.nadoumi.support.web.response.StudentTicketSummary;
@@ -69,7 +71,7 @@ public class StudentSupportTicketController {
 
     @PostMapping("/{id}/meetings")
     @ResponseStatus(HttpStatus.CREATED)
-    public com.nadoumi.support.domain.SupportMeeting bookMeeting(@PathVariable Long id, @Valid @RequestBody com.nadoumi.support.web.request.BookMeetingRequest req) {
+    public SupportMeeting bookMeeting(@PathVariable Long id, @Valid @RequestBody BookMeetingRequest req) {
         return tickets.bookMeeting(id, req);
     }
 

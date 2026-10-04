@@ -117,7 +117,7 @@ const userStore = useUserStore()
 const canOversee = computed(() => userStore.hasPerm('nad:notification:list'))
 const mode = ref<'all' | 'mine'>(canOversee.value ? 'all' : 'mine')
 
-const TYPES = ['CONTACT_INQUIRY_RECEIVED', 'SCHOLARSHIP_PUBLISHED', 'UNIVERSITY_PUBLISHED', 'PROGRAM_PUBLISHED', 'TASK_PROGRESS']
+const TYPES = ['CONTACT_INQUIRY_RECEIVED', 'SCHOLARSHIP_PUBLISHED', 'UNIVERSITY_PUBLISHED', 'PROGRAM_PUBLISHED', 'ARTICLE_PUBLISHED', 'TASK_PROGRESS']
 
 const detail = ref<NotificationDetail | null>(null)
 const taskDetail = ref<Task | null>(null)

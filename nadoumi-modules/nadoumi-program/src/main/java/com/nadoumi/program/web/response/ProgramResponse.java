@@ -65,7 +65,7 @@ public record ProgramResponse(
                 p.getId(), p.getUniversityId(), p.getUniversityName(), p.getUniversitySlug(),
                 p.getName(), p.getSlug(), p.getNameCn(),
                 p.getProgramType() == null ? null : p.getProgramType().name(),
-                p.getLevels() == null ? java.util.List.of() : java.util.List.copyOf(p.getLevels()),
+                p.getLevels() == null ? List.of() : List.copyOf(p.getLevels()),
                 p.getField(),
                 p.getTermLength(),
                 p.getTeachingLanguage() == null ? null : p.getTeachingLanguage().name(),

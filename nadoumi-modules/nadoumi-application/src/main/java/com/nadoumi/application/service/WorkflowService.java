@@ -29,9 +29,11 @@ import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.program.service.ProgramService;
 import com.nadoumi.program.web.response.ProgramResponse;
 import com.nadoumi.scholarship.service.ScholarshipAdminService;
+import com.ruoyi.common.utils.AuditActor;
 import com.ruoyi.common.utils.SecurityUtils;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -205,7 +207,7 @@ public class WorkflowService {
         }
 
         materializeTasks(application.getId(), toStage.getId(), actorUserId);
-        appendEvent(application.getId(), "STAGE_" + transition.getCode().toUpperCase(java.util.Locale.ROOT), actorUserId, reason);
+        appendEvent(application.getId(), "STAGE_" + transition.getCode().toUpperCase(Locale.ROOT), actorUserId, reason);
 
         if (isSubmit) {
             snapshots.writeSubmitSnapshots(application.getId(), application.getApplicantId());
@@ -334,6 +336,6 @@ public class WorkflowService {
     }
 
     private static String actorName() {
-        return com.ruoyi.common.utils.AuditActor.username();
+        return AuditActor.username();
     }
 }

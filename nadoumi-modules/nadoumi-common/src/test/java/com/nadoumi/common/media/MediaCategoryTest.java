@@ -12,7 +12,7 @@ class MediaCategoryTest {
         assertThat(Arrays.stream(MediaCategory.values()).map(Enum::name))
                 .containsExactlyInAnyOrder(
                         "UNIVERSITY_LOGO", "UNIVERSITY_BANNER", "UNIVERSITY_GALLERY",
-                        "SCHOLARSHIP_HERO", "SCHOLARSHIP_COVER", "PROGRAM_IMAGE",
+                        "SCHOLARSHIP_HERO", "SCHOLARSHIP_COVER", "PROGRAM_IMAGE", "ARTICLE_COVER", "ARTICLE_IMAGE",
                         "APPLICANT_PHOTO", "APPLICANT_PASSPORT", "APPLICANT_DOCUMENT", "APPLICATION_DOCUMENT",
                         "ADMISSION_DOCUMENT", "JW202", "OTHER_ATTACHMENT", "MESSAGE_ATTACHMENT");
     }

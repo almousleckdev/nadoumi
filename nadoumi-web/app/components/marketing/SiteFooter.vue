@@ -10,6 +10,8 @@ const year = new Date().getFullYear()
 const explore = [
   { to: '/scholarships', key: 'nav.scholarships' },
   { to: '/universities', key: 'nav.universities' },
+  { to: '/programs', key: 'nav.programs' },
+  { to: '/news', key: 'nav.news' },
 ]
 const company = [
   { to: '/about', key: 'nav.about' },

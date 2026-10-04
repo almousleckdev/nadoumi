@@ -16,6 +16,7 @@ import com.nadoumi.support.mapper.SupportTicketEventMapper;
 import com.nadoumi.support.mapper.SupportTicketMapper;
 import com.nadoumi.support.mapper.SupportUserMapper;
 import com.ruoyi.common.utils.AuditActor;
+import java.time.LocalDateTime;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
@@ -77,12 +78,12 @@ public class TicketWorkflow {
         ticket.setStatus(next);
 
         if (next == TicketStatus.RESOLVED) {
-            tickets.updateResolvedAt(ticket.getId(), java.time.LocalDateTime.now(), AuditActor.username());
-            ticket.setResolvedAt(java.time.LocalDateTime.now());
+            tickets.updateResolvedAt(ticket.getId(), LocalDateTime.now(), AuditActor.username());
+            ticket.setResolvedAt(LocalDateTime.now());
         }
         if (next == TicketStatus.CLOSED) {
-            tickets.updateClosedAt(ticket.getId(), java.time.LocalDateTime.now(), AuditActor.username());
-            ticket.setClosedAt(java.time.LocalDateTime.now());
+            tickets.updateClosedAt(ticket.getId(), LocalDateTime.now(), AuditActor.username());
+            ticket.setClosedAt(LocalDateTime.now());
         }
 
         recordEvent(ticket.getId(), TicketEventType.STATUS_CHANGED, current.name(), next.name(), actorId);

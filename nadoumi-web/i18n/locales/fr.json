@@ -4,6 +4,7 @@
     "scholarships": "Bourses",
     "universities": "Universités",
     "programs": "Programmes",
+    "news": "Actualités",
     "about": "À propos",
     "contact": "Contact",
     "signIn": "Se connecter",
@@ -2246,5 +2247,34 @@
       "Ningbo": "Ningbo",
       "Fuzhou": "Fuzhou"
     }
+  },
+  "news": {
+    "title": "Actualités",
+    "subtitle": "Histoires, guides et nouveautés de Nadoumi.",
+    "searchLabel": "Rechercher dans les actualités",
+    "searchPlaceholder": "Rechercher des articles",
+    "emptyTitle": "Aucun article pour le moment",
+    "emptyBody": "Revenez bientôt pour des histoires et des nouveautés.",
+    "readTime": "{n} min de lecture",
+    "by": "Par {name}",
+    "comments": "Commentaires",
+    "count": "1 commentaire | {n} commentaires",
+    "noComments": "Aucun commentaire. Lancez la discussion.",
+    "placeholder": "Partagez votre avis",
+    "replyPlaceholder": "Écrire une réponse",
+    "post": "Publier le commentaire",
+    "posting": "Publication…",
+    "reply": "Répondre",
+    "cancel": "Annuler",
+    "signIn": "Se connecter",
+    "signInPrompt": "Connectez-vous pour participer à la discussion.",
+    "deleted": "Ce commentaire a été supprimé.",
+    "postError": "Impossible de publier votre commentaire. Veuillez réessayer.",
+    "notFoundTitle": "Article introuvable",
+    "notFoundBody": "Cet article a peut-être été dépublié ou déplacé.",
+    "back": "Retour aux actualités",
+    "replyingTo": "Réponse à {name}",
+    "hideReplies": "Masquer les réponses",
+    "showReplies": "Afficher les réponses"
   }
 }

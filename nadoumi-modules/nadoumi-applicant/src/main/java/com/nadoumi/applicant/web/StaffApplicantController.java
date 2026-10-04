@@ -7,20 +7,22 @@ import com.nadoumi.applicant.service.ApplicantRecordsService;
 import com.nadoumi.applicant.service.ApplicantService;
 import com.nadoumi.applicant.service.EducationService;
 import com.nadoumi.applicant.service.PassportService;
-import com.nadoumi.applicant.web.response.PassportStatusResponse;
-import com.nadoumi.applicant.web.response.ApplicantResponse;
 import com.nadoumi.applicant.web.request.ContactRequest;
-import com.nadoumi.applicant.web.response.ContactResponse;
 import com.nadoumi.applicant.web.request.EducationRequest;
-import com.nadoumi.applicant.web.response.EducationResponse;
-import com.nadoumi.applicant.web.response.PageResponse;
+import com.nadoumi.applicant.web.request.SelfApplicantRequest;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
 import com.nadoumi.applicant.web.request.TestScoreRequest;
+import com.nadoumi.applicant.web.response.ApplicantResponse;
+import com.nadoumi.applicant.web.response.ContactResponse;
+import com.nadoumi.applicant.web.response.EducationResponse;
+import com.nadoumi.applicant.web.response.PageResponse;
+import com.nadoumi.applicant.web.response.PassportStatusResponse;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.ruoyi.common.annotation.Log;
 import com.ruoyi.common.enums.BusinessType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,7 +66,7 @@ public class StaffApplicantController {
             @RequestParam(required = false) String nationality,
             @RequestParam(required = false)
             @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
-            java.time.LocalDateTime createdAfter,
+            LocalDateTime createdAfter,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return service.listForStaff(name, status, nationality, createdAfter, page, size);
@@ -88,7 +90,7 @@ public class StaffApplicantController {
     @PreAuthorize("@ss.hasPermi('nad:applicant:edit')")
     @Log(title = "Applicant", businessType = BusinessType.UPDATE)
     public ApplicantResponse update(@PathVariable Long id,
-            @Valid @RequestBody com.nadoumi.applicant.web.request.SelfApplicantRequest req) {
+            @Valid @RequestBody SelfApplicantRequest req) {
         return service.update(id, req);
     }
 

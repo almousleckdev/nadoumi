@@ -83,7 +83,7 @@ class DocumentServiceTest {
     void shouldCreateDraftThenSubmitFirstVersion_whenCreating() {
         when(access.canAccessApplicant(APPLICANT_ID, "UPLOAD_DOCUMENT")).thenReturn(true);
         when(versions.maxVersionNo(DOCUMENT_ID)).thenReturn(0);
-        when(media.upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong()))
+        when(media.upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong()))
                 .thenReturn(new MediaUploadResult(9L, null));
         when(media.find(9L)).thenReturn(java.util.Optional.of(storedAsset(9L, MediaAccessClass.PROTECTED)));
 
@@ -115,7 +115,7 @@ class DocumentServiceTest {
         assertThatThrownBy(() -> service.createAndUploadFirstVersion(APPLICANT_ID, null, "TRANSCRIPT", file()))
                 .isInstanceOf(AccessDeniedException.class);
         verify(documents, never()).insert(any());
-        verify(media, never()).upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong());
+        verify(media, never()).upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong());
     }
 
     // ---- replace: prior versions stay immutable, status moves to IN_REVIEW ----
@@ -127,7 +127,7 @@ class DocumentServiceTest {
         when(documents.findById(DOCUMENT_ID)).thenReturn(existing);
         when(access.canAccessApplicant(APPLICANT_ID, "UPLOAD_DOCUMENT")).thenReturn(true);
         when(versions.maxVersionNo(DOCUMENT_ID)).thenReturn(1); // one prior version already exists
-        when(media.upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong()))
+        when(media.upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong()))
                 .thenReturn(new MediaUploadResult(10L, null));
         when(media.find(10L)).thenReturn(java.util.Optional.of(storedAsset(10L, MediaAccessClass.PROTECTED)));
         org.mockito.Mockito.doAnswer(inv -> {

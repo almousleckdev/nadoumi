@@ -2,6 +2,7 @@ package com.nadoumi.identity.web;
 
 import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,7 @@ public class StaffProfileController {
         long loginTime = lu.getLoginTime() == null ? now : lu.getLoginTime();
         long expireTime = lu.getExpireTime() == null ? now : lu.getExpireTime();
 
-        Map<String, Object> out = new java.util.LinkedHashMap<>();
+        Map<String, Object> out = new LinkedHashMap<>();
         out.put("loginTime", loginTime);
         out.put("expireTime", expireTime);
         out.put("loggedInForSeconds", Math.max(0, (now - loginTime) / 1000));

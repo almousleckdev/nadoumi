@@ -50,6 +50,8 @@ export default defineNuxtConfig({
     { path: '~/components/messages', pathPrefix: false },
     // documents/ student document list components (<DocumentRow>, <AddDocumentForm>).
     { path: '~/components/documents', pathPrefix: false },
+    // news/ article card, body, threaded comments (<ArticleCard>, <ArticleBody>, <CommentForm>).
+    { path: '~/components/news', pathPrefix: false },
     '~/components',
   ],
   fonts: {
@@ -57,6 +59,7 @@ export default defineNuxtConfig({
       { name: 'Plus Jakarta Sans', provider: 'google', weights: [600, 700] },
       { name: 'Inter', provider: 'google', weights: [400, 500, 600] },
       { name: 'Noto Sans Arabic', provider: 'google', weights: [400, 600] },
+      { name: 'Source Serif 4', provider: 'google', weights: [400, 600] },
     ],
   },
   tailwindcss: { cssPath: '~/assets/css/main.css' },

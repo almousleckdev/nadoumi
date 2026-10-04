@@ -12,6 +12,7 @@ import com.nadoumi.application.mapper.ApplicationTaskMapper;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
@@ -78,7 +79,7 @@ public class GuardEvaluator {
                 .map(p -> p.split(":")[0])
                 .filter(name -> (DOCUMENT_PREDICATES.contains(name) && documentGuardProvider.isEmpty())
                         || (name.equals(PAYMENT_PREDICATE) && paymentGuardProvider.isEmpty()))
-                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private static List<String> predicatesIn(String guardJson) {

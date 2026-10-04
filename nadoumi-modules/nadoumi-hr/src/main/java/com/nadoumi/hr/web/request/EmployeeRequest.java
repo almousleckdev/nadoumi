@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Create/update payload for an employee. On create, an account fields block
@@ -21,7 +22,7 @@ public record EmployeeRequest(
         String email,
         String phone,
         String userStatus,
-        java.util.List<Long> roleIds,
+        List<Long> roleIds,
         // employment
         Long positionId,
         @Size(max = 120) String positionTitle,

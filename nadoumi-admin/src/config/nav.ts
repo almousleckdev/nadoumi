@@ -77,6 +77,7 @@ export const NAV: NavGroup[] = [
   {
     key: 'growth',
     items: [
+      { key: 'news', path: '/news', icon: 'Reading', perm: 'nad:article:list', status: 'implemented' },
       { key: 'cms', path: '/cms', icon: 'Promotion', perm: 'nad:content:view', status: 'planned' },
     ],
   },

@@ -1,6 +1,7 @@
 package com.nadoumi.support.mapper;
 
 import com.nadoumi.support.domain.SupportTicket;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -32,7 +33,7 @@ public interface SupportTicketMapper {
 
     int updateCategory(@Param("id") long id, @Param("category") String category, @Param("updateBy") String updateBy);
 
-    int updateResolvedAt(@Param("id") long id, @Param("resolvedAt") java.time.LocalDateTime resolvedAt, @Param("updateBy") String updateBy);
+    int updateResolvedAt(@Param("id") long id, @Param("resolvedAt") LocalDateTime resolvedAt, @Param("updateBy") String updateBy);
 
-    int updateClosedAt(@Param("id") long id, @Param("closedAt") java.time.LocalDateTime closedAt, @Param("updateBy") String updateBy);
+    int updateClosedAt(@Param("id") long id, @Param("closedAt") LocalDateTime closedAt, @Param("updateBy") String updateBy);
 }

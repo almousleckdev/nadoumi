@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +57,23 @@ class OutboxToNotificationDispatcherTest {
                 .containsExactlyInAnyOrder(1L, 10L, 11L);
         assertThat(batch.getValue()).extracting(NotificationRequest::sourceRef)
                 .allMatch(ref -> ref.startsWith("outbox:42:"));
+    }
+
+    @Test
+    void articlePublished_notifiesActiveStudentsOnlyAndNeverStaff() {
+        when(audience.findActiveStudentUserIds()).thenReturn(List.of(10L, 11L));
+        when(renderer.render(eq(NotificationType.ARTICLE_PUBLISHED), eq(NotificationChannelKind.IN_APP),
+                anyString(), any())).thenReturn(new NotificationRenderer.Rendered(null, "New article"));
+
+        dispatcher.dispatch(event(OutboxEventTypes.ARTICLE_PUBLISHED,
+                "{\"articleId\":5,\"articleTitle\":\"Visa tips\",\"articleSubtitle\":\"\",\"articleSlug\":\"visa-tips\"}"));
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
+        verify(notificationService).createBatch(batch.capture());
+        assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
+                .containsExactlyInAnyOrder(10L, 11L);
+        verify(audience, never()).findStaffUserIdsWithPermission(anyString());
     }
 
     @Test

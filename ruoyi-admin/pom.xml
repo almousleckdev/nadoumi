@@ -109,6 +109,10 @@
         </dependency>
         <dependency>
             <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-content</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-hr</artifactId>
         </dependency>
         <dependency>

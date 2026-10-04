@@ -23,6 +23,9 @@ public final class OutboxEventTypes {
     /** A programme transitioned to {@code PUBLISHED}. Aggregate: {@code program}. */
     public static final String PROGRAM_PUBLISHED = "ProgramPublished";
 
+    /** A news article was published for the first time. Aggregate: {@code article}. Audience: active students only. */
+    public static final String ARTICLE_PUBLISHED = "ArticlePublished";
+
     /** A public contact-form inquiry was accepted. Aggregate: {@code contact_inquiry}. */
     public static final String CONTACT_INQUIRY_RECEIVED = "ContactInquiryReceived";
 

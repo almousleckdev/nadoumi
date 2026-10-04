@@ -85,6 +85,10 @@ public final class MediaCategoryPolicy {
                 MediaAccessClass.PUBLIC, IMAGE_MIME, 6 * MB, RESOURCE_IMAGE, "scholarship/cover"));
         RULES.put(MediaCategory.PROGRAM_IMAGE, new CategoryRule(
                 MediaAccessClass.PUBLIC, IMAGE_MIME, 6 * MB, RESOURCE_IMAGE, "program"));
+        RULES.put(MediaCategory.ARTICLE_COVER, new CategoryRule(
+                MediaAccessClass.PUBLIC, IMAGE_MIME, 8 * MB, RESOURCE_IMAGE, "article/cover"));
+        RULES.put(MediaCategory.ARTICLE_IMAGE, new CategoryRule(
+                MediaAccessClass.PUBLIC, IMAGE_MIME, 8 * MB, RESOURCE_IMAGE, "article/image"));
         RULES.put(MediaCategory.APPLICANT_PHOTO, new CategoryRule(
                 MediaAccessClass.PROTECTED, IMAGE_MIME, 5 * MB, RESOURCE_IMAGE, "applicant/photo"));
         RULES.put(MediaCategory.APPLICANT_PASSPORT, new CategoryRule(

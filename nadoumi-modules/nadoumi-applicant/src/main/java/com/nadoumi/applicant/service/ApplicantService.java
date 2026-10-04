@@ -5,26 +5,26 @@ import com.github.pagehelper.PageInfo;
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
+import com.nadoumi.applicant.rules.AgeRules;
 import com.nadoumi.applicant.web.request.SelfApplicantRequest;
 import com.nadoumi.applicant.web.request.StaffCreateApplicantRequest;
 import com.nadoumi.applicant.web.response.ApplicantResponse;
 import com.nadoumi.applicant.web.response.PageResponse;
 import com.nadoumi.common.access.ApplicantCapability;
-import com.nadoumi.applicant.rules.AgeRules;
+import com.nadoumi.common.access.NadoumiAccessService;
+import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.rules.NameRules;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageSupport;
-import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.common.exception.NadBadRequestException;
-import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
-
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Locale;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,7 +109,7 @@ public class ApplicantService {
     }
 
     public PageResponse<ApplicantResponse> listForStaff(String name, ApplicantStatus status,
-            String nationality, java.time.LocalDateTime createdAfter, int page, int size) {
+            String nationality, LocalDateTime createdAfter, int page, int size) {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);

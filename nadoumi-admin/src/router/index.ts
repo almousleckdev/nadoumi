@@ -55,6 +55,24 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.programs', i18n: true, perm: 'nad:program:list' },
       },
       {
+        path: 'news',
+        name: 'News',
+        component: () => import('@/views/news/index.vue'),
+        meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:list' },
+      },
+      {
+        path: 'news/new',
+        name: 'NewsNew',
+        component: () => import('@/views/news/editor.vue'),
+        meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:create' },
+      },
+      {
+        path: 'news/:id(\\d+)',
+        name: 'NewsEdit',
+        component: () => import('@/views/news/editor.vue'),
+        meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:view' },
+      },
+      {
         path: 'scholarships',
         name: 'Scholarships',
         component: () => import('@/views/scholarships/index.vue'),

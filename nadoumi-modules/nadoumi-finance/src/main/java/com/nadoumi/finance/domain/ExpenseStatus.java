@@ -1,5 +1,6 @@
 package com.nadoumi.finance.domain;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Set;
 public enum ExpenseStatus {
     DRAFT, SUBMITTED, APPROVED, PAID, REJECTED;
 
-    private static final java.util.Map<ExpenseStatus, Set<ExpenseStatus>> ALLOWED = java.util.Map.of(
+    private static final Map<ExpenseStatus, Set<ExpenseStatus>> ALLOWED = Map.of(
             DRAFT, Set.of(SUBMITTED, REJECTED),
             SUBMITTED, Set.of(APPROVED, REJECTED, DRAFT),
             APPROVED, Set.of(PAID, REJECTED),

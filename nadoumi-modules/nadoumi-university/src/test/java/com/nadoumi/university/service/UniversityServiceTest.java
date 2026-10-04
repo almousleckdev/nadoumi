@@ -190,7 +190,7 @@ class UniversityServiceTest {
 
         assertThatThrownBy(() -> service.uploadGalleryImage(3L, upload()))
                 .isInstanceOf(NadBadRequestException.class);
-        verify(media, never()).upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong());
+        verify(media, never()).upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong());
     }
 
     @Test
@@ -256,7 +256,7 @@ class UniversityServiceTest {
         University row = new University();
         row.setId(4L);
         when(mapper.findById(4L)).thenReturn(row);
-        when(media.upload(any(), any(), any(), anyLong(), any(), any(), any(), anyLong()))
+        when(media.upload(any(MediaGateway.UploadSource.class), any(), any(), anyLong(), any(), any(), any(), anyLong()))
                 .thenReturn(new com.nadoumi.common.media.MediaUploadResult(42L, "https://res.cloudinary.com/x/l.png"));
 
         var result = service.uploadLogo(4L, upload());

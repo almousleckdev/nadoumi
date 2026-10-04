@@ -12,8 +12,6 @@ import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.MediaUploadResult;
 import com.nadoumi.common.media.SignedUrl;
 import com.nadoumi.identity.access.CurrentCaller;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,15 +42,9 @@ public class ApplicantMediaService {
     @Transactional(rollbackFor = Exception.class)
     public long upload(long applicantId, ApplicantMediaKind kind, MultipartFile file) {
         guard.require(applicantId, ApplicantCapability.EDIT_PROFILE);
-        MediaUploadResult result;
-        try {
-            result = media.upload(file.getInputStream(), file.getOriginalFilename(), file.getContentType(),
+        MediaUploadResult result = media.upload(file::getInputStream, file.getOriginalFilename(), file.getContentType(),
                     file.getSize(), kind.category(), null,
                     new MediaOwnerRef(MediaOwnerKind.APPLICANT, applicantId), currentUserId());
-        }
-        catch (IOException e) {
-            throw new UncheckedIOException("failed to read upload", e);
-        }
         switch (kind) {
             case PHOTO -> mapper.updatePhotoMediaId(applicantId, result.mediaId());
             case PASSPORT -> mapper.updatePassportMediaId(applicantId, result.mediaId());
