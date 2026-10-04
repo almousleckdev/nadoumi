@@ -3,6 +3,7 @@
     "home": "首页",
     "scholarships": "奖学金",
     "universities": "院校",
+    "programs": "专业项目",
     "about": "关于我们",
     "contact": "联系我们",
     "signIn": "登录",
@@ -192,9 +193,7 @@
     "team2name": "",
     "team2role": "合作伙伴负责人",
     "team3name": "",
-    "team3role": "学生成功负责人",
-    "team4name": "",
-    "team4role": "软件工程师"
+    "team3role": "学生成功负责人"
   },
   "contact": {
     "title": "联系我们",
@@ -264,6 +263,10 @@
     "noResultsBody": "请尝试移除某个筛选条件,或使用更宽泛的关键词搜索。",
     "noUniversitiesTitle": "暂无院校",
     "noUniversitiesBody": "随着目录不断完善,已发布的院校将显示在此处。",
+    "searchPrograms": "搜索专业",
+    "searchProgramsPlaceholder": "专业名称或领域",
+    "noProgramsTitle": "暂无专业",
+    "noProgramsBody": "随着目录不断完善,已发布的专业将显示在此处。",
     "allUniversities": "全部院校",
     "universityFallbackTitle": "院校",
     "universityUnavailable": "该院校暂不可用。"

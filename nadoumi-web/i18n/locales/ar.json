@@ -3,6 +3,7 @@
     "home": "الرئيسية",
     "scholarships": "المنح الدراسية",
     "universities": "الجامعات",
+    "programs": "البرامج",
     "about": "من نحن",
     "contact": "تواصل معنا",
     "signIn": "تسجيل الدخول",
@@ -192,9 +193,7 @@
     "team2name": "",
     "team2role": "رئيس قسم الشراكات",
     "team3name": "",
-    "team3role": "رئيس قسم نجاح الطلاب",
-    "team4name": "",
-    "team4role": "مهندس برمجيات"
+    "team3role": "رئيس قسم نجاح الطلاب"
   },
   "contact": {
     "title": "تواصل معنا",
@@ -264,6 +263,10 @@
     "noResultsBody": "جرّب إزالة أحد عوامل التصفية أو البحث بكلمة أوسع.",
     "noUniversitiesTitle": "لا توجد جامعات بعد",
     "noUniversitiesBody": "ستظهر الجامعات المنشورة هنا مع نمو الدليل.",
+    "searchPrograms": "ابحث عن برامج",
+    "searchProgramsPlaceholder": "اسم البرنامج أو المجال",
+    "noProgramsTitle": "لا توجد برامج بعد",
+    "noProgramsBody": "ستظهر البرامج المنشورة هنا مع نمو الدليل.",
     "allUniversities": "جميع الجامعات",
     "universityFallbackTitle": "جامعة",
     "universityUnavailable": "هذه الجامعة غير متاحة."

@@ -3,6 +3,7 @@
     "home": "Inicio",
     "scholarships": "Becas",
     "universities": "Universidades",
+    "programs": "Programas",
     "about": "Sobre nosotros",
     "contact": "Contacto",
     "signIn": "Iniciar sesión",
@@ -192,9 +193,7 @@
     "team2name": "",
     "team2role": "Responsable de Alianzas",
     "team3name": "",
-    "team3role": "Responsable de Éxito Estudiantil",
-    "team4name": "",
-    "team4role": "Ingeniero de software"
+    "team3role": "Responsable de Éxito Estudiantil"
   },
   "contact": {
     "title": "Contacto",
@@ -264,6 +263,10 @@
     "noResultsBody": "Prueba a quitar un filtro o a buscar algo más general.",
     "noUniversitiesTitle": "Todavía no hay universidades",
     "noUniversitiesBody": "Las universidades publicadas aparecerán aquí a medida que crezca el catálogo.",
+    "searchPrograms": "Buscar programas",
+    "searchProgramsPlaceholder": "Nombre del programa o campo",
+    "noProgramsTitle": "Todavía no hay programas",
+    "noProgramsBody": "Los programas publicados aparecerán aquí a medida que crezca el catálogo.",
     "allUniversities": "Todas las universidades",
     "universityFallbackTitle": "Universidad",
     "universityUnavailable": "Esta universidad no está disponible."

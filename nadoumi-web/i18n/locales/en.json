@@ -3,6 +3,7 @@
     "home": "Home",
     "scholarships": "Scholarships",
     "universities": "Universities",
+    "programs": "Programs",
     "about": "About",
     "contact": "Contact",
     "signIn": "Sign in",
@@ -192,9 +193,7 @@
     "team2name": "",
     "team2role": "Head of Partnerships",
     "team3name": "",
-    "team3role": "Head of Student Success",
-    "team4name": "",
-    "team4role": "Software Engineer"
+    "team3role": "Head of Student Success"
   },
   "contact": {
     "title": "Contact",
@@ -264,6 +263,10 @@
     "noResultsBody": "Try removing a filter or searching for something broader.",
     "noUniversitiesTitle": "No universities yet",
     "noUniversitiesBody": "Published universities will appear here as the catalogue grows.",
+    "searchPrograms": "Search programs",
+    "searchProgramsPlaceholder": "Program name or field",
+    "noProgramsTitle": "No programs yet",
+    "noProgramsBody": "Published programs will appear here as the catalogue grows.",
     "allUniversities": "All universities",
     "universityFallbackTitle": "University",
     "universityUnavailable": "This university is not available."

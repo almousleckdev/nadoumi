@@ -6,7 +6,6 @@ import helpImage from '~/assets/images/apply.png'
 import ceoPhoto from '~/assets/team/ceo.jpeg'
 import team6Photo from '~/assets/team/team6.jpg'
 import femmePhoto from '~/assets/team/femme.jpg'
-import engineerPhoto from '~/assets/team/atalibag.jpeg'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -16,7 +15,6 @@ const team = computed(() => [
   { photo: ceoPhoto, name: t('about.team1name'), role: t('about.team1role') },
   { photo: team6Photo, name: t('about.team2name'), role: t('about.team2role') },
   { photo: femmePhoto, name: t('about.team3name'), role: t('about.team3role') },
-  { photo: engineerPhoto, name: t('about.team4name'), role: t('about.team4role') },
 ])
 
 const values = computed(() => [
@@ -103,7 +101,7 @@ const help = computed(() => [
       <section class="border-t border-slate-200 py-14">
         <h2 class="font-display text-2xl font-bold tracking-tight text-slate-900">{{ t('about.teamTitle') }}</h2>
         <p class="mt-2 max-w-xl text-slate-600">{{ t('about.teamIntro') }}</p>
-        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ul class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <li
             v-for="m in team"
             :key="m.role"

@@ -13,14 +13,15 @@ const typeLabel = computed(() =>
 </script>
 
 <template>
-  <section class="relative isolate overflow-hidden bg-slate-900 text-white">
+  <section class="relative isolate flex min-h-[20rem] items-end overflow-hidden bg-slate-900 text-white sm:min-h-[26rem] lg:min-h-[30rem]">
     <img
       v-if="university.bannerUrl ?? university.coverImageUrl"
       :src="mediaUrl(university.bannerUrl ?? university.coverImageUrl)"
       alt=""
-      class="absolute inset-0 -z-20 h-full w-full object-cover opacity-40"
+      class="absolute inset-0 -z-20 h-full w-full object-cover"
     >
-    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-slate-900/90 to-brand-900/60" aria-hidden="true" />
+    <!-- bottom-weighted scrim keeps the title legible while the cover stays visible -->
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-950/10" aria-hidden="true" />
 
     <!-- university logo, pinned bottom-right of the cover -->
     <img
@@ -36,8 +37,8 @@ const typeLabel = computed(() =>
       {{ monogram }}
     </span>
 
-    <NContainer>
-      <div class="py-12 pe-20 sm:py-16 sm:pe-28">
+    <NContainer class="w-full">
+      <div class="pb-8 pt-24 pe-20 sm:pb-12 sm:pe-28">
         <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ university.name }}</h1>
         <p v-if="university.nameCn" class="mt-1 text-lg text-white/70">{{ university.nameCn }}</p>
         <p class="mt-2 text-white/80">{{ place }}</p>

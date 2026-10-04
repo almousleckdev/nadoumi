@@ -162,17 +162,18 @@ const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => (
     </NContainer>
 
     <NContainer>
-      <section
+      <DiscoverySection
         v-if="partners.pending.value || partners.items.value.length"
-        class="py-12 sm:py-16"
+        :eyebrow="t('home.partners.eyebrow')"
+        :title="t('home.partners.title')"
+        :description="t('home.partners.description')"
+        :carousel-label="t('home.partners.title')"
+        :pending="partners.pending.value"
+        :error="partners.error.value ? t('errors.loadSection') : ''"
+        :empty="!partners.items.value.length"
       >
-        <SectionHeading
-          :eyebrow="t('home.partners.eyebrow')"
-          :title="t('home.partners.title')"
-          :description="t('home.partners.description')"
-        />
         <PartnerLogos :universities="partners.items.value" />
-      </section>
+      </DiscoverySection>
     </NContainer>
 
     <section class="border-t border-slate-200 bg-slate-50">

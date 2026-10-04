@@ -7,12 +7,12 @@ const route = useRoute()
 const { status, user, signOut } = useSession()
 const open = ref(false)
 
-// Programs are discovered through a university, not a top-level product area
-// (docs/PLATFORM_ARCHITECTURE.md §3, C1). "How it works" is homepage content.
+// "How it works" is homepage content.
 const links = [
   { to: '/', key: 'nav.home' },
   { to: '/scholarships', key: 'nav.scholarships' },
   { to: '/universities', key: 'nav.universities' },
+  { to: '/programs', key: 'nav.programs' },
   { to: '/about', key: 'nav.about' },
   { to: '/contact', key: 'nav.contact' },
 ]
