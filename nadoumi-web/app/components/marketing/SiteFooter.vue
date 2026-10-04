@@ -33,6 +33,7 @@ const legal = [
             <WhatsAppContact />
             <WeChatContact />
           </div>
+          <SocialLinks class="mt-4" />
         </div>
 
         <div class="text-sm">

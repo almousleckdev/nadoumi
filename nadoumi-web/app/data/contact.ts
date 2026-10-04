@@ -22,3 +22,14 @@ export const CONTACT = {
 
 /** `tel:` href, strips spaces. */
 export const telHref = (phone: string): string => `tel:${phone.replace(/\s+/g, '')}`
+
+/**
+ * Social profiles shown in the footer.
+ * TODO: the handles below are placeholders; confirm the real account URLs.
+ */
+export const SOCIAL = [
+  { id: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/nadoumi' },
+  { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/nadoumi' },
+  { id: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@nadoumi' },
+  { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/nadoumi' },
+] as const
