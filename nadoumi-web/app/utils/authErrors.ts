@@ -55,6 +55,7 @@ export function authErrorMessage(err: unknown, t: Translate): string {
   if (status !== undefined && status >= 500) return t('errors.server')
 
   // 4. A backend password-policy key is already an i18n key under validation.*.
+  if (detail === 'password.noPersonal') return t('validation.password.noPersonalError')
   if (detail && /^password\./.test(detail)) return t(`validation.${detail}`)
 
   // 5. Known backend `detail` phrases.

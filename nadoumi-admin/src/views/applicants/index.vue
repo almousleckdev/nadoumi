@@ -39,6 +39,13 @@
           :value="s"
         />
       </el-select>
+      <el-checkbox
+        v-model="filters.incomplete"
+        data-test="show-incomplete"
+        @change="reload"
+      >
+        {{ t('applicant.showIncomplete') }}
+      </el-checkbox>
       <el-input
         v-model="filters.nationality"
         :placeholder="t('applicant.nationality')"
@@ -63,7 +70,7 @@
       @update:page="(p: number) => { page = p; load() }"
       @update:page-size="(s: number) => { size = s; page = 0; load() }"
       @retry="load"
-      @row-click="(row) => goToDetail(Number(row.id))"
+      @row-click="(row) => goToDetail(String(row.publicId))"
     >
       <template #cell-givenName="{ row }">
         <div class="who">
@@ -184,7 +191,7 @@ const userStore = useUserStore()
 const { confirm } = useConfirm()
 
 const MASK = '••••'
-const emptyFilters = () => ({ name: '', status: '', nationality: '' })
+const emptyFilters = () => ({ name: '', status: '', nationality: '', incomplete: false })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
   usePagedList<Applicant, ReturnType<typeof emptyFilters>>({
     emptyFilters,
@@ -194,6 +201,7 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
       name: f.name || undefined,
       status: f.status || undefined,
       nationality: f.nationality || undefined,
+      incomplete: f.incomplete || undefined,
       page,
       size,
     }),
@@ -211,7 +219,7 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: '', width: 110, align: 'right' },
 ]
 
-function goToDetail(id: number) {
+function goToDetail(id: string) {
   router.push(`/applicants/${id}`)
 }
 

@@ -4,10 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.applicant.domain.Applicant;
+import com.nadoumi.common.outbox.OutboxEventTypes;
+import com.nadoumi.common.outbox.OutboxWriter;
+import com.nadoumi.identity.service.StudentContactLookup;
 import com.nadoumi.applicant.domain.ApplicantContact;
 import com.nadoumi.applicant.domain.ApplicantEducation;
 import com.nadoumi.applicant.domain.ApplicantInterest;
@@ -35,8 +40,10 @@ class OnboardingServiceTest {
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
     private final InterestService interests = mock(InterestService.class);
     private final ResidenceService residence = mock(ResidenceService.class);
+    private final StudentContactLookup students = mock(StudentContactLookup.class);
+    private final OutboxWriter outbox = mock(OutboxWriter.class);
     private final OnboardingService service =
-            new OnboardingService(mapper, interests, residence, new ApplicantAccessGuard(access));
+            new OnboardingService(mapper, interests, residence, new ApplicantAccessGuard(access), students, outbox);
 
     /** Every section other than the profile, photo and passport is satisfied by these. */
     private void otherSectionsComplete() {
@@ -93,6 +100,51 @@ class OnboardingServiceTest {
 
         verify(mapper).markOnboarded(ID);
         assertThat(status.complete()).isTrue();
+    }
+
+    @Test
+    void shouldQueueTheWelcomeEmailOnce_whenOnboardingCompletes() {
+        when(access.canAccessApplicant(ID, "EDIT_PROFILE")).thenReturn(true);
+        Applicant before = filled();
+        Applicant after = filled();
+        after.setOnboardedAt(LocalDateTime.now());
+        otherSectionsComplete();
+        when(mapper.findById(ID)).thenReturn(before, after);
+        when(students.ownerOf(ID)).thenReturn(java.util.Optional.of(new StudentContactLookup.StudentContact(42L, "ada@example.com")));
+
+        service.complete(ID);
+
+        org.mockito.ArgumentCaptor<String> payload = org.mockito.ArgumentCaptor.forClass(String.class);
+        verify(outbox).write(eq("user"), eq(42L), eq(OutboxEventTypes.STUDENT_ONBOARDED), payload.capture());
+        assertThat(payload.getValue()).contains("\"email\":\"ada@example.com\"").contains("\"userId\":42");
+    }
+
+    @Test
+    void shouldNotQueueAnotherWelcome_whenOnboardingWasAlreadyComplete() {
+        when(access.canAccessApplicant(ID, "EDIT_PROFILE")).thenReturn(true);
+        Applicant done = filled();
+        done.setOnboardedAt(LocalDateTime.now());
+        otherSectionsComplete();
+        when(mapper.findById(ID)).thenReturn(done);
+
+        service.complete(ID);
+
+        verifyNoInteractions(outbox);
+    }
+
+    @Test
+    void shouldQueueNothing_whenTheApplicantHasNoStudentOwner() {
+        when(access.canAccessApplicant(ID, "EDIT_PROFILE")).thenReturn(true);
+        Applicant before = filled();
+        Applicant after = filled();
+        after.setOnboardedAt(LocalDateTime.now());
+        otherSectionsComplete();
+        when(mapper.findById(ID)).thenReturn(before, after);
+        when(students.ownerOf(ID)).thenReturn(java.util.Optional.empty());
+
+        service.complete(ID);
+
+        verifyNoInteractions(outbox);
     }
 
     @Test

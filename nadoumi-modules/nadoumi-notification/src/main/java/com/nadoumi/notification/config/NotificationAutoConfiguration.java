@@ -21,6 +21,7 @@ import com.nadoumi.notification.outbox.OutboxToNotificationDispatcher;
 import com.nadoumi.notification.outbox.OutboxWriterImpl;
 import com.nadoumi.notification.outbox.WelcomeContentComposer;
 import com.nadoumi.notification.render.NotificationRenderer;
+import com.nadoumi.notification.service.NotificationRetirement;
 import com.nadoumi.notification.service.NotificationService;
 import com.nadoumi.program.service.ProgramService;
 import com.nadoumi.scholarship.service.ScholarshipService;
@@ -72,6 +73,12 @@ public class NotificationAutoConfiguration {
     @ConditionalOnMissingBean
     OutboxPollerJob outboxPollerJob(OutboxEventMapper outboxEventMapper, OutboxDispatcher outboxDispatcher) {
         return new OutboxPollerJob(outboxEventMapper, outboxDispatcher);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    NotificationRetirement notificationRetirement(NotificationMapper notificationMapper) {
+        return new NotificationRetirement(notificationMapper);
     }
 
     @Bean

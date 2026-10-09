@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.identity.access.CurrentCaller;
@@ -44,12 +45,12 @@ class StudentAuthServiceTest {
     private final org.springframework.context.ApplicationEventPublisher events =
             mock(org.springframework.context.ApplicationEventPublisher.class);
     private final com.nadoumi.common.outbox.OutboxWriter outbox =
-            mock(com.nadoumi.common.outbox.OutboxWriter.class);
+            mock(com.nadoumi.common.outbox.OutboxWriter.class); // must stay untouched by registration
     private final com.nadoumi.identity.service.otp.OtpService otp =
             mock(com.nadoumi.identity.service.otp.OtpService.class);
 
     private final StudentAuthService service = new StudentAuthService(configService, userService, loginService,
-            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker, events, outbox);
+            tokenService, identityMapper, accessMapper, grants, caller, tickets, sessionRevoker, events);
     private final StudentEmailChangeService emailChange =
             new StudentEmailChangeService(identityMapper, userService, tokenService, caller, otp, events);
 
@@ -115,10 +116,8 @@ class StudentAuthServiceTest {
         verify(identityMapper).updateUserType(42L, StudentAuthService.STUDENT_USER_TYPE);
         verify(identityMapper).markEmailVerified(42L);
 
-        org.mockito.ArgumentCaptor<String> payload = org.mockito.ArgumentCaptor.forClass(String.class);
-        verify(outbox).write(eq("user"), eq(42L),
-                eq(com.nadoumi.common.outbox.OutboxEventTypes.STUDENT_REGISTERED), payload.capture());
-        assertThat(payload.getValue()).contains("\"userId\":42").contains("ada@example.com").contains("ada_l");
+        // The welcome email is not sent at registration: it waits until onboarding is complete.
+        verifyNoInteractions(outbox);
     }
 
     @Test

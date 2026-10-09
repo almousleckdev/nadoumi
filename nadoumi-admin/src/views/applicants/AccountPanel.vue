@@ -6,6 +6,7 @@ import { listAccess } from '@/api/applicant'
 import { changeUserStatus, getUser, type SysUserRow } from '@/api/system'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
+import Avatar from '@/components/ui/Avatar.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import StatusReasonDialog from '@/components/ui/StatusReasonDialog.vue'
 import StudentContactDialog from './StudentContactDialog.vue'
@@ -17,7 +18,7 @@ const STATUS_ACTIVE = '0'
 const STATUS_SUSPENDED = '1'
 const STATUS_BLOCKED = '2'
 
-const props = defineProps<{ id: string }>()
+const props = defineProps<{ id: string, photoUrl?: string | null }>()
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -89,13 +90,12 @@ onMounted(load)
     data-test="account-panel"
   >
     <div class="account__who">
-      <el-avatar
+      <Avatar
+        :name="displayName"
+        :src="props.photoUrl || student.avatar || undefined"
         :size="40"
-        :src="student.avatar || undefined"
-        class="account__avatar"
-      >
-        {{ displayName.slice(0, 1).toUpperCase() }}
-      </el-avatar>
+        data-test="account-avatar"
+      />
       <div class="account__text">
         <span class="account__name">{{ t('students.accountInfo') }}</span>
         <span class="account__meta">@{{ student.userName }} · {{ student.email || t('students.noEmail') }}</span>
@@ -186,11 +186,6 @@ onMounted(load)
   align-items: center;
   gap: 12px;
   min-width: 0;
-}
-.account__avatar {
-  background: var(--nad-primary, #1e3a8a);
-  color: #fff;
-  font-weight: 600;
 }
 .account__text {
   display: flex;

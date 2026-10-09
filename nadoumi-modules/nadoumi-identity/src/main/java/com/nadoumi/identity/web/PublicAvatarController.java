@@ -49,13 +49,13 @@ public class PublicAvatarController {
 
     /** The staff-side link: an applicant's own photo, whether or not the applicant has a sign-in account. */
     @Anonymous
-    @GetMapping("/api/public/avatars/applicants/{applicantId}/{signature}")
-    public ResponseEntity<Void> applicantAvatar(@PathVariable long applicantId, @PathVariable String signature,
+    @GetMapping("/api/public/avatars/applicants/{publicId}/{signature}")
+    public ResponseEntity<Void> applicantAvatar(@PathVariable String publicId, @PathVariable String signature,
             HttpServletRequest request) {
-        if (!links.isValidForApplicant(applicantId, signature)) {
+        if (!links.isValidForApplicant(publicId, signature)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        return redirectToPhoto(profiles.findApplicantPhotoMediaId(applicantId), request);
+        return redirectToPhoto(profiles.findApplicantPhotoMediaId(publicId), request);
     }
 
     private ResponseEntity<Void> redirectToPhoto(Long mediaId, HttpServletRequest request) {

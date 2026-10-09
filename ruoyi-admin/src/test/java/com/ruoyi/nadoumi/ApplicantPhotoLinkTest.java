@@ -25,17 +25,17 @@ class ApplicantPhotoLinkTest extends AbstractStudentIntegrationTest {
         createStaff("photo_staff", "nadoumi_super_admin");
         String staff = bearer(staffToken("photo_staff"));
 
-        String list = mvc.perform(get("/api/staff/applicants").header("Authorization", staff))
+        String list = mvc.perform(get("/api/staff/applicants?incomplete=true").header("Authorization", staff))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
         String link = photoUrlOf(list, withPhoto.applicantId());
-        assertThat(link).startsWith("/api/public/avatars/applicants/" + withPhoto.applicantId() + "/");
+        assertThat(link).startsWith("/api/public/avatars/applicants/" + pid(withPhoto.applicantId()) + "/");
         assertThat(photoUrlOf(list, without.applicantId())).isNull();
 
         mvc.perform(get(link)).andExpect(status().isFound());
-        mvc.perform(get("/api/public/avatars/applicants/" + withPhoto.applicantId() + "/forged-signature"))
+        mvc.perform(get("/api/public/avatars/applicants/" + pid(withPhoto.applicantId()) + "/forged-signature"))
                 .andExpect(status().isNotFound());
-        mvc.perform(get(link.replace("/applicants/" + withPhoto.applicantId() + "/", "/applicants/" + without.applicantId() + "/")))
+        mvc.perform(get(link.replace(pid(withPhoto.applicantId()), pid(without.applicantId()))))
                 .andExpect(status().isNotFound());
     }
 

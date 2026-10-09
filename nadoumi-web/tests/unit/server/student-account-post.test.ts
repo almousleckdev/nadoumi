@@ -60,4 +60,14 @@ describe('POST /api/student-account', () => {
     expect(res).toEqual({ title: 'Conflict', detail: 'username taken', status: 409 })
     expect(state.token).toBeUndefined()
   })
+
+  it('reports signedIn:false, not an error, when the account was created but the automatic sign-in failed', async () => {
+    state.fetchImpl
+      .mockResolvedValueOnce({ userId: 1, username: 'sam' })
+      .mockRejectedValueOnce(Object.assign(new Error('bad'), { statusCode: 400 }))
+    const res = await handler({} as never)
+    expect(res).toEqual({ signedIn: false })
+    expect(state.token).toBeUndefined()
+    expect(state.status).toBe(0)
+  })
 })

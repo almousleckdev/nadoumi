@@ -170,6 +170,11 @@ public abstract class AbstractNadIntegrationTest {
                 "{\"email\":\"" + username + "@example.test\",\"password\":\"" + PASSWORD + "\"}");
     }
 
+    /** Staff URLs identify an applicant by its public UUID, never the numeric id. */
+    protected String pid(long applicantId) {
+        return jdbc.queryForObject("select public_id from nad_applicant where id = ?", String.class, applicantId);
+    }
+
     protected String bearer(String token) {
         return "Bearer " + token;
     }

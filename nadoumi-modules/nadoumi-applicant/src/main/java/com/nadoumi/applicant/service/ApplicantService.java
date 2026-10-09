@@ -103,11 +103,11 @@ public class ApplicantService {
     }
 
     public PageResponse<ApplicantResponse> listForStaff(String name, ApplicantStatus status,
-            String nationality, LocalDateTime createdAfter, int page, int size) {
+            String nationality, LocalDateTime createdAfter, boolean includeIncomplete, int page, int size) {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
-        List<Applicant> rows = mapper.search(name, status, nationality, createdAfter);
+        List<Applicant> rows = mapper.search(name, status, nationality, createdAfter, includeIncomplete);
         long total = new PageInfo<>(rows).getTotal();
         boolean pii = includePii();
         List<ApplicantResponse> content = rows.stream().map(a -> staffView(a, pii)).toList();
@@ -125,7 +125,7 @@ public class ApplicantService {
     // ---- internals ----
 
     private ApplicantResponse staffView(Applicant a, boolean pii) {
-        String photo = a.getPhotoMediaId() == null ? null : avatars.linkForApplicant(a.getId());
+        String photo = a.getPhotoMediaId() == null ? null : avatars.linkForApplicant(a.getPublicId());
         return ApplicantResponse.of(a, pii, photo);
     }
 

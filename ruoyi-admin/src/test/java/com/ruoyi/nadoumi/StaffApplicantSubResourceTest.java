@@ -32,25 +32,25 @@ class StaffApplicantSubResourceTest extends AbstractNadIntegrationTest {
         String token = staffToken("subres_edu");
         long id = newApplicant(token);
 
-        String created = mvc.perform(post("/api/staff/applicants/{id}/education", id)
+        String created = mvc.perform(post("/api/staff/applicants/{id}/education", pid(id))
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"institution\":\"Old School\",\"country\":\"EG\",\"level\":\"BACHELOR\"}"))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         long eduId = ((Number) JsonPath.read(created, "$.id")).longValue();
 
-        mvc.perform(put("/api/staff/applicants/{id}/education/{e}", id, eduId)
+        mvc.perform(put("/api/staff/applicants/{id}/education/{e}", pid(id), eduId)
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"institution\":\"New School\",\"country\":\"EG\",\"level\":\"MASTER\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.institution").value("New School"))
                 .andExpect(jsonPath("$.level").value("MASTER"));
 
-        mvc.perform(delete("/api/staff/applicants/{id}/education/{e}", id, eduId)
+        mvc.perform(delete("/api/staff/applicants/{id}/education/{e}", pid(id), eduId)
                         .header("Authorization", bearer(token)))
                 .andExpect(status().isNoContent());
 
-        mvc.perform(get("/api/staff/applicants/{id}/education", id).header("Authorization", bearer(token)))
+        mvc.perform(get("/api/staff/applicants/{id}/education", pid(id)).header("Authorization", bearer(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
     }
@@ -61,34 +61,34 @@ class StaffApplicantSubResourceTest extends AbstractNadIntegrationTest {
         String token = staffToken("subres_sc");
         long id = newApplicant(token);
 
-        String score = mvc.perform(post("/api/staff/applicants/{id}/test-scores", id)
+        String score = mvc.perform(post("/api/staff/applicants/{id}/test-scores", pid(id))
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"testType\":\"IELTS\",\"score\":\"6.5\"}"))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long scoreId = ((Number) JsonPath.read(score, "$.id")).longValue();
 
-        mvc.perform(put("/api/staff/applicants/{id}/test-scores/{s}", id, scoreId)
+        mvc.perform(put("/api/staff/applicants/{id}/test-scores/{s}", pid(id), scoreId)
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"testType\":\"IELTS\",\"score\":\"7.5\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.score").value("7.5"));
-        mvc.perform(delete("/api/staff/applicants/{id}/test-scores/{s}", id, scoreId)
+        mvc.perform(delete("/api/staff/applicants/{id}/test-scores/{s}", pid(id), scoreId)
                         .header("Authorization", bearer(token)))
                 .andExpect(status().isNoContent());
 
-        String contact = mvc.perform(post("/api/staff/applicants/{id}/contacts", id)
+        String contact = mvc.perform(post("/api/staff/applicants/{id}/contacts", pid(id))
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"relation\":\"GUARDIAN\",\"name\":\"Pat\",\"email\":\"pat@example.test\"}"))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long contactId = ((Number) JsonPath.read(contact, "$.id")).longValue();
 
-        mvc.perform(put("/api/staff/applicants/{id}/contacts/{c}", id, contactId)
+        mvc.perform(put("/api/staff/applicants/{id}/contacts/{c}", pid(id), contactId)
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"relation\":\"EMERGENCY\",\"name\":\"Sam\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.relation").value("EMERGENCY"))
                 .andExpect(jsonPath("$.name").value("Sam"));
-        mvc.perform(delete("/api/staff/applicants/{id}/contacts/{c}", id, contactId)
+        mvc.perform(delete("/api/staff/applicants/{id}/contacts/{c}", pid(id), contactId)
                         .header("Authorization", bearer(token)))
                 .andExpect(status().isNoContent());
     }
@@ -100,13 +100,13 @@ class StaffApplicantSubResourceTest extends AbstractNadIntegrationTest {
         long a = newApplicant(token);
         long b = newApplicant(token);
 
-        String created = mvc.perform(post("/api/staff/applicants/{id}/test-scores", a)
+        String created = mvc.perform(post("/api/staff/applicants/{id}/test-scores", pid(a))
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"testType\":\"TOEFL\",\"score\":\"100\"}"))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long scoreOnA = ((Number) JsonPath.read(created, "$.id")).longValue();
 
-        mvc.perform(put("/api/staff/applicants/{id}/test-scores/{s}", b, scoreOnA)
+        mvc.perform(put("/api/staff/applicants/{id}/test-scores/{s}", pid(b), scoreOnA)
                         .header("Authorization", bearer(token)).contentType("application/json")
                         .content("{\"testType\":\"TOEFL\",\"score\":\"110\"}"))
                 .andExpect(status().isNotFound());
@@ -126,19 +126,19 @@ class StaffApplicantSubResourceTest extends AbstractNadIntegrationTest {
 
         String editor = staffTokenFor("subres_owner", "ops_manager");
         long id = newApplicant(editor);
-        String created = mvc.perform(post("/api/staff/applicants/{id}/education", id)
+        String created = mvc.perform(post("/api/staff/applicants/{id}/education", pid(id))
                         .header("Authorization", bearer(editor)).contentType("application/json")
                         .content("{\"institution\":\"Uni\",\"country\":\"EG\",\"level\":\"BACHELOR\"}"))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long eduId = ((Number) JsonPath.read(created, "$.id")).longValue();
 
         String viewer = staffTokenFor("subres_viewer", "sub_view_only");
-        mvc.perform(put("/api/staff/applicants/{id}/education/{e}", id, eduId)
+        mvc.perform(put("/api/staff/applicants/{id}/education/{e}", pid(id), eduId)
                         .header("Authorization", bearer(viewer)).contentType("application/json")
                         .content("{\"institution\":\"Hacked\",\"country\":\"EG\",\"level\":\"DOCTORATE\"}"))
                 .andExpect(status().isForbidden());
         // ...but the same viewer can read it
-        mvc.perform(get("/api/staff/applicants/{id}/education", id).header("Authorization", bearer(viewer)))
+        mvc.perform(get("/api/staff/applicants/{id}/education", pid(id)).header("Authorization", bearer(viewer)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].institution").value("Uni"));
     }

@@ -32,8 +32,11 @@ public final class OutboxEventTypes {
     /** A task's status or assignment changed. Aggregate: {@code task}. */
     public static final String TASK_PROGRESS_CHANGED = "TaskProgressChanged";
 
-    /** A student finished registration (email verified + account created). Aggregate: {@code user}. */
-    public static final String STUDENT_REGISTERED = "StudentRegistered";
+    /**
+     * A student completed onboarding, so their profile is real. The welcome email and notification are sent for
+     * this, not at registration: an account that never finished onboarding gets nothing. Aggregate: {@code user}.
+     */
+    public static final String STUDENT_ONBOARDED = "StudentOnboarded";
 
     /**
      * An application was submitted. Aggregate: {@code application}.

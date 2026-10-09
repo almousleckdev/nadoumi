@@ -59,7 +59,7 @@ class StudentPassportTest extends AbstractStudentIntegrationTest {
         upload(s, "/passport/scan", "passport.png").andExpect(status().isCreated());
         createStaff("pii_less", "staff");
 
-        mvc.perform(get("/api/staff/applicants/" + s.applicantId() + "/passport/scan").param("json", "1")
+        mvc.perform(get("/api/staff/applicants/" + pid(s.applicantId()) + "/passport/scan").param("json", "1")
                         .header("Authorization", bearer(staffToken("pii_less"))))
                 .andExpect(status().isForbidden());
     }
@@ -70,7 +70,7 @@ class StudentPassportTest extends AbstractStudentIntegrationTest {
         upload(s, "/passport/scan", "passport.png").andExpect(status().isCreated());
         createStaff("pii_full", "case_officer");
 
-        mvc.perform(get("/api/staff/applicants/" + s.applicantId() + "/passport/scan").param("json", "1")
+        mvc.perform(get("/api/staff/applicants/" + pid(s.applicantId()) + "/passport/scan").param("json", "1")
                         .header("Authorization", bearer(staffToken("pii_full"))))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.url").isNotEmpty());
     }

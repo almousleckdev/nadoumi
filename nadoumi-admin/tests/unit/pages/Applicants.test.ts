@@ -14,7 +14,7 @@ import Applicants from '@/views/applicants/index.vue'
 import { useUserStore } from '@/stores/user'
 
 const row = (id: number, over = {}) => ({
-  id, givenName: 'Amina', familyName: 'Benali', nationality: 'MA', email: 'a@x.io', passportNo: null,
+  id, publicId: `00000000-0000-4000-8000-00000000000${id}`, givenName: 'Amina', familyName: 'Benali', nationality: 'MA', email: 'a@x.io', passportNo: null,
   status: 'ACTIVE', createdAt: '2026-01-01 10:00:00', photoUrl: null, ...over,
 })
 
@@ -71,5 +71,22 @@ describe('Applicants list', () => {
     useUserStore().permissions = ['nad:applicant:list']
     const w = await mountList()
     expect(body(w).find('[data-test="delete-applicant"]').exists()).toBe(false)
+  })
+
+  it('opens the detail page by the applicant UUID, never the numeric id', async () => {
+    const w = await mountList()
+    await body(w).find('tbody tr').trigger('click')
+    await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/applicants/00000000-0000-4000-8000-000000000007')
+  })
+
+  it('leaves incomplete sign-ups out until asked for them', async () => {
+    const w = await mountList()
+    expect(api.listApplicants).toHaveBeenLastCalledWith(expect.objectContaining({ incomplete: undefined }))
+
+    await w.findComponent({ name: 'ElCheckbox' }).vm.$emit('update:modelValue', true)
+    await w.findComponent({ name: 'ElCheckbox' }).vm.$emit('change', true)
+    await flushPromises()
+    expect(api.listApplicants).toHaveBeenLastCalledWith(expect.objectContaining({ incomplete: true }))
   })
 })

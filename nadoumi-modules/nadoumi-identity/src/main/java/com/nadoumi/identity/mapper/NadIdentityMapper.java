@@ -27,6 +27,9 @@ public interface NadIdentityMapper {
 
     int touchPwdUpdateDate(@Param("userId") Long userId);
 
+    /** The sign-in email of a live student account, or null. */
+    String selectStudentEmail(@Param("userId") Long userId);
+
     /**
      * Soft-deletes a student account and frees its sign-in identifiers so they can be registered again.
      * Returns 0 when the user is not a live student.

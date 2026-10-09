@@ -117,6 +117,7 @@ export default {
     phoneInvalid: 'Enter a valid phone number',
   },
   applicant: {
+    showIncomplete: 'Include incomplete sign-ups',
     delete: 'Delete',
     deleteTitle: 'Delete applicant',
     deleteConfirm: 'Permanently delete {name}? This removes the profile, applications, documents and uploaded files, and closes their student login if it has no other applicant. This cannot be undone.',
@@ -159,7 +160,7 @@ export default {
     phone: 'Phone',
     status: 'Status',
     registered: 'Registered',
-    idLabel: 'Applicant #{id}',
+    idLabel: 'ID {id}',
     invitedEmail: 'Owner invite email',
     invitedEmailHint: 'The person who will own this profile',
     required: 'Required',

@@ -36,7 +36,7 @@ class MediaAccessLogTest extends AbstractNadIntegrationTest {
 
         assertThat(jdbc.queryForObject("select count(*) from nad_media_access_log", Integer.class)).isZero();
 
-        mvc.perform(get("/api/staff/applicants/{id}/photo", applicantId)
+        mvc.perform(get("/api/staff/applicants/{id}/photo", pid(applicantId))
                         .param("json", "1").header("Authorization", bearer(token)))
                 .andExpect(status().isOk());
 
@@ -64,7 +64,7 @@ class MediaAccessLogTest extends AbstractNadIntegrationTest {
         createStaff("mal_stranger", "media_log_no_view");
         String strangerToken = staffToken("mal_stranger");
 
-        mvc.perform(get("/api/staff/applicants/{id}/photo", applicantId)
+        mvc.perform(get("/api/staff/applicants/{id}/photo", pid(applicantId))
                         .param("json", "1").header("Authorization", bearer(strangerToken)))
                 .andExpect(status().isForbidden());
 
@@ -112,7 +112,7 @@ class MediaAccessLogTest extends AbstractNadIntegrationTest {
     }
 
     private long uploadStaffPhoto(String staffToken, long applicantId) throws Exception {
-        String res = mvc.perform(multipart("/api/staff/applicants/{id}/photo", applicantId)
+        String res = mvc.perform(multipart("/api/staff/applicants/{id}/photo", pid(applicantId))
                         .file(new org.springframework.mock.web.MockMultipartFile("file", "me.png", "image/png", PNG))
                         .header("Authorization", bearer(staffToken)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();

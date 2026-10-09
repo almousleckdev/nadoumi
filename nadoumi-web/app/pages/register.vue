@@ -66,7 +66,7 @@ async function submit() {
   }
   busy.value = true
   try {
-    await $fetch('/api/student-account', {
+    const res = await $fetch<{ signedIn: boolean }>('/api/student-account', {
       method: 'POST',
       body: {
         username: normalizeUsername(form.username),
@@ -75,6 +75,12 @@ async function submit() {
         ticket: ticket.value,
       },
     })
+    if (!res.signedIn) {
+      // The account was created; only the automatic sign-in failed, so send them to sign in.
+      useToast().info(t('auth.accountCreatedSignIn'))
+      await navigateTo(localePath('/login'))
+      return
+    }
     await refresh()
     await navigateTo(localePath('/onboarding'))
   }

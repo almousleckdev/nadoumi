@@ -1,9 +1,6 @@
 package com.nadoumi.identity.service;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.nadoumi.common.access.AccessCapabilityMatrix;
-import com.nadoumi.common.outbox.OutboxEventTypes;
-import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.identity.access.CapabilityOverrides;
 import com.nadoumi.identity.access.CurrentCaller;
 import com.nadoumi.identity.access.SessionRevoker;
@@ -63,13 +60,11 @@ public class StudentAuthService {
     private final TicketService tickets;
     private final SessionRevoker sessionRevoker;
     private final ApplicationEventPublisher events;
-    private final OutboxWriter outbox;
 
     public StudentAuthService(ISysConfigService configService, ISysUserService userService,
             SysLoginService loginService, TokenService tokenService, NadIdentityMapper identityMapper,
             UserApplicantAccessMapper accessMapper, UserApplicantAccessService grants, CurrentCaller caller,
-            TicketService tickets, SessionRevoker sessionRevoker, ApplicationEventPublisher events,
-            OutboxWriter outbox) {
+            TicketService tickets, SessionRevoker sessionRevoker, ApplicationEventPublisher events) {
         this.configService = configService;
         this.userService = userService;
         this.loginService = loginService;
@@ -81,7 +76,6 @@ public class StudentAuthService {
         this.tickets = tickets;
         this.sessionRevoker = sessionRevoker;
         this.events = events;
-        this.outbox = outbox;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -119,15 +113,6 @@ public class StudentAuthService {
         identityMapper.updateUserType(user.getUserId(), STUDENT_USER_TYPE);
         identityMapper.markEmailVerified(user.getUserId());
         events.publishEvent(new StudentRegisteredEvent(user.getUserId(), email, username));
-
-        // Committed with the account row; the poller fans it to the Welcome email.
-        JSONObject payload = new JSONObject();
-        payload.put("userId", user.getUserId());
-        payload.put("email", email);
-        payload.put("firstName", username);
-        payload.put("displayName", username);
-        payload.put("locale", "en");
-        outbox.write("user", user.getUserId(), OutboxEventTypes.STUDENT_REGISTERED, payload.toJSONString());
 
         return new StudentRegisterResponse(user.getUserId(), user.getUserName());
     }

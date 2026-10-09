@@ -54,7 +54,7 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 
     @Override
     public void dispatch(OutboxEvent event) {
-        if (OutboxEventTypes.STUDENT_REGISTERED.equals(event.getType())) {
+        if (OutboxEventTypes.STUDENT_ONBOARDED.equals(event.getType())) {
             welcomeComposer.handle(event, parseContext(event));
             return;
         }

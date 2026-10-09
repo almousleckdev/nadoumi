@@ -46,4 +46,12 @@
         where c.article_id = #{articleId} and l.user_id = #{userId}
         order by l.comment_id
     </select>
+
+    <delete id="removeArticleLikesByUser">
+        delete from nad_article_like where user_id = #{userId}
+    </delete>
+
+    <delete id="removeCommentLikesByUser">
+        delete from nad_article_comment_like where user_id = #{userId}
+    </delete>
 </mapper>

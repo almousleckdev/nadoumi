@@ -74,8 +74,9 @@ public class UserConstants
     public static final int USERNAME_MAX_LENGTH = 20;
 
     /**
-     * 密码长度限制
+     * Login accepts every password the account policy allows: PasswordPolicy permits 8 to 32 characters, so a cap
+     * below 32 here locks out anyone who chose a long password right after they registered.
      */
     public static final int PASSWORD_MIN_LENGTH = 5;
-    public static final int PASSWORD_MAX_LENGTH = 20;
+    public static final int PASSWORD_MAX_LENGTH = 32;
 }

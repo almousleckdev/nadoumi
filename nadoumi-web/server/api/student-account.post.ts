@@ -25,10 +25,17 @@ export default defineEventHandler(async (event) => {
     return e.data ?? { detail: 'registration failed' }
   }
 
-  const { token } = await $fetch<{ token: string }>(`${base}/api/student/login`, {
-    method: 'POST',
-    body: { email: body.email, password: body.password },
-  })
-  setStudentToken(event, token)
-  return { signedIn: true }
+  // The account exists now. If the automatic sign-in fails the student must still be told it was created,
+  // not shown a registration error for something that succeeded.
+  try {
+    const { token } = await $fetch<{ token: string }>(`${base}/api/student/login`, {
+      method: 'POST',
+      body: { email: body.email, password: body.password },
+    })
+    setStudentToken(event, token)
+    return { signedIn: true }
+  }
+  catch {
+    return { signedIn: false }
+  }
 })

@@ -52,7 +52,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
         long applicant = s.applicantId();
         createStaff("era_admin", "nadoumi_super_admin");
 
-        mvc.perform(delete("/api/staff/applicants/" + applicant).header("Authorization", bearer(staffToken("era_admin"))))
+        mvc.perform(delete("/api/staff/applicants/" + pid(applicant)).header("Authorization", bearer(staffToken("era_admin"))))
                 .andExpect(status().isNoContent());
 
         for (String table : new String[] {"nad_applicant_education", "nad_applicant_contact", "nad_applicant_residence",
@@ -78,7 +78,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long id = ((Number) JsonPath.read(created, "$.id")).longValue();
 
-        mvc.perform(delete("/api/staff/applicants/" + id).header("Authorization", token)).andExpect(status().isNoContent());
+        mvc.perform(delete("/api/staff/applicants/" + pid(id)).header("Authorization", token)).andExpect(status().isNoContent());
 
         assertThat(count("nad_applicant", "id", id)).isZero();
     }
@@ -89,7 +89,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
         long userId = userIdOf(s);
         createStaff("era_admin3", "nadoumi_super_admin");
 
-        mvc.perform(delete("/api/staff/applicants/" + s.applicantId()).header("Authorization", bearer(staffToken("era_admin3"))))
+        mvc.perform(delete("/api/staff/applicants/" + pid(s.applicantId())).header("Authorization", bearer(staffToken("era_admin3"))))
                 .andExpect(status().isNoContent());
 
         assertThat(jdbc.queryForObject("select count(*) from sys_user where email = ? and del_flag = '0'", Integer.class, s.email()))
@@ -102,7 +102,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
         Student s = register("Keep", "Me");
         createStaff("era_ops", "ops_manager");
 
-        mvc.perform(delete("/api/staff/applicants/" + s.applicantId()).header("Authorization", bearer(staffToken("era_ops"))))
+        mvc.perform(delete("/api/staff/applicants/" + pid(s.applicantId())).header("Authorization", bearer(staffToken("era_ops"))))
                 .andExpect(status().isForbidden());
 
         assertThat(count("nad_applicant", "id", s.applicantId())).isEqualTo(1);
@@ -113,7 +113,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
         Student attacker = register("Sneaky", "One");
         Student victim = register("Vic", "Tim");
 
-        mvc.perform(delete("/api/staff/applicants/" + victim.applicantId()).header("Authorization", bearer(attacker.token())))
+        mvc.perform(delete("/api/staff/applicants/" + pid(victim.applicantId())).header("Authorization", bearer(attacker.token())))
                 .andExpect(status().isForbidden());
 
         assertThat(count("nad_applicant", "id", victim.applicantId())).isEqualTo(1);
@@ -129,10 +129,31 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         long secondId = ((Number) JsonPath.read(second, "$.id")).longValue();
 
-        mvc.perform(delete("/api/staff/applicants/" + secondId).header("Authorization", bearer(staffToken("era_admin4"))))
+        mvc.perform(delete("/api/staff/applicants/" + pid(secondId)).header("Authorization", bearer(staffToken("era_admin4"))))
                 .andExpect(status().isNoContent());
 
         assertThat(jdbc.queryForObject("select del_flag from sys_user where user_id = ?", String.class, userId)).isEqualTo("0");
         assertThat(count("nad_applicant", "id", s.applicantId())).isEqualTo(1);
+    }
+
+    @Test
+    void shouldLeaveNoGhostChatOrNotificationBehind_whenTheStudentIsDeleted() throws Exception {
+        Student s = register("Ghost", "Free");
+        long userId = userIdOf(s);
+        createStaff("era_admin5", "nadoumi_super_admin");
+        String staff = bearer(staffToken("era_admin5"));
+        mvc.perform(post("/api/staff/conversations/direct").header("Authorization", staff)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"userId\":" + userId + "}"))
+                .andExpect(status().isOk());
+        jdbc.update("insert into nad_notification (recipient_user_id, type, title, body, created_at) "
+                + "values (?, 'WELCOME', 'Welcome', 'Hello', now())", userId);
+        assertThat(count("nad_conversation_participant", "user_id", userId)).isEqualTo(1);
+
+        mvc.perform(delete("/api/staff/applicants/" + pid(s.applicantId())).header("Authorization", staff))
+                .andExpect(status().isNoContent());
+
+        assertThat(count("nad_conversation_participant", "user_id", userId)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from nad_conversation", Long.class)).isZero();
+        assertThat(count("nad_notification", "recipient_user_id", userId)).isZero();
     }
 }

@@ -9,6 +9,7 @@ import com.nadoumi.common.text.Texts;
  */
 public record ApplicantResponse(
         Long id,
+        String publicId,
         String givenName,
         String familyName,
         String dob,
@@ -39,6 +40,7 @@ public record ApplicantResponse(
     public static ApplicantResponse of(Applicant a, boolean includePii, String photoUrl) {
         return new ApplicantResponse(
                 a.getId(),
+                a.getPublicId(),
                 a.getGivenName(),
                 a.getFamilyName(),
                 includePii ? Texts.stringOrNull(a.getDob()) : mask(a.getDob()),

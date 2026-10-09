@@ -13,6 +13,11 @@ public interface ArticleReactionMapper {
 
     int deleteArticleLike(@Param("articleId") long articleId, @Param("userId") long userId);
 
+    /** Removes every like a retired student gave, on articles and on comments. */
+    int removeArticleLikesByUser(@Param("userId") long userId);
+
+    int removeCommentLikesByUser(@Param("userId") long userId);
+
     int countArticleLikes(@Param("articleId") long articleId);
 
     /** Ids of the most recent likers, newest first. */

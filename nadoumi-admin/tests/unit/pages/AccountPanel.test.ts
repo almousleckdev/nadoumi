@@ -26,9 +26,9 @@ const router = createRouter({
   routes: [{ path: '/applicants', component: { template: '<div />' } }, { path: '/', component: { template: '<div />' } }],
 })
 
-async function mountPanel() {
+async function mountPanel(photoUrl?: string) {
   const w = mount(AccountPanel, {
-    props: { id: '7' },
+    props: { id: '7', photoUrl },
     global: {
       ...mountOpts().global,
       plugins: [...mountOpts().global.plugins, router],
@@ -117,5 +117,16 @@ describe('Applicant account panel', () => {
     const w = await mountPanel()
     expect(w.find('[data-test="account-suspend"]').exists()).toBe(false)
     expect(w.find('[data-test="account-block"]').exists()).toBe(false)
+  })
+
+  it("shows the applicant's profile photo, which is not the sign-in account's avatar column", async () => {
+    const w = await mountPanel('/api/public/avatars/applicants/u/sig')
+    expect(w.findComponent({ name: 'Avatar' }).props('src')).toBe('/api/public/avatars/applicants/u/sig')
+  })
+
+  it('falls back to initials when there is no photo', async () => {
+    const w = await mountPanel()
+    expect(w.findComponent({ name: 'Avatar' }).props('src')).toBeUndefined()
+    expect(w.find('[data-test="account-avatar"]').text()).toContain('A')
   })
 })

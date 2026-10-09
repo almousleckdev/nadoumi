@@ -49,4 +49,10 @@
         set status = 'DELETED', deleted_by = #{deletedBy}, deleted_time = now()
         where id = #{id} and status = 'VISIBLE'
     </update>
+
+    <update id="markDeletedByAuthor">
+        update nad_article_comment
+        set status = 'DELETED', deleted_by = #{deletedBy}, deleted_time = now()
+        where author_id = #{authorId} and status = 'VISIBLE'
+    </update>
 </mapper>

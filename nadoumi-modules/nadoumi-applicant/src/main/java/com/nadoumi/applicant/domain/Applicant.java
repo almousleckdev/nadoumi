@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class Applicant {
 
     private Long id;
+    private String publicId = java.util.UUID.randomUUID().toString();
     private String givenName;
     private String familyName;
     private LocalDate dob;
@@ -42,6 +43,10 @@ public class Applicant {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    /** Unguessable id used in staff URLs and the staff API; the numeric {@code id} stays internal. */
+    public String getPublicId() { return publicId; }
+    public void setPublicId(String publicId) { this.publicId = publicId; }
 
     public String getGivenName() { return givenName; }
     public void setGivenName(String givenName) { this.givenName = givenName; }

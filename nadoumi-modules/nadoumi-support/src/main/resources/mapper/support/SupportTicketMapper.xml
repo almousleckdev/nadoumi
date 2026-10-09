@@ -91,4 +91,8 @@
     <delete id="deleteById">
         delete from nad_support_ticket where id = #{id}
     </delete>
+
+    <select id="findOpenedBy" resultMap="ticket">
+        select * from nad_support_ticket where opened_by_user_id = #{userId}
+    </select>
 </mapper>

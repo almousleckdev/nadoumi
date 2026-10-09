@@ -20,5 +20,8 @@ public interface ArticleCommentMapper {
     int countByAuthorSince(@Param("authorId") long authorId, @Param("since") LocalDateTime since);
 
     /** Soft delete. Returns 0 when the comment was already deleted. */
+    /** Blanks every comment a retired student wrote; replies keep their place under the deleted marker. */
+    int markDeletedByAuthor(@Param("authorId") long authorId, @Param("deletedBy") long deletedBy);
+
     int markDeleted(@Param("id") long id, @Param("deletedBy") long deletedBy);
 }

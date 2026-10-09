@@ -551,3 +551,13 @@ Staff photos remain public `STAFF_AVATAR` assets (absolute https URLs only).
 
 Delete permissions are separate from edit and manage permissions on purpose: holding `nad:support:ticket:manage` or
 `system:user:edit` never allows a delete.
+
+## Identifiers and passwords (EXISTING, 2026-10-09, V100)
+
+- **Applicant ids.** `nad_applicant.public_id` is a random UUID. The staff API and the admin URLs use only it; the
+  numeric id is internal, and a numeric id on `/api/staff/applicants/...` is a 404, so applicants cannot be found
+  by counting. Authorization still runs on the real id in the access guard. Other entities (applications,
+  scholarships, documents) still use numeric ids in their paths; they need the same treatment.
+- **Password length.** The password policy allows 8 to 32 characters. RuoYi's login pre-check capped passwords at 20,
+  so a student with a longer password was registered but could never sign in. `UserConstants.PASSWORD_MAX_LENGTH`
+  is now 32, and the register flow reports an automatic sign-in failure as "account created, please sign in".

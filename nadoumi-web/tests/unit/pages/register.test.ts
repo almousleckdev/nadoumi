@@ -176,4 +176,36 @@ describe('register wizard (3 steps)', () => {
     const next = w.findAll('button').find(b => b.text().toLowerCase() === 'next')!
     expect(next.attributes('disabled')).toBeDefined()
   })
+
+  it('tells the student plainly that the password must not contain the username', async () => {
+    const w = await mountSuspended(Register)
+    await reachPasswordStep(w)
+    await w.find('#password').setValue('Ada_l-Pass1!')
+
+    expect(w.find('[data-test="pw-personal-error"]').text())
+      .toBe('Your password must not contain your username or the first part of your email address.')
+  })
+
+  it('does not show that message for a password that is fine', async () => {
+    const w = await mountSuspended(Register)
+    await reachPasswordStep(w)
+    await w.find('#password').setValue('Zebra-Moon-71!')
+
+    expect(w.find('[data-test="pw-personal-error"]').exists()).toBe(false)
+  })
+
+  it('sends the student to sign in when the account was created but the automatic sign-in failed', async () => {
+    const w = await mountSuspended(Register)
+    await reachPasswordStep(w)
+    await w.find('#password').setValue('Zebra-Moon-71!')
+    await w.find('#confirm').setValue('Zebra-Moon-71!')
+    await w.find('#accept-terms').setValue(true)
+    fetchImpl.mockImplementation((url: string) => (url === '/api/student-account' ? Promise.resolve({ signedIn: false }) : Promise.resolve({})))
+
+    await w.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(nav).toHaveBeenCalledWith('/login')
+    expect(nav).not.toHaveBeenCalledWith('/onboarding')
+  })
 })

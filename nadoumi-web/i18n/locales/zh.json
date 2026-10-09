@@ -341,6 +341,7 @@
     "acceptTermsShort": "我同意{terms}",
     "acceptPrivacyShort": "我同意{privacy}",
     "consentRequired": "请先同意服务条款及隐私政策以继续。",
+    "accountCreatedSignIn": "您的账号已创建，但自动登录失败，请手动登录。",
     "showPassword": "显示密码",
     "hidePassword": "隐藏密码",
     "pwStrong": "密码强度高",
@@ -718,7 +719,8 @@
       "needSpecial": "请添加一个特殊字符。",
       "sameAsCurrent": "请选择与当前密码不同的新密码。",
       "length": "8 至 32 个字符",
-      "noPersonal": "不能包含您的姓名或邮箱",
+      "noPersonal": "不包含用户名或邮箱前缀",
+      "noPersonalError": "密码不能包含您的用户名或邮箱前缀。",
       "mismatch": "两次输入的密码不一致。"
     }
   },
