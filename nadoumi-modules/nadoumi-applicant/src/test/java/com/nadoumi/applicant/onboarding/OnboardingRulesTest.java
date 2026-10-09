@@ -50,7 +50,7 @@ class OnboardingRulesTest {
         ApplicantInterest interest = new ApplicantInterest();
         interest.setDesiredLevel(StudyLevel.MASTER);
         interest.setFields(List.of("BUSINESS"));
-        interest.setCities(List.of("Beijing"));
+        interest.setCities(List.of("Beijing", "Sichuan", "Shanghai"));
         ApplicantResidence residence = new ApplicantResidence();
         residence.setInChina(false);
         ApplicantContact guardian = new ApplicantContact();
@@ -202,5 +202,20 @@ class OnboardingRulesTest {
 
         assertThat(section(new OnboardingData(d.applicant(), d.education(), d.interest(), d.residence(), List.of(other, noPhone)),
                 "CONTACT").missing()).containsExactly("guardianOrEmergencyContact");
+    }
+
+    @Test
+    void shouldRequireAtLeastThreeProvincesOrCities() {
+        OnboardingData d = data(complete());
+        ApplicantInterest two = new ApplicantInterest();
+        two.setDesiredLevel(StudyLevel.MASTER);
+        two.setFields(List.of("Computer Science"));
+        two.setCities(List.of("Beijing", "Shanghai"));
+
+        assertThat(section(new OnboardingData(d.applicant(), d.education(), two, d.residence(), d.contacts()), "INTERESTS")
+                .missing()).containsExactly("cities");
+        two.setCities(List.of("Beijing", "Shanghai", "Sichuan"));
+        assertThat(section(new OnboardingData(d.applicant(), d.education(), two, d.residence(), d.contacts()), "INTERESTS")
+                .complete()).isTrue();
     }
 }

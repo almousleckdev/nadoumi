@@ -19,7 +19,6 @@ import com.ruoyi.common.core.domain.model.LoginUser;
 import com.nadoumi.identity.web.request.StudentLoginRequest;
 import com.nadoumi.identity.web.request.StudentRegisterRequest;
 import com.nadoumi.identity.event.StudentRegisteredEvent;
-import com.nadoumi.common.rules.NameRules;
 import com.nadoumi.identity.web.response.AccessibleApplicant;
 import com.nadoumi.identity.web.response.StudentIdentityResponse;
 import com.nadoumi.identity.web.response.StudentRegisterResponse;
@@ -95,18 +94,22 @@ public class StudentAuthService {
         if (!verifiedEmail.equals(email)) {
             throw new NadBadRequestException("email verification does not match this address");
         }
-        String givenName = NameRules.normalize(req.firstName());
-        String familyName = NameRules.normalize(req.lastName());
-        PasswordPolicy.violation(req.password(), null,
-                        List.of(req.firstName(), req.lastName(), StudentEmails.localPart(email)))
+        String username = StudentUsernames.normalize(req.username());
+        if (!StudentUsernames.isValid(username)) {
+            throw new NadBadRequestException("username is not valid");
+        }
+        if (!usernameAvailable(username)) {
+            throw new NadBadRequestException("username is already taken");
+        }
+        PasswordPolicy.violation(req.password(), null, List.of(username, StudentEmails.localPart(email)))
                 .ifPresent(key -> { throw new NadBadRequestException(key); });
         if (identityMapper.selectUserIdByEmailAndType(email, STUDENT_USER_TYPE) != null) {
             throw new NadBadRequestException("email already registered");
         }
 
         SysUser user = new SysUser();
-        user.setUserName(generateStudentHandle(email));
-        user.setNickName(givenName + " " + familyName);
+        user.setUserName(username);
+        user.setNickName(username);
         user.setEmail(email);
         user.setPassword(SecurityUtils.encryptPassword(req.password()));
         user.setPwdUpdateDate(DateUtils.getNowDate());
@@ -115,14 +118,14 @@ public class StudentAuthService {
         }
         identityMapper.updateUserType(user.getUserId(), STUDENT_USER_TYPE);
         identityMapper.markEmailVerified(user.getUserId());
-        events.publishEvent(new StudentRegisteredEvent(user.getUserId(), email, givenName, familyName));
+        events.publishEvent(new StudentRegisteredEvent(user.getUserId(), email, username));
 
         // Committed with the account row; the poller fans it to the Welcome email.
         JSONObject payload = new JSONObject();
         payload.put("userId", user.getUserId());
         payload.put("email", email);
-        payload.put("firstName", req.firstName().trim());
-        payload.put("displayName", req.firstName().trim() + " " + req.lastName().trim());
+        payload.put("firstName", username);
+        payload.put("displayName", username);
         payload.put("locale", "en");
         outbox.write("user", user.getUserId(), OutboxEventTypes.STUDENT_REGISTERED, payload.toJSONString());
 
@@ -141,6 +144,24 @@ public class StudentAuthService {
         String token = loginService.login(user.getUserName(), req.password(), req.code(), req.uuid());
         grants.acceptInvitesFor(userId, user.getEmail());
         return token;
+    }
+
+    /** Whether a handle is well formed and still free, for the live check while a student types it. */
+    public UsernameCheck checkUsername(String raw) {
+        String username = StudentUsernames.normalize(raw);
+        boolean valid = StudentUsernames.isValid(username);
+        return new UsernameCheck(valid, valid && usernameAvailable(username));
+    }
+
+    /** Result of {@link #checkUsername}: {@code available} is only ever true for a valid handle. */
+    public record UsernameCheck(boolean valid, boolean available) {
+    }
+
+    /** True when no account uses this handle (case-insensitively). The handle must already be normalised. */
+    public boolean usernameAvailable(String normalizedUsername) {
+        SysUser probe = new SysUser();
+        probe.setUserName(normalizedUsername);
+        return userService.checkUserNameUnique(probe);
     }
 
     public boolean studentEmailExists(String email) {
@@ -220,20 +241,6 @@ public class StudentAuthService {
      * A unique, opaque internal {@code user_name} for a student. Never shown to the
      * user; the verified email and the display name carry identity.
      */
-    private String generateStudentHandle(String email) {
-        String base = "stu_" + email.replaceAll("[^a-z0-9]", "");
-        if (base.length() > 18) {
-            base = base.substring(0, 18);
-        }
-        SysUser probe = new SysUser();
-        for (int suffix = 0; ; suffix++) {
-            String candidate = suffix == 0 ? base : base + suffix;
-            probe.setUserName(candidate);
-            if (userService.checkUserNameUnique(probe)) {
-                return candidate;
-            }
-        }
-    }
 
     /** Personal terms a password must not contain: name words + email local-part. */
     private static List<String> personalTerms(String displayName, String email) {

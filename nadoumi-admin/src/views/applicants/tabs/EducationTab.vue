@@ -27,9 +27,25 @@
           min-width="200"
         />
         <el-table-column
+          :label="t('applicant.detail.place')"
+          min-width="140"
+        >
+          <template #default="{ row }">
+            {{ [row.city, countryName(row.country, locale)].filter(Boolean).join(', ') }}
+          </template>
+        </el-table-column>
+        <el-table-column
           :label="t('applicant.level')"
-          prop="level"
           width="130"
+        >
+          <template #default="{ row }">
+            {{ codeLabel(row.level) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          :label="t('applicant.detail.qualification')"
+          prop="qualification"
+          min-width="140"
         />
         <el-table-column
           :label="t('applicant.field')"
@@ -151,6 +167,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { codeLabel, countryName } from '@/utils/applicantLabels'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import {
@@ -165,7 +182,7 @@ import Drawer from '@/components/ui/Drawer.vue'
 const props = defineProps<{ id: string, canEdit: boolean }>()
 const emit = defineEmits<{ count: [n: number] }>()
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const { confirm } = useConfirm()
 const list = useResourceList<Education>(() => listEducation(props.id))
 

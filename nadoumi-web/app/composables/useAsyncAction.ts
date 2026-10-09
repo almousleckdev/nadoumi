@@ -1,11 +1,13 @@
 /**
- * The busy/notice/error triad every dashboard save-action page repeats:
- * reset both messages, run the action, show a success notice or map the
- * error via authErrorMessage, always clear busy. `run` returns the action's
- * result (or undefined on failure) so callers can still use it.
+ * The busy/error pair every save-action page repeats: reset the error, run the
+ * action, announce success as a toast or map the failure via authErrorMessage,
+ * always clear busy. `run` returns the action's result (or undefined on failure)
+ * so callers can still use it. `notice` is kept (always empty) for pages that
+ * still bind it; success is no longer an inline banner.
  */
 export function useAsyncAction() {
   const { t } = useI18n()
+  const toast = useToast()
   const busy = ref(false)
   const notice = ref('')
   const error = ref('')
@@ -16,7 +18,7 @@ export function useAsyncAction() {
     error.value = ''
     try {
       const result = await fn()
-      if (successMessage) notice.value = successMessage
+      if (successMessage) toast.success(successMessage)
       return result
     }
     catch (e) {

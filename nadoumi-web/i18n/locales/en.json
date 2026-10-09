@@ -55,7 +55,8 @@
     "next": "Next",
     "pagination": "Pagination",
     "switchingLanguage": "Switching language…",
-    "present": "Present"
+    "present": "Present",
+    "notifications": "Notifications"
   },
   "home": {
     "hero": {
@@ -291,7 +292,7 @@
     "registerSubtitle": "Create a profile to start your application",
     "fullName": "Full name",
     "username": "Username",
-    "usernameHint": "2–20 characters, used to sign in",
+    "usernameHint": "3–20 characters: lowercase letters, numbers, dots or underscores. Shown in chats until you add your name.",
     "passportNameHint": "Enter your names exactly as they appear on your passport.",
     "step1Title": "Your details",
     "step2Title": "Set a password",
@@ -361,7 +362,16 @@
         "chat": "Chat privately with your Nadoumi advisor"
       }
     },
-    "forgotSubtitle": "Verify your email, then choose a new password."
+    "forgotSubtitle": "Verify your email, then choose a new password.",
+    "usernameChecking": "Checking availability…",
+    "usernameAvailable": "This username is available.",
+    "usernameTaken": "This username is already taken.",
+    "usernameProblem": {
+      "tooShort": "Use at least 3 characters.",
+      "tooLong": "Use at most 20 characters.",
+      "characters": "Use only lowercase letters, numbers, dots or underscores, starting with a letter or number.",
+      "reserved": "This username is not available."
+    }
   },
   "dashboard": {
     "nav": {
@@ -417,7 +427,9 @@
         "VERIFIED": "Verified",
         "REJECTED": "Rejected",
         "EXPIRED": "Expired"
-      }
+      },
+      "identityTitle": "Identity documents",
+      "identityBlurb": "Your photo and passport are needed for every application."
     },
     "home": {
       "subtitle": "Here's an overview of your scholarship journey.",
@@ -564,7 +576,14 @@
         "blurb": "Deleting your account removes your access permanently. Our team handles this by request so nothing tied to an active application is lost by mistake. Email us and we'll take care of it promptly.",
         "cta": "Request account deletion",
         "mailSubject": "Account deletion request"
-      }
+      },
+      "subtitle": "Manage your sign-in details, security and profile photo.",
+      "changePhoto": "Change photo",
+      "photoSaved": "Profile photo updated",
+      "photoFailed": "The photo could not be uploaded. Please try again.",
+      "photoBadType": "Choose a JPEG, PNG or WebP image.",
+      "photoTooBig": "The photo must be smaller than {mb} MB.",
+      "studentId": "Student ID"
     },
     "changePassword": "Change password",
     "pwCurrent": "Current password",
@@ -829,7 +848,7 @@
     },
     "work": {
       "title": "Work experience",
-      "blurb": "Add any work experience, especially in China. This step is optional."
+      "blurb": "Add any work experience, especially in China. You can skip this step."
     },
     "finishing": {
       "title": "Setting up your dashboard",
@@ -837,7 +856,12 @@
       "profile": "Saving your profile…",
       "documents": "Checking your documents…",
       "dashboard": "Preparing your dashboard…"
-    }
+    },
+    "progressLabel": "Onboarding progress",
+    "optionalTag": "Optional",
+    "helpTitle": "Need help?",
+    "helpBody": "Our team is happy to guide you. Email support{'@'}nadoumi.com.",
+    "eyebrow": "Step {n} of {total}"
   },
   "university": {
     "founded": "Founded",
@@ -1077,40 +1101,6 @@
     "colDoc": "Document",
     "colRequirement": "Requirement",
     "colNotes": "Notes"
-  },
-  "assistant": {
-    "fabLabel": "Open the Nadoumi assistant",
-    "title": "Nadoumi Assistant",
-    "subtitle": "Find scholarships and track your application",
-    "close": "Close",
-    "greeting": "Hi! I can help you discover scholarships and check on an application. What would you like to do?",
-    "tabFind": "Find scholarships",
-    "tabTrack": "Track application",
-    "findPlaceholder": "e.g. fully funded master in engineering",
-    "findHint": "Type a subject, country or keyword.",
-    "anyFunding": "Any funding",
-    "fundingFully": "Fully funded",
-    "fundingPartial": "Partial",
-    "fundingSelf": "Self funded",
-    "search": "Search",
-    "searching": "Searching…",
-    "noResults": "No scholarships matched. Try a broader keyword.",
-    "resultsTitle": "Top matches",
-    "viewAll": "See all results",
-    "open": "Open",
-    "deadline": "Deadline",
-    "rolling": "Rolling",
-    "trackPlaceholder": "Enter your application ID",
-    "trackHint": "You can find the ID in your dashboard or confirmation email.",
-    "trackCta": "Check status",
-    "trackChecking": "Checking…",
-    "trackNotFound": "We couldn't find an application with that ID. Check the ID and try again.",
-    "trackComingSoon": "Application tracking is being connected. In the meantime, sign in to your dashboard to see your applications.",
-    "trackGoDashboard": "Go to my dashboard",
-    "trackStatus": "Status",
-    "trackStage": "Stage",
-    "trackUpdated": "Last updated",
-    "disclaimer": "Guided search across the live Nadoumi catalog."
   },
   "guides": {
     "more": "More guides",
@@ -2089,7 +2079,10 @@
     "chipsCount": "{n} of {max} selected",
     "search": "Search…",
     "noMatches": "No matches found.",
-    "typeToSearch": "Type to search…"
+    "typeToSearch": "Type to search…",
+    "removeTag": "Remove {value}",
+    "tagsNeedMore": "Add {n} more to continue",
+    "tagsCount": "{n} of {max} added"
   },
   "passport": {
     "title": "Passport",
@@ -2109,7 +2102,6 @@
     "expiryHint": "Your passport must be valid for more than six months from today.",
     "save": "Save passport",
     "saved": "Passport saved",
-    "matches": "Your passport matches your profile.",
     "errors": {
       "numberInvalid": "Use 5 to 20 letters and numbers.",
       "issueFuture": "The issue date cannot be in the future.",
@@ -2127,7 +2119,9 @@
   },
   "review": {
     "name": "Name",
-    "photo": "Photo"
+    "photo": "Photo",
+    "notUploaded": "Not uploaded yet",
+    "passportScan": "Passport scan"
   },
   "welcome": {
     "title": "Welcome, {name}!",
@@ -2158,16 +2152,18 @@
     "level": "Desired level",
     "scholarship": "Scholarship interest",
     "fields": "Fields of study",
-    "fieldsHint": "Choose up to twelve fields you are interested in.",
+    "fieldsHint": "Type a field of study and press Enter. Add as many as you like, up to 12.",
     "otherField": "Add another field",
-    "cities": "Preferred cities",
-    "citiesHint": "Choose the Chinese cities you would consider studying in.",
+    "cities": "Preferred provinces or cities",
+    "citiesHint": "Type at least three provinces or cities in China you would consider, pressing Enter after each.",
     "otherCity": "Add another city",
     "teachingLanguage": "Teaching language",
     "intakeYear": "Intake year",
     "intakeTerm": "Intake term",
     "notes": "Other preferences",
-    "notesHint": "Anything else that would help us match you with the right programme."
+    "notesHint": "Anything else that would help us match you with the right programme.",
+    "fieldsPlaceholder": "e.g. Computer Science",
+    "citiesPlaceholder": "e.g. Beijing, Sichuan, Shanghai"
   },
   "location": {
     "sectionWhere": "Where you are now",
@@ -2290,6 +2286,11 @@
       "Shenyang": "Shenyang",
       "Ningbo": "Ningbo",
       "Fuzhou": "Fuzhou"
+    },
+    "teachingLanguage": {
+      "EN": "English",
+      "ZH": "Chinese",
+      "EN_ZH": "English and Chinese"
     }
   },
   "news": {
@@ -2347,5 +2348,14 @@
     "retry": "Try again",
     "close": "Close",
     "formerMember": "Former member"
+  },
+  "formErrors": {
+    "startFuture": "The start date cannot be in the future.",
+    "endBeforeStart": "The end date must be after the start date.",
+    "endFuture": "The end date cannot be in the future.",
+    "endRequired": "Add an end date, or tick that this is current.",
+    "visaExpired": "This visa has already expired.",
+    "needOne": "Add at least one.",
+    "needCities": "Add at least three provinces or cities."
   }
 }

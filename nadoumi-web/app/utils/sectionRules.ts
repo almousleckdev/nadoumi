@@ -1,4 +1,4 @@
-import { CHINA_COUNTRY, CONTACT_RELATIONS_REACHABLE } from '~/constants/applicantOptions'
+import { CHINA_COUNTRY, CONTACT_RELATIONS_REACHABLE, MIN_INTEREST_CITIES } from '~/constants/applicantOptions'
 import type { FieldErrors } from '~/constants/formErrors'
 import { isoDate } from '~/utils/dates'
 
@@ -111,7 +111,7 @@ export function validateInterests(form: InterestsForm): FieldErrors {
   const errors: FieldErrors = {}
   if (blank(form.desiredLevel)) errors.desiredLevel = 'required'
   if (form.fields.length === 0) errors.fields = 'needOne'
-  if (form.cities.length === 0) errors.cities = 'needOne'
+  if (form.cities.length < MIN_INTEREST_CITIES) errors.cities = 'needCities'
   return errors
 }
 

@@ -16,6 +16,14 @@ export interface Applicant {
   phone: string | null
   status: ApplicantStatus
   createdAt: string | null
+  gender: string | null
+  countryOfOrigin: string | null
+  countryOfResidence: string | null
+  nativeLanguage: string | null
+  wechatId: string | null
+  whatsapp: string | null
+  emailVerified: boolean
+  onboardingComplete: boolean
 }
 
 /** Back-compat alias used by list views. */
@@ -24,12 +32,16 @@ export type ApplicantRow = Applicant
 export interface Education {
   id: number
   institution: string
+  country: string | null
+  city: string | null
   level: string | null
+  qualification: string | null
   field: string | null
   gpa: number | null
   gpaScale: number | null
   startDate: string | null
   endDate: string | null
+  current: boolean
 }
 
 export interface TestScore {
@@ -187,38 +199,73 @@ export const uploadApplicantPhoto = (id: number | string, file: File): Promise<{
 export const getApplicantPhotoUrl = (id: number | string) =>
   request.get<unknown, ApplicantPhotoUrl>(`${BASE}/${id}/photo`, { params: { json: 1 } })
 
-// ---- interests ----
+// ---- interests, location and work: what the student entered during onboarding (read-only for staff) ----
 export interface ApplicantInterest {
-  primaryKind: string
-  preferredPrograms: string[]
-  preferredUniversities: string[]
-  preferredCountries: string[]
+  desiredLevel: string
+  /** Free text typed by the student. */
+  fields: string[]
+  /** Provinces or cities typed by the student (at least three). */
+  cities: string[]
+  scholarshipInterest: string | null
+  intakeYear: number | null
+  intakeTerm: string | null
+  /** EN, ZH or EN_ZH. */
+  teachingLanguage: string | null
+  notes: string | null
 }
+/** 204 (nothing entered yet) arrives as an empty body. */
 export const getInterests = (id: number | string) =>
-  request.get<unknown, ApplicantInterest>(`${BASE}/${id}/interests`)
+  request.get<unknown, ApplicantInterest | ''>(`${BASE}/${id}/interests`).then(r => r || null)
 
-// ---- residence ----
 export interface ApplicantResidence {
-  countryOfResidence: string
-  addressLine1: string
-  addressLine2?: string
-  city: string
-  stateProvince: string
-  postalCode: string
-  currentSince: string
+  inChina: boolean
+  country: string
+  city: string | null
+  address: string | null
+  chinaEducationLevel: string | null
+  chinaSchool: string | null
+  visaType: string | null
+  visaExpiryDate: string | null
 }
 export const getResidence = (id: number | string) =>
-  request.get<unknown, ApplicantResidence>(`${BASE}/${id}/residence`)
+  request.get<unknown, ApplicantResidence | ''>(`${BASE}/${id}/residence`).then(r => r || null)
 
-// ---- work ----
 export interface ApplicantWork {
   id: number
   employer: string
-  position: string
+  jobTitle: string
+  employmentType: string | null
+  country: string | null
+  city: string | null
   startDate: string
-  endDate?: string
+  endDate: string | null
   current: boolean
-  description?: string
+  description: string | null
+  workVisaType: string | null
+  workVisaExpiry: string | null
 }
 export const listWork = (id: number | string) =>
   request.get<unknown, ApplicantWork[]>(`${BASE}/${id}/work`)
+
+// ---- passport ----
+export interface PassportMismatch { field: string, passportValue: string | null, profileValue: string | null }
+export interface PassportStatus {
+  /** masked unless the caller holds nad:applicant:pii:view */
+  passportNo: string | null
+  givenName: string | null
+  familyName: string | null
+  dob: string | null
+  issueDate: string | null
+  expiryDate: string | null
+  readMethod: string | null
+  edited: boolean
+  scanUploaded: boolean
+  validForAdmission: boolean
+  matchesProfile: boolean
+  mismatches: PassportMismatch[]
+}
+export const getPassportStatus = (id: number | string) =>
+  request.get<unknown, PassportStatus>(`${BASE}/${id}/passport`)
+/** Short-lived signed URL of the passport scan; absent (404) when no scan was uploaded. */
+export const getPassportScanUrl = (id: number | string) =>
+  request.get<unknown, ApplicantPhotoUrl>(`${BASE}/${id}/passport/scan`, { params: { json: 1 }, silent: true } as object)

@@ -19,6 +19,7 @@ export const FORM_ERROR_KEYS = {
   endRequired: 'formErrors.endRequired',
   visaExpired: 'formErrors.visaExpired',
   needOne: 'formErrors.needOne',
+  needCities: 'formErrors.needCities',
   emailInvalid: 'validation.email',
 } as const
 

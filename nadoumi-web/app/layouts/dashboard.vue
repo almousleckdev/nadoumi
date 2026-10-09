@@ -1,8 +1,8 @@
 <template>
   <div class="contents">
+    <ToastHost />
     <DashboardShell>
       <slot />
     </DashboardShell>
-    <AiAssistant />
   </div>
 </template>

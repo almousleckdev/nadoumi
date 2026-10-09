@@ -7,6 +7,8 @@ export const OPTION_GROUPS = {
   studyLevel: ['LANGUAGE', 'FOUNDATION', 'BACHELOR', 'MASTER', 'DOCTORATE'],
   scholarshipInterest: ['REQUIRED', 'PREFERRED', 'NOT_NEEDED'],
   intakeTerm: ['SPRING', 'SUMMER', 'FALL', 'WINTER'],
+  /** The only teaching languages a programme is offered in here: English, Chinese, or both. */
+  teachingLanguage: ['EN', 'ZH', 'EN_ZH'],
   chinaVisaType: ['X1', 'X2', 'Z', 'F', 'L', 'S1', 'S2', 'OTHER'],
   employmentType: ['FULL_TIME', 'PART_TIME', 'INTERNSHIP', 'FREELANCE'],
   contactRelation: ['GUARDIAN', 'EMERGENCY', 'OTHER'],
@@ -27,5 +29,8 @@ export type OptionGroup = keyof typeof OPTION_GROUPS
 export const CHINA_COUNTRY = 'CN'
 export const MAX_INTEREST_FIELDS = 12
 export const MAX_INTEREST_CITIES = 10
+/** A student names at least this many provinces or cities they would consider. */
+export const MIN_INTEREST_CITIES = 3
+export const MAX_INTEREST_FIELD_LENGTH = 40
 export const INTAKE_YEAR_SPAN = 4
 export const CONTACT_RELATIONS_REACHABLE = ['GUARDIAN', 'EMERGENCY'] as const

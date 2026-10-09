@@ -38,6 +38,9 @@ public final class OnboardingRules {
         return OnboardingSection.of(EDUCATION, data.education().isEmpty() ? List.of("educationRecord") : List.of());
     }
 
+    /** A student names at least this many provinces or cities they would consider. */
+    static final int MIN_INTEREST_CITIES = 3;
+
     private static OnboardingSection interests(OnboardingData data) {
         ApplicantInterest interest = data.interest();
         if (interest == null) {
@@ -47,7 +50,7 @@ public final class OnboardingRules {
         if (interest.getFields() == null || interest.getFields().isEmpty()) {
             missing.add("fields");
         }
-        if (interest.getCities() == null || interest.getCities().isEmpty()) {
+        if (interest.getCities() == null || interest.getCities().size() < MIN_INTEREST_CITIES) {
             missing.add("cities");
         }
         return OnboardingSection.of(INTERESTS, missing);

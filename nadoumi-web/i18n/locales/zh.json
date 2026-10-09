@@ -55,7 +55,8 @@
     "next": "下一步",
     "pagination": "分页",
     "switchingLanguage": "正在切换语言…",
-    "present": "至今"
+    "present": "至今",
+    "notifications": "通知"
   },
   "home": {
     "hero": {
@@ -291,7 +292,7 @@
     "registerSubtitle": "创建档案以开始您的申请",
     "fullName": "姓名",
     "username": "用户名",
-    "usernameHint": "2 至 20 个字符,用于登录",
+    "usernameHint": "3 至 20 个字符：小写字母、数字、点或下划线。在您添加姓名之前，将在聊天中显示。",
     "passportNameHint": "请按护照上的写法填写姓名。",
     "step1Title": "您的基本信息",
     "step2Title": "设置密码",
@@ -361,7 +362,16 @@
         "chat": "与您的 Nadoumi 顾问私密沟通"
       }
     },
-    "forgotSubtitle": "先验证您的邮箱，然后设置新密码。"
+    "forgotSubtitle": "先验证您的邮箱，然后设置新密码。",
+    "usernameChecking": "正在检查是否可用…",
+    "usernameAvailable": "该用户名可以使用。",
+    "usernameTaken": "该用户名已被占用。",
+    "usernameProblem": {
+      "tooShort": "至少使用 3 个字符。",
+      "tooLong": "最多使用 20 个字符。",
+      "characters": "仅可使用小写字母、数字、点或下划线，且以字母或数字开头。",
+      "reserved": "该用户名不可用。"
+    }
   },
   "dashboard": {
     "nav": {
@@ -417,7 +427,9 @@
         "VERIFIED": "已核验",
         "REJECTED": "已驳回",
         "EXPIRED": "已过期"
-      }
+      },
+      "identityTitle": "身份证件",
+      "identityBlurb": "每次申请都需要您的照片和护照。"
     },
     "home": {
       "subtitle": "这是您的奖学金申请之旅概览。",
@@ -564,7 +576,14 @@
         "blurb": "删除账户将永久移除您的访问权限。为避免误删与正在进行的申请相关的任何内容，此操作由我们团队按请求处理——请发邮件给我们，我们会尽快处理。",
         "cta": "申请删除账户",
         "mailSubject": "账户删除请求"
-      }
+      },
+      "subtitle": "管理您的登录信息、安全设置和头像。",
+      "changePhoto": "更换头像",
+      "photoSaved": "头像已更新",
+      "photoFailed": "头像上传失败，请重试。",
+      "photoBadType": "请选择 JPEG、PNG 或 WebP 图片。",
+      "photoTooBig": "头像必须小于 {mb} MB。",
+      "studentId": "学生编号"
     },
     "changePassword": "修改密码",
     "pwCurrent": "当前密码",
@@ -829,7 +848,7 @@
     },
     "work": {
       "title": "工作经历",
-      "blurb": "请填写您的工作经历，尤其是在中国的工作经历。此步骤为可选。"
+      "blurb": "添加任何工作经历，尤其是在中国的经历。您可以跳过此步骤。"
     },
     "finishing": {
       "title": "正在为您准备仪表盘",
@@ -837,7 +856,12 @@
       "profile": "正在保存您的个人资料…",
       "documents": "正在检查您的文件…",
       "dashboard": "正在准备您的仪表盘…"
-    }
+    },
+    "progressLabel": "资料设置进度",
+    "optionalTag": "可选",
+    "helpTitle": "需要帮助？",
+    "helpBody": "我们的团队乐意为您指引。请发邮件至 support{'@'}nadoumi.com。",
+    "eyebrow": "第 {n} 步，共 {total} 步"
   },
   "university": {
     "founded": "创办于",
@@ -1077,40 +1101,6 @@
     "colDoc": "材料",
     "colRequirement": "要求",
     "colNotes": "备注"
-  },
-  "assistant": {
-    "fabLabel": "打开 Nadoumi 助手",
-    "title": "Nadoumi 助手",
-    "subtitle": "查找奖学金并跟踪您的申请",
-    "close": "关闭",
-    "greeting": "您好！我可以帮您查找奖学金或查询申请进度,请问您需要什么帮助？",
-    "tabFind": "查找奖学金",
-    "tabTrack": "查询申请",
-    "findPlaceholder": "例如：工程学全额资助硕士",
-    "findHint": "请输入专业方向、国家或关键词。",
-    "anyFunding": "不限资助方式",
-    "fundingFully": "全额资助",
-    "fundingPartial": "部分资助",
-    "fundingSelf": "自费",
-    "search": "搜索",
-    "searching": "搜索中…",
-    "noResults": "未找到匹配的奖学金,请尝试更宽泛的关键词。",
-    "resultsTitle": "最佳匹配结果",
-    "viewAll": "查看全部结果",
-    "open": "打开",
-    "deadline": "截止日期",
-    "rolling": "滚动录取",
-    "trackPlaceholder": "请输入您的申请编号",
-    "trackHint": "申请编号可在个人中心或确认邮件中查看。",
-    "trackCta": "查询进度",
-    "trackChecking": "查询中…",
-    "trackNotFound": "未找到该编号对应的申请记录,请核对编号后重试。",
-    "trackComingSoon": "申请进度跟踪功能正在接入中。在此之前,请登录个人中心查看您的申请。",
-    "trackGoDashboard": "前往我的个人中心",
-    "trackStatus": "状态",
-    "trackStage": "阶段",
-    "trackUpdated": "最近更新",
-    "disclaimer": "基于 Nadoumi 实时目录的引导式搜索。"
   },
   "guides": {
     "more": "更多留学指南",
@@ -2089,7 +2079,10 @@
     "chipsCount": "已选择 {n}/{max} 项",
     "search": "搜索…",
     "noMatches": "未找到匹配项。",
-    "typeToSearch": "输入以搜索…"
+    "typeToSearch": "输入以搜索…",
+    "removeTag": "移除 {value}",
+    "tagsNeedMore": "再添加 {n} 项即可继续",
+    "tagsCount": "已添加 {n} / {max}"
   },
   "passport": {
     "title": "护照",
@@ -2109,7 +2102,6 @@
     "expiryHint": "护照自今天起有效期必须超过六个月。",
     "save": "保存护照",
     "saved": "护照已保存",
-    "matches": "您的护照与个人资料一致。",
     "errors": {
       "numberInvalid": "请使用 5 至 20 位字母和数字。",
       "issueFuture": "签发日期不能是未来的日期。",
@@ -2127,7 +2119,9 @@
   },
   "review": {
     "name": "姓名",
-    "photo": "照片"
+    "photo": "照片",
+    "notUploaded": "尚未上传",
+    "passportScan": "护照扫描件"
   },
   "welcome": {
     "title": "欢迎您，{name}！",
@@ -2157,17 +2151,19 @@
     "sectionWhen": "您希望的入学时间",
     "level": "意向学历层次",
     "scholarship": "奖学金意向",
-    "fields": "专业方向",
-    "fieldsHint": "最多可选择十二个感兴趣的专业方向。",
+    "fields": "学习领域",
+    "fieldsHint": "输入一个学习领域并按回车。可添加多个，最多 12 个。",
     "otherField": "添加其他专业方向",
-    "cities": "意向城市",
-    "citiesHint": "请选择您考虑就读的中国城市。",
+    "cities": "意向省份或城市",
+    "citiesHint": "输入至少三个您考虑就读的中国省份或城市，每输入一个按一次回车。",
     "otherCity": "添加其他城市",
     "teachingLanguage": "授课语言",
     "intakeYear": "入学年份",
     "intakeTerm": "入学学期",
     "notes": "其他偏好",
-    "notesHint": "任何有助于我们为您匹配合适项目的其他信息。"
+    "notesHint": "任何有助于我们为您匹配合适项目的其他信息。",
+    "fieldsPlaceholder": "例如：计算机科学",
+    "citiesPlaceholder": "例如：北京、四川、上海"
   },
   "location": {
     "sectionWhere": "您当前所在地",
@@ -2290,6 +2286,11 @@
       "Shenyang": "沈阳",
       "Ningbo": "宁波",
       "Fuzhou": "福州"
+    },
+    "teachingLanguage": {
+      "EN": "英语",
+      "ZH": "中文",
+      "EN_ZH": "英语和中文"
     }
   },
   "news": {
@@ -2347,5 +2348,14 @@
     "retry": "重试",
     "close": "关闭",
     "formerMember": "已离开的成员"
+  },
+  "formErrors": {
+    "startFuture": "开始日期不能晚于今天。",
+    "endBeforeStart": "结束日期必须晚于开始日期。",
+    "endFuture": "结束日期不能晚于今天。",
+    "endRequired": "请填写结束日期，或勾选“至今”。",
+    "visaExpired": "此签证已过期。",
+    "needOne": "至少添加一项。",
+    "needCities": "至少添加三个省份或城市。"
   }
 }

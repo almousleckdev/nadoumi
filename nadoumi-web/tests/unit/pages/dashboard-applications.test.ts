@@ -1,3 +1,4 @@
+import { useToast } from '~/composables/useToast'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
@@ -37,6 +38,8 @@ async function mountDetail() {
   await flushPromises()
   return w
 }
+
+const toastMessages = () => useToast().toasts.value.map(t => t.message)
 
 describe('dashboard applications list', () => {
   it('shows an honest empty state that points at scholarships, never fake applications', async () => {
@@ -96,7 +99,7 @@ describe('dashboard application detail', () => {
     await w.find('[data-test="submit"]').trigger('click')
     await flushPromises()
     expect(submit).toHaveBeenCalledWith(7)
-    expect(w.text()).toContain('Your application has been submitted')
+    expect(toastMessages()).toContain('Your application has been submitted.')
     expect(w.text()).toContain('In review')
   })
 
@@ -113,7 +116,7 @@ describe('dashboard application detail', () => {
     await w.find('[data-test="withdraw-confirm"]').trigger('click')
     await flushPromises()
     expect(withdraw).toHaveBeenCalledWith(7, 'Changed plans')
-    expect(w.text()).toContain('Your application has been withdrawn')
+    expect(toastMessages()).toContain('Your application has been withdrawn.')
     expect(w.find('[data-test="withdraw-start"]').exists()).toBe(false)
   })
 

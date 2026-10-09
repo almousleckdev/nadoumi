@@ -17,7 +17,7 @@ public record InterestRequest(
         StudyLevel desiredLevel,
         @NotEmpty @Size(max = 12)
         List<@NotBlank @Size(max = 40) String> fields,
-        @NotEmpty @Size(max = 10)
+        @Size(min = 3, max = 10)
         List<@NotBlank @Size(max = 80) String> cities,
         ScholarshipInterest scholarshipInterest,
         @Min(2020) @Max(2100)

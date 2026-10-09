@@ -30,8 +30,9 @@ public class StudentRegisteredListener {
     @Transactional(rollbackFor = Exception.class)
     public void onStudentRegistered(StudentRegisteredEvent event) {
         Applicant applicant = new Applicant();
-        applicant.setGivenName(event.givenName());
-        applicant.setFamilyName(event.familyName());
+        // the legal names come later, from the student's own onboarding (profile and passport details)
+        applicant.setGivenName("");
+        applicant.setFamilyName("");
         applicant.setEmail(event.email());
         applicant.setEmailVerifiedAt(LocalDateTime.now());
         applicant.setStatus(ApplicantStatus.ACTIVE);

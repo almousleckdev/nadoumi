@@ -87,7 +87,7 @@ describe('PassportUploadCard', () => {
       passportNo: 'L898902C3', readMethod: 'MANUAL', edited: false,
     }))
     expect(w.emitted('changed')).toHaveLength(1)
-    expect(w.text()).toContain('matches your profile')
+    expect(w.text()).not.toContain('matches your profile')
   })
 
   it('collapses to a compact summary once verified and matching, and Edit expands it', async () => {

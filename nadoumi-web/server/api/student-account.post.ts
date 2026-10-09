@@ -3,7 +3,7 @@
 // { signedIn: true } and never sees the JWT.
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
-    firstName: string; lastName: string; email: string
+    username: string; email: string
     password: string; ticket: string
   }>(event)
   const base = backendBaseUrl(event)
@@ -12,8 +12,7 @@ export default defineEventHandler(async (event) => {
     await $fetch(`${base}/api/student/register`, {
       method: 'POST',
       body: {
-        firstName: body.firstName,
-        lastName: body.lastName,
+        username: body.username,
         email: body.email,
         password: body.password,
         ticket: body.ticket,

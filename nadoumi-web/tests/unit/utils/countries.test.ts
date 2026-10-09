@@ -26,4 +26,28 @@ describe('countries and languages', () => {
     expect(isCountryCode('CN')).toBe(true)
     expect(isCountryCode('XX')).toBe(false)
   })
+
+  it('never lists a bare language code, even when the browser has no name for it (Chrome lacks Fula, Chechen...)', () => {
+    const real = Intl.DisplayNames
+    class Sparse {
+      constructor(private readonly locales: string[], private readonly opts: Intl.DisplayNamesOptions) {}
+      of(code: string) { return ['ff', 'ce', 'ab'].includes(code) ? undefined : new real(this.locales, this.opts).of(code) }
+    }
+    ;(Intl as unknown as { DisplayNames: unknown }).DisplayNames = Sparse
+    try {
+      const options = languageOptions('en')
+      expect(options.filter(o => o.label.toLowerCase() === o.value.toLowerCase())).toEqual([])
+      expect(options.find(o => o.value === 'ff')?.label).toBe('Fula')
+      expect(options.find(o => o.value === 'ce')?.label).toBe('Chechen')
+    }
+    finally {
+      ;(Intl as unknown as { DisplayNames: unknown }).DisplayNames = real
+    }
+  })
+
+  it('leaves out dead, liturgical and constructed languages nobody speaks natively', () => {
+    const codes = languageOptions('en').map(o => o.value)
+    for (const dead of ['ae', 'cu', 'la', 'pi', 'vo', 'io', 'ia', 'ie']) expect(codes).not.toContain(dead)
+    for (const real of ['fr', 'ar', 'en', 'zh', 'es', 'ff', 'wo', 'sw']) expect(codes).toContain(real)
+  })
 })

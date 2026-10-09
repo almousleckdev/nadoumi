@@ -28,10 +28,13 @@ function onPick(event: Event) {
 </script>
 
 <template>
-  <li class="grid gap-3 rounded-lg border border-slate-200 bg-white p-4" data-test="document-row">
-    <div class="flex flex-wrap items-start justify-between gap-2">
-      <div class="min-w-0">
-        <h3 class="font-display font-semibold text-slate-900">{{ typeLabel }}</h3>
+  <li class="grid content-between gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md" data-test="document-row">
+    <div class="flex items-start justify-between gap-3">
+      <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700" aria-hidden="true">
+        <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M7 3h7l4 4v14H7V3Z" stroke-linejoin="round" /><path d="M14 3v5h4M10 13h5M10 17h5" stroke-linecap="round" /></svg>
+      </span>
+      <div class="min-w-0 flex-1">
+        <h3 class="truncate font-display font-semibold text-slate-900">{{ typeLabel }}</h3>
         <p v-if="doc.currentVersion" class="mt-0.5 text-xs text-slate-500">
           {{ t('dashboard.docs.version', { n: doc.currentVersion.versionNo }) }}
           · {{ formatFileSize(doc.currentVersion.sizeBytes) }}
@@ -47,7 +50,7 @@ function onPick(event: Event) {
     </NAlert>
     <NAlert v-if="fileProblem" tone="danger">{{ fileProblem }}</NAlert>
 
-    <div class="flex flex-wrap items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
       <NButton v-if="doc.currentVersion" size="sm" variant="secondary" :disabled="busy" data-test="doc-download" @click="emit('download')">
         {{ t('dashboard.docs.download') }}
       </NButton>

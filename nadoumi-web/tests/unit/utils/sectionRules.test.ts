@@ -19,7 +19,7 @@ const residence = (over: Partial<ResidenceForm> = {}): ResidenceForm => ({
   visaType: '', visaExpiryDate: '', ...over,
 })
 const interests = (over: Partial<InterestsForm> = {}): InterestsForm => ({
-  desiredLevel: 'MASTER', fields: ['LAW'], cities: ['Beijing'], scholarshipInterest: '', intakeYear: '',
+  desiredLevel: 'MASTER', fields: ['Law'], cities: ['Beijing', 'Shanghai', 'Sichuan'], scholarshipInterest: '', intakeYear: '',
   intakeTerm: '', teachingLanguage: '', notes: '', ...over,
 })
 const contact = (over: Partial<ContactForm> = {}): ContactForm => ({
@@ -82,9 +82,11 @@ describe('validateInterests', () => {
   it('accepts a level with a field and a city', () => {
     expect(validateInterests(interests())).toEqual({})
   })
-  it('needs a level, at least one field and one city', () => {
+  it('needs a level, at least one field and at least three provinces or cities', () => {
     expect(validateInterests(interests({ desiredLevel: '', fields: [], cities: [] })))
-      .toEqual({ desiredLevel: 'required', fields: 'needOne', cities: 'needOne' })
+      .toEqual({ desiredLevel: 'required', fields: 'needOne', cities: 'needCities' })
+    expect(validateInterests(interests({ cities: ['Beijing', 'Shanghai'] }))).toEqual({ cities: 'needCities' })
+    expect(validateInterests(interests({ cities: ['Beijing', 'Shanghai', 'Sichuan'] }))).toEqual({})
   })
 })
 

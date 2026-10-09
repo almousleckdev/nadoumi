@@ -20,26 +20,52 @@ class StudentOnboardingFoundationTest extends AbstractStudentIntegrationTest {
     // ---- registration ----
 
     @Test
-    void shouldCreatePrefilledUppercaseApplicant_whenStudentRegisters() throws Exception {
+    void shouldCreateAnApplicantWithoutNamesYet_whenStudentRegisters() throws Exception {
         Student s = register("ahmed", "hassan");
 
         mvc.perform(get("/api/student/applicants/" + s.applicantId()).header("Authorization", bearer(s.token())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.givenName").value("AHMED"))
-                .andExpect(jsonPath("$.familyName").value("HASSAN"))
+                .andExpect(jsonPath("$.givenName").value(""))
+                .andExpect(jsonPath("$.familyName").value(""))
                 .andExpect(jsonPath("$.email").value(s.email()))
                 .andExpect(jsonPath("$.emailVerified").value(true))
                 .andExpect(jsonPath("$.onboardingComplete").value(false));
     }
 
     @Test
-    void shouldRejectRegistration_whenNameContainsDigits() throws Exception {
-        String email = uniqueEmail();
-        String ticket = ticketFor(email);
-
+    void shouldRejectRegistration_whenTheUsernameIsNotValidOrIsTaken() throws Exception {
+        for (String bad : new String[] { "ab", "has space", "admin" }) {
+            String email = uniqueEmail();
+            String ticket = ticketFor(email);
+            mvc.perform(post("/api/student/register").contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"username\":\"" + bad + "\",\"email\":\"" + email + "\",\"password\":\""
+                                    + STRONG_PASSWORD + "\",\"ticket\":\"" + ticket + "\"}"))
+                    .andExpect(status().isBadRequest());
+        }
+        String taken = "taken_" + System.nanoTime() % 100000;
+        String email1 = uniqueEmail();
         mvc.perform(post("/api/student/register").contentType(MediaType.APPLICATION_JSON)
-                        .content(registerBody("john2", "doe", email, ticket)))
+                        .content("{\"username\":\"" + taken + "\",\"email\":\"" + email1 + "\",\"password\":\""
+                                + STRONG_PASSWORD + "\",\"ticket\":\"" + ticketFor(email1) + "\"}"))
+                .andExpect(status().isCreated());
+        String email2 = uniqueEmail();
+        mvc.perform(post("/api/student/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + taken.toUpperCase() + "\",\"email\":\"" + email2 + "\",\"password\":\""
+                                + STRONG_PASSWORD + "\",\"ticket\":\"" + ticketFor(email2) + "\"}"))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void shouldAnswerTheLiveUsernameCheck_withoutAuthentication() throws Exception {
+        mvc.perform(get("/api/student/username-available").param("username", "fresh_name_" + System.nanoTime() % 1000))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.valid").value(true))
+                .andExpect(jsonPath("$.available").value(true));
+        mvc.perform(get("/api/student/username-available").param("username", "x"))
+                .andExpect(jsonPath("$.valid").value(false))
+                .andExpect(jsonPath("$.available").value(false));
+        mvc.perform(get("/api/student/username-available").param("username", "almousleck"))
+                .andExpect(jsonPath("$.available").value(false));
     }
 
     // ---- profile rules ----
