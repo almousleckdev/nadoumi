@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Builds and sends the "Welcome to Nadoumi" email for a {@code StudentRegistered}
+ * Builds and sends the "Welcome to Nadoumi" email for a {@code StudentOnboarded}
  * outbox event. It owns the whole welcome flow because the email carries
  * structured programme / scholarship sections the generic flat-string dispatch
  * path does not model:
@@ -67,7 +67,7 @@ public class WelcomeContentComposer {
     public void handle(OutboxEvent event, Map<String, Object> context) {
         Long userId = asLong(context.get("userId"));
         if (userId == null) {
-            log.warn("StudentRegistered outbox event id={} has no userId — skipped", event.getId());
+            log.warn("StudentOnboarded outbox event id={} has no userId — skipped", event.getId());
             return;
         }
         String sourceRef = "outbox:" + event.getId() + ":" + userId;
@@ -83,7 +83,7 @@ public class WelcomeContentComposer {
 
         String recipient = Texts.stringOrNull(context.get("email"));
         if (recipient == null || recipient.isBlank()) {
-            log.warn("StudentRegistered outbox event id={} has no email — in-app only", event.getId());
+            log.warn("StudentOnboarded outbox event id={} has no email — in-app only", event.getId());
             notificationService.recordDirectEmailDelivery(notificationId, false, "no recipient address");
             return;
         }

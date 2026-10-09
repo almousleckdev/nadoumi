@@ -14,11 +14,15 @@ public interface ApplicantMapper {
 
     Applicant findById(Long id);
 
+    /** Resolves a staff-facing UUID to the internal row id, or null. */
+    Long findIdByPublicId(@Param("publicId") String publicId);
+
     /** Staff list, PageHelper-paged. All args optional filters. */
     List<Applicant> search(@Param("name") String name,
                            @Param("status") ApplicantStatus status,
                            @Param("nationality") String nationality,
-                           @Param("createdAfter") LocalDateTime createdAfter);
+                           @Param("createdAfter") LocalDateTime createdAfter,
+                           @Param("includeIncomplete") boolean includeIncomplete);
 
     /** Student list — restricted to the caller's accessible applicant ids. Empty ids -> empty. */
     List<Applicant> findByIds(@Param("ids") Collection<Long> ids);

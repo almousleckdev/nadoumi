@@ -10,6 +10,9 @@ const result = computed(() => passwordChecks(props.value, {
   confirm: props.confirm,
 }))
 
+const personalViolated = computed(() =>
+  props.value.length > 0 && result.value.rules.some(rule => rule.key === 'validation.password.noPersonal' && !rule.ok))
+
 const showMismatch = computed(() =>
   props.confirm !== undefined && props.confirm.length > 0 && props.value !== props.confirm)
 </script>
@@ -35,6 +38,9 @@ const showMismatch = computed(() =>
         </li>
       </ul>
     </template>
+    <p v-if="personalViolated" role="alert" data-test="pw-personal-error" class="mt-1.5 text-xs font-medium text-red-600">
+      {{ t('validation.password.noPersonalError') }}
+    </p>
     <p v-if="showMismatch" role="alert" class="mt-1.5 text-xs text-red-600">{{ t('validation.password.mismatch') }}</p>
   </div>
 </template>

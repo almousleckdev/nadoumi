@@ -17,7 +17,7 @@ import ApplicantDetail from '@/views/applicants/detail.vue'
 import { useUserStore } from '@/stores/user'
 
 const applicant = {
-  id: 7, givenName: 'Amina', familyName: 'Benali', dob: null, nationality: 'MA', passportNo: null,
+  id: 7, publicId: '00000000-0000-4000-8000-000000000007', givenName: 'Amina', familyName: 'Benali', dob: null, nationality: 'MA', passportNo: null,
   email: 'amina@example.com', phone: null, status: 'ACTIVE', createdAt: '2026-01-01 10:00:00',
 }
 

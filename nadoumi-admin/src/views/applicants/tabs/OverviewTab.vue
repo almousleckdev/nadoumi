@@ -28,7 +28,7 @@
         <span class="ov__photo-label">{{ t('applicant.photo') }}</span>
         <ImageUpload
           v-model="photoMediaId"
-          :action="`/api/staff/applicants/${props.applicant.id}/photo`"
+          :action="`/api/staff/applicants/${props.applicant.publicId}/photo`"
           :preview-url="photoUrl"
           aspect="square"
           :disabled="!canEdit"
@@ -246,8 +246,8 @@ const passportItems = computed<DescriptionItem[]>(() => {
 
 async function loadPassport() {
   try {
-    passport.value = await getPassportStatus(props.applicant.id)
-    scanUrl.value = passport.value.scanUploaded ? (await getPassportScanUrl(props.applicant.id)).url : null
+    passport.value = await getPassportStatus(props.applicant.publicId)
+    scanUrl.value = passport.value.scanUploaded ? (await getPassportScanUrl(props.applicant.publicId)).url : null
   }
   catch {
     scanUrl.value = null
@@ -263,7 +263,7 @@ const photoMediaId = ref<number | null>(null)
 
 async function refreshPhoto() {
   try {
-    photoUrl.value = (await getApplicantPhotoUrl(props.applicant.id)).url
+    photoUrl.value = (await getApplicantPhotoUrl(props.applicant.publicId)).url
   }
   catch {
     photoUrl.value = null
@@ -310,7 +310,7 @@ async function save() {
       body.dob = form.dob || null
       body.passportNo = form.passportNo || null
     }
-    await updateApplicant(props.applicant.id, body)
+    await updateApplicant(props.applicant.publicId, body)
     ElMessage.success(t('common.saved'))
     open.value = false
     emit('updated')

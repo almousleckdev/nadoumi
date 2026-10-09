@@ -21,7 +21,7 @@
     <template v-else-if="applicant">
       <PageHeader :title="`${applicant.givenName} ${applicant.familyName}`">
         <template #subtitle>
-          {{ t('applicant.idLabel', { id: applicant.id }) }} ·
+          {{ t('applicant.idLabel', { id: applicant.publicId }) }} ·
           {{ t('applicant.registered') }} {{ formatDate(applicant.createdAt) }}
         </template>
         <template #actions>
@@ -42,6 +42,7 @@
       <AccountPanel
         v-if="canViewAccess"
         :id="id"
+        :photo-url="applicant.photoUrl"
       />
 
       <AppTabs

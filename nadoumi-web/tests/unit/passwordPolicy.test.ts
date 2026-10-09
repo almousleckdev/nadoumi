@@ -32,7 +32,7 @@ describe('passwordChecks', () => {
     expect(passwordChecks('Abcdef1!').rules.some(x => x.key === 'validation.password.noPersonal')).toBe(false)
     const r = passwordChecks('Lovelace1!', { forbidden: ['Ada', 'Lovelace'] })
     expect(r.strong).toBe(false)
-    expect(r.firstError).toBe('validation.password.noPersonal')
+    expect(r.firstError).toBe('validation.password.noPersonalError')
   })
 
   it('reports a confirm mismatch last', () => {

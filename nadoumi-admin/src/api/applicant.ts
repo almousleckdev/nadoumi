@@ -4,7 +4,10 @@ import { uploadMedia } from './media'
 export type ApplicantStatus = 'DRAFT' | 'ACTIVE' | 'UNLINKED' | 'ARCHIVED'
 
 export interface Applicant {
+  /** numeric row id; internal, never put in a URL */
   id: number
+  /** unguessable id used in every staff URL and API path */
+  publicId: string
   givenName: string
   familyName: string
   /** masked ("••••") unless the caller holds nad:applicant:pii:view */
@@ -112,6 +115,8 @@ export const listApplicants = (params: {
   status?: string
   nationality?: string
   createdAfter?: string
+  /** also list students who registered but have not finished onboarding */
+  incomplete?: boolean
   page?: number
   size?: number
 }) => request.get<unknown, Page<Applicant>>(BASE, { params })

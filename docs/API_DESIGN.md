@@ -152,7 +152,9 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 
 | DELETE | `/api/staff/support/tickets/{id}` | `nad:support:ticket:delete` | Deletes the ticket, its events and meetings, and its chat. `204`. A support chat cannot be deleted from `/api/staff/conversations/{id}` (`400`). |
 
-`ApplicantResponse.photoUrl` (staff list and detail only) is a signed avatar link `/api/public/avatars/applicants/{id}/{signature}`, present when the applicant has a photo; the HMAC is domain-separated from the per-user avatar link.
+**Applicant identifiers (2026-10-09, V100).** Staff URLs identify an applicant by `publicId`, a UUID (`/api/staff/applicants/{publicId}/...`); `ApplicantPublicIdFilter` rewrites it to the internal row id before the controllers run, and a numeric id on the staff API answers `404`. The student API accepts the UUID too and still accepts the numeric id (a student reaches only their own applicants). `GET /api/staff/applicants` hides students who registered but have not finished onboarding unless `incomplete=true`.
+
+`ApplicantResponse.photoUrl` (staff list and detail only) is a signed avatar link `/api/public/avatars/applicants/{publicId}/{signature}`, present when the applicant has a photo; the HMAC is domain-separated from the per-user avatar link.
 
 **Admin uses:** list + `GET {id}` + full CRUD on the three sub-resources + the
 access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a

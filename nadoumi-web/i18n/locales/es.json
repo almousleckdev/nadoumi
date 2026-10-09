@@ -341,6 +341,7 @@
     "acceptTermsShort": "Acepto los {terms}",
     "acceptPrivacyShort": "Acepto la {privacy}",
     "consentRequired": "Acepta los Términos y la Política de Privacidad para continuar.",
+    "accountCreatedSignIn": "Tu cuenta fue creada, pero no pudimos iniciar sesión automáticamente. Inicia sesión.",
     "showPassword": "Mostrar contraseña",
     "hidePassword": "Ocultar contraseña",
     "pwStrong": "Contraseña segura",
@@ -718,7 +719,8 @@
       "needSpecial": "Añade un carácter especial.",
       "sameAsCurrent": "Elige una contraseña distinta de la actual.",
       "length": "De 8 a 32 caracteres",
-      "noPersonal": "No contiene tu nombre ni tu correo",
+      "noPersonal": "No contiene tu nombre de usuario ni el inicio de tu correo",
+      "noPersonalError": "Tu contraseña no debe contener tu nombre de usuario ni la primera parte de tu correo electrónico.",
       "mismatch": "Las contraseñas no coinciden."
     }
   },

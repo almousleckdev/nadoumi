@@ -44,4 +44,8 @@
                update_by = #{updateBy}, update_time = now()
          where user_id = #{userId} and user_type = '10' and del_flag = '0'
     </update>
+
+    <select id="selectStudentEmail" resultType="string">
+        select email from sys_user where user_id = #{userId} and user_type = '10' and del_flag = '0'
+    </select>
 </mapper>

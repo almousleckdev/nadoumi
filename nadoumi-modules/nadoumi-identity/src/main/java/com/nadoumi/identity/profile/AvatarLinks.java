@@ -32,17 +32,17 @@ public class AvatarLinks {
         return PATH_PREFIX + userId + "/" + sign(userId);
     }
 
-    /** Staff see an applicant's photo by applicant id; the signature is domain-separated from a user's. */
-    public String linkForApplicant(long applicantId) {
-        return PATH_PREFIX + "applicants/" + applicantId + "/" + sign("applicant:" + applicantId);
+    /** Staff see an applicant's photo by its public UUID (never the numeric id); the signature is domain-separated from a user's. */
+    public String linkForApplicant(String applicantPublicId) {
+        return PATH_PREFIX + "applicants/" + applicantPublicId + "/" + sign("applicant:" + applicantPublicId);
     }
 
     public boolean isValid(long userId, String signature) {
         return matches(sign(userId), signature);
     }
 
-    public boolean isValidForApplicant(long applicantId, String signature) {
-        return matches(sign("applicant:" + applicantId), signature);
+    public boolean isValidForApplicant(String applicantPublicId, String signature) {
+        return matches(sign("applicant:" + applicantPublicId), signature);
     }
 
     private static boolean matches(String expected, String signature) {

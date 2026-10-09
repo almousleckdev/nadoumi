@@ -237,7 +237,7 @@ One shared, non-boxed Nadoumi email design backs **every** transactional email
 
 ### 4.4 Welcome email — BUILT
 
-`StudentAuthService.register` writes a **`StudentRegistered`** outbox event in its
+`OnboardingService.complete` writes a **`StudentOnboarded`** outbox event (not at registration: an account that never finished onboarding gets no welcome) in its
 own transaction. `OutboxToNotificationDispatcher` hands it to
 **`WelcomeContentComposer`** (in `nadoumi-notification`, which gains read-only
 compile deps on `nadoumi-scholarship` + `nadoumi-program`), which:

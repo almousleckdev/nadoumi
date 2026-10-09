@@ -341,6 +341,7 @@
     "acceptTermsShort": "I agree to the {terms}",
     "acceptPrivacyShort": "I agree to the {privacy}",
     "consentRequired": "Please accept the Terms and the Privacy Policy to continue.",
+    "accountCreatedSignIn": "Your account was created, but we could not sign you in automatically. Please sign in.",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "pwStrong": "Strong password",
@@ -718,7 +719,8 @@
       "needSpecial": "Add a special character.",
       "sameAsCurrent": "Choose a password different from your current one.",
       "length": "8–32 characters",
-      "noPersonal": "Doesn't contain your name or email",
+      "noPersonal": "Doesn't contain your username or email name",
+      "noPersonalError": "Your password must not contain your username or the first part of your email address.",
       "mismatch": "Passwords do not match."
     }
   },

@@ -148,7 +148,7 @@ class OutboxToNotificationDispatcherTest {
 
     @Test
     void studentRegistered_isHandedToTheWelcomeComposer_notTheGenericFanOut() {
-        OutboxEvent e = event(OutboxEventTypes.STUDENT_REGISTERED,
+        OutboxEvent e = event(OutboxEventTypes.STUDENT_ONBOARDED,
                 "{\"userId\":77,\"email\":\"stu@example.test\",\"firstName\":\"Amina\",\"locale\":\"en\"}");
 
         dispatcher.dispatch(e);

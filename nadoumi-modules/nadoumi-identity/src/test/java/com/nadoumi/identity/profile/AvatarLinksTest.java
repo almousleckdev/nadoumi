@@ -36,12 +36,12 @@ class AvatarLinksTest {
 
     @Test
     void shouldKeepAnApplicantLinkSeparateFromAUserLinkWithTheSameNumber() {
-        String applicantSig = links.linkForApplicant(42).substring("/api/public/avatars/applicants/42/".length());
+        String applicantSig = links.linkForApplicant("abc-42").substring("/api/public/avatars/applicants/abc-42/".length());
         String userSig = links.linkFor(42).substring("/api/public/avatars/42/".length());
 
-        assertThat(links.isValidForApplicant(42, applicantSig)).isTrue();
-        assertThat(links.isValidForApplicant(43, applicantSig)).isFalse();
+        assertThat(links.isValidForApplicant("abc-42", applicantSig)).isTrue();
+        assertThat(links.isValidForApplicant("abc-43", applicantSig)).isFalse();
         assertThat(links.isValid(42, applicantSig)).isFalse();
-        assertThat(links.isValidForApplicant(42, userSig)).isFalse();
+        assertThat(links.isValidForApplicant("abc-42", userSig)).isFalse();
     }
 }

@@ -79,7 +79,7 @@ in the nadoumi-web build**.
 | Module | Status | Notes |
 | --- | --- | --- |
 | Dashboard | **IMPLEMENTED** | Real applicant KPIs + honest coming-soon (§6.1). |
-| Applicants — list | **IMPLEMENTED** | Search / status / nationality filter, pagination, profile photo, permanent delete. `GET /api/staff/applicants`. |
+| Applicants — list | **IMPLEMENTED** | Search / status / nationality filter, pagination, profile photo, permanent delete. `GET /api/staff/applicants`. Students who registered but have not finished onboarding are hidden by default (they are sign-ups, not applicants); the "Include incomplete sign-ups" filter shows them. Rows open by UUID. |
 | Applicants — detail | **IMPLEMENTED** | Overview + Education + Test scores + Contacts + Access tabs. |
 | Applicant — profile edit | **IMPLEMENTED** | Drawer form → `PUT /api/staff/applicants/{id}` (`nad:applicant:edit`). PII fields hidden/locked without `nad:applicant:pii:view`. |
 | Applicant — education / test scores / contacts CRUD | **IMPLEMENTED** | Add / edit / remove via drawer forms; staff `POST` / `PUT` / `DELETE` on each sub-resource (`nad:applicant:edit`). |

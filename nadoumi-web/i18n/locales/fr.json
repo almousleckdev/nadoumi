@@ -341,6 +341,7 @@
     "acceptTermsShort": "J'accepte les {terms}",
     "acceptPrivacyShort": "J'accepte la {privacy}",
     "consentRequired": "Veuillez accepter les Conditions et la Politique de confidentialité pour continuer.",
+    "accountCreatedSignIn": "Votre compte a été créé, mais la connexion automatique a échoué. Veuillez vous connecter.",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "pwStrong": "Mot de passe fort",
@@ -718,7 +719,8 @@
       "needSpecial": "Ajoutez un caractère spécial.",
       "sameAsCurrent": "Choisissez un mot de passe différent de l'actuel.",
       "length": "8 à 32 caractères",
-      "noPersonal": "Ne contient pas votre nom ni votre e-mail",
+      "noPersonal": "Ne contient ni votre nom d'utilisateur ni le début de votre e-mail",
+      "noPersonalError": "Votre mot de passe ne doit pas contenir votre nom d'utilisateur ni le début de votre adresse e-mail.",
       "mismatch": "Les mots de passe ne correspondent pas."
     }
   },

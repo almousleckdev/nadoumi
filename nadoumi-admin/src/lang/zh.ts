@@ -117,6 +117,7 @@ export default {
     phoneInvalid: '请输入有效的手机号码',
   },
   applicant: {
+    showIncomplete: '包含未完成注册的学生',
     delete: '删除',
     deleteTitle: '删除申请人',
     deleteConfirm: '永久删除 {name}？这将移除其档案、申请、文档和已上传文件；若该学生登录账号没有其他申请人，也会一并关闭。此操作无法撤销。',
@@ -159,7 +160,7 @@ export default {
     phone: '手机号码',
     status: '状态',
     registered: '注册时间',
-    idLabel: '申请人 #{id}',
+    idLabel: 'ID {id}',
     invitedEmail: '所有者邀请邮箱',
     invitedEmailHint: '将拥有此档案的人员',
     required: '必填',

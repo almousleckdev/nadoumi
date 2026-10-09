@@ -16,5 +16,5 @@ public interface PublicProfileMapper {
     Long findStudentPhotoMediaId(@Param("userId") long userId);
 
     /** The photo of one applicant, or null. */
-    Long findApplicantPhotoMediaId(@Param("applicantId") long applicantId);
+    Long findApplicantPhotoMediaId(@Param("publicId") String publicId);
 }

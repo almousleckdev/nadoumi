@@ -71,9 +71,10 @@ public class StaffApplicantController {
             @RequestParam(required = false)
             @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
             LocalDateTime createdAfter,
+            @RequestParam(defaultValue = "false") boolean incomplete,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return service.listForStaff(name, status, nationality, createdAfter, page, size);
+        return service.listForStaff(name, status, nationality, createdAfter, incomplete, page, size);
     }
 
     @GetMapping("/{id}")

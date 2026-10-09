@@ -94,4 +94,8 @@
         select <include refid="cols"/> from nad_notification where id = #{id}
     </select>
 
+
+    <delete id="removeByRecipient">
+        delete from nad_notification where recipient_user_id = #{userId}
+    </delete>
 </mapper>

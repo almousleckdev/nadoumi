@@ -1,5 +1,6 @@
 package com.nadoumi.applicant.onboarding;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
 import com.nadoumi.common.access.ApplicantCapability;
@@ -8,6 +9,9 @@ import com.nadoumi.applicant.service.InterestService;
 import com.nadoumi.applicant.service.ResidenceService;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.exception.NadNotFoundException;
+import com.nadoumi.common.outbox.OutboxEventTypes;
+import com.nadoumi.common.outbox.OutboxWriter;
+import com.nadoumi.identity.service.StudentContactLookup;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -26,13 +30,17 @@ public class OnboardingService {
     private final InterestService interests;
     private final ResidenceService residence;
     private final ApplicantAccessGuard guard;
+    private final StudentContactLookup students;
+    private final OutboxWriter outbox;
 
     public OnboardingService(ApplicantMapper mapper, InterestService interests, ResidenceService residence,
-            ApplicantAccessGuard guard) {
+            ApplicantAccessGuard guard, StudentContactLookup students, OutboxWriter outbox) {
         this.mapper = mapper;
         this.interests = interests;
         this.residence = residence;
         this.guard = guard;
+        this.students = students;
+        this.outbox = outbox;
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +61,21 @@ public class OnboardingService {
             throw new NadBadRequestException("onboarding is incomplete: " + incompleteKeys(status));
         }
         mapper.markOnboarded(applicantId);
+        announceOnboarded(applicant);
         return statusOf(dataFor(load(applicantId)));
+    }
+
+    /** The welcome email and notification are sent now, once, because only now is the profile real. */
+    private void announceOnboarded(Applicant applicant) {
+        students.ownerOf(applicant.getId()).ifPresent(owner -> {
+            JSONObject payload = new JSONObject();
+            payload.put("userId", owner.userId());
+            payload.put("email", owner.email());
+            payload.put("firstName", applicant.getGivenName());
+            payload.put("displayName", applicant.getGivenName());
+            payload.put("locale", "en");
+            outbox.write("user", owner.userId(), OutboxEventTypes.STUDENT_ONBOARDED, payload.toJSONString());
+        });
     }
 
     /** Records that the student has seen the welcome celebration, so it is shown once. */

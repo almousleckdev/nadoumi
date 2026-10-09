@@ -4,6 +4,7 @@
 
     <resultMap id="applicant" type="com.nadoumi.applicant.domain.Applicant">
         <id     property="id"          column="id"/>
+        <result property="publicId"    column="public_id"/>
         <result property="givenName"   column="given_name"/>
         <result property="familyName"  column="family_name"/>
         <result property="dob"         column="dob"/>
@@ -38,13 +39,17 @@
     </resultMap>
 
     <sql id="cols">
-        id, given_name, family_name, dob, nationality, passport_no, email, phone, photo_media_id, status,
+        id, public_id, given_name, family_name, dob, nationality, passport_no, email, phone, photo_media_id, status,
         gender, country_of_origin, country_of_residence, native_language, wechat_id, whatsapp,
         email_verified_at, onboarded_at, welcomed_at,
         passport_media_id, passport_given_name, passport_family_name, passport_dob, passport_issue_date,
         passport_expiry_date, passport_read_method, passport_data_edited,
         create_by, create_time, update_by, update_time, remark
     </sql>
+
+    <select id="findIdByPublicId" resultType="java.lang.Long">
+        select id from nad_applicant where public_id = #{publicId}
+    </select>
 
     <select id="findById" resultMap="applicant">
         select <include refid="cols"/> from nad_applicant where id = #{id}
@@ -59,6 +64,12 @@
             <if test="status != null">and status = #{status}</if>
             <if test="nationality != null and nationality != ''">and nationality = #{nationality}</if>
             <if test="createdAfter != null">and create_time &gt;= #{createdAfter}</if>
+            <if test="!includeIncomplete">
+                <!-- a student who registered but has not finished onboarding is not an applicant yet -->
+                and (onboarded_at is not null
+                     or not exists (select 1 from sys_user u
+                                    where u.user_type = '10' and u.user_id = cast(nad_applicant.create_by as unsigned)))
+            </if>
         </where>
         order by create_time desc, id desc
     </select>
@@ -73,10 +84,10 @@
     <insert id="insert" parameterType="com.nadoumi.applicant.domain.Applicant"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_applicant
-            (given_name, family_name, dob, nationality, passport_no, email, phone, status, create_by, create_time, remark,
+            (public_id, given_name, family_name, dob, nationality, passport_no, email, phone, status, create_by, create_time, remark,
              gender, country_of_origin, country_of_residence, native_language, wechat_id, whatsapp, email_verified_at)
         values
-            (#{givenName}, #{familyName}, #{dob}, #{nationality}, #{passportNo}, #{email}, #{phone},
+            (#{publicId}, #{givenName}, #{familyName}, #{dob}, #{nationality}, #{passportNo}, #{email}, #{phone},
              #{status}, #{createBy}, now(), #{remark},
              #{gender}, #{countryOfOrigin}, #{countryOfResidence}, #{nativeLanguage}, #{wechatId}, #{whatsapp},
              #{emailVerifiedAt})

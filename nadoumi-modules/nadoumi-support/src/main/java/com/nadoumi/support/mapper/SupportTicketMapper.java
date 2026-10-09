@@ -27,6 +27,9 @@ public interface SupportTicketMapper {
     int updateStatus(@Param("id") long id, @Param("expected") String expected, @Param("status") String status,
             @Param("updateBy") String updateBy);
 
+    /** Every ticket a user opened, any status. */
+    List<SupportTicket> findOpenedBy(@Param("userId") long userId);
+
     int deleteById(@Param("id") long id);
 
     int updateAssignee(@Param("id") long id, @Param("assigneeId") Long assigneeId, @Param("updateBy") String updateBy);

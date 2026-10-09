@@ -14,6 +14,9 @@ public interface NotificationMapper {
     /** @return rows inserted — {@code 0} when a same-{@code (recipient, source_ref)} row already exists. */
     int insert(Notification notification);
 
+    /** Everything addressed to a retired student account (deliveries go with it). */
+    int removeByRecipient(@Param("userId") long userId);
+
     /**
      * Which of the given {@code source_ref}s already have a row — used to skip
      * already-delivered recipients before a batch insert (idempotency, without an

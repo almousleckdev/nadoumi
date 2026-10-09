@@ -77,7 +77,7 @@ class MediaAccessAuthorizationTest extends AbstractNadIntegrationTest {
         long applicantId = createApplicant(token);
         long mediaId = uploadStaffPhoto(token, applicantId);
 
-        mvc.perform(get("/api/staff/applicants/{id}/photo", applicantId)
+        mvc.perform(get("/api/staff/applicants/{id}/photo", pid(applicantId))
                         .param("json", "1").header("Authorization", bearer(token)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.url").value(startsWith("https://fake.local/")))
@@ -99,7 +99,7 @@ class MediaAccessAuthorizationTest extends AbstractNadIntegrationTest {
         long applicantId = createApplicant(token);
         uploadStaffPhoto(token, applicantId);
 
-        mvc.perform(get("/api/staff/applicants/{id}/photo", applicantId).header("Authorization", bearer(token)))
+        mvc.perform(get("/api/staff/applicants/{id}/photo", pid(applicantId)).header("Authorization", bearer(token)))
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", startsWith("https://fake.local/")));
     }
@@ -118,7 +118,7 @@ class MediaAccessAuthorizationTest extends AbstractNadIntegrationTest {
         createStaff("maa_noview", "media_no_appl_view");
         String noViewToken = staffToken("maa_noview");
 
-        mvc.perform(get("/api/staff/applicants/{id}/photo", applicantId)
+        mvc.perform(get("/api/staff/applicants/{id}/photo", pid(applicantId))
                         .param("json", "1").header("Authorization", bearer(noViewToken)))
                 .andExpect(status().isForbidden());
 
@@ -153,7 +153,7 @@ class MediaAccessAuthorizationTest extends AbstractNadIntegrationTest {
     }
 
     private long uploadStaffPhoto(String staffToken, long applicantId) throws Exception {
-        String res = mvc.perform(multipart("/api/staff/applicants/{id}/photo", applicantId)
+        String res = mvc.perform(multipart("/api/staff/applicants/{id}/photo", pid(applicantId))
                         .file(new org.springframework.mock.web.MockMultipartFile("file", "me.png", "image/png", PNG))
                         .header("Authorization", bearer(staffToken)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();

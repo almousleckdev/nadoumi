@@ -37,6 +37,9 @@ function containsAny(value: string, terms: string[] | undefined): boolean {
     .some(term => lower.includes(term))
 }
 
+/** The rule shown in the checklist; when it fails the student is told why in full (…noPersonalError). */
+const PERSONAL_RULE = 'validation.password.noPersonal'
+
 export function passwordChecks(value: string, opts: PasswordCheckOptions = {}): PasswordCheckResult {
   const v = value ?? ''
   const rules: PasswordRule[] = [
@@ -47,7 +50,7 @@ export function passwordChecks(value: string, opts: PasswordCheckOptions = {}): 
     { key: 'validation.password.needSpecial', ok: [...v].some(c => SPECIALS.includes(c)) },
   ]
   if ((opts.forbidden ?? []).length) {
-    rules.push({ key: 'validation.password.noPersonal', ok: v.length > 0 && !containsAny(v, opts.forbidden) })
+    rules.push({ key: PERSONAL_RULE, ok: v.length > 0 && !containsAny(v, opts.forbidden) })
   }
 
   const strong = rules.every(r => r.ok) && !(opts.current && v === opts.current)
@@ -56,7 +59,7 @@ export function passwordChecks(value: string, opts: PasswordCheckOptions = {}): 
   else if (v.length > MAX) firstError = 'validation.password.tooLong'
   else {
     const failed = rules.find(r => !r.ok)
-    if (failed) firstError = failed.key
+    if (failed) firstError = failed.key === PERSONAL_RULE ? 'validation.password.noPersonalError' : failed.key
     else if (opts.current && v === opts.current) firstError = 'validation.password.sameAsCurrent'
     else if (opts.confirm !== undefined && v !== opts.confirm) firstError = 'validation.password.mismatch'
   }

@@ -52,7 +52,7 @@ class WelcomeContentComposerTest {
     private static OutboxEvent event(String payload) {
         OutboxEvent e = new OutboxEvent();
         e.setId(9L);
-        e.setType("StudentRegistered");
+        e.setType("StudentOnboarded");
         e.setPayloadJson(payload);
         return e;
     }

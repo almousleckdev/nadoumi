@@ -215,12 +215,7 @@ public class ConversationService {
         if (conversation.getConversationType() == ConversationType.SUPPORT) {
             throw new NadBadRequestException("This chat belongs to a support ticket. Delete the ticket from Support instead.");
         }
-        List<Long> participantIds = participants.listActiveForConversation(conversationId).stream()
-                .map(ConversationParticipant::getUserId).toList();
-        List<Long> mediaIds = attachmentRows.listMediaIdsByConversation(conversationId);
-        conversations.deleteById(conversationId);
-        mediaIds.forEach(id -> attachmentService.release(id, userId));
-        events.conversationRemoved(conversationId, userId, participantIds);
+        purge(conversationId, userId);
     }
 
     /**
@@ -236,12 +231,31 @@ public class ConversationService {
         if (conversation == null || conversation.getConversationType() != ConversationType.SUPPORT) {
             throw new NadBadRequestException("not a support conversation");
         }
+        purge(conversationId, userId);
+    }
+
+    /**
+     * Removes every chat a person takes part in, with its messages and files. Called when a student account is
+     * retired, so a deleted student leaves no empty "Deleted" conversation behind in the staff inbox.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteAllOf(long userId) {
+        guard.requireStaff();
+        long actor = caller.requireUserId();
+        participants.listActiveForUser(userId).stream()
+                .map(ConversationParticipant::getConversationId)
+                .distinct()
+                .forEach(id -> purge(id, actor));
+    }
+
+    /** Deletes the rows, releases the attachment files, and tells everyone who had it open. */
+    private void purge(long conversationId, long actorUserId) {
         List<Long> participantIds = participants.listActiveForConversation(conversationId).stream()
                 .map(ConversationParticipant::getUserId).toList();
         List<Long> mediaIds = attachmentRows.listMediaIdsByConversation(conversationId);
         conversations.deleteById(conversationId);
-        mediaIds.forEach(id -> attachmentService.release(id, userId));
-        events.conversationRemoved(conversationId, userId, participantIds);
+        mediaIds.forEach(id -> attachmentService.release(id, actorUserId));
+        events.conversationRemoved(conversationId, actorUserId, participantIds);
     }
 
     /** Staff-only, gated by {@code nad:conversation:participant:manage} at the controller. */

@@ -1,11 +1,13 @@
 package com.nadoumi.identity.service;
 
+import com.nadoumi.common.erasure.StudentRetirementParticipant;
 import com.nadoumi.identity.access.SessionRevoker;
 import com.nadoumi.identity.mapper.NadIdentityMapper;
 import com.nadoumi.identity.mapper.UserApplicantAccessMapper;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,10 +25,14 @@ public class StudentAccountRetirement {
     private final UserApplicantAccessMapper access;
     private final SessionRevoker sessions;
 
-    public StudentAccountRetirement(NadIdentityMapper identity, UserApplicantAccessMapper access, SessionRevoker sessions) {
+    private final ObjectProvider<StudentRetirementParticipant> participants;
+
+    public StudentAccountRetirement(NadIdentityMapper identity, UserApplicantAccessMapper access, SessionRevoker sessions,
+            ObjectProvider<StudentRetirementParticipant> participants) {
         this.identity = identity;
         this.access = access;
         this.sessions = sessions;
+        this.participants = participants;
     }
 
     /** Users that hold (or held) a grant on the applicant; read before the grants are erased. */
@@ -48,6 +54,10 @@ public class StudentAccountRetirement {
             if (access.countForUser(userId) > 0) {
                 continue;
             }
+            if (identity.selectStudentEmail(userId) == null) {
+                continue; // staff and already-closed accounts are never touched
+            }
+            participants.orderedStream().forEach(participant -> participant.retire(userId));
             if (identity.softDeleteStudent(userId, String.valueOf(actorId)) > 0) {
                 sessions.revokeAll(userId, null);
                 log.info("student account {} retired by staff {}", userId, actorId);
