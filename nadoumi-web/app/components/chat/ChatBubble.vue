@@ -18,7 +18,7 @@ function relayPreview(url: string) {
   emit('preview', url)
 }
 /** Sent images form one grid; everything else (and images still uploading) stays a card. */
-const isImage = (a: { image: boolean, id: number }) => a.image && a.id > 0
+const isImage = (a: { image: boolean }) => a.image
 const images = computed(() => props.message.attachments.filter(isImage))
 const files = computed(() => props.message.attachments.filter(a => !isImage(a)))
 const time = computed(() => clockTime(props.message.createdAt, locale.value))

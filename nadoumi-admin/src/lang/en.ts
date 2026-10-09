@@ -952,6 +952,7 @@ export default {
     attachmentBadType: 'Only images, PDF, Word, Excel, PowerPoint or text files are accepted.',
     attachmentTooBig: '{name} is larger than {mb} MB.',
     notSent: 'Not sent', discard: 'Delete', applicationTag: 'Application #{id}',
+    delete: 'Delete chat', deleteConfirm: 'Delete this chat for good? All its messages and files are removed for you and the student, and this cannot be undone.', deletedOk: 'Chat deleted',
     previousImage: 'Previous image', nextImage: 'Next image', imageCounter: '{n} of {total}',
   },
   documents: {

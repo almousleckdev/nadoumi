@@ -530,3 +530,13 @@ username, a photo, a `STU-` reference and presence (no email, surname, phone); s
 at 20 and needs 2+ characters or an id; attachments are validated by content (type, size, count), stored in
 Cloudinary as PROTECTED and reachable only through a participant-checked redirect; the SSE stream sends events only
 to the user a message or receipt is for.
+
+### 11.1 Student profile photos (EXISTING, 2026-10-09; supersedes "students never show a photo" in section 11)
+
+A student's profile photo is private media (`APPLICANT_PHOTO`, PROTECTED). It is now shown next to their name where
+they already appear (a chat, a News comment, a liker), but never by exposing the media itself: `PublicProfileService`
+hands out `/api/public/avatars/{userId}/{signature}`, where the signature is an HMAC-SHA256 of the user id keyed by
+`token.secret`. `PublicAvatarController` answers 404 for a bad signature, a user without a photo, or an asset that
+is not an applicant photo, so user ids cannot be walked; otherwise it redirects (60 s cache) to a short-lived signed
+media URL, and each view is written to the media access log. A student's raw `sys_user.avatar` is still ignored.
+Staff photos remain public `STAFF_AVATAR` assets (absolute https URLs only).

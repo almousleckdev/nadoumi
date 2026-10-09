@@ -6,7 +6,7 @@ import java.util.Locale;
 
 /**
  * The one place that decides what of a person is public. Staff are public authors: their nickname and
- * photo appear. Students are shown by first name only, with no photo, and a surname or an email address
+ * photo appear. Students are shown by first name only; their photo is never read from here (it is private media and is reached only through a signed {@link AvatarLinks} link), and a surname or an email address
  * can never come out of here. Anything that is not clearly a staff member is treated as a student, so a new
  * or unexpected user type exposes less, never more.
  */
@@ -36,7 +36,7 @@ public final class PublicProfileRules {
         return cap(softenCaps(first));
     }
 
-    /** Only a staff member's photo, and only as an absolute https URL the public site can actually load. */
+    /** A staff member's photo, and only as an absolute https URL the public site can actually load; null for anyone else. */
     public static String avatarUrl(String userType, String avatar) {
         if (!isStaff(userType) || avatar == null) {
             return null;
@@ -54,7 +54,7 @@ public final class PublicProfileRules {
         }
     }
 
-    private static boolean isStaff(String userType) {
+    static boolean isStaff(String userType) {
         return CurrentCaller.STAFF.equals(userType);
     }
 

@@ -149,7 +149,7 @@ defineExpose({ scrollToEnd })
 
 <template>
   <section
-    class="relative min-h-0 min-w-0 flex-1 flex-col bg-slate-50"
+    class="relative min-h-0 min-w-0 flex-1 flex-col bg-gradient-to-b from-slate-50 to-slate-100/60"
     :aria-label="t('dashboard.messages.conversation')"
     @dragover="onDragOver"
     @dragleave.self="dragging = false"
@@ -170,9 +170,15 @@ defineExpose({ scrollToEnd })
         </button>
         <ChatAvatar :name="peer?.name" :src="peer?.avatarUrl" size="md" :online="peer ? peer.online : null" />
         <div class="min-w-0 flex-1">
-          <h2 class="truncate font-display text-base font-semibold text-slate-900" data-test="peer-name">
-            {{ peer?.name ?? t('dashboard.messages.untitled') }}
-          </h2>
+          <div class="flex items-center gap-2">
+            <h2 class="truncate font-display text-base font-semibold text-slate-900" data-test="peer-name">
+              {{ peer?.name ?? t('dashboard.messages.untitled') }}
+            </h2>
+            <span class="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-100 px-2 py-0.5 text-[11px] font-semibold text-brand-800" data-test="staff-badge">
+              <svg viewBox="0 0 24 24" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              {{ t('dashboard.messages.staffBadge') }}
+            </span>
+          </div>
           <p class="truncate text-xs" :class="peer?.online ? 'text-emerald-700' : 'text-slate-500'" data-test="presence">
             {{ presenceText }}
           </p>
@@ -210,9 +216,14 @@ defineExpose({ scrollToEnd })
               </button>
             </div>
 
-            <p v-if="messages.length === 0" class="py-16 text-center text-sm text-slate-500" data-test="thread-empty">
-              {{ t('dashboard.messages.threadEmpty', { name: peer?.name ?? '' }) }}
-            </p>
+            <div v-if="messages.length === 0" class="grid justify-items-center gap-3 py-14 text-center" data-test="thread-empty">
+              <ChatAvatar :name="peer?.name" :src="peer?.avatarUrl" size="lg" />
+              <div>
+                <p class="font-display text-base font-semibold text-slate-900">{{ peer?.name }}</p>
+                <p class="text-xs font-medium text-brand-800">{{ t('dashboard.messages.staffBadge') }}</p>
+              </div>
+              <p class="max-w-xs text-sm text-slate-600">{{ t('dashboard.messages.threadEmpty', { name: peer?.name ?? '' }) }}</p>
+            </div>
 
             <div v-for="group in groups" :key="group.key">
               <p class="my-3 text-center">
@@ -251,17 +262,19 @@ defineExpose({ scrollToEnd })
         </button>
       </div>
 
+      <div class="shrink-0">
       <div v-if="closed" class="flex flex-wrap items-center justify-center gap-3 border-t border-slate-200 bg-white px-4 py-3 text-sm text-slate-600" data-test="closed">
-        {{ t('dashboard.messages.closedNotice') }}
-        <NButton size="sm" variant="secondary" @click="emit('reopen')">{{ t('dashboard.messages.reopen') }}</NButton>
+          {{ t('dashboard.messages.closedNotice') }}
+          <NButton size="sm" variant="secondary" @click="emit('reopen')">{{ t('dashboard.messages.reopen') }}</NButton>
+        </div>
+        <ChatComposer
+          v-else
+          ref="composer"
+          v-model="draft"
+          :conversation-id="conversation.id"
+          @send="relaySend"
+        />
       </div>
-      <ChatComposer
-        v-else
-        ref="composer"
-        v-model="draft"
-        :conversation-id="conversation.id"
-        @send="relaySend"
-      />
 
       <div v-if="dragging" class="pointer-events-none absolute inset-0 z-30 grid place-items-center border-2 border-dashed border-brand-500 bg-brand-50/90" data-test="drop-overlay">
         <p class="text-sm font-semibold text-brand-800">{{ t('dashboard.messages.dropFiles') }}</p>

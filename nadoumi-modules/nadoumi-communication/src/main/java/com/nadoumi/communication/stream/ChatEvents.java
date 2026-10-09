@@ -26,6 +26,19 @@ public class ChatEvents {
         }
     }
 
+    /** Tells everyone who was in a deleted conversation (except the person who deleted it) to drop it. */
+    public void conversationRemoved(long conversationId, long removedByUserId, java.util.Collection<Long> participantUserIds) {
+        for (Long userId : participantUserIds) {
+            if (userId != removedByUserId) {
+                realtime.afterCommit(userId, "removed", new RemovedEvent(conversationId));
+            }
+        }
+    }
+
+    /** Wire body of a {@code removed} event. */
+    public record RemovedEvent(long conversationId) {
+    }
+
     /** Tells the other participants how far {@code readerUserId} has read. */
     public void messagesRead(long conversationId, long readerUserId, long messageId) {
         DeliveryTracker.ReceiptEvent event = new DeliveryTracker.ReceiptEvent(conversationId, readerUserId, messageId);

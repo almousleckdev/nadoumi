@@ -191,6 +191,8 @@ const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => (
       </NContainer>
     </section>
 
+    <StudentTestimonials />
+
     <CtaBand
       :image="imagery.ctaClassroom"
       :eyebrow="t('home.cta.eyebrow')"

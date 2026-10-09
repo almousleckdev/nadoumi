@@ -287,9 +287,10 @@ function insertEmoji(emoji: string) {
 
 function submit() {
   if (!canSend.value) return
-  const files = pending.value.filter(p => p.mediaId !== null).map(p => ({ name: p.file.name, type: p.file.type, size: p.file.size }))
+  // the image previews now belong to the message being sent, which releases them once the server has answered
+  const files = pending.value.filter(p => p.mediaId !== null)
+    .map(p => ({ name: p.file.name, type: p.file.type, size: p.file.size, previewUrl: p.previewUrl ?? undefined }))
   emit('send', draft.value, readyIds.value, files)
-  releasePreviews()
   pending.value = []
   draft.value = ''
   problem.value = ''
@@ -311,16 +312,17 @@ defineExpose({ addFiles, focus: () => textarea.value?.focus() })
 .cc__retry { padding: 0; border: 0; background: none; color: var(--nad-brand-700); font-size: 12px; font-weight: 600; cursor: pointer; }
 .cc__x { display: grid; place-items: center; width: 20px; height: 20px; border: 0; border-radius: 50%; background: transparent; color: var(--nad-ink-soft); cursor: pointer; }
 .cc__x:hover { background: #e2e8f0; }
-.cc__row { display: flex; align-items: flex-end; gap: 6px; }
+.cc__row { display: flex; align-items: flex-end; gap: 4px; padding: 6px; border: 1px solid var(--nad-line); border-radius: 24px; background: #f8fafc; transition: border-color 0.15s, background 0.15s; }
+.cc__row:focus-within { border-color: var(--nad-brand-500); background: #fff; }
 .cc__icon { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--nad-ink-soft); cursor: pointer; }
 .cc__icon:hover { background: #f1f5f9; }
 .cc__icon:focus-within, .cc__icon:focus-visible { outline: 2px solid var(--nad-brand-500); }
 .cc__icon--off { pointer-events: none; opacity: 0.5; }
 .cc__emoji { position: relative; }
 .cc__pop { position: absolute; inset-block-end: 100%; inset-inline-start: 0; z-index: 20; margin-bottom: 8px; }
-.cc__input { box-sizing: border-box; flex: 1; min-height: 40px; max-height: 160px; padding: 9px 16px; border: 1px solid var(--nad-line); border-radius: 20px; background: #f8fafc; color: var(--nad-ink); font: inherit; font-size: 15px; line-height: 22px; resize: none; }
+.cc__input { box-sizing: border-box; flex: 1; min-height: 40px; max-height: 160px; padding: 9px 8px; border: 0; background: transparent; color: var(--nad-ink); font: inherit; font-size: 15px; line-height: 22px; resize: none; }
 .cc__input::placeholder { color: var(--nad-ink-soft); }
-.cc__input:focus { border-color: var(--nad-brand-500); background: #fff; outline: none; }
+.cc__input:focus { outline: none; }
 .cc__input:disabled { opacity: 0.6; }
 .cc__send { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--nad-brand-600); color: #fff; cursor: pointer; transition: background 0.15s; }
 .cc__send:hover:not(:disabled) { background: var(--nad-brand-700); }

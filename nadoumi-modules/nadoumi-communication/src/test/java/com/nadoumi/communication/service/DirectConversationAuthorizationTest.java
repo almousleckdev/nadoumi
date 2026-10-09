@@ -52,12 +52,13 @@ class DirectConversationAuthorizationTest {
     private final MessagePublisher publisher = mock(MessagePublisher.class);
     private final MediaGateway media = mock(MediaGateway.class);
     private final ConversationGuard guard = new ConversationGuard(conversations, participants, caller, grants);
+    private final com.nadoumi.communication.stream.ChatEvents events = mock(com.nadoumi.communication.stream.ChatEvents.class);
     private final ConversationService service = new ConversationService(conversations, participants, messages, users,
             access, caller, publisher, guard,
             new ConversationResponseAssembler(attachments, mock(com.nadoumi.identity.profile.PublicProfileService.class), media,
                     mock(com.nadoumi.communication.stream.PresenceService.class)),
             new ConversationAttachments(guard, attachments, messages, media, caller),
-            mock(com.nadoumi.communication.stream.ChatEvents.class));
+            events, attachments);
 
     DirectConversationAuthorizationTest() {
         when(users.isActiveStaff(STAFF_A)).thenReturn(true);
@@ -197,5 +198,67 @@ class DirectConversationAuthorizationTest {
 
         verify(publisher, never()).publish(anyLong(), anyLong(), any(), anyList());
         assertThat(closed.getStatus()).isEqualTo(ConversationStatus.CLOSED);
+    }
+
+    // ---- deleting a chat ----
+
+    private Conversation direct(long id, ConversationType type) {
+        Conversation c = new Conversation();
+        c.setId(id);
+        c.setConversationType(type);
+        c.setStatus(ConversationStatus.OPEN);
+        when(conversations.findById(id)).thenReturn(c);
+        return c;
+    }
+
+    @Test
+    void shouldRejectDeletingAChat_whenTheStaffMemberIsNotInIt() {
+        callerIs(STAFF_B, true);
+        direct(42L, ConversationType.DIRECT);
+
+        assertThatThrownBy(() -> service.delete(42L)).isInstanceOf(AccessDeniedException.class);
+
+        verify(conversations, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void shouldRejectDeletingAChat_whenTheCallerIsAStudent() {
+        callerIs(STUDENT_A, false);
+        direct(42L, ConversationType.DIRECT);
+
+        assertThatThrownBy(() -> service.delete(42L)).isInstanceOf(AccessDeniedException.class);
+
+        verify(conversations, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void shouldRefuseDeletingATicketChat_becauseTheSupportModuleOwnsIt() {
+        callerIs(STAFF_A, true);
+        direct(42L, ConversationType.SUPPORT);
+        when(participants.findActive(42L, STAFF_A)).thenReturn(new ConversationParticipant());
+
+        assertThatThrownBy(() -> service.delete(42L)).isInstanceOf(NadBadRequestException.class);
+
+        verify(conversations, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void shouldDeleteTheChatReleaseItsFilesAndTellTheStudent_whenAParticipantDeletesIt() {
+        callerIs(STAFF_A, true);
+        direct(42L, ConversationType.DIRECT);
+        ConversationParticipant staff = new ConversationParticipant();
+        staff.setUserId(STAFF_A);
+        ConversationParticipant student = new ConversationParticipant();
+        student.setUserId(STUDENT_A);
+        when(participants.findActive(42L, STAFF_A)).thenReturn(staff);
+        when(participants.listActiveForConversation(42L)).thenReturn(List.of(staff, student));
+        when(attachments.listMediaIdsByConversation(42L)).thenReturn(List.of(501L, 502L));
+
+        service.delete(42L);
+
+        verify(conversations).deleteById(42L);
+        verify(media).softDelete(501L, STAFF_A);
+        verify(media).softDelete(502L, STAFF_A);
+        verify(events).conversationRemoved(42L, STAFF_A, List.of(STAFF_A, STUDENT_A));
     }
 }

@@ -40,6 +40,11 @@ const name = computed(() => props.attachment.filename ?? t('dashboard.messages.a
     >
   </button>
 
+  <div v-else-if="uploading && attachment.image && attachment.previewUrl" class="relative overflow-hidden rounded-lg border border-slate-200" data-test="attachment-sending-image">
+    <img :src="attachment.previewUrl" :alt="name" class="w-full object-cover opacity-70" :class="compact ? 'h-32' : 'max-h-64 max-w-xs'">
+    <span class="absolute inset-0 grid place-items-center"><NSpinner class="h-5 w-5" /></span>
+  </div>
+
   <component
     :is="uploading ? 'div' : 'a'"
     v-else

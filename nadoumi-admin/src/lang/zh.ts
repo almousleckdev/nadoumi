@@ -952,6 +952,7 @@ export default {
     attachmentBadType: '仅支持图片、PDF、Word、Excel、PowerPoint 或文本文件。',
     attachmentTooBig: '{name} 超过 {mb} MB。',
     notSent: '未发送', discard: '删除', applicationTag: '申请 #{id}',
+    delete: '删除对话', deleteConfirm: '永久删除此对话？其中的所有消息和文件将对您和学生一并删除，且无法恢复。', deletedOk: '对话已删除',
     previousImage: '上一张图片', nextImage: '下一张图片', imageCounter: '第 {n} 张，共 {total} 张',
   },
   documents: {

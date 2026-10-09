@@ -41,5 +41,8 @@ public interface ConversationMapper {
     int updateLastMessage(@Param("id") long id, @Param("messageId") long messageId, @Param("at") java.time.LocalDateTime at,
             @Param("preview") String preview, @Param("senderUserId") long senderUserId);
 
+    /** Removes the conversation; its messages, attachments and participants go with it (ON DELETE CASCADE). */
+    int deleteById(@Param("id") long id);
+
     int updateStatus(@Param("id") long id, @Param("status") String status, @Param("updateBy") String updateBy);
 }

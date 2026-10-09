@@ -8,6 +8,7 @@ public class PublicProfileRow {
     private String userName;
     private String avatar;
     private String ownerGivenName;
+    private Long ownerPhotoMediaId;
 
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
@@ -19,6 +20,8 @@ public class PublicProfileRow {
     public void setUserName(String userName) { this.userName = userName; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+    public Long getOwnerPhotoMediaId() { return ownerPhotoMediaId; }
+    public void setOwnerPhotoMediaId(Long ownerPhotoMediaId) { this.ownerPhotoMediaId = ownerPhotoMediaId; }
     public String getOwnerGivenName() { return ownerGivenName; }
     public void setOwnerGivenName(String ownerGivenName) { this.ownerGivenName = ownerGivenName; }
 }

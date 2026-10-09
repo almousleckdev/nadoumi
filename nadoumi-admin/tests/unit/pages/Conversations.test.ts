@@ -8,7 +8,7 @@ const ME = 1
 
 const api = vi.hoisted(() => ({
   listInbox: vi.fn(), searchStudents: vi.fn(), openDirect: vi.fn(), listMessages: vi.fn(), postMessage: vi.fn(),
-  uploadAttachment: vi.fn(), markConversationRead: vi.fn(), closeConversation: vi.fn(),
+  uploadAttachment: vi.fn(), markConversationRead: vi.fn(), closeConversation: vi.fn(), deleteConversation: vi.fn(),
 }))
 vi.mock('@/api/conversation', async (original) => ({ ...(await original<typeof import('@/api/conversation')>()), ...api }))
 
@@ -213,6 +213,75 @@ describe('the open conversation', () => {
     await flushPromises()
     expect(api.listMessages).toHaveBeenLastCalledWith(1, 71, true)
     expect(w.find('[data-message-id="68"]').exists()).toBe(true)
+  })
+})
+
+describe('deleting a chat', () => {
+  it('goes back to the list with the back button', async () => {
+    const w = await mountPage()
+    await openFirst(w)
+    await w.find('[data-test="back"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-test="peer-name"]').exists()).toBe(false)
+  })
+
+  it('deletes the chat for good after a confirmation, and not without one', async () => {
+    api.deleteConversation.mockResolvedValue(undefined)
+    const w = await mountPage()
+    await openFirst(w)
+    confirm.mockResolvedValueOnce(false)
+    await w.find('[data-test="delete-chat"]').trigger('click')
+    await flushPromises()
+    expect(api.deleteConversation).not.toHaveBeenCalled()
+    await w.find('[data-test="delete-chat"]').trigger('click')
+    await flushPromises()
+    expect(api.deleteConversation).toHaveBeenCalledWith(1)
+    expect(confirm).toHaveBeenLastCalledWith(expect.objectContaining({ tone: 'danger' }))
+    expect(w.findAll('[data-test="inbox-item"]')).toHaveLength(1)
+    expect(w.find('[data-test="peer-name"]').exists()).toBe(false)
+  })
+
+  it('keeps the chat and reports it when the delete fails', async () => {
+    api.deleteConversation.mockRejectedValue(new Error('forbidden'))
+    const w = await mountPage()
+    await openFirst(w)
+    await w.find('[data-test="delete-chat"]').trigger('click')
+    await flushPromises()
+    expect(w.findAll('[data-test="inbox-item"]')).toHaveLength(2)
+  })
+
+  it('drops a chat a colleague deleted, live', async () => {
+    const w = await mountPage()
+    await openFirst(w)
+    emit('removed', { conversationId: 1 })
+    await flushPromises()
+    expect(w.findAll('[data-test="inbox-item"]')).toHaveLength(1)
+    expect(w.find('[data-test="peer-name"]').exists()).toBe(false)
+  })
+})
+
+describe('sending an image', () => {
+  it('shows the picture itself while it is being sent, not a document card', async () => {
+    let resolve!: (m: ChatMessage) => void
+    api.uploadAttachment.mockResolvedValue({ mediaId: 77 })
+    api.postMessage.mockReturnValue(new Promise<ChatMessage>((r) => { resolve = r }))
+    URL.createObjectURL = () => 'blob:preview-1'
+    URL.revokeObjectURL = vi.fn()
+    const w = await mountPage()
+    await openFirst(w)
+    const input = w.find('input[type="file"]')
+    Object.defineProperty(input.element, 'files', { value: [new File(['x'], 'pic.png', { type: 'image/png' })], configurable: true })
+    await input.trigger('change')
+    await flushPromises()
+    await w.find('form').trigger('submit')
+    await flushPromises()
+    expect(w.find('[data-test="attachment-sending-image"] img').attributes('src')).toBe('blob:preview-1')
+    expect(w.find('[data-test="attachment-file"]').exists()).toBe(false)
+
+    resolve(msg(40, { senderUserId: ME, body: '', attachments: [{ id: 9, filename: 'pic.png', contentType: 'image/png', byteSize: 1, image: true }] }))
+    await flushPromises()
+    expect(w.find('[data-test="attachment-sending-image"]').exists()).toBe(false)
+    expect(w.find('[data-test="attachment-image"] img').attributes('src')).toContain('/api/staff/conversations/1/attachments/9')
   })
 })
 

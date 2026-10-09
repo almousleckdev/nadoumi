@@ -26,6 +26,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ConversationAttachments {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ConversationAttachments.class);
+
     private final ConversationGuard guard;
     private final MessageAttachmentMapper attachments;
     private final MessageMapper messages;
@@ -79,6 +81,16 @@ public class ConversationAttachments {
                 signed.url(), signed.expiresAt().toString(),
                 asset == null ? null : asset.originalFilename(),
                 asset == null ? null : asset.contentType());
+    }
+
+    /** Releases a deleted conversation's file. A media record that is already gone is not an error. */
+    public void release(long mediaId, long actorUserId) {
+        try {
+            media.softDelete(mediaId, actorUserId);
+        }
+        catch (RuntimeException e) {
+            log.warn("could not release media {} of a deleted conversation", mediaId, e);
+        }
     }
 
     /** Every attachment on a new message must be a message attachment this caller uploaded to this conversation. */

@@ -1,6 +1,6 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { API_BASE } from '@/utils/apiBase'
-import type { ChatMessage, PresenceEvent, ReceiptEvent } from '@/api/conversation'
+import type { ChatMessage, PresenceEvent, ReceiptEvent, RemovedEvent } from '@/api/conversation'
 
 export const STAFF_STREAM_URL = `${API_BASE}/api/staff/stream`
 export const STREAM_BACKOFF_START_MS = 1_000
@@ -12,6 +12,8 @@ export interface ChatStreamHandlers {
   delivered: (event: ReceiptEvent) => void
   read: (event: ReceiptEvent) => void
   presence: (event: PresenceEvent) => void
+  /** Another participant (a colleague) deleted the conversation. */
+  removed: (event: RemovedEvent) => void
   /** After every reconnect (events sent while offline are lost) and, without EventSource, every {@link STREAM_POLL_MS}. */
   resync: () => void
 }
@@ -57,6 +59,7 @@ export function useStaffChatStream(handlers: ChatStreamHandlers) {
     listen<ReceiptEvent>('delivered', handlers.delivered)
     listen<ReceiptEvent>('read', handlers.read)
     listen<PresenceEvent>('presence', handlers.presence)
+    listen<RemovedEvent>('removed', handlers.removed)
     source.addEventListener('error', () => {
       connected.value = false
       reconnecting.value = true

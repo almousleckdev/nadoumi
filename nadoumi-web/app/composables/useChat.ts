@@ -8,7 +8,7 @@ import { maxPointer, mergeMessages, sortInbox } from '~/utils/chat'
 export type LoadStatus = 'loading' | 'ready' | 'error'
 
 /** What a file that is still uploading or just attached looks like in the optimistic bubble. */
-export interface OutgoingFile { name: string, type: string, size: number }
+export interface OutgoingFile { name: string, type: string, size: number, previewUrl?: string }
 
 interface Outgoing { body: string, mediaIds: number[], files: OutgoingFile[] }
 
@@ -142,7 +142,8 @@ export function useChat() {
   function temporaryMessage(conversationId: number, body: string, files: OutgoingFile[]): ChatMessage {
     tempSeq += 1
     const attachments: ChatAttachment[] = files.map((f, i) => ({
-      id: -(tempSeq * 10 + i), filename: f.name, contentType: f.type, byteSize: f.size, image: false,
+      id: -(tempSeq * 10 + i), filename: f.name, contentType: f.type, byteSize: f.size,
+      image: f.type.startsWith('image/'), previewUrl: f.previewUrl,
     }))
     return {
       id: -tempSeq, conversationId, senderUserId: myId.value, senderName: null, body,
@@ -154,6 +155,7 @@ export function useChat() {
     try {
       const sent = await api.post(conversationId, pending.body, pending.mediaIds)
       outgoing.delete(temp.id)
+      releasePreviews(pending.files)
       if (activeId.value === conversationId) {
         messages.value = mergeMessages(messages.value.filter(m => m.id !== temp.id), [sent])
       }
@@ -186,7 +188,14 @@ export function useChat() {
     void transmit(conversationId, temp, pending)
   }
 
+  /** Local image previews are only needed until the server's copy is shown. */
+  function releasePreviews(files: OutgoingFile[]) {
+    files.forEach(f => f.previewUrl && URL.revokeObjectURL(f.previewUrl))
+  }
+
   function discard(tempId: number) {
+    const pending = outgoing.get(tempId)
+    if (pending) releasePreviews(pending.files)
     outgoing.delete(tempId)
     messages.value = messages.value.filter(m => m.id !== tempId)
   }
@@ -241,6 +250,12 @@ export function useChat() {
     conversation.peerDeliveredMessageId = maxPointer(conversation.peerDeliveredMessageId, event.messageId)
   }
 
+  /** A staff member deleted the chat: it disappears from the inbox, and from the screen if it was open. */
+  function onRemoved(event: { conversationId: number }) {
+    inbox.value = inbox.value.filter(c => c.id !== event.conversationId)
+    if (activeId.value === event.conversationId) void select(null)
+  }
+
   const presenceByUser = reactive<Record<number, PresenceEvent>>({})
 
   function onPresence(event: PresenceEvent) {
@@ -268,7 +283,7 @@ export function useChat() {
   }
 
   const { reconnecting } = useChatStream({
-    message: onMessage, delivered: onDelivered, read: onRead, presence: onPresence, resync: () => void resync(),
+    message: onMessage, delivered: onDelivered, read: onRead, presence: onPresence, removed: onRemoved, resync: () => void resync(),
   })
 
   function onVisible() {

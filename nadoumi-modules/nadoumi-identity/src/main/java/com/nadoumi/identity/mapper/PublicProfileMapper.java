@@ -11,4 +11,7 @@ public interface PublicProfileMapper {
 
     /** One row per known user, with the given name of their active OWNER applicant (null for staff). */
     List<PublicProfileRow> findByUserIds(@Param("userIds") Collection<Long> userIds);
+
+    /** The photo asset of a student's active OWNER applicant, or null when there is none (or the user is staff). */
+    Long findStudentPhotoMediaId(@Param("userId") long userId);
 }

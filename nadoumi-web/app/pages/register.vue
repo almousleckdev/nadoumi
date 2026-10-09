@@ -81,19 +81,17 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
 
 <template>
   <div>
-    <NCard>
-      <h1 class="mb-1 font-display text-2xl font-bold text-slate-900">{{ t('auth.registerTitle') }}</h1>
-      <p class="mb-5 text-sm text-slate-500">{{ t('auth.registerSubtitle') }}</p>
-      <ol class="mb-6 flex items-center justify-center gap-2 text-xs font-medium text-slate-400">
-        <li v-for="(s, i) in STEPS" :key="s" class="flex items-center gap-2">
-          <span
-            class="inline-flex h-6 w-6 items-center justify-center rounded-full border transition-colors"
-            :class="step >= i + 1 ? 'border-brand-500 bg-brand-50 text-brand-700' : 'border-slate-200'"
-          >{{ i + 1 }}</span>
-          <span :class="step >= i + 1 ? 'text-slate-700' : ''">{{ t(`auth.registerStep.${s}`) }}</span>
-          <span v-if="i < STEPS.length - 1" class="h-px w-6 bg-slate-200" />
-        </li>
-      </ol>
+    <h1 class="font-display text-3xl font-bold text-slate-900">{{ t('auth.registerTitle') }}</h1>
+    <p class="mt-2 text-slate-600">{{ t('auth.registerSubtitle') }}</p>
+    <ol class="mb-8 mt-6 grid grid-cols-3 gap-2" data-test="register-steps">
+      <li v-for="(s, i) in STEPS" :key="s" :aria-current="step === i + 1 ? 'step' : undefined">
+        <span class="block h-1.5 rounded-full transition-colors" :class="step >= i + 1 ? 'bg-brand-500' : 'bg-slate-200'" />
+        <span class="mt-2 block text-xs font-medium" :class="step === i + 1 ? 'text-slate-900' : step > i + 1 ? 'text-brand-700' : 'text-slate-500'">
+          {{ i + 1 }}. {{ t(`auth.registerStep.${s}`) }}
+        </span>
+      </li>
+    </ol>
+    <div>
 
       <!-- Steps 1 & 2 · Personal information + email verification.
            EmailVerifyStep is mounted once and owns the OTP UI; `step` (1 vs 2) only
@@ -151,12 +149,12 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
 
         <ConsentCheckboxes v-model="consent" single :invalid="submitted" />
 
-        <NButton type="submit" :loading="busy" :disabled="!canSubmit" block>{{ t('auth.next') }}</NButton>
+        <NButton type="submit" size="lg" :loading="busy" :disabled="!canSubmit" block>{{ t('auth.next') }}</NButton>
       </form>
-    </NCard>
+    </div>
 
-    <p class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/login')" class="rounded-full bg-white/95 px-3 py-1 font-medium text-slate-700 shadow-sm hover:bg-white hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
+    <p class="mt-8 border-t border-slate-200 pt-6 text-center text-sm">
+      <NuxtLink :to="localePath('/login')" class="font-medium text-slate-700 hover:text-brand-700 hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
     </p>
   </div>
 </template>

@@ -12,6 +12,9 @@ public interface MessageAttachmentMapper {
 
     List<MessageAttachment> listByMessageIds(@Param("messageIds") java.util.Collection<Long> messageIds);
 
+    /** Every media asset attached anywhere in the conversation (to be released when it is deleted). */
+    List<Long> listMediaIdsByConversation(@Param("conversationId") long conversationId);
+
     int insert(MessageAttachment attachment);
 
     int setPromotedDocumentId(@Param("id") long id, @Param("documentId") long documentId);

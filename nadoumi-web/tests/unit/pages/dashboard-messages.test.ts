@@ -360,6 +360,56 @@ describe('image viewer', () => {
   })
 })
 
+describe('Nadoumi staff and removal', () => {
+  it('goes back to the list with the back button', async () => {
+    const w = await mountPage()
+    await openFirst(w)
+    await w.find('[data-test="back"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-test="peer-name"]').exists()).toBe(false)
+  })
+
+  it('labels the person on top of the chat as Nadoumi staff', async () => {
+    const w = await mountPage()
+    await openFirst(w)
+    expect(w.find('[data-test="staff-badge"]').text()).toBe('Nadoumi staff')
+  })
+
+  it('drops a chat the moment a staff member deletes it, and clears the open thread', async () => {
+    const w = await mountPage()
+    await openFirst(w)
+    emit('removed', { conversationId: 1 })
+    await flushPromises()
+    expect(w.findAll('[data-test="inbox-item"]')).toHaveLength(1)
+    expect(w.find('[data-test="peer-name"]').exists()).toBe(false)
+  })
+})
+
+describe('sending an image', () => {
+  it('shows the picture itself while it is being sent, not a document card', async () => {
+    let resolve!: (m: ChatMessage) => void
+    api.uploadAttachment.mockResolvedValue({ mediaId: 77 })
+    api.post.mockReturnValue(new Promise<ChatMessage>((r) => { resolve = r }))
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: () => 'blob:preview-1', revokeObjectURL: vi.fn() }))
+    const w = await mountPage()
+    await openFirst(w)
+    const input = w.find('input[type="file"]')
+    Object.defineProperty(input.element, 'files', { value: [new File(['x'], 'pic.png', { type: 'image/png' })], configurable: true })
+    await input.trigger('change')
+    await flushPromises()
+    await w.find('form').trigger('submit')
+    await flushPromises()
+    expect(w.find('[data-test="attachment-sending-image"] img').attributes('src')).toBe('blob:preview-1')
+    expect(w.find('[data-test="attachment-file"]').exists()).toBe(false)
+
+    resolve(msg(40, { senderUserId: ME, body: '', attachments: [{ id: 9, filename: 'pic.png', contentType: 'image/png', byteSize: 1, image: true }] }))
+    await flushPromises()
+    expect(w.find('[data-test="attachment-sending-image"]').exists()).toBe(false)
+    expect(w.find('[data-test="attachment-image"] img').attributes('src')).toBe('/api/student-attachment/1/9')
+    vi.unstubAllGlobals()
+  })
+})
+
 describe('history', () => {
   it('loads earlier messages with the oldest id as the cursor', async () => {
     api.listMessages.mockResolvedValueOnce(Array.from({ length: 30 }, (_, i) => msg(100 - i)))

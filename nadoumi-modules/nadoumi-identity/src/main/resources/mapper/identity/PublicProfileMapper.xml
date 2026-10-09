@@ -9,6 +9,7 @@
         <result property="userName"       column="user_name"/>
         <result property="avatar"         column="avatar"/>
         <result property="ownerGivenName" column="owner_given_name"/>
+        <result property="ownerPhotoMediaId" column="owner_photo_media_id"/>
     </resultMap>
 
     <select id="findByUserIds" resultMap="row">
@@ -18,9 +19,26 @@
                 join nad_applicant a on a.id = acc.applicant_id
                 where acc.user_id = u.user_id and acc.access_role = 'OWNER' and acc.status = 'ACTIVE'
                 order by acc.id
-                limit 1) as owner_given_name
+                limit 1) as owner_given_name,
+               (select a.photo_media_id
+                from nad_user_applicant_access acc
+                join nad_applicant a on a.id = acc.applicant_id
+                where acc.user_id = u.user_id and acc.access_role = 'OWNER' and acc.status = 'ACTIVE'
+                order by acc.id
+                limit 1) as owner_photo_media_id
         from sys_user u
         where u.user_id in
         <foreach collection="userIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </select>
+
+    <!-- the profile photo of a student's active OWNER applicant, or null; staff never match -->
+    <select id="findStudentPhotoMediaId" resultType="java.lang.Long">
+        select a.photo_media_id
+        from sys_user u
+        join nad_user_applicant_access acc on acc.user_id = u.user_id and acc.access_role = 'OWNER' and acc.status = 'ACTIVE'
+        join nad_applicant a on a.id = acc.applicant_id
+        where u.user_id = #{userId} and (u.user_type is null or u.user_type &lt;&gt; '00') and a.photo_media_id is not null
+        order by acc.id
+        limit 1
     </select>
 </mapper>

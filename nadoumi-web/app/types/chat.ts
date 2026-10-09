@@ -34,6 +34,8 @@ export interface ChatAttachment {
   contentType: string | null
   byteSize: number
   image: boolean
+  /** Client-only: a local preview of an image that is still being sent. */
+  previewUrl?: string
 }
 
 export type SendState = 'sent' | 'sending' | 'failed'
@@ -55,6 +57,7 @@ export type ReceiptStatus = SendState | 'delivered' | 'read'
 
 /** Bodies of the SSE events (besides `message`, which is a {@link ChatMessage}). */
 export interface ReceiptEvent { conversationId: number, userId: number, messageId: number }
+export interface RemovedEvent { conversationId: number }
 export interface PresenceEvent { userId: number, online: boolean, lastSeenAt: string | null }
 
 export const MESSAGE_PAGE_SIZE = 30

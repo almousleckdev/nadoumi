@@ -14,9 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class PublicProfileService {
 
     private final PublicProfileMapper mapper;
+    private final AvatarLinks avatarLinks;
 
-    public PublicProfileService(PublicProfileMapper mapper) {
+    public PublicProfileService(PublicProfileMapper mapper, AvatarLinks avatarLinks) {
         this.mapper = mapper;
+        this.avatarLinks = avatarLinks;
     }
 
     /** A profile per user that still exists; ids with no matching user are simply absent from the map. */
@@ -31,8 +33,17 @@ public class PublicProfileService {
             profiles.put(row.getUserId(), new PublicProfile(
                     PublicProfileRules.displayName(row.getUserType(), row.getNickName(), row.getUserName(),
                             row.getOwnerGivenName()),
-                    PublicProfileRules.avatarUrl(row.getUserType(), row.getAvatar())));
+                    avatarFor(row)));
         }
         return profiles;
+    }
+
+    /** A staff member's public photo URL, or a signed link to a student's photo when they have uploaded one. */
+    private String avatarFor(PublicProfileRow row) {
+        String staffPhoto = PublicProfileRules.avatarUrl(row.getUserType(), row.getAvatar());
+        if (staffPhoto != null || PublicProfileRules.isStaff(row.getUserType())) {
+            return staffPhoto;
+        }
+        return row.getOwnerPhotoMediaId() == null ? null : avatarLinks.linkFor(row.getUserId());
     }
 }

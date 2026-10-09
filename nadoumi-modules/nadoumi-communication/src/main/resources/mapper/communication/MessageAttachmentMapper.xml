@@ -27,6 +27,12 @@
         order by id
     </select>
 
+    <select id="listMediaIdsByConversation" resultType="long">
+        select a.media_asset_id from nad_message_attachment a
+        join nad_message m on m.id = a.message_id
+        where m.conversation_id = #{conversationId}
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.communication.domain.MessageAttachment"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_message_attachment (message_id, media_asset_id, original_filename, content_type, byte_size, create_time)

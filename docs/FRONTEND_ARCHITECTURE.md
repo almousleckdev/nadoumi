@@ -637,3 +637,13 @@ sends with retry, receipts, presence), fed by `useChatStream.ts` (typed SSE even
 redirect `server/api/student-attachment/[conversationId]/[attachmentId].get.ts`. The image viewer is a centred card
 over a blurred backdrop that steps through every image of the conversation (buttons, arrow keys, swipe). Layout is
 two panes from `md` up and one pane (list or thread) below, RTL-safe, five locales.
+
+## Student auth and testimonials — EXISTING (2026-10-09)
+
+`layouts/auth.vue` frames sign in, register and password help as a split screen: a brand panel (photo, headline,
+three value points) from `lg` up and the form on a white surface, with a compact header and the locale switcher on
+phones. The pages hold only the form (the register stepper is a three-segment progress bar). The home page ends its
+"Your journey with Nadoumi" section with `components/marketing/StudentTestimonials.vue`: one featured story at a time
+(portrait, quote in the language the student wrote it, route "Chad to China") with previous/next, face thumbnails,
+arrow keys and a read-more clamp. Stories live in `app/data/testimonials.ts`; photos are optimized JPEGs in
+`public/students` (originals are kept out of `public`, in the git-ignored `design/students-originals`).

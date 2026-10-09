@@ -37,6 +37,8 @@ export interface ChatAttachment {
   contentType: string | null
   byteSize: number
   image: boolean
+  /** Client-only: a local preview of an image that is still being sent. */
+  previewUrl?: string
 }
 
 export type SendState = 'sent' | 'sending' | 'failed'
@@ -68,6 +70,7 @@ export interface StudentResult {
 
 /** Bodies of the SSE events (besides `message`, which is a {@link ChatMessage}). */
 export interface ReceiptEvent { conversationId: number, userId: number, messageId: number }
+export interface RemovedEvent { conversationId: number }
 export interface PresenceEvent { userId: number, online: boolean, lastSeenAt: string | null }
 
 export const MESSAGE_PAGE_SIZE = 30
@@ -132,6 +135,10 @@ export const markConversationRead = (id: number) =>
 
 export const closeConversation = (id: number) =>
   request.post<unknown, undefined>(`/api/staff/conversations/${id}/close`)
+
+/** Permanently deletes the chat (messages and files) for both sides. */
+export const deleteConversation = (id: number) =>
+  request.delete<unknown, undefined>(`/api/staff/conversations/${id}`)
 
 export const chatUnreadCount = () =>
   request.get<unknown, { count: number }>('/api/staff/conversations/unread-count', { silent: true } as object)

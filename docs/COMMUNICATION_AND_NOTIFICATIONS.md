@@ -334,3 +334,15 @@ listing**: images and downloads go through `GET .../attachments/{id}[?download=1
 Word (.docx and legacy .doc), Excel (.xlsx), PowerPoint (.pptx). Office files are identified from their own content
 (an OOXML package by the main part it declares, a legacy file by its OLE2 signature); macro-enabled formats, ZIPs,
 executables and anything whose bytes disagree with the declared type are refused.
+
+### 7.6 Deleting a chat and profile pictures (EXISTING, 2026-10-09)
+
+- `DELETE /api/staff/conversations/{id}` permanently deletes a private chat for both sides. Only an active staff
+  participant may do it (another staff member or a student gets 403); ticket (SUPPORT) chats are refused. Messages,
+  attachments and participants go with the conversation (ON DELETE CASCADE), attachment files are released through
+  `MediaGateway.softDelete`, the call is written to the RuoYi operation log (`Delete conversation`), and the other
+  participant receives a `removed` event so the chat leaves their screen immediately. A new chat can be started again.
+- Chat pictures: staff show their public photo URL; students show their private photo through the signed avatar link
+  (see SECURITY.md 11.1). Initials are the fallback everywhere. The student chat header labels the person "Nadoumi staff".
+- Sending an image shows the picture itself immediately (a local preview), then the stored copy; it is no longer a
+  document card while in flight. Multiple images in one message render as a grid; the viewer steps through all of them.
