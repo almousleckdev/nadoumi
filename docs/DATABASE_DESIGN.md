@@ -387,3 +387,7 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - `nad_message`: index `(sender_user_id, created_at)`. `nad_applicant`: index on `given_name` (student search).
 - `nad_user_presence(user_id PK → sys_user ON DELETE CASCADE, last_seen_at UTC)`.
 - Rollback: documented in the header of `V96__nad_chat_rework.sql`.
+
+- **V97** widens `sys_user.avatar` from RuoYi's `varchar(100)` to `varchar(512)`. A staff photo is stored as its
+  Cloudinary delivery URL, which is longer than 100 characters, so saving a staff photo failed ("Data too long") and
+  staff pictures never appeared in chat or on News. Rollback is in the migration header.

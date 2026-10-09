@@ -300,4 +300,27 @@ class ChatPrivacyApiTest extends AbstractNadIntegrationTest {
         assertThat(studentOpens(studentAToken, staffA)).isEqualTo(conversation);
         studentSays(studentAToken, conversation, "hi again");
     }
+
+    @Test
+    void aStaffParticipantCanDeleteAChatForGood_andOnlyAStaffParticipant() throws Exception {
+        long conversation = studentOpens(studentAToken, staffA);
+        studentSays(studentAToken, conversation, "please remove this later");
+
+        assertRefused(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                .delete("/api/staff/conversations/{id}", conversation).header("Authorization", bearer(staffBToken))).andReturn());
+        assertRefused(mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                .delete("/api/staff/conversations/{id}", conversation).header("Authorization", bearer(studentAToken))).andReturn());
+        assertThat(jdbc.queryForObject("select count(*) from nad_conversation", Integer.class)).isEqualTo(1);
+
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                        .delete("/api/staff/conversations/{id}", conversation).header("Authorization", bearer(staffAToken)))
+                .andExpect(status().isNoContent());
+
+        assertThat(jdbc.queryForObject("select count(*) from nad_conversation", Integer.class)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from nad_message", Integer.class)).isZero();
+        mvc.perform(get("/api/student/conversations").header("Authorization", bearer(studentAToken)))
+                .andExpect(jsonPath("$.length()").value(0));
+        // a fresh chat can be started again afterwards
+        assertThat(studentOpens(studentAToken, staffA)).isNotEqualTo(conversation);
+    }
 }

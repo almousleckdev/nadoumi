@@ -150,6 +150,18 @@
       "title": "Fully funded scholarships",
       "description": "Tuition, accommodation and a stipend covered.",
       "empty": "No fully funded scholarships are published yet."
+    },
+    "testimonials": {
+      "eyebrow": "Student stories",
+      "title": "Hear from students already in China",
+      "description": "Real words from students whose journey Nadoumi helped make possible.",
+      "anonymous": "Nadoumi student",
+      "readMore": "Read more",
+      "readLess": "Show less",
+      "previous": "Previous story",
+      "next": "Next story",
+      "show": "Show story {n}",
+      "photoAlt": "Portrait of {name}"
     }
   },
   "about": {
@@ -339,7 +351,17 @@
     "newToNadoumi": "New to Nadoumi?",
     "createProfile": "Create a profile",
     "givenName": "Given name",
-    "familyName": "Family name"
+    "familyName": "Family name",
+    "panel": {
+      "headline": "Your path to study abroad starts here",
+      "subtitle": "Discover universities and scholarships, apply, and stay in touch with your Nadoumi advisor, all in one place.",
+      "points": {
+        "discover": "Browse universities, programs and scholarships",
+        "apply": "Apply and follow every step of your application",
+        "chat": "Chat privately with your Nadoumi advisor"
+      }
+    },
+    "forgotSubtitle": "Verify your email, then choose a new password."
   },
   "dashboard": {
     "nav": {
@@ -489,7 +511,8 @@
       "attach": "Attach a file",
       "previousImage": "Previous image",
       "nextImage": "Next image",
-      "imageCounter": "{n} of {total}"
+      "imageCounter": "{n} of {total}",
+      "staffBadge": "Nadoumi staff"
     },
     "profileTitle": "Applicant profile",
     "createProfileTitle": "Create your applicant profile",

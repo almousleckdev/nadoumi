@@ -40,4 +40,10 @@ describe('Avatar', () => {
 
     expect(w.find('img').attributes('src')).toBe('https://cdn.example/new.png')
   })
+
+  it('reads a server-relative photo link (a signed profile-photo path) against the API origin', () => {
+    const w = mount(Avatar, { props: { name: 'Ava', src: '/api/public/avatars/7/abc' } })
+    expect(w.find('img').attributes('src')).toMatch(/\/api\/public\/avatars\/7\/abc$/)
+    expect(w.find('img').attributes('src')).not.toBe('/api/public/avatars/7/abc')
+  })
 })

@@ -22,7 +22,7 @@ class FakeEventSource {
   }
 }
 
-const handlers = () => ({ message: vi.fn(), delivered: vi.fn(), read: vi.fn(), presence: vi.fn(), resync: vi.fn() })
+const handlers = () => ({ message: vi.fn(), delivered: vi.fn(), read: vi.fn(), presence: vi.fn(), removed: vi.fn(), resync: vi.fn() })
 
 function host(h0: ReturnType<typeof handlers>) {
   let api!: ReturnType<typeof useChatStream>
@@ -64,6 +64,13 @@ describe('useChatStream', () => {
     expect(h0.delivered).toHaveBeenCalledWith({ conversationId: 3, userId: 2, messageId: 9 })
     expect(h0.read).toHaveBeenCalledOnce()
     expect(h0.presence).toHaveBeenCalledWith({ userId: 2, online: true, lastSeenAt: null })
+  })
+
+  it('tells the page when a staff member deletes the chat', () => {
+    const h0 = handlers()
+    host(h0)
+    FakeEventSource.instances[0]!.emit('removed', JSON.stringify({ conversationId: 3 }))
+    expect(h0.removed).toHaveBeenCalledWith({ conversationId: 3 })
   })
 
   it('ignores a malformed event instead of throwing', () => {

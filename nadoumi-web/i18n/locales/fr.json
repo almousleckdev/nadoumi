@@ -150,6 +150,18 @@
       "title": "Bourses entièrement financées",
       "description": "Frais de scolarité, hébergement et une allocation pris en charge.",
       "empty": "Aucune bourse entièrement financée n'est encore publiée."
+    },
+    "testimonials": {
+      "eyebrow": "Témoignages d'étudiants",
+      "title": "La parole aux étudiants déjà en Chine",
+      "description": "Les mots d'étudiants dont Nadoumi a contribué à rendre le parcours possible.",
+      "anonymous": "Étudiante Nadoumi",
+      "readMore": "Lire la suite",
+      "readLess": "Réduire",
+      "previous": "Témoignage précédent",
+      "next": "Témoignage suivant",
+      "show": "Afficher le témoignage {n}",
+      "photoAlt": "Portrait de {name}"
     }
   },
   "about": {
@@ -339,7 +351,17 @@
     "newToNadoumi": "Nouveau sur Nadoumi ?",
     "createProfile": "Créer un profil",
     "givenName": "Prénom",
-    "familyName": "Nom de famille"
+    "familyName": "Nom de famille",
+    "panel": {
+      "headline": "Votre parcours d'études à l'étranger commence ici",
+      "subtitle": "Découvrez universités et bourses, postulez et restez en contact avec votre conseiller Nadoumi, au même endroit.",
+      "points": {
+        "discover": "Parcourez universités, programmes et bourses",
+        "apply": "Postulez et suivez chaque étape de votre candidature",
+        "chat": "Échangez en privé avec votre conseiller Nadoumi"
+      }
+    },
+    "forgotSubtitle": "Vérifiez votre e-mail, puis choisissez un nouveau mot de passe."
   },
   "dashboard": {
     "nav": {
@@ -489,7 +511,8 @@
       "attach": "Joindre un fichier",
       "previousImage": "Image précédente",
       "nextImage": "Image suivante",
-      "imageCounter": "{n} sur {total}"
+      "imageCounter": "{n} sur {total}",
+      "staffBadge": "Équipe Nadoumi"
     },
     "profileTitle": "Profil du candidat",
     "createProfileTitle": "Créez votre profil de candidat",

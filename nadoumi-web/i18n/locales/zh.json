@@ -150,6 +150,18 @@
       "title": "全额资助奖学金",
       "description": "涵盖学费、住宿及生活补贴。",
       "empty": "暂无已发布的全额资助奖学金。"
+    },
+    "testimonials": {
+      "eyebrow": "学生故事",
+      "title": "听听已在中国学习的学生怎么说",
+      "description": "来自 Nadoumi 协助其成行的学生的真实心声。",
+      "anonymous": "Nadoumi 学生",
+      "readMore": "阅读更多",
+      "readLess": "收起",
+      "previous": "上一篇",
+      "next": "下一篇",
+      "show": "查看第 {n} 篇",
+      "photoAlt": "{name} 的照片"
     }
   },
   "about": {
@@ -339,7 +351,17 @@
     "newToNadoumi": "还没有 Nadoumi 账户？",
     "createProfile": "创建档案",
     "givenName": "名",
-    "familyName": "姓"
+    "familyName": "姓",
+    "panel": {
+      "headline": "您的留学之路从这里开始",
+      "subtitle": "发现大学和奖学金，提交申请，并与您的 Nadoumi 顾问保持联系，一站式完成。",
+      "points": {
+        "discover": "浏览大学、专业和奖学金",
+        "apply": "申请并跟进申请的每一步",
+        "chat": "与您的 Nadoumi 顾问私密沟通"
+      }
+    },
+    "forgotSubtitle": "先验证您的邮箱，然后设置新密码。"
   },
   "dashboard": {
     "nav": {
@@ -489,7 +511,8 @@
       "attach": "添加附件",
       "previousImage": "上一张图片",
       "nextImage": "下一张图片",
-      "imageCounter": "第 {n} 张，共 {total} 张"
+      "imageCounter": "第 {n} 张，共 {total} 张",
+      "staffBadge": "Nadoumi 团队"
     },
     "profileTitle": "申请人档案",
     "createProfileTitle": "创建您的申请人档案",

@@ -139,9 +139,10 @@ function insertEmoji(emoji: string) {
 
 function submit() {
   if (!canSend.value) return
-  const files = pending.value.filter(p => p.mediaId !== null).map(p => ({ name: p.file.name, type: p.file.type, size: p.file.size }))
+  // the image previews now belong to the message being sent, which releases them once the server has answered
+  const files = pending.value.filter(p => p.mediaId !== null)
+    .map(p => ({ name: p.file.name, type: p.file.type, size: p.file.size, previewUrl: p.previewUrl ?? undefined }))
   emit('send', draft.value, readyIds.value, files)
-  releasePreviews()
   pending.value = []
   draft.value = ''
   problem.value = ''
@@ -183,7 +184,7 @@ defineExpose({ addFiles, focus: () => textarea.value?.focus() })
       </li>
     </ul>
 
-    <div class="relative flex items-end gap-1.5">
+    <div class="relative flex items-end gap-1 rounded-3xl border border-slate-200 bg-slate-50 p-1.5 transition-colors focus-within:border-brand-500 focus-within:bg-white">
       <label
         :for="fileInputId"
         class="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full text-slate-600 hover:bg-slate-100 focus-within:outline focus-within:outline-2 focus-within:outline-brand-500"
@@ -234,7 +235,7 @@ defineExpose({ addFiles, focus: () => textarea.value?.focus() })
         :disabled="disabled"
         :placeholder="disabled ? t('dashboard.messages.closedNotice') : t('dashboard.messages.composer')"
         :aria-label="t('dashboard.messages.composer')"
-        class="max-h-40 min-h-[2.5rem] flex-1 resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-[0.9375rem] leading-6 text-slate-900 placeholder:text-slate-500 focus:border-brand-500 focus:bg-white focus:outline-none disabled:opacity-60"
+        class="max-h-40 min-h-[2.5rem] flex-1 resize-none bg-transparent px-2 py-2 text-[0.9375rem] leading-6 text-slate-900 placeholder:text-slate-500 focus:outline-none disabled:opacity-60"
         data-test="composer"
         @keydown="onKeydown"
         @paste="onPaste"

@@ -3,6 +3,8 @@ package com.nadoumi.communication.web;
 import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.communication.domain.enums.ParticipantRole;
 import com.nadoumi.communication.service.ChatDirectoryService;
+import com.ruoyi.common.annotation.Log;
+import com.ruoyi.common.enums.BusinessType;
 import com.nadoumi.communication.service.ConversationService;
 import com.nadoumi.communication.web.request.OpenDirectRequest;
 import com.nadoumi.communication.web.response.StudentSearchResult;
@@ -137,6 +139,14 @@ public class StaffConversationController {
     @PreAuthorize("@ss.hasPermi('nad:conversation:participant:manage')")
     public void removeParticipant(@PathVariable Long id, @PathVariable Long userId) {
         conversations.removeParticipant(id, userId);
+    }
+
+    @DeleteMapping("/conversations/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
+    @Log(title = "Delete conversation", businessType = BusinessType.DELETE)
+    public void delete(@PathVariable Long id) {
+        conversations.delete(id);
     }
 
     @PostMapping("/conversations/{id}/close")

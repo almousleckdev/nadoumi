@@ -150,6 +150,18 @@
       "title": "Becas totalmente financiadas",
       "description": "Matrícula, alojamiento y una asignación cubiertos.",
       "empty": "Todavía no hay becas totalmente financiadas publicadas."
+    },
+    "testimonials": {
+      "eyebrow": "Historias de estudiantes",
+      "title": "La voz de los estudiantes que ya están en China",
+      "description": "Palabras reales de estudiantes cuyo camino Nadoumi ayudó a hacer posible.",
+      "anonymous": "Estudiante de Nadoumi",
+      "readMore": "Leer más",
+      "readLess": "Mostrar menos",
+      "previous": "Historia anterior",
+      "next": "Historia siguiente",
+      "show": "Mostrar la historia {n}",
+      "photoAlt": "Retrato de {name}"
     }
   },
   "about": {
@@ -339,7 +351,17 @@
     "newToNadoumi": "¿Nuevo en Nadoumi?",
     "createProfile": "Crear un perfil",
     "givenName": "Nombre",
-    "familyName": "Apellidos"
+    "familyName": "Apellidos",
+    "panel": {
+      "headline": "Tu camino para estudiar en el extranjero empieza aquí",
+      "subtitle": "Descubre universidades y becas, solicita y mantén el contacto con tu asesor de Nadoumi, todo en un solo lugar.",
+      "points": {
+        "discover": "Explora universidades, programas y becas",
+        "apply": "Solicita y sigue cada paso de tu solicitud",
+        "chat": "Chatea en privado con tu asesor de Nadoumi"
+      }
+    },
+    "forgotSubtitle": "Verifica tu correo y luego elige una nueva contraseña."
   },
   "dashboard": {
     "nav": {
@@ -489,7 +511,8 @@
       "attach": "Adjuntar un archivo",
       "previousImage": "Imagen anterior",
       "nextImage": "Imagen siguiente",
-      "imageCounter": "{n} de {total}"
+      "imageCounter": "{n} de {total}",
+      "staffBadge": "Equipo Nadoumi"
     },
     "profileTitle": "Perfil del solicitante",
     "createProfileTitle": "Crea tu perfil de solicitante",

@@ -1,6 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import {
-  INBOX_PAGE_SIZE, MESSAGE_PAGE_SIZE, closeConversation, listInbox, listMessages, markConversationRead, openDirect,
+  INBOX_PAGE_SIZE, MESSAGE_PAGE_SIZE, closeConversation, deleteConversation, listInbox, listMessages, markConversationRead, openDirect,
   postMessage,
   type ChatAttachment, type ChatConversation, type ChatMessage, type PresenceEvent, type ReceiptEvent,
 } from '@/api/conversation'
@@ -10,7 +10,7 @@ import { maxPointer, mergeMessages, sortInbox } from '@/utils/chat'
 export type LoadStatus = 'loading' | 'ready' | 'error'
 
 /** What a file that has just been attached looks like in the optimistic bubble. */
-export interface OutgoingFile { name: string, type: string, size: number }
+export interface OutgoingFile { name: string, type: string, size: number, previewUrl?: string }
 
 interface Outgoing { body: string, mediaIds: number[], files: OutgoingFile[] }
 
@@ -146,7 +146,8 @@ export function useStaffChat(myId: () => number) {
   function temporaryMessage(conversationId: number, body: string, files: OutgoingFile[]): ChatMessage {
     tempSeq += 1
     const attachments: ChatAttachment[] = files.map((f, i) => ({
-      id: -(tempSeq * 10 + i), filename: f.name, contentType: f.type, byteSize: f.size, image: false,
+      id: -(tempSeq * 10 + i), filename: f.name, contentType: f.type, byteSize: f.size,
+      image: f.type.startsWith('image/'), previewUrl: f.previewUrl,
     }))
     return {
       id: -tempSeq, conversationId, senderUserId: myId(), senderName: null, body,
@@ -158,6 +159,7 @@ export function useStaffChat(myId: () => number) {
     try {
       const sent = await postMessage(conversationId, pending.body, pending.mediaIds)
       outgoing.delete(temp.id)
+      releasePreviews(pending.files)
       if (activeId.value === conversationId) {
         messages.value = mergeMessages(messages.value.filter(m => m.id !== temp.id), [sent])
       }
@@ -190,7 +192,14 @@ export function useStaffChat(myId: () => number) {
     void transmit(conversationId, temp, pending)
   }
 
+  /** Local image previews are only needed until the server's copy is shown. */
+  function releasePreviews(files: OutgoingFile[]) {
+    files.forEach(f => f.previewUrl && URL.revokeObjectURL(f.previewUrl))
+  }
+
   function discard(tempId: number) {
+    const pending = outgoing.get(tempId)
+    if (pending) releasePreviews(pending.files)
     outgoing.delete(tempId)
     messages.value = messages.value.filter(m => m.id !== tempId)
   }
@@ -230,6 +239,12 @@ export function useStaffChat(myId: () => number) {
     return conversation.id
   }
 
+  /** Deletes the chat for both sides, then drops it locally. */
+  async function remove(conversationId: number) {
+    await deleteConversation(conversationId)
+    onRemoved({ conversationId })
+  }
+
   async function close(conversationId: number) {
     await closeConversation(conversationId)
     const conversation = inbox.value.find(c => c.id === conversationId)
@@ -255,6 +270,12 @@ export function useStaffChat(myId: () => number) {
     if (!conversation) return
     conversation.peerReadMessageId = maxPointer(conversation.peerReadMessageId, event.messageId)
     conversation.peerDeliveredMessageId = maxPointer(conversation.peerDeliveredMessageId, event.messageId)
+  }
+
+  /** The chat is gone (deleted here or by a colleague): it leaves the inbox, and the screen if it was open. */
+  function onRemoved(event: { conversationId: number }) {
+    inbox.value = inbox.value.filter(c => c.id !== event.conversationId)
+    if (activeId.value === event.conversationId) void select(null)
   }
 
   const presenceByUser = reactive<Record<number, PresenceEvent>>({})
@@ -284,7 +305,7 @@ export function useStaffChat(myId: () => number) {
   }
 
   const { reconnecting } = useStaffChatStream({
-    message: onMessage, delivered: onDelivered, read: onRead, presence: onPresence, resync: () => void resync(),
+    message: onMessage, delivered: onDelivered, read: onRead, presence: onPresence, removed: onRemoved, resync: () => void resync(),
   })
 
   function onVisible() {
@@ -296,6 +317,6 @@ export function useStaffChat(myId: () => number) {
   return {
     inbox, inboxStatus, hasMoreInbox, loadingMoreInbox, activeId, active, messages, threadStatus, hasOlder,
     loadingOlder, olderFailed, reconnecting, presenceByUser,
-    loadInbox, loadMoreInbox, select, loadOlder, send, retry, discard, openWith, close,
+    loadInbox, loadMoreInbox, select, loadOlder, send, retry, discard, openWith, close, remove,
   }
 }

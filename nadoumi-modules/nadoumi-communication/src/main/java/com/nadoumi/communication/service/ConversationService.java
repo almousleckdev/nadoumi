@@ -15,6 +15,7 @@ import com.nadoumi.communication.domain.enums.ParticipantRole;
 import com.nadoumi.communication.mapper.CommunicationUserMapper;
 import com.nadoumi.communication.mapper.ConversationMapper;
 import com.nadoumi.communication.mapper.ConversationParticipantMapper;
+import com.nadoumi.communication.mapper.MessageAttachmentMapper;
 import com.nadoumi.communication.mapper.MessageMapper;
 import com.nadoumi.communication.web.request.OpenConversationRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
@@ -59,12 +60,13 @@ public class ConversationService {
     private final ConversationResponseAssembler assembler;
     private final ConversationAttachments attachmentService;
     private final ChatEvents events;
+    private final MessageAttachmentMapper attachmentRows;
 
     public ConversationService(ConversationMapper conversations, ConversationParticipantMapper participants,
             MessageMapper messages, CommunicationUserMapper users, NadoumiAccessService access,
             CurrentCaller caller, MessagePublisher publisher, ConversationGuard guard,
             ConversationResponseAssembler assembler, ConversationAttachments attachmentService,
-            ChatEvents events) {
+            ChatEvents events, MessageAttachmentMapper attachmentRows) {
         this.conversations = conversations;
         this.participants = participants;
         this.messages = messages;
@@ -76,6 +78,7 @@ public class ConversationService {
         this.assembler = assembler;
         this.attachmentService = attachmentService;
         this.events = events;
+        this.attachmentRows = attachmentRows;
     }
 
     /**
@@ -197,6 +200,27 @@ public class ConversationService {
         guard.requireStaff();
         guard.requireActiveParticipant(conversationId, caller.requireUserId());
         conversations.updateStatus(conversationId, ConversationStatus.CLOSED.name(), AuditActor.username());
+    }
+
+    /**
+     * Permanently deletes a private chat (messages, attachments and all) for both sides. Only an active staff
+     * participant may do it; ticket chats belong to the support module and are refused. Attachment files are
+     * released after the rows are gone, and the student's screen is told to drop the conversation.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(long conversationId) {
+        guard.requireStaff();
+        long userId = caller.requireUserId();
+        Conversation conversation = guard.requireActiveParticipant(conversationId, userId);
+        if (conversation.getConversationType() == ConversationType.SUPPORT) {
+            throw new NadBadRequestException("a support ticket's chat cannot be deleted here");
+        }
+        List<Long> participantIds = participants.listActiveForConversation(conversationId).stream()
+                .map(ConversationParticipant::getUserId).toList();
+        List<Long> mediaIds = attachmentRows.listMediaIdsByConversation(conversationId);
+        conversations.deleteById(conversationId);
+        mediaIds.forEach(id -> attachmentService.release(id, userId));
+        events.conversationRemoved(conversationId, userId, participantIds);
     }
 
     /** Staff-only, gated by {@code nad:conversation:participant:manage} at the controller. */

@@ -56,6 +56,15 @@
         >
           {{ t('conversations.close') }}
         </el-button>
+        <el-button
+          size="small"
+          type="danger"
+          plain
+          data-test="delete-chat"
+          @click="emit('delete')"
+        >
+          {{ t('conversations.delete') }}
+        </el-button>
       </header>
 
       <div
@@ -135,13 +144,19 @@
               </button>
             </div>
 
-            <p
+            <div
               v-if="messages.length === 0"
               class="ct__empty"
               data-test="thread-empty"
             >
-              {{ t('conversations.threadEmpty', { name: peer?.name ?? '' }) }}
-            </p>
+              <ChatAvatar
+                :name="peer?.name"
+                :src="peer?.avatarUrl"
+                :size="56"
+              />
+              <strong>{{ peer?.name }}</strong>
+              <span>{{ t('conversations.threadEmpty', { name: peer?.name ?? '' }) }}</span>
+            </div>
 
             <div
               v-for="group in groups"
@@ -184,26 +199,28 @@
         </button>
       </div>
 
-      <div
-        v-if="closed"
-        class="ct__closed"
-        data-test="closed"
-      >
-        {{ t('conversations.closedNotice') }}
-        <el-button
-          size="small"
-          @click="emit('reopen')"
+      <div class="ct__foot">
+        <div
+          v-if="closed"
+          class="ct__closed"
+          data-test="closed"
         >
-          {{ t('conversations.reopen') }}
-        </el-button>
+          {{ t('conversations.closedNotice') }}
+          <el-button
+            size="small"
+            @click="emit('reopen')"
+          >
+            {{ t('conversations.reopen') }}
+          </el-button>
+        </div>
+        <ChatComposer
+          v-else
+          ref="composer"
+          v-model="draft"
+          :conversation-id="conversation.id"
+          @send="relaySend"
+        />
       </div>
-      <ChatComposer
-        v-else
-        ref="composer"
-        v-model="draft"
-        :conversation-id="conversation.id"
-        @send="relaySend"
-      />
 
       <div
         v-if="dragging"
@@ -269,6 +286,7 @@ const draft = defineModel<string>('draft', { required: true })
 const emit = defineEmits<{
   back: []
   close: []
+  delete: []
   loadOlder: []
   reload: []
   reopen: []
@@ -390,7 +408,8 @@ defineExpose({ scrollToEnd })
 </script>
 
 <style scoped>
-.ct { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; flex: 1; background: #f8fafc; }
+.ct { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; flex: 1; background: linear-gradient(#f8fafc, #f1f5f9); }
+.ct__foot { flex-shrink: 0; }
 .ct__head { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--nad-line); background: #fff; }
 .ct__back { display: none; width: 36px; height: 36px; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--nad-ink-soft); cursor: pointer; }
 .ct__back:hover { background: #f1f5f9; }
@@ -411,6 +430,7 @@ defineExpose({ scrollToEnd })
 .ct__pill:hover { background: #f8fafc; }
 .ct__skeleton { max-width: 520px; }
 .ct__state, .ct__empty { display: grid; justify-items: center; gap: 12px; padding: 64px 0; color: var(--nad-ink-soft); font-size: 14px; text-align: center; }
+.ct__empty strong { color: var(--nad-ink); font-size: 16px; }
 .ct__empty { margin: 0; }
 .ct__jump { position: absolute; inset-block-end: 12px; inset-inline-end: 16px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 0; border-radius: 999px; background: #fff; box-shadow: var(--nad-shadow-md), 0 0 0 1px var(--nad-line); color: var(--nad-ink); font-size: 12px; font-weight: 600; cursor: pointer; }
 .ct__jump-n { display: grid; place-items: center; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 999px; background: var(--nad-brand-700); color: #fff; font-size: 10px; }

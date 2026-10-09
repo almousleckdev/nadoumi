@@ -86,10 +86,13 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V96 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V97 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(87);
+        assertThat(applied).isEqualTo(88);
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
+        // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
+        assertThat(single(ds, "SELECT character_maximum_length FROM information_schema.columns WHERE table_schema = DATABASE() "
+                + "AND table_name = 'sys_user' AND column_name = 'avatar'")).isEqualTo("512");
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -400,7 +403,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(86); // V2..V96, same gaps as above
+        assertThat(applied).isEqualTo(87); // V2..V97, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

@@ -114,6 +114,10 @@
         where id = #{id}
     </update>
 
+    <delete id="deleteById">
+        delete from nad_conversation where id = #{id}
+    </delete>
+
     <update id="updateStatus">
         update nad_conversation set status = #{status}, update_by = #{updateBy}, update_time = now()
         where id = #{id}

@@ -61,7 +61,7 @@ class ConversationServiceTest {
             new ConversationAttachments(guard, attachments, messages, media, caller);
     private final ConversationService service = new ConversationService(conversations, participants, messages,
             users, access, caller, publisher, guard, assembler, attachmentService,
-            mock(com.nadoumi.communication.stream.ChatEvents.class));
+            mock(com.nadoumi.communication.stream.ChatEvents.class), attachments);
 
     private static Conversation conversation() {
         Conversation c = new Conversation();

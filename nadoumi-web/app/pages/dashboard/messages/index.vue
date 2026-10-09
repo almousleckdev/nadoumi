@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t } = useI18n()
@@ -30,6 +30,11 @@ function reopen() {
   const peer = chat.active.value?.peer
   if (peer) void startWith(peer.userId)
 }
+
+// a chat that disappears (deleted by staff) must not leave its id in the address bar
+watch(() => chat.activeId.value, (id) => {
+  if (id === null && route.query.id) void router.replace({ query: { ...route.query, id: undefined } })
+})
 
 onMounted(async () => {
   await chat.loadInbox()

@@ -40,6 +40,7 @@
         :reconnecting="chat.reconnecting.value"
         @back="open(null)"
         @close="onClose"
+        @delete="onDelete"
         @load-older="chat.loadOlder()"
         @reload="chat.activeId.value && chat.select(chat.activeId.value)"
         @reopen="reopen"
@@ -112,6 +113,23 @@ async function onClose() {
   try {
     await chat.close(id)
     ElMessage.success(t('conversations.closedOk'))
+  }
+  catch (e) {
+    ElMessage.error((e as Error)?.message || t('conversations.loadError'))
+  }
+}
+
+async function onDelete() {
+  const id = chat.activeId.value
+  if (id === null) return
+  const confirmed = await confirm({
+    title: t('conversations.delete'), message: t('conversations.deleteConfirm'), confirmText: t('conversations.delete'), tone: 'danger',
+  })
+  if (!confirmed) return
+  try {
+    await chat.remove(id)
+    void router.replace({ query: { ...route.query, id: undefined } })
+    ElMessage.success(t('conversations.deletedOk'))
   }
   catch (e) {
     ElMessage.error((e as Error)?.message || t('conversations.loadError'))

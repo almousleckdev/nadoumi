@@ -50,8 +50,13 @@ useSeo(t('auth.forgotTitle'), t('auth.reset.title'))
 
 <template>
   <div>
-    <NCard>
-      <h1 class="mb-6 font-display text-2xl font-bold text-slate-900">{{ t('auth.forgotTitle') }}</h1>
+    <NuxtLink :to="localePath('/login')" class="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-brand-700">
+      <svg viewBox="0 0 24 24" class="h-4 w-4 rtl:-scale-x-100" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m15 6-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      {{ t('auth.reset.toLogin') }}
+    </NuxtLink>
+    <h1 class="font-display text-3xl font-bold text-slate-900">{{ t('auth.forgotTitle') }}</h1>
+    <p class="mb-8 mt-2 text-slate-600">{{ t('auth.forgotSubtitle') }}</p>
+    <div>
       <EmailVerifyStep
         v-if="stage === 'verify'"
         v-model:email="email"
@@ -74,7 +79,7 @@ useSeo(t('auth.forgotTitle'), t('auth.reset.title'))
           :label="t('auth.confirmPassword')"
           :error="submitted && next.confirm && next.password !== next.confirm ? t('validation.password.mismatch') : ''"
         />
-        <NButton type="submit" :loading="busy" :disabled="!canSubmit" block>{{ t('auth.reset.title') }}</NButton>
+        <NButton type="submit" size="lg" :loading="busy" :disabled="!canSubmit" block>{{ t('auth.reset.title') }}</NButton>
       </form>
 
       <div v-else class="grid gap-4">
@@ -83,9 +88,6 @@ useSeo(t('auth.forgotTitle'), t('auth.reset.title'))
           {{ t('auth.reset.toLogin') }}
         </NuxtLink>
       </div>
-    </NCard>
-    <p class="mt-4 text-center text-sm">
-      <NuxtLink :to="localePath('/login')" class="rounded-full bg-white/95 px-3 py-1 font-medium text-slate-700 shadow-sm hover:bg-white hover:underline">{{ t('auth.toLogin') }}</NuxtLink>
-    </p>
+    </div>
   </div>
 </template>

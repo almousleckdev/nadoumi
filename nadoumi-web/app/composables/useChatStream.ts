@@ -1,5 +1,5 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import type { ChatMessage, PresenceEvent, ReceiptEvent } from '~/types/chat'
+import type { ChatMessage, PresenceEvent, ReceiptEvent, RemovedEvent } from '~/types/chat'
 
 export const CHAT_STREAM_URL = '/api/student-stream'
 export const STREAM_BACKOFF_START_MS = 1_000
@@ -11,6 +11,8 @@ export interface ChatStreamHandlers {
   delivered: (event: ReceiptEvent) => void
   read: (event: ReceiptEvent) => void
   presence: (event: PresenceEvent) => void
+  /** A staff member deleted the conversation. */
+  removed: (event: RemovedEvent) => void
   /** After every reconnect (events sent while offline are lost) and, without EventSource, every {@link STREAM_POLL_MS}. */
   resync: () => void
 }
@@ -55,6 +57,7 @@ export function useChatStream(handlers: ChatStreamHandlers) {
     listen<ReceiptEvent>('delivered', handlers.delivered)
     listen<ReceiptEvent>('read', handlers.read)
     listen<PresenceEvent>('presence', handlers.presence)
+    listen<RemovedEvent>('removed', handlers.removed)
     source.addEventListener('error', () => {
       connected.value = false
       reconnecting.value = true

@@ -16,6 +16,23 @@
       @error="imageFailed = true"
     >
   </button>
+  <div
+    v-else-if="uploading && attachment.image && attachment.previewUrl"
+    class="att att--sending"
+    :class="{ 'att--compact': compact }"
+    data-test="attachment-sending-image"
+  >
+    <img
+      :src="attachment.previewUrl"
+      :alt="name"
+    >
+    <el-icon
+      class="is-loading att__spin"
+      :size="22"
+    >
+      <Loading />
+    </el-icon>
+  </div>
   <component
     :is="uploading ? 'div' : 'a'"
     v-else
@@ -50,7 +67,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Download } from '@element-plus/icons-vue'
+import { Download, Loading } from '@element-plus/icons-vue'
 import { attachmentUrl, type ChatAttachment } from '@/api/conversation'
 import { fileKind, formatBytes } from '@/utils/chat'
 
@@ -83,6 +100,10 @@ const name = computed(() => props.attachment.filename ?? t('conversations.attach
 }
 .att--image img { display: block; max-width: 280px; max-height: 240px; width: 100%; object-fit: cover; }
 .att--compact img { width: 100%; height: 128px; max-width: none; }
+.att--sending { position: relative; overflow: hidden; border: 1px solid var(--nad-line); border-radius: 10px; }
+.att--sending img { display: block; width: 100%; max-width: 280px; max-height: 240px; object-fit: cover; opacity: 0.7; }
+.att--sending.att--compact img { height: 128px; max-width: none; }
+.att__spin { position: absolute; inset: 0; margin: auto; color: var(--nad-brand-600); }
 .att--image:focus-visible { outline: 2px solid var(--nad-brand-500); outline-offset: 2px; }
 .att--file {
   display: flex;

@@ -22,7 +22,7 @@ class FakeEventSource {
   }
 }
 
-const handlers = () => ({ message: vi.fn(), delivered: vi.fn(), read: vi.fn(), presence: vi.fn(), resync: vi.fn() })
+const handlers = () => ({ message: vi.fn(), delivered: vi.fn(), read: vi.fn(), presence: vi.fn(), removed: vi.fn(), resync: vi.fn() })
 
 function host(h0: ReturnType<typeof handlers>) {
   let api!: ReturnType<typeof useStaffChatStream>
