@@ -38,11 +38,25 @@ class StudentAccountRetirementTest {
     void shouldRetireAStudentWithNoApplicantLeft_andEndTheirSessions() {
         when(access.countForUser(50L)).thenReturn(0);
         when(identity.selectStudentEmail(50L)).thenReturn("ada@example.com");
-        when(identity.softDeleteStudent(50L, "3")).thenReturn(1);
+        when(identity.removeStudentRow(50L)).thenReturn(1);
 
         retirement.retireOrphans(List.of(50L), 3L);
 
         verify(participant).retire(50L);
+        verify(sessions).revokeAll(50L, null);
+        verify(identity).removeStudentRow(50L);
+        verify(identity, never()).softDeleteStudent(anyLong(), anyString());
+    }
+
+    @Test
+    void shouldKeepAnAnonymisedShell_whenAForeignKeyStillPointsAtTheAccount() {
+        when(access.countForUser(50L)).thenReturn(0);
+        when(identity.selectStudentEmail(50L)).thenReturn("ada@example.com");
+        when(identity.removeStudentRow(50L)).thenThrow(new org.springframework.dao.DataIntegrityViolationException("fk"));
+
+        retirement.retireOrphans(List.of(50L), 3L);
+
+        verify(identity).softDeleteStudent(50L, "3");
         verify(sessions).revokeAll(50L, null);
     }
 

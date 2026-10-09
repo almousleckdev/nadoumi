@@ -5,6 +5,7 @@
       :status="statusText"
       :status-tone="autosave.state.value === 'error' ? 'error' : 'normal'"
       :user-name="userStore.nickName"
+      :user-avatar="assetUrl(userStore.avatar) || undefined"
       :primary-visible="primaryVisible"
       :primary-label="isLive ? t('news.editor.saveChanges') : t('news.editor.publish')"
       :primary-idle="primaryIdle"
@@ -58,6 +59,21 @@
         </template>
       </div>
     </main>
+
+    <div
+      v-if="imageUploading"
+      class="ne__upload"
+      role="status"
+      data-test="image-uploading"
+    >
+      <el-icon
+        class="is-loading"
+        :size="18"
+      >
+        <Loading />
+      </el-icon>
+      {{ t('news.editor.imageUploading') }}
+    </div>
 
     <input
       ref="imageInput"
@@ -120,6 +136,7 @@ import './editor/editor.css'
 import ArticlePreview from './editor/ArticlePreview.vue'
 import AutoGrowTextarea from './editor/AutoGrowTextarea.vue'
 import BlockInserter from './editor/BlockInserter.vue'
+import { Loading } from '@element-plus/icons-vue'
 import CoverBlock from './editor/CoverBlock.vue'
 import EditorTopBar, { type TopBarMenuItem } from './editor/EditorTopBar.vue'
 import SelectionToolbar from './editor/SelectionToolbar.vue'
@@ -386,10 +403,11 @@ function imageProblem(file: File): string | null {
 async function onCoverSelected(file: File) {
   const problem = imageProblem(file)
   if (problem) return void ElMessage.error(problem)
-  const draft = await ensureDraft()
-  if (!draft) return
+  // Loading starts at once: creating the draft first can take a moment on a slow connection.
   coverUploading.value = true
   try {
+    const draft = await ensureDraft()
+    if (!draft) return
     const { mediaId, url } = await uploadArticleCover(draft.id, file)
     const fresh = url ? null : await getArticle(draft.id)
     article.value = {
@@ -409,10 +427,10 @@ async function onCoverSelected(file: File) {
 async function insertImageFile(file: File) {
   const problem = imageProblem(file)
   if (problem) return void ElMessage.error(problem)
-  const draft = await ensureDraft()
-  if (!draft || !editor.value) return
   imageUploading.value = true
   try {
+    const draft = await ensureDraft()
+    if (!draft || !editor.value) return
     const { url } = await uploadArticleImage(draft.id, file)
     if (!url) return void ElMessage.error(t('imageUpload.failed'))
     editor.value.chain().focus()
@@ -576,6 +594,22 @@ onBeforeUnmount(() => window.removeEventListener('beforeunload', onBeforeUnload)
 </script>
 
 <style scoped>
+.ne__upload {
+  position: fixed;
+  inset-block-end: 28px;
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #242424;
+  color: #fff;
+  font: 400 14px/20px var(--ne-sans);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 25%);
+}
 .ne {
   min-height: 100vh;
   /* full-width images extend past the column; never let them add a horizontal scrollbar */

@@ -8,13 +8,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Closes the student sign-in accounts left without any applicant once an applicant is erased. RuoYi never
- * hard-deletes users (chats, tickets and audit rows keep pointing at them), so the account is soft-deleted and
- * anonymised, which also frees its username and email for a new registration.
+ * Closes the student sign-in accounts left without any applicant once an applicant is erased. Chats, tickets and the
+ * rest are removed first, so the account row can normally be deleted outright; if a foreign key still points at it
+ * the row is kept as an anonymised shell. Either way the username and email are free for a new registration.
  */
 @Service
 public class StudentAccountRetirement {
@@ -58,10 +59,29 @@ public class StudentAccountRetirement {
                 continue; // staff and already-closed accounts are never touched
             }
             participants.orderedStream().forEach(participant -> participant.retire(userId));
-            if (identity.softDeleteStudent(userId, String.valueOf(actorId)) > 0) {
-                sessions.revokeAll(userId, null);
-                log.info("student account {} retired by staff {}", userId, actorId);
+            sessions.revokeAll(userId, null);
+            close(userId, actorId);
+        }
+    }
+
+    /**
+     * Removes the account row. When something else still points at the user (for example a grant they gave on
+     * another applicant), the row is kept as an anonymised shell instead: no username, email, phone or photo is
+     * left, and the identifiers are free for a new registration either way.
+     */
+    private void close(Long userId, long actorId) {
+        try {
+            identity.removeStudentRoles(userId);
+            identity.removeStudentPosts(userId);
+            if (identity.removeStudentRow(userId) > 0) {
+                log.info("student account {} deleted by staff {}", userId, actorId);
+                return;
             }
         }
+        catch (DataIntegrityViolationException e) {
+            log.info("student account {} is still referenced, keeping an anonymised shell", userId);
+        }
+        identity.softDeleteStudent(userId, String.valueOf(actorId));
+        log.info("student account {} anonymised by staff {}", userId, actorId);
     }
 }

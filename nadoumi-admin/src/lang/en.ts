@@ -361,6 +361,7 @@ export default {
       leaveTitle: 'Leave without saving?',
       leaveConfirm: 'Your latest changes could not be saved. Leave anyway?',
       leave: 'Leave',
+      imageUploading: 'Uploading image…',
       cover: { add: 'Add a cover image', replace: 'Replace', uploading: 'Uploading…', alt: 'Article cover' },
       menu: {
         more: 'More options',

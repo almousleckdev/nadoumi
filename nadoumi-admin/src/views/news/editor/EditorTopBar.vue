@@ -84,6 +84,7 @@
 
         <Avatar
           :name="userName"
+          :src="userAvatar"
           :size="32"
         />
       </div>
@@ -108,6 +109,7 @@ defineProps<{
   status: string
   statusTone: 'normal' | 'error'
   userName: string
+  userAvatar?: string
   primaryVisible: boolean
   primaryLabel: string
   /** Looks inactive (nothing to publish yet) but still explains itself when pressed. */

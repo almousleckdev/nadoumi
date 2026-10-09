@@ -361,6 +361,7 @@ export default {
       leaveTitle: '不保存就离开?',
       leaveConfirm: '最新的更改未能保存,仍要离开吗?',
       leave: '离开',
+      imageUploading: '正在上传图片…',
       cover: { add: '添加封面图片', replace: '更换', uploading: '上传中…', alt: '文章封面' },
       menu: {
         more: '更多选项',
