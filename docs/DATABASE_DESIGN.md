@@ -388,6 +388,8 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - `nad_user_presence(user_id PK → sys_user ON DELETE CASCADE, last_seen_at UTC)`.
 - Rollback: documented in the header of `V96__nad_chat_rework.sql`.
 
+- **V104** adds `nad_scholarship_field` (one row per field of study, `level` NULL = every level, unique per scholarship, level and name, cascade on scholarship delete) and carries each scholarship's existing single `field` over as an every-level row. `nad_scholarship.field` stays as a searchable summary (the distinct names joined with ", ", cut at a whole name to 120 characters) kept up to date by the writer; the public `field` filter and text search read the new table.
+- **V103** removes student accounts deleted the old way (`user_type = '10'` and `del_flag = '2'`, some still holding their email) with their chats, tickets, notifications, comments and likes; a row something still references is anonymised instead. Strictly scoped: staff, the break-glass admin, live students and the catalog are never selected (a test proves it). Not reversible.
 - **V102** removes student accounts that have no access grant at all (orphans left by earlier applicant deletions that could still sign in and held their username and email): their chats, tickets, notifications, comments and likes first, then the row, or an anonymised shell if something still references it. Not reversible.
 - **V101** one-time cleanup of chats, tickets, notifications and comments that students deleted before deletion removed them (they showed as "Deleted student"). Not reversible.
 - **V100** adds `nad_applicant.public_id char(36)` (unique, default `uuid()`, backfilled per row): the unguessable id

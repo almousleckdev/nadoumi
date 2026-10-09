@@ -466,3 +466,7 @@ Student (`/api/student/conversations`, bearer JWT; participant rows are the auth
 
 Responses use explicit DTOs (`ConversationSummaryResponse`, `MessageResponse`, `ChatPerson`,
 `StudentSearchResult`); none carries an email, surname or signed URL in a list.
+
+### Scholarship fields of study (EXISTING, 2026-10-09, V104)
+
+`POST/PUT /api/staff/scholarships` accepts `fields: [{ level?, name }]`: one or many fields, each for every level (`level` omitted) or for one education level. A `level` the scholarship does not offer is a `400`. Names are trimmed and de-duplicated per level. The older single `field` string is still accepted when `fields` is absent (it becomes one every-level entry). Responses (`view.fields` on staff, `fields` on `/api/public/scholarships[/{slug}]`) list every entry; `field` is only the joined summary. `GET /api/public/scholarships?field=Medicine` matches a scholarship that lists that field at any level.

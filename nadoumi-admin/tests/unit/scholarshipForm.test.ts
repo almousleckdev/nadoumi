@@ -132,4 +132,47 @@ describe('formFromScholarship', () => {
     ])
     expect(payload.intakes).toEqual([{ term: 'AUTUMN_SEPTEMBER', applicationOpen: '2026-01-01', applicationClose: '2026-04-01' }])
   })
+
+  describe('fields of study', () => {
+    it('keeps one entry per field with its level, and trims them', () => {
+      const form = blankForm()
+      form.levels = ['BACHELOR', 'MASTER']
+      form.fields = [
+        { level: null, name: '  Engineering ' },
+        { level: 'MASTER', name: 'Medicine' },
+        { level: 'BACHELOR', name: '   ' },
+      ]
+      expect(buildPayload(form).fields).toEqual([
+        { level: null, name: 'Engineering' },
+        { level: 'MASTER', name: 'Medicine' },
+      ])
+    })
+
+    it('does not send a field for a level that is no longer offered', () => {
+      const form = blankForm()
+      form.levels = ['BACHELOR']
+      form.fields = [{ level: 'PHD', name: 'Physics' }, { level: null, name: 'Law' }]
+      expect(buildPayload(form).fields).toEqual([{ level: null, name: 'Law' }])
+    })
+
+    it('no longer sends the old single field text', () => {
+      expect(buildPayload(blankForm()).field).toBeNull()
+    })
+
+    it('loads the structured fields of a scholarship', () => {
+      const loaded = formFromScholarship({
+        ...scholarship,
+        view: { ...scholarship.view, fields: [{ level: null, name: 'Law' }, { level: 'MASTER', name: 'Medicine' }] },
+      } as Scholarship)
+      expect(loaded.fields).toEqual([{ level: null, name: 'Law' }, { level: 'MASTER', name: 'Medicine' }])
+    })
+
+    it('turns an older scholarship that only has the summary text into one every-level field', () => {
+      const loaded = formFromScholarship({
+        ...scholarship,
+        view: { ...scholarship.view, fields: [], field: 'Engineering' },
+      } as Scholarship)
+      expect(loaded.fields).toEqual([{ level: null, name: 'Engineering' }])
+    })
+  })
 })

@@ -961,6 +961,8 @@
     "feesNone": "لا يوجد",
     "colTitle": "المنحة الدراسية",
     "colLevel": "المستوى",
+    "colField": "مجال الدراسة",
+    "allLevels": "جميع المستويات",
     "colLanguage": "اللغة",
     "colIntake": "موعد القبول القادم",
     "colDeadline": "الموعد النهائي",

@@ -5,6 +5,7 @@ import com.nadoumi.scholarship.domain.ScholarshipCategory;
 import com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
+import com.nadoumi.scholarship.domain.ScholarshipField;
 import com.nadoumi.scholarship.domain.ScholarshipIntake;
 import com.nadoumi.scholarship.domain.ScholarshipAccommodation;
 import com.nadoumi.scholarship.domain.ScholarshipCoverage;
@@ -71,6 +72,8 @@ public interface ScholarshipMapper {
 
     List<ScholarshipIntake> findIntakes(@Param("scholarshipId") Long scholarshipId);
 
+    List<ScholarshipField> findFields(@Param("scholarshipId") Long scholarshipId);
+
     ScholarshipEligibility findEligibility(@Param("scholarshipId") Long scholarshipId);
 
     List<ScholarshipFee> findFees(@Param("scholarshipId") Long scholarshipId);
@@ -92,6 +95,11 @@ public interface ScholarshipMapper {
     int deleteCategoryLinks(@Param("scholarshipId") Long scholarshipId);
 
     int insertCategoryLink(@Param("scholarshipId") Long scholarshipId, @Param("code") String code);
+
+    int deleteFields(@Param("scholarshipId") Long scholarshipId);
+
+    int insertField(@Param("scholarshipId") Long scholarshipId, @Param("level") String level,
+            @Param("name") String name, @Param("sortOrder") int sortOrder);
 
     int deleteIntakes(@Param("scholarshipId") Long scholarshipId);
 

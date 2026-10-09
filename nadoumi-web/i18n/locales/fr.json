@@ -961,6 +961,8 @@
     "feesNone": "Aucun",
     "colTitle": "Bourse",
     "colLevel": "Niveau",
+    "colField": "Domaine d'études",
+    "allLevels": "Tous les niveaux",
     "colLanguage": "Langue",
     "colIntake": "Prochaine session",
     "colDeadline": "Échéance",

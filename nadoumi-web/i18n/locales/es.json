@@ -961,6 +961,8 @@
     "feesNone": "Ninguna",
     "colTitle": "Beca",
     "colLevel": "Nivel",
+    "colField": "Campo de estudio",
+    "allLevels": "Todos los niveles",
     "colLanguage": "Idioma",
     "colIntake": "Próxima convocatoria",
     "colDeadline": "Plazo",

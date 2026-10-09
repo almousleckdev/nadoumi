@@ -181,6 +181,7 @@ public class ScholarshipAdminService {
         s.setLevels(mapper.findLevels(id));
         s.setCategories(mapper.findCategories(id));
         s.setIntakes(mapper.findIntakes(id));
+        s.setFields(mapper.findFields(id));
         s.setEligibility(mapper.findEligibility(id));
         s.setFees(mapper.findFees(id));
         s.setLevelStipends(mapper.findLevelStipends(id));
@@ -196,7 +197,7 @@ public class ScholarshipAdminService {
         s.setCountry(req.country().toUpperCase(Locale.ROOT));
         s.setProvince(Texts.blankToNull(req.province()));
         s.setCity(Texts.blankToNull(req.city()));
-        s.setField(Texts.blankToNull(req.field()));
+        s.setField(ScholarshipFields.summary(ScholarshipFields.normalise(req)));
         s.setTeachingLanguage(req.teachingLanguage());
         s.setFundingModel(req.fundingModel());
         s.setHasStipend(req.levelStipends() != null && !req.levelStipends().isEmpty());

@@ -961,6 +961,8 @@
     "feesNone": "无",
     "colTitle": "奖学金名称",
     "colLevel": "层次",
+    "colField": "专业领域",
+    "allLevels": "所有层次",
     "colLanguage": "语言",
     "colIntake": "下一批次",
     "colDeadline": "截止日期",

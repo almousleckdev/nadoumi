@@ -79,12 +79,15 @@
     <sql id="publicFilter">
         <if test="q != null and q != ''">
             and (v.title like concat('%', #{q}, '%') or v.summary like concat('%', #{q}, '%')
-                 or v.field like concat('%', #{q}, '%'))
+                 or exists (select 1 from nad_scholarship_field sf where sf.scholarship_id = v.id
+                            and sf.name like concat('%', #{q}, '%')))
         </if>
         <if test="country != null and country != ''">and v.country = #{country}</if>
         <if test="province != null and province != ''">and v.province = #{province}</if>
         <if test="city != null and city != ''">and v.city = #{city}</if>
-        <if test="field != null and field != ''">and v.field = #{field}</if>
+        <if test="field != null and field != ''">
+            and exists (select 1 from nad_scholarship_field sf where sf.scholarship_id = v.id and sf.name = #{field})
+        </if>
         <if test="teachingLanguage != null">and v.teaching_language = #{teachingLanguage}</if>
         <if test="fundingModel != null">and v.funding_model = #{fundingModel}</if>
         <if test="hasStipend != null">and v.has_stipend = #{hasStipend}</if>
@@ -264,6 +267,10 @@
         where cl.scholarship_id = #{scholarshipId} order by c.sort_order
     </select>
 
+    <select id="findFields" resultType="com.nadoumi.scholarship.domain.ScholarshipField">
+        select level, name from nad_scholarship_field where scholarship_id = #{scholarshipId} order by sort_order, id
+    </select>
+
     <select id="findIntakes" resultType="com.nadoumi.scholarship.domain.ScholarshipIntake">
         select term, application_open as applicationOpen, application_close as applicationClose
         from nad_scholarship_intake where scholarship_id = #{scholarshipId} order by sort_order, id
@@ -311,6 +318,12 @@
     <insert id="insertCategoryLink">
         insert into nad_scholarship_category_link (scholarship_id, category_id)
         select #{scholarshipId}, id from nad_scholarship_category where code = #{code}
+    </insert>
+
+    <delete id="deleteFields">delete from nad_scholarship_field where scholarship_id = #{scholarshipId}</delete>
+    <insert id="insertField">
+        insert into nad_scholarship_field (scholarship_id, level, name, sort_order)
+        values (#{scholarshipId}, #{level}, #{name}, #{sortOrder})
     </insert>
 
     <delete id="deleteIntakes">delete from nad_scholarship_intake where scholarship_id = #{scholarshipId}</delete>

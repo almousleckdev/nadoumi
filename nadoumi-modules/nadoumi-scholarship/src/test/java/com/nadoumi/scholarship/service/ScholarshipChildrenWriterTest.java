@@ -34,7 +34,7 @@ class ScholarshipChildrenWriterTest {
     private static ScholarshipRequest request(FundingModel funding, List<EducationLevel> levels, List<String> categories,
             List<ScholarshipRequest.IntakeInput> intakes, ScholarshipRequest.EligibilityInput eligibility,
             List<ScholarshipRequest.FeeInput> fees, List<ScholarshipRequest.DocumentRequirementInput> documents) {
-        return new ScholarshipRequest("Title", null, "CN", null, null, null, null, funding, null, null, null, null,
+        return new ScholarshipRequest("Title", null, "CN", null, null, null, null, null, funding, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, levels, categories, intakes, eligibility, fees, null,
                 null, null, documents);

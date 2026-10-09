@@ -84,7 +84,7 @@ class WelcomeContentComposerTest {
         return new PublicScholarshipResponse(
                 1L, slug, "REF-1", title, null, country, null, null, null, null, null, false,
                 null, null, null, null, false, false, deadline, null, null, null, false, false, false,
-                null, null, null, null, null, null, List.of(), List.of(), List.of(),
+                null, null, null, null, null, null, List.of(), List.of(), List.of(), List.of(),
                 null, null, null, null, null, null, null, null, null, null);
     }
 

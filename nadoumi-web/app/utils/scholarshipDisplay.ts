@@ -50,3 +50,24 @@ export function deadlineSummary(raw: string | null | undefined, t: Translate): D
     : days === 0 ? t('scholarships.deadlineToday') : t('scholarships.deadlineDays', { n: days })
   return { rolling: false, tone: deadlineTone(days), date: raw, text }
 }
+
+const FIELD_LEVEL_ORDER = ['NON_DEGREE', 'DIPLOMA', 'BACHELOR', 'MASTER', 'PHD']
+
+/**
+ * The fields of study as one line: "Engineering" when every level shares them, or
+ * "All levels: Engineering · Master's: Medicine" when they differ by level. Empty when none are listed.
+ */
+export function fieldsLabel(
+  fields: { level?: string | null, name: string }[] | null | undefined,
+  t: Translate,
+): string {
+  const list = fields ?? []
+  if (!list.length) return ''
+  const shared = list.filter(f => !f.level).map(f => f.name)
+  const perLevel = FIELD_LEVEL_ORDER
+    .map(level => ({ level, names: list.filter(f => f.level === level).map(f => f.name) }))
+    .filter(entry => entry.names.length > 0)
+  if (!perLevel.length) return shared.join(', ')
+  const parts = perLevel.map(e => `${t(`scholarships.level.${e.level}`)}: ${e.names.join(', ')}`)
+  return (shared.length ? [`${t('scholarships.allLevels')}: ${shared.join(', ')}`, ...parts] : parts).join(' · ')
+}

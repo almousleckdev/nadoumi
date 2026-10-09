@@ -103,6 +103,7 @@ public class ScholarshipService {
         s.setLevels(mapper.findLevels(s.getId()));
         s.setCategories(mapper.findCategories(s.getId()));
         s.setIntakes(mapper.findIntakes(s.getId()));
+        s.setFields(mapper.findFields(s.getId()));
     }
 
     private static Long parseId(String value) {

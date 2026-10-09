@@ -64,6 +64,7 @@ public class Scholarship {
     private List<String> levels = new ArrayList<>();
     private List<ScholarshipCategory> categories = new ArrayList<>();
     private List<ScholarshipIntake> intakes = new ArrayList<>();
+    private List<ScholarshipField> fields = new ArrayList<>();
     private ScholarshipEligibility eligibility;
     private List<ScholarshipFee> fees = new ArrayList<>();
     private List<ScholarshipLevelStipend> levelStipends = new ArrayList<>();
@@ -166,6 +167,9 @@ public class Scholarship {
     public void setLevels(List<String> levels) { this.levels = levels; }
     public List<ScholarshipCategory> getCategories() { return categories; }
     public void setCategories(List<ScholarshipCategory> categories) { this.categories = categories; }
+    public List<ScholarshipField> getFields() { return fields; }
+    public void setFields(List<ScholarshipField> fields) { this.fields = fields; }
+
     public List<ScholarshipIntake> getIntakes() { return intakes; }
     public void setIntakes(List<ScholarshipIntake> intakes) { this.intakes = intakes; }
     public ScholarshipEligibility getEligibility() { return eligibility; }

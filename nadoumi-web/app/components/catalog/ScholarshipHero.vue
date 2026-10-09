@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { ScholarshipDetail } from '~/types/catalog'
 
-defineProps<{ s: ScholarshipDetail, applyTo: string }>()
+const props = defineProps<{ s: ScholarshipDetail, applyTo: string }>()
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+const fieldsText = computed(() => fieldsLabel(props.s.fields, t))
 
 function fundingLabel(m?: string) {
   return m ? t(`scholarships.funding.${m}`) : ''
@@ -38,6 +39,7 @@ function langLabel(c?: string | null) {
         <div><dt class="inline text-slate-400">{{ t('scholarships.colDeadline') }}: </dt><dd class="inline">{{ s.deadline ?? t('catalog.rollingDeadline') }}</dd></div>
         <div><dt class="inline text-slate-400">{{ t('scholarships.colLanguage') }}: </dt><dd class="inline">{{ langLabel(s.teachingLanguage) }}</dd></div>
         <div v-if="s.levels.length"><dt class="inline text-slate-400">{{ t('scholarships.colLevel') }}: </dt><dd class="inline">{{ s.levels.map(l => t(`scholarships.level.${l}`)).join(', ') }}</dd></div>
+        <div v-if="fieldsText"><dt class="inline text-slate-400">{{ t('scholarships.colField') }}: </dt><dd class="inline">{{ fieldsText }}</dd></div>
         <div v-if="s.nonDegreeDuration"><dt class="inline text-slate-400">{{ t('scholarships.nonDegreeDuration') }}: </dt><dd class="inline">{{ t(`scholarships.nonDegree.${s.nonDegreeDuration}`, s.nonDegreeDuration) }}</dd></div>
         <div v-if="s.studyDurationMonths"><dt class="inline text-slate-400">{{ t('scholarships.studyDuration') }}: </dt><dd class="inline">{{ t('scholarships.stipendDuration', { n: s.studyDurationMonths }) }}</dd></div>
         <div v-if="s.applicationChannel"><dt class="inline text-slate-400">{{ t('scholarships.applicationChannel') }}: </dt><dd class="inline">{{ t(`scholarships.channel.${s.applicationChannel}`, s.applicationChannel) }}<span v-if="s.agencyNumber"> ({{ s.agencyNumber }})</span></dd></div>

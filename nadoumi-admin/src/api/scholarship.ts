@@ -91,6 +91,12 @@ export interface ScholarshipDocumentRequirementInput {
   note?: string | null
 }
 
+/** One field of study. A null level means it applies to every level the scholarship offers. */
+export interface ScholarshipFieldEntry {
+  level: EducationLevel | null
+  name: string
+}
+
 /** The student-safe view carried inside every ScholarshipResponse. */
 /** The fields a scholarship has both as the API returns it and as staff enter it. */
 export interface ScholarshipFields {
@@ -113,6 +119,8 @@ export interface ScholarshipFields {
 }
 
 export interface ScholarshipView extends ScholarshipFields {
+  /** every field of study, per level; `field` above is only their short summary */
+  fields: ScholarshipFieldEntry[]
   id: number
   slug: string
   referenceCode?: string | null
@@ -172,6 +180,7 @@ export interface Scholarship {
 }
 
 export interface ScholarshipInput extends ScholarshipFields {
+  fields: ScholarshipFieldEntry[]
   benefits?: string | null
   requirements?: string | null
   policy?: string | null
