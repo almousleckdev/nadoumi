@@ -1,119 +1,114 @@
 package com.nadoumi.communication.service;
 
-import com.nadoumi.common.media.MediaAccessLogContext;
 import com.nadoumi.common.media.MediaGateway;
-import com.nadoumi.communication.domain.Conversation;
-import com.nadoumi.communication.domain.ConversationParticipant;
 import com.nadoumi.communication.domain.Message;
 import com.nadoumi.communication.domain.MessageAttachment;
-import com.nadoumi.communication.domain.enums.ParticipantRole;
-import com.nadoumi.communication.mapper.CommunicationUserMapper;
-import com.nadoumi.communication.mapper.ConversationParticipantMapper;
+import com.nadoumi.communication.mapper.InboxRow;
 import com.nadoumi.communication.mapper.MessageAttachmentMapper;
-import com.nadoumi.communication.mapper.MessageMapper;
+import com.nadoumi.communication.stream.PresenceService;
 import com.nadoumi.communication.web.response.AttachmentResponse;
+import com.nadoumi.communication.web.response.ChatPerson;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
+import com.nadoumi.identity.profile.PublicProfile;
+import com.nadoumi.identity.profile.PublicProfileService;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
+/**
+ * Turns rows into API responses with a fixed number of queries however long the list is: one for every
+ * message's attachments and one for every distinct person's profile. Nothing here talks to the media provider.
+ */
 @Component
 public class ConversationResponseAssembler {
 
-    private static final Logger log = LoggerFactory.getLogger(ConversationResponseAssembler.class);
-    private static final int PREVIEW_LENGTH = 140;
+    private static final String UNKNOWN_PERSON = "Someone";
+    private static final String IMAGE_PREFIX = "image/";
 
-    private final ConversationParticipantMapper participants;
-    private final MessageMapper messages;
     private final MessageAttachmentMapper attachments;
-    private final CommunicationUserMapper users;
+    private final PublicProfileService profiles;
     private final MediaGateway media;
+    private final PresenceService presence;
 
-    public ConversationResponseAssembler(ConversationParticipantMapper participants, MessageMapper messages,
-            MessageAttachmentMapper attachments, CommunicationUserMapper users, MediaGateway media) {
-        this.participants = participants;
-        this.messages = messages;
+    public ConversationResponseAssembler(MessageAttachmentMapper attachments, PublicProfileService profiles,
+            MediaGateway media, PresenceService presence) {
         this.attachments = attachments;
-        this.users = users;
+        this.profiles = profiles;
         this.media = media;
-    }
-
-    public ConversationSummaryResponse summary(Conversation c, ConversationParticipant myParticipant) {
-        Message latest = messages.findLatest(c.getId());
-        long afterId = myParticipant == null || myParticipant.getLastReadMessageId() == null
-                ? 0 : myParticipant.getLastReadMessageId();
-        long unread = myParticipant == null ? 0 : messages.countAfter(c.getId(), afterId, myParticipant.getUserId());
-        String preview = latest == null ? null : previewFor(latest);
-
-        Long studentUserId = null;
-        String studentName = null;
-        Long adminUserId = null;
-        String adminName = null;
-
-        for (ConversationParticipant p : participants.listActiveForConversation(c.getId())) {
-            if (p.getRole() == ParticipantRole.STAFF) {
-                if (adminUserId == null) {
-                    adminUserId = p.getUserId();
-                    adminName = users.findDisplayName(p.getUserId());
-                }
-            } else if (studentUserId == null) {
-                studentUserId = p.getUserId();
-                studentName = users.findDisplayName(p.getUserId());
-            }
-        }
-
-        return new ConversationSummaryResponse(c.getId(), c.getSubject(), c.getApplicationId(),
-                c.getConversationType().name(), c.getStatus().name(), preview,
-                latest == null ? null : latest.getCreatedAt(), unread,
-                studentUserId, studentName, adminUserId, adminName);
+        this.presence = presence;
     }
 
     public MessageResponse message(Message m) {
-        return message(m, null);
+        return messages(List.of(m)).get(0);
     }
 
-    public MessageResponse message(Message m, MediaAccessLogContext ctx) {
-        List<AttachmentResponse> attached = attachments.listByMessage(m.getId()).stream()
-                .map(a -> attachment(a, ctx))
-                .toList();
-        String senderName = users.findDisplayName(m.getSenderUserId());
-        return new MessageResponse(m.getId(), m.getConversationId(), m.getSenderUserId(), senderName,
-                m.getBody(), m.getCreatedAt(), m.getEditedAt(), attached);
-    }
-
-    private AttachmentResponse attachment(MessageAttachment a, MediaAccessLogContext ctx) {
-        return media.find(a.getMediaAssetId())
-                .map(asset -> new AttachmentResponse(a.getId(), a.getMediaAssetId(), asset.originalFilename(),
-                        asset.contentType(), asset.byteSize(), signedUrl(a, ctx)))
-                .orElseGet(() -> new AttachmentResponse(a.getId(), a.getMediaAssetId(), null, null, 0, null));
-    }
-
-    private String signedUrl(MessageAttachment a, MediaAccessLogContext ctx) {
-        if (ctx == null) {
-            return null;
+    public List<MessageResponse> messages(List<Message> found) {
+        if (found.isEmpty()) {
+            return List.of();
         }
-        try {
-            return media.issueInlineSignedUrl(a.getMediaAssetId(), ctx).url();
+        Map<Long, List<MessageAttachment>> byMessage = attachments
+                .listByMessageIds(found.stream().map(Message::getId).toList()).stream()
+                .collect(Collectors.groupingBy(MessageAttachment::getMessageId));
+        Map<Long, PublicProfile> people = profiles.resolve(
+                found.stream().map(Message::getSenderUserId).collect(Collectors.toSet()));
+        List<MessageResponse> out = new ArrayList<>(found.size());
+        for (Message m : found) {
+            PublicProfile sender = people.get(m.getSenderUserId());
+            out.add(new MessageResponse(m.getId(), m.getConversationId(), m.getSenderUserId(),
+                    sender == null ? UNKNOWN_PERSON : sender.displayName(), m.getBody(), m.getCreatedAt(),
+                    m.getEditedAt(), byMessage.getOrDefault(m.getId(), List.of()).stream().map(this::attachment).toList()));
         }
-        catch (RuntimeException e) {
-            log.warn("could not pre-sign attachment {} (media {}); the client will fetch it on demand",
-                    a.getId(), a.getMediaAssetId(), e);
-            return null;
-        }
+        return out;
     }
 
-    private static String truncate(String body) {
-        return body.length() <= PREVIEW_LENGTH ? body : body.substring(0, PREVIEW_LENGTH) + "…";
+    public List<ConversationSummaryResponse> inbox(List<InboxRow> rows) {
+        Set<Long> peerIds = new HashSet<>();
+        rows.stream().map(InboxRow::peerUserId).filter(java.util.Objects::nonNull).forEach(peerIds::add);
+        Map<Long, ChatPerson> people = people(peerIds);
+        return rows.stream().map(r -> summary(r, people)).toList();
     }
 
-    /** An attachment-only message (no caption) still needs an honest, non-empty preview. */
-    private String previewFor(Message latest) {
-        if (!latest.getBody().isBlank()) {
-            return truncate(latest.getBody());
+    private ConversationSummaryResponse summary(InboxRow r, Map<Long, ChatPerson> people) {
+        ChatPerson peer = r.peerUserId() == null ? null : people.get(r.peerUserId());
+        return new ConversationSummaryResponse(r.conversationId(), r.subject(), r.applicationId(),
+                r.conversationType(), r.status(), r.lastMessageId(), r.lastMessagePreview(), r.lastMessageAt(),
+                r.lastSenderUserId(), r.unreadCount(), peer, r.peerDeliveredMessageId(), r.peerReadMessageId());
+    }
+
+    /** People for a set of user ids, e.g. the participants of one conversation. */
+    public Map<Long, ChatPerson> people(Collection<Long> userIds) {
+        Map<Long, PublicProfile> found = profiles.resolve(userIds);
+        Map<Long, PresenceService.Presence> live = presence.presenceOf(userIds);
+        Map<Long, ChatPerson> out = new HashMap<>();
+        for (Long id : userIds) {
+            PublicProfile profile = found.get(id);
+            PresenceService.Presence p = live.getOrDefault(id, new PresenceService.Presence(false, null));
+            out.put(id, new ChatPerson(id, profile == null ? UNKNOWN_PERSON : profile.displayName(),
+                    profile == null ? null : profile.avatarUrl(), p.online(), p.lastSeenAt()));
         }
-        int count = attachments.listByMessage(latest.getId()).size();
-        return count == 1 ? "📎 Attachment" : "📎 " + count + " attachments";
+        return out;
+    }
+
+    private AttachmentResponse attachment(MessageAttachment a) {
+        String filename = a.getOriginalFilename();
+        String contentType = a.getContentType();
+        long size = a.getByteSize() == null ? 0 : a.getByteSize();
+        if (filename == null || contentType == null) {
+            var asset = media.find(a.getMediaAssetId());
+            if (asset.isPresent()) {
+                filename = asset.get().originalFilename();
+                contentType = asset.get().contentType();
+                size = asset.get().byteSize();
+            }
+        }
+        return new AttachmentResponse(a.getId(), filename, contentType, size,
+                contentType != null && contentType.startsWith(IMAGE_PREFIX));
     }
 }

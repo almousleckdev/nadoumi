@@ -104,6 +104,10 @@ public abstract class AbstractNadIntegrationTest {
         }
         // Media: null the *_media_id FKs (ON DELETE SET NULL, so ordering is lenient)
         // then clear the media tables for clean per-test state.
+        jdbc.update("delete from nad_message_attachment");
+        jdbc.update("delete from nad_message");
+        jdbc.update("delete from nad_conversation_participant");
+        jdbc.update("delete from nad_conversation");
         jdbc.update("delete from nad_media_access_log");
         jdbc.update("update nad_university set logo_media_id = null, banner_media_id = null");
         jdbc.update("update nad_university_gallery set media_id = null");

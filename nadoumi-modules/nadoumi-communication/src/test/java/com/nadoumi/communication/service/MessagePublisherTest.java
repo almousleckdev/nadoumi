@@ -23,8 +23,7 @@ import com.nadoumi.communication.mapper.ConversationMapper;
 import com.nadoumi.communication.mapper.ConversationParticipantMapper;
 import com.nadoumi.communication.mapper.MessageAttachmentMapper;
 import com.nadoumi.communication.mapper.MessageMapper;
-import com.nadoumi.communication.stream.RealtimePublisher;
-import com.nadoumi.communication.stream.SseConnectionRegistry;
+import com.nadoumi.communication.stream.PresenceService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,10 +36,9 @@ class MessagePublisherTest {
     private final ConversationMapper conversations = mock(ConversationMapper.class);
     private final CommunicationUserMapper users = mock(CommunicationUserMapper.class);
     private final OutboxWriter outbox = mock(OutboxWriter.class);
-    private final RealtimePublisher realtime = mock(RealtimePublisher.class);
-    private final SseConnectionRegistry connections = mock(SseConnectionRegistry.class);
+    private final PresenceService presence = mock(PresenceService.class);
     private final MessagePublisher publisher = new MessagePublisher(messages, attachments, participants,
-            conversations, users, outbox, realtime, connections);
+            conversations, users, outbox, presence, mock(com.nadoumi.common.media.MediaGateway.class));
 
 
     @org.junit.jupiter.api.BeforeEach
@@ -70,7 +68,7 @@ class MessagePublisherTest {
     @Test
     void offlineRecipient_getsAnOutboxEventWithTheExactPayloadContract() {
         when(participants.listActiveForConversation(9L)).thenReturn(List.of(participant(1L), participant(2L)));
-        when(connections.hasLocalConnection(2L)).thenReturn(false);
+        when(presence.isOnline(2L)).thenReturn(false);
         when(conversations.findById(9L)).thenReturn(conversation());
         when(users.findDisplayName(1L)).thenReturn("Ada");
 
@@ -88,24 +86,45 @@ class MessagePublisherTest {
     }
 
     @Test
-    void onlineRecipient_getsNoOutboxEventButStillGetsAPing() {
+    void onlineRecipient_getsNoOutboxEvent_becauseTheyAreReachedLive() {
         when(participants.listActiveForConversation(9L)).thenReturn(List.of(participant(1L), participant(2L)));
-        when(connections.hasLocalConnection(2L)).thenReturn(true);
+        when(presence.isOnline(2L)).thenReturn(true);
 
         publisher.publish(9L, 1L, "hello", List.of());
 
         verify(outbox, never()).write(anyString(), anyLong(), anyString(), anyString());
-        verify(realtime).publishConversationPing(2L, 9L);
     }
 
     @Test
-    void theSenderNeverReceivesItsOwnNotificationOrPing() {
+    void keepsTheConversationSummaryCurrent_withATruncatedPreview() {
+        when(participants.listActiveForConversation(9L)).thenReturn(List.of(participant(1L)));
+        String longBody = "x".repeat(300);
+
+        publisher.publish(9L, 1L, longBody, List.of());
+
+        ArgumentCaptor<String> preview = ArgumentCaptor.forClass(String.class);
+        verify(conversations).updateLastMessage(org.mockito.ArgumentMatchers.eq(9L), org.mockito.ArgumentMatchers.eq(50L),
+                any(), preview.capture(), org.mockito.ArgumentMatchers.eq(1L));
+        assertThat(preview.getValue()).hasSize(160).endsWith("…");
+    }
+
+    @Test
+    void describesAnAttachmentOnlyMessageInThePreview() {
+        when(participants.listActiveForConversation(9L)).thenReturn(List.of(participant(1L)));
+
+        publisher.publish(9L, 1L, "", List.of(101L));
+
+        verify(conversations).updateLastMessage(org.mockito.ArgumentMatchers.eq(9L), org.mockito.ArgumentMatchers.eq(50L),
+                any(), org.mockito.ArgumentMatchers.eq("📎 Attachment"), org.mockito.ArgumentMatchers.eq(1L));
+    }
+
+    @Test
+    void theSenderNeverReceivesItsOwnNotification() {
         when(participants.listActiveForConversation(9L)).thenReturn(List.of(participant(1L)));
 
         publisher.publish(9L, 1L, "hello", List.of());
 
         verify(outbox, never()).write(anyString(), anyLong(), anyString(), anyString());
-        verify(realtime, never()).publishConversationPing(anyLong(), anyLong());
     }
 
     @Test

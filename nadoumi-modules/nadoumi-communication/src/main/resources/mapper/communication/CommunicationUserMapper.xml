@@ -2,8 +2,61 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nadoumi.communication.mapper.CommunicationUserMapper">
 
+    <!-- An enabled staff account that may take part in chat: super admin or any role granting nad:conversation:participate. -->
+    <sql id="chatStaffFilter">
+        u.del_flag = '0' and u.status = '0' and (u.user_type = '00' or u.user_type is null or u.user_type = '')
+        and exists (
+            select 1 from sys_user_role ur
+            join sys_role r on r.role_id = ur.role_id and r.status = '0' and r.del_flag = '0'
+            left join sys_role_menu rm on rm.role_id = r.role_id
+            left join sys_menu m on m.menu_id = rm.menu_id
+            where ur.user_id = u.user_id and (r.role_key = 'admin' or m.perms = 'nad:conversation:participate')
+        )
+    </sql>
+
     <select id="findDisplayName" resultType="string">
         select coalesce(nullif(nick_name, ''), user_name) from sys_user where user_id = #{userId}
+    </select>
+
+    <select id="isActiveStaff" resultType="boolean">
+        select exists(select 1 from sys_user u where u.user_id = #{userId} and <include refid="chatStaffFilter"/>)
+    </select>
+
+    <select id="isActiveStudent" resultType="boolean">
+        select exists(select 1 from sys_user
+            where user_id = #{userId} and del_flag = '0' and status = '0' and user_type = '10')
+    </select>
+
+    <select id="listChatStaffIds" resultType="long">
+        select u.user_id from sys_user u where <include refid="chatStaffFilter"/>
+        order by coalesce(nullif(u.nick_name, ''), u.user_name) limit #{limit}
+    </select>
+
+    <select id="searchStudents" resultType="com.nadoumi.communication.mapper.StudentHit">
+        select hit.userId, min(hit.applicationId) as applicationId
+        from (
+            <if test="numericId != null">
+                select u.user_id as userId, null as applicationId from sys_user u
+                where u.user_id = #{numericId} and u.user_type = '10' and u.status = '0' and u.del_flag = '0'
+                union all
+                select acc.user_id as userId, app.id as applicationId
+                from nad_application app
+                join nad_user_applicant_access acc on acc.applicant_id = app.applicant_id and acc.status = 'ACTIVE'
+                join sys_user u on u.user_id = acc.user_id and u.user_type = '10' and u.status = '0' and u.del_flag = '0'
+                where app.id = #{numericId}
+                union all
+            </if>
+            select u.user_id as userId, null as applicationId from sys_user u
+            where u.user_type = '10' and u.status = '0' and u.del_flag = '0'
+              and (u.nick_name like concat('%', #{text}, '%') or u.user_name like concat('%', #{text}, '%')
+                   or exists (select 1 from nad_user_applicant_access acc
+                              join nad_applicant a on a.id = acc.applicant_id
+                              where acc.user_id = u.user_id and acc.status = 'ACTIVE'
+                                and (a.given_name like concat(#{text}, '%') or a.family_name like concat(#{text}, '%'))))
+        ) hit
+        group by hit.userId
+        order by min(case when hit.applicationId is not null then 0 else 1 end), hit.userId
+        limit #{limit}
     </select>
 
     <select id="listStaffAdmins" resultType="com.nadoumi.communication.web.response.AdminContactResponse">

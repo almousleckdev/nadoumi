@@ -39,15 +39,19 @@ public final class MediaCategoryPolicy {
     private static final Set<String> DOCUMENT_MIME = Set.of("application/pdf", "image/jpeg", "image/png");
 
     /**
-     * Message attachments additionally accept Word documents (CLAUDE.md's Messaging
-     * requirement is "photo, documents — PDF, Word, and so on"), and webp for photos.
-     * Scoped to this one category so it does not loosen ADMISSION_DOCUMENT / JW202 /
-     * OTHER_ATTACHMENT, which keep the narrower {@link #DOCUMENT_MIME} allow-list.
+     * Message attachments additionally accept Office documents (Word, Excel, PowerPoint: the
+     * macro-free OOXML formats plus legacy .doc), plain text, and webp for photos. Scoped to this one
+     * category so it does not loosen ADMISSION_DOCUMENT / JW202 / OTHER_ATTACHMENT, which keep the
+     * narrower {@link #DOCUMENT_MIME} allow-list. Macro-enabled formats (docm, xlsm) and archives are
+     * deliberately absent.
      */
     private static final Set<String> MESSAGE_ATTACHMENT_MIME = Set.of(
             "application/pdf", "image/jpeg", "image/png", "image/webp",
             "application/msword",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "text/plain");
 
     /**
      * Resolved policy for one {@link MediaCategory}.
@@ -89,6 +93,9 @@ public final class MediaCategoryPolicy {
                 MediaAccessClass.PUBLIC, IMAGE_MIME, 8 * MB, RESOURCE_IMAGE, "article/cover"));
         RULES.put(MediaCategory.ARTICLE_IMAGE, new CategoryRule(
                 MediaAccessClass.PUBLIC, IMAGE_MIME, 8 * MB, RESOURCE_IMAGE, "article/image"));
+        // a staff member's photo is shown next to the articles they write, so it is a public CDN asset
+        RULES.put(MediaCategory.STAFF_AVATAR, new CategoryRule(
+                MediaAccessClass.PUBLIC, IMAGE_MIME, 3 * MB, RESOURCE_IMAGE, "staff/avatar"));
         RULES.put(MediaCategory.APPLICANT_PHOTO, new CategoryRule(
                 MediaAccessClass.PROTECTED, IMAGE_MIME, 5 * MB, RESOURCE_IMAGE, "applicant/photo"));
         RULES.put(MediaCategory.APPLICANT_PASSPORT, new CategoryRule(

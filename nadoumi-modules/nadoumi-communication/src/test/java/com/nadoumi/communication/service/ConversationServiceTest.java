@@ -55,11 +55,13 @@ class ConversationServiceTest {
     private final MediaGateway media = mock(MediaGateway.class);
     private final ConversationGuard guard = new ConversationGuard(conversations, participants, caller, grants);
     private final ConversationResponseAssembler assembler =
-            new ConversationResponseAssembler(participants, messages, attachments, users, media);
+            new ConversationResponseAssembler(attachments, mock(com.nadoumi.identity.profile.PublicProfileService.class), media,
+                    mock(com.nadoumi.communication.stream.PresenceService.class));
     private final ConversationAttachments attachmentService =
             new ConversationAttachments(guard, attachments, messages, media, caller);
     private final ConversationService service = new ConversationService(conversations, participants, messages,
-            users, access, caller, publisher, guard, assembler, attachmentService);
+            users, access, caller, publisher, guard, assembler, attachmentService,
+            mock(com.nadoumi.communication.stream.ChatEvents.class));
 
     private static Conversation conversation() {
         Conversation c = new Conversation();
@@ -97,10 +99,11 @@ class ConversationServiceTest {
         when(publisher.publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
                 org.mockito.ArgumentMatchers.eq("Hi there"), any())).thenReturn(posted);
 
-        var req = new OpenConversationRequest(5L, null, "Question", "Hi there");
+        when(users.isActiveStaff(50L)).thenReturn(true);
+        var req = new OpenConversationRequest(5L, null, 50L, "Question", "Hi there");
         service.open(req);
 
-        verify(participants).insert(any());
+        verify(participants, org.mockito.Mockito.times(2)).insert(any());
         verify(publisher).publish(anyLong(), org.mockito.ArgumentMatchers.eq(1L),
                 org.mockito.ArgumentMatchers.eq("Hi there"), any());
     }
@@ -290,7 +293,7 @@ class ConversationServiceTest {
     void listForStaff_rejectsANonStaffCaller() {
         when(caller.isStaff()).thenReturn(false);
 
-        assertThatThrownBy(() -> service.listForStaff()).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> service.listForStaff(null, null, 0)).isInstanceOf(AccessDeniedException.class);
     }
 
     // ---- read-state math ----
@@ -348,7 +351,7 @@ class ConversationServiceTest {
         when(conversations.findById(9L)).thenReturn(conversation());
         when(participants.findActive(9L, 2L)).thenReturn(null);
 
-        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, ctx())).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, false, ctx())).isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -358,7 +361,7 @@ class ConversationServiceTest {
         when(participants.findActive(9L, 1L)).thenReturn(new ConversationParticipant());
         when(attachments.findById(500L)).thenReturn(null);
 
-        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, ctx())).isInstanceOf(NadNotFoundException.class);
+        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, false, ctx())).isInstanceOf(NadNotFoundException.class);
     }
 
     @Test
@@ -369,7 +372,7 @@ class ConversationServiceTest {
         when(attachments.findById(500L)).thenReturn(attachment(500L, 100L, 7L));
         when(messages.findById(100L)).thenReturn(message(100L, 42L)); // a different conversation
 
-        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, ctx())).isInstanceOf(NadNotFoundException.class);
+        assertThatThrownBy(() -> service.attachmentAccess(9L, 500L, false, ctx())).isInstanceOf(NadNotFoundException.class);
     }
 
     @Test
@@ -387,7 +390,7 @@ class ConversationServiceTest {
                 "transcript.pdf", "application/pdf", 1234L, null, null, null, 1L, null, "ACTIVE", expiry);
         when(media.find(7L)).thenReturn(java.util.Optional.of(asset));
 
-        var access = service.attachmentAccess(9L, 500L, ctx());
+        var access = service.attachmentAccess(9L, 500L, false, ctx());
 
         assertThat(access.url()).isEqualTo("https://cdn.example.com/scan.pdf");
         assertThat(access.filename()).isEqualTo("transcript.pdf");

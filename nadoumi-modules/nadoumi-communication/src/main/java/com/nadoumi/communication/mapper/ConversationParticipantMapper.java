@@ -23,6 +23,15 @@ public interface ConversationParticipantMapper {
     int remove(@Param("conversationId") long conversationId, @Param("userId") long userId,
             @Param("removedAt") LocalDateTime removedAt);
 
+    /** Everyone who shares an active conversation with the user: the audience for their presence changes. */
+    List<Long> listPeerUserIds(@Param("userId") long userId);
+
+    /** Conversations whose newest message (from someone else) has not reached this user yet. */
+    List<UndeliveredRow> listUndelivered(@Param("userId") long userId);
+
+    int updateLastDelivered(@Param("conversationId") long conversationId, @Param("userId") long userId,
+            @Param("messageId") long messageId);
+
     int updateLastRead(@Param("conversationId") long conversationId, @Param("userId") long userId,
             @Param("messageId") long messageId);
 }

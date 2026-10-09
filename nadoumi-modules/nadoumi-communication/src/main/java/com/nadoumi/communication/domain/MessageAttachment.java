@@ -9,6 +9,9 @@ public class MessageAttachment {
     private Long messageId;
     private Long mediaAssetId;
     private Long promotedDocumentId;
+    private String originalFilename;
+    private String contentType;
+    private Long byteSize;
     private LocalDateTime createTime;
 
     public Long getId() { return id; }
@@ -23,6 +26,12 @@ public class MessageAttachment {
     public Long getPromotedDocumentId() { return promotedDocumentId; }
     public void setPromotedDocumentId(Long promotedDocumentId) { this.promotedDocumentId = promotedDocumentId; }
 
+    public String getOriginalFilename() { return originalFilename; }
+    public void setOriginalFilename(String originalFilename) { this.originalFilename = originalFilename; }
+    public String getContentType() { return contentType; }
+    public void setContentType(String contentType) { this.contentType = contentType; }
+    public Long getByteSize() { return byteSize; }
+    public void setByteSize(Long byteSize) { this.byteSize = byteSize; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
 }

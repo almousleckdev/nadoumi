@@ -24,12 +24,12 @@ import com.nadoumi.communication.web.response.AttachmentAccessResponse;
 import com.nadoumi.communication.web.response.ConversationSummaryResponse;
 import com.nadoumi.communication.web.response.MessageResponse;
 import com.nadoumi.communication.web.response.ParticipantResponse;
+import com.nadoumi.communication.stream.ChatEvents;
 import com.nadoumi.identity.access.CurrentCaller;
 import com.ruoyi.common.utils.AuditActor;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,7 +45,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ConversationService {
 
-    private static final int PAGE_SIZE = 50;
+    private static final int PAGE_SIZE = 30;
+    private static final int INBOX_PAGE_SIZE = 30;
 
     private final ConversationMapper conversations;
     private final ConversationParticipantMapper participants;
@@ -57,11 +58,13 @@ public class ConversationService {
     private final ConversationGuard guard;
     private final ConversationResponseAssembler assembler;
     private final ConversationAttachments attachmentService;
+    private final ChatEvents events;
 
     public ConversationService(ConversationMapper conversations, ConversationParticipantMapper participants,
             MessageMapper messages, CommunicationUserMapper users, NadoumiAccessService access,
             CurrentCaller caller, MessagePublisher publisher, ConversationGuard guard,
-            ConversationResponseAssembler assembler, ConversationAttachments attachmentService) {
+            ConversationResponseAssembler assembler, ConversationAttachments attachmentService,
+            ChatEvents events) {
         this.conversations = conversations;
         this.participants = participants;
         this.messages = messages;
@@ -72,11 +75,18 @@ public class ConversationService {
         this.guard = guard;
         this.assembler = assembler;
         this.attachmentService = attachmentService;
+        this.events = events;
     }
 
-    /** Opens a conversation for the caller's applicant, adds them as the first participant, posts the first message. */
+    /**
+     * A student starts (or resumes) their private chat with one chosen staff member. The staff side must be an
+     * active staff account; the pair shares exactly one DIRECT conversation, so repeating this call posts into it.
+     */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse open(OpenConversationRequest req) {
+        if (caller.isStaff()) {
+            throw new AccessDeniedException("students only");
+        }
         Long applicantId = req.applicantId();
         if (applicantId == null) {
             List<Long> ids = access.accessibleApplicantIds();
@@ -88,47 +98,26 @@ public class ConversationService {
             throw new NadForbiddenException("missing MESSAGE_STAFF on applicant " + applicantId);
         }
         long userId = caller.requireUserId();
+        long staffUserId = resolveStaff(req.adminUserId());
+        ParticipantRole role = applicantId == null ? ParticipantRole.APPLICANT : guard.participantRoleFor(applicantId);
 
-        Conversation conversation = newConversation(req.subject(), req.applicationId(), ConversationType.GENERAL);
-
-        addParticipantRow(conversation.getId(), userId, applicantId == null ? ParticipantRole.APPLICANT : guard.participantRoleFor(applicantId));
-
-        Long adminUserId = req.adminUserId();
-        if (adminUserId != null && adminUserId > 0) {
-            addParticipantRow(conversation.getId(), adminUserId, ParticipantRole.STAFF);
-        } else {
-            List<AdminContactResponse> admins = users.listStaffAdmins();
-            if (!admins.isEmpty()) {
-                addParticipantRow(conversation.getId(), admins.get(0).userId(), ParticipantRole.STAFF);
-            }
-        }
-
-        Message message = publisher.publish(conversation.getId(), userId, req.body(), List.of());
-        return assembler.message(message);
+        Conversation conversation = directConversation(staffUserId, userId, role, req.subject(), req.applicationId());
+        return publishAndAnnounce(conversation.getId(), userId, req.body(), List.of());
     }
 
-    /** Initiates a conversation from staff to a student. */
+    /** Staff start (or resume) their private chat with one student. The recipient must be an active student. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse createByStaff(StaffCreateConversationRequest req) {
         guard.requireStaff();
         long staffUserId = caller.requireUserId();
         Long studentUserId = req.studentUserId();
-        if (studentUserId == null || studentUserId <= 0) {
-            throw new NadBadRequestException("studentUserId is required");
+        if (studentUserId == null || studentUserId <= 0 || !users.isActiveStudent(studentUserId)) {
+            throw new NadBadRequestException("the recipient must be an active student");
         }
 
-        Conversation conversation = newConversation(req.subject(), req.applicationId(), ConversationType.GENERAL);
-
-        addParticipantRow(conversation.getId(), staffUserId, ParticipantRole.STAFF);
-        addParticipantRow(conversation.getId(), studentUserId, ParticipantRole.APPLICANT);
-
-        Message message = publisher.publish(conversation.getId(), staffUserId, req.body(), List.of());
-        return assembler.message(message);
-    }
-
-    @Transactional(readOnly = true)
-    public List<AdminContactResponse> listAdmins() {
-        return users.listStaffAdmins();
+        Conversation conversation = directConversation(staffUserId, studentUserId, ParticipantRole.APPLICANT,
+                req.subject(), req.applicationId());
+        return publishAndAnnounce(conversation.getId(), staffUserId, req.body(), List.of());
     }
 
     /**
@@ -164,44 +153,30 @@ public class ConversationService {
         if (conversation == null || conversation.getConversationType() != ConversationType.SUPPORT) {
             throw new NadNotFoundException("support conversation not found");
         }
-        return messages.listByConversation(conversationId, beforeId, PAGE_SIZE).stream()
-                .map(assembler::message)
-                .toList();
+        return assembler.messages(messages.listByConversation(conversationId, beforeId, PAGE_SIZE));
     }
 
     /** Posts a message to a conversation the caller is an active participant of. */
     @Transactional(rollbackFor = Exception.class)
     public MessageResponse post(long conversationId, PostMessageRequest req) {
-        return post(conversationId, req, null);
-    }
-
-    /** Posts a message and pre-signs attachment URLs for immediate rendering. */
-    @Transactional(rollbackFor = Exception.class)
-    public MessageResponse post(long conversationId, PostMessageRequest req, MediaAccessLogContext ctx) {
         long userId = caller.requireUserId();
-        guard.requireActiveParticipant(conversationId, userId);
+        Conversation conversation = guard.requireActiveParticipant(conversationId, userId);
+        if (conversation.getStatus() == ConversationStatus.CLOSED) {
+            throw new NadBadRequestException("this conversation is closed");
+        }
         List<Long> attachmentMediaIds = req.attachmentMediaIdsOrEmpty();
         if (req.body().isBlank() && attachmentMediaIds.isEmpty()) {
             throw new NadBadRequestException("a message needs text, an attachment, or both");
         }
         attachmentService.requireOwned(attachmentMediaIds, conversationId, userId);
-        Message message = publisher.publish(conversationId, userId, req.body(), attachmentMediaIds);
-        return assembler.message(message, ctx);
+        return publishAndAnnounce(conversationId, userId, req.body(), attachmentMediaIds);
     }
 
     /** Newest-first message page (cursor by id, exclusive), for a caller who is an active participant. */
     @Transactional(readOnly = true)
     public List<MessageResponse> listMessages(long conversationId, long beforeId) {
-        return listMessages(conversationId, beforeId, null);
-    }
-
-    /** Newest-first message page with pre-signed attachment URLs (eliminates N+1 fetch round-trips). */
-    @Transactional(readOnly = true)
-    public List<MessageResponse> listMessages(long conversationId, long beforeId, MediaAccessLogContext ctx) {
         guard.requireActiveParticipant(conversationId, caller.requireUserId());
-        return messages.listByConversation(conversationId, beforeId, PAGE_SIZE).stream()
-                .map(m -> assembler.message(m, ctx))
-                .toList();
+        return assembler.messages(messages.listByConversation(conversationId, beforeId, PAGE_SIZE));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -210,7 +185,9 @@ public class ConversationService {
         guard.requireActiveParticipant(conversationId, userId);
         Message latest = messages.findLatest(conversationId);
         if (latest != null) {
+            participants.updateLastDelivered(conversationId, userId, latest.getId());
             participants.updateLastRead(conversationId, userId, latest.getId());
+            events.messagesRead(conversationId, userId, latest.getId());
         }
     }
 
@@ -225,7 +202,10 @@ public class ConversationService {
     /** Staff-only, gated by {@code nad:conversation:participant:manage} at the controller. */
     @Transactional(rollbackFor = Exception.class)
     public void addParticipant(long conversationId, long userId, ParticipantRole role) {
-        guard.requireStaff();
+        requireManageable(conversationId);
+        if (!users.isActiveStaff(userId) && !isSupport(conversationId)) {
+            throw new NadBadRequestException("only staff can be added to this conversation");
+        }
         if (participants.findActive(conversationId, userId) != null) {
             return;
         }
@@ -235,64 +215,43 @@ public class ConversationService {
     /** Staff-only, gated by {@code nad:conversation:participant:manage} at the controller. */
     @Transactional(rollbackFor = Exception.class)
     public void removeParticipant(long conversationId, long userId) {
-        guard.requireStaff();
+        requireManageable(conversationId);
         participants.remove(conversationId, userId, LocalDateTime.now());
     }
 
-    /** Every conversation the current caller is an active participant of, newest activity first. */
+    /**
+     * The caller's own conversations, newest activity first, in one query. Staff see only chats they take part
+     * in: another staff member's private conversation never appears here.
+     */
     @Transactional(readOnly = true)
-    public List<ConversationSummaryResponse> listForUser() {
+    public List<ConversationSummaryResponse> inbox(String query, Long applicationId, int page) {
         long userId = caller.requireUserId();
-        List<ConversationParticipant> mine = participants.listActiveForUser(userId);
-        if (mine.isEmpty()) {
-            return List.of();
-        }
-        List<Conversation> found = conversations.findByIds(mine.stream().map(ConversationParticipant::getConversationId).toList());
-        List<ConversationSummaryResponse> out = new ArrayList<>(found.size());
-        for (Conversation c : found) {
-            ConversationParticipant p = mine.stream().filter(m -> m.getConversationId().equals(c.getId())).findFirst().orElseThrow();
-            out.add(assembler.summary(c, p));
-        }
-        return out.stream()
-                .sorted(Comparator.comparing(ConversationSummaryResponse::lastMessageAt,
-                        Comparator.nullsLast(Comparator.reverseOrder())))
-                .toList();
+        String trimmed = query == null ? null : query.trim();
+        int offset = Math.max(page, 0) * INBOX_PAGE_SIZE;
+        return assembler.inbox(conversations.listInbox(userId, trimmed, applicationId, null, INBOX_PAGE_SIZE, offset));
     }
 
-    /** Staff-only: every conversation attached to one application (public API for other modules -- see class doc). */
+    /** Total unread messages for the caller, in one query: what the navigation badge shows. */
+    @Transactional(readOnly = true)
+    public long unreadCount() {
+        return conversations.countUnread(caller.requireUserId());
+    }
+
+    /** Staff inbox: {@link #inbox} behind a staff check (the controller's permission is not the only gate). */
+    @Transactional(readOnly = true)
+    public List<ConversationSummaryResponse> listForStaff(String query, Long applicationId, int page) {
+        guard.requireStaff();
+        return inbox(query, applicationId, page);
+    }
+
+    /** Staff-only: the caller's own conversations attached to one application. */
     @Transactional(readOnly = true)
     public List<ConversationSummaryResponse> listForApplication(long applicationId) {
         guard.requireStaff();
-        return conversations.findByApplicationId(applicationId).stream()
-                .map(c -> assembler.summary(c, null))
-                .toList();
-    }
-
-    /** Staff inbox: strictly the caller's assigned/participating conversations with optional search. */
-    @Transactional(readOnly = true)
-    public List<ConversationSummaryResponse> listForStaff(String studentName, Long applicationId) {
-        guard.requireStaff();
-        long userId = caller.requireUserId();
-        List<Conversation> found = conversations.searchForStaff(userId, studentName, applicationId);
-        if (found.isEmpty()) {
-            return List.of();
-        }
-        List<ConversationSummaryResponse> out = new ArrayList<>(found.size());
-        for (Conversation c : found) {
-            ConversationParticipant myParticipant = participants.findActive(c.getId(), userId);
-            out.add(assembler.summary(c, myParticipant));
-        }
-        return out.stream()
-                .sorted(Comparator.comparing(ConversationSummaryResponse::lastMessageAt,
-                        Comparator.nullsLast(Comparator.reverseOrder())))
-                .toList();
+        return inbox(null, applicationId, 0);
     }
 
     @Transactional(readOnly = true)
-    public List<ConversationSummaryResponse> listForStaff() {
-        return listForStaff(null, null);
-    }
-
     public List<ParticipantResponse> listParticipants(long conversationId) {
         guard.requireActiveParticipant(conversationId, caller.requireUserId());
         return participants.listActiveForConversation(conversationId).stream()
@@ -305,12 +264,106 @@ public class ConversationService {
         return attachmentService.upload(conversationId, file);
     }
 
-    /** A short-lived signed URL to view a PROTECTED attachment inline (see {@link ConversationAttachments#access}). */
-    public AttachmentAccessResponse attachmentAccess(long conversationId, long attachmentId, MediaAccessLogContext ctx) {
-        return attachmentService.access(conversationId, attachmentId, ctx);
+    /** A short-lived signed URL to view (or, with {@code download}, save) a PROTECTED attachment (see {@link ConversationAttachments#access}). */
+    public AttachmentAccessResponse attachmentAccess(long conversationId, long attachmentId, boolean download,
+            MediaAccessLogContext ctx) {
+        return attachmentService.access(conversationId, attachmentId, download, ctx);
+    }
+
+    /**
+     * Gets or creates the caller's private chat with {@code otherUserId} without posting anything. A staff caller
+     * can only reach an active student, and a student caller only a chat-eligible staff member.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ConversationSummaryResponse openDirect(long otherUserId) {
+        long userId = caller.requireUserId();
+        if (userId == otherUserId) {
+            throw new NadBadRequestException("you cannot chat with yourself");
+        }
+        Conversation conversation;
+        if (caller.isStaff()) {
+            if (!users.isActiveStudent(otherUserId)) {
+                throw new NadBadRequestException("the recipient must be an active student");
+            }
+            conversation = directConversation(userId, otherUserId, ParticipantRole.APPLICANT, null, null);
+        }
+        else {
+            if (!users.isActiveStaff(otherUserId)) {
+                throw new NadBadRequestException("the chosen advisor is not an active staff member");
+            }
+            conversation = directConversation(otherUserId, userId, ParticipantRole.APPLICANT, null, null);
+        }
+        return assembler.inbox(conversations.listInbox(userId, null, null, conversation.getId(), 1, 0)).get(0);
     }
 
     // ---- internals ----
+
+    /** Stores the message, then tells the other participants once the transaction commits. */
+    private MessageResponse publishAndAnnounce(long conversationId, long senderUserId, String body, List<Long> mediaIds) {
+        MessageResponse response = assembler.message(publisher.publish(conversationId, senderUserId, body, mediaIds));
+        events.messagePosted(response);
+        return response;
+    }
+
+    /** Participant changes on a private chat are made by someone already in it; SUPPORT pools stay staff-managed. */
+    private void requireManageable(long conversationId) {
+        guard.requireStaff();
+        Conversation conversation = conversations.findById(conversationId);
+        if (conversation == null) {
+            throw new NadNotFoundException("conversation not found");
+        }
+        if (conversation.getConversationType() != ConversationType.SUPPORT) {
+            guard.requireActiveParticipant(conversationId, caller.requireUserId());
+        }
+    }
+
+    private boolean isSupport(long conversationId) {
+        Conversation conversation = conversations.findById(conversationId);
+        return conversation != null && conversation.getConversationType() == ConversationType.SUPPORT;
+    }
+
+    private long resolveStaff(Long requestedStaffUserId) {
+        if (requestedStaffUserId != null && requestedStaffUserId > 0) {
+            if (!users.isActiveStaff(requestedStaffUserId)) {
+                throw new NadBadRequestException("the chosen advisor is not an active staff member");
+            }
+            return requestedStaffUserId;
+        }
+        List<AdminContactResponse> admins = users.listStaffAdmins();
+        if (admins.isEmpty()) {
+            throw new NadBadRequestException("no advisor is available right now");
+        }
+        return admins.get(0).userId();
+    }
+
+    /** The single DIRECT conversation of a staff/student pair: created on first contact, reopened if it was closed. */
+    private Conversation directConversation(long staffUserId, long studentUserId, ParticipantRole studentRole,
+            String subject, Long applicationId) {
+        String key = staffUserId + ":" + studentUserId;
+        Conversation existing = conversations.findByDirectKey(key);
+        if (existing != null) {
+            if (existing.getStatus() == ConversationStatus.CLOSED) {
+                conversations.updateStatus(existing.getId(), ConversationStatus.OPEN.name(), AuditActor.username());
+            }
+            return existing;
+        }
+        Conversation created = new Conversation();
+        created.setSubject(subject);
+        created.setApplicationId(applicationId);
+        created.setConversationType(ConversationType.DIRECT);
+        created.setStatus(ConversationStatus.OPEN);
+        created.setDirectKey(key);
+        created.setCreateBy(AuditActor.username());
+        try {
+            conversations.insert(created);
+        }
+        catch (DuplicateKeyException raced) {
+            return conversations.findByDirectKey(key);
+        }
+        addParticipantRow(created.getId(), staffUserId, ParticipantRole.STAFF);
+        addParticipantRow(created.getId(), studentUserId, studentRole);
+        return created;
+    }
 
     private Conversation newConversation(String subject, Long applicationId, ConversationType type) {
         Conversation conversation = new Conversation();

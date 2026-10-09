@@ -13,6 +13,7 @@ public class ConversationParticipant {
     private LocalDateTime addedAt;
     private LocalDateTime removedAt;
     private Long lastReadMessageId;
+    private Long lastDeliveredMessageId;
     private boolean muted;
 
     public Long getId() { return id; }
@@ -36,6 +37,8 @@ public class ConversationParticipant {
     public Long getLastReadMessageId() { return lastReadMessageId; }
     public void setLastReadMessageId(Long lastReadMessageId) { this.lastReadMessageId = lastReadMessageId; }
 
+    public Long getLastDeliveredMessageId() { return lastDeliveredMessageId; }
+    public void setLastDeliveredMessageId(Long lastDeliveredMessageId) { this.lastDeliveredMessageId = lastDeliveredMessageId; }
     public boolean isMuted() { return muted; }
     public void setMuted(boolean muted) { this.muted = muted; }
 }

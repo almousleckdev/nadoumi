@@ -9,13 +9,9 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 /**
- * The one new piece D6's Redis fan-out plan needs on top of the existing, already
- * in-use {@code RedisConnectionFactory} ({@code ruoyi-framework}'s {@code RedisConfig}
- * backs sessions and the rate limiter off the same factory). A dedicated
- * {@link StringRedisTemplate} keeps this module's plain-JSON pub/sub payloads
- * independent of the existing {@code RedisTemplate<Object,Object>}'s FastJson2
- * value serializer -- same connection factory, same Redis server, a different
- * (simpler) view over it for this one purpose. Not a second Redis client config.
+ * The Redis pieces the SSE fan-out needs on top of the connection factory the rest of the app already uses. A
+ * dedicated {@link StringRedisTemplate} keeps the plain-JSON payloads independent of the existing
+ * {@code RedisTemplate<Object,Object>}'s FastJson2 serializer.
  */
 @Configuration
 public class RedisStreamConfig {
@@ -30,9 +26,7 @@ public class RedisStreamConfig {
             RedisConnectionFactory connectionFactory, StreamMessageListener listener) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(listener, List.of(
-                new ChannelTopic(StreamChannels.NOTIFICATION),
-                new ChannelTopic(StreamChannels.CONVERSATION)));
+        container.addMessageListener(listener, List.of(new ChannelTopic(StreamChannels.CONVERSATION)));
         return container;
     }
 }
