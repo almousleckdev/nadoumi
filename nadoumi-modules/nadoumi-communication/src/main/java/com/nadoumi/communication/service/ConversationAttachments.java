@@ -61,7 +61,7 @@ public class ConversationAttachments {
      * must belong to a message actually posted in {@code conversationId} -- knowing an
      * attachment id from one conversation must never unlock a read in another.
      */
-    public AttachmentAccessResponse access(long conversationId, long attachmentId, MediaAccessLogContext ctx) {
+    public AttachmentAccessResponse access(long conversationId, long attachmentId, boolean download, MediaAccessLogContext ctx) {
         guard.requireActiveParticipant(conversationId, caller.requireUserId());
         MessageAttachment attachment = attachments.findById(attachmentId);
         if (attachment == null) {
@@ -71,7 +71,9 @@ public class ConversationAttachments {
         if (owner == null || owner.getConversationId() != conversationId) {
             throw new NadNotFoundException("attachment not found");
         }
-        var signed = media.issueInlineSignedUrl(attachment.getMediaAssetId(), ctx);
+        var signed = download
+                ? media.issueSignedUrl(attachment.getMediaAssetId(), ctx)
+                : media.issueInlineSignedUrl(attachment.getMediaAssetId(), ctx);
         var asset = media.find(attachment.getMediaAssetId()).orElse(null);
         return new AttachmentAccessResponse(
                 signed.url(), signed.expiresAt().toString(),

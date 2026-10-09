@@ -4,6 +4,7 @@
 
     <resultMap id="article" type="com.nadoumi.content.domain.Article">
         <id     property="id"           column="id"/>
+        <result property="publicId"     column="public_id"/>
         <result property="slug"         column="slug"/>
         <result property="title"        column="title"/>
         <result property="subtitle"     column="subtitle"/>
@@ -14,7 +15,10 @@
         <result property="publishedAt"  column="published_at"/>
         <result property="authorId"     column="author_id"/>
         <result property="authorName"   column="author_name"/>
+        <result property="authorAvatar" column="author_avatar"/>
+        <result property="authorType"   column="author_type"/>
         <result property="commentCount" column="comment_count"/>
+        <result property="likeCount"    column="like_count"/>
         <result property="createBy"     column="create_by"/>
         <result property="createTime"   column="create_time"/>
         <result property="updateBy"     column="update_by"/>
@@ -22,15 +26,23 @@
     </resultMap>
 
     <sql id="cols">
-        a.id, a.slug, a.title, a.subtitle, a.body_md, a.cover_media_id, a.language, a.status, a.published_at,
+        a.id, a.public_id, a.slug, a.title, a.subtitle, a.body_md, a.cover_media_id, a.language, a.status, a.published_at,
         a.author_id, coalesce(nullif(u.nick_name, ''), u.user_name) as author_name,
-        a.create_by, a.create_time, a.update_by, a.update_time
+        u.avatar as author_avatar, u.user_type as author_type,
+        a.create_by, a.create_time, a.update_by, a.update_time,
+        (select count(*) from nad_article_like l where l.article_id = a.id) as like_count
     </sql>
 
     <select id="findById" resultMap="article">
         select <include refid="cols"/>, null as comment_count
         from nad_article a left join sys_user u on u.user_id = a.author_id
         where a.id = #{id}
+    </select>
+
+    <select id="findByPublicId" resultMap="article">
+        select <include refid="cols"/>, null as comment_count
+        from nad_article a left join sys_user u on u.user_id = a.author_id
+        where a.public_id = #{publicId}
     </select>
 
     <select id="findBySlug" resultMap="article">
@@ -41,6 +53,15 @@
 
     <select id="findIdBySlug" resultType="long">
         select id from nad_article where slug = #{slug}
+    </select>
+
+    <select id="findRelatedCandidates" resultMap="article">
+        select <include refid="cols"/>,
+               (select count(*) from nad_article_comment c where c.article_id = a.id and c.status = 'VISIBLE') as comment_count
+        from nad_article a left join sys_user u on u.user_id = a.author_id
+        where a.status = 'PUBLISHED' and a.language = #{language} and a.id != #{excludeId}
+        order by coalesce(a.published_at, a.create_time) desc, a.id desc
+        limit #{limit}
     </select>
 
     <select id="search" resultMap="article">

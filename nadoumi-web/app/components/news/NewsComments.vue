@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import type { CommentNode } from '~/types/news'
 
-defineProps<{ slug: string, comments: CommentNode[], total: number }>()
+defineProps<{
+  slug: string
+  comments: CommentNode[]
+  total: number
+  reactions: ReturnType<typeof useNewsReactions>
+}>()
 const emit = defineEmits<{ posted: [] }>()
 
 const { t } = useI18n()
@@ -41,6 +46,7 @@ const signedIn = computed(() => status.value === 'authed')
         :comment="c"
         :slug="slug"
         :signed-in="signedIn"
+        :reactions="reactions"
         @posted="emit('posted')"
       />
     </ul>

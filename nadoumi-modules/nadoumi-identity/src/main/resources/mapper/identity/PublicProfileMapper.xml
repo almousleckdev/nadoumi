@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.identity.mapper.PublicProfileMapper">
+
+    <resultMap id="row" type="com.nadoumi.identity.profile.PublicProfileRow">
+        <id     property="userId"         column="user_id"/>
+        <result property="userType"       column="user_type"/>
+        <result property="nickName"       column="nick_name"/>
+        <result property="userName"       column="user_name"/>
+        <result property="avatar"         column="avatar"/>
+        <result property="ownerGivenName" column="owner_given_name"/>
+    </resultMap>
+
+    <select id="findByUserIds" resultMap="row">
+        select u.user_id, u.user_type, u.nick_name, u.user_name, u.avatar,
+               (select a.given_name
+                from nad_user_applicant_access acc
+                join nad_applicant a on a.id = acc.applicant_id
+                where acc.user_id = u.user_id and acc.access_role = 'OWNER' and acc.status = 'ACTIVE'
+                order by acc.id
+                limit 1) as owner_given_name
+        from sys_user u
+        where u.user_id in
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </select>
+</mapper>

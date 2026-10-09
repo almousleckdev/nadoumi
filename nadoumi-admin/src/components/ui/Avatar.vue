@@ -6,23 +6,28 @@
     aria-hidden="true"
   >
     <img
-      v-if="src"
+      v-if="src && !failed"
       :src="src"
       :alt="name"
       class="avatar__img"
+      @error="failed = true"
     >
     <template v-else>{{ initials }}</template>
   </span>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = withDefaults(defineProps<{
   name?: string
   src?: string
   size?: number
 }>(), { name: '', src: undefined, size: 32 })
+
+// an image that cannot be loaded (moved, expired) falls back to initials instead of a broken image
+const failed = ref(false)
+watch(() => props.src, () => { failed.value = false })
 
 const initials = computed(() => {
   const parts = props.name.trim().split(/\s+/).filter(Boolean)

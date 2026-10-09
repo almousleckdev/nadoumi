@@ -270,3 +270,67 @@ clients. No sticky sessions required for correctness (only for connection affini
 - Realtime: unauthenticated stream → 401; a user receives only their own events;
   two app instances both deliver an event published by either (Redis fan-out
   integration test).
+
+---
+
+## 7. Chat rework — EXISTING (2026-10-09, migration V96)
+
+Supersedes the planned/baseline chat notes above where they differ. The transport stays the approved D6 choice
+(SSE plus Redis fan-out); no WebSocket was introduced.
+
+### 7.1 Who can talk to whom (enforced in `ConversationService`, server-side)
+
+- Chat is strictly **staff to student**. A student can open a chat only with an active staff account that holds
+  `nad:conversation:participate` (or the super-admin role); staff can open a chat only with an active student
+  (`user_type '10'`). Staff to staff and student to student are rejected with 400.
+- Each staff/student pair shares exactly **one** `DIRECT` conversation (`nad_conversation.direct_key =
+  "<staffId>:<studentId>"`, unique). Starting a chat again returns the same conversation and reopens it if it
+  was closed. `GENERAL` and `SUPPORT` conversations keep working unchanged (support tickets own their SUPPORT chat).
+- A conversation is private to its two participants. Another staff member gets 403 on its messages, read marker,
+  attachments and participant list, and it never appears in their inbox. Adding a participant requires being an
+  active participant already (hand-over is explicit), and only active staff can be added. A closed chat rejects posts.
+- A chat shows the other side as **first name or username plus profile photo only** (`PublicProfileService`:
+  staff nickname and https photo; students first name, no surname, email or phone).
+
+### 7.2 Real-time (SSE events carry their data; clients do not re-fetch)
+
+`GET /api/student/stream` and `GET /api/staff/stream` emit: `ready`, `heartbeat` (every 20 s, configurable via
+`nadoumi.chat.heartbeat-seconds`), `message` (the full message), `delivered` and `read`
+(`{conversationId,userId,messageId}`), `presence` (`{userId,online,lastSeenAt}`). Every event is published to Redis
+after the transaction commits and relayed by each instance to its own connections.
+
+- **Delivery** is recorded server-side when a `message` event is written to a live connection of the recipient, and
+  when a recipient's stream opens (everything sent while away). **Read** is recorded by `POST .../read`.
+  Both are stored as pointers on `nad_conversation_participant` (`last_delivered_message_id`, `last_read_message_id`)
+  and surface as `peerDeliveredMessageId` / `peerReadMessageId` on the inbox row.
+- **Presence**: each connection is a member of a Redis sorted set keyed per user (score = expiry, refreshed by the
+  heartbeat), so a crashed instance's connections age out in 60 s. The last connection closing stores
+  `nad_user_presence.last_seen_at` (UTC) and tells everyone sharing a conversation. Presence is only visible to
+  people who share a conversation, plus the student-facing staff directory.
+- Not built: typing indicators; multi-device echo of a user's own sent messages (a second tab of the same user
+  catches up on resync or reload). DECISION REQUIRED only if either becomes a requirement.
+
+### 7.3 Performance
+
+Inbox = one query (`ConversationMapper.listInbox`: summary denormalised on `nad_conversation.last_*`, unread count
+and the other participant in the same statement) plus one batched profile lookup; thread page = one message query,
+one attachment query, one profile lookup. Attachment rows store filename, type and size, and **no URL is signed in a
+listing**: images and downloads go through `GET .../attachments/{id}[?download=1]`, which re-checks participation and
+302-redirects to a short-lived signed Cloudinary URL. The sidebar badge uses `GET .../unread-count` (one query).
+
+### 7.4 Finding people
+
+- Students: `GET /api/student/conversations/staff` (chat-eligible staff: name, photo, presence; no email).
+- Staff: `GET /api/staff/chat/students?q=` searches **on the server**, at most 20 results, minimum 2 characters of a
+  name or an id: `STU-<id>`/`<id>` (student user id), `APP-<id>` (application id), or name (nickname, username,
+  applicant first/family-name prefix). Results carry `studentRef`, first name, photo, presence, and the matched
+  application id. Staff inbox filter: `GET /api/staff/conversations?q=&applicationId=&page=`.
+- "Student ID" is the student's platform user id (there is no separate student number in the schema).
+  DECISION REQUIRED if a business-facing student number should exist.
+
+### 7.5 Attachments
+
+`MESSAGE_ATTACHMENT` (PROTECTED, Cloudinary, 15 MB, max 5 per message): images (jpeg/png/webp), PDF, plain text,
+Word (.docx and legacy .doc), Excel (.xlsx), PowerPoint (.pptx). Office files are identified from their own content
+(an OOXML package by the main part it declares, a legacy file by its OLE2 signature); macro-enabled formats, ZIPs,
+executables and anything whose bytes disagree with the declared type are refused.

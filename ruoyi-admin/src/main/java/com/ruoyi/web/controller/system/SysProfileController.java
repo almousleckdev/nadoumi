@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller.system;
 
 import java.util.Map;
+import com.nadoumi.identity.service.StaffAvatarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,9 +21,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.DateUtils;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
-import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.FileUtils;
-import com.ruoyi.common.utils.file.MimeTypeUtils;
 import com.ruoyi.framework.web.service.TokenService;
 import com.ruoyi.system.service.ISysUserService;
 
@@ -35,6 +34,9 @@ import com.ruoyi.system.service.ISysUserService;
 @RequestMapping("/system/user/profile")
 public class SysProfileController extends BaseController
 {
+    @Autowired
+    private StaffAvatarService staffAvatars;
+
     @Autowired
     private ISysUserService userService;
 
@@ -128,22 +130,26 @@ public class SysProfileController extends BaseController
         if (!file.isEmpty())
         {
             LoginUser loginUser = getLoginUser();
-            String avatar = FileUploadUtils.upload(RuoYiConfig.getAvatarPath(), file, MimeTypeUtils.IMAGE_EXTENSION, true);
-            if (userService.updateUserAvatar(loginUser.getUserId(), avatar))
-            {
-                String oldAvatar = loginUser.getUser().getAvatar();
-                if (StringUtils.isNotEmpty(oldAvatar))
-                {
-                    FileUtils.deleteFile(RuoYiConfig.getProfile() + FileUtils.stripPrefix(oldAvatar));
-                }
-                AjaxResult ajax = AjaxResult.success();
-                ajax.put("imgUrl", avatar);
-                // 更新缓存用户头像
-                loginUser.getUser().setAvatar(avatar);
-                tokenService.setLoginUser(loginUser);
-                return ajax;
-            }
+            String oldAvatar = loginUser.getUser().getAvatar();
+            // stored as a public media asset, so the public site can show it next to the staff member's articles
+            String avatar = staffAvatars.replace(loginUser.getUserId(), file);
+            deleteLegacyLocalAvatar(oldAvatar);
+            AjaxResult ajax = AjaxResult.success();
+            ajax.put("imgUrl", avatar);
+            // 更新缓存用户头像
+            loginUser.getUser().setAvatar(avatar);
+            tokenService.setLoginUser(loginUser);
+            return ajax;
         }
         return error("Failed to upload the image, please contact an administrator");
+    }
+
+    /** Photos uploaded before avatars moved to media storage are files on this server's disk; remove them once replaced. */
+    private void deleteLegacyLocalAvatar(String oldAvatar)
+    {
+        if (StringUtils.isNotEmpty(oldAvatar) && !oldAvatar.startsWith("https://"))
+        {
+            FileUtils.deleteFile(RuoYiConfig.getProfile() + FileUtils.stripPrefix(oldAvatar));
+        }
     }
 }

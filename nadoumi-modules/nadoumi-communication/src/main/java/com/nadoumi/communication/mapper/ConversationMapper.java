@@ -26,7 +26,20 @@ public interface ConversationMapper {
             @Param("applicationId") Long applicationId
     );
 
+    /** The caller's conversations, newest activity first, with unread counts and the other side, in one query. */
+    List<InboxRow> listInbox(@Param("userId") long userId, @Param("query") String query,
+            @Param("applicationId") Long applicationId, @Param("conversationId") Long conversationId,
+            @Param("limit") int limit, @Param("offset") int offset);
+
+    /** Unread messages across all of the user's conversations (the sidebar badge). */
+    long countUnread(@Param("userId") long userId);
+
+    Conversation findByDirectKey(@Param("directKey") String directKey);
+
     int insert(Conversation conversation);
+
+    int updateLastMessage(@Param("id") long id, @Param("messageId") long messageId, @Param("at") java.time.LocalDateTime at,
+            @Param("preview") String preview, @Param("senderUserId") long senderUserId);
 
     int updateStatus(@Param("id") long id, @Param("status") String status, @Param("updateBy") String updateBy);
 }

@@ -22,4 +22,22 @@ describe('Avatar', () => {
     const w = mount(Avatar, { props: { name: 'A B', size: 48 } })
     expect(w.attributes('style')).toContain('width: 48px')
   })
+
+  it('falls back to initials when the image cannot be loaded', async () => {
+    const w = mount(Avatar, { props: { name: 'Jane Smith', src: 'https://cdn.example/gone.png' } })
+
+    await w.find('img').trigger('error')
+
+    expect(w.find('img').exists()).toBe(false)
+    expect(w.text()).toBe('JS')
+  })
+
+  it('tries a new image after the previous one failed', async () => {
+    const w = mount(Avatar, { props: { name: 'Jane Smith', src: 'https://cdn.example/gone.png' } })
+    await w.find('img').trigger('error')
+
+    await w.setProps({ src: 'https://cdn.example/new.png' })
+
+    expect(w.find('img').attributes('src')).toBe('https://cdn.example/new.png')
+  })
 })

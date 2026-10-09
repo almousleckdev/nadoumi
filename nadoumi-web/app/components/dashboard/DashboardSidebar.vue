@@ -9,17 +9,17 @@ const localePath = useLocalePath()
 const route = useRoute()
 const { signOut } = useSession()
 
-const { listConversations } = useMessages()
+const { count: unreadMessages, refresh: refreshUnreadMessages } = useChatUnread()
 const { unreadCount: getUnreadNotifs } = useNotifications()
 
-const { data: badgeCounts } = useAsyncData('sidebar-badges', async () => {
-  const [convos, notifs] = await Promise.all([
-    listConversations().catch(() => []),
-    getUnreadNotifs().catch(() => ({ count: 0 }))
+const { data: notificationCount } = useAsyncData('sidebar-badges', async () => {
+  const [, notifs] = await Promise.all([
+    refreshUnreadMessages(),
+    getUnreadNotifs().catch(() => ({ count: 0 })),
   ])
-  const unreadMessages = convos.reduce((sum, c) => sum + (c.unreadCount || 0), 0)
-  return { messages: unreadMessages, notifications: notifs.count }
+  return notifs.count
 })
+const badgeCounts = computed(() => ({ messages: unreadMessages.value, notifications: notificationCount.value ?? 0 }))
 
 
 interface NavItem { to: string, key: string, icon: DashboardIconName, badge?: number }

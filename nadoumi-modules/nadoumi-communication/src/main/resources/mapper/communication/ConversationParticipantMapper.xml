@@ -10,10 +10,11 @@
         <result property="addedAt"            column="added_at"/>
         <result property="removedAt"          column="removed_at"/>
         <result property="lastReadMessageId"  column="last_read_message_id"/>
+        <result property="lastDeliveredMessageId" column="last_delivered_message_id"/>
         <result property="muted"              column="muted"/>
     </resultMap>
 
-    <sql id="cols">id, conversation_id, user_id, role, added_at, removed_at, last_read_message_id, muted</sql>
+    <sql id="cols">id, conversation_id, user_id, role, added_at, removed_at, last_read_message_id, last_delivered_message_id, muted</sql>
 
     <select id="findActive" resultMap="participant">
         select <include refid="cols"/> from nad_conversation_participant
@@ -46,6 +47,29 @@
     <update id="remove">
         update nad_conversation_participant set removed_at = #{removedAt}
         where conversation_id = #{conversationId} and user_id = #{userId} and removed_at is null
+    </update>
+
+    <select id="listPeerUserIds" resultType="long">
+        select distinct other.user_id
+        from nad_conversation_participant me
+        join nad_conversation_participant other
+          on other.conversation_id = me.conversation_id and other.user_id &lt;&gt; me.user_id and other.removed_at is null
+        where me.user_id = #{userId} and me.removed_at is null
+    </select>
+
+    <select id="listUndelivered" resultType="com.nadoumi.communication.mapper.UndeliveredRow">
+        select c.id as conversationId, c.last_message_id as messageId, c.last_sender_user_id as senderUserId
+        from nad_conversation_participant me
+        join nad_conversation c on c.id = me.conversation_id
+        where me.user_id = #{userId} and me.removed_at is null
+          and c.last_message_id is not null and c.last_sender_user_id &lt;&gt; me.user_id
+          and (me.last_delivered_message_id is null or me.last_delivered_message_id &lt; c.last_message_id)
+    </select>
+
+    <update id="updateLastDelivered">
+        update nad_conversation_participant set last_delivered_message_id = #{messageId}
+        where conversation_id = #{conversationId} and user_id = #{userId}
+          and (last_delivered_message_id is null or last_delivered_message_id &lt; #{messageId})
     </update>
 
     <update id="updateLastRead">

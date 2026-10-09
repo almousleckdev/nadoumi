@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.content.mapper.ArticleReactionMapper">
+
+    <insert id="insertArticleLike">
+        insert ignore into nad_article_like (article_id, user_id, create_time)
+        values (#{articleId}, #{userId}, now())
+    </insert>
+
+    <delete id="deleteArticleLike">
+        delete from nad_article_like where article_id = #{articleId} and user_id = #{userId}
+    </delete>
+
+    <select id="countArticleLikes" resultType="int">
+        select count(*) from nad_article_like where article_id = #{articleId}
+    </select>
+
+    <select id="recentArticleLikerIds" resultType="long">
+        select user_id from nad_article_like
+        where article_id = #{articleId}
+        order by create_time desc, user_id desc
+        limit #{limit}
+    </select>
+
+    <select id="articleLikedBy" resultType="boolean">
+        select exists (select 1 from nad_article_like where article_id = #{articleId} and user_id = #{userId})
+    </select>
+
+    <insert id="insertCommentLike">
+        insert ignore into nad_article_comment_like (comment_id, user_id, create_time)
+        values (#{commentId}, #{userId}, now())
+    </insert>
+
+    <delete id="deleteCommentLike">
+        delete from nad_article_comment_like where comment_id = #{commentId} and user_id = #{userId}
+    </delete>
+
+    <select id="countCommentLikes" resultType="int">
+        select count(*) from nad_article_comment_like where comment_id = #{commentId}
+    </select>
+
+    <select id="commentIdsLikedBy" resultType="long">
+        select l.comment_id
+        from nad_article_comment_like l
+        join nad_article_comment c on c.id = l.comment_id
+        where c.article_id = #{articleId} and l.user_id = #{userId}
+        order by l.comment_id
+    </select>
+</mapper>

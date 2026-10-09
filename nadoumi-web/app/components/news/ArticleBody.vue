@@ -49,7 +49,20 @@ const html = computed(() => renderMarkdown(props.markdown))
   margin: 2rem auto 0;
   border-radius: 6px;
 }
-.nad-article-body :deep(hr) { margin: 3rem auto; width: 4rem; border-color: rgb(148 163 184); }
+.nad-article-body :deep(hr) {
+  height: 1.25rem;
+  margin: 3rem 0 0;
+  border: 0;
+  text-align: center;
+}
+.nad-article-body :deep(hr)::before {
+  content: '\00b7\00b7\00b7';
+  padding-inline-start: 0.6em;
+  font-size: 1.9rem;
+  line-height: 1.25rem;
+  letter-spacing: 0.6em;
+  color: rgb(15 23 42);
+}
 .nad-article-body :deep(code) {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.9em;
@@ -68,4 +81,42 @@ const html = computed(() => renderMarkdown(props.markdown))
 }
 .nad-article-body :deep(pre code) { background: none; padding: 0; }
 .nad-article-body > :deep(:first-child) { margin-top: 0; }
+
+/* Figures: inline sits in the column, wide and full extend past it, centred in either text direction. */
+.nad-article-body :deep(.nad-fig) {
+  --nad-fig-width: 100%;
+  width: var(--nad-fig-width);
+  margin: 2.5rem calc(50% - var(--nad-fig-width) / 2) 0;
+}
+.nad-article-body :deep(.nad-fig--wide) { --nad-fig-width: min(1032px, calc(100vw - 2rem)); }
+.nad-article-body :deep(.nad-fig--full) { --nad-fig-width: 100vw; }
+/* With the sidebar beside the article (lg and up) a figure can only extend a little past the text column. */
+@media (min-width: 1024px) {
+  .nad-article-body :deep(.nad-fig--wide),
+  .nad-article-body :deep(.nad-fig--full) { --nad-fig-width: calc(100% + 4rem); }
+}
+.nad-article-body :deep(.nad-fig img) { margin: 0; width: 100%; border-radius: 0; }
+.nad-article-body :deep(.nad-fig--inline img) { border-radius: 2px; }
+.nad-article-body :deep(figcaption) {
+  margin-top: 0.625rem;
+  padding: 0 1rem;
+  text-align: center;
+  font-family: 'Plus Jakarta Sans', Inter, sans-serif;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: rgb(100 116 139);
+}
+.nad-article-body :deep(.nad-embed) {
+  position: relative;
+  margin: 2.5rem 0 0;
+  aspect-ratio: 16 / 9;
+  background: rgb(0 0 0);
+}
+.nad-article-body :deep(.nad-embed iframe) {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
 </style>

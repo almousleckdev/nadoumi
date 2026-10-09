@@ -14,7 +14,7 @@ const date = computed(() => formatTimestamp(props.article.publishedAt, locale.va
     <NuxtLink :to="localePath(`/news/${article.slug}`)" class="group flex items-start gap-5 no-underline hover:no-underline sm:gap-8">
       <div class="min-w-0 flex-1">
         <p class="flex flex-wrap items-center gap-x-2 text-sm text-slate-600">
-          <NAvatar v-if="article.authorName" :name="article.authorName" size="sm" />
+          <NAvatar v-if="article.authorName" :name="article.authorName" :src="article.authorAvatarUrl ?? undefined" size="sm" />
           <span v-if="article.authorName" class="font-medium text-slate-900">{{ article.authorName }}</span>
           <span v-if="article.authorName && date" aria-hidden="true">·</span>
           <time v-if="date" :datetime="article.publishedAt ?? undefined">{{ date }}</time>
@@ -29,6 +29,10 @@ const date = computed(() => formatTimestamp(props.article.publishedAt, locale.va
           <span>{{ t('news.readTime', { n: n(article.readMinutes) }) }}</span>
           <span aria-hidden="true">·</span>
           <span>{{ t('news.count', article.commentCount) }}</span>
+          <template v-if="article.likeCount > 0">
+            <span aria-hidden="true">·</span>
+            <span>{{ t('news.likeCount', article.likeCount) }}</span>
+          </template>
         </p>
       </div>
       <img

@@ -10,7 +10,7 @@
         <result property="createTime"          column="create_time"/>
     </resultMap>
 
-    <sql id="cols">id, message_id, media_asset_id, promoted_document_id, create_time</sql>
+    <sql id="cols">id, message_id, media_asset_id, promoted_document_id, original_filename, content_type, byte_size, create_time</sql>
 
     <select id="findById" resultMap="attachment">
         select <include refid="cols"/> from nad_message_attachment where id = #{id}
@@ -20,10 +20,17 @@
         select <include refid="cols"/> from nad_message_attachment where message_id = #{messageId}
     </select>
 
+    <select id="listByMessageIds" resultMap="attachment">
+        select <include refid="cols"/> from nad_message_attachment
+        where message_id in
+        <foreach collection="messageIds" item="i" open="(" separator="," close=")">#{i}</foreach>
+        order by id
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.communication.domain.MessageAttachment"
             useGeneratedKeys="true" keyProperty="id">
-        insert into nad_message_attachment (message_id, media_asset_id, create_time)
-        values (#{messageId}, #{mediaAssetId}, now())
+        insert into nad_message_attachment (message_id, media_asset_id, original_filename, content_type, byte_size, create_time)
+        values (#{messageId}, #{mediaAssetId}, #{originalFilename}, #{contentType}, #{byteSize}, now())
     </insert>
 
     <update id="setPromotedDocumentId">

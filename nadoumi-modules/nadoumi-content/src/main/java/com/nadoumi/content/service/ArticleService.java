@@ -27,6 +27,7 @@ import com.nadoumi.content.web.response.StaffArticleResponse;
 import com.alibaba.fastjson2.JSONObject;
 import com.ruoyi.common.utils.AuditActor;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +38,9 @@ public class ArticleService {
 
     static final String DEFAULT_LANGUAGE = "en";
     static final int MAX_BODY_IMAGES = 50;
+    static final int MAX_RELATED = 12;
+    /** How many of the newest same-language articles related ones are ranked from. */
+    static final int RELATED_POOL = 50;
 
     private final ArticleMapper mapper;
     private final MediaGateway media;
@@ -65,8 +69,8 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public StaffArticleResponse staffGet(long id) {
-        return toStaff(load(id));
+    public StaffArticleResponse staffGet(UUID publicId) {
+        return toStaff(loadPublic(publicId));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -83,19 +87,23 @@ public class ArticleService {
 
     /** The slug is fixed at creation so published URLs never change when the title is edited. */
     @Transactional(rollbackFor = Exception.class)
-    public StaffArticleResponse update(long id, ArticleRequest req) {
-        Article a = load(id);
+    public StaffArticleResponse update(UUID publicId, ArticleRequest req) {
+        Article a = loadPublic(publicId);
         apply(a, req);
         a.setUpdateBy(AuditActor.username());
         mapper.update(a);
-        return toStaff(load(id));
+        return toStaff(load(a.getId()));
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public StaffArticleResponse publish(long id) {
-        Article a = load(id);
+    public StaffArticleResponse publish(UUID publicId) {
+        Article a = loadPublic(publicId);
+        long id = a.getId();
         if (a.getCoverMediaId() == null) {
             throw new NadBadRequestException("upload a cover image before publishing");
+        }
+        if (a.getBodyMd() == null || a.getBodyMd().isBlank()) {
+            throw new NadBadRequestException("write the article body before publishing");
         }
         mapper.updateStatus(id, ArticleStatus.PUBLISHED, AuditActor.username());
         // students are told once; re-publishing after an unpublish must not announce it again
@@ -106,8 +114,9 @@ public class ArticleService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public StaffArticleResponse unpublish(long id) {
-        Article a = load(id);
+    public StaffArticleResponse unpublish(UUID publicId) {
+        Article a = loadPublic(publicId);
+        long id = a.getId();
         if (a.getStatus() != ArticleStatus.PUBLISHED) {
             throw new NadBadRequestException("only a published article can be unpublished");
         }
@@ -127,17 +136,17 @@ public class ArticleService {
 
     /** A published article must be unpublished first, so a live page is never deleted by accident. */
     @Transactional(rollbackFor = Exception.class)
-    public void delete(long id) {
-        Article a = load(id);
+    public void delete(UUID publicId) {
+        Article a = loadPublic(publicId);
         if (a.getStatus() == ArticleStatus.PUBLISHED) {
             throw new NadBadRequestException("unpublish the article before deleting it");
         }
-        mapper.delete(id);
+        mapper.delete(a.getId());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public MediaUploadResult uploadCover(long id, MultipartFile file) {
-        load(id);
+    public MediaUploadResult uploadCover(UUID publicId, MultipartFile file) {
+        long id = loadPublic(publicId).getId();
         MediaUploadResult result = uploadFor(id, file, MediaCategory.ARTICLE_COVER);
         mapper.updateCoverMediaId(id, result.mediaId(), AuditActor.username());
         return result;
@@ -145,8 +154,8 @@ public class ArticleService {
 
     /** Uploads an image for the article body; the caller embeds the returned URL in the Markdown. */
     @Transactional(rollbackFor = Exception.class)
-    public MediaUploadResult uploadBodyImage(long id, MultipartFile file) {
-        load(id);
+    public MediaUploadResult uploadBodyImage(UUID publicId, MultipartFile file) {
+        long id = loadPublic(publicId).getId();
         int existing = mapper.countImages(id);
         if (existing >= MAX_BODY_IMAGES) {
             throw new NadBadRequestException("at most " + MAX_BODY_IMAGES + " images per article");
@@ -170,15 +179,38 @@ public class ArticleService {
 
     @Transactional(readOnly = true)
     public PublicArticleDetail publicGet(String slug) {
-        Article a = mapper.findBySlug(slug);
-        if (a == null || a.getStatus() != ArticleStatus.PUBLISHED) {
-            throw new NadNotFoundException("article not found");
-        }
+        Article a = publishedBySlug(slug);
         return new PublicArticleDetail(ArticleSummary.of(a, coverUrl(a)), a.getBodyMd(),
                 comments.publicThread(a.getId()));
     }
 
+    /** Articles worth reading next, from the same language, best word overlap first (see {@link RelatedArticles}). */
+    @Transactional(readOnly = true)
+    public List<ArticleSummary> related(String slug, int limit) {
+        Article current = publishedBySlug(slug);
+        int size = Math.min(Math.max(limit, 1), MAX_RELATED);
+        List<Article> pool = mapper.findRelatedCandidates(current.getId(), current.getLanguage(), RELATED_POOL);
+        return RelatedArticles.rank(current, pool, size).stream().map(a -> ArticleSummary.of(a, coverUrl(a))).toList();
+    }
+
     // ---- helpers ----
+
+    /** A draft, unpublished or unknown slug is indistinguishable from a missing article. */
+    private Article publishedBySlug(String slug) {
+        Article a = mapper.findBySlug(slug);
+        if (a == null || a.getStatus() != ArticleStatus.PUBLISHED) {
+            throw new NadNotFoundException("article not found");
+        }
+        return a;
+    }
+
+    private Article loadPublic(UUID publicId) {
+        Article a = mapper.findByPublicId(publicId.toString());
+        if (a == null) {
+            throw new NadNotFoundException("article not found");
+        }
+        return a;
+    }
 
     private Article load(long id) {
         Article a = mapper.findById(id);

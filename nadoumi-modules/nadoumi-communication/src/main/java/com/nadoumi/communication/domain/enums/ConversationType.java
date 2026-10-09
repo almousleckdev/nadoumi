@@ -8,5 +8,7 @@ package com.nadoumi.communication.domain.enums;
  */
 public enum ConversationType {
     GENERAL,
-    SUPPORT
+    SUPPORT,
+    /** One private chat between exactly one staff member and one student; at most one per pair. */
+    DIRECT
 }

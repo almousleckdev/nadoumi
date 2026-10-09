@@ -7,6 +7,19 @@ import Layout from '@/layout/index.vue'
 export const routes: RouteRecordRaw[] = [
   { path: '/login', component: () => import('@/views/login.vue'), meta: { hidden: true } },
   { path: '/404', component: () => import('@/views/error/404.vue'), meta: { hidden: true } },
+  // The article editor is a full-screen writing surface, so it sits outside the sidebar layout.
+  {
+    path: '/news/new',
+    name: 'NewsNew',
+    component: () => import('@/views/news/editor.vue'),
+    meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:create', hidden: true },
+  },
+  {
+    path: '/news/:id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})',
+    name: 'NewsEdit',
+    component: () => import('@/views/news/editor.vue'),
+    meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:view', hidden: true },
+  },
   {
     path: '/',
     component: Layout,
@@ -59,18 +72,6 @@ export const routes: RouteRecordRaw[] = [
         name: 'News',
         component: () => import('@/views/news/index.vue'),
         meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:list' },
-      },
-      {
-        path: 'news/new',
-        name: 'NewsNew',
-        component: () => import('@/views/news/editor.vue'),
-        meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:create' },
-      },
-      {
-        path: 'news/:id(\\d+)',
-        name: 'NewsEdit',
-        component: () => import('@/views/news/editor.vue'),
-        meta: { title: 'nav.items.news', i18n: true, perm: 'nad:article:view' },
       },
       {
         path: 'scholarships',

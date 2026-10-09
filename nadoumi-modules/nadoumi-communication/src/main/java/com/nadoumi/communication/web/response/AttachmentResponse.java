@@ -1,14 +1,8 @@
 package com.nadoumi.communication.web.response;
 
-public record AttachmentResponse(
-        long id,
-        long mediaAssetId,
-        String filename,
-        String contentType,
-        long byteSize,
-        String url) {
-
-    public AttachmentResponse(long id, long mediaAssetId, String filename, String contentType, long byteSize) {
-        this(id, mediaAssetId, filename, contentType, byteSize, null);
-    }
+/**
+ * Display metadata only. The bytes are fetched on demand through the conversation's attachment endpoint, which
+ * re-checks participation and hands out a short-lived signed URL, so a listing never signs anything.
+ */
+public record AttachmentResponse(long id, String filename, String contentType, long byteSize, boolean image) {
 }

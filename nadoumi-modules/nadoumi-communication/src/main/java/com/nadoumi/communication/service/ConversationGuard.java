@@ -3,6 +3,7 @@ package com.nadoumi.communication.service;
 import com.nadoumi.common.access.AccessRole;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.communication.domain.enums.ParticipantRole;
+import com.nadoumi.communication.domain.Conversation;
 import com.nadoumi.communication.mapper.ConversationMapper;
 import com.nadoumi.communication.mapper.ConversationParticipantMapper;
 import com.nadoumi.identity.access.CurrentCaller;
@@ -27,13 +28,16 @@ public class ConversationGuard {
         this.grants = grants;
     }
 
-    public void requireActiveParticipant(long conversationId, long userId) {
-        if (conversations.findById(conversationId) == null) {
+    /** Returns the conversation so callers that also need its state do not load it a second time. */
+    public Conversation requireActiveParticipant(long conversationId, long userId) {
+        Conversation conversation = conversations.findById(conversationId);
+        if (conversation == null) {
             throw new NadNotFoundException("conversation not found");
         }
         if (participants.findActive(conversationId, userId) == null) {
             throw new AccessDeniedException("not a participant of conversation " + conversationId);
         }
+        return conversation;
     }
 
     public void requireStaff() {

@@ -496,3 +496,37 @@ events, not shared tables.
   never a provider reference / reconciliation field.
 - Extend the existing `RolePermissionMatrixTest` data set with the new tokens and
   their "only these roles" assertions.
+
+---
+
+## 11. Public identity on News (EXISTING, 2026-10-09)
+
+Anything a reader sees about a person next to an article, a comment or a like goes through one rule set,
+`nadoumi-identity` `PublicProfileRules`, so a surname, an email address or a student's photo cannot leak by accident.
+
+| Who | Name shown | Photo shown |
+| --- | --- | --- |
+| Staff author (`user_type` `00`) | Nickname (falls back to the username) | Their profile photo, only if it is an absolute `https` URL |
+| Student (any other `user_type`) | **First given name only**: the owner applicant's `given_name`, else the first word of the account nickname, else the username. An email-like username becomes "Student". Passport-style ALL CAPS is softened ("AVA" → "Ava") | **Never.** Initials only (a decision recorded 2026-10-09: private applicant photos are `PROTECTED` and are not republished) |
+| User that no longer exists | Empty; the site shows a translated "Former member" | None |
+
+- Unknown or future user types are treated as students, so a new type can only expose less.
+- Names are capped at 40 characters and stripped of control characters.
+- A staff photo is a **public** media asset (`STAFF_AVATAR`, stored in Cloudinary through `MediaGateway`), uploaded from the admin
+  profile page. Legacy RuoYi photos (relative `/profile/avatar/…` paths on the server's disk) are never published: the public site cannot
+  reach them and container disks are ephemeral.
+- The staff-facing comment list keeps the full nickname for moderation; only the public thread uses the public profile.
+- **Who liked** (`GET /api/student/news/{slug}/likes`) requires a signed-in reader, so first names are not scraped anonymously; anonymous
+  visitors only ever see counts. Shares go to external networks and are not tracked, so there is nothing to show about who shared.
+- Tests: `PublicProfileRulesTest` (rules), `NewsIdentityApiTest` (end to end: no surname, email or student photo in any public response).
+
+## 12. Chat privacy (EXISTING, 2026-10-09)
+
+Server-side rules, each covered by `ChatPrivacyApiTest` / `DirectConversationAuthorizationTest`:
+staff talk only to students and students only to staff; one private `DIRECT` conversation per pair; another staff
+member or student gets 403 on messages, read marker, attachments and participant changes; nobody can add themselves
+to a chat they are not in; closed chats reject posts; participants and search results expose only a first name or
+username, a photo, a `STU-` reference and presence (no email, surname, phone); student search is server-side, capped
+at 20 and needs 2+ characters or an id; attachments are validated by content (type, size, count), stored in
+Cloudinary as PROTECTED and reachable only through a participant-checked redirect; the SSE stream sends events only
+to the user a message or receipt is for.

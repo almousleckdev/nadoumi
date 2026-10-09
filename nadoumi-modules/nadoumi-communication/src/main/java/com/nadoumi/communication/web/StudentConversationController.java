@@ -1,7 +1,10 @@
 package com.nadoumi.communication.web;
 
 import com.nadoumi.common.media.MediaAccessLogContext;
+import com.nadoumi.communication.service.ChatDirectoryService;
 import com.nadoumi.communication.service.ConversationService;
+import com.nadoumi.communication.web.request.OpenDirectRequest;
+import com.nadoumi.communication.web.response.ChatPerson;
 import com.nadoumi.communication.web.request.OpenConversationRequest;
 import com.nadoumi.communication.web.request.PostMessageRequest;
 import com.nadoumi.communication.web.response.AdminContactResponse;
@@ -32,19 +35,33 @@ import org.springframework.web.multipart.MultipartFile;
 public class StudentConversationController {
 
     private final ConversationService conversations;
+    private final ChatDirectoryService directory;
 
-    public StudentConversationController(ConversationService conversations) {
+    public StudentConversationController(ConversationService conversations, ChatDirectoryService directory) {
         this.conversations = conversations;
+        this.directory = directory;
     }
 
     @GetMapping
-    public List<ConversationSummaryResponse> mine() {
-        return conversations.listForUser();
+    public List<ConversationSummaryResponse> mine(@RequestParam(name = "page", defaultValue = "0") int page) {
+        return conversations.inbox(null, null, page);
     }
 
-    @GetMapping("/admins")
-    public List<AdminContactResponse> listAdmins() {
-        return conversations.listAdmins();
+    @GetMapping("/unread-count")
+    public Map<String, Long> unreadCount() {
+        return Map.of("count", conversations.unreadCount());
+    }
+
+    /** The staff a student can start a private chat with: first name, photo and whether they are online. */
+    @GetMapping("/staff")
+    public List<ChatPerson> staff() {
+        return directory.staffDirectory();
+    }
+
+    /** Gets or creates the student's private chat with one staff member; nothing is posted. */
+    @PostMapping("/direct")
+    public ConversationSummaryResponse openDirect(@Valid @RequestBody OpenDirectRequest req) {
+        return conversations.openDirect(req.userId());
     }
 
     @PostMapping
@@ -55,16 +72,14 @@ public class StudentConversationController {
 
     @GetMapping("/{id}/messages")
     public List<MessageResponse> messages(@PathVariable Long id,
-            @RequestParam(name = "beforeId", defaultValue = "0") long beforeId,
-            HttpServletRequest request) {
-        return conversations.listMessages(id, beforeId, accessContext(request));
+            @RequestParam(name = "beforeId", defaultValue = "0") long beforeId) {
+        return conversations.listMessages(id, beforeId);
     }
 
     @PostMapping("/{id}/messages")
     @ResponseStatus(HttpStatus.CREATED)
-    public MessageResponse post(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req,
-            HttpServletRequest request) {
-        return conversations.post(id, req, accessContext(request));
+    public MessageResponse post(@PathVariable Long id, @Valid @RequestBody PostMessageRequest req) {
+        return conversations.post(id, req);
     }
 
     @PostMapping("/{id}/read")
@@ -79,17 +94,14 @@ public class StudentConversationController {
         return Map.of("mediaId", conversations.uploadAttachment(id, file));
     }
 
-    /** A short-lived signed URL to view/download an attachment already on one of this conversation's messages. */
+    /** A short-lived signed URL to view (or, with {@code download=1}, save) an attachment on one of this conversation's messages. */
     @GetMapping("/{id}/attachments/{attachmentId}")
     public ResponseEntity<AttachmentAccessResponse> attachmentAccess(@PathVariable Long id, @PathVariable Long attachmentId,
-            @RequestParam(name = "json", required = false) String json, HttpServletRequest request) {
-        AttachmentAccessResponse access = conversations.attachmentAccess(id, attachmentId, accessContext(request));
-        String accept = request.getHeader("Accept");
-        boolean wantsJson = "1".equals(json) || (accept != null && accept.contains("application/json"));
-        if (wantsJson) {
-            return ResponseEntity.ok(access);
-        }
-        return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(access.url())).build();
+            @RequestParam(name = "json", required = false) String json,
+            @RequestParam(name = "download", required = false) String download, HttpServletRequest request) {
+        AttachmentAccessResponse access = conversations.attachmentAccess(id, attachmentId, "1".equals(download),
+                accessContext(request));
+        return AttachmentRedirects.respond(access, json, request);
     }
 
     private static MediaAccessLogContext accessContext(HttpServletRequest request) {

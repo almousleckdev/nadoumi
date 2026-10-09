@@ -500,3 +500,81 @@ parameter, and — for anything with a public/student surface — a response-bod
 denylist net. No role combination, including `nadoumi_super_admin`, causes a
 confidential financial / payroll / employee / partnership field to appear on an
 anonymous or student response.
+
+## 8. News article editor (EXISTING, 2026-10-09, revised the same day)
+
+A Medium-style, distraction-free writing surface replaces the former form-plus-Markdown
+split view. Routes `/news/new` and `/news/:id` sit **outside** the sidebar layout
+(full-screen), still gated by `nad:article:create` / `nad:article:view` in route meta.
+
+**Layout.** Sticky top bar (**‹ All stories** back button, "Draft in {name}", save status, **Preview**, Publish pill,
+⋯ menu, avatar), then a 680 px column in this order: serif title, subtitle, **cover image**, body. Wide images
+extend to 1032 px, full-width ones to the viewport edge.
+
+**Editor.** TipTap (ProseMirror) with `tiptap-markdown`; the document is serialised to the
+Markdown dialect in `FRONTEND_ARCHITECTURE.md` §9, so `body_md` and the public renderer are
+unchanged. Title and subtitle are plain auto-growing fields mapped to the existing
+`title` / `subtitle`. Floating selection toolbar (bold, italic, link, heading, subheading,
+quote, list), a "+" gutter inserter (image, video, code block, divider), image blocks with
+size / alt text / caption, video embeds, code blocks with a language picker, Markdown
+shortcuts (`## `, `> `, `- `, ``` ``` ```, `---`), paste/drop image upload.
+
+**Draft lifecycle.**
+- The article is created when the title is *committed* (Enter, leaving the field, or moving
+  to the body), because the slug is derived from the title at creation and then fixed.
+- Drafts autosave 1.5 s after the last edit, one save in flight at a time
+  (`editor/useAutosave.ts`); leaving with a failed or pending save asks first.
+- A **published** article is never autosaved: edits are held and written by the explicit
+  "Save changes" button, so the live page never changes mid-sentence.
+- Publishing needs title, cover and body. The server enforces cover and body (400), the UI
+  explains what is missing. The first publish asks for confirmation (students are notified).
+- Media uploads need a saved draft; without a title the editor asks for one first.
+
+**Layout of the code** (`src/views/news/`): `editor.vue` (page, lifecycle, uploads),
+`editor/dialect.ts` + `editor/extensions.ts` (pure schema + Markdown rules, unit-tested without
+Vue), `editor/*View.vue` (node views), `SelectionToolbar`, `BlockInserter`, `EditorTopBar`,
+`CoverBlock`, dialogs, `commentThread.ts` (comments drawer logic).
+
+**Styling.** The accent colour is the single CSS variable `--ne-accent` on the editor root
+(Medium's green by default, matching the design references in `design/`); set it to the
+Nadoumi orange to rebrand. The serif is self-hosted (`@fontsource-variable/source-serif-4`).
+
+**Tests.** `newsDialect`, `newsEditorMarkdown` (round trips, raw-HTML inertness, block
+insertion), `useAutosave`, `newsCommentThread`; backend `ArticleServiceTest` covers the
+blank-body publish rule.
+
+**Identifiers and routes.** Articles are addressed by UUID: `/news/:id` only matches a UUID, and every
+`/api/staff/news/{id}` call uses it (`API_DESIGN.md` News). `Article.id` is therefore a `string` in the admin.
+
+**After publishing** the editor navigates to the News list (the story now shows there as Published); "Save changes"
+on an already-live article stays on the page.
+
+**Reader preview** (`editor/ArticlePreview.vue`). A full-screen, read-only rendering of the article as readers see it,
+including edits that are not saved yet, with a Desktop / Mobile switch. It mounts its own TipTap instance over the same
+schema, node views and `editor/editor.css` typography as the writing surface, so what is previewed is what was authored.
+Opened from the top bar, or straight from the list via `/news/:id?preview=1`. Escape or **Back to editor** closes it.
+It approximates the public page's typography rather than embedding it; the public renderer is covered by its own tests.
+
+**List page** (`views/news/index.vue`). Cover thumbnail (a placeholder when there is none or the image fails to load),
+title with its public path, language, status, **likes**, comments, published date and explicit row actions:
+**Preview**, **Edit** and a ⋯ menu with **Publish / Unpublish** and **Delete**. Publish is disabled until a cover exists
+and Delete is disabled, with the reason, for a live article, mirroring the server's rules.
+
+**Selection toolbar.** The link field belongs to the selection it was opened for: selecting other text, clearing the
+selection, losing focus or pressing Escape returns to the formatting buttons (regression-tested in
+`SelectionToolbar.test.ts`).
+
+**Staff profile photo.** The admin profile page's photo upload (`POST /system/user/profile/avatar`) now stores the image as a public media
+asset (`STAFF_AVATAR`, 3 MB, images only) and saves its absolute URL in `sys_user.avatar`, through `StaffAvatarService`. Previously RuoYi wrote a
+file on the server's disk and stored a relative path: unreachable from the public site and lost on a container rebuild, which is why a staff
+member's photo never appeared next to their articles. The article reader preview and the public byline now show it. Photos uploaded the old
+way are not published; the staff member re-uploads once, and the old file is cleaned up.
+
+## Staff chat — EXISTING (2026-10-09)
+
+`views/conversations/` (`index.vue`, `ChatInbox`, `ChatThread`, `ChatBubble`, `ChatComposer`, `ChatAttachment`,
+`EmojiPicker`, `ImageLightbox`) over `composables/useStaffChat.ts` and `useStaffChatStream.ts` (native EventSource;
+the httpOnly session cookie authenticates it). One search box narrows the staff member's own chats on the server and,
+through `useStudentSearch.ts` (300 ms debounce, race-safe, 2+ characters or an id), lists students from
+`/api/staff/chat/students` to start a private chat with. Students are never bulk-loaded into the browser. English and
+Chinese strings under `conversations.*`.

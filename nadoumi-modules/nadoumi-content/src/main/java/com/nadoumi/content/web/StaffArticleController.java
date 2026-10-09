@@ -13,6 +13,7 @@ import com.ruoyi.common.enums.BusinessType;
 import com.ruoyi.common.utils.AuditActor;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,7 +54,7 @@ public class StaffArticleController {
 
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:article:view')")
-    public StaffArticleResponse get(@PathVariable Long id) {
+    public StaffArticleResponse get(@PathVariable UUID id) {
         return articles.staffGet(id);
     }
 
@@ -68,21 +69,21 @@ public class StaffArticleController {
     @PutMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:article:edit')")
     @Log(title = "News", businessType = BusinessType.UPDATE)
-    public StaffArticleResponse update(@PathVariable Long id, @Valid @RequestBody ArticleRequest req) {
+    public StaffArticleResponse update(@PathVariable UUID id, @Valid @RequestBody ArticleRequest req) {
         return articles.update(id, req);
     }
 
     @PostMapping("/{id}/publish")
     @PreAuthorize("@ss.hasPermi('nad:article:publish')")
     @Log(title = "News", businessType = BusinessType.UPDATE)
-    public StaffArticleResponse publish(@PathVariable Long id) {
+    public StaffArticleResponse publish(@PathVariable UUID id) {
         return articles.publish(id);
     }
 
     @PostMapping("/{id}/unpublish")
     @PreAuthorize("@ss.hasPermi('nad:article:publish')")
     @Log(title = "News", businessType = BusinessType.UPDATE)
-    public StaffArticleResponse unpublish(@PathVariable Long id) {
+    public StaffArticleResponse unpublish(@PathVariable UUID id) {
         return articles.unpublish(id);
     }
 
@@ -90,27 +91,27 @@ public class StaffArticleController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@ss.hasPermi('nad:article:remove')")
     @Log(title = "News", businessType = BusinessType.DELETE)
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable UUID id) {
         articles.delete(id);
     }
 
     @PostMapping("/{id}/cover")
     @PreAuthorize("@ss.hasPermi('nad:article:edit')")
     @Log(title = "News media", businessType = BusinessType.UPDATE)
-    public MediaUploadResult uploadCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public MediaUploadResult uploadCover(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
         return articles.uploadCover(id, file);
     }
 
     @PostMapping("/{id}/images")
     @PreAuthorize("@ss.hasPermi('nad:article:edit')")
     @Log(title = "News media", businessType = BusinessType.UPDATE)
-    public MediaUploadResult uploadImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    public MediaUploadResult uploadImage(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
         return articles.uploadBodyImage(id, file);
     }
 
     @GetMapping("/{id}/comments")
     @PreAuthorize("@ss.hasPermi('nad:article:view')")
-    public List<StaffCommentResponse> comments(@PathVariable Long id) {
+    public List<StaffCommentResponse> comments(@PathVariable UUID id) {
         return comments.staffList(id);
     }
 

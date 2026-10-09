@@ -10,6 +10,9 @@ import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.nio.charset.StandardCharsets;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
@@ -95,7 +98,7 @@ public final class MediaValidation {
         }
 
         // (4) magic-byte sniff — the resolved type is canonical, not the client's claim
-        String resolved = sniff(head);
+        String resolved = sniff(head, declared);
 
         // (5) hard denylist on the sniffed type
         if (HARD_DENYLIST.contains(resolved)) {
@@ -135,17 +138,65 @@ public final class MediaValidation {
         return s;
     }
 
-    private static String sniff(InputStream head) {
+    private static String sniff(InputStream head, String declared) {
         try {
             byte[] window = head.readNBytes(SNIFF_WINDOW_BYTES);
             Metadata metadata = new Metadata();
             try (TikaInputStream tis = TikaInputStream.get(window, metadata)) {
                 MediaType type = DETECTOR.detect(tis, metadata);
-                return type.getBaseType().toString();
+                return refineOffice(type.getBaseType().toString(), window, declared);
             }
         } catch (IOException e) {
             throw new UncheckedIOException("failed to read upload head for sniffing", e);
         }
+    }
+
+    /** What tika-core reports for any OOXML package, and for any legacy OLE2 (.doc/.xls/.ppt) file. */
+    private static final String TIKA_OOXML = "application/x-tika-ooxml";
+    private static final String TIKA_OLE2 = "application/x-tika-msoffice";
+    private static final String MSWORD = "application/msword";
+
+    /** Marker in an OOXML package's {@code [Content_Types].xml} -> the concrete type. Macro-enabled variants have no entry. */
+    private static final Map<String, String> OOXML_MAIN_PARTS = Map.of(
+            "wordprocessingml.document.main+xml",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "spreadsheetml.sheet.main+xml",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "presentationml.presentation.main+xml",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+
+    /**
+     * tika-core alone cannot tell a Word file from any other ZIP or OLE2 container. Office files are therefore
+     * identified from their own content: an OOXML package by the main part its first entry declares, a legacy
+     * OLE2 file by its signature plus the client's .doc claim. Anything else keeps the sniffed type and is
+     * judged (and normally refused) by the allow-list.
+     */
+    private static String refineOffice(String sniffed, byte[] window, String declared) {
+        if (TIKA_OOXML.equals(sniffed)) {
+            String main = contentTypesOf(window);
+            for (Map.Entry<String, String> part : OOXML_MAIN_PARTS.entrySet()) {
+                if (main.contains(part.getKey())) {
+                    return part.getValue();
+                }
+            }
+            return sniffed;
+        }
+        return TIKA_OLE2.equals(sniffed) && MSWORD.equals(declared) ? MSWORD : sniffed;
+    }
+
+    /** The text of the package's {@code [Content_Types].xml} (its first entry), or empty when unreadable. */
+    private static String contentTypesOf(byte[] window) {
+        try (ZipInputStream zip = new ZipInputStream(new java.io.ByteArrayInputStream(window))) {
+            for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                if ("[Content_Types].xml".equals(entry.getName())) {
+                    return new String(zip.readNBytes(SNIFF_WINDOW_BYTES), StandardCharsets.UTF_8);
+                }
+            }
+        }
+        catch (IOException | RuntimeException e) {
+            // a truncated or malformed package: left to the allow-list, which will refuse it
+        }
+        return "";
     }
 
     private static String family(String mime) {

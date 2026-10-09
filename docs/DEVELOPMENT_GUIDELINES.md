@@ -41,7 +41,9 @@ SPRING_DATASOURCE_DRUID_MASTER_URL='jdbc:mysql://localhost:3306/ry-vue?useUnicod
 SPRING_DATASOURCE_DRUID_MASTER_USERNAME=root \
 SPRING_DATASOURCE_DRUID_MASTER_PASSWORD= \
 java -jar ruoyi-admin/target/ruoyi-admin.jar
-#   → http://localhost:8080 , login admin / admin123 (captcha on by default)
+#   → http://localhost:8080. NOTE: the stock `admin` account is a DISABLED break-glass account in this project
+#     (docs/SECURITY.md S5). Sign in as the staff super-admin `almousleck`; its seed password is in docs/SECURITY.md.
+#     (captcha is on by default; it is off in the seeded config)
 #   On first boot Flyway runs V1 and Quartz registers the seed jobs in QRTZ_* tables.
 
 # 4. Admin frontend  (transitional Vue 2 admin; nadoumi-admin/RuoYi-Vue3 arrives Phase 3.5)
@@ -57,7 +59,7 @@ curl -s localhost:8080/captchaImage | head -c 60             # captcha + uuid
 # (disable captcha for scripted login: sys_config sys.account.captchaEnabled=false
 #  + redis-cli DEL sys_config:sys.account.captchaEnabled)
 curl -s -XPOST localhost:8080/login -H 'Content-Type: application/json' \
-  -d '{"username":"admin","password":"admin123"}'
+  -d '{"username":"almousleck","password":"<seed password from docs/SECURITY.md>"}'
 ```
 
 ### Local overrides

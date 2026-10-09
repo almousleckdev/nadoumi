@@ -83,13 +83,13 @@ describe('Students', () => {
     expect(system.listUsers).toHaveBeenLastCalledWith(expect.objectContaining({ userType: '10', pageNum: 2 }))
   })
 
-  it('opens the contact dialog for a student, prefilled with a default subject', async () => {
+  it('opens the contact dialog for a student with just a message box (no subject)', async () => {
     const w = await mountStudents()
     await rowFor(w, 'Amina').findAll('button').find(b => b.text() === 'Contact Student')!.trigger('click')
     await flushPromises()
     expect(w.find('.el-dialog').text()).toContain('Message Amina')
-    const subject = w.find('.el-dialog input').element as HTMLInputElement
-    expect(subject.value).toBe('Message from Nadoumi Administration')
+    expect(w.find('.el-dialog input').exists()).toBe(false)
+    expect(w.find('.el-dialog textarea').exists()).toBe(true)
   })
 
   it('sends a direct message to the chosen student and offers to open the conversation', async () => {
@@ -103,10 +103,11 @@ describe('Students', () => {
     await flushPromises()
 
     expect(conversation.createConversation).toHaveBeenCalledWith({
-      studentUserId: 21, subject: 'Message from Nadoumi Administration', body: 'Please upload your passport.',
+      studentUserId: 21, body: 'Please upload your passport.',
     })
     expect(ui.success).toHaveBeenCalled()
     expect(router.currentRoute.value.path).toBe('/conversations')
+    expect(router.currentRoute.value.query.id).toBe('5')
   })
 
   it('does not send an empty message', async () => {

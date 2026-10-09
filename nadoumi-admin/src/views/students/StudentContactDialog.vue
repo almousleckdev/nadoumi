@@ -6,8 +6,6 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { createConversation } from '@/api/conversation'
 import type { SysUserRow } from '@/api/system'
 
-const DEFAULT_SUBJECT = 'Message from Nadoumi Administration'
-
 const props = defineProps<{ student: SysUserRow | null }>()
 const open = defineModel<boolean>({ required: true })
 
@@ -15,7 +13,7 @@ const { t } = useI18n()
 const router = useRouter()
 
 const sending = ref(false)
-const form = reactive({ subject: '', body: '' })
+const form = reactive({ body: '' })
 
 const title = computed(() => t('students.sendMessageModalTitle', {
   name: props.student?.nickName || props.student?.userName,
@@ -23,18 +21,17 @@ const title = computed(() => t('students.sendMessageModalTitle', {
 
 watch(open, (isOpen) => {
   if (!isOpen) return
-  form.subject = DEFAULT_SUBJECT
   form.body = ''
 })
 
-async function offerConversation() {
+async function offerConversation(conversationId: number) {
   try {
     await ElMessageBox.confirm(t('students.openConversationPrompt'), t('students.messageSentTitle'), {
       confirmButtonText: t('students.goToConversations'),
       cancelButtonText: t('students.stayHere'),
       type: 'success',
     })
-    router.push('/conversations')
+    router.push({ path: '/conversations', query: { id: conversationId } })
   }
   catch {
     /* the user chose to stay on this page */
@@ -45,14 +42,10 @@ async function submit() {
   if (!props.student || !form.body.trim()) return
   sending.value = true
   try {
-    await createConversation({
-      studentUserId: props.student.userId,
-      subject: form.subject.trim() || DEFAULT_SUBJECT,
-      body: form.body.trim(),
-    })
+    const sent = await createConversation({ studentUserId: props.student.userId, body: form.body.trim() })
     ElMessage.success(t('students.messageSent'))
     open.value = false
-    void offerConversation()
+    void offerConversation(sent.conversationId)
   }
   catch (e) {
     ElMessage.error((e as Error)?.message || t('students.sendFailed'))
@@ -74,14 +67,6 @@ async function submit() {
       label-position="top"
       class="contact-form"
     >
-      <el-form-item :label="t('students.messageSubject')">
-        <el-input
-          v-model="form.subject"
-          :placeholder="t('students.messageSubjectPlaceholder')"
-          maxlength="200"
-          show-word-limit
-        />
-      </el-form-item>
       <el-form-item
         :label="t('students.messageBody')"
         required

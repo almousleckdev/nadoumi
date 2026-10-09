@@ -68,3 +68,6 @@ CLAUDE.local.md
 nadoumi-web/node_modules/
 nadoumi-admin/node_modules/
 nadoumi-admin/dist/
+
+# UI reference screenshots supplied by the product owner (large, not source)
+/design/

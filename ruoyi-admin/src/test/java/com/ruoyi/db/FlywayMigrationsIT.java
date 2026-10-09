@@ -86,9 +86,10 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V94 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V96 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(85);
+        assertThat(applied).isEqualTo(87);
+        assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         assertThat(tableExists(ds, "sys_user")).isTrue();
         assertThat(tableExists(ds, "nad_user_applicant_access")).isTrue();
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
@@ -399,12 +400,60 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(84); // V2..V94, same gaps as above
+        assertThat(applied).isEqualTo(86); // V2..V96, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
                 .isEqualTo("2");
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_user WHERE user_name = 'almousleck'")).isEqualTo("1");
+    }
+
+    @Test
+    void articlePublicId_isBackfilledUniquelyForExistingRowsAndDefaultedForNewOnes() throws Exception {
+        DataSource ds = freshSchema("article_public_id_db");
+        flyway(ds).target(MigrationVersion.fromVersion("94")).load().migrate();
+        try (Connection c = ds.getConnection(); Statement s = c.createStatement()) {
+            for (int i = 1; i <= 3; i++) {
+                s.execute("INSERT INTO nad_article (slug, title, body_md, author_id) VALUES ('a" + i + "', 'T" + i + "', 'b', 1)");
+            }
+        }
+
+        flyway(ds).load().migrate();
+
+        assertThat(single(ds, "SELECT COUNT(DISTINCT public_id) FROM nad_article")).isEqualTo("3");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_article WHERE public_id REGEXP "
+                + "'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'")).isEqualTo("3");
+        try (Connection c = ds.getConnection(); Statement s = c.createStatement()) {
+            // an insert that names no public_id (as the old application code did) still gets a unique one
+            s.execute("INSERT INTO nad_article (slug, title, body_md, author_id) VALUES ('a4', 'T4', 'b', 1)");
+        }
+        assertThat(single(ds, "SELECT COUNT(DISTINCT public_id) FROM nad_article")).isEqualTo("4");
+        assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.statistics WHERE table_schema = DATABASE() "
+                + "AND table_name = 'nad_article' AND index_name = 'uk_nad_article_public_id' AND non_unique = 0"))
+                .isEqualTo("1");
+    }
+
+    @Test
+    void articleLikes_areOnePerUserAndCascadeWithTheirArticleAndComment() throws Exception {
+        DataSource ds = freshSchema("article_likes_db");
+        flyway(ds).load().migrate();
+        try (Connection c = ds.getConnection(); Statement s = c.createStatement()) {
+            s.execute("INSERT INTO nad_article (slug, title, body_md, author_id) VALUES ('a', 'T', 'b', 1)");
+            s.execute("INSERT INTO nad_article_comment (article_id, author_id, body, create_time) "
+                    + "SELECT id, 1, 'hi', now() FROM nad_article WHERE slug = 'a'");
+            s.execute("INSERT INTO nad_article_like (article_id, user_id, create_time) "
+                    + "SELECT id, 7, now() FROM nad_article WHERE slug = 'a'");
+            s.execute("INSERT INTO nad_article_comment_like (comment_id, user_id, create_time) "
+                    + "SELECT id, 7, now() FROM nad_article_comment");
+
+            assertThatThrownBy(() -> s.execute("INSERT INTO nad_article_like (article_id, user_id, create_time) "
+                    + "SELECT id, 7, now() FROM nad_article WHERE slug = 'a'"))
+                    .isInstanceOf(SQLIntegrityConstraintViolationException.class);
+
+            s.execute("DELETE FROM nad_article WHERE slug = 'a'");
+        }
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_article_like")).isEqualTo("0");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_article_comment_like")).isEqualTo("0");
     }
 
     @Test

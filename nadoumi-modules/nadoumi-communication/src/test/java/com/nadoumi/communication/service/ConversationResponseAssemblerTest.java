@@ -2,197 +2,124 @@ package com.nadoumi.communication.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.nadoumi.common.media.MediaAccessClass;
-import com.nadoumi.common.media.MediaAccessLogContext;
-import com.nadoumi.common.media.MediaCategory;
 import com.nadoumi.common.media.MediaGateway;
-import com.nadoumi.common.media.SignedUrl;
-import com.nadoumi.common.media.StoredAsset;
-import com.nadoumi.communication.domain.Conversation;
-import com.nadoumi.communication.domain.ConversationParticipant;
 import com.nadoumi.communication.domain.Message;
 import com.nadoumi.communication.domain.MessageAttachment;
-import com.nadoumi.communication.domain.enums.ConversationStatus;
-import com.nadoumi.communication.domain.enums.ConversationType;
-import com.nadoumi.communication.domain.enums.ParticipantRole;
-import com.nadoumi.communication.mapper.CommunicationUserMapper;
-import com.nadoumi.communication.mapper.ConversationParticipantMapper;
+import com.nadoumi.communication.mapper.InboxRow;
 import com.nadoumi.communication.mapper.MessageAttachmentMapper;
-import com.nadoumi.communication.mapper.MessageMapper;
-import java.time.Instant;
+import com.nadoumi.communication.web.response.MessageResponse;
+import com.nadoumi.identity.profile.PublicProfile;
+import com.nadoumi.identity.profile.PublicProfileService;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class ConversationResponseAssemblerTest {
 
-    private final ConversationParticipantMapper participants = mock(ConversationParticipantMapper.class);
-    private final MessageMapper messages = mock(MessageMapper.class);
     private final MessageAttachmentMapper attachments = mock(MessageAttachmentMapper.class);
-    private final CommunicationUserMapper users = mock(CommunicationUserMapper.class);
+    private final PublicProfileService profiles = mock(PublicProfileService.class);
     private final MediaGateway media = mock(MediaGateway.class);
-    private final ConversationResponseAssembler assembler =
-            new ConversationResponseAssembler(participants, messages, attachments, users, media);
+    private final com.nadoumi.communication.stream.PresenceService presence =
+            mock(com.nadoumi.communication.stream.PresenceService.class);
+    private final ConversationResponseAssembler assembler = new ConversationResponseAssembler(attachments, profiles, media, presence);
 
-    private static Message message(long id, String body) {
+    private static Message message(long id, long sender) {
         Message m = new Message();
         m.setId(id);
         m.setConversationId(9L);
-        m.setSenderUserId(1L);
-        m.setBody(body);
-        m.setCreatedAt(LocalDateTime.parse("2026-02-03T09:15:00"));
+        m.setSenderUserId(sender);
+        m.setBody("body " + id);
+        m.setCreatedAt(LocalDateTime.of(2026, 10, 9, 8, 0));
         return m;
     }
 
-    private static MessageAttachment attachment(long id, long mediaAssetId) {
+    private static MessageAttachment attachment(long id, long messageId, String name, String type, long size) {
         MessageAttachment a = new MessageAttachment();
         a.setId(id);
-        a.setMediaAssetId(mediaAssetId);
+        a.setMessageId(messageId);
+        a.setMediaAssetId(500 + id);
+        a.setOriginalFilename(name);
+        a.setContentType(type);
+        a.setByteSize(size);
         return a;
     }
 
-    private static StoredAsset asset(long id) {
-        return new StoredAsset(id, "CLOUDINARY", MediaAccessClass.PROTECTED, MediaCategory.MESSAGE_ATTACHMENT,
-                "raw", "upload", "pub", "asset", null, null, "scan.pdf", "application/pdf", 2048L,
-                null, null, null, 1L, null, "ACTIVE", Instant.parse("2026-02-03T09:15:00Z"));
-    }
+    @Test
+    void shouldUseOneAttachmentQueryAndOneProfileQuery_whenAssemblingAWholePage() {
+        List<Message> page = java.util.stream.LongStream.rangeClosed(1, 30)
+                .mapToObj(i -> message(i, i % 2 == 0 ? 1L : 100L)).toList();
+        when(attachments.listByMessageIds(anyCollection())).thenReturn(List.of());
+        when(profiles.resolve(anyCollection())).thenReturn(Map.of(1L, new PublicProfile("Jane", null),
+                100L, new PublicProfile("Amina", null)));
 
-    private static MediaAccessLogContext ctx() {
-        return new MediaAccessLogContext(1L, null, null, null, "127.0.0.1", "test-agent");
-    }
+        List<MessageResponse> out = assembler.messages(page);
 
-    private static Conversation conversation() {
-        Conversation c = new Conversation();
-        c.setId(9L);
-        c.setSubject("Visa question");
-        c.setConversationType(ConversationType.GENERAL);
-        c.setStatus(ConversationStatus.OPEN);
-        return c;
-    }
-
-    private static ConversationParticipant participant(long userId, ParticipantRole role, Long lastRead) {
-        ConversationParticipant p = new ConversationParticipant();
-        p.setConversationId(9L);
-        p.setUserId(userId);
-        p.setRole(role);
-        p.setLastReadMessageId(lastRead);
-        return p;
+        assertThat(out).hasSize(30);
+        verify(attachments, times(1)).listByMessageIds(anyCollection());
+        verify(profiles, times(1)).resolve(anyCollection());
+        verify(attachments, never()).listByMessage(org.mockito.ArgumentMatchers.anyLong());
     }
 
     @Test
-    void shouldIncludeSenderNameAndAttachmentMetadata_whenMappingMessage() {
-        when(users.findDisplayName(1L)).thenReturn("Amina");
-        when(attachments.listByMessage(5L)).thenReturn(List.of(attachment(50L, 7L)));
-        when(media.find(7L)).thenReturn(Optional.of(asset(7L)));
+    void shouldNameSendersByTheirPublicProfile_neverTheirAccountName() {
+        when(attachments.listByMessageIds(anyCollection())).thenReturn(List.of());
+        when(profiles.resolve(anyCollection())).thenReturn(Map.of(100L, new PublicProfile("Amina", null)));
 
-        var response = assembler.message(message(5L, "hello"));
+        MessageResponse out = assembler.message(message(1, 100L));
 
-        assertThat(response.senderName()).isEqualTo("Amina");
-        assertThat(response.attachments()).hasSize(1);
-        assertThat(response.attachments().get(0).filename()).isEqualTo("scan.pdf");
-        assertThat(response.attachments().get(0).url()).isNull();
+        assertThat(out.senderName()).isEqualTo("Amina");
     }
 
     @Test
-    void shouldPreSignAttachmentUrls_whenAccessContextIsProvided() {
-        when(attachments.listByMessage(5L)).thenReturn(List.of(attachment(50L, 7L)));
-        when(media.find(7L)).thenReturn(Optional.of(asset(7L)));
-        when(media.issueInlineSignedUrl(anyLong(), any()))
-                .thenReturn(new SignedUrl("https://cdn.example.com/x", Instant.parse("2026-02-03T09:20:00Z")));
+    void shouldDescribeAttachmentsFromTheRowWithoutSigningOrTouchingMedia() {
+        when(attachments.listByMessageIds(anyCollection())).thenReturn(List.of(
+                attachment(1, 1, "photo.png", "image/png", 2048), attachment(2, 1, "cv.pdf", "application/pdf", 4096)));
+        when(profiles.resolve(anyCollection())).thenReturn(Map.of());
 
-        var response = assembler.message(message(5L, "hello"), ctx());
+        MessageResponse out = assembler.message(message(1, 100L));
 
-        assertThat(response.attachments().get(0).url()).isEqualTo("https://cdn.example.com/x");
+        assertThat(out.attachments()).extracting("filename", "image").containsExactly(
+                org.assertj.core.groups.Tuple.tuple("photo.png", true), org.assertj.core.groups.Tuple.tuple("cv.pdf", false));
+        assertThat(out.senderName()).isEqualTo("Someone");
+        verifyNoInteractions(media);
     }
 
     @Test
-    void shouldLeaveUrlEmptyAndKeepMessage_whenSigningFails() {
-        when(attachments.listByMessage(5L)).thenReturn(List.of(attachment(50L, 7L)));
-        when(media.find(7L)).thenReturn(Optional.of(asset(7L)));
-        when(media.issueInlineSignedUrl(anyLong(), any())).thenThrow(new IllegalStateException("cloudinary down"));
+    void shouldFallBackToTheMediaRecord_whenAnOldAttachmentRowHasNoMetadata() {
+        MessageAttachment legacy = attachment(1, 1, null, null, 0);
+        when(attachments.listByMessageIds(anyCollection())).thenReturn(List.of(legacy));
+        when(profiles.resolve(anyCollection())).thenReturn(Map.of());
+        when(media.find(501L)).thenReturn(java.util.Optional.empty());
 
-        var response = assembler.message(message(5L, "hello"), ctx());
+        MessageResponse out = assembler.message(message(1, 100L));
 
-        assertThat(response.attachments()).hasSize(1);
-        assertThat(response.attachments().get(0).url()).isNull();
-        assertThat(response.attachments().get(0).filename()).isEqualTo("scan.pdf");
+        assertThat(out.attachments()).hasSize(1);
+        assertThat(out.attachments().get(0).image()).isFalse();
+        verify(media).find(501L);
     }
 
     @Test
-    void shouldReturnBareAttachment_whenMediaAssetIsMissing() {
-        when(attachments.listByMessage(5L)).thenReturn(List.of(attachment(50L, 7L)));
-        when(media.find(7L)).thenReturn(Optional.empty());
+    void shouldShowOnlyFirstNameAndAvatarForThePeer_inTheInbox() {
+        InboxRow row = new InboxRow(9L, "Hi", null, "DIRECT", "OPEN", 12L, "last words",
+                LocalDateTime.of(2026, 10, 9, 8, 0), 100L, 3L, 100L, 11L, 10L);
+        when(profiles.resolve(anyCollection())).thenReturn(Map.of(100L, new PublicProfile("Amina", null)));
 
-        var response = assembler.message(message(5L, "hello"));
+        var out = assembler.inbox(List.of(row));
 
-        assertThat(response.attachments().get(0).filename()).isNull();
-        assertThat(response.attachments().get(0).byteSize()).isZero();
-    }
-
-    @Test
-    void shouldTruncateLongPreview_whenSummarisingConversation() {
-        when(messages.findLatest(9L)).thenReturn(message(5L, "x".repeat(300)));
-        when(participants.listActiveForConversation(9L)).thenReturn(List.of());
-
-        var summary = assembler.summary(conversation(), null);
-
-        assertThat(summary.lastMessagePreview()).hasSize(141).endsWith("…");
-    }
-
-    @Test
-    void shouldDescribeAttachmentOnlyMessages_whenBodyIsBlank() {
-        when(messages.findLatest(9L)).thenReturn(message(5L, "  "));
-        when(participants.listActiveForConversation(9L)).thenReturn(List.of());
-        when(attachments.listByMessage(5L)).thenReturn(List.of(attachment(1L, 7L)));
-        assertThat(assembler.summary(conversation(), null).lastMessagePreview()).isEqualTo("📎 Attachment");
-
-        when(attachments.listByMessage(5L)).thenReturn(List.of(attachment(1L, 7L), attachment(2L, 8L)));
-        assertThat(assembler.summary(conversation(), null).lastMessagePreview()).isEqualTo("📎 2 attachments");
-    }
-
-    @Test
-    void shouldReportNoUnreadAndNoPreview_whenThereIsNoCallerParticipantAndNoMessages() {
-        when(messages.findLatest(9L)).thenReturn(null);
-        when(participants.listActiveForConversation(9L)).thenReturn(List.of());
-
-        var summary = assembler.summary(conversation(), null);
-
-        assertThat(summary.unreadCount()).isZero();
-        assertThat(summary.lastMessagePreview()).isNull();
-        assertThat(summary.lastMessageAt()).isNull();
-    }
-
-    @Test
-    void shouldCountUnreadAfterTheCallersLastReadMessage() {
-        ConversationParticipant me = participant(3L, ParticipantRole.APPLICANT, 40L);
-        when(messages.findLatest(9L)).thenReturn(message(45L, "hi"));
-        when(messages.countAfter(9L, 40L, 3L)).thenReturn(4L);
-        when(participants.listActiveForConversation(9L)).thenReturn(List.of(me));
-
-        assertThat(assembler.summary(conversation(), me).unreadCount()).isEqualTo(4L);
-    }
-
-    @Test
-    void shouldPickTheFirstStaffAsAdminAndTheFirstOtherAsStudent() {
-        when(messages.findLatest(9L)).thenReturn(null);
-        when(participants.listActiveForConversation(9L)).thenReturn(List.of(
-                participant(20L, ParticipantRole.STAFF, null),
-                participant(21L, ParticipantRole.STAFF, null),
-                participant(30L, ParticipantRole.APPLICANT, null),
-                participant(31L, ParticipantRole.GUARDIAN, null)));
-        when(users.findDisplayName(20L)).thenReturn("Karim");
-        when(users.findDisplayName(30L)).thenReturn("Amina");
-
-        var summary = assembler.summary(conversation(), null);
-
-        assertThat(summary.adminUserId()).isEqualTo(20L);
-        assertThat(summary.adminName()).isEqualTo("Karim");
-        assertThat(summary.studentUserId()).isEqualTo(30L);
-        assertThat(summary.studentName()).isEqualTo("Amina");
+        assertThat(out).hasSize(1);
+        assertThat(out.get(0).peer().name()).isEqualTo("Amina");
+        assertThat(out.get(0).peer().avatarUrl()).isNull();
+        assertThat(out.get(0).unreadCount()).isEqualTo(3L);
+        assertThat(out.get(0).peerReadMessageId()).isEqualTo(10L);
+        verify(profiles, times(1)).resolve(anyCollection());
     }
 }

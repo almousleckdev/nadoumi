@@ -10,9 +10,14 @@
         <result property="status"           column="status"/>
         <result property="createBy"         column="create_by"/>
         <result property="createTime"       column="create_time"/>
+        <result property="directKey"           column="direct_key"/>
+        <result property="lastMessageId"       column="last_message_id"/>
+        <result property="lastMessageAt"       column="last_message_at"/>
+        <result property="lastMessagePreview"  column="last_message_preview"/>
+        <result property="lastSenderUserId"    column="last_sender_user_id"/>
     </resultMap>
 
-    <sql id="cols">id, subject, application_id, conversation_type, status, create_by, create_time</sql>
+    <sql id="cols">id, subject, application_id, conversation_type, status, create_by, create_time, direct_key, last_message_id, last_message_at, last_message_preview, last_sender_user_id</sql>
 
     <select id="findById" resultMap="conversation">
         select <include refid="cols"/> from nad_conversation where id = #{id}
@@ -53,11 +58,61 @@
         order by c.id desc
     </select>
 
+    <select id="listInbox" resultType="com.nadoumi.communication.mapper.InboxRow">
+        select c.id as conversationId, c.subject, c.application_id as applicationId,
+               c.conversation_type as conversationType, c.status,
+               c.last_message_id as lastMessageId, c.last_message_preview as lastMessagePreview,
+               c.last_message_at as lastMessageAt, c.last_sender_user_id as lastSenderUserId,
+               (select count(*) from nad_message m
+                where m.conversation_id = c.id and m.id &gt; coalesce(me.last_read_message_id, 0)
+                  and m.sender_user_id &lt;&gt; me.user_id and m.deleted_at is null) as unreadCount,
+               peer.user_id as peerUserId,
+               peer.last_delivered_message_id as peerDeliveredMessageId,
+               peer.last_read_message_id as peerReadMessageId
+        from nad_conversation_participant me
+        join nad_conversation c on c.id = me.conversation_id
+        left join nad_conversation_participant peer
+               on peer.id = (select min(p2.id) from nad_conversation_participant p2
+                             where p2.conversation_id = c.id and p2.user_id &lt;&gt; me.user_id and p2.removed_at is null)
+        <if test="query != null and query != ''">
+            left join sys_user pu on pu.user_id = peer.user_id
+        </if>
+        where me.user_id = #{userId} and me.removed_at is null
+        <if test="applicationId != null">and c.application_id = #{applicationId}</if>
+        <if test="conversationId != null">and c.id = #{conversationId}</if>
+        <if test="query != null and query != ''">
+            and (pu.nick_name like concat('%', #{query}, '%') or pu.user_name like concat('%', #{query}, '%'))
+        </if>
+        order by coalesce(c.last_message_at, c.create_time) desc, c.id desc
+        limit #{limit} offset #{offset}
+    </select>
+
     <insert id="insert" parameterType="com.nadoumi.communication.domain.Conversation"
             useGeneratedKeys="true" keyProperty="id">
-        insert into nad_conversation (subject, application_id, conversation_type, status, create_by, create_time)
-        values (#{subject}, #{applicationId}, #{conversationType}, #{status}, #{createBy}, now())
+        insert into nad_conversation (subject, application_id, conversation_type, status, direct_key, create_by, create_time)
+        values (#{subject}, #{applicationId}, #{conversationType}, #{status}, #{directKey}, #{createBy}, now())
     </insert>
+
+    <select id="countUnread" resultType="long">
+        select coalesce(sum(x.unread), 0) from (
+            select (select count(*) from nad_message m
+                    where m.conversation_id = me.conversation_id and m.id &gt; coalesce(me.last_read_message_id, 0)
+                      and m.sender_user_id &lt;&gt; me.user_id and m.deleted_at is null) as unread
+            from nad_conversation_participant me
+            where me.user_id = #{userId} and me.removed_at is null
+        ) x
+    </select>
+
+    <select id="findByDirectKey" resultMap="conversation">
+        select <include refid="cols"/> from nad_conversation where direct_key = #{directKey}
+    </select>
+
+    <update id="updateLastMessage">
+        update nad_conversation
+        set last_message_id = #{messageId}, last_message_at = #{at},
+            last_message_preview = #{preview}, last_sender_user_id = #{senderUserId}
+        where id = #{id}
+    </update>
 
     <update id="updateStatus">
         update nad_conversation set status = #{status}, update_by = #{updateBy}, update_time = now()

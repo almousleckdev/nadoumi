@@ -72,10 +72,27 @@
       @row-click="(row) => open(row as Article)"
       @retry="load"
     >
+      <template #cell-cover="{ row }">
+        <img
+          v-if="(row as Article).coverUrl && !brokenCovers.has((row as Article).id)"
+          class="n-thumb"
+          :src="assetUrl((row as Article).coverUrl)"
+          :alt="t('news.coverAlt', { title: (row as Article).title })"
+          loading="lazy"
+          @error="brokenCovers.add((row as Article).id)"
+        >
+        <span
+          v-else
+          class="n-thumb n-thumb--empty"
+          :title="t('news.noCover')"
+        >
+          <el-icon :size="18"><Picture /></el-icon>
+        </span>
+      </template>
       <template #cell-title="{ row }">
         <div class="n-title">
-          <span class="n-title__text">{{ row.title }}</span>
-          <span class="n-title__ref">#{{ row.id }} · {{ row.slug }}</span>
+          <span class="n-title__text">{{ row.title || t('news.untitled') }}</span>
+          <span class="n-title__ref">/{{ row.slug }}</span>
         </div>
       </template>
       <template #cell-status="{ value }">
@@ -89,47 +106,82 @@
         {{ value ? formatDateTime(value) : '' }}
       </template>
       <template #cell-actions="{ row }">
-        <el-button
-          v-if="userStore.hasPerm('nad:article:publish') && (row as Article).status !== 'PUBLISHED' && (row as Article).coverMediaId"
-          link
-          size="small"
-          type="primary"
-          @click.stop="onPublish(row as Article)"
-        >
-          {{ t('news.publish') }}
-        </el-button>
-        <el-button
-          v-if="userStore.hasPerm('nad:article:publish') && (row as Article).status === 'PUBLISHED'"
-          link
-          size="small"
-          @click.stop="onUnpublish(row as Article)"
-        >
-          {{ t('news.unpublish') }}
-        </el-button>
-        <el-button
-          v-if="userStore.hasPerm('nad:article:remove') && (row as Article).status !== 'PUBLISHED'"
-          link
-          size="small"
-          type="danger"
-          @click.stop="onDelete(row as Article)"
-        >
-          {{ t('common.delete') }}
-        </el-button>
+        <div class="n-actions">
+          <el-button
+            link
+            size="small"
+            :icon="View"
+            @click.stop="preview(row as Article)"
+          >
+            {{ t('news.preview') }}
+          </el-button>
+          <el-button
+            v-if="userStore.hasPerm('nad:article:edit')"
+            link
+            size="small"
+            type="primary"
+            :icon="EditPen"
+            @click.stop="open(row as Article)"
+          >
+            {{ t('news.editAction') }}
+          </el-button>
+          <el-dropdown
+            trigger="click"
+            @command="(cmd: string) => onCommand(cmd, row as Article)"
+          >
+            <el-button
+              link
+              size="small"
+              :aria-label="t('news.moreActions')"
+              @click.stop
+            >
+              <el-icon><MoreFilled /></el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-if="canPublish && (row as Article).status !== 'PUBLISHED'"
+                  command="publish"
+                  :disabled="!(row as Article).coverMediaId"
+                >
+                  {{ (row as Article).coverMediaId ? t('news.publish') : t('news.publishNeedsCover') }}
+                </el-dropdown-item>
+                <el-dropdown-item
+                  v-if="canPublish && (row as Article).status === 'PUBLISHED'"
+                  command="unpublish"
+                >
+                  {{ t('news.unpublish') }}
+                </el-dropdown-item>
+                <el-dropdown-item
+                  v-if="userStore.hasPerm('nad:article:remove')"
+                  command="delete"
+                  :disabled="(row as Article).status === 'PUBLISHED'"
+                  divided
+                >
+                  <span :class="{ 'n-danger': (row as Article).status !== 'PUBLISHED' }">
+                    {{ (row as Article).status === 'PUBLISHED' ? t('news.deleteNeedsUnpublish') : t('common.delete') }}
+                  </span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </template>
     </DataTable>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { EditPen, MoreFilled, Picture, Plus, View } from '@element-plus/icons-vue'
 import {
   ARTICLE_LANGUAGES, ARTICLE_STATUSES, deleteArticle, listArticles, publishArticle, unpublishArticle,
   type Article,
 } from '@/api/news'
+import { assetUrl } from '@/utils/asset'
 import { formatDateTime } from '@/utils/date'
 import { useUserStore } from '@/stores/user'
 import { useConfirm } from '@/composables/useConfirm'
@@ -161,17 +213,34 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
     }),
   })
 
+const canPublish = computed(() => userStore.hasPerm('nad:article:publish'))
+// covers whose image failed to load fall back to the placeholder instead of showing alt text
+const brokenCovers = reactive(new Set<string>())
+
 const columns: DataTableColumn[] = [
-  { prop: 'title', label: t('news.articleTitle'), minWidth: 280 },
+  { prop: 'cover', label: t('news.coverColumn'), width: 112, tooltip: false },
+  { prop: 'title', label: t('news.articleTitle'), minWidth: 260 },
   { prop: 'language', label: t('news.language'), width: 100 },
-  { prop: 'status', label: t('news.status'), width: 130 },
+  { prop: 'status', label: t('news.status'), width: 150 },
+  { prop: 'likeCount', label: t('news.likes'), width: 90 },
   { prop: 'commentCount', label: t('news.comments'), width: 110 },
   { prop: 'publishedAt', label: t('news.publishedAt'), width: 170 },
-  { prop: 'actions', label: t('common.actions'), width: 190, align: 'right' },
+  { prop: 'actions', label: t('common.actions'), width: 230, align: 'right', tooltip: false },
 ]
 
 function open(a: Article) {
   router.push(`/news/${a.id}`)
+}
+
+/** The editor opens straight into its reader preview. */
+function preview(a: Article) {
+  router.push({ path: `/news/${a.id}`, query: { preview: '1' } })
+}
+
+function onCommand(command: string, a: Article) {
+  if (command === 'publish') return void onPublish(a)
+  if (command === 'unpublish') return void onUnpublish(a)
+  if (command === 'delete') return void onDelete(a)
 }
 
 async function onPublish(a: Article) {
@@ -224,5 +293,27 @@ onMounted(load)
 .n-title__ref {
   font-size: 12px;
   color: var(--nad-ink-soft, #64748b);
+}
+.n-thumb {
+  display: block;
+  width: 88px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--el-fill-color-light);
+}
+.n-thumb--empty {
+  display: grid;
+  place-items: center;
+  color: var(--el-text-color-placeholder);
+  border: 1px dashed var(--el-border-color);
+}
+.n-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.n-danger {
+  color: var(--el-color-danger);
 }
 </style>

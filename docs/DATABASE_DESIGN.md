@@ -364,9 +364,26 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 | sub | PII column encryption (`passport_no`, `national_id`) + data residency | **OPEN** — SECURITY §6; needs security/legal input; not a Phase 2 blocker. |
 
 
-## News — EXISTING (V92 DDL, V93 menu/permissions)
+## News — EXISTING (V92 DDL, V93 menu/permissions, V95 public id + likes)
 
 - `nad_article` — `slug` unique; `status` `DRAFT|PUBLISHED|UNPUBLISHED`; `body_md` Markdown (image binaries stay in object storage, referenced by absolute media URL); `cover_media_id`; `published_at` set on first publish; `author_id` → `sys_user` (no FK, as elsewhere).
 - `nad_article_image` — images uploaded for an article body (`ON DELETE CASCADE` from the article).
 - `nad_article_comment` — self-referencing `parent_id` (threads of any depth); `status` `VISIBLE|DELETED` with `deleted_by` / `deleted_time`. Both FKs are `ON DELETE CASCADE`: a thread is owned by its article, and cascading through a `RESTRICT` parent FK made article deletion fail.
 - Decision (user, 2026-10-04): one language per article (`language` column), Markdown content, comments visible immediately.
+- **`nad_article.public_id` (V95)** — `char(36)`, `NOT NULL`, unique (`uk_nad_article_public_id`), server default `(uuid())`. The opaque identifier in staff URLs and `/api/staff/news/{id}` paths, so the guessable `1, 2, 3` sequence never leaves the service. `id` stays the surrogate primary key and the target of every foreign key. V95 adds the column nullable, backfills one UUID per existing row, then makes it `NOT NULL`; because the default lives in the database, an insert that names no `public_id` (older application code, a manual fix) still gets a unique one. Public pages keep addressing articles by `slug` (readable, SEO).
+- **`nad_article_like` (V95)** — `(article_id, user_id)` primary key, `create_time`; index on `user_id`; `article_id` → `nad_article` `ON DELETE CASCADE`. One like per reader per article; the composite key makes a repeated like a no-op (`insert ignore`) and indexes the per-article count.
+- **`nad_article_comment_like` (V95)** — the same shape keyed by `(comment_id, user_id)`, cascading from `nad_article_comment`. A comment's likes are removed with it.
+- `user_id` is a `sys_user` id with no foreign key, as for comment authors elsewhere in this domain. Like totals are counted with indexed sub-selects; a denormalised counter is a later optimisation if feeds grow.
+- Verified by `FlywayMigrationsIT` (backfill uniqueness, default for new rows, like uniqueness, cascades) against a real MySQL container.
+
+
+## Chat rework — EXISTING (V96)
+
+- `nad_conversation`: `direct_key` varchar(40) unique (`"<staffId>:<studentId>"`, DIRECT only), denormalised
+  `last_message_id`, `last_message_at`, `last_message_preview` (≤160), `last_sender_user_id`; index on `last_message_at`.
+  `conversation_type` gains `DIRECT`. Existing rows are backfilled and keep their type.
+- `nad_conversation_participant.last_delivered_message_id` (delivery pointer, next to `last_read_message_id`).
+- `nad_message_attachment`: `original_filename`, `content_type`, `byte_size` (so a listing never reads media rows).
+- `nad_message`: index `(sender_user_id, created_at)`. `nad_applicant`: index on `given_name` (student search).
+- `nad_user_presence(user_id PK → sys_user ON DELETE CASCADE, last_seen_at UTC)`.
+- Rollback: documented in the header of `V96__nad_chat_rework.sql`.
