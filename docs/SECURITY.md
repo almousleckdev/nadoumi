@@ -540,3 +540,13 @@ hands out `/api/public/avatars/{userId}/{signature}`, where the signature is an 
 is not an applicant photo, so user ids cannot be walked; otherwise it redirects (60 s cache) to a short-lived signed
 media URL, and each view is written to the media access log. A student's raw `sys_user.avatar` is still ignored.
 Staff photos remain public `STAFF_AVATAR` assets (absolute https URLs only).
+
+## Destructive staff actions (EXISTING, 2026-10-09, V98)
+
+| Action | Permission | Default holders | Guard |
+| --- | --- | --- | --- |
+| Delete a student account | `nad:student:delete` | super admin | Soft delete and anonymise; sessions and grants revoked. Refused while the student has any application. Each module takes part through `StudentRemovalParticipant`, so identity never reads application tables. Audited by `@Log`. |
+| Delete a support ticket and its chat | `nad:support:ticket:delete` | super admin | Removes the ticket, events, meetings and chat. A support chat cannot be deleted from Conversations. |
+
+Both are separate from the edit and manage permissions on purpose: holding `nad:support:ticket:manage` or
+`system:user:edit` never allows a delete.

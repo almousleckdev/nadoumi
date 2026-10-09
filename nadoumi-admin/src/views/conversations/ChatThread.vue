@@ -57,6 +57,7 @@
           {{ t('conversations.close') }}
         </el-button>
         <el-button
+          v-if="conversation.conversationType !== SUPPORT_TYPE"
           size="small"
           type="danger"
           plain
@@ -266,6 +267,9 @@ import ChatAvatar from './ChatAvatar.vue'
 import ChatBubble from './ChatBubble.vue'
 import ChatComposer from './ChatComposer.vue'
 import ImageLightbox from './ImageLightbox.vue'
+
+// A ticket's chat belongs to Support: it is deleted there, together with the ticket.
+const SUPPORT_TYPE = 'SUPPORT'
 
 /**
  * The open conversation: header with presence, the message list (date dividers, older history on scroll, a

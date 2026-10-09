@@ -211,7 +211,7 @@ public class WorkflowService {
 
         if (isSubmit) {
             snapshots.writeSubmitSnapshots(application.getId(), application.getApplicantId());
-            emitter.submitted(applicationMapper.findById(application.getId()));
+            emitter.submitted(applicationMapper.findById(application.getId()), actorUserId);
         }
         else {
             emitter.statusChanged(applicationMapper.findById(application.getId()), toStage.getStatusLabel());

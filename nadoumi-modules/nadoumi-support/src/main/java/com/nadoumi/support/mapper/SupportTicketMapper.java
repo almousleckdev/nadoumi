@@ -27,6 +27,8 @@ public interface SupportTicketMapper {
     int updateStatus(@Param("id") long id, @Param("expected") String expected, @Param("status") String status,
             @Param("updateBy") String updateBy);
 
+    int deleteById(@Param("id") long id);
+
     int updateAssignee(@Param("id") long id, @Param("assigneeId") Long assigneeId, @Param("updateBy") String updateBy);
 
     int updatePriority(@Param("id") long id, @Param("priority") String priority, @Param("updateBy") String updateBy);

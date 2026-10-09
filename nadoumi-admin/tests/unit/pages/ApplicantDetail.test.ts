@@ -5,10 +5,10 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import { mountOpts } from '../../helpers'
 
-const api = vi.hoisted(() => ({ getApplicant: vi.fn() }))
+const api = vi.hoisted(() => ({ getApplicant: vi.fn(), listAccess: vi.fn(), deleteStudentAccount: vi.fn() }))
 vi.mock('@/api/applicant', () => api)
 
-const system = vi.hoisted(() => ({ changeUserStatus: vi.fn() }))
+const system = vi.hoisted(() => ({ changeUserStatus: vi.fn(), getUser: vi.fn() }))
 vi.mock('@/api/system', () => system)
 
 import ApplicantDetail from '@/views/applicants/detail.vue'
@@ -51,7 +51,9 @@ describe('Applicant detail', () => {
     setActivePinia(createPinia())
     useUserStore().permissions = ['*:*:*']
     api.getApplicant.mockReset().mockResolvedValue(applicant)
+    api.listAccess.mockReset().mockResolvedValue([])
     system.changeUserStatus.mockReset()
+    system.getUser.mockReset()
   })
 
   it('shows the applicant and the tabs, including test scores', async () => {
@@ -60,12 +62,10 @@ describe('Applicant detail', () => {
     for (const label of ['Overview', 'Education', 'Test scores', 'Contacts']) expect(w.text()).toContain(label)
   })
 
-  it('never offers to suspend or block a user account from an applicant page', async () => {
+  it('shows no account section for an applicant that has no student account', async () => {
     const w = await mountDetail()
-    const labels = w.findAll('button').map(b => b.text())
-    expect(labels).not.toContain('Suspend')
-    expect(labels).not.toContain('Block')
-    expect(system.changeUserStatus).not.toHaveBeenCalled()
+    expect(w.find('[data-test="account-panel"]').exists()).toBe(false)
+    expect(system.getUser).not.toHaveBeenCalled()
   })
 
   it('lets the overview edit only when the caller may edit applicants', async () => {

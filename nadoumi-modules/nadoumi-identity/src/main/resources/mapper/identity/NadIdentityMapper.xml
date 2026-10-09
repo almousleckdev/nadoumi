@@ -35,4 +35,13 @@
     <update id="touchPwdUpdateDate">
         update sys_user set pwd_update_date = now() where user_id = #{userId}
     </update>
+
+    <update id="softDeleteStudent">
+        update sys_user
+           set del_flag = '2', status = '1',
+               user_name = concat('deleted_', user_id), nick_name = 'Deleted student',
+               email = '', phonenumber = '', avatar = '',
+               update_by = #{updateBy}, update_time = now()
+         where user_id = #{userId} and user_type = '10' and del_flag = '0'
+    </update>
 </mapper>

@@ -40,8 +40,7 @@ class OutboxToNotificationDispatcherTest {
     }
 
     @Test
-    void universityPublished_notifiesStaffAudienceAndEveryActiveStudent() {
-        when(audience.findStaffUserIdsWithPermission("nad:notification:list")).thenReturn(List.of(1L));
+    void universityPublished_notifiesActiveStudentsOnlyAndNeverStaff() {
         when(audience.findActiveStudentUserIds()).thenReturn(List.of(10L, 11L));
         when(renderer.render(eq(NotificationType.UNIVERSITY_PUBLISHED), eq(NotificationChannelKind.IN_APP),
                 anyString(), any())).thenReturn(new NotificationRenderer.Rendered(null, "New university"));
@@ -49,14 +48,33 @@ class OutboxToNotificationDispatcherTest {
         dispatcher.dispatch(event(OutboxEventTypes.UNIVERSITY_PUBLISHED,
                 "{\"universityId\":7,\"universityName\":\"Fudan\",\"country\":\"CN\",\"universitySlug\":\"fudan\"}"));
 
-        // one staff + two students, fanned out in a single batch call
+        // two students, fanned out in a single batch call; the publishing staff are not told
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
         verify(notificationService).createBatch(batch.capture());
         assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
-                .containsExactlyInAnyOrder(1L, 10L, 11L);
+                .containsExactlyInAnyOrder(10L, 11L);
         assertThat(batch.getValue()).extracting(NotificationRequest::sourceRef)
                 .allMatch(ref -> ref.startsWith("outbox:42:"));
+        verify(audience, never()).findStaffUserIdsWithPermission(anyString());
+    }
+
+    @Test
+    void applicationReceived_tellsTheStaffQueueButNotTheSubmitter() {
+        when(audience.findStaffUserIdsWithPermission("nad:application:list")).thenReturn(List.of(3L, 4L, 9L));
+        when(renderer.render(eq(NotificationType.APPLICATION_RECEIVED), eq(NotificationChannelKind.IN_APP),
+                anyString(), any())).thenReturn(new NotificationRenderer.Rendered(null, "New application"));
+
+        dispatcher.dispatch(event(OutboxEventTypes.APPLICATION_RECEIVED,
+                "{\"applicationRef\":\"APP-5\",\"opportunityTitle\":\"MBA\","
+                        + "\"audiencePermission\":\"nad:application:list\",\"actorUserId\":9}"));
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<NotificationRequest>> batch = ArgumentCaptor.forClass(List.class);
+        verify(notificationService).createBatch(batch.capture());
+        assertThat(batch.getValue()).extracting(NotificationRequest::recipientUserId)
+                .containsExactlyInAnyOrder(3L, 4L);
+        verify(audience, never()).findActiveStudentUserIds();
     }
 
     @Test

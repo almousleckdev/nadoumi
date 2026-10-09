@@ -269,3 +269,7 @@ export const getPassportStatus = (id: number | string) =>
 /** Short-lived signed URL of the passport scan; absent (404) when no scan was uploaded. */
 export const getPassportScanUrl = (id: number | string) =>
   request.get<unknown, ApplicantPhotoUrl>(`${BASE}/${id}/passport/scan`, { params: { json: 1 }, silent: true } as object)
+
+/** Deletes a student account (soft delete). Refused by the server while the student has applications. */
+export const deleteStudentAccount = (userId: number) =>
+  request.delete(`/api/staff/students/${userId}`)

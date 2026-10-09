@@ -8,6 +8,9 @@ public interface ApplicationMapper {
 
     Application findById(Long id);
 
+    /** How many applications exist for any of these applicants (any status, drafts included). */
+    int countByApplicantIds(@Param("applicantIds") List<Long> applicantIds);
+
     List<Application> searchStaff(ApplicationSearch filter);
 
     /** All applications for one applicant, newest first — the student "my applications" list. */

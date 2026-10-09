@@ -33,6 +33,12 @@ public interface UserApplicantAccessMapper {
 
     List<Long> accessibleApplicantIds(@Param("userId") Long userId);
 
+    /** Owner ids of the applicants this user owns right now. */
+    List<Long> ownedApplicantIds(@Param("userId") Long userId);
+
+    /** Revokes every live grant a user holds (account deletion). Rows are kept for the audit trail. */
+    int revokeAllForUser(@Param("userId") Long userId, @Param("revokedBy") Long revokedBy, @Param("updateBy") String updateBy);
+
     int insert(UserApplicantAccess grant);
 
     int update(UserApplicantAccess grant);

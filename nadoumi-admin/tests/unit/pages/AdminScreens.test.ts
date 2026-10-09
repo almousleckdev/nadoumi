@@ -40,7 +40,6 @@ const router = createRouter({
   history: createMemoryHistory(),
   routes: [
     { path: '/staff', component: { template: '<div />' }, meta: { userType: '00' } },
-    { path: '/students', component: { template: '<div />' }, meta: { userType: '10' } },
     { path: '/:x(.*)*', component: { template: '<div />' } },
   ],
 })

@@ -11,6 +11,7 @@ import com.nadoumi.support.domain.SupportTicket;
 import com.nadoumi.support.domain.enums.TicketCategory;
 import com.nadoumi.support.domain.enums.TicketPriority;
 import com.nadoumi.support.domain.enums.TicketStatus;
+import com.nadoumi.support.mapper.SupportMeetingMapper;
 import com.nadoumi.support.mapper.SupportTicketEventMapper;
 import com.nadoumi.support.mapper.SupportTicketMapper;
 import com.nadoumi.support.web.response.StaffTicketDetail;
@@ -19,6 +20,8 @@ import com.nadoumi.support.web.response.TicketEventResponse;
 import com.ruoyi.framework.web.service.PermissionService;
 import java.util.Comparator;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,22 +36,27 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StaffSupportTicketService {
 
+    private static final Logger log = LoggerFactory.getLogger(StaffSupportTicketService.class);
+
     static final String PERM_VIEW = "nad:support:ticket:view";
     static final String PERM_MANAGE = "nad:support:ticket:manage";
     static final String PERM_ASSIGN = "nad:support:ticket:assign";
+    static final String PERM_DELETE = "nad:support:ticket:delete";
 
     private final SupportTicketMapper tickets;
     private final SupportTicketEventMapper events;
+    private final SupportMeetingMapper meetings;
     private final TicketWorkflow workflow;
     private final ConversationService conversations;
     private final CurrentCaller caller;
     private final PermissionService rbac;
 
     public StaffSupportTicketService(SupportTicketMapper tickets, SupportTicketEventMapper events,
-            TicketWorkflow workflow, ConversationService conversations, CurrentCaller caller,
+            SupportMeetingMapper meetings, TicketWorkflow workflow, ConversationService conversations, CurrentCaller caller,
             PermissionService rbac) {
         this.tickets = tickets;
         this.events = events;
+        this.meetings = meetings;
         this.workflow = workflow;
         this.conversations = conversations;
         this.caller = caller;
@@ -125,6 +133,20 @@ public class StaffSupportTicketService {
             workflow.changeStatus(ticket, TicketStatus.IN_PROGRESS, userId);
         }
         return posted;
+    }
+
+    /**
+     * Permanently deletes a ticket with its events, meetings and chat. The ticket row goes first because it
+     * holds the foreign key to the conversation.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(long id) {
+        requirePermission(PERM_DELETE);
+        SupportTicket ticket = find(id);
+        meetings.deleteByTicketId(id);
+        tickets.deleteById(id);
+        conversations.deleteSupportConversation(ticket.getConversationId());
+        log.info("support ticket {} deleted by user {}", id, caller.requireUserId());
     }
 
     private SupportTicket find(long id) {

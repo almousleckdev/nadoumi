@@ -47,6 +47,12 @@ public final class OutboxEventTypes {
      */
     public static final String APPLICATION_STATUS_CHANGED = "ApplicationStatusChanged";
 
+    /**
+     * A student's application reached the staff queue. Aggregate: {@code application}. Audience: staff holding
+     * the application list permission, minus the person who submitted it.
+     */
+    public static final String APPLICATION_RECEIVED = "ApplicationReceived";
+
     /** A message was posted to a conversation. Aggregate: {@code conversation}. */
     public static final String MESSAGE_POSTED = "MessagePosted";
 

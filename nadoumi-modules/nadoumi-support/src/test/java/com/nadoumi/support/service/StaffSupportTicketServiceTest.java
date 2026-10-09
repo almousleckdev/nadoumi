@@ -21,6 +21,7 @@ import com.nadoumi.support.domain.SupportTicket;
 import com.nadoumi.support.domain.enums.TicketCategory;
 import com.nadoumi.support.domain.enums.TicketPriority;
 import com.nadoumi.support.domain.enums.TicketStatus;
+import com.nadoumi.support.mapper.SupportMeetingMapper;
 import com.nadoumi.support.mapper.SupportTicketEventMapper;
 import com.nadoumi.support.mapper.SupportTicketMapper;
 import com.ruoyi.framework.web.service.PermissionService;
@@ -36,12 +37,13 @@ class StaffSupportTicketServiceTest {
 
     private final SupportTicketMapper tickets = mock(SupportTicketMapper.class);
     private final SupportTicketEventMapper events = mock(SupportTicketEventMapper.class);
+    private final SupportMeetingMapper meetings = mock(SupportMeetingMapper.class);
     private final TicketWorkflow workflow = mock(TicketWorkflow.class);
     private final ConversationService conversations = mock(ConversationService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final PermissionService rbac = mock(PermissionService.class);
     private final StaffSupportTicketService service =
-            new StaffSupportTicketService(tickets, events, workflow, conversations, caller, rbac);
+            new StaffSupportTicketService(tickets, events, meetings, workflow, conversations, caller, rbac);
 
     private void asStaffWith(String... permissions) {
         when(caller.isStaff()).thenReturn(true);
@@ -66,6 +68,39 @@ class StaffSupportTicketServiceTest {
 
     private static MessageResponse message() {
         return new MessageResponse(1, 9L, ME, "Agent", "hi", LocalDateTime.now(), null, List.of());
+    }
+
+    // ---- deleting a ticket ----
+
+    @Test
+    void shouldDeleteTicketThenItsChat_whenStaffMayDelete() {
+        asStaffWith("nad:support:ticket:delete");
+        when(tickets.findById(7L)).thenReturn(ticket(TicketStatus.OPEN, null));
+
+        service.delete(7L);
+
+        org.mockito.InOrder order = org.mockito.Mockito.inOrder(meetings, tickets, conversations);
+        order.verify(meetings).deleteByTicketId(7L);
+        order.verify(tickets).deleteById(7L);
+        order.verify(conversations).deleteSupportConversation(9L);
+    }
+
+    @Test
+    void shouldRefuseDelete_whenStaffOnlyManagesTickets() {
+        asStaffWith("nad:support:ticket:view", "nad:support:ticket:manage");
+
+        assertThatThrownBy(() -> service.delete(7L)).isInstanceOf(AccessDeniedException.class);
+        verify(tickets, never()).deleteById(anyLong());
+        verify(conversations, never()).deleteSupportConversation(anyLong());
+    }
+
+    @Test
+    void shouldReportNotFound_whenDeletingAMissingTicket() {
+        asStaffWith("nad:support:ticket:delete");
+        when(tickets.findById(7L)).thenReturn(null);
+
+        assertThatThrownBy(() -> service.delete(7L)).isInstanceOf(NadNotFoundException.class);
+        verify(conversations, never()).deleteSupportConversation(anyLong());
     }
 
     // ---- required security tests: permission gates ----

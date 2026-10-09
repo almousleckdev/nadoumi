@@ -388,6 +388,11 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - `nad_user_presence(user_id PK → sys_user ON DELETE CASCADE, last_seen_at UTC)`.
 - Rollback: documented in the header of `V96__nad_chat_rework.sql`.
 
+- **V98** notification audience cleanup and two destructive permissions. Catalog and news announcements
+  (`SCHOLARSHIP_PUBLISHED`, `UNIVERSITY_PUBLISHED`, `PROGRAM_PUBLISHED`, `ARTICLE_PUBLISHED`) are student-only and in-app
+  only: their EMAIL templates are deleted, queued EMAIL deliveries are marked `FAILED`, and notification rows the old
+  broadcast created for staff are removed. Adds the `APPLICATION_RECEIVED` IN_APP template and the menu buttons
+  `nad:support:ticket:delete` and `nad:student:delete` (role 3 only). Manual rollback is in the file header.
 - **V97** widens `sys_user.avatar` from RuoYi's `varchar(100)` to `varchar(512)`. A staff photo is stored as its
   Cloudinary delivery URL, which is longer than 100 characters, so saving a staff photo failed ("Data too long") and
   staff pictures never appeared in chat or on News. Rollback is in the migration header.
