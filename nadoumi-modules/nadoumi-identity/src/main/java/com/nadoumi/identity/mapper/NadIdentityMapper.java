@@ -30,6 +30,13 @@ public interface NadIdentityMapper {
     /** The sign-in email of a live student account, or null. */
     String selectStudentEmail(@Param("userId") Long userId);
 
+    int removeStudentRoles(@Param("userId") Long userId);
+
+    int removeStudentPosts(@Param("userId") Long userId);
+
+    /** Removes the account row itself. Fails on a foreign key while other rows still point at the user. */
+    int removeStudentRow(@Param("userId") Long userId);
+
     /**
      * Soft-deletes a student account and frees its sign-in identifiers so they can be registered again.
      * Returns 0 when the user is not a live student.

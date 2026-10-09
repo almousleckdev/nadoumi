@@ -36,6 +36,18 @@
         update sys_user set pwd_update_date = now() where user_id = #{userId}
     </update>
 
+    <delete id="removeStudentRoles">
+        delete from sys_user_role where user_id = #{userId}
+    </delete>
+
+    <delete id="removeStudentPosts">
+        delete from sys_user_post where user_id = #{userId}
+    </delete>
+
+    <delete id="removeStudentRow">
+        delete from sys_user where user_id = #{userId} and user_type = '10'
+    </delete>
+
     <update id="softDeleteStudent">
         update sys_user
            set del_flag = '2', status = '1',

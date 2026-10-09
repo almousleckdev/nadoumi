@@ -60,7 +60,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
             assertThat(count(table, "applicant_id", applicant)).as(table).isZero();
         }
         assertThat(count("nad_applicant", "id", applicant)).isZero();
-        assertThat(jdbc.queryForObject("select del_flag from sys_user where user_id = ?", String.class, userId)).isEqualTo("2");
+        assertThat(count("sys_user", "user_id", userId)).as("the account row is gone, not kept").isZero();
         mvc.perform(get("/api/student/applicants").header("Authorization", bearer(s.token())))
                 .andExpect(jsonPath("$.code").value(401)); // RuoYi renders a rejected call as 200 with the code in the body
         mvc.perform(post("/api/student/login").contentType(MediaType.APPLICATION_JSON)
@@ -94,7 +94,7 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
 
         assertThat(jdbc.queryForObject("select count(*) from sys_user where email = ? and del_flag = '0'", Integer.class, s.email()))
                 .isZero();
-        assertThat(jdbc.queryForObject("select email from sys_user where user_id = ?", String.class, userId)).isEmpty();
+        assertThat(count("sys_user", "user_id", userId)).isZero();
     }
 
     @Test
@@ -155,5 +155,33 @@ class ApplicantErasureTest extends AbstractStudentIntegrationTest {
         assertThat(count("nad_conversation_participant", "user_id", userId)).isZero();
         assertThat(jdbc.queryForObject("select count(*) from nad_conversation", Long.class)).isZero();
         assertThat(count("nad_notification", "recipient_user_id", userId)).isZero();
+    }
+
+    @Test
+    void shouldLetTheSameStudentRegisterAgainWithTheSameUsernameAndEmail_afterTheyWereDeleted() throws Exception {
+        String email = uniqueEmail();
+        String username = usernameFor("again", "same");
+        String ticket = ticketFor(email);
+        mvc.perform(post("/api/student/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\",\"email\":\"" + email + "\",\"password\":\""
+                                + STRONG_PASSWORD + "\",\"ticket\":\"" + ticket + "\"}"))
+                .andExpect(status().isCreated());
+        long applicantId = jdbc.queryForObject(
+                "select a.id from nad_applicant a join sys_user u on u.user_id = a.create_by where u.email = ?", Long.class, email);
+        createStaff("era_admin6", "nadoumi_super_admin");
+
+        mvc.perform(delete("/api/staff/applicants/" + pid(applicantId)).header("Authorization", bearer(staffToken("era_admin6"))))
+                .andExpect(status().isNoContent());
+
+        mvc.perform(get("/api/student/username-available").param("username", username))
+                .andExpect(jsonPath("$.available").value(true));
+        assertThat(jdbc.queryForObject("select count(*) from sys_user where email = ? and del_flag = '0'", Integer.class, email))
+                .isZero();
+        String newEmail = uniqueEmail(); // the 60 s resend cooldown applies per address, so use a new one for the code
+        String again = ticketFor(newEmail);
+        mvc.perform(post("/api/student/register").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"" + username + "\",\"email\":\"" + newEmail + "\",\"password\":\""
+                                + STRONG_PASSWORD + "\",\"ticket\":\"" + again + "\"}"))
+                .andExpect(status().isCreated());
     }
 }

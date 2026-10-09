@@ -545,7 +545,7 @@ Staff photos remain public `STAFF_AVATAR` assets (absolute https URLs only).
 
 | Action | Permission | Default holders | Guard |
 | --- | --- | --- | --- |
-| Permanently delete an applicant | `nad:applicant:delete` | super admin | Removes the applicant, applications, documents and files, and soft-deletes a student login left without an applicant. Each module deletes its own data through `ApplicantErasureParticipant`, so no module reads another's tables. Audited by `@Log`. |
+| Permanently delete an applicant | `nad:applicant:delete` | super admin | Removes the applicant, applications, documents and files, and deletes a student login left without an applicant (an anonymised shell only if a foreign key still references it). Each module deletes its own data through `ApplicantErasureParticipant`, so no module reads another's tables. Audited by `@Log`. |
 | Delete a support ticket and its chat | `nad:support:ticket:delete` | super admin | Removes the ticket, events, meetings and chat. A support chat cannot be deleted from Conversations. |
 | Suspend or block an account (student or staff) | `system:user:edit` | per role | A written reason of 5 to 255 characters is required and stored in `sys_user.status_reason`; activation clears it. Sessions end at once. |
 
