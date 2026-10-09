@@ -86,9 +86,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V97 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V98 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(88);
+        assertThat(applied).isEqualTo(89);
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
         assertThat(single(ds, "SELECT character_maximum_length FROM information_schema.columns WHERE table_schema = DATABASE() "
@@ -256,7 +256,8 @@ class FlywayMigrationsIT {
         // APPLICATION_SUBMITTED, APPLICATION_STATUS_CHANGED, each IN_APP + EMAIL)
         // + 1 from V83 (MESSAGE_POSTED) + 3 from V89 (TICKET_OPENED/ASSIGNED/STATUS_CHANGED)
         // + 2 from V94 (ARTICLE_PUBLISHED, IN_APP + EMAIL)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("24");
+        // - 4 from V98 (EMAIL templates of the four student-only announcements) + 1 (APPLICATION_RECEIVED IN_APP)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("21");
         // V34 — notification dispatch Quartz job, seeded active
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");
@@ -345,9 +346,9 @@ class FlywayMigrationsIT {
                 + "WHERE r.role_key = 'staff' AND m.perms IN "
                 + "('nad:applicant:list','nad:university:list','nad:university:create','nad:university:edit',"
                 + "'nad:program:create','nad:scholarship:create','system:user:list','system:dept:list')")).isEqualTo("8");
-        // V51 — catalog-published notification templates
+        // V51 — catalog-published notification templates (V98 dropped their EMAIL rows: in-app only)
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template "
-                + "WHERE type IN ('UNIVERSITY_PUBLISHED','PROGRAM_PUBLISHED')")).isEqualTo("4");
+                + "WHERE type IN ('UNIVERSITY_PUBLISHED','PROGRAM_PUBLISHED')")).isEqualTo("2");
         // V52 — public Partners showcase flag (separate from the confidential partner_status)
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'nad_university' AND column_name = 'public_partner'")).isEqualTo("1");
@@ -403,7 +404,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(87); // V2..V97, same gaps as above
+        assertThat(applied).isEqualTo(88); // V2..V98, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

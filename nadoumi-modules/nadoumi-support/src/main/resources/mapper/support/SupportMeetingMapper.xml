@@ -56,4 +56,8 @@
         where id = #{id}
     </update>
 
+
+    <delete id="deleteByTicketId">
+        delete from nad_support_meeting where ticket_id = #{ticketId}
+    </delete>
 </mapper>

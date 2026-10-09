@@ -39,7 +39,7 @@ describe('Sidebar', () => {
     expect(hrefs.sort()).toEqual([
       '/applicants', '/applications', '/audit', '/config', '/conversations', '/dashboard', '/departments', '/dict',
       '/employees', '/expenses', '/finance', '/jobs', '/loginlog', '/menus', '/news', '/notifications', '/payroll', '/posts',
-      '/programs', '/revenue', '/roles', '/scholarships', '/students', '/support', '/tasks', '/universities',
+      '/programs', '/revenue', '/roles', '/scholarships', '/support', '/tasks', '/universities',
     ])
     expect(w.text()).not.toMatch(/planned/i)
     expect(w.text()).not.toContain('Payments')

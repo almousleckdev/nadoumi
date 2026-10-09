@@ -11,10 +11,11 @@ import com.nadoumi.notification.render.NotificationRenderer;
 import com.nadoumi.notification.service.NotificationRequest;
 import com.nadoumi.notification.service.NotificationService;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,15 +25,19 @@ import org.slf4j.LoggerFactory;
  * poller's at-least-once redelivery is a no-op the second time.
  *
  * <p>Strict scope isolation: {@link NotificationScope#TARGETED} notifications
- * MUST have explicit recipient(s) and NEVER broadcast. Only {@link NotificationScope#GLOBAL}
- * public catalog announcements reach staff and students, and {@link NotificationScope#STUDENTS}
- * announcements (news) reach active students only.</p>
+ * MUST have explicit recipient(s) and NEVER broadcast. {@link NotificationScope#STUDENTS}
+ * announcements (catalog, news) reach active students only, never staff. A payload may name an
+ * {@code actorUserId}, who is always removed from the audience: nobody is notified about what they did.</p>
  */
 public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 
     private static final Logger log = LoggerFactory.getLogger(OutboxToNotificationDispatcher.class);
 
     private static final String AUDIENCE_PERMISSION = "nad:notification:list";
+
+    /** Targeted types whose audience is "staff who can work this queue", resolved by permission. */
+    private static final Set<NotificationType> STAFF_QUEUE_TYPES = EnumSet.of(
+            NotificationType.CONTACT_INQUIRY_RECEIVED, NotificationType.TICKET_OPENED, NotificationType.APPLICATION_RECEIVED);
 
     private final NotificationService notificationService;
     private final NotificationRenderer renderer;
@@ -66,22 +71,21 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
         if (recipients == null || recipients.isEmpty()) {
             if (type.scope() == NotificationScope.TARGETED) {
                 // If it's a contact inquiry or ticket opened without explicit assignees, resolve authorized staff
-                if (type == NotificationType.CONTACT_INQUIRY_RECEIVED || type == NotificationType.TICKET_OPENED) {
+                if (STAFF_QUEUE_TYPES.contains(type)) {
                     recipients = new ArrayList<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
                 } else {
                     log.warn("outbox event id={} type={} is TARGETED but has no recipient user ID — skipped to prevent leakage",
                             event.getId(), type);
                     return;
                 }
-            } else if (type.scope() == NotificationScope.STUDENTS) {
-                recipients = audienceMapper.findActiveStudentUserIds();
             } else {
-                // GLOBAL catalog announcement: staff holding catalog permission + active registered students
-                LinkedHashSet<Long> set =
-                        new LinkedHashSet<>(audienceMapper.findStaffUserIdsWithPermission(audiencePermission(context)));
-                set.addAll(audienceMapper.findActiveStudentUserIds());
-                recipients = new ArrayList<>(set);
+                recipients = audienceMapper.findActiveStudentUserIds();
             }
+        }
+        Long actorUserId = longFromPayload(context, "actorUserId");
+        if (actorUserId != null) {
+            recipients = new ArrayList<>(recipients);
+            recipients.remove(actorUserId);
         }
         if (recipients.isEmpty()) {
             log.warn("outbox event id={} type={} resolved to empty recipients",
@@ -116,6 +120,7 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             case OutboxEventTypes.TASK_PROGRESS_CHANGED -> NotificationType.TASK_PROGRESS;
             case OutboxEventTypes.APPLICATION_SUBMITTED -> NotificationType.APPLICATION_SUBMITTED;
             case OutboxEventTypes.APPLICATION_STATUS_CHANGED -> NotificationType.APPLICATION_STATUS_CHANGED;
+            case OutboxEventTypes.APPLICATION_RECEIVED -> NotificationType.APPLICATION_RECEIVED;
             case OutboxEventTypes.MESSAGE_POSTED -> NotificationType.MESSAGE_POSTED;
             case OutboxEventTypes.TICKET_OPENED -> NotificationType.TICKET_OPENED;
             case OutboxEventTypes.TICKET_ASSIGNED -> NotificationType.TICKET_ASSIGNED;

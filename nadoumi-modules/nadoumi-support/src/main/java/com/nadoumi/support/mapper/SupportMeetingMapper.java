@@ -23,5 +23,7 @@ public interface SupportMeetingMapper {
                                         @Param("start") LocalDateTime start,
                                         @Param("end") LocalDateTime end);
     
+    int deleteByTicketId(@Param("ticketId") long ticketId);
+
     int updateStatus(@Param("id") long id, @Param("status") String status, @Param("updateBy") String updateBy);
 }

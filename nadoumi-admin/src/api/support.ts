@@ -77,6 +77,9 @@ export const changeTicketCategory = (id: number, category: TicketCategory) =>
 export const replyToTicket = (id: number, body: string) =>
   request.post<unknown, TicketMessage>(`${base}/${id}/messages`, { body })
 
+// needs nad:support:ticket:delete; removes the ticket together with its chat
+export const deleteTicket = (id: number) => request.delete<unknown, undefined>(`${base}/${id}`)
+
 // needs nad:support:ticket:assign
 export const assignTicket = (id: number, assigneeUserId: number) =>
   request.patch<unknown, StaffTicketSummary>(`${base}/${id}/assign`, { assigneeUserId })

@@ -11,7 +11,10 @@ const api = vi.hoisted(() => ({
   changeTicketCategory: vi.fn(),
   assignTicket: vi.fn(),
   replyToTicket: vi.fn(),
+  deleteTicket: vi.fn(),
 }))
+const confirmAnswer = vi.hoisted(() => ({ value: true }))
+vi.mock('@/composables/useConfirm', () => ({ useConfirm: () => ({ confirm: vi.fn(async () => confirmAnswer.value) }) }))
 vi.mock('@/api/support', async (orig) => ({ ...(await orig<typeof import('@/api/support')>()), ...api }))
 vi.mock('@/api/system', async (orig) => ({
   ...(await orig<typeof import('@/api/system')>()),
@@ -47,6 +50,8 @@ beforeEach(() => {
   api.changeTicketStatus.mockResolvedValue(ticket({ status: 'IN_PROGRESS' }))
   api.replyToTicket.mockResolvedValue({})
   api.assignTicket.mockResolvedValue(ticket({ assignedStaffId: 7 }))
+  api.deleteTicket.mockResolvedValue(undefined)
+  confirmAnswer.value = true
 })
 
 describe('Support tickets queue', () => {
@@ -180,5 +185,45 @@ describe('Support ticket drawer', () => {
     await flushPromises()
     expect(document.body.querySelector('[data-test="priority-select"]')).not.toBeNull()
     expect(document.body.querySelector('[data-test="assign-select"]')).toBeNull()
+  })
+})
+
+describe('Deleting a ticket', () => {
+  const deleteButton = () => document.body.querySelector('[data-test="delete-ticket"]') as HTMLButtonElement | null
+
+  it('deletes the ticket after a confirmation, then closes the drawer and refreshes the queue', async () => {
+    const w = mountDrawer()
+    await flushPromises()
+    deleteButton()!.click()
+    await flushPromises()
+    expect(api.deleteTicket).toHaveBeenCalledWith(5)
+    expect(w.emitted('update:modelValue')?.[0]).toEqual([false])
+    expect(w.emitted('changed')).toHaveLength(1)
+  })
+
+  it('keeps the ticket when the confirmation is declined', async () => {
+    confirmAnswer.value = false
+    const w = mountDrawer()
+    await flushPromises()
+    deleteButton()!.click()
+    await flushPromises()
+    expect(api.deleteTicket).not.toHaveBeenCalled()
+    expect(w.emitted('changed')).toBeUndefined()
+  })
+
+  it('keeps the drawer open when the server refuses', async () => {
+    api.deleteTicket.mockRejectedValue(new Error('missing nad:support:ticket:delete'))
+    const w = mountDrawer()
+    await flushPromises()
+    deleteButton()!.click()
+    await flushPromises()
+    expect(w.emitted('update:modelValue')).toBeUndefined()
+  })
+
+  it('offers no delete without the delete permission', async () => {
+    useUserStore().permissions = ['nad:support:ticket:view', 'nad:support:ticket:manage']
+    mountDrawer()
+    await flushPromises()
+    expect(deleteButton()).toBeNull()
   })
 })

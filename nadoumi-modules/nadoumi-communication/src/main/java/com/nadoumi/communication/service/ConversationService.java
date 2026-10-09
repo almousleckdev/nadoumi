@@ -213,7 +213,28 @@ public class ConversationService {
         long userId = caller.requireUserId();
         Conversation conversation = guard.requireActiveParticipant(conversationId, userId);
         if (conversation.getConversationType() == ConversationType.SUPPORT) {
-            throw new NadBadRequestException("a support ticket's chat cannot be deleted here");
+            throw new NadBadRequestException("This chat belongs to a support ticket. Delete the ticket from Support instead.");
+        }
+        List<Long> participantIds = participants.listActiveForConversation(conversationId).stream()
+                .map(ConversationParticipant::getUserId).toList();
+        List<Long> mediaIds = attachmentRows.listMediaIdsByConversation(conversationId);
+        conversations.deleteById(conversationId);
+        mediaIds.forEach(id -> attachmentService.release(id, userId));
+        events.conversationRemoved(conversationId, userId, participantIds);
+    }
+
+    /**
+     * Removes the chat behind a support ticket. Called only by the support module once it has checked the
+     * caller's ticket permission and deleted the ticket row that referenced this conversation, so no
+     * participant check applies here. Refuses anything that is not a SUPPORT conversation.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteSupportConversation(long conversationId) {
+        guard.requireStaff();
+        long userId = caller.requireUserId();
+        Conversation conversation = conversations.findById(conversationId);
+        if (conversation == null || conversation.getConversationType() != ConversationType.SUPPORT) {
+            throw new NadBadRequestException("not a support conversation");
         }
         List<Long> participantIds = participants.listActiveForConversation(conversationId).stream()
                 .map(ConversationParticipant::getUserId).toList();

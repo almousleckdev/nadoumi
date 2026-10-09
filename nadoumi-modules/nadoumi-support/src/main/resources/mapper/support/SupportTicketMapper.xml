@@ -87,4 +87,8 @@
         update nad_support_ticket set closed_at = #{closedAt}, update_by = #{updateBy}, update_time = now()
         where id = #{id}
     </update>
+
+    <delete id="deleteById">
+        delete from nad_support_ticket where id = #{id}
+    </delete>
 </mapper>

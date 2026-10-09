@@ -217,6 +217,14 @@ describe('the open conversation', () => {
 })
 
 describe('deleting a chat', () => {
+  it('offers no delete for a support ticket chat, which is deleted from Support', async () => {
+    api.listInbox.mockResolvedValue([conv(1, { conversationType: 'SUPPORT' })])
+    const w = await mountPage()
+    await openFirst(w)
+    expect(w.find('[data-test="peer-name"]').exists()).toBe(true)
+    expect(w.find('[data-test="delete-chat"]').exists()).toBe(false)
+  })
+
   it('goes back to the list with the back button', async () => {
     const w = await mountPage()
     await openFirst(w)

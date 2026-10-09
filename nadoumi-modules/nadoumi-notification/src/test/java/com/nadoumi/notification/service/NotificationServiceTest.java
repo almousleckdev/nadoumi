@@ -46,6 +46,10 @@ class NotificationServiceTest {
         return NotificationRequest.of(7L, NotificationType.SCHOLARSHIP_PUBLISHED, "t", "b");
     }
 
+    private static NotificationRequest deadlineReminder() {
+        return NotificationRequest.of(7L, NotificationType.SCHOLARSHIP_DEADLINE_REMINDER, "t", "b");
+    }
+
     private List<NotificationDelivery> capturedDeliveries(int expectedInserts) {
         ArgumentCaptor<NotificationDelivery> captor = ArgumentCaptor.forClass(NotificationDelivery.class);
         verify(deliveryMapper, times(expectedInserts)).insert(captor.capture());
@@ -75,9 +79,9 @@ class NotificationServiceTest {
 
     @Test
     void create_skipsEmail_whenPreferenceDisabled_forNonTransactionalType() {
-        when(preferenceMapper.findEnabled(7L, "SCHOLARSHIP_PUBLISHED", "EMAIL")).thenReturn(false);
+        when(preferenceMapper.findEnabled(7L, "SCHOLARSHIP_DEADLINE_REMINDER", "EMAIL")).thenReturn(false);
 
-        service.create(scholarshipPublished());
+        service.create(deadlineReminder());
 
         assertThat(capturedDeliveries(1))
                 .singleElement()
@@ -88,10 +92,19 @@ class NotificationServiceTest {
     void create_enqueuesEmail_whenNoPreferenceRow_forNonTransactionalType() {
         when(preferenceMapper.findEnabled(anyLong(), anyString(), anyString())).thenReturn(null);
 
-        service.create(scholarshipPublished());
+        service.create(deadlineReminder());
 
         assertThat(capturedDeliveries(2))
                 .anyMatch(d -> "EMAIL".equals(d.getChannel()) && "PENDING".equals(d.getStatus()));
+    }
+
+    @Test
+    void create_sendsNoEmail_forACatalogAnnouncement() {
+        service.create(scholarshipPublished());
+
+        assertThat(capturedDeliveries(1))
+                .singleElement()
+                .satisfies(d -> assertThat(d.getChannel()).isEqualTo("IN_APP"));
     }
 
     @Test

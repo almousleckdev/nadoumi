@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { statusChangeCopy, statusLabelKey, statusTone } from '@/views/students/studentStatus'
+import { statusChangeCopy, statusLabelKey, statusTone } from '@/views/applicants/studentStatus'
 
 describe('statusTone', () => {
   it('maps active, suspended and blocked accounts to badge tones', () => {

@@ -23,6 +23,7 @@ public class ApplicationOutboxEmitter {
 
     private static final Logger log = LoggerFactory.getLogger(ApplicationOutboxEmitter.class);
     private static final String FALLBACK_TITLE = "your application";
+    private static final String STAFF_QUEUE_PERMISSION = "nad:application:list";
 
     private final OutboxWriter outboxWriter;
     private final UserApplicantAccessService accessService;
@@ -37,8 +38,10 @@ public class ApplicationOutboxEmitter {
         this.scholarshipAdminService = scholarshipAdminService;
     }
 
-    public void submitted(Application application) {
+    /** Confirms to the applicant's users and tells the staff queue; the submitter is never told about their own action. */
+    public void submitted(Application application, long actorUserId) {
         emit(application, OutboxEventTypes.APPLICATION_SUBMITTED, null);
+        emitToStaffQueue(application, actorUserId);
     }
 
     public void statusChanged(Application application, String status) {
@@ -63,6 +66,16 @@ public class ApplicationOutboxEmitter {
         }
         payload.put("recipientUserIds", recipients);
         outboxWriter.write("application", application.getId(), outboxType, payload.toJSONString());
+    }
+
+    private void emitToStaffQueue(Application application, long actorUserId) {
+        JSONObject payload = new JSONObject();
+        payload.put("applicationRef", "APP-" + application.getId());
+        payload.put("opportunityTitle", opportunityTitle(application));
+        payload.put("applicationId", application.getId());
+        payload.put("audiencePermission", STAFF_QUEUE_PERMISSION);
+        payload.put("actorUserId", actorUserId);
+        outboxWriter.write("application", application.getId(), OutboxEventTypes.APPLICATION_RECEIVED, payload.toJSONString());
     }
 
     private String opportunityTitle(Application application) {

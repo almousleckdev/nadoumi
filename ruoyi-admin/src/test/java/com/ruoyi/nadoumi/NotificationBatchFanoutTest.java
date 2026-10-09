@@ -19,7 +19,7 @@ class NotificationBatchFanoutTest extends AbstractNadIntegrationTest {
 
     @Test
     void universityPublished_fansOutOncePerRecipient_andIsIdempotent() {
-        long staffId = createStaff("fan_staff", "ops_manager"); // holds nad:notification:list
+        long staffId = createStaff("fan_staff", "ops_manager"); // the publishing side: must not be told
         long s1 = createStudent("fan_s1");
         long s2 = createStudent("fan_s2");
 
@@ -33,8 +33,11 @@ class NotificationBatchFanoutTest extends AbstractNadIntegrationTest {
         outboxPollerJob.run();
 
         int after1 = countUniversityPublished();
-        // the three recipients I created each got exactly one row, IN_APP delivered
-        for (long uid : new long[] { staffId, s1, s2 }) {
+        assertThat(jdbc.queryForObject(
+                "select count(*) from nad_notification where recipient_user_id = ? and type = 'UNIVERSITY_PUBLISHED'",
+                Integer.class, staffId)).isZero();
+        // each student got exactly one row, IN_APP delivered and no email queued
+        for (long uid : new long[] { s1, s2 }) {
             assertThat(jdbc.queryForObject(
                     "select count(*) from nad_notification where recipient_user_id = ? and type = 'UNIVERSITY_PUBLISHED'",
                     Integer.class, uid)).isEqualTo(1);
@@ -42,6 +45,10 @@ class NotificationBatchFanoutTest extends AbstractNadIntegrationTest {
                     "select d.status from nad_notification_delivery d join nad_notification n on n.id = d.notification_id "
                             + "where n.recipient_user_id = ? and n.type = 'UNIVERSITY_PUBLISHED' and d.channel = 'IN_APP'",
                     String.class, uid)).isEqualTo("SENT");
+            assertThat(jdbc.queryForObject(
+                    "select count(*) from nad_notification_delivery d join nad_notification n on n.id = d.notification_id "
+                            + "where n.recipient_user_id = ? and n.type = 'UNIVERSITY_PUBLISHED' and d.channel = 'EMAIL'",
+                    Integer.class, uid)).isZero();
         }
 
         // redeliver the same event — the source_ref pre-filter must make it a no-op

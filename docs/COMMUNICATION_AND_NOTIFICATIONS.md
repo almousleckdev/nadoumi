@@ -26,7 +26,22 @@ Two separate concerns (CLAUDE.md §12): **Chat** (people ↔ people) vs **Notifi
 - Reusable: `AsyncManager` / `AsyncFactory` / `ThreadPoolConfig`; Redis (pub/sub
   available); Quartz (JDBC store to be enabled — Phase 2).
 
-### 1a. Notifications — EXISTING (Step 5, slices 1–3 + 5)
+### 1a. Notification audiences — EXISTING (2026-10-09, V98)
+
+The rule is: **staff are told only about work that needs them; students are told about what concerns them.**
+
+| Audience | Types | Channels |
+| --- | --- | --- |
+| Every active student (`NotificationScope.STUDENTS`) | scholarship / university / programme published, article published | in-app only. No email: a mass email per publish is noise and a deliverability risk. |
+| Every active student | scholarship deadline reminder | in-app + email, switchable per student. |
+| Named users (`TARGETED`) | welcome, application submitted / status changed (applicant's users), ticket status (the opener), message posted (other participants), task progress (creator, assignee, approvers) | per type |
+| Staff holding a queue permission | contact inquiry, ticket opened, **application received** (`nad:application:list`) | in-app (+ email for contact inquiry) |
+
+The person whose action caused an event is never in its audience (`actorUserId` in the payload is removed by
+`OutboxToNotificationDispatcher`). There is no broadcast to staff: the old `GLOBAL` scope, which sent every catalog
+publish to all staff and students, was removed.
+
+### 1b. Notifications — EXISTING (Step 5, slices 1–3 + 5)
 
 `nadoumi-notification` module. **What is built:**
 

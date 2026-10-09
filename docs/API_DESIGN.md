@@ -150,6 +150,9 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 | GET | `/api/staff/applicants/{applicantId}/access` | `nad:applicant:access:view` | `List<AccessGrantResponse>` — grantee `userId` / `invitedEmail`, role, status, interim flag, granted/expires, effective capabilities (`StaffApplicantAccessController`). |
 | POST / DELETE / POST `/transfer-ownership` | `/api/staff/applicants/{applicantId}/access[/{grantId}]` | `nad:applicant:access:manage` | delegate / revoke / transfer ownership. |
 
+| DELETE | `/api/staff/students/{userId}` | `nad:student:delete` | Soft-deletes and anonymises a student account (`sys_user.del_flag='2'`, name `deleted_<id>`, email and phone cleared), revokes every session and access grant, archives the applicant profiles the student owned. Refused with `400` while any of the student's applicants has an application (those are business records). `204`. |
+| DELETE | `/api/staff/support/tickets/{id}` | `nad:support:ticket:delete` | Deletes the ticket, its events and meetings, and its chat. `204`. A support chat cannot be deleted from `/api/staff/conversations/{id}` (`400`). |
+
 **Admin uses:** list + `GET {id}` + full CRUD on the three sub-resources + the
 access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a
 `sys_user` join so the access list shows a name rather than `User #id`.

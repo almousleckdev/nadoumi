@@ -18,20 +18,23 @@ public enum NotificationType {
     /** A public contact-form inquiry was accepted — support staff must see it. */
     CONTACT_INQUIRY_RECEIVED(true, "New contact inquiry", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 
-    /** A scholarship was published — informational, preference-controllable. */
-    SCHOLARSHIP_PUBLISHED(false, "Scholarship published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
+    /**
+     * Catalog and news announcements are for students only and in-app only: staff already know what they
+     * published, and a mass email per publish is noise. Only a deadline reminder is worth an email.
+     */
+    SCHOLARSHIP_PUBLISHED(false, "Scholarship published", Set.of(), NotificationScope.STUDENTS),
 
-    /** A scholarship deadline is approaching — informational, preference-controllable. */
-    SCHOLARSHIP_DEADLINE_REMINDER(false, "Scholarship deadline", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
+    /** A scholarship deadline is approaching — students only, preference-controllable. */
+    SCHOLARSHIP_DEADLINE_REMINDER(false, "Scholarship deadline", Set.of(NotificationChannelKind.EMAIL), NotificationScope.STUDENTS),
 
-    /** A university was published to the public catalog — informational. */
-    UNIVERSITY_PUBLISHED(false, "University published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
+    /** A university was published to the public catalog — students only, in-app. */
+    UNIVERSITY_PUBLISHED(false, "University published", Set.of(), NotificationScope.STUDENTS),
 
-    /** A programme was published to the public catalog — informational. */
-    PROGRAM_PUBLISHED(false, "Programme published", Set.of(NotificationChannelKind.EMAIL), NotificationScope.GLOBAL),
+    /** A programme was published to the public catalog — students only, in-app. */
+    PROGRAM_PUBLISHED(false, "Programme published", Set.of(), NotificationScope.STUDENTS),
 
-    /** A news article was published — students only, informational, preference-controllable. */
-    ARTICLE_PUBLISHED(false, "New article", Set.of(NotificationChannelKind.EMAIL), NotificationScope.STUDENTS),
+    /** A news article was published — students only, in-app. */
+    ARTICLE_PUBLISHED(false, "New article", Set.of(), NotificationScope.STUDENTS),
 
     /** A task changed status or assignment — the creator, assignee and admins are told. */
     TASK_PROGRESS(true, "Task update", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
@@ -50,6 +53,9 @@ public enum NotificationType {
 
     /** An application's stage/status changed — the applicant's linked users are told. */
     APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
+
+    /** A student's application is waiting for staff — staff who work the application queue are told. */
+    APPLICATION_RECEIVED(false, "New application", Set.of(), NotificationScope.TARGETED),
 
     /** A message was posted to a conversation — its other participants are told. */
     MESSAGE_POSTED(false, "New message", Set.of(), NotificationScope.TARGETED),
@@ -90,7 +96,7 @@ public enum NotificationType {
         return secondaryChannels;
     }
 
-    /** Target scope: GLOBAL platform broadcast or strictly TARGETED recipients. */
+    /** Target scope: every active student, or strictly TARGETED recipients. */
     public NotificationScope scope() {
         return scope;
     }

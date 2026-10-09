@@ -81,6 +81,21 @@
         {{ t('support.noHistory') }}
       </p>
     </template>
+
+    <template
+      v-if="canDelete && detail"
+      #footer
+    >
+      <el-button
+        type="danger"
+        plain
+        :loading="busy"
+        data-test="delete-ticket"
+        @click="removeTicket"
+      >
+        {{ t('support.deleteTicket') }}
+      </el-button>
+    </template>
   </el-drawer>
 </template>
 
@@ -88,6 +103,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
+import { useConfirm } from '@/composables/useConfirm'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import LoadingState from '@/components/ui/LoadingState.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
@@ -95,7 +111,7 @@ import { useUserStore } from '@/stores/user'
 import TicketControls from './drawer/TicketControls.vue'
 import TicketThread from './drawer/TicketThread.vue'
 import {
-  getTicket, replyToTicket,
+  deleteTicket, getTicket, replyToTicket,
   type StaffTicketDetail, type TicketEvent,
 } from '@/api/support'
 import type { SysUserRow } from '@/api/system'
@@ -106,8 +122,10 @@ const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'changed': [] }>()
 
 const { t } = useI18n()
 const userStore = useUserStore()
+const { confirm } = useConfirm()
 
 const canManage = computed(() => userStore.hasPerm('nad:support:ticket:manage'))
+const canDelete = computed(() => userStore.hasPerm('nad:support:ticket:delete'))
 
 const detail = ref<StaffTicketDetail | null>(null)
 const loading = ref(false)
@@ -163,6 +181,31 @@ async function runAction(fn: () => Promise<unknown>): Promise<boolean> {
     // The backend is authoritative on transitions and permissions; show what it said.
     ElMessage.error((e as Error)?.message || t('state.errorTitle'))
     return false
+  }
+  finally {
+    busy.value = false
+  }
+}
+
+async function removeTicket() {
+  if (!detail.value) return
+  const ticket = detail.value.ticket
+  const ok = await confirm({
+    title: t('support.deleteTicket'),
+    message: t('support.deleteTicketConfirm', { id: ticket.id }),
+    confirmText: t('common.delete'),
+    tone: 'danger',
+  })
+  if (!ok) return
+  busy.value = true
+  try {
+    await deleteTicket(ticket.id)
+    ElMessage.success(t('support.ticketDeleted'))
+    emit('update:modelValue', false)
+    emit('changed')
+  }
+  catch (e) {
+    ElMessage.error((e as Error)?.message || t('state.errorTitle'))
   }
   finally {
     busy.value = false

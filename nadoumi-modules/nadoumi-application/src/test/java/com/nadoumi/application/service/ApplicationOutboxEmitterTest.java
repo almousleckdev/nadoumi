@@ -46,12 +46,27 @@ class ApplicationOutboxEmitterTest {
     }
 
     @Test
-    void shouldWriteNothing_whenThereIsNoActiveRecipient() {
+    void shouldNotConfirmToAnyone_whenThereIsNoActiveRecipient() {
         when(accessService.listForApplicant(5L)).thenReturn(List.of(grant(9L, AccessGrantStatus.REVOKED)));
 
-        emitter.submitted(application());
+        emitter.submitted(application(), 3L);
 
-        verify(outboxWriter, never()).write(anyString(), anyLong(), anyString(), anyString());
+        verify(outboxWriter, never()).write(anyString(), anyLong(), eq(OutboxEventTypes.APPLICATION_SUBMITTED), anyString());
+    }
+
+    @Test
+    void shouldTellTheStaffQueueButNotTheSubmitter_whenSubmitted() {
+        when(accessService.listForApplicant(5L)).thenReturn(List.of(grant(9L, AccessGrantStatus.ACTIVE)));
+        when(programService.get(11L)).thenThrow(new IllegalStateException("skip title"));
+
+        emitter.submitted(application(), 9L);
+
+        ArgumentCaptor<String> payload = ArgumentCaptor.forClass(String.class);
+        verify(outboxWriter).write(eq("application"), eq(77L), eq(OutboxEventTypes.APPLICATION_RECEIVED), payload.capture());
+        assertThat(payload.getValue())
+                .contains("\"audiencePermission\":\"nad:application:list\"")
+                .contains("\"actorUserId\":9")
+                .doesNotContain("recipientUserIds");
     }
 
     @Test
@@ -75,7 +90,7 @@ class ApplicationOutboxEmitterTest {
                 grant(9L, AccessGrantStatus.ACTIVE), grant(9L, AccessGrantStatus.ACTIVE), grant(4L, AccessGrantStatus.ACTIVE)));
         when(programService.get(11L)).thenThrow(new IllegalStateException("skip title"));
 
-        emitter.submitted(application());
+        emitter.submitted(application(), 3L);
 
         ArgumentCaptor<String> payload = ArgumentCaptor.forClass(String.class);
         verify(outboxWriter).write(eq("application"), eq(77L), eq(OutboxEventTypes.APPLICATION_SUBMITTED), payload.capture());

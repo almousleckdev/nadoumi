@@ -29,6 +29,11 @@
         </template>
       </PageHeader>
 
+      <AccountPanel
+        v-if="canViewAccess"
+        :id="id"
+      />
+
       <AppTabs
         v-model="tab"
         :tabs="tabs"
@@ -101,6 +106,7 @@ import LocationTab from './tabs/LocationTab.vue'
 import WorkTab from './tabs/WorkTab.vue'
 import ContactsTab from './tabs/ContactsTab.vue'
 import AccessTab from './tabs/AccessTab.vue'
+import AccountPanel from './AccountPanel.vue'
 import { formatDate } from '@/utils/date'
 
 const { t } = useI18n()
