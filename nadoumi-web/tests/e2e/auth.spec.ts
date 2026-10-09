@@ -36,6 +36,7 @@ test('register wizard (OTP) -> auto-login -> onboarding -> sign out', async ({ p
 
   await page.locator('[data-test="user-menu"]').click()
   await page.locator('[data-test="sign-out"]').click()
+  await page.locator('[data-test="sign-out-confirm"]').click()
 
   await expect(page).toHaveURL(/\/$/)
   await expect(page.getByRole('link', { name: /sign in/i }).first()).toBeVisible()

@@ -2,6 +2,7 @@ package com.nadoumi.applicant.web;
 
 import com.nadoumi.applicant.domain.enums.ApplicantStatus;
 import com.nadoumi.applicant.service.ApplicantMediaKind;
+import com.nadoumi.applicant.service.ApplicantErasureService;
 import com.nadoumi.applicant.service.ApplicantMediaService;
 import com.nadoumi.applicant.service.ApplicantRecordsService;
 import com.nadoumi.applicant.service.ApplicantService;
@@ -48,14 +49,17 @@ public class StaffApplicantController {
     private final ApplicantMediaService media;
     private final PassportService passports;
     private final EducationService education;
+    private final ApplicantErasureService erasure;
 
     public StaffApplicantController(ApplicantService service, ApplicantRecordsService records,
-            ApplicantMediaService media, PassportService passports, EducationService education) {
+            ApplicantMediaService media, PassportService passports, EducationService education,
+            ApplicantErasureService erasure) {
         this.service = service;
         this.records = records;
         this.media = media;
         this.passports = passports;
         this.education = education;
+        this.erasure = erasure;
     }
 
     @GetMapping
@@ -94,12 +98,13 @@ public class StaffApplicantController {
         return service.update(id, req);
     }
 
+    /** Permanent delete: the applicant, its applications, documents and files, and a student login left without one. */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@ss.hasPermi('nad:applicant:archive')")
-    @Log(title = "Applicant", businessType = BusinessType.UPDATE)
-    public void archive(@PathVariable Long id) {
-        service.archive(id);
+    @PreAuthorize("@ss.hasPermi('nad:applicant:delete')")
+    @Log(title = "Applicant", businessType = BusinessType.DELETE)
+    public void delete(@PathVariable Long id) {
+        erasure.erase(id);
     }
 
     // ---- protected files: profile photo and passport scan ----

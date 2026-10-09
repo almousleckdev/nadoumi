@@ -69,6 +69,7 @@
         <div class="who">
           <Avatar
             :name="`${row.givenName} ${row.familyName}`"
+            :src="(row as Applicant).photoUrl || undefined"
             :size="30"
           />
           <span class="who__name">{{ row.givenName }} {{ row.familyName }}</span>
@@ -85,12 +86,13 @@
       </template>
       <template #cell-actions="{ row }">
         <el-button
-          v-if="row.status !== 'ARCHIVED' && userStore.hasPerm('nad:applicant:archive')"
+          v-if="userStore.hasPerm('nad:applicant:delete')"
           link
           type="danger"
-          @click.stop="onArchive(row as Applicant)"
+          data-test="delete-applicant"
+          @click.stop="onDelete(row as Applicant)"
         >
-          {{ t('applicant.archive') }}
+          {{ t('applicant.delete') }}
         </el-button>
       </template>
     </DataTable>
@@ -159,7 +161,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import {
-  archiveApplicant, createApplicant, listApplicants,
+  deleteApplicant, createApplicant, listApplicants,
   type Applicant, type ApplicantStatus,
 } from '@/api/applicant'
 import { useUserStore } from '@/stores/user'
@@ -213,17 +215,22 @@ function goToDetail(id: number) {
   router.push(`/applicants/${id}`)
 }
 
-async function onArchive(row: Applicant) {
+async function onDelete(row: Applicant) {
   const ok = await confirm({
-    title: t('applicant.archiveTitle'),
-    message: t('applicant.archiveConfirm', { name: `${row.givenName} ${row.familyName}` }),
-    confirmText: t('applicant.archive'),
+    title: t('applicant.deleteTitle'),
+    message: t('applicant.deleteConfirm', { name: `${row.givenName} ${row.familyName}` }),
+    confirmText: t('applicant.delete'),
     tone: 'danger',
   })
   if (!ok) return
-  await archiveApplicant(row.id)
-  ElMessage.success(t('applicant.archived'))
-  load()
+  try {
+    await deleteApplicant(row.id)
+    ElMessage.success(t('applicant.deleted'))
+    await load()
+  }
+  catch (e) {
+    ElMessage.error((e as Error)?.message || t('applicant.deleteFailed'))
+  }
 }
 
 // create

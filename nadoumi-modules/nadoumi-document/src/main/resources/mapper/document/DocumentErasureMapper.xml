@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.document.mapper.DocumentErasureMapper">
+
+    <select id="mediaAssetIds" resultType="long">
+        select distinct v.media_asset_id
+        from nad_document_version v join nad_document d on d.id = v.document_id
+        where d.applicant_id = #{applicantId}
+    </select>
+
+    <delete id="removeEvents">
+        delete e from nad_document_event e join nad_document d on d.id = e.document_id
+        where d.applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="removeVersions">
+        delete v from nad_document_version v join nad_document d on d.id = v.document_id
+        where d.applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="removeDocuments">
+        delete from nad_document where applicant_id = #{applicantId}
+    </delete>
+
+</mapper>

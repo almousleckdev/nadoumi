@@ -4,7 +4,8 @@ const emit = defineEmits<{ 'toggle-collapse': [], 'toggle-mobile': [] }>()
 
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { user, applicants, signOut } = useSession()
+const { user, applicants } = useSession()
+const { ask: askSignOut } = useSignOutConfirm()
 const { unreadCount } = useNotifications()
 const { primary } = useMyApplicant()
 const { url: avatarUrl } = useMyPhoto()
@@ -78,7 +79,7 @@ const displayName = computed(() => primary.value?.givenName ?? user.value?.nickN
       </template>
       <div class="px-3 py-2 text-xs text-slate-500">{{ user?.username }}</div>
       <NuxtLink :to="localePath('/dashboard/account')" class="block px-3 py-2 text-sm hover:bg-slate-50">{{ t('dashboard.nav.account') }}</NuxtLink>
-      <button data-test="sign-out" type="button" class="block w-full px-3 py-2 text-start text-sm text-red-600 hover:bg-slate-50" @click="signOut">
+      <button data-test="sign-out" type="button" class="block w-full px-3 py-2 text-start text-sm text-red-600 hover:bg-slate-50" @click="askSignOut">
         {{ t('common.signOut') }}
       </button>
     </NDropdown>

@@ -41,6 +41,9 @@ import com.ruoyi.system.service.ISysUserService;
 @RequestMapping("/system/user")
 public class SysUserController extends BaseController
 {
+    private static final int MIN_STATUS_REASON_CHARS = 5;
+    private static final int MAX_STATUS_REASON_CHARS = 255;
+
     @Autowired
     private ISysUserService userService;
 
@@ -224,9 +227,20 @@ public class SysUserController extends BaseController
     {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
+        boolean disabling = "1".equals(user.getStatus()) || "2".equals(user.getStatus());
+        String reason = StringUtils.trimToNull(user.getStatusReason());
+        if (disabling && (reason == null || reason.length() < MIN_STATUS_REASON_CHARS))
+        {
+            return error("A reason of at least " + MIN_STATUS_REASON_CHARS + " characters is required to suspend or block an account");
+        }
+        if (reason != null && reason.length() > MAX_STATUS_REASON_CHARS)
+        {
+            return error("The reason must be at most " + MAX_STATUS_REASON_CHARS + " characters");
+        }
+        user.setStatusReason(disabling ? reason : null);
         user.setUpdateBy(getUsername());
         int rows = userService.updateUserStatus(user);
-        if (rows > 0 && ("1".equals(user.getStatus()) || "2".equals(user.getStatus())))
+        if (rows > 0 && disabling)
         {
             sessionRevoker.revokeAll(user.getUserId(), null);
         }

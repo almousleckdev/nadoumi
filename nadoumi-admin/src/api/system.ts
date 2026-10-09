@@ -28,6 +28,8 @@ export interface SysUserRow {
   sex: string | null
   avatar?: string | null
   status: string
+  /** why the account is suspended or blocked; set only while it is */
+  statusReason?: string | null
   deptId: number | null
   dept?: { deptName?: string } | null
   createTime: string | null
@@ -152,8 +154,9 @@ export const updateUser = (body: SysUserForm) => request.put('/system/user', bod
 export const deleteUsers = (ids: number[]) => request.delete(`/system/user/${ids.join(',')}`)
 export const resetUserPwd = (userId: number, password: string) =>
   request.put('/system/user/resetPwd', { userId, password })
-export const changeUserStatus = (userId: number, status: string) =>
-  request.put('/system/user/changeStatus', { userId, status })
+/** Disabling (suspend or block) needs a written reason; activating clears it. */
+export const changeUserStatus = (userId: number, status: string, statusReason?: string) =>
+  request.put('/system/user/changeStatus', { userId, status, statusReason })
 export const getUserAuthRole = (userId: number) =>
   request.get<unknown, { user: SysUserRow, roles: SysRole[] }>(`/system/user/authRole/${userId}`)
 export const updateUserAuthRole = (userId: number, roleIds: number[]) =>

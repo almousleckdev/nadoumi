@@ -41,4 +41,8 @@
         order by acc.id
         limit 1
     </select>
+
+    <select id="findApplicantPhotoMediaId" resultType="java.lang.Long">
+        select photo_media_id from nad_applicant where id = #{applicantId}
+    </select>
 </mapper>

@@ -1,6 +1,6 @@
 import type {
   ApplicantDto, ContactDto, EducationDto, InterestDto, OnboardingStatusDto, PassportStatusDto, ResidenceDto,
-  TestScoreDto, WorkDto,
+  WorkDto,
 } from '~/types/catalog'
 
 export interface SelfApplicantBody {
@@ -32,9 +32,6 @@ export interface WorkBody {
   employer: string; jobTitle: string; country: string; startDate: string; current: boolean
   employmentType?: string; city?: string; endDate?: string; description?: string
   workVisaType?: string; workVisaExpiry?: string
-}
-export interface TestScoreBody {
-  testType: string; score: string; subScoresJson?: string; takenOn?: string; expiresOn?: string
 }
 export interface ContactBody {
   relation: string; name: string; email?: string; phone?: string
@@ -95,9 +92,6 @@ export function useApplicant() {
     updateEducation: (id: number, eduId: number, b: EducationBody) => p<EducationDto>(`applicants/${id}/education/${eduId}`, { method: 'PUT', body: clean(b) }),
     deleteEducation: (id: number, eduId: number): Promise<void> => p<undefined>(`applicants/${id}/education/${eduId}`, { method: 'DELETE' }),
 
-    listTestScores: (id: number) => p<TestScoreDto[]>(`applicants/${id}/test-scores`, undefined),
-    addTestScore: (id: number, b: TestScoreBody) => p<TestScoreDto>(`applicants/${id}/test-scores`, { method: 'POST', body: clean(b) }),
-    deleteTestScore: (id: number, scoreId: number): Promise<void> => p<undefined>(`applicants/${id}/test-scores/${scoreId}`, { method: 'DELETE' }),
 
     listContacts: (id: number) => p<ContactDto[]>(`applicants/${id}/contacts`, undefined),
     addContact: (id: number, b: ContactBody) => p<ContactDto>(`applicants/${id}/contacts`, { method: 'POST', body: clean(b) }),

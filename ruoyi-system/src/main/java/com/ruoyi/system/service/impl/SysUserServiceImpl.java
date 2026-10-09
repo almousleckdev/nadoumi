@@ -327,7 +327,7 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public int updateUserStatus(SysUser user)
     {
-        return userMapper.updateUserStatus(user.getUserId(), user.getStatus());
+        return userMapper.updateUserStatus(user.getUserId(), user.getStatus(), user.getStatusReason());
     }
 
     /**

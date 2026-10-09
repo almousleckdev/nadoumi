@@ -4,7 +4,7 @@ import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { mountOpts } from '../../helpers'
 
-const api = vi.hoisted(() => ({ listAccess: vi.fn(), deleteStudentAccount: vi.fn() }))
+const api = vi.hoisted(() => ({ listAccess: vi.fn() }))
 vi.mock('@/api/applicant', () => api)
 
 const system = vi.hoisted(() => ({ getUser: vi.fn(), changeUserStatus: vi.fn() }))
@@ -45,10 +45,8 @@ describe('Applicant account panel', () => {
     useUserStore().permissions = ['*:*:*']
     confirmAnswer.value = true
     api.listAccess.mockReset().mockResolvedValue([owner])
-    api.deleteStudentAccount.mockReset().mockResolvedValue(undefined)
     system.getUser.mockReset().mockResolvedValue({ code: 200, data: student() })
     system.changeUserStatus.mockReset().mockResolvedValue({})
-    vi.spyOn(router, 'push').mockResolvedValue(undefined)
   })
 
   it('shows the owning student account with its status', async () => {
@@ -71,43 +69,53 @@ describe('Applicant account panel', () => {
     expect(system.getUser).not.toHaveBeenCalled()
   })
 
-  it('suspends an active account after confirmation', async () => {
+  it('asks for a reason before suspending, and sends it with the change', async () => {
     const w = await mountPanel()
     await w.find('[data-test="account-suspend"]').trigger('click')
     await flushPromises()
-    expect(system.changeUserStatus).toHaveBeenCalledWith(42, '1')
+    expect(system.changeUserStatus).not.toHaveBeenCalled()
+    const dialog = w.findComponent({ name: 'StatusReasonDialog' })
+    expect(dialog.props('modelValue')).toBe(true)
+
+    dialog.vm.$emit('confirm', 'Repeated fake documents')
+    await flushPromises()
+
+    expect(system.changeUserStatus).toHaveBeenCalledWith(42, '1', 'Repeated fake documents')
     expect(w.find('[data-test="account-activate"]').exists()).toBe(true)
+    expect(w.find('[data-test="account-reason"]').text()).toContain('Repeated fake documents')
   })
 
-  it('does not change the status when the confirmation is declined', async () => {
-    confirmAnswer.value = false
+  it('asks for a reason before blocking', async () => {
     const w = await mountPanel()
     await w.find('[data-test="account-block"]').trigger('click')
+    await flushPromises()
+    w.findComponent({ name: 'StatusReasonDialog' }).vm.$emit('confirm', 'Abusive messages to staff')
+    await flushPromises()
+    expect(system.changeUserStatus).toHaveBeenCalledWith(42, '2', 'Abusive messages to staff')
+  })
+
+  it('reactivates after a plain confirmation, with no reason', async () => {
+    system.getUser.mockResolvedValue({ code: 200, data: student({ status: '1', statusReason: 'Under review' }) })
+    const w = await mountPanel()
+    await w.find('[data-test="account-activate"]').trigger('click')
+    await flushPromises()
+    expect(system.changeUserStatus).toHaveBeenCalledWith(42, '0', undefined)
+    expect(w.find('[data-test="account-reason"]').exists()).toBe(false)
+  })
+
+  it('does not reactivate when the confirmation is declined', async () => {
+    confirmAnswer.value = false
+    system.getUser.mockResolvedValue({ code: 200, data: student({ status: '1' }) })
+    const w = await mountPanel()
+    await w.find('[data-test="account-activate"]').trigger('click')
     await flushPromises()
     expect(system.changeUserStatus).not.toHaveBeenCalled()
   })
 
-  it('deletes the student after confirmation and returns to the applicants list', async () => {
+  it('offers no status buttons without the edit permission', async () => {
+    useUserStore().permissions = ['nad:applicant:access:view']
     const w = await mountPanel()
-    await w.find('[data-test="account-delete"]').trigger('click')
-    await flushPromises()
-    expect(api.deleteStudentAccount).toHaveBeenCalledWith(42)
-    expect(router.push).toHaveBeenCalledWith('/applicants')
-  })
-
-  it('keeps the page when the server refuses the deletion', async () => {
-    api.deleteStudentAccount.mockRejectedValue(new Error('This student has 1 application on record'))
-    const w = await mountPanel()
-    await w.find('[data-test="account-delete"]').trigger('click')
-    await flushPromises()
-    expect(router.push).not.toHaveBeenCalled()
-    expect(w.find('[data-test="account-panel"]').exists()).toBe(true)
-  })
-
-  it('offers no delete button without the delete permission', async () => {
-    useUserStore().permissions = ['system:user:edit', 'nad:applicant:access:view']
-    const w = await mountPanel()
-    expect(w.find('[data-test="account-delete"]').exists()).toBe(false)
-    expect(w.find('[data-test="account-suspend"]').exists()).toBe(true)
+    expect(w.find('[data-test="account-suspend"]').exists()).toBe(false)
+    expect(w.find('[data-test="account-block"]').exists()).toBe(false)
   })
 })

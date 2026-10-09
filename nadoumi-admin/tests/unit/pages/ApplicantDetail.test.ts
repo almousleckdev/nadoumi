@@ -5,7 +5,9 @@ import { createPinia, setActivePinia } from 'pinia'
 import { defineComponent, h } from 'vue'
 import { mountOpts } from '../../helpers'
 
-const api = vi.hoisted(() => ({ getApplicant: vi.fn(), listAccess: vi.fn(), deleteStudentAccount: vi.fn() }))
+const api = vi.hoisted(() => ({ getApplicant: vi.fn(), listAccess: vi.fn(), deleteApplicant: vi.fn() }))
+const confirmAnswer = vi.hoisted(() => ({ value: true }))
+vi.mock('@/composables/useConfirm', () => ({ useConfirm: () => ({ confirm: vi.fn(async () => confirmAnswer.value) }) }))
 vi.mock('@/api/applicant', () => api)
 
 const system = vi.hoisted(() => ({ changeUserStatus: vi.fn(), getUser: vi.fn() }))
@@ -21,7 +23,7 @@ const applicant = {
 
 const router = createRouter({
   history: createMemoryHistory(),
-  routes: [{ path: '/applicants/:id', component: { template: '<div />' } }],
+  routes: [{ path: '/applicants/:id', component: { template: '<div />' } }, { path: '/applicants', component: { template: '<div />' } }],
 })
 
 const tabStub = (name: string) => defineComponent({
@@ -37,7 +39,7 @@ async function mountDetail() {
       ...mountOpts().global,
       plugins: [...mountOpts().global.plugins, router],
       stubs: {
-        OverviewTab: tabStub('overview'), EducationTab: tabStub('education'), ScoresTab: tabStub('scores'),
+        OverviewTab: tabStub('overview'), EducationTab: tabStub('education'),
         ContactsTab: tabStub('contacts'), InterestsTab: true, LocationTab: true, WorkTab: true, AccessTab: true,
       },
     },
@@ -52,14 +54,17 @@ describe('Applicant detail', () => {
     useUserStore().permissions = ['*:*:*']
     api.getApplicant.mockReset().mockResolvedValue(applicant)
     api.listAccess.mockReset().mockResolvedValue([])
+    api.deleteApplicant.mockReset().mockResolvedValue(undefined)
+    confirmAnswer.value = true
     system.changeUserStatus.mockReset()
     system.getUser.mockReset()
   })
 
-  it('shows the applicant and the tabs, including test scores', async () => {
+  it('shows the applicant and the tabs, with no test scores tab', async () => {
     const w = await mountDetail()
     expect(w.text()).toContain('Amina Benali')
-    for (const label of ['Overview', 'Education', 'Test scores', 'Contacts']) expect(w.text()).toContain(label)
+    for (const label of ['Overview', 'Education', 'Contacts']) expect(w.text()).toContain(label)
+    expect(w.text()).not.toContain('Test scores')
   })
 
   it('shows no account section for an applicant that has no student account', async () => {
@@ -78,5 +83,27 @@ describe('Applicant detail', () => {
     api.getApplicant.mockRejectedValue(new Error('boom'))
     const w = await mountDetail()
     expect(w.text()).toContain('boom')
+  })
+
+  it('deletes the applicant after a confirmation and returns to the list', async () => {
+    const w = await mountDetail()
+    await w.find('[data-test="delete-applicant"]').trigger('click')
+    await flushPromises()
+    expect(api.deleteApplicant).toHaveBeenCalledWith('7')
+    expect(router.currentRoute.value.path).toBe('/applicants')
+  })
+
+  it('keeps the applicant when the confirmation is declined', async () => {
+    confirmAnswer.value = false
+    const w = await mountDetail()
+    await w.find('[data-test="delete-applicant"]').trigger('click')
+    await flushPromises()
+    expect(api.deleteApplicant).not.toHaveBeenCalled()
+  })
+
+  it('offers no delete without the delete permission', async () => {
+    useUserStore().permissions = ['nad:applicant:view']
+    const w = await mountDetail()
+    expect(w.find('[data-test="delete-applicant"]').exists()).toBe(false)
   })
 })

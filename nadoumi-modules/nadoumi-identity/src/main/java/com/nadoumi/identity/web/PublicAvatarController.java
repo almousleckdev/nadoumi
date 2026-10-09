@@ -44,7 +44,21 @@ public class PublicAvatarController {
         if (!links.isValid(userId, signature)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
-        Long mediaId = profiles.findStudentPhotoMediaId(userId);
+        return redirectToPhoto(profiles.findStudentPhotoMediaId(userId), request);
+    }
+
+    /** The staff-side link: an applicant's own photo, whether or not the applicant has a sign-in account. */
+    @Anonymous
+    @GetMapping("/api/public/avatars/applicants/{applicantId}/{signature}")
+    public ResponseEntity<Void> applicantAvatar(@PathVariable long applicantId, @PathVariable String signature,
+            HttpServletRequest request) {
+        if (!links.isValidForApplicant(applicantId, signature)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return redirectToPhoto(profiles.findApplicantPhotoMediaId(applicantId), request);
+    }
+
+    private ResponseEntity<Void> redirectToPhoto(Long mediaId, HttpServletRequest request) {
         if (mediaId == null || media.find(mediaId).filter(a -> a.category() == MediaCategory.APPLICANT_PHOTO).isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

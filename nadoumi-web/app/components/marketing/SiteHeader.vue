@@ -4,7 +4,8 @@ import logoUrl from '~/assets/images/logo.jpg'
 const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
-const { status, user, signOut } = useSession()
+const { status, user } = useSession()
+const { ask: askSignOut } = useSignOutConfirm()
 const open = ref(false)
 
 // "How it works" is homepage content.
@@ -58,7 +59,7 @@ watch(() => route.fullPath, () => { open.value = false })
             <NDropdown :label="user?.nickName ?? t('nav.dashboard')" trigger-test-id="user-menu">
               <NuxtLink :to="localePath('/dashboard')" class="block px-3 py-2 text-sm no-underline hover:bg-slate-50">{{ t('nav.dashboard') }}</NuxtLink>
               <NuxtLink :to="localePath('/dashboard/account')" class="block px-3 py-2 text-sm no-underline hover:bg-slate-50">{{ t('dashboard.nav.account') }}</NuxtLink>
-              <button type="button" data-test="sign-out" class="block w-full px-3 py-2 text-start text-sm text-red-600 hover:bg-slate-50" @click="signOut">{{ t('common.signOut') }}</button>
+              <button type="button" data-test="sign-out" class="block w-full px-3 py-2 text-start text-sm text-red-600 hover:bg-slate-50" @click="askSignOut">{{ t('common.signOut') }}</button>
             </NDropdown>
           </template>
           <template v-else>

@@ -18,6 +18,7 @@ import com.nadoumi.common.rules.NameRules;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.identity.profile.AvatarLinks;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
 import java.time.LocalDate;
@@ -44,11 +45,13 @@ public class ApplicantService {
     private final UserApplicantAccessService grants;
     private final CurrentCaller caller;
     private final PermissionService rbac;
+    private final AvatarLinks avatars;
 
     public ApplicantService(ApplicantMapper mapper, NadoumiAccessService access,
             UserApplicantAccessService grants, CurrentCaller caller, PermissionService rbac,
-            ApplicantAccessGuard guard) {
+            ApplicantAccessGuard guard, AvatarLinks avatars) {
         this.mapper = mapper;
+        this.avatars = avatars;
         this.access = access;
         this.guard = guard;
         this.grants = grants;
@@ -80,12 +83,12 @@ public class ApplicantService {
         a.setCreateBy(String.valueOf(caller.requireUserId()));
         mapper.insert(a);
         grants.createStaffApplicantAccess(a.getId(), req.invitedEmail(), caller.requireUserId());
-        return ApplicantResponse.of(a, includePii());
+        return staffView(a, includePii());
     }
 
     public ApplicantResponse get(Long id) {
         guard.require(id, ApplicantCapability.VIEW_PROFILE);
-        return ApplicantResponse.of(load(id), includePii());
+        return staffView(load(id), includePii());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -99,15 +102,6 @@ public class ApplicantService {
         return ApplicantResponse.of(a, includePii());
     }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void archive(Long id) {
-        if (!caller.isStaff()) {
-            throw new AccessDeniedException("archive is a staff action");
-        }
-        load(id);
-        mapper.updateStatus(id, ApplicantStatus.ARCHIVED, String.valueOf(caller.requireUserId()));
-    }
-
     public PageResponse<ApplicantResponse> listForStaff(String name, ApplicantStatus status,
             String nationality, LocalDateTime createdAfter, int page, int size) {
         page = PageSupport.clampPage(page);
@@ -116,7 +110,7 @@ public class ApplicantService {
         List<Applicant> rows = mapper.search(name, status, nationality, createdAfter);
         long total = new PageInfo<>(rows).getTotal();
         boolean pii = includePii();
-        List<ApplicantResponse> content = rows.stream().map(a -> ApplicantResponse.of(a, pii)).toList();
+        List<ApplicantResponse> content = rows.stream().map(a -> staffView(a, pii)).toList();
         return PageResponse.of(content, page, size, total);
     }
 
@@ -129,6 +123,11 @@ public class ApplicantService {
     }
 
     // ---- internals ----
+
+    private ApplicantResponse staffView(Applicant a, boolean pii) {
+        String photo = a.getPhotoMediaId() == null ? null : avatars.linkForApplicant(a.getId());
+        return ApplicantResponse.of(a, pii, photo);
+    }
 
     private Applicant load(Long id) {
         Applicant a = mapper.findById(id);

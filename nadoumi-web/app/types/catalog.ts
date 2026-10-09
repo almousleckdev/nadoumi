@@ -343,15 +343,6 @@ export interface WorkDto {
   workVisaExpiry: string | null
 }
 
-export interface TestScoreDto {
-  id: number
-  testType: string
-  score: string
-  subScoresJson: string | null
-  takenOn: string | null
-  expiresOn: string | null
-}
-
 export interface ContactDto {
   id: number
   relation: string

@@ -117,10 +117,12 @@ describe('dashboard account page', () => {
     })
   })
 
-  it('signs out', async () => {
+  it('asks before signing out', async () => {
+    useSignOutConfirm().dismiss()
     const w = await mountSuspended(Account)
     await w.find('[data-test="sign-out"]').trigger('click')
-    expect(signOut).toHaveBeenCalled()
+    expect(useSignOutConfirm().open.value).toBe(true)
+    expect(signOut).not.toHaveBeenCalled()
   })
 
   it('links out to the real Profile page, and does not duplicate Notifications/Documents nav with a dead shortcut card', async () => {

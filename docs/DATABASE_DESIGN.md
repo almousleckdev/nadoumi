@@ -388,6 +388,10 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - `nad_user_presence(user_id PK → sys_user ON DELETE CASCADE, last_seen_at UTC)`.
 - Rollback: documented in the header of `V96__nad_chat_rework.sql`.
 
+- **V99** adds `sys_user.status_reason` (why an account is suspended or blocked) and swaps `nad:student:delete` for
+  `nad:applicant:delete` (role 3). Applicant erasure deletes rows in this order: access grants, document events /
+  versions / documents, applications (children cascade), the seven `nad_applicant_*` tables, `nad_applicant`.
+  Manual rollback is in the file header.
 - **V98** notification audience cleanup and two destructive permissions. Catalog and news announcements
   (`SCHOLARSHIP_PUBLISHED`, `UNIVERSITY_PUBLISHED`, `PROGRAM_PUBLISHED`, `ARTICLE_PUBLISHED`) are student-only and in-app
   only: their EMAIL templates are deleted, queued EMAIL deliveries are marked `FAILED`, and notification rows the old

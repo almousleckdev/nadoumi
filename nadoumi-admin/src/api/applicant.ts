@@ -24,6 +24,8 @@ export interface Applicant {
   whatsapp: string | null
   emailVerified: boolean
   onboardingComplete: boolean
+  /** signed avatar link; present only when the applicant has a profile photo */
+  photoUrl?: string | null
 }
 
 /** Back-compat alias used by list views. */
@@ -42,15 +44,6 @@ export interface Education {
   startDate: string | null
   endDate: string | null
   current: boolean
-}
-
-export interface TestScore {
-  id: number
-  testType: string
-  score: string
-  subScoresJson: string | null
-  takenOn: string | null
-  expiresOn: string | null
 }
 
 export interface Contact {
@@ -97,14 +90,6 @@ export interface EducationInput {
   endDate?: string | null
 }
 
-export interface TestScoreInput {
-  testType: string
-  score: string
-  subScoresJson?: string | null
-  takenOn?: string | null
-  expiresOn?: string | null
-}
-
 export interface ContactInput {
   relation: string
   name: string
@@ -147,7 +132,8 @@ export const createApplicant = (body: {
 export const updateApplicant = (id: number | string, body: ApplicantProfileInput) =>
   request.put<unknown, Applicant>(`${BASE}/${id}`, body)
 
-export const archiveApplicant = (id: number | string) =>
+/** Permanent delete: the applicant, its applications, documents, files and a student login left without one. */
+export const deleteApplicant = (id: number | string) =>
   request.delete(`${BASE}/${id}`)
 
 // ---- education ----
@@ -160,15 +146,6 @@ export const updateEducation = (id: number | string, eduId: number, body: Educat
 export const deleteEducation = (id: number | string, eduId: number) =>
   request.delete(`${BASE}/${id}/education/${eduId}`)
 
-// ---- test scores ----
-export const listTestScores = (id: number | string) =>
-  request.get<unknown, TestScore[]>(`${BASE}/${id}/test-scores`)
-export const addTestScore = (id: number | string, body: TestScoreInput) =>
-  request.post<unknown, TestScore>(`${BASE}/${id}/test-scores`, body)
-export const updateTestScore = (id: number | string, scoreId: number, body: TestScoreInput) =>
-  request.put<unknown, TestScore>(`${BASE}/${id}/test-scores/${scoreId}`, body)
-export const deleteTestScore = (id: number | string, scoreId: number) =>
-  request.delete(`${BASE}/${id}/test-scores/${scoreId}`)
 
 // ---- contacts ----
 export const listContacts = (id: number | string) =>
@@ -270,6 +247,3 @@ export const getPassportStatus = (id: number | string) =>
 export const getPassportScanUrl = (id: number | string) =>
   request.get<unknown, ApplicantPhotoUrl>(`${BASE}/${id}/passport/scan`, { params: { json: 1 }, silent: true } as object)
 
-/** Deletes a student account (soft delete). Refused by the server while the student has applications. */
-export const deleteStudentAccount = (userId: number) =>
-  request.delete(`/api/staff/students/${userId}`)
