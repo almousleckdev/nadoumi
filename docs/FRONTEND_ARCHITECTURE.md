@@ -558,3 +558,82 @@ RuoYi-Vue2/3 codebase.
 - Local run needs `mvn install` first (so `spring-boot:run` picks up the cleaned
   `ruoyi-*` jars, not the stale `.m2` copies). `ry-vue` dev DB has captcha disabled
   and student self-registration enabled for convenience.
+
+### 9. News article body format and public rendering (EXISTING, 2026-10-09)
+
+An article body (`nad_article.body_md`) is **plain Markdown**. The admin editor
+(`ADMIN_ARCHITECTURE.md` §8) and the public renderer
+(`nadoumi-web/app/composables/useMarkdown.ts`) share two small conventions on top of
+standard Markdown; everything else is stock CommonMark.
+
+| Block | Stored as | Public output |
+| --- | --- | --- |
+| Heading / subheading | `## Heading`, `### Subheading` | `<h2>`, `<h3>` (the page title is the only `<h1>`) |
+| Quote, lists, bold, italic, link, divider, code | standard Markdown (`>`, `-`, `**`, `*`, `[t](u)`, `---`, fenced code with a language) | standard elements; divider renders as three centred dots |
+| Image | `![alt](url "caption")` | `<figure class="nad-fig nad-fig--inline">` with `<figcaption>` when a caption exists |
+| Wide / full-width image | the same, with `#wide` or `#full` appended to the url: `![alt](url#wide "caption")` | `nad-fig--wide` (up to 1032 px) / `nad-fig--full` (viewport width); the marker never reaches the `src` |
+| Video | a paragraph holding **only** a YouTube or Vimeo autolink: `<https://www.youtube.com/watch?v=ID>` | sandboxed `<iframe>` on `youtube-nocookie.com` / `player.vimeo.com` |
+
+Rules that keep this safe and portable:
+
+- **Raw HTML is never honoured** (`html: false` on both sides). The two block
+  conventions are recognised from Markdown tokens and their markup is built from
+  escaped values.
+- **Embeds are allow-listed.** Only `https` links to `youtube.com`, `m.youtube.com`,
+  `youtu.be`, `vimeo.com`, `player.vimeo.com` with a well-formed id qualify (no
+  credentials in the URL). The iframe `src` is rebuilt from the id, never copied from the
+  input. A video link inside a sentence, or with its own link text, stays an ordinary link.
+- **A body that never used the conventions renders exactly as before**; existing
+  articles need no migration.
+- The conventions are implemented twice (admin `editor/dialect.ts`, web
+  `utils/articleDialect.ts`) because the two apps share no package. Each side has its own
+  tests over the same cases; change them together.
+
+**Not part of the format (deferred):** drop caps, text highlights, private notes, link
+preview cards (they need a server-side fetch, so an SSRF review first), Unsplash search
+(needs an API key) and syntax highlighting on the public site (the editor stores the
+language; the site renders `language-xxx` without colouring).
+
+### 10. News engagement: likes and sharing (EXISTING, 2026-10-09)
+
+On the public article page (`nadoumi-web/app/pages/news/[slug].vue`) signed-in students can **like the article and
+individual comments** and anyone can **share**; replying already existed.
+
+- **Where it shows.** An actions bar (♡ likes, comments, Share) under the byline and again after the body, both driven
+  by one state object. Each comment has its own ♡ next to Reply. Feed cards show a like count when it is above zero.
+- **Totals are public, "liked by me" is personal.** Counts arrive with the cacheable public page. What the signed-in
+  reader already liked is fetched separately in the browser (`GET /api/student/news/{slug}/reactions`) so a personalised
+  value is never baked into a shared page.
+- **Behaviour** (`composables/useNewsReactions.ts`): a tap shows at once, then settles on the server's total; a failed
+  request puts everything back and shows an error; a second tap on the same item is ignored while its request runs; the
+  endpoints are idempotent so retries are safe.
+- **Guests** who tap a heart go to `/login?redirect=<this article>` and return after signing in.
+- **Share** (`ShareMenu.vue`, `utils/share.ts`): the device's own share sheet when the browser has one, Copy link with a
+  live "Link copied" confirmation, and X, Facebook, LinkedIn and WhatsApp links. Links are built only for `http(s)` page
+  URLs and every value is URL-encoded, so a title can never change the query.
+- All strings exist in en, fr, es, ar and zh (enforced by the locale parity test).
+
+**People and recommendations (2026-10-09).**
+- **Who is shown.** The article byline and each comment show the person's name and photo as `SECURITY.md` §11 allows: staff authors with a
+  real photo, students by first name with an initials circle. `NAvatar` falls back to initials if a photo fails to load. A comment whose
+  author no longer exists reads "Former member" (translated).
+- **Liked by.** The "N likes" text opens a dialog (`LikersModal.vue`, `composables/useNewsLikers.ts`) listing recent likers. It is fetched only
+  for signed-in readers, every time it opens; a guest sees a sign-in prompt instead.
+- **More to read.** `GET /api/public/news/{slug}/related` feeds `RelatedArticles.vue` in a right-hand column (`lg` and up, sticky). Below `lg` it
+  follows the comments. A failed lookup shows no column and never affects the article.
+- **Layout consequence.** Beside the sidebar, "wide" and "full width" figures can extend only 2 rem past the text column; on small screens,
+  where there is no sidebar, they keep their full widths.
+
+**Not built (deliberately):** editing or deleting your own comment, reporting a comment, notifying an author of a like or
+a reply, and a per-reader "my likes" page. Each needs its own design (notification volume, moderation workflow).
+
+
+## Student chat — EXISTING (2026-10-09)
+
+`app/pages/dashboard/messages/index.vue` composes `components/chat/*` (inbox, thread, bubble, composer, emoji picker,
+staff picker, image viewer, receipt ticks). State lives in `composables/useChat.ts` (inbox, open thread, optimistic
+sends with retry, receipts, presence), fed by `useChatStream.ts` (typed SSE events through the BFF relay
+`server/api/student-stream.get.ts`, backoff reconnect, resync after a gap). Attachments and downloads use the BFF
+redirect `server/api/student-attachment/[conversationId]/[attachmentId].get.ts`. The image viewer is a centred card
+over a blurred backdrop that steps through every image of the conversation (buttons, arrow keys, swipe). Layout is
+two panes from `md` up and one pane (list or thread) below, RTL-safe, five locales.

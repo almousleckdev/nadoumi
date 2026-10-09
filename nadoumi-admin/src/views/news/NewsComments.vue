@@ -58,9 +58,9 @@ import { deleteArticleComment, listArticleComments, type ArticleComment } from '
 import { formatDateTime } from '@/utils/date'
 import { useUserStore } from '@/stores/user'
 import { useConfirm } from '@/composables/useConfirm'
-import { threadRows } from './markdown'
+import { threadRows } from './commentThread'
 
-const props = defineProps<{ articleId: number }>()
+const props = defineProps<{ articleId: string }>()
 const emit = defineEmits<{ changed: [] }>()
 
 // Deeper replies stop indenting so long threads stay inside the panel.

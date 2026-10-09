@@ -7,8 +7,9 @@ export type ArticleLanguage = 'en' | 'fr' | 'zh' | 'ar' | 'es'
 export const ARTICLE_STATUSES: ArticleStatus[] = ['DRAFT', 'PUBLISHED', 'UNPUBLISHED']
 export const ARTICLE_LANGUAGES: ArticleLanguage[] = ['en', 'fr', 'zh', 'ar', 'es']
 
+/** `id` is the article's opaque public UUID, the only identifier staff URLs and API paths use. */
 export interface Article {
-  id: number
+  id: string
   slug: string
   title: string
   subtitle: string | null
@@ -19,7 +20,10 @@ export interface Article {
   status: ArticleStatus
   publishedAt: string | null
   authorName: string | null
+  /** Absolute photo URL, or null when the author has none (or only a legacy local file). */
+  authorAvatarUrl: string | null
   commentCount: number
+  likeCount: number
   createTime: string | null
   updateTime: string | null
 }

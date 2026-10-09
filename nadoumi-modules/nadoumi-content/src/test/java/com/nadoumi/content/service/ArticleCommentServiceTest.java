@@ -19,6 +19,8 @@ import com.nadoumi.content.mapper.ArticleCommentMapper;
 import com.nadoumi.content.mapper.ArticleMapper;
 import com.nadoumi.content.web.request.CommentRequest;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.identity.profile.PublicProfile;
+import com.nadoumi.identity.profile.PublicProfileService;
 import org.junit.jupiter.api.Test;
 
 class ArticleCommentServiceTest {
@@ -30,7 +32,8 @@ class ArticleCommentServiceTest {
     private final ArticleCommentMapper comments = mock(ArticleCommentMapper.class);
     private final ArticleMapper articles = mock(ArticleMapper.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
-    private final ArticleCommentService service = new ArticleCommentService(comments, articles, caller);
+    private final PublicProfileService profiles = mock(PublicProfileService.class);
+    private final ArticleCommentService service = new ArticleCommentService(comments, articles, caller, profiles);
 
     private static Article article(ArticleStatus status) {
         Article a = new Article();
@@ -133,5 +136,37 @@ class ArticleCommentServiceTest {
         when(comments.findById(404L)).thenReturn(null);
 
         assertThatThrownBy(() -> service.staffDelete(404L, 1L)).isInstanceOf(NadNotFoundException.class);
+    }
+
+    // ---- who the public sees as a comment's author ----
+
+    @Test
+    void shouldReturnThePostersPublicProfile_notTheirFullName_whenTheyComment() {
+        givenPublishedArticle();
+        when(profiles.resolve(java.util.List.of(USER_ID)))
+                .thenReturn(java.util.Map.of(USER_ID, new PublicProfile("Ava", null)));
+
+        var node = service.post("live", new CommentRequest(null, "Great read"));
+
+        org.assertj.core.api.Assertions.assertThat(node.authorName()).isEqualTo("Ava");
+        org.assertj.core.api.Assertions.assertThat(node.authorAvatarUrl()).isNull();
+    }
+
+    @Test
+    void shouldBuildTheThreadFromResolvedProfiles_andSkipDeletedAuthors() {
+        ArticleComment visible = comment(1, ARTICLE_ID, CommentStatus.VISIBLE);
+        visible.setAuthorId(5L);
+        ArticleComment deleted = comment(2, ARTICLE_ID, CommentStatus.DELETED);
+        deleted.setAuthorId(6L);
+        when(comments.findByArticle(ARTICLE_ID)).thenReturn(java.util.List.of(visible, deleted));
+        when(profiles.resolve(java.util.List.of(5L)))
+                .thenReturn(java.util.Map.of(5L, new PublicProfile("Jane Smith", "https://cdn.example/jane.jpg")));
+
+        var thread = service.publicThread(ARTICLE_ID);
+
+        org.assertj.core.api.Assertions.assertThat(thread.get(0).authorName()).isEqualTo("Jane Smith");
+        org.assertj.core.api.Assertions.assertThat(thread.get(0).authorAvatarUrl()).isEqualTo("https://cdn.example/jane.jpg");
+        org.assertj.core.api.Assertions.assertThat(thread.get(1).authorName()).isNull();
+        verify(profiles).resolve(java.util.List.of(5L)); // a deleted comment's author is never even looked up
     }
 }

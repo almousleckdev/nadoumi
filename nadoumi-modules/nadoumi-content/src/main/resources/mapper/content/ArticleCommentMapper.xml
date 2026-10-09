@@ -13,11 +13,13 @@
         <result property="deletedBy"   column="deleted_by"/>
         <result property="deletedTime" column="deleted_time"/>
         <result property="createTime"  column="create_time"/>
+        <result property="likeCount"   column="like_count"/>
     </resultMap>
 
     <sql id="cols">
         c.id, c.article_id, c.parent_id, c.author_id, coalesce(nullif(u.nick_name, ''), u.user_name) as author_name,
-        c.body, c.status, c.deleted_by, c.deleted_time, c.create_time
+        c.body, c.status, c.deleted_by, c.deleted_time, c.create_time,
+        (select count(*) from nad_article_comment_like l where l.comment_id = c.id) as like_count
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">

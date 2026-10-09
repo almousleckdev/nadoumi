@@ -12,8 +12,12 @@ import com.nadoumi.content.web.request.CommentRequest;
 import com.nadoumi.content.web.response.CommentNode;
 import com.nadoumi.content.web.response.StaffCommentResponse;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.identity.profile.PublicProfile;
+import com.nadoumi.identity.profile.PublicProfileService;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,16 +31,25 @@ public class ArticleCommentService {
     private final ArticleCommentMapper comments;
     private final ArticleMapper articles;
     private final CurrentCaller caller;
+    private final PublicProfileService publicProfiles;
 
-    public ArticleCommentService(ArticleCommentMapper comments, ArticleMapper articles, CurrentCaller caller) {
+    public ArticleCommentService(ArticleCommentMapper comments, ArticleMapper articles, CurrentCaller caller,
+            PublicProfileService publicProfiles) {
         this.comments = comments;
         this.articles = articles;
         this.caller = caller;
+        this.publicProfiles = publicProfiles;
     }
 
     @Transactional(readOnly = true)
     public List<CommentNode> publicThread(long articleId) {
-        return CommentTree.build(comments.findByArticle(articleId));
+        List<ArticleComment> flat = comments.findByArticle(articleId);
+        List<Long> authorIds = flat.stream()
+                .filter(c -> c.getStatus() == CommentStatus.VISIBLE)
+                .map(ArticleComment::getAuthorId)
+                .toList();
+        Map<Long, PublicProfile> profiles = publicProfiles.resolve(authorIds);
+        return CommentTree.build(flat, profiles::get);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -63,8 +76,9 @@ public class ArticleCommentService {
         comments.insert(c);
 
         ArticleComment saved = comments.findById(c.getId());
-        return new CommentNode(saved.getId(), saved.getParentId(), saved.getAuthorName(), saved.getBody(), false,
-                saved.getCreateTime(), List.of());
+        PublicProfile author = publicProfiles.resolve(List.of(userId)).get(userId);
+        return new CommentNode(saved.getId(), saved.getParentId(), author == null ? null : author.displayName(),
+                author == null ? null : author.avatarUrl(), saved.getBody(), false, 0, saved.getCreateTime(), List.of());
     }
 
     /** A reply must target a visible comment of the same article; otherwise the id is treated as unknown. */
@@ -76,8 +90,12 @@ public class ArticleCommentService {
     }
 
     @Transactional(readOnly = true)
-    public List<StaffCommentResponse> staffList(long articleId) {
-        return comments.findByArticle(articleId).stream().map(StaffCommentResponse::of).toList();
+    public List<StaffCommentResponse> staffList(UUID articlePublicId) {
+        Article article = articles.findByPublicId(articlePublicId.toString());
+        if (article == null) {
+            throw new NadNotFoundException("article not found");
+        }
+        return comments.findByArticle(article.getId()).stream().map(StaffCommentResponse::of).toList();
     }
 
     @Transactional(rollbackFor = Exception.class)

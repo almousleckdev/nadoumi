@@ -5,6 +5,7 @@ import com.nadoumi.content.service.ArticleService;
 import com.nadoumi.content.web.response.ArticleSummary;
 import com.nadoumi.content.web.response.PublicArticleDetail;
 import com.ruoyi.common.annotation.Anonymous;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,12 @@ public class PublicArticleController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
         return service.publicList(q, language, page, size);
+    }
+
+    @Anonymous
+    @GetMapping("/{slug}/related")
+    public List<ArticleSummary> related(@PathVariable String slug, @RequestParam(defaultValue = "4") int limit) {
+        return service.related(slug, limit);
     }
 
     @Anonymous

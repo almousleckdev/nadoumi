@@ -1,0 +1,135 @@
+/*
+ * News editor: theme tokens and the article reading typography.
+ * Shared by the writing surface (editor.vue) and the reader preview (ArticlePreview.vue) so the two
+ * can never drift apart. `.ne-theme` carries the tokens; `.ne-prose` is the article body.
+ */
+.ne-theme {
+  --ne-paper: #fff;
+  --ne-ink: #242424;
+  --ne-muted: #6b6b6b;
+  --ne-placeholder: #b3b3b1;
+  /* Medium's green by default; set this one variable to change the accent (e.g. Nadoumi orange) */
+  --ne-accent: #1a8917;
+  --ne-accent-strong: #156d12;
+  --ne-accent-soft: #d1e7d0;
+  --ne-accent-on-dark: #9fd695;
+  --ne-serif: 'Source Serif 4 Variable', charter, 'Bitstream Charter', 'Sitka Text', cambria, georgia, serif;
+  --ne-sans: -apple-system, blinkmacsystemfont, 'Segoe UI', roboto, 'Helvetica Neue', arial, sans-serif;
+  --ne-mono: ui-monospace, sfmono-regular, menlo, consolas, monospace;
+  --ne-body-font: 400 21px/33px var(--ne-serif);
+  /* widths of the figures that break out of the 680px column; the preview re-points them at its own frame */
+  --ne-wide-width: min(1032px, calc(100vw - 32px));
+  --ne-full-width: 100vw;
+
+  background: var(--ne-paper);
+  color: var(--ne-ink);
+}
+
+/* ---- the writing surface (ProseMirror renders into `.ne-prose`) ---- */
+.ne-prose {
+  min-height: 40vh;
+  outline: none;
+  font: var(--ne-body-font);
+  letter-spacing: -0.003em;
+  word-break: break-word;
+}
+.ne-prose > :first-child {
+  margin-top: 0;
+}
+.ne-prose p {
+  margin: 29px 0 0;
+}
+.ne-prose p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: inline-start;
+  height: 0;
+  color: var(--ne-placeholder);
+  pointer-events: none;
+}
+.ne-prose h1,
+.ne-prose h2,
+.ne-prose h3 {
+  margin: 40px 0 0;
+  font-family: var(--ne-serif);
+  font-weight: 700;
+  letter-spacing: -0.014em;
+}
+.ne-prose h1 {
+  font-size: 34px;
+  line-height: 42px;
+}
+.ne-prose h2 {
+  font-size: 30px;
+  line-height: 38px;
+}
+.ne-prose h3 {
+  margin-top: 32px;
+  font-size: 22px;
+  line-height: 30px;
+}
+.ne-prose blockquote {
+  margin: 29px 0 0 -23px;
+  padding-inline-start: 20px;
+  border-inline-start: 3px solid var(--ne-ink);
+  font-style: italic;
+}
+.ne-prose blockquote p {
+  margin-top: 0;
+}
+.ne-prose ul,
+.ne-prose ol {
+  margin: 29px 0 0;
+  padding-inline-start: 30px;
+}
+.ne-prose ul {
+  list-style: disc;
+}
+.ne-prose ol {
+  list-style: decimal;
+}
+.ne-prose li + li {
+  margin-top: 14px;
+}
+.ne-prose li p {
+  margin-top: 0;
+}
+.ne-prose a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ne-prose code {
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: #f2f2f2;
+  font: 0.86em var(--ne-mono);
+}
+.ne-prose pre code {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  font: inherit;
+}
+.ne-prose hr {
+  height: 20px;
+  margin: 45px 0 0;
+  border: 0;
+  text-align: center;
+}
+.ne-prose hr::before {
+  content: '\00b7\00b7\00b7';
+  font-size: 30px;
+  letter-spacing: 0.6em;
+  padding-inline-start: 0.6em;
+  line-height: 20px;
+}
+.ne-prose hr.ProseMirror-selectednode {
+  outline: 2px solid var(--ne-accent);
+  outline-offset: 2px;
+}
+.ne-prose ::selection {
+  background: #bad7fb;
+}
+.ne-prose--readonly {
+  cursor: default;
+}

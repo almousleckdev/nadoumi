@@ -408,17 +408,53 @@ upload controller, including the catalog controllers.
 | Per-environment CORS origins | **OPEN** — deploy-time config, not design. |
 
 
-## News (`nadoumi-content`) — EXISTING (2026-10-04)
+## News (`nadoumi-content`) — EXISTING (2026-10-04, editor contract updated 2026-10-09, UUID ids + likes + related + public identity 2026-10-09)
 
 | Audience | Endpoint | Notes |
 |---|---|---|
 | Public (anonymous) | `GET /api/public/news?q&language&page&size` | PUBLISHED articles only, as `ArticleSummary` |
 | Public (anonymous) | `GET /api/public/news/{slug}` | `PublicArticleDetail`: article, Markdown body, nested comment tree. Draft / unpublished → 404 |
 | Student (signed in) | `POST /api/student/news/{slug}/comments` | `{parentId?, body}`; replies nest to any depth; parent must be a visible comment of the same article; 5 comments per user per minute |
-| Staff | `GET/POST /api/staff/news`, `GET/PUT /api/staff/news/{id}` | `nad:article:list/view/create/edit` |
-| Staff | `POST /api/staff/news/{id}/publish`, `/unpublish` | `nad:article:publish`; publishing requires a cover image; the first publish notifies active students |
-| Staff | `POST /api/staff/news/{id}/cover`, `/images` | multipart `file`; `/images` returns the URL to embed as Markdown |
+| Staff | `GET/POST /api/staff/news`, `GET/PUT /api/staff/news/{id}` (`{id}` is the article's **UUID**, not the database sequence) | `nad:article:list/view/create/edit`. `title` is required; **`bodyMd` may be empty** so a draft can be autosaved from the first keystroke |
+| Staff | `POST /api/staff/news/{id}/publish`, `/unpublish` | `nad:article:publish`; publishing requires a **cover image and a non-blank body** (400 otherwise); the first publish notifies active students |
+| Staff | `POST /api/staff/news/{id}/cover`, `/images` | multipart `file`; `/images` returns the URL to embed as Markdown (the editor adds the width and caption conventions, see `FRONTEND_ARCHITECTURE.md` §9) |
 | Staff | `GET /api/staff/news/{id}/comments`, `DELETE /api/staff/news/comments/{commentId}` | `nad:article:comment:remove`; soft delete |
 | Staff | `DELETE /api/staff/news/{id}` | `nad:article:remove`; a PUBLISHED article must be unpublished first |
 
+| Student (signed in) | `PUT` / `DELETE /api/student/news/{slug}/like` | Like / unlike the article. Idempotent; returns `{liked, likeCount}`. Draft, unpublished and unknown slugs are all `404` |
+| Student (signed in) | `PUT` / `DELETE /api/student/news/{slug}/comments/{commentId}/like` | Like / unlike a comment. The comment must be visible and belong to that article, else `400`. Returns `{liked, likeCount}` |
+| Student (signed in) | `GET /api/student/news/{slug}/reactions` | What this reader already liked: `{articleLiked, likedCommentIds[]}`. Per-person, so it is never part of the cacheable public page |
+
+| Student (signed in) | `GET /api/student/news/{slug}/likes?limit=20` | Who liked, newest first: `{total, likers:[{displayName, avatarUrl}]}` (limit 1-50). First names only, no student photos (`SECURITY.md` §11). Anonymous: rejected |
+| Public (anonymous) | `GET /api/public/news/{slug}/related?limit=4` | Up to 12 `ArticleSummary` of the same language, best title/subtitle word overlap first, newest among equals; never the article itself or an unpublished one. Draft / unknown slug → 404 |
+
+Public responses carry totals only: `ArticleSummary.likeCount` and `CommentNode.likeCount`. Who liked is available only to signed-in readers (above).
+
+`ArticleSummary.authorAvatarUrl` and `CommentNode.authorAvatarUrl` are absolute `https` URLs or null; `authorName` on a comment is the public first name (or null when the account no longer exists). Staff responses carry `likeCount` and identify the article by `id` (UUID). A rejected anonymous call to a `/api/student/**` endpoint follows the RuoYi convention, HTTP `200` with `{"code":401}` in the body.
+
+Staff path ids are typed `UUID`: a malformed id is a client error, an unknown one is `404`, and the numeric sequence is not accepted.
+
 Public comment nodes of a deleted comment carry no body and no author; the body is kept for staff (audit).
+
+---
+
+## Chat endpoints — EXISTING (2026-10-09; details in COMMUNICATION_AND_NOTIFICATIONS.md §7)
+
+Student (`/api/student/conversations`, bearer JWT; participant rows are the authorization) and staff
+(`/api/staff/...`, `@PreAuthorize nad:conversation:participate`):
+
+| Method and path | Purpose |
+|---|---|
+| `GET  .../conversations?page=` (staff: `&q=&applicationId=`) | Own inbox, 30 per page, newest activity first |
+| `GET  .../conversations/unread-count` | `{count}` for the navigation badge |
+| `GET  /api/student/conversations/staff` | Staff directory for students (name, photo, presence) |
+| `GET  /api/staff/chat/students?q=` | Server-side student search (max 20; id, application id or name) |
+| `POST .../conversations/direct` `{userId}` | Get or create the private chat with one person; posts nothing |
+| `GET/POST .../conversations/{id}/messages` | Page (30, `beforeId` cursor) / post `{body, attachmentMediaIds[≤5]}` |
+| `POST .../conversations/{id}/read`, `/close` (staff) | Read marker / close |
+| `POST .../conversations/{id}/attachments` | Upload (multipart `file`), returns `{mediaId}` |
+| `GET  .../conversations/{id}/attachments/{aid}[?download=1][&json=1]` | Participant-checked redirect to a signed URL |
+| `GET  /api/{student,staff}/stream` | SSE: `message`, `delivered`, `read`, `presence`, `heartbeat` |
+
+Responses use explicit DTOs (`ConversationSummaryResponse`, `MessageResponse`, `ChatPerson`,
+`StudentSearchResult`); none carries an email, surname or signed URL in a list.

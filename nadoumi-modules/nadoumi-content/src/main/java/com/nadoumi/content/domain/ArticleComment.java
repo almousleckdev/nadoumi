@@ -15,6 +15,8 @@ public class ArticleComment {
     private Long deletedBy;
     private LocalDateTime deletedTime;
     private LocalDateTime createTime;
+    /** Joined count of reader likes; not a column of {@code nad_article_comment}. */
+    private Integer likeCount;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -36,4 +38,6 @@ public class ArticleComment {
     public void setDeletedTime(LocalDateTime deletedTime) { this.deletedTime = deletedTime; }
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
+    public Integer getLikeCount() { return likeCount; }
+    public void setLikeCount(Integer likeCount) { this.likeCount = likeCount; }
 }

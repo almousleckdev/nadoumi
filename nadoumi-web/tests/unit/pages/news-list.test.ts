@@ -19,7 +19,7 @@ describe('news feed', () => {
     publicGet.mockResolvedValue(page([{
       slug: 'visa-tips', title: 'Visa tips for China', subtitle: 'What to prepare', language: 'en',
       coverUrl: 'https://res.cloudinary.com/demo/image/upload/v1/visa.jpg',
-      authorName: 'Amina', publishedAt: '2026-09-01T10:00:00', commentCount: 3, readMinutes: 4,
+      authorName: 'Amina', publishedAt: '2026-09-01T10:00:00', commentCount: 3, likeCount: 0, readMinutes: 4,
     }]))
     const w = await mountSuspended(NewsList)
     await flushPromises()

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 public class Article {
     private Long id;
+    /** Opaque UUID used in staff URLs; assigned by the database. */
+    private String publicId;
     private String slug;
     private String title;
     private String subtitle;
@@ -16,8 +18,13 @@ public class Article {
     private Long authorId;
     /** Joined from {@code sys_user}; not a column of {@code nad_article}. */
     private String authorName;
+    /** Joined from {@code sys_user}; the raw avatar value and the account type that decides if it may be shown. */
+    private String authorAvatar;
+    private String authorType;
     /** Joined count of VISIBLE comments; only populated by list queries. */
     private Integer commentCount;
+    /** Joined count of reader likes. */
+    private Integer likeCount;
     private String createBy;
     private LocalDateTime createTime;
     private String updateBy;
@@ -25,6 +32,8 @@ public class Article {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+    public String getPublicId() { return publicId; }
+    public void setPublicId(String publicId) { this.publicId = publicId; }
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
     public String getTitle() { return title; }
@@ -45,8 +54,14 @@ public class Article {
     public void setAuthorId(Long authorId) { this.authorId = authorId; }
     public String getAuthorName() { return authorName; }
     public void setAuthorName(String authorName) { this.authorName = authorName; }
+    public String getAuthorAvatar() { return authorAvatar; }
+    public void setAuthorAvatar(String authorAvatar) { this.authorAvatar = authorAvatar; }
+    public String getAuthorType() { return authorType; }
+    public void setAuthorType(String authorType) { this.authorType = authorType; }
     public Integer getCommentCount() { return commentCount; }
     public void setCommentCount(Integer commentCount) { this.commentCount = commentCount; }
+    public Integer getLikeCount() { return likeCount; }
+    public void setLikeCount(Integer likeCount) { this.likeCount = likeCount; }
     public String getCreateBy() { return createBy; }
     public void setCreateBy(String createBy) { this.createBy = createBy; }
     public LocalDateTime getCreateTime() { return createTime; }
