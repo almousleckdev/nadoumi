@@ -21,17 +21,21 @@ describe('DashboardShell', () => {
     expect(w.text()).not.toContain('Switch applicant')
   })
 
-  it('calls signOut from the account menu', async () => {
+  it('asks before signing out from the account menu, and does not sign out yet', async () => {
+    useSignOutConfirm().dismiss()
     const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
     await w.find('[data-test="account-menu"]').trigger('click')
     await w.find('[data-test="sign-out"]').trigger('click')
-    expect(signOut).toHaveBeenCalled()
+    expect(useSignOutConfirm().open.value).toBe(true)
+    expect(signOut).not.toHaveBeenCalled()
   })
 
-  it('also calls signOut from the sidebar', async () => {
+  it('asks before signing out from the sidebar too', async () => {
+    useSignOutConfirm().dismiss()
     const w = await mountSuspended(DashboardShell, { slots: { default: () => 'body' } })
     await w.find('[data-test="sidebar-sign-out"]').trigger('click')
-    expect(signOut).toHaveBeenCalled()
+    expect(useSignOutConfirm().open.value).toBe(true)
+    expect(signOut).not.toHaveBeenCalled()
   })
 
   it('shows the real, buildable sidebar sections — nothing linking to an unbuilt feature', async () => {

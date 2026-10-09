@@ -8,8 +8,8 @@ public interface ApplicationMapper {
 
     Application findById(Long id);
 
-    /** How many applications exist for any of these applicants (any status, drafts included). */
-    int countByApplicantIds(@Param("applicantIds") List<Long> applicantIds);
+    /** Permanent erasure of an applicant; child rows cascade. */
+    int removeByApplicantId(@Param("applicantId") long applicantId);
 
     List<Application> searchStaff(ApplicationSearch filter);
 

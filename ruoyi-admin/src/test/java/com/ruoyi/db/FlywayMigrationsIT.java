@@ -86,9 +86,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V98 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V99 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(89);
+        assertThat(applied).isEqualTo(90);
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
         assertThat(single(ds, "SELECT character_maximum_length FROM information_schema.columns WHERE table_schema = DATABASE() "
@@ -98,7 +98,7 @@ class FlywayMigrationsIT {
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(tableExists(ds, "nad_applicant_education")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_dict_data WHERE dict_type = 'nad_user_type'")).isEqualTo("4");
-        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:applicant:%'")).isEqualTo("10");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:applicant:%'")).isEqualTo("11");
         // V9 — university catalog + its menu/permission set
         assertThat(tableExists(ds, "nad_university")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_menu WHERE perms LIKE 'nad:university:%'")).isEqualTo("6");
@@ -404,7 +404,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(88); // V2..V98, same gaps as above
+        assertThat(applied).isEqualTo(89); // V2..V99, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

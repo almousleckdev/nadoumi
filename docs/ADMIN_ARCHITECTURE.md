@@ -21,7 +21,7 @@ Verified 2026-09-02 (see `docs/ARCHITECTURE_GAP_ANALYSIS.md` §2):
 | --- | --- | --- |
 | Dev URL | **`http://localhost:8082`** | **`http://localhost:1024`** (wants `:80`) |
 | Stack | Vue 3 + Vite + TS + Element Plus + Pinia | Vue 2 + vue-cli-service + Element UI (stock RuoYi) |
-| Nadoumi screens | **Dashboard** (real, live applicant metrics) + **Applicants** (real list/create/archive) | none |
+| Nadoumi screens | **Dashboard** (real, live applicant metrics) + **Applicants** (real list/create/delete) | none |
 | RuoYi platform screens | none yet — unknown `component` → `views/placeholder.vue` | all implemented |
 | Nadoumi commits | 2 | 2 tweaks on top of 696 upstream |
 
@@ -79,7 +79,7 @@ in the nadoumi-web build**.
 | Module | Status | Notes |
 | --- | --- | --- |
 | Dashboard | **IMPLEMENTED** | Real applicant KPIs + honest coming-soon (§6.1). |
-| Applicants — list | **IMPLEMENTED** | Search / status / nationality filter, pagination, archive. `GET /api/staff/applicants`. |
+| Applicants — list | **IMPLEMENTED** | Search / status / nationality filter, pagination, profile photo, permanent delete. `GET /api/staff/applicants`. |
 | Applicants — detail | **IMPLEMENTED** | Overview + Education + Test scores + Contacts + Access tabs. |
 | Applicant — profile edit | **IMPLEMENTED** | Drawer form → `PUT /api/staff/applicants/{id}` (`nad:applicant:edit`). PII fields hidden/locked without `nad:applicant:pii:view`. |
 | Applicant — education / test scores / contacts CRUD | **IMPLEMENTED** | Add / edit / remove via drawer forms; staff `POST` / `PUT` / `DELETE` on each sub-resource (`nad:applicant:edit`). |
@@ -91,7 +91,7 @@ in the nadoumi-web build**.
 | My profile | **IMPLEMENTED** (2026-09-06) | `views/profile.vue` — avatar upload, editable display name / phone / email / gender, password change. `GET/PUT /system/user/profile`, `POST /system/user/profile/avatar`, `PUT /system/user/profile/updatePwd`. Was password-only before. |
 | Employees (HR) | **IMPLEMENTED** (2026-09-06) | `views/employees/index.vue` + `EmployeeDrawer.vue` at `/employees` — the staff account **and** the employment record in one flow: position (`sys_post`), title, department, reports-to, employment type/status, start / probation / end dates, salary + currency + pay frequency (section hidden unless `nad:employee:compensation:view`), work location, emergency contact, notes, roles. Backend `nadoumi-hr` module — `nad_employee` (V35), `/api/staff/employees` (`nad:employee:*`). The old `/staff` account-only screen is kept as a hidden route. |
 | Tasks | **IMPLEMENTED** (2026-09-06) | `views/tasks/index.vue` + `TaskDrawer.vue` at `/tasks` — create/assign, filter by status/priority/mine, a detail drawer with the activity timeline and status-transition buttons. Lifecycle `PENDING → IN_PROGRESS → COMPLETED → APPROVED` (approve needs `nad:task:approve`); `CANCELLED` from any live state. Priority colours per spec: LOW = orange, MEDIUM = blue, HIGH = green. Every change writes `nad_task_event` and emits `TaskProgressChanged` → the creator, assignee and task admins are notified (in-app + email). Backend `nadoumi-hr` — `nad_task` / `nad_task_event` (V36), `/api/staff/tasks` (`nad:task:*`). |
-| Students | **REMOVED** (2026-10-09, V98) | There is no `/students` screen: a student and their applicant profile are one person to staff, so the Applicants screen is the single place to find them. The applicant detail page carries an **account panel** (`views/applicants/AccountPanel.vue`, shown when the applicant has an active student owner and the caller holds `nad:applicant:access:view`): account status, contact, suspend / block / activate (`system:user:edit`), and **Delete student** (`nad:student:delete`, super admin only by default). The dashboard still counts students via `/system/user/list?userType=10`. |
+| Students | **REMOVED** (2026-10-09, V98) | There is no `/students` screen: a student and their applicant profile are one person to staff, so the Applicants screen is the single place to find them. The applicant detail page carries an **account panel** (`views/applicants/AccountPanel.vue`, shown when the applicant has an active student owner and the caller holds `nad:applicant:access:view`): account status, contact, suspend / block / activate (`system:user:edit`), with a required written reason for suspend and block. **Delete applicant** (`nad:applicant:delete`, super admin by default) is a button on the applicants table and the applicant page, so it also covers applicants without an account. The Test scores tab was removed. The dashboard still counts students via `/system/user/list?userType=10`. |
 | Pagination | **IMPLEMENTED** (2026-09-06) | Shared `components/ui/Pagination.vue` — `total, sizes, prev, pager, next, jumper` with page-size options `[10, 20, 50, 100, 150, 200]`; retrofitted onto every paged list screen. |
 | Roles | **IMPLEMENTED** (2026-09-06) | `views/roles/index.vue` — CRUD + status toggle + permission (menu-tree) assignment + data scope. `/system/role/*` + `/system/menu/roleMenuTreeselect`. Built-in roles are read-only in the UI. |
 | Menus & Permissions | **IMPLEMENTED** (2026-09-06) | `views/menus/index.vue` — tree table + drawer (directory / menu / button), parent picker, `perms` token editor. `/system/menu/*`. |

@@ -7,7 +7,7 @@ const emit = defineEmits<{ navigate: [] }>()
 const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
-const { signOut } = useSession()
+const { ask: askSignOut } = useSignOutConfirm()
 
 const { count: unreadMessages, refresh: refreshUnreadMessages } = useChatUnread()
 const { unreadCount: getUnreadNotifs } = useNotifications()
@@ -95,7 +95,7 @@ const linkClass = (active: boolean) => [
       data-test="sidebar-sign-out"
       :title="collapsed ? t('common.signOut') : undefined"
       :class="linkClass(false)"
-      @click="signOut(); emit('navigate')"
+      @click="askSignOut(); emit('navigate')"
     >
       <DashboardIcon name="logout" :size="18" class="shrink-0" />
       <span v-show="!collapsed" class="truncate">{{ t('common.signOut') }}</span>

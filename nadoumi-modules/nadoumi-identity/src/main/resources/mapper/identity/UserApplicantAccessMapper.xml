@@ -98,17 +98,17 @@
         where user_id = #{userId} and status = 'ACTIVE' and <include refid="notExpired"/>
     </select>
 
-    <select id="ownedApplicantIds" resultType="long">
-        select distinct applicant_id from nad_user_applicant_access
-        where user_id = #{userId} and access_role = 'OWNER' and status = 'ACTIVE'
+    <select id="userIdsForApplicant" resultType="long">
+        select distinct user_id from nad_user_applicant_access where applicant_id = #{applicantId} and user_id is not null
     </select>
 
-    <update id="revokeAllForUser">
-        update nad_user_applicant_access
-           set status = 'REVOKED', revoked_by_user_id = #{revokedBy}, revoked_at = now(),
-               update_by = #{updateBy}, update_time = now()
-         where user_id = #{userId} and status in ('ACTIVE', 'PENDING')
-    </update>
+    <select id="countForUser" resultType="int">
+        select count(*) from nad_user_applicant_access where user_id = #{userId}
+    </select>
+
+    <delete id="deleteByApplicantId">
+        delete from nad_user_applicant_access where applicant_id = #{applicantId}
+    </delete>
 
     <insert id="insert" parameterType="com.nadoumi.identity.domain.UserApplicantAccess"
             useGeneratedKeys="true" keyProperty="id">

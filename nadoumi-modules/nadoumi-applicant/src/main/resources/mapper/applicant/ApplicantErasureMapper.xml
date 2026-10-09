@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.applicant.mapper.ApplicantErasureMapper">
+
+    <delete id="deleteContacts">
+        delete from nad_applicant_contact where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteEducation">
+        delete from nad_applicant_education where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteInterestChoices">
+        delete from nad_applicant_interest_choice where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteInterests">
+        delete from nad_applicant_interest where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteResidence">
+        delete from nad_applicant_residence where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteTestScores">
+        delete from nad_applicant_test_score where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteWork">
+        delete from nad_applicant_work where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deleteApplicant">
+        delete from nad_applicant where id = #{applicantId}
+    </delete>
+
+</mapper>

@@ -40,6 +40,9 @@ public class SysUser extends BaseEntity
      */
     private String userType;
 
+    /** Why the account is suspended or blocked; required when disabling, cleared on activation. */
+    private String statusReason;
+
     /** 用户账号 */
     @Excel(name = "登录名称")
     private String userName;
@@ -137,6 +140,16 @@ public class SysUser extends BaseEntity
     public void setDeptId(Long deptId)
     {
         this.deptId = deptId;
+    }
+
+    public String getStatusReason()
+    {
+        return statusReason;
+    }
+
+    public void setStatusReason(String statusReason)
+    {
+        this.statusReason = statusReason;
     }
 
     public String getUserType()

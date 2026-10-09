@@ -26,11 +26,17 @@ public record ApplicantResponse(
         String whatsapp,
         boolean emailVerified,
         boolean onboardingComplete,
-        boolean welcomePending) {
+        boolean welcomePending,
+        String photoUrl) {
 
     private static final String MASK = "••••";
 
     public static ApplicantResponse of(Applicant a, boolean includePii) {
+        return of(a, includePii, null);
+    }
+
+    /** {@code photoUrl} is a signed avatar link, minted only where staff see the person (see {@code AvatarLinks}). */
+    public static ApplicantResponse of(Applicant a, boolean includePii, String photoUrl) {
         return new ApplicantResponse(
                 a.getId(),
                 a.getGivenName(),
@@ -50,7 +56,8 @@ public record ApplicantResponse(
                 a.getWhatsapp(),
                 a.getEmailVerifiedAt() != null,
                 a.getOnboardedAt() != null,
-                a.getOnboardedAt() != null && a.getWelcomedAt() == null);
+                a.getOnboardedAt() != null && a.getWelcomedAt() == null,
+                photoUrl);
     }
 
     private static String mask(Object v) {

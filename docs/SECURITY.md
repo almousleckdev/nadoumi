@@ -541,12 +541,13 @@ is not an applicant photo, so user ids cannot be walked; otherwise it redirects 
 media URL, and each view is written to the media access log. A student's raw `sys_user.avatar` is still ignored.
 Staff photos remain public `STAFF_AVATAR` assets (absolute https URLs only).
 
-## Destructive staff actions (EXISTING, 2026-10-09, V98)
+## Destructive staff actions (EXISTING, 2026-10-09, V98 and V99)
 
 | Action | Permission | Default holders | Guard |
 | --- | --- | --- | --- |
-| Delete a student account | `nad:student:delete` | super admin | Soft delete and anonymise; sessions and grants revoked. Refused while the student has any application. Each module takes part through `StudentRemovalParticipant`, so identity never reads application tables. Audited by `@Log`. |
+| Permanently delete an applicant | `nad:applicant:delete` | super admin | Removes the applicant, applications, documents and files, and soft-deletes a student login left without an applicant. Each module deletes its own data through `ApplicantErasureParticipant`, so no module reads another's tables. Audited by `@Log`. |
 | Delete a support ticket and its chat | `nad:support:ticket:delete` | super admin | Removes the ticket, events, meetings and chat. A support chat cannot be deleted from Conversations. |
+| Suspend or block an account (student or staff) | `system:user:edit` | per role | A written reason of 5 to 255 characters is required and stored in `sys_user.status_reason`; activation clears it. Sessions end at once. |
 
-Both are separate from the edit and manage permissions on purpose: holding `nad:support:ticket:manage` or
+Delete permissions are separate from edit and manage permissions on purpose: holding `nad:support:ticket:manage` or
 `system:user:edit` never allows a delete.

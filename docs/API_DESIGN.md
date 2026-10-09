@@ -143,15 +143,16 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 | GET | `/api/staff/applicants/{id}` | `nad:applicant:view` | `ApplicantResponse` — `dob` + `passportNo` **masked** (`••••` → serialized `null`) unless the caller holds `nad:applicant:pii:view`. |
 | POST | `/api/staff/applicants` | `nad:applicant:create` | interim-owner + invite flow. `201`. |
 | PUT | `/api/staff/applicants/{id}` | `nad:applicant:edit` | |
-| DELETE | `/api/staff/applicants/{id}` | `nad:applicant:archive` | soft archive, `204`. |
+| DELETE | `/api/staff/applicants/{id}` | `nad:applicant:delete` | **Permanent delete** (replaces the old archive, 2026-10-09, V99): grants first, then every module's data through `ApplicantErasureParticipant` (documents, applications), then the applicant's own rows and its photo and passport files, then each former owner's student login that is left with no applicant (soft delete and anonymise, sessions ended). Works for any applicant, with or without an account or applications. `204`. |
 | GET / POST / PUT / DELETE | `/api/staff/applicants/{id}/education[/{eduId}]` | view / edit | `POST` → `201`; `PUT` → `200`; `DELETE` → `204`. Cross-applicant id → `404`. |
 | GET / POST / PUT / DELETE | `/api/staff/applicants/{id}/test-scores[/{scoreId}]` | view / edit | idem |
 | GET / POST / PUT / DELETE | `/api/staff/applicants/{id}/contacts[/{contactId}]` | view / edit | idem |
 | GET | `/api/staff/applicants/{applicantId}/access` | `nad:applicant:access:view` | `List<AccessGrantResponse>` — grantee `userId` / `invitedEmail`, role, status, interim flag, granted/expires, effective capabilities (`StaffApplicantAccessController`). |
 | POST / DELETE / POST `/transfer-ownership` | `/api/staff/applicants/{applicantId}/access[/{grantId}]` | `nad:applicant:access:manage` | delegate / revoke / transfer ownership. |
 
-| DELETE | `/api/staff/students/{userId}` | `nad:student:delete` | Soft-deletes and anonymises a student account (`sys_user.del_flag='2'`, name `deleted_<id>`, email and phone cleared), revokes every session and access grant, archives the applicant profiles the student owned. Refused with `400` while any of the student's applicants has an application (those are business records). `204`. |
 | DELETE | `/api/staff/support/tickets/{id}` | `nad:support:ticket:delete` | Deletes the ticket, its events and meetings, and its chat. `204`. A support chat cannot be deleted from `/api/staff/conversations/{id}` (`400`). |
+
+`ApplicantResponse.photoUrl` (staff list and detail only) is a signed avatar link `/api/public/avatars/applicants/{id}/{signature}`, present when the applicant has a photo; the HMAC is domain-separated from the per-user avatar link.
 
 **Admin uses:** list + `GET {id}` + full CRUD on the three sub-resources + the
 access `GET`. **Remaining:** surface grant / revoke / transfer in the UI; add a

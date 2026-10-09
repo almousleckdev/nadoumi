@@ -14,4 +14,7 @@ public interface PublicProfileMapper {
 
     /** The photo asset of a student's active OWNER applicant, or null when there is none (or the user is staff). */
     Long findStudentPhotoMediaId(@Param("userId") long userId);
+
+    /** The photo of one applicant, or null. */
+    Long findApplicantPhotoMediaId(@Param("applicantId") long applicantId);
 }

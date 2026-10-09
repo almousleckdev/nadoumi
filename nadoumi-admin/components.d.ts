@@ -76,6 +76,7 @@ declare module 'vue' {
     StatCard: typeof import('./src/components/dashboard/StatCard.vue')['default']
     StatePanel: typeof import('./src/components/ui/StatePanel.vue')['default']
     StatusBadge: typeof import('./src/components/ui/StatusBadge.vue')['default']
+    StatusReasonDialog: typeof import('./src/components/ui/StatusReasonDialog.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

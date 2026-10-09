@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { deleteStudentAccount, listAccess } from '@/api/applicant'
+import { listAccess } from '@/api/applicant'
 import { changeUserStatus, getUser, type SysUserRow } from '@/api/system'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
+import StatusReasonDialog from '@/components/ui/StatusReasonDialog.vue'
 import StudentContactDialog from './StudentContactDialog.vue'
 import { statusChangeCopy, statusLabelKey, statusTone } from './studentStatus'
 
@@ -20,17 +20,17 @@ const STATUS_BLOCKED = '2'
 const props = defineProps<{ id: string }>()
 
 const { t } = useI18n()
-const router = useRouter()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
 const student = ref<SysUserRow | null>(null)
 const contactOpen = ref(false)
 const busy = ref(false)
+const reasonOpen = ref(false)
+const pendingStatus = ref(STATUS_SUSPENDED)
 
 const canChangeStatus = computed(() => userStore.hasPerm('system:user:edit'))
 const canContact = computed(() => userStore.hasPerm('nad:conversation:participate'))
-const canDelete = computed(() => userStore.hasPerm('nad:student:delete'))
 const displayName = computed(() => student.value?.nickName || student.value?.userName || '')
 
 // The account is the applicant's active owner. Staff-created applicants have none, so the panel stays hidden.
@@ -47,48 +47,32 @@ async function load() {
   }
 }
 
+// Suspending or blocking needs a written reason; activating needs only a confirmation.
 async function changeStatus(next: string) {
   const current = student.value
   if (!current) return
-  const copy = statusChangeCopy(next)
-  const ok = await confirm({
-    title: t(copy.title),
-    message: t(copy.confirm, { name: displayName.value }),
-    tone: copy.tone === 'warning' ? 'danger' : 'primary',
-  })
-  if (!ok) return
+  if (next === STATUS_ACTIVE) {
+    const copy = statusChangeCopy(next)
+    const ok = await confirm({ title: t(copy.title), message: t(copy.confirm, { name: displayName.value }), tone: 'primary' })
+    if (ok) await apply(next)
+    return
+  }
+  pendingStatus.value = next
+  reasonOpen.value = true
+}
+
+async function apply(next: string, reason?: string) {
+  const current = student.value
+  if (!current) return
   busy.value = true
   try {
-    await changeUserStatus(current.userId, next)
-    student.value = { ...current, status: next }
+    await changeUserStatus(current.userId, next, reason)
+    student.value = { ...current, status: next, statusReason: next === STATUS_ACTIVE ? null : reason }
+    reasonOpen.value = false
     ElMessage.success(t('students.statusUpdated'))
   }
   catch (e) {
     ElMessage.error((e as Error)?.message || t('students.statusUpdateFailed'))
-  }
-  finally {
-    busy.value = false
-  }
-}
-
-async function remove() {
-  const current = student.value
-  if (!current) return
-  const ok = await confirm({
-    title: t('students.deleteTitle'),
-    message: t('students.deleteConfirm', { name: displayName.value }),
-    confirmText: t('common.delete'),
-    tone: 'danger',
-  })
-  if (!ok) return
-  busy.value = true
-  try {
-    await deleteStudentAccount(current.userId)
-    ElMessage.success(t('students.deleted'))
-    router.push('/applicants')
-  }
-  catch (e) {
-    ElMessage.error((e as Error)?.message || t('students.deleteFailed'))
   }
   finally {
     busy.value = false
@@ -115,6 +99,11 @@ onMounted(load)
       <div class="account__text">
         <span class="account__name">{{ t('students.accountInfo') }}</span>
         <span class="account__meta">@{{ student.userName }} · {{ student.email || t('students.noEmail') }}</span>
+        <span
+          v-if="student.statusReason"
+          class="account__reason"
+          data-test="account-reason"
+        >{{ t('students.reasonLabel') }}: {{ student.statusReason }}</span>
       </div>
       <StatusBadge
         :status="statusTone(student.status)"
@@ -161,18 +150,16 @@ onMounted(load)
           {{ t('students.unblock') }}
         </el-button>
       </template>
-      <el-button
-        v-if="canDelete"
-        size="small"
-        type="danger"
-        plain
-        :loading="busy"
-        data-test="account-delete"
-        @click="remove"
-      >
-        {{ t('students.deleteStudent') }}
-      </el-button>
     </div>
+
+    <StatusReasonDialog
+      v-model="reasonOpen"
+      :title="t(statusChangeCopy(pendingStatus).title)"
+      :message="t(statusChangeCopy(pendingStatus).confirm, { name: displayName })"
+      :confirm-text="t(statusChangeCopy(pendingStatus).title)"
+      :busy="busy"
+      @confirm="(reason: string) => apply(pendingStatus, reason)"
+    />
 
     <StudentContactDialog
       v-model="contactOpen"
@@ -217,6 +204,11 @@ onMounted(load)
 .account__meta {
   font-size: 12px;
   color: var(--nad-ink-soft);
+  overflow-wrap: anywhere;
+}
+.account__reason {
+  font-size: 12px;
+  color: var(--el-color-danger);
   overflow-wrap: anywhere;
 }
 .account__actions {

@@ -14,6 +14,7 @@ import com.nadoumi.applicant.web.request.SelfApplicantRequest;
 import com.nadoumi.common.access.NadoumiAccessService;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.identity.access.CurrentCaller;
+import com.nadoumi.identity.profile.AvatarLinks;
 import com.nadoumi.identity.service.UserApplicantAccessService;
 import com.ruoyi.framework.web.service.PermissionService;
 import java.time.LocalDate;
@@ -30,7 +31,8 @@ class ApplicantServiceTest {
     private final UserApplicantAccessService grants = mock(UserApplicantAccessService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final PermissionService rbac = mock(PermissionService.class);
-    private final ApplicantService service = new ApplicantService(mapper, access, grants, caller, rbac, new ApplicantAccessGuard(access));
+    private final ApplicantService service = new ApplicantService(mapper, access, grants, caller, rbac, new ApplicantAccessGuard(access),
+            new AvatarLinks("test-secret-test-secret-test-secret-test-secret-0123456789"));
 
     private static Applicant saved() {
         Applicant a = new Applicant();

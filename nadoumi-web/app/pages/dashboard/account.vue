@@ -8,7 +8,8 @@ definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
 const localePath = useLocalePath()
 const toast = useToast()
-const { user, refresh, signOut } = useSession()
+const { user, refresh } = useSession()
+const { ask: askSignOut } = useSignOutConfirm()
 const { primary } = useMyApplicant()
 const { url: photoUrl, refresh: refreshPhoto } = useMyPhoto()
 const { uploadPhoto } = useApplicant()
@@ -118,7 +119,7 @@ useSeo(t('dashboard.accountTitle'), t('dashboard.account.subtitle'))
         </div>
         <div class="flex shrink-0 gap-2">
           <NButton size="sm" variant="secondary" :to="localePath('/dashboard/profile')">{{ t('dashboard.quickProfile') }}</NButton>
-          <NButton size="sm" variant="ghost" data-test="sign-out" @click="signOut">{{ t('common.signOut') }}</NButton>
+          <NButton size="sm" variant="ghost" data-test="sign-out" @click="askSignOut">{{ t('common.signOut') }}</NButton>
         </div>
       </div>
     </section>

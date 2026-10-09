@@ -29,6 +29,7 @@ async function registerAndSignOut(page: import('@playwright/test').Page, email: 
   await expect(page).toHaveURL(/\/onboarding/)
   await page.locator('[data-test="user-menu"]').click()
   await page.locator('[data-test="sign-out"]').click()
+  await page.locator('[data-test="sign-out-confirm"]').click()
   await expect(page).toHaveURL(/\/$/)
 }
 

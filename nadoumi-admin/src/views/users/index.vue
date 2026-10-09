@@ -103,6 +103,15 @@
       @change="load"
     />
 
+    <StatusReasonDialog
+      v-model="reasonOpen"
+      :title="t('users.disableTitle')"
+      :message="t('users.disableMessage', { name: pendingDisable?.userName ?? '' })"
+      :confirm-text="t('users.disable')"
+      :busy="disabling"
+      @confirm="confirmDisable"
+    />
+
     <UserDrawer
       v-model="drawerOpen"
       :user-id="editingId"
@@ -122,6 +131,7 @@ import PageHeader from '@/components/PageHeader.vue'
 import FilterBar from '@/components/ui/FilterBar.vue'
 import DataTable from '@/components/ui/DataTable.vue'
 import Pagination from '@/components/ui/Pagination.vue'
+import StatusReasonDialog from '@/components/ui/StatusReasonDialog.vue'
 import UserDrawer from './UserDrawer.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
@@ -182,15 +192,44 @@ function onSaved() {
   load()
 }
 
-async function toggleStatus(row: SysUserRow, active: boolean) {
-  const next = active ? '0' : '1'
+const SUSPENDED = '1'
+const ACTIVE = '0'
+const reasonOpen = ref(false)
+const disabling = ref(false)
+const pendingDisable = ref<SysUserRow | null>(null)
+
+// Turning an account off needs a written reason; turning it back on does not.
+function toggleStatus(row: SysUserRow, active: boolean) {
+  if (!active) {
+    pendingDisable.value = row
+    reasonOpen.value = true
+    return
+  }
+  void applyStatus(row, ACTIVE)
+}
+
+async function confirmDisable(reason: string) {
+  const row = pendingDisable.value
+  if (!row) return
+  disabling.value = true
   try {
-    await changeUserStatus(row.userId, next)
+    if (await applyStatus(row, SUSPENDED, reason)) reasonOpen.value = false
+  }
+  finally {
+    disabling.value = false
+  }
+}
+
+async function applyStatus(row: SysUserRow, next: string, reason?: string): Promise<boolean> {
+  try {
+    await changeUserStatus(row.userId, next, reason)
     row.status = next
+    row.statusReason = next === ACTIVE ? null : reason
     ElMessage.success(t('common.saved'))
+    return true
   }
   catch {
-    /* toast shown by request.ts */
+    return false // the toast is shown by request.ts
   }
 }
 

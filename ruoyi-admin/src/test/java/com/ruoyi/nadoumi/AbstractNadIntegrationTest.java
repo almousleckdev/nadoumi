@@ -109,6 +109,11 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_conversation_participant");
         jdbc.update("delete from nad_conversation");
         jdbc.update("delete from nad_media_access_log");
+        jdbc.update("delete from nad_user_applicant_access");
+        jdbc.update("delete from nad_application"); // cascades events, tasks, decisions, snapshots, workflow instance
+        jdbc.update("delete from nad_document_event");
+        jdbc.update("delete from nad_document_version");
+        jdbc.update("delete from nad_document");
         jdbc.update("update nad_university set logo_media_id = null, banner_media_id = null");
         jdbc.update("update nad_university_gallery set media_id = null");
         jdbc.update("update nad_scholarship set hero_media_id = null, cover_media_id = null");

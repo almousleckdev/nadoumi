@@ -32,19 +32,33 @@ public class AvatarLinks {
         return PATH_PREFIX + userId + "/" + sign(userId);
     }
 
+    /** Staff see an applicant's photo by applicant id; the signature is domain-separated from a user's. */
+    public String linkForApplicant(long applicantId) {
+        return PATH_PREFIX + "applicants/" + applicantId + "/" + sign("applicant:" + applicantId);
+    }
+
     public boolean isValid(long userId, String signature) {
-        if (signature == null) {
-            return false;
-        }
-        return MessageDigest.isEqual(sign(userId).getBytes(StandardCharsets.UTF_8),
+        return matches(sign(userId), signature);
+    }
+
+    public boolean isValidForApplicant(long applicantId, String signature) {
+        return matches(sign("applicant:" + applicantId), signature);
+    }
+
+    private static boolean matches(String expected, String signature) {
+        return signature != null && MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
                 signature.getBytes(StandardCharsets.UTF_8));
     }
 
     private String sign(long userId) {
+        return sign(Long.toString(userId));
+    }
+
+    private String sign(String subject) {
         try {
             Mac mac = Mac.getInstance(HMAC);
             mac.init(new SecretKeySpec(key, HMAC));
-            byte[] digest = mac.doFinal(Long.toString(userId).getBytes(StandardCharsets.UTF_8));
+            byte[] digest = mac.doFinal(subject.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(digest).substring(0, SIGNATURE_CHARS);
         }
         catch (GeneralSecurityException e) {

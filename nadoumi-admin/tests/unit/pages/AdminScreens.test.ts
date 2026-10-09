@@ -124,6 +124,34 @@ describe('Users screen', () => {
     expect(w.text()).toContain('Reset password')
     expect(w.text()).not.toContain('Delete')
   })
+
+  it('asks for a reason before switching a staff account off, and sends it', async () => {
+    sys.listUsers.mockResolvedValue(page)
+    sys.changeUserStatus.mockResolvedValue({})
+    await router.push('/staff')
+    const w = mountView(Users)
+    await flushPromises()
+
+    w.find('.el-table__body').findComponent({ name: 'ElSwitch' }).vm.$emit('change', false)
+    await flushPromises()
+    expect(sys.changeUserStatus).not.toHaveBeenCalled()
+
+    w.findComponent({ name: 'StatusReasonDialog' }).vm.$emit('confirm', 'Left the company')
+    await flushPromises()
+    expect(sys.changeUserStatus).toHaveBeenCalledWith(5, '1', 'Left the company')
+  })
+
+  it('switches a staff account back on without a reason', async () => {
+    sys.listUsers.mockResolvedValue({ ...page, rows: [{ ...page.rows[0], status: '1' }] })
+    sys.changeUserStatus.mockResolvedValue({})
+    await router.push('/staff')
+    const w = mountView(Users)
+    await flushPromises()
+
+    w.find('.el-table__body').findComponent({ name: 'ElSwitch' }).vm.$emit('change', true)
+    await flushPromises()
+    expect(sys.changeUserStatus).toHaveBeenCalledWith(5, '0', undefined)
+  })
 })
 
 describe('Roles screen', () => {
