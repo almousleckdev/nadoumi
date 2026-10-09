@@ -117,6 +117,9 @@ export default {
     phoneInvalid: '请输入有效的手机号码',
   },
   applicant: {
+    unnamed: '尚未填写姓名',
+    hiddenSignUps: '已隐藏 {n} 个未完成注册：这些学生已注册但尚未完成引导流程。',
+    showThem: '显示',
     showIncomplete: '包含未完成注册的学生',
     delete: '删除',
     deleteTitle: '删除申请人',

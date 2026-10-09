@@ -15,7 +15,7 @@ import com.nadoumi.common.erasure.ApplicantErasureParticipant;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.identity.service.StudentAccountRetirement;
+import com.nadoumi.identity.service.AccountRetirement;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class ApplicantErasureServiceTest {
 
     private final ApplicantMapper applicants = mock(ApplicantMapper.class);
     private final ApplicantErasureMapper erasure = mock(ApplicantErasureMapper.class);
-    private final StudentAccountRetirement accounts = mock(StudentAccountRetirement.class);
+    private final AccountRetirement accounts = mock(AccountRetirement.class);
     private final ApplicantErasureParticipant participant = mock(ApplicantErasureParticipant.class);
     private final MediaGateway media = mock(MediaGateway.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);

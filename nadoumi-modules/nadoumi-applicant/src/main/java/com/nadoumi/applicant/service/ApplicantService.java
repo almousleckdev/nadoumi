@@ -114,6 +114,11 @@ public class ApplicantService {
         return PageResponse.of(content, page, size, total);
     }
 
+    @Transactional(readOnly = true)
+    public int countIncompleteSignUps() {
+        return mapper.countIncompleteSignUps();
+    }
+
     public List<ApplicantResponse> listMine() {
         List<Long> ids = access.accessibleApplicantIds();
         if (ids.isEmpty()) {

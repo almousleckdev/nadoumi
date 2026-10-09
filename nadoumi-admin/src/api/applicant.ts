@@ -121,6 +121,10 @@ export const listApplicants = (params: {
   size?: number
 }) => request.get<unknown, Page<Applicant>>(BASE, { params })
 
+/** Students who registered but have not finished onboarding: the ones the default list hides. */
+export const getIncompleteSignUpCount = () =>
+  request.get<unknown, { count: number }>(`${BASE}/incomplete-count`)
+
 export const getApplicant = (id: number | string) =>
   request.get<unknown, Applicant>(`${BASE}/${id}`)
 

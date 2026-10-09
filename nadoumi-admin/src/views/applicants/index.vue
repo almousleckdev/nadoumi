@@ -55,6 +55,23 @@
       />
     </FilterBar>
 
+    <div
+      v-if="hiddenSignUps > 0 && !filters.incomplete"
+      class="hidden-note"
+      role="status"
+      data-test="hidden-signups"
+    >
+      <span>{{ t('applicant.hiddenSignUps', { n: hiddenSignUps }) }}</span>
+      <el-button
+        link
+        type="primary"
+        data-test="show-hidden-signups"
+        @click="showIncomplete"
+      >
+        {{ t('applicant.showThem') }}
+      </el-button>
+    </div>
+
     <DataTable
       storage-key="applicants"
       :columns="columns"
@@ -75,11 +92,11 @@
       <template #cell-givenName="{ row }">
         <div class="who">
           <Avatar
-            :name="`${row.givenName} ${row.familyName}`"
+            :name="nameOf(row as Applicant)"
             :src="(row as Applicant).photoUrl || undefined"
             :size="30"
           />
-          <span class="who__name">{{ row.givenName }} {{ row.familyName }}</span>
+          <span class="who__name">{{ nameOf(row as Applicant) }}</span>
         </div>
       </template>
       <template #cell-passportNo="{ value }">
@@ -168,7 +185,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import {
-  deleteApplicant, createApplicant, listApplicants,
+  deleteApplicant, createApplicant, getIncompleteSignUpCount, listApplicants,
   type Applicant, type ApplicantStatus,
 } from '@/api/applicant'
 import { useUserStore } from '@/stores/user'
@@ -183,6 +200,7 @@ import Avatar from '@/components/ui/Avatar.vue'
 import Drawer from '@/components/ui/Drawer.vue'
 import { usePagedList } from '@/composables/usePagedList'
 import { formatDate } from '@/utils/date'
+import { applicantDisplayName } from '@/utils/applicantLabels'
 import { titleCase } from '@/utils/text'
 
 const { t } = useI18n()
@@ -219,6 +237,24 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: '', width: 110, align: 'right' },
 ]
 
+const nameOf = (a: Applicant) => applicantDisplayName(a, t('applicant.unnamed'))
+
+const hiddenSignUps = ref(0)
+
+async function loadHiddenSignUps() {
+  try {
+    hiddenSignUps.value = (await getIncompleteSignUpCount()).count
+  }
+  catch {
+    hiddenSignUps.value = 0 // the banner is a convenience; the list itself still works
+  }
+}
+
+function showIncomplete() {
+  filters.incomplete = true
+  void reload()
+}
+
 function goToDetail(id: string) {
   router.push(`/applicants/${id}`)
 }
@@ -226,15 +262,16 @@ function goToDetail(id: string) {
 async function onDelete(row: Applicant) {
   const ok = await confirm({
     title: t('applicant.deleteTitle'),
-    message: t('applicant.deleteConfirm', { name: `${row.givenName} ${row.familyName}` }),
+    message: t('applicant.deleteConfirm', { name: nameOf(row) }),
     confirmText: t('applicant.delete'),
     tone: 'danger',
   })
   if (!ok) return
   try {
-    await deleteApplicant(row.id)
+    await deleteApplicant(row.publicId)
     ElMessage.success(t('applicant.deleted'))
     await load()
+    void loadHiddenSignUps()
   }
   catch (e) {
     ElMessage.error((e as Error)?.message || t('applicant.deleteFailed'))
@@ -273,10 +310,23 @@ async function submitCreate() {
   }
 }
 
-onMounted(load)
+onMounted(() => { void load(); void loadHiddenSignUps() })
 </script>
 
 <style scoped>
+.hidden-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--nad-line, #e5e7eb);
+  border-radius: 8px;
+  background: var(--nad-surface-muted, #f8fafc);
+  font-size: 13px;
+  color: var(--nad-ink-soft);
+}
 .who {
   display: flex;
   align-items: center;
