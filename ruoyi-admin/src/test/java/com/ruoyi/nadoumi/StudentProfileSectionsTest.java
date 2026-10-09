@@ -50,8 +50,8 @@ class StudentProfileSectionsTest extends AbstractStudentIntegrationTest {
         mvc.perform(get(s.applicantUrl() + "/interests").header("Authorization", bearer(s.token())))
                 .andExpect(status().isNoContent());
 
-        interests(s, "[\"BUSINESS\",\"LAW\"]", "[\"Beijing\",\"Shanghai\"]").andExpect(status().isOk());
-        interests(s, "[\"LAW\"]", "[\"Hangzhou\"]").andExpect(status().isOk());
+        interests(s, "[\"BUSINESS\",\"LAW\"]", "[\"Beijing\",\"Shanghai\",\"Sichuan\"]").andExpect(status().isOk());
+        interests(s, "[\"LAW\"]", "[\"Hangzhou\",\"Beijing\",\"Sichuan\"]").andExpect(status().isOk());
 
         mvc.perform(get(s.applicantUrl() + "/interests").header("Authorization", bearer(s.token())))
                 .andExpect(jsonPath("$.desiredLevel").value("MASTER"))
@@ -63,8 +63,9 @@ class StudentProfileSectionsTest extends AbstractStudentIntegrationTest {
     void shouldRequireAtLeastOneFieldAndOneCity() throws Exception {
         Student s = register("int", "empty");
 
-        interests(s, "[]", "[\"Beijing\"]").andExpect(status().isBadRequest());
+        interests(s, "[]", "[\"Beijing\",\"Shanghai\",\"Sichuan\"]").andExpect(status().isBadRequest());
         interests(s, "[\"LAW\"]", "[]").andExpect(status().isBadRequest());
+        interests(s, "[\"LAW\"]", "[\"Beijing\",\"Shanghai\"]").andExpect(status().isBadRequest());
     }
 
     // ---- residence ----
@@ -193,7 +194,7 @@ class StudentProfileSectionsTest extends AbstractStudentIntegrationTest {
         mvc.perform(get(base + "/residence").header("Authorization", auth)).andExpect(status().isForbidden());
         mvc.perform(get(base + "/work").header("Authorization", auth)).andExpect(status().isForbidden());
         mvc.perform(put(base + "/interests").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"desiredLevel\":\"MASTER\",\"fields\":[\"LAW\"],\"cities\":[\"Beijing\"]}"))
+                        .content("{\"desiredLevel\":\"MASTER\",\"fields\":[\"LAW\"],\"cities\":[\"Beijing\",\"Shanghai\",\"Sichuan\"]}"))
                 .andExpect(status().isForbidden());
         mvc.perform(post(base + "/onboarding/welcomed").header("Authorization", auth)).andExpect(status().isForbidden());
     }
