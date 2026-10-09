@@ -47,6 +47,13 @@
         create_by, create_time, update_by, update_time, remark
     </sql>
 
+    <select id="countIncompleteSignUps" resultType="int">
+        select count(*) from nad_applicant
+        where onboarded_at is null
+          and exists (select 1 from sys_user u
+                      where u.user_type = '10' and u.user_id = cast(nad_applicant.create_by as unsigned))
+    </select>
+
     <select id="findIdByPublicId" resultType="java.lang.Long">
         select id from nad_applicant where public_id = #{publicId}
     </select>

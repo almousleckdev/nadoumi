@@ -77,6 +77,13 @@ public class StaffApplicantController {
         return service.listForStaff(name, status, nationality, createdAfter, incomplete, page, size);
     }
 
+    /** How many sign-ups the default list hides, so staff always know they exist and can open and delete them. */
+    @GetMapping("/incomplete-count")
+    @PreAuthorize("@ss.hasPermi('nad:applicant:list')")
+    public java.util.Map<String, Integer> incompleteCount() {
+        return java.util.Map.of("count", service.countIncompleteSignUps());
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@ss.hasPermi('nad:applicant:view')")
     public ApplicantResponse get(@PathVariable Long id) {

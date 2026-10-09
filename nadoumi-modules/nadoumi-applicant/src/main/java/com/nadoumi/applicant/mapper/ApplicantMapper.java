@@ -14,6 +14,9 @@ public interface ApplicantMapper {
 
     Applicant findById(Long id);
 
+    /** Students who registered but have not finished onboarding: the ones the default staff list hides. */
+    int countIncompleteSignUps();
+
     /** Resolves a staff-facing UUID to the internal row id, or null. */
     Long findIdByPublicId(@Param("publicId") String publicId);
 

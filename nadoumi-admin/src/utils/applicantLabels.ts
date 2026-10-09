@@ -29,3 +29,15 @@ export function codeLabel(code: string | null | undefined): string {
   const text = code.toLowerCase().replace(/_/g, ' ')
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
+
+/**
+ * What to call an applicant on screen. A student who has registered but not yet entered their passport names has
+ * no name, so fall back to their email (then to a placeholder) rather than showing an empty row.
+ */
+export function applicantDisplayName(
+  a: { givenName?: string | null, familyName?: string | null, email?: string | null },
+  placeholder: string,
+): string {
+  const full = [a.givenName, a.familyName].filter(Boolean).join(' ').trim()
+  return full || a.email || placeholder
+}

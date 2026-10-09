@@ -59,6 +59,9 @@ public class SysUserController extends BaseController
     @Autowired
     private com.nadoumi.identity.access.SessionRevoker sessionRevoker;
 
+    @Autowired
+    private com.nadoumi.identity.service.AccountRetirement accountRetirement;
+
     /**
      * 获取用户列表
      */
@@ -194,7 +197,29 @@ public class SysUserController extends BaseController
         {
             return error("You cannot delete your own account");
         }
-        return toAjax(userService.deleteUserByIds(userIds));
+        // Check everything first so a refusal never leaves some of the selected accounts deleted.
+        for (Long userId : userIds)
+        {
+            SysUser target = new SysUser();
+            target.setUserId(userId);
+            userService.checkUserAllowed(target);
+            userService.checkUserDataScope(userId);
+            SysUser existing = userService.selectUserById(userId);
+            if (existing == null)
+            {
+                return error("User not found");
+            }
+            if ("10".equals(existing.getUserType()))
+            {
+                return error("A student is deleted from Applicants, together with their profile, not from here");
+            }
+        }
+        // A deleted staff account is removed completely (chats, notifications, likes, then the row itself).
+        for (Long userId : userIds)
+        {
+            accountRetirement.retireStaff(userId, getUserId());
+        }
+        return success();
     }
 
     /**

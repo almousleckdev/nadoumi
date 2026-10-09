@@ -561,3 +561,12 @@ Delete permissions are separate from edit and manage permissions on purpose: hol
 - **Password length.** The password policy allows 8 to 32 characters. RuoYi's login pre-check capped passwords at 20,
   so a student with a longer password was registered but could never sign in. `UserConstants.PASSWORD_MAX_LENGTH`
   is now 32, and the register flow reports an automatic sign-in failure as "account created, please sign in".
+
+## Deleting a person means deleting them (EXISTING, 2026-10-09, V102)
+
+Deleting an applicant closes the student login it leaves without an applicant, and deleting a staff account removes
+it completely. Both go through `AccountRetirement`: every module removes what it keeps under that person first
+(`AccountRetirementParticipant`: chats, tickets, notifications, comments, likes), sessions end, then the account row is
+deleted. Only when a record such as payroll still references the row does it stay, anonymised: no username, email,
+phone or photo, and the identifiers are free to register again. A student can never be deleted from the staff
+screen, only through their applicant, so a login can no longer outlive its profile.

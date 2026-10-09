@@ -150,6 +150,8 @@ renders those fields disabled with a "not saved yet" note and never posts them.
 | GET | `/api/staff/applicants/{applicantId}/access` | `nad:applicant:access:view` | `List<AccessGrantResponse>` — grantee `userId` / `invitedEmail`, role, status, interim flag, granted/expires, effective capabilities (`StaffApplicantAccessController`). |
 | POST / DELETE / POST `/transfer-ownership` | `/api/staff/applicants/{applicantId}/access[/{grantId}]` | `nad:applicant:access:manage` | delegate / revoke / transfer ownership. |
 
+| GET | `/api/staff/applicants/incomplete-count` | `nad:applicant:list` | `{ count }`: the sign-ups the default list hides, so staff can show and delete them. |
+| DELETE | `/system/user/{ids}` | `system:user:remove` | Deletes **staff** completely (chats, notifications, likes, then the account row; an anonymised shell only if something like payroll still references it). Refuses students (delete the applicant instead), yourself and the break-glass admin. |
 | DELETE | `/api/staff/support/tickets/{id}` | `nad:support:ticket:delete` | Deletes the ticket, its events and meetings, and its chat. `204`. A support chat cannot be deleted from `/api/staff/conversations/{id}` (`400`). |
 
 **Applicant identifiers (2026-10-09, V100).** Staff URLs identify an applicant by `publicId`, a UUID (`/api/staff/applicants/{publicId}/...`); `ApplicantPublicIdFilter` rewrites it to the internal row id before the controllers run, and a numeric id on the staff API answers `404`. The student API accepts the UUID too and still accepts the numeric id (a student reaches only their own applicants). `GET /api/staff/applicants` hides students who registered but have not finished onboarding unless `incomplete=true`.

@@ -19,7 +19,7 @@
     />
 
     <template v-else-if="applicant">
-      <PageHeader :title="`${applicant.givenName} ${applicant.familyName}`">
+      <PageHeader :title="nameOf(applicant)">
         <template #subtitle>
           {{ t('applicant.idLabel', { id: applicant.publicId }) }} ·
           {{ t('applicant.registered') }} {{ formatDate(applicant.createdAt) }}
@@ -114,8 +114,10 @@ import ContactsTab from './tabs/ContactsTab.vue'
 import AccessTab from './tabs/AccessTab.vue'
 import AccountPanel from './AccountPanel.vue'
 import { formatDate } from '@/utils/date'
+import { applicantDisplayName } from '@/utils/applicantLabels'
 
 const { t } = useI18n()
+const nameOf = (a: Applicant) => applicantDisplayName(a, t('applicant.unnamed'))
 const route = useRoute()
 const router = useRouter()
 const id = route.params.id as string
@@ -167,7 +169,7 @@ async function onDelete() {
   if (!current) return
   const ok = await confirm({
     title: t('applicant.deleteTitle'),
-    message: t('applicant.deleteConfirm', { name: `${current.givenName} ${current.familyName}` }),
+    message: t('applicant.deleteConfirm', { name: nameOf(current) }),
     confirmText: t('applicant.delete'),
     tone: 'danger',
   })

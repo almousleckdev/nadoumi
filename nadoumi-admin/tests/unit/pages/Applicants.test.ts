@@ -4,7 +4,9 @@ import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
 import { mountOpts } from '../../helpers'
 
-const api = vi.hoisted(() => ({ listApplicants: vi.fn(), deleteApplicant: vi.fn(), createApplicant: vi.fn() }))
+const api = vi.hoisted(() => ({
+  listApplicants: vi.fn(), deleteApplicant: vi.fn(), createApplicant: vi.fn(), getIncompleteSignUpCount: vi.fn(),
+}))
 vi.mock('@/api/applicant', () => api)
 
 const confirmAnswer = vi.hoisted(() => ({ value: true }))
@@ -36,6 +38,7 @@ describe('Applicants list', () => {
     confirmAnswer.value = true
     api.listApplicants.mockReset().mockResolvedValue({ content: [row(7, { photoUrl: '/api/public/avatars/applicants/7/sig' }), row(8)], totalElements: 2 })
     api.deleteApplicant.mockReset().mockResolvedValue(undefined)
+    api.getIncompleteSignUpCount.mockReset().mockResolvedValue({ count: 0 })
   })
 
   it('shows the profile photo of an applicant that has one, and initials for the rest', async () => {
@@ -55,7 +58,8 @@ describe('Applicants list', () => {
     const w = await mountList()
     await body(w).find('[data-test="delete-applicant"]').trigger('click')
     await flushPromises()
-    expect(api.deleteApplicant).toHaveBeenCalledWith(7)
+    // the staff API only accepts the UUID: a numeric id is a 404, so the delete must send the public id
+    expect(api.deleteApplicant).toHaveBeenCalledWith('00000000-0000-4000-8000-000000000007')
     expect(api.listApplicants).toHaveBeenCalledTimes(2)
   })
 
@@ -88,5 +92,22 @@ describe('Applicants list', () => {
     await w.findComponent({ name: 'ElCheckbox' }).vm.$emit('change', true)
     await flushPromises()
     expect(api.listApplicants).toHaveBeenLastCalledWith(expect.objectContaining({ incomplete: true }))
+  })
+
+  it('tells staff how many incomplete sign-ups the list hides, and shows them on request', async () => {
+    api.getIncompleteSignUpCount.mockResolvedValue({ count: 3 })
+    const w = await mountList()
+    expect(w.find('[data-test="hidden-signups"]').text()).toContain('3 incomplete sign-up')
+
+    await w.find('[data-test="show-hidden-signups"]').trigger('click')
+    await flushPromises()
+
+    expect(api.listApplicants).toHaveBeenLastCalledWith(expect.objectContaining({ incomplete: true }))
+    expect(w.find('[data-test="hidden-signups"]').exists()).toBe(false)
+  })
+
+  it('shows no notice when nothing is hidden', async () => {
+    const w = await mountList()
+    expect(w.find('[data-test="hidden-signups"]').exists()).toBe(false)
   })
 })

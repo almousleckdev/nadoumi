@@ -117,6 +117,9 @@ export default {
     phoneInvalid: 'Enter a valid phone number',
   },
   applicant: {
+    unnamed: 'Not named yet',
+    hiddenSignUps: '{n} incomplete sign-up(s) are hidden: students who registered but have not finished onboarding.',
+    showThem: 'Show them',
     showIncomplete: 'Include incomplete sign-ups',
     delete: 'Delete',
     deleteTitle: 'Delete applicant',

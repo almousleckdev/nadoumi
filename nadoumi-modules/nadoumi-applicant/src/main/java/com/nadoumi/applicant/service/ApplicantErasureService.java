@@ -7,7 +7,7 @@ import com.nadoumi.common.erasure.ApplicantErasureParticipant;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.identity.access.CurrentCaller;
-import com.nadoumi.identity.service.StudentAccountRetirement;
+import com.nadoumi.identity.service.AccountRetirement;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -31,13 +31,13 @@ public class ApplicantErasureService {
 
     private final ApplicantMapper applicants;
     private final ApplicantErasureMapper erasure;
-    private final StudentAccountRetirement accounts;
+    private final AccountRetirement accounts;
     private final ObjectProvider<ApplicantErasureParticipant> participants;
     private final MediaGateway media;
     private final CurrentCaller caller;
 
     public ApplicantErasureService(ApplicantMapper applicants, ApplicantErasureMapper erasure,
-            StudentAccountRetirement accounts, ObjectProvider<ApplicantErasureParticipant> participants,
+            AccountRetirement accounts, ObjectProvider<ApplicantErasureParticipant> participants,
             MediaGateway media, CurrentCaller caller) {
         this.applicants = applicants;
         this.erasure = erasure;
