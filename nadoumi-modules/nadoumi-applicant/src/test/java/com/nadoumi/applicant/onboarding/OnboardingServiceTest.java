@@ -43,7 +43,7 @@ class OnboardingServiceTest {
         ApplicantInterest interest = new ApplicantInterest();
         interest.setDesiredLevel(StudyLevel.MASTER);
         interest.setFields(List.of("BUSINESS"));
-        interest.setCities(List.of("Beijing"));
+        interest.setCities(List.of("Beijing", "Shanghai", "Guangdong"));
         ApplicantResidence home = new ApplicantResidence();
         home.setInChina(false);
         ApplicantContact guardian = new ApplicantContact();
