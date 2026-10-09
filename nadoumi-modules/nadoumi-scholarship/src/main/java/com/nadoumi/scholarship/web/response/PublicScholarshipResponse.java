@@ -52,6 +52,7 @@ public record PublicScholarshipResponse(
         String coverUrl,
         List<String> levels,
         List<String> categories,
+        List<Field> fields,
         List<Intake> intakes,
         // ---- detail only ----
         String benefits,
@@ -88,6 +89,10 @@ public record PublicScholarshipResponse(
             String cur = currency == null ? "CNY" : currency.toUpperCase();
             return new Money(rmb(amount, cur), usd(amount, cur), cur);
         }
+    }
+
+    /** A field of study; {@code level} is null when it applies to every level. */
+    public record Field(String level, String name) {
     }
 
     public record Intake(String term, LocalDate applicationOpen, LocalDate applicationClose) {
@@ -157,6 +162,7 @@ public record PublicScholarshipResponse(
                 s.getHeroMediaId(), heroUrl, s.getCoverMediaId(), coverUrl,
                 List.copyOf(s.getLevels()),
                 s.getCategories().stream().map(ScholarshipCategory::code).toList(),
+                s.getFields().stream().map(f -> new Field(f.level(), f.name())).toList(),
                 s.getIntakes().stream()
                         .map(i -> new Intake(i.term(), i.applicationOpen(), i.applicationClose())).toList(),
                 detail ? s.getBenefits() : null,

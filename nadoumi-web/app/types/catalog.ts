@@ -27,6 +27,8 @@ export interface ScholarshipCard {
   province?: string | null
   city?: string | null
   field?: string | null
+  /** every field of study; a null level means it applies to every level the scholarship offers */
+  fields?: { level?: string | null, name: string }[]
   teachingLanguage?: 'ENGLISH' | 'CHINESE' | 'BOTH' | null
   fundingModel: 'FULLY' | 'PARTIAL' | 'SELF'
   hasStipend: boolean

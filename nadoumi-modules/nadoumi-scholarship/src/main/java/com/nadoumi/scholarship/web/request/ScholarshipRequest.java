@@ -34,6 +34,7 @@ public record ScholarshipRequest(
         @Size(max = 120) String province,
         @Size(max = 120) String city,
         @Size(max = 120) String field,
+        @Valid List<FieldInput> fields,
         TeachingLanguage teachingLanguage,
         @NotNull FundingModel fundingModel,
         Boolean hasStipend,
@@ -72,6 +73,10 @@ public record ScholarshipRequest(
         @Valid List<AccommodationInput> accommodations,
         @Valid List<CoverageInput> coverage,
         @Valid List<DocumentRequirementInput> documentRequirements) {
+
+    /** One field of study; a null {@code level} means it applies to every level the scholarship offers. */
+    public record FieldInput(EducationLevel level, @NotBlank @Size(max = 120) String name) {
+    }
 
     public record IntakeInput(@NotBlank @Size(max = 24) String term,
             LocalDate applicationOpen, LocalDate applicationClose) {

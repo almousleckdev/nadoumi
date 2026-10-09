@@ -6,6 +6,7 @@ import {
   type ScholarshipCategoryOption,
 } from '@/api/scholarship'
 import FormSection from '@/components/ui/FormSection.vue'
+import FieldsEditor from './FieldsEditor.vue'
 import { useScholarshipForm } from '../scholarshipForm'
 
 const { t } = useI18n()
@@ -73,16 +74,6 @@ watch(() => form.fundingModel, () => {
         />
       </el-form-item>
     </div>
-    <el-form-item :label="t('scholarship.field')">
-      <el-input
-        v-model="form.field"
-        maxlength="120"
-        :placeholder="t('scholarship.fieldHint')"
-      />
-      <p class="hint">
-        {{ t('scholarship.fieldNote') }}
-      </p>
-    </el-form-item>
   </FormSection>
 
   <FormSection :title="t('scholarship.secClassification')">
@@ -151,6 +142,7 @@ watch(() => form.fundingModel, () => {
         />
       </el-checkbox-group>
     </el-form-item>
+    <FieldsEditor />
     <el-form-item
       v-if="form.levels.includes('NON_DEGREE')"
       :label="t('scholarship.nonDegreeDuration')"

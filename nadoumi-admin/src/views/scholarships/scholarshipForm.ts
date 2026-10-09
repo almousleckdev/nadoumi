@@ -1,11 +1,19 @@
 import { inject, type InjectionKey } from 'vue'
 import { numberOrNull, textOrNull } from '@/utils/formValues'
 import type {
-  Scholarship, ScholarshipInput,
+  Scholarship, ScholarshipFieldEntry, ScholarshipInput,
   EducationLevel, FeeKind, NationalityScope,
   RoomType, NonDegreeDuration, StipendFrequency,
   CoverageKind, ApplicationChannel,
 } from '@/api/scholarship'
+
+/** The fields of study of a loaded scholarship; an older one with only the summary text keeps it as one every-level field. */
+function fieldsOf(view: Scholarship['view']): ScholarshipFieldEntry[] {
+  if (view.fields?.length) {
+    return view.fields.map(f => ({ level: (f.level ?? null) as EducationLevel | null, name: f.name }))
+  }
+  return view.field ? [{ level: null, name: view.field }] : []
+}
 
 export function blankEligibility() {
   return {
@@ -19,7 +27,8 @@ export function blankEligibility() {
 }
 export function blankForm() {
   return {
-    title: '', summary: '', country: '', province: '', city: '', field: '',
+    title: '', summary: '', country: '', province: '', city: '',
+    fields: [] as ScholarshipFieldEntry[],
     teachingLanguage: null as string | null,
     fundingModel: 'FULLY' as ScholarshipInput['fundingModel'],
     categoryCodes: [] as string[],
@@ -59,7 +68,8 @@ export function formFromScholarship(source: Scholarship): ScholarshipForm {
   return {
     ...blankForm(),
     title: v.title, summary: v.summary ?? '', country: v.country,
-    province: v.province ?? '', city: v.city ?? '', field: v.field ?? '',
+    province: v.province ?? '', city: v.city ?? '',
+    fields: fieldsOf(v),
     teachingLanguage: v.teachingLanguage ?? null, fundingModel: v.fundingModel,
     categoryCodes: [...v.categories], levels: [...v.levels] as EducationLevel[],
     benefits: v.benefits ?? '', requirements: v.requirements ?? '', policy: v.policy ?? '',
@@ -104,7 +114,10 @@ export function buildPayload(form: ScholarshipForm): ScholarshipInput {
     country: form.country.trim().toUpperCase(),
     province: textOrNull(form.province),
     city: textOrNull(form.city),
-    field: textOrNull(form.field),
+    field: null,
+    fields: form.fields
+      .map(f => ({ level: f.level, name: f.name.trim() }))
+      .filter(f => f.name !== '' && (f.level === null || form.levels.includes(f.level))),
     teachingLanguage: (form.teachingLanguage as ScholarshipInput['teachingLanguage']) || null,
     fundingModel: form.fundingModel,
     hasStipend: form.levelStipends.some(st => st.amount != null),

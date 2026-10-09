@@ -11,7 +11,7 @@ const result = computed(() => passwordChecks(props.value, {
 }))
 
 const personalViolated = computed(() =>
-  props.value.length > 0 && result.value.rules.some(rule => rule.key === 'validation.password.noPersonal' && !rule.ok))
+  props.value.length > 0 && result.value.rules.some((rule: { key: string, ok: boolean }) => rule.key === 'validation.password.noPersonal' && !rule.ok))
 
 const showMismatch = computed(() =>
   props.confirm !== undefined && props.confirm.length > 0 && props.value !== props.confirm)

@@ -961,6 +961,8 @@
     "feesNone": "None",
     "colTitle": "Scholarship",
     "colLevel": "Level",
+    "colField": "Field of study",
+    "allLevels": "All levels",
     "colLanguage": "Language",
     "colIntake": "Next intake",
     "colDeadline": "Deadline",

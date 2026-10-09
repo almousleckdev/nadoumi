@@ -5,6 +5,7 @@ import com.nadoumi.scholarship.domain.ScholarshipAccommodation;
 import com.nadoumi.scholarship.domain.ScholarshipCoverage;
 import com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement;
 import com.nadoumi.scholarship.domain.ScholarshipEligibility;
+import com.nadoumi.scholarship.domain.ScholarshipField;
 import com.nadoumi.scholarship.domain.ScholarshipFee;
 import com.nadoumi.scholarship.domain.ScholarshipIntake;
 import com.nadoumi.scholarship.domain.ScholarshipLevelStipend;
@@ -38,6 +39,7 @@ public class ScholarshipChildrenWriter {
 
     public void replace(Long id, ScholarshipRequest req) {
         replaceLevels(id, req);
+        replaceFields(id, req);
         replaceCategories(id, req);
         replaceIntakes(id, req.intakes());
         replaceEligibility(id, req.eligibility());
@@ -52,6 +54,14 @@ public class ScholarshipChildrenWriter {
         mapper.deleteLevels(id);
         if (req.levels() != null) {
             req.levels().stream().distinct().forEach(level -> mapper.insertLevel(id, level.name()));
+        }
+    }
+
+    private void replaceFields(Long id, ScholarshipRequest req) {
+        mapper.deleteFields(id);
+        int order = 0;
+        for (ScholarshipField field : ScholarshipFields.normalise(req)) {
+            mapper.insertField(id, field.level(), field.name(), order++);
         }
     }
 
