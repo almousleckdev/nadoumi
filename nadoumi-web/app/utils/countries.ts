@@ -13,19 +13,42 @@ export interface Option { value: string, label: string }
 export const COUNTRY_CODES = Object.keys(getAlpha2Codes())
 export const LANGUAGE_CODES = ISO6391.getAllCodes()
 
+/**
+ * ISO 639-1 also lists dead, liturgical and constructed languages (Avestan, Old Church Slavonic, Latin, Pali,
+ * Volapük, Ido, Interlingua, Interlingue). Nobody has them as a native language, so they are not offered.
+ */
+const NOT_A_NATIVE_LANGUAGE = new Set(['ae', 'cu', 'la', 'pi', 'vo', 'io', 'ia', 'ie'])
+
+/**
+ * `fallback: 'none'` makes an unknown code yield undefined instead of echoing the code back. Browsers ship
+ * different language data: Chrome has no name for Fula, Chechen and about fifty others, and the default
+ * behaviour would list them as the bare codes "ff", "ce"...
+ */
 function displayNames(locale: string, type: 'region' | 'language'): Intl.DisplayNames | null {
   try {
-    return new Intl.DisplayNames([locale], { type })
+    return new Intl.DisplayNames([locale], { type, fallback: 'none' })
   }
   catch {
     return null
   }
 }
 
+/** The browser's name in the active locale, else the ISO table's English name; never the bare code. */
+function nameOf(names: Intl.DisplayNames | null, code: string, type: 'region' | 'language'): string | null {
+  const local = names?.of(code)
+  if (local && local.toLowerCase() !== code.toLowerCase()) return local
+  const english = type === 'language' ? ISO6391.getName(code) : null
+  return english || null
+}
+
 function toOptions(codes: readonly string[], locale: string, type: 'region' | 'language'): Option[] {
   const names = displayNames(locale, type)
   return codes
-    .map(value => ({ value, label: names?.of(value) ?? value }))
+    .filter(code => type !== 'language' || !NOT_A_NATIVE_LANGUAGE.has(code))
+    .flatMap((value) => {
+      const label = nameOf(names, value, type)
+      return label ? [{ value, label }] : []
+    })
     .sort((a, b) => a.label.localeCompare(b.label, locale))
 }
 

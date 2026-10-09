@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { ApplicantDto } from '~/types/catalog'
-
 defineProps<{ collapsed: boolean }>()
 const emit = defineEmits<{ 'toggle-collapse': [], 'toggle-mobile': [] }>()
 
@@ -9,7 +7,7 @@ const localePath = useLocalePath()
 const { user, applicants, signOut } = useSession()
 const { unreadCount } = useNotifications()
 const { primary } = useMyApplicant()
-const { photoUrl } = useApplicant()
+const { url: avatarUrl } = useMyPhoto()
 
 const unread = ref(0)
 const POLL_MS = 60_000
@@ -23,11 +21,6 @@ async function refreshUnread() {
     /* silent — the bell is non-critical */
   }
 }
-
-const avatarUrl = ref('')
-watch(primary, async (applicant: ApplicantDto | null) => {
-  avatarUrl.value = applicant ? await photoUrl(applicant.id).then(r => r.url).catch(() => '') : ''
-}, { immediate: true })
 
 onMounted(() => {
   refreshUnread()

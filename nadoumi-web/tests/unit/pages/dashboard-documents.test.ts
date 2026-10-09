@@ -4,7 +4,15 @@ import { flushPromises } from '@vue/test-utils'
 import Documents from '~/pages/dashboard/documents.vue'
 import AddDocumentForm from '~/components/documents/AddDocumentForm.vue'
 import type { StudentDocumentDto } from '~/types/documents'
+import { useToast } from '~/composables/useToast'
 import { fakeFile, pickFile } from '../helpers/files'
+
+const toastMessages = () => useToast().toasts.value.map(t => t.message)
+/** The add-document form lives in a panel that opens from the "Add a document" button. */
+async function openAdd(w: Awaited<ReturnType<typeof mountPage>>) {
+  await w.find('[data-test="docs-add-toggle"]').trigger('click')
+  await flushPromises()
+}
 
 const applicant = {
   id: 1, givenName: 'ADA', familyName: 'LOVELACE', dob: '2000-01-01', email: 'a@b.co', emailVerified: true,
@@ -118,6 +126,7 @@ describe('dashboard documents page', () => {
   it('uploads a new document with the chosen type, then refreshes the list', async () => {
     api.create.mockResolvedValue(doc())
     const w = await mountPage()
+    await openAdd(w)
     const form = w.findComponent(AddDocumentForm)
     const file = fakeFile('visa.pdf', 'application/pdf')
 
@@ -127,11 +136,13 @@ describe('dashboard documents page', () => {
 
     expect(api.create).toHaveBeenCalledWith(1, 'VISA', file)
     expect(api.list).toHaveBeenCalledTimes(2)
-    expect(w.text()).toContain('Document uploaded.')
+    expect(toastMessages()).toContain('Document uploaded.')
+    expect(w.find('[data-test="docs-add-panel"]').exists()).toBe(false) // the panel closes once it is saved
   })
 
   it('refuses a file until a document type is chosen', async () => {
     const w = await mountPage()
+    await openAdd(w)
     await pickFile(w.findComponent(AddDocumentForm), fakeFile('visa.pdf', 'application/pdf'))
     await flushPromises()
 
@@ -141,6 +152,7 @@ describe('dashboard documents page', () => {
 
   it('rejects an unsupported file type before it reaches the server', async () => {
     const w = await mountPage()
+    await openAdd(w)
     const form = w.findComponent(AddDocumentForm)
     await form.find('#docType').setValue('VISA')
     await pickFile(form, fakeFile('notes.txt', 'text/plain'))
@@ -180,18 +192,27 @@ describe('dashboard documents page', () => {
     await flushPromises()
 
     expect(api.replace).toHaveBeenCalledWith(10, file)
-    expect(w.text()).toContain('New version uploaded.')
+    expect(toastMessages()).toContain('New version uploaded.')
   })
 
-  it('shows the identity cards (photo, passport) as part of Your documents, not a separate section', async () => {
+  it('shows the identity documents (photo and passport) in their own section above the list', async () => {
     const w = await mountPage()
-    expect(w.text()).toContain('Your documents')
+    expect(w.text()).toContain('Identity documents')
     expect(w.text()).toContain('Passport')
-    expect(w.text()).not.toContain('Identity documents')
+    expect(w.text()).toContain('Your documents')
   })
 
-  it('shows Add a document as its own left/right section, separate from the list', async () => {
+  it('opens the add-document form from a button and closes it again', async () => {
     const w = await mountPage()
-    expect(w.text()).toContain('Add a document')
+    expect(w.findComponent(AddDocumentForm).exists()).toBe(false)
+    await openAdd(w)
+    expect(w.findComponent(AddDocumentForm).exists()).toBe(true)
+    await w.find('[data-test="docs-add-toggle"]').trigger('click')
+    expect(w.findComponent(AddDocumentForm).exists()).toBe(false)
+  })
+
+  it('never claims the passport matches the profile', async () => {
+    const w = await mountPage()
+    expect(w.text()).not.toContain('matches your profile')
   })
 })

@@ -55,7 +55,8 @@
     "next": "Siguiente",
     "pagination": "Paginación",
     "switchingLanguage": "Cambiando de idioma…",
-    "present": "Actualidad"
+    "present": "Actualidad",
+    "notifications": "Notificaciones"
   },
   "home": {
     "hero": {
@@ -291,7 +292,7 @@
     "registerSubtitle": "Crea un perfil para iniciar tu solicitud",
     "fullName": "Nombre completo",
     "username": "Nombre de usuario",
-    "usernameHint": "De 2 a 20 caracteres, se usa para iniciar sesión",
+    "usernameHint": "De 3 a 20 caracteres: letras minúsculas, números, puntos o guiones bajos. Se muestra en los chats hasta que añadas tu nombre.",
     "passportNameHint": "Escribe tus nombres exactamente como aparecen en tu pasaporte.",
     "step1Title": "Tus datos",
     "step2Title": "Establece una contraseña",
@@ -361,7 +362,16 @@
         "chat": "Chatea en privado con tu asesor de Nadoumi"
       }
     },
-    "forgotSubtitle": "Verifica tu correo y luego elige una nueva contraseña."
+    "forgotSubtitle": "Verifica tu correo y luego elige una nueva contraseña.",
+    "usernameChecking": "Comprobando disponibilidad…",
+    "usernameAvailable": "Este nombre de usuario está disponible.",
+    "usernameTaken": "Este nombre de usuario ya está en uso.",
+    "usernameProblem": {
+      "tooShort": "Usa al menos 3 caracteres.",
+      "tooLong": "Usa como máximo 20 caracteres.",
+      "characters": "Usa solo letras minúsculas, números, puntos o guiones bajos, empezando por una letra o un número.",
+      "reserved": "Este nombre de usuario no está disponible."
+    }
   },
   "dashboard": {
     "nav": {
@@ -417,7 +427,9 @@
         "VERIFIED": "Verificado",
         "REJECTED": "Rechazado",
         "EXPIRED": "Caducado"
-      }
+      },
+      "identityTitle": "Documentos de identidad",
+      "identityBlurb": "Tu foto y tu pasaporte se necesitan para cada solicitud."
     },
     "home": {
       "subtitle": "Aquí tienes un resumen de tu proceso de solicitud de becas.",
@@ -564,7 +576,14 @@
         "blurb": "Eliminar tu cuenta quita tu acceso de forma permanente. Nuestro equipo gestiona esto bajo solicitud para que nada relacionado con una solicitud activa se pierda por error. Escríbenos y nos encargaremos rápidamente.",
         "cta": "Solicitar eliminación de cuenta",
         "mailSubject": "Solicitud de eliminación de cuenta"
-      }
+      },
+      "subtitle": "Gestiona tus datos de acceso, la seguridad y tu foto de perfil.",
+      "changePhoto": "Cambiar foto",
+      "photoSaved": "Foto de perfil actualizada",
+      "photoFailed": "No se pudo subir la foto. Inténtalo de nuevo.",
+      "photoBadType": "Elige una imagen JPEG, PNG o WebP.",
+      "photoTooBig": "La foto debe pesar menos de {mb} MB.",
+      "studentId": "ID de estudiante"
     },
     "changePassword": "Cambiar contraseña",
     "pwCurrent": "Contraseña actual",
@@ -829,7 +848,7 @@
     },
     "work": {
       "title": "Experiencia laboral",
-      "blurb": "Añade tu experiencia laboral, especialmente en China. Este paso es opcional."
+      "blurb": "Añade cualquier experiencia laboral, sobre todo en China. Puedes omitir este paso."
     },
     "finishing": {
       "title": "Preparando tu panel",
@@ -837,7 +856,12 @@
       "profile": "Guardando tu perfil…",
       "documents": "Comprobando tus documentos…",
       "dashboard": "Preparando tu panel…"
-    }
+    },
+    "progressLabel": "Progreso de la configuración",
+    "optionalTag": "Opcional",
+    "helpTitle": "¿Necesitas ayuda?",
+    "helpBody": "Nuestro equipo te guiará con gusto. Escribe a support{'@'}nadoumi.com.",
+    "eyebrow": "Paso {n} de {total}"
   },
   "university": {
     "founded": "Fundada en",
@@ -1077,40 +1101,6 @@
     "colDoc": "Documento",
     "colRequirement": "Requisito",
     "colNotes": "Notas"
-  },
-  "assistant": {
-    "fabLabel": "Abrir el asistente de Nadoumi",
-    "title": "Asistente Nadoumi",
-    "subtitle": "Encuentra becas y sigue tu solicitud",
-    "close": "Cerrar",
-    "greeting": "¡Hola! Puedo ayudarte a descubrir becas y a consultar una solicitud. ¿Qué te gustaría hacer?",
-    "tabFind": "Buscar becas",
-    "tabTrack": "Seguir solicitud",
-    "findPlaceholder": "ej. máster totalmente financiado en ingeniería",
-    "findHint": "Escribe un tema, un país o una palabra clave.",
-    "anyFunding": "Cualquier financiación",
-    "fundingFully": "Totalmente financiada",
-    "fundingPartial": "Parcial",
-    "fundingSelf": "Autofinanciada",
-    "search": "Buscar",
-    "searching": "Buscando…",
-    "noResults": "No se encontraron becas coincidentes. Prueba con una palabra clave más general.",
-    "resultsTitle": "Mejores coincidencias",
-    "viewAll": "Ver todos los resultados",
-    "open": "Abrir",
-    "deadline": "Plazo",
-    "rolling": "Admisión continua",
-    "trackPlaceholder": "Introduce el identificador de tu solicitud",
-    "trackHint": "Puedes encontrar el identificador en tu panel o en el correo de confirmación.",
-    "trackCta": "Comprobar estado",
-    "trackChecking": "Comprobando…",
-    "trackNotFound": "No pudimos encontrar ninguna solicitud con ese identificador. Compruébalo e inténtalo de nuevo.",
-    "trackComingSoon": "El seguimiento de solicitudes se está conectando. Mientras tanto, inicia sesión en tu panel para ver tus solicitudes.",
-    "trackGoDashboard": "Ir a mi panel",
-    "trackStatus": "Estado",
-    "trackStage": "Etapa",
-    "trackUpdated": "Última actualización",
-    "disclaimer": "Búsqueda guiada en el catálogo de Nadoumi en tiempo real."
   },
   "guides": {
     "more": "Más guías",
@@ -2089,7 +2079,10 @@
     "chipsCount": "{n} de {max} seleccionados",
     "search": "Buscar…",
     "noMatches": "No se encontraron resultados.",
-    "typeToSearch": "Escribe para buscar…"
+    "typeToSearch": "Escribe para buscar…",
+    "removeTag": "Quitar {value}",
+    "tagsNeedMore": "Añade {n} más para continuar",
+    "tagsCount": "{n} de {max} añadidos"
   },
   "passport": {
     "title": "Pasaporte",
@@ -2109,7 +2102,6 @@
     "expiryHint": "Tu pasaporte debe ser válido durante más de seis meses a partir de hoy.",
     "save": "Guardar pasaporte",
     "saved": "Pasaporte guardado",
-    "matches": "Tu pasaporte coincide con tu perfil.",
     "errors": {
       "numberInvalid": "Usa entre 5 y 20 letras y números.",
       "issueFuture": "La fecha de expedición no puede ser futura.",
@@ -2127,7 +2119,9 @@
   },
   "review": {
     "name": "Nombre",
-    "photo": "Foto"
+    "photo": "Foto",
+    "notUploaded": "Aún no subido",
+    "passportScan": "Escaneo del pasaporte"
   },
   "welcome": {
     "title": "¡Bienvenido, {name}!",
@@ -2158,16 +2152,18 @@
     "level": "Nivel deseado",
     "scholarship": "Interés en una beca",
     "fields": "Áreas de estudio",
-    "fieldsHint": "Elige hasta doce áreas que te interesen.",
+    "fieldsHint": "Escribe un área de estudio y pulsa Intro. Añade las que quieras, hasta 12.",
     "otherField": "Añadir otra área",
-    "cities": "Ciudades preferidas",
-    "citiesHint": "Elige las ciudades chinas en las que considerarías estudiar.",
+    "cities": "Provincias o ciudades preferidas",
+    "citiesHint": "Escribe al menos tres provincias o ciudades de China que considerarías, pulsando Intro tras cada una.",
     "otherCity": "Añadir otra ciudad",
     "teachingLanguage": "Idioma de enseñanza",
     "intakeYear": "Año de ingreso",
     "intakeTerm": "Periodo de ingreso",
     "notes": "Otras preferencias",
-    "notesHint": "Cualquier otra información que nos ayude a encontrar el programa adecuado para ti."
+    "notesHint": "Cualquier otra información que nos ayude a encontrar el programa adecuado para ti.",
+    "fieldsPlaceholder": "p. ej. Informática",
+    "citiesPlaceholder": "p. ej. Pekín, Sichuan, Shanghái"
   },
   "location": {
     "sectionWhere": "Dónde te encuentras ahora",
@@ -2290,6 +2286,11 @@
       "Shenyang": "Shenyang",
       "Ningbo": "Ningbo",
       "Fuzhou": "Fuzhou"
+    },
+    "teachingLanguage": {
+      "EN": "Inglés",
+      "ZH": "Chino",
+      "EN_ZH": "Inglés y chino"
     }
   },
   "news": {
@@ -2347,5 +2348,14 @@
     "retry": "Reintentar",
     "close": "Cerrar",
     "formerMember": "Antiguo miembro"
+  },
+  "formErrors": {
+    "startFuture": "La fecha de inicio no puede estar en el futuro.",
+    "endBeforeStart": "La fecha de fin debe ser posterior a la de inicio.",
+    "endFuture": "La fecha de fin no puede estar en el futuro.",
+    "endRequired": "Añade una fecha de fin o marca que es actual.",
+    "visaExpired": "Este visado ya ha caducado.",
+    "needOne": "Añade al menos uno.",
+    "needCities": "Añade al menos tres provincias o ciudades."
   }
 }

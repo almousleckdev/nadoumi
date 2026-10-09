@@ -55,7 +55,8 @@
     "next": "Suivant",
     "pagination": "Pagination",
     "switchingLanguage": "Changement de langue…",
-    "present": "Aujourd’hui"
+    "present": "Aujourd’hui",
+    "notifications": "Notifications"
   },
   "home": {
     "hero": {
@@ -291,7 +292,7 @@
     "registerSubtitle": "Créez un profil pour démarrer votre candidature",
     "fullName": "Nom complet",
     "username": "Nom d'utilisateur",
-    "usernameHint": "2 à 20 caractères, utilisé pour vous connecter",
+    "usernameHint": "3 à 20 caractères : lettres minuscules, chiffres, points ou tirets bas. Affiché dans les discussions tant que vous n'avez pas ajouté votre nom.",
     "passportNameHint": "Saisissez vos noms exactement comme ils figurent sur votre passeport.",
     "step1Title": "Vos informations",
     "step2Title": "Définir un mot de passe",
@@ -361,7 +362,16 @@
         "chat": "Échangez en privé avec votre conseiller Nadoumi"
       }
     },
-    "forgotSubtitle": "Vérifiez votre e-mail, puis choisissez un nouveau mot de passe."
+    "forgotSubtitle": "Vérifiez votre e-mail, puis choisissez un nouveau mot de passe.",
+    "usernameChecking": "Vérification de la disponibilité…",
+    "usernameAvailable": "Ce nom d'utilisateur est disponible.",
+    "usernameTaken": "Ce nom d'utilisateur est déjà pris.",
+    "usernameProblem": {
+      "tooShort": "Utilisez au moins 3 caractères.",
+      "tooLong": "Utilisez au plus 20 caractères.",
+      "characters": "Utilisez uniquement des lettres minuscules, chiffres, points ou tirets bas, en commençant par une lettre ou un chiffre.",
+      "reserved": "Ce nom d'utilisateur n'est pas disponible."
+    }
   },
   "dashboard": {
     "nav": {
@@ -417,7 +427,9 @@
         "VERIFIED": "Vérifié",
         "REJECTED": "Refusé",
         "EXPIRED": "Expiré"
-      }
+      },
+      "identityTitle": "Documents d'identité",
+      "identityBlurb": "Votre photo et votre passeport sont nécessaires pour chaque candidature."
     },
     "home": {
       "subtitle": "Voici un aperçu de votre parcours de candidature aux bourses.",
@@ -564,7 +576,14 @@
         "blurb": "Supprimer votre compte retire définitivement votre accès. Notre équipe traite cela sur demande afin que rien lié à une candidature active ne soit perdu par erreur. Écrivez-nous et nous nous en occuperons rapidement.",
         "cta": "Demander la suppression du compte",
         "mailSubject": "Demande de suppression de compte"
-      }
+      },
+      "subtitle": "Gérez vos identifiants, votre sécurité et votre photo de profil.",
+      "changePhoto": "Changer de photo",
+      "photoSaved": "Photo de profil mise à jour",
+      "photoFailed": "La photo n'a pas pu être téléversée. Réessayez.",
+      "photoBadType": "Choisissez une image JPEG, PNG ou WebP.",
+      "photoTooBig": "La photo doit peser moins de {mb} Mo.",
+      "studentId": "ID étudiant"
     },
     "changePassword": "Changer le mot de passe",
     "pwCurrent": "Mot de passe actuel",
@@ -829,7 +848,7 @@
     },
     "work": {
       "title": "Expérience professionnelle",
-      "blurb": "Ajoutez toute expérience professionnelle, notamment en Chine. Cette étape est facultative."
+      "blurb": "Ajoutez toute expérience professionnelle, surtout en Chine. Vous pouvez ignorer cette étape."
     },
     "finishing": {
       "title": "Préparation de votre tableau de bord",
@@ -837,7 +856,12 @@
       "profile": "Enregistrement de votre profil…",
       "documents": "Vérification de vos documents…",
       "dashboard": "Préparation de votre tableau de bord…"
-    }
+    },
+    "progressLabel": "Progression de l'inscription",
+    "optionalTag": "Facultatif",
+    "helpTitle": "Besoin d'aide ?",
+    "helpBody": "Notre équipe vous guide avec plaisir. Écrivez à support{'@'}nadoumi.com.",
+    "eyebrow": "Étape {n} sur {total}"
   },
   "university": {
     "founded": "Fondée en",
@@ -1077,40 +1101,6 @@
     "colDoc": "Document",
     "colRequirement": "Exigence",
     "colNotes": "Remarques"
-  },
-  "assistant": {
-    "fabLabel": "Ouvrir l'assistant Nadoumi",
-    "title": "Assistant Nadoumi",
-    "subtitle": "Trouvez des bourses et suivez votre candidature",
-    "close": "Fermer",
-    "greeting": "Bonjour ! Je peux vous aider à découvrir des bourses et à suivre une candidature. Que souhaitez-vous faire ?",
-    "tabFind": "Trouver des bourses",
-    "tabTrack": "Suivre une candidature",
-    "findPlaceholder": "ex. master entièrement financé en ingénierie",
-    "findHint": "Saisissez un sujet, un pays ou un mot-clé.",
-    "anyFunding": "Tout financement",
-    "fundingFully": "Entièrement financée",
-    "fundingPartial": "Partiellement financée",
-    "fundingSelf": "Autofinancée",
-    "search": "Rechercher",
-    "searching": "Recherche en cours…",
-    "noResults": "Aucune bourse ne correspond. Essayez un mot-clé plus large.",
-    "resultsTitle": "Meilleures correspondances",
-    "viewAll": "Voir tous les résultats",
-    "open": "Ouvrir",
-    "deadline": "Échéance",
-    "rolling": "Admission continue",
-    "trackPlaceholder": "Saisissez l'identifiant de votre candidature",
-    "trackHint": "Vous trouverez l'identifiant dans votre tableau de bord ou dans l'e-mail de confirmation.",
-    "trackCta": "Vérifier le statut",
-    "trackChecking": "Vérification…",
-    "trackNotFound": "Nous n'avons trouvé aucune candidature avec cet identifiant. Vérifiez-le et réessayez.",
-    "trackComingSoon": "Le suivi des candidatures est en cours de mise en place. En attendant, connectez-vous à votre tableau de bord pour voir vos candidatures.",
-    "trackGoDashboard": "Aller à mon tableau de bord",
-    "trackStatus": "Statut",
-    "trackStage": "Étape",
-    "trackUpdated": "Dernière mise à jour",
-    "disclaimer": "Recherche guidée dans le catalogue Nadoumi en temps réel."
   },
   "guides": {
     "more": "Plus de guides",
@@ -2089,7 +2079,10 @@
     "chipsCount": "{n} sur {max} sélectionné(s)",
     "search": "Rechercher…",
     "noMatches": "Aucun résultat.",
-    "typeToSearch": "Tapez pour rechercher…"
+    "typeToSearch": "Tapez pour rechercher…",
+    "removeTag": "Retirer {value}",
+    "tagsNeedMore": "Ajoutez-en {n} de plus pour continuer",
+    "tagsCount": "{n} sur {max} ajoutés"
   },
   "passport": {
     "title": "Passeport",
@@ -2109,7 +2102,6 @@
     "expiryHint": "Votre passeport doit être valide plus de six mois à compter d'aujourd'hui.",
     "save": "Enregistrer le passeport",
     "saved": "Passeport enregistré",
-    "matches": "Votre passeport correspond à votre profil.",
     "errors": {
       "numberInvalid": "Utilisez de 5 à 20 lettres et chiffres.",
       "issueFuture": "La date de délivrance ne peut pas être dans le futur.",
@@ -2127,7 +2119,9 @@
   },
   "review": {
     "name": "Nom",
-    "photo": "Photo"
+    "photo": "Photo",
+    "notUploaded": "Pas encore téléversé",
+    "passportScan": "Scan du passeport"
   },
   "welcome": {
     "title": "Bienvenue, {name} !",
@@ -2157,17 +2151,19 @@
     "sectionWhen": "Quand vous voulez commencer",
     "level": "Niveau souhaité",
     "scholarship": "Intérêt pour une bourse",
-    "fields": "Domaines d’études",
-    "fieldsHint": "Choisissez jusqu’à douze domaines qui vous intéressent.",
+    "fields": "Domaines d'études",
+    "fieldsHint": "Saisissez un domaine d'études et appuyez sur Entrée. Ajoutez-en autant que vous voulez, jusqu'à 12.",
     "otherField": "Ajouter un autre domaine",
-    "cities": "Villes préférées",
-    "citiesHint": "Choisissez les villes chinoises où vous envisageriez d’étudier.",
+    "cities": "Provinces ou villes souhaitées",
+    "citiesHint": "Saisissez au moins trois provinces ou villes de Chine que vous envisagez, en appuyant sur Entrée après chacune.",
     "otherCity": "Ajouter une autre ville",
     "teachingLanguage": "Langue d’enseignement",
     "intakeYear": "Année d’entrée",
     "intakeTerm": "Session d’entrée",
     "notes": "Autres préférences",
-    "notesHint": "Toute autre information qui pourrait nous aider à vous proposer le bon programme."
+    "notesHint": "Toute autre information qui pourrait nous aider à vous proposer le bon programme.",
+    "fieldsPlaceholder": "ex. Informatique",
+    "citiesPlaceholder": "ex. Pékin, Sichuan, Shanghai"
   },
   "location": {
     "sectionWhere": "Où vous vous trouvez actuellement",
@@ -2290,6 +2286,11 @@
       "Shenyang": "Shenyang",
       "Ningbo": "Ningbo",
       "Fuzhou": "Fuzhou"
+    },
+    "teachingLanguage": {
+      "EN": "Anglais",
+      "ZH": "Chinois",
+      "EN_ZH": "Anglais et chinois"
     }
   },
   "news": {
@@ -2347,5 +2348,14 @@
     "retry": "Réessayer",
     "close": "Fermer",
     "formerMember": "Ancien membre"
+  },
+  "formErrors": {
+    "startFuture": "La date de début ne peut pas être dans le futur.",
+    "endBeforeStart": "La date de fin doit être postérieure à la date de début.",
+    "endFuture": "La date de fin ne peut pas être dans le futur.",
+    "endRequired": "Ajoutez une date de fin, ou cochez « en cours ».",
+    "visaExpired": "Ce visa a déjà expiré.",
+    "needOne": "Ajoutez-en au moins un.",
+    "needCities": "Ajoutez au moins trois provinces ou villes."
   }
 }

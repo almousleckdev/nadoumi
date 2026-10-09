@@ -6,7 +6,7 @@
  * we try rendering it as an image and fall back to the file card if the browser can't load it
  * (e.g. it's a PDF), rather than assuming a type we don't actually know.
  */
-const props = defineProps<{ src: string; type?: string; name?: string }>()
+const props = defineProps<{ src: string; type?: string; name?: string; compact?: boolean }>()
 const { t } = useI18n()
 
 const imageFailed = ref(false)
@@ -19,7 +19,8 @@ const showFileCard = computed(() => isPdf.value || imageFailed.value)
 <template>
   <div
     v-if="!showFileCard"
-    class="flex h-72 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-900/5"
+    class="flex items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-900/5"
+    :class="compact ? 'h-44' : 'h-72'"
   >
     <img :src="src" :alt="name ?? t('onboarding.doc.previewAlt')" class="h-full w-full object-contain" @error="imageFailed = true">
   </div>

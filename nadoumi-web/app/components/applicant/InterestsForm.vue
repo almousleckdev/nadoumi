@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { InterestBody } from '~/composables/useApplicant'
 import {
-  INTAKE_YEAR_SPAN, MAX_INTEREST_CITIES, MAX_INTEREST_FIELDS,
+  INTAKE_YEAR_SPAN, MAX_INTEREST_CITIES, MAX_INTEREST_FIELDS, MAX_INTEREST_FIELD_LENGTH, MIN_INTEREST_CITIES,
 } from '~/constants/applicantOptions'
 import type { InterestDto } from '~/types/catalog'
 import { interestsBody, interestsForm } from '~/utils/sectionMappers'
@@ -10,10 +10,8 @@ import { validateInterests } from '~/utils/sectionRules'
 const props = defineProps<{ record: InterestDto | null, busy: boolean }>()
 const emit = defineEmits<{ submit: [body: InterestBody] }>()
 const { t } = useI18n()
-const { languages } = useLocaleOptions()
 const { options: levels } = useEnumOptions('studyLevel')
-const { options: fields } = useEnumOptions('fieldOfStudy')
-const { options: cities } = useEnumOptions('chinaCity')
+const { options: teaching } = useEnumOptions('teachingLanguage')
 const { options: scholarship } = useEnumOptions('scholarshipInterest')
 const { options: terms } = useEnumOptions('intakeTerm')
 
@@ -32,12 +30,12 @@ const years = Array.from({ length: INTAKE_YEAR_SPAN + 1 }, (_, i) => {
     <FormSection :title="t('interests.sectionStudy')">
       <FormSelectField id="int-level" v-model="form.desiredLevel" :label="t('interests.level')" :options="levels" :error="errors.desiredLevel" required />
       <FormSelectField id="int-scholarship" v-model="form.scholarshipInterest" :label="t('interests.scholarship')" :options="scholarship" />
-      <ChipMultiSelect id="int-fields" v-model="form.fields" :label="t('interests.fields')" :hint="t('interests.fieldsHint')" :options="fields" :max="MAX_INTEREST_FIELDS" :custom-label="t('interests.otherField')" :error="errors.fields" required />
+      <TagInput id="int-fields" v-model="form.fields" :label="t('interests.fields')" :hint="t('interests.fieldsHint')" :placeholder="t('interests.fieldsPlaceholder')" :max="MAX_INTEREST_FIELDS" :max-length="MAX_INTEREST_FIELD_LENGTH" :min="1" :error="errors.fields" required />
     </FormSection>
 
     <FormSection :title="t('interests.sectionWhere')">
-      <ChipMultiSelect id="int-cities" v-model="form.cities" :label="t('interests.cities')" :hint="t('interests.citiesHint')" :options="cities" :max="MAX_INTEREST_CITIES" :custom-label="t('interests.otherCity')" :error="errors.cities" required />
-      <FormComboboxField id="int-teaching" v-model="form.teachingLanguage" :label="t('interests.teachingLanguage')" :options="languages" />
+      <TagInput id="int-cities" v-model="form.cities" :label="t('interests.cities')" :hint="t('interests.citiesHint')" :placeholder="t('interests.citiesPlaceholder')" :max="MAX_INTEREST_CITIES" :min="MIN_INTEREST_CITIES" :error="errors.cities" required />
+      <FormSelectField id="int-teaching" v-model="form.teachingLanguage" :label="t('interests.teachingLanguage')" :options="teaching" />
     </FormSection>
 
     <FormSection :title="t('interests.sectionWhen')">

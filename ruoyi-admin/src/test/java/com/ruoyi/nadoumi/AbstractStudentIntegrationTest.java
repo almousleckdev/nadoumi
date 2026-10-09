@@ -83,7 +83,7 @@ abstract class AbstractStudentIntegrationTest extends AbstractNadIntegrationTest
                                 + "\"startDate\":\"2018-09-01\",\"endDate\":\"2021-06-30\"}"))
                 .andExpect(status().isCreated());
         mvc.perform(put(s.applicantUrl() + "/interests").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"desiredLevel\":\"MASTER\",\"fields\":[\"BUSINESS\"],\"cities\":[\"Beijing\"]}"))
+                        .content("{\"desiredLevel\":\"MASTER\",\"fields\":[\"BUSINESS\"],\"cities\":[\"Beijing\",\"Sichuan\",\"Shanghai\"]}"))
                 .andExpect(status().isOk());
         mvc.perform(put(s.applicantUrl() + "/residence").header("Authorization", auth).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"inChina\":false,\"country\":\"EG\",\"city\":\"Cairo\"}"))
@@ -108,8 +108,16 @@ abstract class AbstractStudentIntegrationTest extends AbstractNadIntegrationTest
     }
 
     protected static String registerBody(String first, String last, String email, String ticket) {
-        return "{\"firstName\":\"" + first + "\",\"lastName\":\"" + last + "\",\"email\":\"" + email
+        return "{\"username\":\"" + usernameFor(first, last) + "\",\"email\":\"" + email
                 + "\",\"password\":\"" + STRONG_PASSWORD + "\",\"ticket\":\"" + ticket + "\"}";
+    }
+
+    /** A unique, valid handle that still reads like the old first/last pair the tests were written around. */
+    protected static String usernameFor(String first, String last) {
+        String base = (first + "_" + last).toLowerCase().replaceAll("[^a-z0-9_]", "x");
+        String suffix = Integer.toString(SEQ.incrementAndGet(), 36);
+        int room = 20 - suffix.length() - 1;
+        return (base.length() > room ? base.substring(0, room) : base) + "_" + suffix;
     }
 
     protected String ticketFor(String email) throws Exception {

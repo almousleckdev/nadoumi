@@ -54,7 +54,7 @@ class StudentAuthServiceTest {
             new StudentEmailChangeService(identityMapper, userService, tokenService, caller, otp, events);
 
     private static StudentRegisterRequest register(String email, String password, String ticket) {
-        return new StudentRegisterRequest("Ada", "Lovelace", email, password, ticket);
+        return new StudentRegisterRequest("ada_l", email, password, ticket);
     }
 
     @BeforeEach
@@ -80,6 +80,7 @@ class StudentAuthServiceTest {
     @Test
     void register_rejects_a_password_that_fails_the_policy() {
         when(tickets.consume("tkt", OtpPurpose.REGISTER)).thenReturn("a@x.com");
+        when(userService.checkUserNameUnique(any(SysUser.class))).thenReturn(true);
         assertThatThrownBy(() -> service.register(register("a@x.com", "weak", "tkt")))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("password.tooShort");
@@ -90,6 +91,7 @@ class StudentAuthServiceTest {
         when(tickets.consume("tkt", OtpPurpose.REGISTER)).thenReturn("a@x.com");
         when(identityMapper.selectUserIdByEmailAndType("a@x.com", StudentAuthService.STUDENT_USER_TYPE))
                 .thenReturn(5L);
+        when(userService.checkUserNameUnique(any(SysUser.class))).thenReturn(true);
         assertThatThrownBy(() -> service.register(register("a@x.com", "Abcdef1!", "tkt")))
                 .isInstanceOf(NadBadRequestException.class)
                 .hasMessageContaining("already registered");
@@ -109,14 +111,14 @@ class StudentAuthServiceTest {
         var response = service.register(register("Ada@Example.com", "Abcdef1!", "tkt"));
 
         assertThat(response.userId()).isEqualTo(42L);
-        assertThat(response.username()).startsWith("stu_");
+        assertThat(response.username()).isEqualTo("ada_l");
         verify(identityMapper).updateUserType(42L, StudentAuthService.STUDENT_USER_TYPE);
         verify(identityMapper).markEmailVerified(42L);
 
         org.mockito.ArgumentCaptor<String> payload = org.mockito.ArgumentCaptor.forClass(String.class);
         verify(outbox).write(eq("user"), eq(42L),
                 eq(com.nadoumi.common.outbox.OutboxEventTypes.STUDENT_REGISTERED), payload.capture());
-        assertThat(payload.getValue()).contains("\"userId\":42").contains("ada@example.com").contains("Ada");
+        assertThat(payload.getValue()).contains("\"userId\":42").contains("ada@example.com").contains("ada_l");
     }
 
     @Test
@@ -324,5 +326,60 @@ class StudentAuthServiceTest {
         assertThat(ev.getValue().userId()).isEqualTo(7L);
         assertThat(ev.getValue().notifyEmail()).isEqualTo("old@x.com");
         assertThat(ev.getValue().newEmail()).isEqualTo("new@x.com");
+    }
+
+    @Test
+    void register_rejects_a_username_that_is_not_valid() {
+        when(tickets.consume("tkt", OtpPurpose.REGISTER)).thenReturn("ada@example.com");
+
+        for (String bad : new String[] { "ab", "has space", "Ünicode", "admin", "way_too_long_for_a_handle_x", "ada@example.com" }) {
+            assertThatThrownBy(() -> service.register(new StudentRegisterRequest(bad, "ada@example.com", "Abcdef1!", "tkt")))
+                    .as(bad).isInstanceOf(NadBadRequestException.class);
+        }
+    }
+
+    @Test
+    void register_rejects_a_username_that_is_taken() {
+        when(tickets.consume("tkt", OtpPurpose.REGISTER)).thenReturn("ada@example.com");
+        when(userService.checkUserNameUnique(any(SysUser.class))).thenReturn(false);
+
+        assertThatThrownBy(() -> service.register(register("ada@example.com", "Abcdef1!", "tkt")))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("taken");
+    }
+
+    @Test
+    void register_stores_the_username_lower_cased_and_uses_it_as_the_display_name() {
+        when(tickets.consume("tkt", OtpPurpose.REGISTER)).thenReturn("ada@example.com");
+        when(identityMapper.selectUserIdByEmailAndType("ada@example.com", StudentAuthService.STUDENT_USER_TYPE)).thenReturn(null);
+        when(userService.checkUserNameUnique(any(SysUser.class))).thenReturn(true);
+        when(userService.registerUser(any(SysUser.class))).thenAnswer(invocation -> {
+            invocation.<SysUser>getArgument(0).setUserId(7L);
+            return true;
+        });
+
+        service.register(new StudentRegisterRequest("  Ada_L ", "Ada@Example.com", "Abcdef1!", "tkt"));
+
+        org.mockito.ArgumentCaptor<SysUser> saved = org.mockito.ArgumentCaptor.forClass(SysUser.class);
+        verify(userService).registerUser(saved.capture());
+        assertThat(saved.getValue().getUserName()).isEqualTo("ada_l");
+        assertThat(saved.getValue().getNickName()).isEqualTo("ada_l");
+    }
+
+    @Test
+    void register_refuses_a_password_that_contains_the_username() {
+        when(tickets.consume("tkt", OtpPurpose.REGISTER)).thenReturn("ada@example.com");
+        when(userService.checkUserNameUnique(any(SysUser.class))).thenReturn(true);
+
+        assertThatThrownBy(() -> service.register(register("ada@example.com", "Ada_l-Pass1!", "tkt")))
+                .isInstanceOf(NadBadRequestException.class);
+    }
+
+    @Test
+    void checkUsername_reports_validity_and_availability_separately() {
+        when(userService.checkUserNameUnique(any(SysUser.class))).thenReturn(true, false);
+
+        assertThat(service.checkUsername("ada_l")).isEqualTo(new StudentAuthService.UsernameCheck(true, true));
+        assertThat(service.checkUsername("ada_l")).isEqualTo(new StudentAuthService.UsernameCheck(true, false));
+        assertThat(service.checkUsername("x")).isEqualTo(new StudentAuthService.UsernameCheck(false, false));
     }
 }

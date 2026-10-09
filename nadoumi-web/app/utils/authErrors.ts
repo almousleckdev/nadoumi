@@ -17,6 +17,8 @@ interface FetchLikeError {
 /** Ordered: the first backend `detail` substring that matches wins. */
 const DETAIL_RULES: [RegExp, string][] = [
   [/already registered/i, 'errors.emailTaken'],
+  [/username is already taken/i, 'auth.usernameTaken'],
+  [/username is not valid/i, 'auth.usernameProblem.characters'],
   [/email or password is incorrect/i, 'errors.badCredentials'],
   [/current password is incorrect/i, 'errors.currentPasswordWrong'],
   [/does not match this address/i, 'errors.otpEmailMismatch'],

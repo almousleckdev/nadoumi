@@ -93,7 +93,6 @@ const cardStatus = computed(() => {
 <template>
   <DocumentCard :title="t('passport.title')" :guidance="expanded ? t('passport.guidance') : ''" :status="cardStatus">
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
-    <NAlert v-if="cardStatus === 'done'" tone="success">{{ t('passport.matches') }}</NAlert>
 
     <div v-if="!expanded" class="flex items-center gap-4">
       <figure v-if="savedScanUrl" class="h-24 w-24 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50 sm:h-28 sm:w-28">
@@ -114,8 +113,7 @@ const cardStatus = computed(() => {
     </div>
 
     <template v-else>
-      <NAlert v-if="cardStatus === 'done'" tone="success">{{ t('passport.matches') }}</NAlert>
-      <PassportMismatchNotice v-if="mismatches.length" :mismatches="mismatches" @edit-profile="$emit('edit-profile')" />
+        <PassportMismatchNotice v-if="mismatches.length" :mismatches="mismatches" @edit-profile="$emit('edit-profile')" />
 
       <DocumentPreview v-if="file" :src="preview" :type="file.type" :name="file.name" />
       <DocumentPreview v-else-if="savedScanUrl" :src="savedScanUrl" :name="t('passport.title')" />

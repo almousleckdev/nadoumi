@@ -1,18 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import { mockNuxtImport } from '@nuxt/test-utils/runtime'
 import { useAsyncAction } from '~/composables/useAsyncAction'
+import { useToast } from '~/composables/useToast'
 
 // useI18n needs a component setup context; the key itself is enough to assert on.
 mockNuxtImport('useI18n', () => () => ({ t: (key: string) => key }))
 
 describe('useAsyncAction', () => {
-  it('returns the action result and shows the success notice', async () => {
+  it('returns the action result and announces success as a toast, not an inline banner', async () => {
     const { run, notice, error, busy } = useAsyncAction()
+    useToast().toasts.value = []
 
     const result = await run(async () => 42, 'saved')
 
     expect(result).toBe(42)
-    expect(notice.value).toBe('saved')
+    expect(useToast().toasts.value.map(t => [t.kind, t.message])).toEqual([['success', 'saved']])
+    expect(notice.value).toBe('')
     expect(error.value).toBe('')
     expect(busy.value).toBe(false)
   })
@@ -50,14 +53,13 @@ describe('useAsyncAction', () => {
     expect(busy.value).toBe(false)
   })
 
-  it('clears the previous notice and error on the next run', async () => {
-    const { run, notice, error } = useAsyncAction()
+  it('clears the previous error on the next run', async () => {
+    const { run, error } = useAsyncAction()
     await run(async () => { throw new Error('first') })
     expect(error.value).not.toBe('')
 
     await run(async () => undefined, 'ok')
 
     expect(error.value).toBe('')
-    expect(notice.value).toBe('ok')
   })
 })

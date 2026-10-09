@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { toRef } from 'vue'
+
 definePageMeta({ middleware: 'guest', layout: 'auth' })
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -7,7 +9,7 @@ const { refresh } = useSession()
 const STEPS = ['personal', 'verify', 'password'] as const
 const step = ref<1 | 2 | 3>(1)
 
-const form = reactive({ firstName: '', lastName: '', email: '', password: '', confirm: '' })
+const form = reactive({ username: '', email: '', password: '', confirm: '' })
 const consent = ref({ terms: false, privacy: false })
 const ticket = ref('')
 const emailVerified = ref(false)
@@ -15,11 +17,20 @@ const error = ref('')
 const submitted = ref(false)
 const busy = ref(false)
 
+// The student's legal names are asked for later, in onboarding, from the passport. Here: a handle and a verified email.
+const usernameRef = toRef(form, 'username')
+const { status: usernameStatus, problem: usernameProblemKey, usable: usernameUsable } = useUsernameCheck(usernameRef)
+const usernameFeedback = computed(() => {
+  if (usernameProblemKey.value) return { tone: 'error', text: t(`auth.usernameProblem.${usernameProblemKey.value}`) }
+  if (usernameStatus.value === 'taken') return { tone: 'error', text: t('auth.usernameTaken') }
+  if (usernameStatus.value === 'checking') return { tone: 'info', text: t('auth.usernameChecking') }
+  if (usernameStatus.value === 'available') return { tone: 'ok', text: t('auth.usernameAvailable') }
+  return null
+})
 // The OTP verification is the email-ownership check — no separate confirm-email field.
-const step1Valid = computed(() =>
-  Boolean(form.firstName.trim() && form.lastName.trim() && isValidEmail(form.email)))
+const step1Valid = computed(() => usernameUsable.value && isValidEmail(form.email))
 
-const forbidden = computed(() => [form.firstName, form.lastName, form.email.split('@')[0] ?? ''])
+const forbidden = computed(() => [normalizeUsername(form.username), form.email.split('@')[0] ?? ''])
 const passwordResult = computed(() =>
   passwordChecks(form.password, { forbidden: forbidden.value, confirm: form.confirm }))
 
@@ -58,8 +69,7 @@ async function submit() {
     await $fetch('/api/student-account', {
       method: 'POST',
       body: {
-        firstName: form.firstName,
-        lastName: form.lastName,
+        username: normalizeUsername(form.username),
         email: form.email,
         password: form.password,
         ticket: ticket.value,
@@ -104,15 +114,28 @@ useSeo(t('auth.registerTitle'), t('home.hero.subtitle'))
         <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
 
         <template v-if="step === 1">
-          <div class="grid gap-4 sm:grid-cols-2">
-            <NField :label="t('auth.givenName')" for="firstName" required>
-              <NInput id="firstName" :model-value="form.firstName" autocomplete="given-name" :maxlength="100" @update:model-value="(v: string) => form.firstName = v.toUpperCase()" />
-            </NField>
-            <NField :label="t('auth.familyName')" for="lastName" required>
-              <NInput id="lastName" :model-value="form.lastName" autocomplete="family-name" :maxlength="100" @update:model-value="(v: string) => form.lastName = v.toUpperCase()" />
-            </NField>
-          </div>
-          <NAlert tone="info">{{ t('auth.passportNameHint') }}</NAlert>
+          <NField :label="t('auth.username')" for="username" :hint="t('auth.usernameHint')" required>
+            <NInput
+              id="username"
+              :model-value="form.username"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              :maxlength="20"
+              :invalid="usernameFeedback?.tone === 'error'"
+              :valid="usernameFeedback?.tone === 'ok'"
+              @update:model-value="(v: string) => form.username = v.toLowerCase().replace(/\s/g, '')"
+            />
+          </NField>
+          <p
+            v-if="usernameFeedback"
+            class="-mt-2 text-sm"
+            :class="{ 'text-red-600': usernameFeedback.tone === 'error', 'text-emerald-700': usernameFeedback.tone === 'ok', 'text-slate-500': usernameFeedback.tone === 'info' }"
+            role="status"
+            data-test="username-feedback"
+          >
+            {{ usernameFeedback.text }}
+          </p>
         </template>
 
         <EmailVerifyStep
