@@ -1,15 +1,25 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
-import { Plus, Delete } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import { Plus, Delete, DocumentAdd } from '@element-plus/icons-vue'
 import FormSection from '@/components/ui/FormSection.vue'
 import { titleCase } from '@/utils/text'
-import { useUniversityForm } from '../universityForm'
+import { useUniversityForm, type DeptRow } from '../universityForm'
+import { parseDepartments } from '../bulkPaste'
+import BulkPasteDialog from './BulkPasteDialog.vue'
 
 const { t } = useI18n()
 const form = useUniversityForm()
 
 const thisYear = new Date().getFullYear()
 const TYPES = ['PUBLIC', 'PRIVATE'] as const
+
+const pasteOpen = ref(false)
+
+function addPasted(rows: DeptRow[]) {
+  // drop the untouched blank row the form starts with, then append
+  form.departments = [...form.departments.filter(d => d.name.trim() || d.id != null), ...rows]
+}
 </script>
 
 <template>
@@ -102,6 +112,21 @@ const TYPES = ['PUBLIC', 'PRIVATE'] as const
     >
       {{ t('university.addDepartment') }}
     </el-button>
+    <el-button
+      size="small"
+      :icon="DocumentAdd"
+      @click="pasteOpen = true"
+    >
+      {{ t('university.pasteDepartments') }}
+    </el-button>
+    <BulkPasteDialog
+      v-model="pasteOpen"
+      :title="t('university.pasteDepartmentsTitle')"
+      :hint="t('university.pasteDepartmentsHint')"
+      :placeholder="t('university.pasteDepartmentsExample')"
+      :parse="text => parseDepartments(text, form.departments)"
+      @confirm="addPasted"
+    />
   </FormSection>
 
   <FormSection :title="t('university.secProfile')">

@@ -6,6 +6,11 @@ import { numberOrNull, textOrNull } from '@/utils/formValues'
 
 export const MAX_GALLERY = 10
 
+// Nadoumi's own contact details, pre-filled when a university has none of its own.
+export const DEFAULT_WEBSITE = 'https://nadoumi.com/'
+export const DEFAULT_ADMISSIONS_EMAIL = 'team@nadoumiconsulting.com'
+export const DEFAULT_OFFICE_PHONE = '+86 159 0823 7607 / +86 155 2057 6024'
+
 export type GalleryRow = {
   imageUrl: string | null
   mediaId: number | null
@@ -21,9 +26,9 @@ export function blankUniversityForm() {
     name: '', nameCn: '', country: '', type: null as string | null,
     city: '', province: '', foundedYear: null as number | null,
     totalStudents: null as number | null, internationalStudents: null as number | null,
-    facultyCount: null as number | null, website: '', rankingTier: '',
+    facultyCount: null as number | null, website: DEFAULT_WEBSITE, rankingTier: '',
     introduction: '', history: '', campusInfo: '', accommodationInfo: '', nearbyInfo: '',
-    admissionsEmail: '', officePhone: '',
+    admissionsEmail: DEFAULT_ADMISSIONS_EMAIL, officePhone: DEFAULT_OFFICE_PHONE,
     logoImageUrl: null as string | null, coverImageUrl: null as string | null,
     logoMediaId: null as number | null, bannerMediaId: null as number | null,
     recommended: false, featured: false, publicPartner: false,
@@ -47,10 +52,10 @@ export function formFromUniversity(u: University): UniversityForm {
     name: u.name, nameCn: u.nameCn ?? '', country: u.country, type: u.type,
     city: u.city ?? '', province: u.province ?? '', foundedYear: u.foundedYear,
     totalStudents: u.totalStudents, internationalStudents: u.internationalStudents,
-    facultyCount: u.facultyCount, website: u.website ?? '', rankingTier: u.rankingTier ?? '',
+    facultyCount: u.facultyCount, website: u.website || DEFAULT_WEBSITE, rankingTier: u.rankingTier ?? '',
     introduction: u.introduction ?? '', history: u.history ?? '', campusInfo: u.campusInfo ?? '',
     accommodationInfo: u.accommodationInfo ?? '', nearbyInfo: u.nearbyInfo ?? '',
-    admissionsEmail: u.admissionsEmail ?? '', officePhone: u.officePhone ?? '',
+    admissionsEmail: u.admissionsEmail || DEFAULT_ADMISSIONS_EMAIL, officePhone: u.officePhone || DEFAULT_OFFICE_PHONE,
     logoImageUrl: u.logoImageUrl ?? null, coverImageUrl: u.coverImageUrl ?? null,
     logoMediaId: u.logoMediaId ?? null, bannerMediaId: u.bannerMediaId ?? null,
     recommended: u.recommended, featured: u.featured, publicPartner: u.publicPartner ?? false,

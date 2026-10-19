@@ -8,7 +8,7 @@ describe('SiteFooter', () => {
 
     const link = w.findAll('a').find(a => a.attributes('href')?.startsWith('https://wa.me/'))
     expect(link).toBeTruthy()
-    expect(link!.attributes('href')).toBe('https://wa.me/8615908237607')
+    expect(link!.attributes('href')).toBe('https://wa.me/8615520576024')
     expect(link!.attributes('target')).toBe('_blank')
     expect(link!.attributes('rel')).toContain('noopener')
   })
@@ -37,5 +37,15 @@ describe('SiteFooter', () => {
     expect(wcImg.exists()).toBe(true)
     expect(wcImg.attributes('src')).toContain('wechat')
     expect(wcPopover.text()).toContain('WeChat')
+  })
+
+  it('links the Nadoumi social profiles and no longer shows LinkedIn', async () => {
+    const w = await mountSuspended(SiteFooter)
+    const hrefs = w.findAll('a').map(a => a.attributes('href') ?? '')
+
+    expect(hrefs).toContain('https://www.facebook.com/profile.php?id=61583472043300')
+    expect(hrefs.some(h => h.startsWith('https://www.instagram.com/nadoumi_consulting'))).toBe(true)
+    expect(hrefs.some(h => h.startsWith('https://www.tiktok.com/@nadoumi.consultin'))).toBe(true)
+    expect(hrefs.some(h => h.includes('linkedin.com'))).toBe(false)
   })
 })

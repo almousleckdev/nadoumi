@@ -31,6 +31,13 @@ const deferredImages = useDeferredImages()
 // snapshot of the university's departments as loaded, to diff against on save
 const originalDepartments = ref<DeptRow[]>([])
 
+// The drawer stays mounted between openings, and ImageUpload keeps its own preview / held-file
+// state. Bumping this key on every open remounts the media section so a previous university's
+// logo and cover can never show up on the next one.
+const openSeq = ref(0)
+// The record whose images the media section previews: the list row first, then the fresh fetch.
+const current = ref<University | null>(null)
+
 const form = reactive(blankUniversityForm())
 provide(universityFormKey, form)
 
@@ -46,8 +53,10 @@ const rules = {
 
 watch(() => props.modelValue, async (open) => {
   if (!open) return
+  openSeq.value += 1
   Object.assign(form, blankUniversityForm())
   originalDepartments.value = []
+  current.value = props.university
   if (!props.university) return
   // The list row carries no child collections (rankings / highlights / gallery);
   // fetch the full record so editing shows and preserves them.
@@ -56,6 +65,7 @@ watch(() => props.modelValue, async (open) => {
     u = await getUniversity(props.university.id)
   }
   catch { /* fall back to the row we already have */ }
+  current.value = u
   Object.assign(form, formFromUniversity(u))
   try {
     const depts = await listDepartments(u.id)
@@ -106,7 +116,8 @@ async function save() {
       <ContentSections />
       <MediaSections
         ref="media"
-        :university="university"
+        :key="openSeq"
+        :university="current"
       />
       <PublishingSection />
     </el-form>

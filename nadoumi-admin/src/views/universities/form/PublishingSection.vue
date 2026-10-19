@@ -81,7 +81,10 @@ const PUBLISH = ['DRAFT', 'PUBLISHED'] as const
         <el-input v-model="form.admissionsEmail" />
       </el-form-item>
       <el-form-item :label="t('university.officePhone')">
-        <el-input v-model="form.officePhone" />
+        <el-input
+          v-model="form.officePhone"
+          maxlength="64"
+        />
       </el-form-item>
     </div>
     <el-form-item :label="t('university.remark')">

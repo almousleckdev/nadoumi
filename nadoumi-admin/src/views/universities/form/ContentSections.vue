@@ -1,15 +1,24 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Plus, Delete } from '@element-plus/icons-vue'
+import { Plus, Delete, DocumentAdd } from '@element-plus/icons-vue'
 import FormSection from '@/components/ui/FormSection.vue'
 import { titleCase } from '@/utils/text'
 import { useUniversityForm } from '../universityForm'
+import { parseRankings, type RankingDraft } from '../bulkPaste'
+import BulkPasteDialog from './BulkPasteDialog.vue'
 
 const { t } = useI18n()
 const form = useUniversityForm()
 
 const thisYear = new Date().getFullYear()
 const KINDS = ['HIGHLIGHT', 'ADVANTAGE'] as const
+
+const pasteOpen = ref(false)
+
+function addPasted(rows: RankingDraft[]) {
+  form.rankings = [...form.rankings.filter(r => r.source.trim() || r.rankPosition), ...rows]
+}
 </script>
 
 <template>
@@ -140,6 +149,21 @@ const KINDS = ['HIGHLIGHT', 'ADVANTAGE'] as const
     >
       {{ t('university.addRanking') }}
     </el-button>
+    <el-button
+      size="small"
+      :icon="DocumentAdd"
+      @click="pasteOpen = true"
+    >
+      {{ t('university.pasteRankings') }}
+    </el-button>
+    <BulkPasteDialog
+      v-model="pasteOpen"
+      :title="t('university.pasteRankingsTitle')"
+      :hint="t('university.pasteRankingsHint')"
+      :placeholder="t('university.pasteRankingsExample')"
+      :parse="text => parseRankings(text, thisYear)"
+      @confirm="addPasted"
+    />
   </FormSection>
 </template>
 
