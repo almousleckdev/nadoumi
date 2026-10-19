@@ -86,9 +86,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V106 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V107 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(97);
+        assertThat(applied).isEqualTo(98);
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
         assertThat(single(ds, "SELECT character_maximum_length FROM information_schema.columns WHERE table_schema = DATABASE() "
@@ -369,7 +369,11 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_highlight h "
                 + "JOIN nad_university u ON u.id = h.university_id AND u.create_by = 'import'")).isEqualTo("1390");
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_ranking r "
-                + "JOIN nad_university u ON u.id = r.university_id AND u.create_by = 'import'")).isEqualTo("96");
+                + "JOIN nad_university u ON u.id = r.university_id AND u.create_by = 'import'")).isEqualTo("116");
+        // V107 — every university's website is the Nadoumi site; rankings come from U.S. News only for the enriched ones
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university WHERE website <> 'https://nadoumi.com/' OR website IS NULL"))
+                .isEqualTo("0");
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_university_ranking WHERE source LIKE 'US News%' AND note LIKE '%2026-2027%'")).isEqualTo("53");
         // V90 spot-checks: a couple of the new rows exist with the expected identity
         assertThat(single(ds, "SELECT type FROM nad_university WHERE name = 'Wuhan University' AND country = 'CN'"))
                 .isEqualTo("PUBLIC");
@@ -404,7 +408,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(96); // V2..V106, same gaps as above
+        assertThat(applied).isEqualTo(97); // V2..V107, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

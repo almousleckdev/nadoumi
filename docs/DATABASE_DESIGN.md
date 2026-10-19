@@ -388,6 +388,7 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - `nad_user_presence(user_id PK → sys_user ON DELETE CASCADE, last_seen_at UTC)`.
 - Rollback: documented in the header of `V96__nad_chat_rework.sql`.
 
+- **V107** sets every university's website to https://nadoumi.com/, replaces the seed's "approximate -- verify" rankings with U.S. News Best Global Universities 2026-2027 figures for the enriched universities, and adds colleges, addresses and verified official logo/cover/gallery URLs for the second batch. DML only.
 - **V106** enriches three catalog universities imported as drafts by V90 (Hangzhou, Hanjiang and Harbin Normal): departments, accommodation and nearby text, official logo/cover/gallery URLs where verified (Hangzhou and Hanjiang only), and corrects a few headcounts that contradicted the official sources. DML only; rows stay DRAFT. Provenance and rollback are in the migration header.
 - **V105** widens `nad_university.office_phone` from varchar(32) to varchar(64) so an office line can list two numbers (request limit raised to match).
 - **V104** adds `nad_scholarship_field` (one row per field of study, `level` NULL = every level, unique per scholarship, level and name, cascade on scholarship delete) and carries each scholarship's existing single `field` over as an every-level row. `nad_scholarship.field` stays as a searchable summary (the distinct names joined with ", ", cut at a whole name to 120 characters) kept up to date by the writer; the public `field` filter and text search read the new table.
