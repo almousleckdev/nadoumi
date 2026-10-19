@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import whatsappIconUrl from '~/assets/images/whatsapp.png'
-import { CONTACT } from '~/data/contact'
+import { whatsappHref as buildWhatsappHref } from '~/data/contact'
 
 const { t } = useI18n()
 
-/** wa.me needs digits only, no `+` or spaces. */
-const whatsappHref = `https://wa.me/${CONTACT.phones[0].replace(/\D/g, '')}`
+const whatsappHref = buildWhatsappHref()
 </script>
 
 <template>

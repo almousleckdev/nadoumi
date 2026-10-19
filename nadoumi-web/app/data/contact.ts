@@ -23,13 +23,16 @@ export const CONTACT = {
 /** `tel:` href, strips spaces. */
 export const telHref = (phone: string): string => `tel:${phone.replace(/\s+/g, '')}`
 
-/**
- * Social profiles shown in the footer.
- * TODO: the handles below are placeholders; confirm the real account URLs.
- */
+/** Number behind the WhatsApp chat links (footer + floating button). */
+export const WHATSAPP_PHONE = '+86 155 2057 6024'
+
+/** `wa.me` needs digits only, no `+` or spaces. */
+export const whatsappHref = (phone: string = WHATSAPP_PHONE): string =>
+  `https://wa.me/${phone.replace(/\D/g, '')}`
+
+/** Social profiles shown in the footer. */
 export const SOCIAL = [
-  { id: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/nadoumi' },
-  { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/nadoumi' },
-  { id: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@nadoumi' },
-  { id: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/nadoumi' },
+  { id: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/profile.php?id=61583472043300' },
+  { id: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/nadoumi_consulting?srtk=NWtwYXI4cmIweDc3' },
+  { id: 'tiktok', label: 'TikTok', href: 'https://www.tiktok.com/@nadoumi.consultin?_r=1&_t=ZS-9AgSPhAMKak' },
 ] as const
