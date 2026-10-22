@@ -17,6 +17,11 @@ import com.nadoumi.applicant.web.response.ResidenceResponse;
 import com.nadoumi.applicant.web.response.TestScoreResponse;
 import com.nadoumi.applicant.web.response.WorkResponse;
 import com.nadoumi.common.exception.NadNotFoundException;
+import com.nadoumi.common.media.MediaAccessLogContext;
+import com.nadoumi.common.media.MediaGateway;
+import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Optional;
@@ -31,19 +36,43 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApplicantDossierService {
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicantDossierService.class);
+    private static final String SYSTEM = "system";
+    private static final int MAX_PHOTO_BYTES = 6 * 1024 * 1024;
+
     private final ApplicantMapper applicants;
     private final ResidenceMapper residences;
     private final WorkMapper work;
     private final InterestService interests;
     private final FamilyMapper family;
+    private final MediaGateway media;
 
     public ApplicantDossierService(ApplicantMapper applicants, ResidenceMapper residences, WorkMapper work,
-            InterestService interests, FamilyMapper family) {
+            InterestService interests, FamilyMapper family,
+            MediaGateway media) {
         this.applicants = applicants;
         this.residences = residences;
         this.work = work;
         this.interests = interests;
         this.family = family;
+        this.media = media;
+    }
+
+    /** The profile photo as a small JPEG for a printed document, or empty when there is none or it cannot be decoded. */
+    @Transactional(readOnly = true)
+    public Optional<byte[]> photoJpeg(long applicantId) {
+        Applicant applicant = applicants.findById(applicantId);
+        if (applicant == null || applicant.getPhotoMediaId() == null) {
+            return Optional.empty();
+        }
+        try (var stream = media.openProxyStream(applicant.getPhotoMediaId(),
+                new MediaAccessLogContext(0L, applicantId, null, null, SYSTEM, SYSTEM)).body()) {
+            return PhotoNormalizer.toJpeg(stream.readNBytes(MAX_PHOTO_BYTES));
+        }
+        catch (IOException | RuntimeException e) {
+            log.warn("could not read the profile photo of applicant {}", applicantId, e);
+            return Optional.empty();
+        }
     }
 
     @Transactional(readOnly = true)

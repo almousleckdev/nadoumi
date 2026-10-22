@@ -80,8 +80,7 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 > * **Form content = what the portal collects.** Applying for, personal and passport, marital status, religion, place of
 >   birth, official language and permanent address, test scores, education, work experience, **family members, financial
 >   supporter and emergency contact in China**, study plan, the affirmation and a signature line. A section a student has
->   not filled is printed as "Not provided". **Not built:** applicant photo and signature image on the form, the documents
->   checklist, Chinese labels, the verification QR, a "re-send receipt" button.
+>   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** the signature image, Chinese labels, the verification QR.
 > * **Erasure.** `PaymentErasure` also deletes the generated documents and soft-deletes their PDFs.
 >
 > **Update 2026-10-22 (documents checklist): Step 3 is IMPLEMENTED in its first form.** The documents an application needs come from the

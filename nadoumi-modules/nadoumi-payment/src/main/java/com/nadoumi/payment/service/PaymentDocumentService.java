@@ -203,7 +203,7 @@ public class PaymentDocumentService {
     private ApplicationFormModel formModel(ApplicationPayment payment, Description opportunity,
             ApplicantDossier dossier, Instant now) {
         return new ApplicationFormModel(PaymentDocumentNumbers.applicationForm(payment), now, applicationRef(payment),
-                opportunity, payment.getReference(), dossier);
+                opportunity, payment.getReference(), dossier, dossiers.photoJpeg(payment.getApplicantId()).orElse(null));
     }
 
     private static String studentName(ApplicationPayment payment, ApplicantDossier dossier) {

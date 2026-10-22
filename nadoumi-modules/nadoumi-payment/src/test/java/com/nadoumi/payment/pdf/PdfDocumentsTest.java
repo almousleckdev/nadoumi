@@ -88,7 +88,7 @@ class PdfDocumentsTest {
                 model.dossier().supporter(), model.dossier().chinaEmergency());
 
         byte[] pdf = forms.render(new ApplicationFormModel(model.formNo(), model.generatedAt(), model.applicationRef(),
-                model.opportunity(), model.paymentReference(), dossier));
+                model.opportunity(), model.paymentReference(), dossier, model.photo()));
 
         try (PDDocument doc = Loader.loadPDF(pdf)) {
             assertThat(doc.getNumberOfPages()).isGreaterThan(1);
@@ -98,6 +98,36 @@ class PdfDocumentsTest {
                 stripper.setEndPage(page);
                 assertThat(stripper.getText(doc)).contains(PdfFixtures.ADDRESS, "Page " + page + " / " + doc.getNumberOfPages());
             }
+        }
+    }
+
+    @Test
+    void shouldPlaceThePhotoInTheMasthead_andRenderWithoutOneWhenThereIsNone() throws IOException {
+        var withPhoto = PdfFixtures.form(PdfFixtures.programme(), "Amina");
+        var without = new ApplicationFormModel(withPhoto.formNo(), withPhoto.generatedAt(), withPhoto.applicationRef(),
+                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), null);
+        var garbage = new ApplicationFormModel(withPhoto.formNo(), withPhoto.generatedAt(), withPhoto.applicationRef(),
+                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), new byte[] {1, 2, 3, 4});
+
+        byte[] big = forms.render(withPhoto);
+        byte[] plain = forms.render(without);
+        byte[] ignored = forms.render(garbage); // an unusable image is left out, never an error
+
+        assertThat(big.length).isGreaterThan(plain.length);
+        assertThat(text(big)).contains("Application Form", "NAD-APP-2026-000042");
+        assertThat(text(ignored)).contains("Application Form");
+        assertThat(images(big)).isGreaterThan(images(plain));
+    }
+
+    private static int images(byte[] pdf) throws IOException {
+        try (PDDocument doc = Loader.loadPDF(pdf)) {
+            int count = 0;
+            for (var name : doc.getPage(0).getResources().getXObjectNames()) {
+                if (doc.getPage(0).getResources().getXObject(name) instanceof org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject) {
+                    count++;
+                }
+            }
+            return count;
         }
     }
 

@@ -579,4 +579,23 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         openSession(b, appB);
         reportPayment(b, appB, "BANK9999994").andExpect(status().isConflict());
     }
+
+    @Test
+    void shouldStillRenderTheForm_whenTheStudentHasAProfilePhoto() throws Exception {
+        Student s = register("pay", "photo");
+        var image = new java.awt.image.BufferedImage(200, 260, java.awt.image.BufferedImage.TYPE_INT_RGB);
+        var jpeg = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(image, "jpeg", jpeg);
+        mvc.perform(multipart(s.applicantUrl() + "/photo")
+                        .file(new MockMultipartFile("file", "me.jpg", "image/jpeg", jpeg.toByteArray()))
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().isCreated());
+        long app = draftFor(s);
+        payAndConfirm(s, app, "BANK9999995");
+
+        documentsWorker.runOnce();
+
+        mvc.perform(get(url(app, "/documents/APPLICATION_FORM")).header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_PDF));
+    }
 }

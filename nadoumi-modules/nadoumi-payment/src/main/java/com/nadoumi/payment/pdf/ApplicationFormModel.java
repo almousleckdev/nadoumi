@@ -11,5 +11,7 @@ public record ApplicationFormModel(
         String applicationRef,
         Description opportunity,
         String paymentReference,
-        ApplicantDossier dossier) {
+        ApplicantDossier dossier,
+        /** A small JPEG of the applicant, or null when there is no usable photo. */
+        byte[] photo) {
 }

@@ -19,6 +19,7 @@ import com.lowagie.text.pdf.ColumnText;
 import com.nadoumi.identity.service.mail.BrandProperties;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 import org.springframework.stereotype.Component;
@@ -99,7 +100,13 @@ public class PdfRenderer {
 
         /** Logo, title and the right-hand block of reference lines. */
         public void masthead(String title, List<String[]> references) {
-            PdfPTable table = new PdfPTable(new float[] {1.1f, 2.6f, 2.3f});
+            masthead(title, references, null);
+        }
+
+        /** As {@link #masthead(String, List)}, with the applicant's photo (JPEG bytes) in a framed box on the right. */
+        public void masthead(String title, List<String[]> references, byte[] photoJpeg) {
+            boolean withPhoto = photoJpeg != null;
+            PdfPTable table = new PdfPTable(withPhoto ? new float[] {1.0f, 2.8f, 2.0f, 1.1f} : new float[] {1.1f, 2.6f, 2.3f});
             table.setWidthPercentage(100);
             Image logo = assets.logo();
             logo.scaleToFit(mm(22), mm(22));
@@ -123,8 +130,26 @@ public class PdfRenderer {
                 refs.addElement(line);
             }
             table.addCell(refs);
+            if (withPhoto) {
+                table.addCell(photoCell(photoJpeg));
+            }
             add(table);
             add(rule(BRAND, 1.2f, mm(3), mm(5)));
+        }
+
+        private PdfPCell photoCell(byte[] jpeg) {
+            PdfPCell cell = cell(Rectangle.BOX, 2);
+            cell.setBorderColor(RULE);
+            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            try {
+                Image photo = Image.getInstance(jpeg);
+                photo.scaleToFit(mm(24), mm(31));
+                cell.addElement(photo);
+            }
+            catch (IOException | DocumentException e) {
+                cell.setBorder(Rectangle.NO_BORDER); // an unusable image is left out, never an error
+            }
+            return cell;
         }
 
         /** A numbered section heading. */
