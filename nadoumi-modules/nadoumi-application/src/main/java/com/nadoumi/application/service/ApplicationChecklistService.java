@@ -64,7 +64,7 @@ public class ApplicationChecklistService {
         if (application == null) {
             throw new NadNotFoundException("application not found");
         }
-        List<Document> mine = documents.listMine(application.getApplicantId(), null).stream()
+        List<Document> mine = documents.search(application.getApplicantId(), null).stream()
                 .filter(d -> d.getApplicationId() == null || d.getApplicationId().equals(applicationId))
                 .toList();
         List<Item> items = new ArrayList<>();

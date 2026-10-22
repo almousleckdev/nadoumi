@@ -18,4 +18,11 @@ public class PaymentApiExceptionHandler {
         pd.setDetail(e.getMessage());
         return pd;
     }
+
+    @ExceptionHandler(PaymentThrottledException.class)
+    public ProblemDetail throttled(PaymentThrottledException e) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.TOO_MANY_REQUESTS);
+        pd.setDetail(e.getMessage());
+        return pd;
+    }
 }

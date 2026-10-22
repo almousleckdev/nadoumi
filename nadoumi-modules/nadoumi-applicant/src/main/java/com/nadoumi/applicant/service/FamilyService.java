@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,11 +59,15 @@ public class FamilyService {
         personal.setPermanentAddress(blankToNull(req.permanentAddress()));
         personal.setPermanentPostcode(blankToNull(req.permanentPostcode()));
         if (mapper.findPersonal(applicantId) == null) {
-            mapper.insertPersonal(personal);
+            try {
+                mapper.insertPersonal(personal);
+                return PersonalDetailsResponse.of(personal);
+            }
+            catch (DuplicateKeyException e) {
+                // a concurrent save created the row first: update it instead
+            }
         }
-        else {
-            mapper.updatePersonal(personal);
-        }
+        mapper.updatePersonal(personal);
         return PersonalDetailsResponse.of(personal);
     }
 
@@ -128,11 +133,15 @@ public class FamilyService {
         person.setCompanyAddress(blankToNull(req.companyAddress()));
         person.setHomeAddress(blankToNull(req.homeAddress()));
         if (mapper.findPerson(applicantId, role) == null) {
-            mapper.insertPerson(person);
+            try {
+                mapper.insertPerson(person);
+                return PersonResponse.of(person);
+            }
+            catch (DuplicateKeyException e) {
+                // a concurrent save created the row first: update it instead
+            }
         }
-        else {
-            mapper.updatePerson(person);
-        }
+        mapper.updatePerson(person);
         return PersonResponse.of(person);
     }
 

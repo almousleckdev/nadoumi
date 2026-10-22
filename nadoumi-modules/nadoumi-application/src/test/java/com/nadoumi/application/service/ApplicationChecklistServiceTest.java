@@ -66,7 +66,7 @@ class ApplicationChecklistServiceTest {
     }
 
     private void studentHas(Document... docs) {
-        when(documents.listMine(APPLICANT, null)).thenReturn(List.of(docs));
+        when(documents.search(APPLICANT, null)).thenReturn(List.of(docs));
     }
 
     @Test

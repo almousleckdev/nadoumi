@@ -1,5 +1,6 @@
 package com.nadoumi.payment.config;
 
+import com.nadoumi.payment.mapper.PaymentMapper;
 import com.ruoyi.common.constant.CacheConstants;
 import com.ruoyi.common.core.redis.RedisCache;
 import java.math.BigDecimal;
@@ -28,23 +29,30 @@ public class PaymentSettings {
     private static final String DEFAULT_PAYEE = "Sichuan Nadoumi Education Consulting Co., Ltd.";
 
     private final RedisCache redisCache;
+    private final PaymentMapper mapper;
 
-    public PaymentSettings(RedisCache redisCache) {
+    public PaymentSettings(RedisCache redisCache, PaymentMapper mapper) {
         this.redisCache = redisCache;
+        this.mapper = mapper;
     }
 
-    /** The Nadoumi application fee in RMB; zero (or unset) means no payment step. */
+    /**
+     * The Nadoumi application fee in RMB. Zero means no payment step, and only an explicit zero, a negative number
+     * or no configuration row at all means that. A garbled value (a typo such as "12O") throws instead of quietly
+     * switching the payment gate off, and a cold cache falls back to the {@code sys_config} row.
+     */
     public BigDecimal applicationFee() {
         Object cached = redisCache.getCacheObject(CacheConstants.SYS_CONFIG_KEY + FEE_KEY);
-        if (cached == null) {
+        String raw = cached == null ? mapper.findConfigValue(FEE_KEY) : cached.toString();
+        if (raw == null || raw.isBlank()) {
             return BigDecimal.ZERO;
         }
         try {
-            BigDecimal fee = new BigDecimal(cached.toString().trim());
+            BigDecimal fee = new BigDecimal(raw.trim());
             return fee.signum() > 0 ? fee : BigDecimal.ZERO;
         }
         catch (NumberFormatException e) {
-            return BigDecimal.ZERO;
+            throw new IllegalStateException("the setting " + FEE_KEY + " is not a number", e);
         }
     }
 

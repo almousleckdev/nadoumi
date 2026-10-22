@@ -77,6 +77,20 @@
         order by (status = 'PROOF_SUBMITTED') desc, coalesce(submitted_at, create_time) desc, id desc
     </select>
 
+    <select id="findConfigValue" resultType="java.lang.String">
+        select config_value from sys_config where config_key = #{key} limit 1
+    </select>
+
+    <select id="countSessionsSince" resultType="int">
+        select count(*) from nad_application_payment
+        where application_id = #{applicationId} and kind = #{kind} and create_time &gt;= #{since}
+    </select>
+
+    <select id="countTxnOnOtherApplication" resultType="int">
+        select count(*) from nad_application_payment
+        where student_txn_no = #{txnNo} and application_id != #{applicationId}
+    </select>
+
     <update id="markProofSubmitted">
         update nad_application_payment
         set status = 'PROOF_SUBMITTED', student_txn_no = #{txnNo}, proof_media_id = #{proofMediaId},

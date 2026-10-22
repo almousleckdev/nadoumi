@@ -57,13 +57,14 @@ public class WorkflowService {
     private final WorkflowDefinitionService definitions;
     private final ApplicationSnapshotWriter snapshots;
     private final ApplicationOutboxEmitter emitter;
+    private final SubmitGate submitGate;
 
     public WorkflowService(WfDefinitionMapper definitionMapper, ApplicationMapper applicationMapper,
             WfInstanceMapper instanceMapper, ApplicationTaskMapper taskMapper,
             ApplicationStageHistoryMapper historyMapper, ApplicationEventMapper eventMapper,
             ApplicationDecisionMapper decisionMapper, GuardEvaluator guards, ProgramService programService,
             ScholarshipAdminService scholarshipAdminService, WorkflowDefinitionService definitions,
-            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter) {
+            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter, SubmitGate submitGate) {
         this.definitionMapper = definitionMapper;
         this.applicationMapper = applicationMapper;
         this.instanceMapper = instanceMapper;
@@ -77,6 +78,7 @@ public class WorkflowService {
         this.definitions = definitions;
         this.snapshots = snapshots;
         this.emitter = emitter;
+        this.submitGate = submitGate;
     }
 
     // draft creation
@@ -162,6 +164,9 @@ public class WorkflowService {
                 application.getCurrentStageId());
         if (transition == null) {
             throw new NadBadRequestException("no transition '" + transitionCode + "' from the current stage");
+        }
+        if ("submit".equals(transition.getCode())) {
+            submitGate.require(applicationId); // fee paid and documents in, for any actor
         }
         if (staffActor && transition.getRoleRequired() != null && !SecurityUtils.hasRole(transition.getRoleRequired())) {
             throw new NadForbiddenException("this transition requires the '" + transition.getRoleRequired() + "' role");

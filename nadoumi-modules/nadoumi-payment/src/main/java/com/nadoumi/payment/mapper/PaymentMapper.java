@@ -20,6 +20,16 @@ public interface PaymentMapper {
 
     ApplicationPayment findLatest(@Param("applicationId") long applicationId, @Param("kind") String kind);
 
+    /** The raw {@code sys_config} value for a key (read-only), or null when there is no such row. */
+    String findConfigValue(@Param("key") String key);
+
+    /** Payment sessions opened for the application since {@code since}: caps start-cancel loops. */
+    int countSessionsSince(@Param("applicationId") long applicationId, @Param("kind") String kind,
+            @Param("since") LocalDateTime since);
+
+    /** Rows (any status) that carry this transaction number on a different application. */
+    int countTxnOnOtherApplication(@Param("txnNo") String txnNo, @Param("applicationId") long applicationId);
+
     int countConfirmed(@Param("applicationId") long applicationId, @Param("kind") String kind);
 
     List<ApplicationPayment> search(@Param("status") PaymentStatus status, @Param("q") String q);

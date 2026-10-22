@@ -499,4 +499,84 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON).content("{\"requirements\":[{\"docType\":\"not valid\",\"mandatory\":true}]}"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void shouldEmailTheReceiptAgain_butNotMoreOftenThanTheCooldownAllows() throws Exception {
+        Student s = register("pay", "resend");
+        long app = draftFor(s);
+        payAndConfirm(s, app, "BANK9999991");
+        documentsWorker.runOnce();
+        var first = mailbox.last(s.email()).orElseThrow();
+
+        mvc.perform(post(url(app, "/documents/RECEIPT/resend")).header("Authorization", bearer(s.token())))
+                .andExpect(status().isTooManyRequests());
+
+        jdbc.update("update nad_payment_document_delivery set sent_at = ? where document_id = "
+                + "(select id from nad_payment_document where application_id = ? and kind = 'RECEIPT')",
+                java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).minusMinutes(10), app);
+        mvc.perform(post(url(app, "/documents/RECEIPT/resend")).header("Authorization", bearer(s.token())))
+                .andExpect(status().isAccepted());
+        documentsWorker.runOnce();
+
+        assertThat(mailbox.last(s.email()).orElseThrow()).isNotSameAs(first);
+        assertThat(jdbc.queryForObject("select count(*) from nad_payment_document_delivery where sent_at is not null "
+                + "and document_id = (select id from nad_payment_document where application_id = ? and kind = 'RECEIPT')",
+                Integer.class, app)).isEqualTo(1);
+    }
+
+    @Test
+    void shouldNotLetAnotherStudentResendTheReceipt() throws Exception {
+        Student owner = register("pay", "resown");
+        Student intruder = register("pay", "resint");
+        long app = draftFor(owner);
+        payAndConfirm(owner, app, "BANK9999992");
+        documentsWorker.runOnce();
+
+        mvc.perform(post(url(app, "/documents/RECEIPT/resend")).header("Authorization", bearer(intruder.token())))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldNotLetAStudentSkipThePaymentGate_throughTheGenericTransitionEndpoint() throws Exception {
+        Student s = register("pay", "bypass");
+        long app = draftFor(s);
+
+        // the generic transition call is for offer responses and withdrawal only
+        mvc.perform(post("/api/student/applications/" + app + "/transitions/submit").header("Authorization", bearer(s.token())))
+                .andExpect(status().isForbidden());
+        mvc.perform(post("/api/student/applications/" + app + "/transitions/claim").header("Authorization", bearer(s.token())))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/student/applications/" + app).header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$.currentStatus").value("DRAFT"));
+    }
+
+    @Test
+    void shouldStopStaffFromSubmittingAnUnpaidDraft_andAllowItOncePaid() throws Exception {
+        Student s = register("pay", "staffsubmit");
+        long app = draftFor(s);
+
+        mvc.perform(post("/api/staff/applications/" + app + "/transitions/submit").header("Authorization", staffAuth)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"version\":0}"))
+                .andExpect(status().isPaymentRequired());
+
+        payAndConfirm(s, app, "BANK9999993");
+        mvc.perform(post("/api/staff/applications/" + app + "/transitions/submit").header("Authorization", staffAuth)
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"version\":0}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldRefuseATransactionNumberAlreadyUsedOnAnotherApplication_evenAfterRejection() throws Exception {
+        Student a = register("pay", "rej1");
+        Student b = register("pay", "rej2");
+        long appA = draftFor(a);
+        long appB = draftFor(b);
+        openSession(a, appA);
+        reportPayment(a, appA, "BANK9999994").andExpect(status().isOk());
+        mvc.perform(post("/api/staff/payments/" + paymentId(appA) + "/reject").header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"Amount does not match\"}")).andExpect(status().isOk());
+
+        openSession(b, appB);
+        reportPayment(b, appB, "BANK9999994").andExpect(status().isConflict());
+    }
 }

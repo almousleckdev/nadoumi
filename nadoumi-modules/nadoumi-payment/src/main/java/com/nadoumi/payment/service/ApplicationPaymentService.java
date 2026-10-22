@@ -14,6 +14,7 @@ import com.nadoumi.payment.config.PaymentSettings;
 import com.nadoumi.payment.domain.ApplicationPayment;
 import com.nadoumi.payment.domain.enums.PaymentStatus;
 import com.nadoumi.payment.exception.PaymentConflictException;
+import com.nadoumi.payment.exception.PaymentThrottledException;
 import com.nadoumi.payment.mapper.PaymentMapper;
 import com.nadoumi.payment.service.PaymentQrSource.QrImage;
 import com.nadoumi.payment.web.response.StudentPaymentResponse;
@@ -43,6 +44,10 @@ public class ApplicationPaymentService {
     private static final String METHOD_QR = "QR";
     private static final Pattern TXN_NO = Pattern.compile("[A-Za-z0-9_-]{6,40}");
     private static final int REFERENCE_ATTEMPTS = 3;
+
+    /** A student may open at most this many sessions per application in the window: no start-and-cancel loops. */
+    static final int MAX_SESSIONS_PER_WINDOW = 10;
+    static final Duration SESSION_CAP_WINDOW = Duration.ofHours(24);
 
     private final PaymentMapper mapper;
     private final PaymentSettings settings;
@@ -94,6 +99,10 @@ public class ApplicationPaymentService {
         if (open != null || mapper.countConfirmed(applicationId, KIND) > 0) {
             return respond(app);
         }
+        LocalDateTime since = LocalDateTime.now(clock).minus(SESSION_CAP_WINDOW);
+        if (mapper.countSessionsSince(applicationId, KIND, since) >= MAX_SESSIONS_PER_WINDOW) {
+            throw new PaymentThrottledException("too many payment attempts today; contact support");
+        }
         insertSession(app, fee);
         return respond(app);
     }
@@ -120,6 +129,9 @@ public class ApplicationPaymentService {
         ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, KIND));
         if (payment == null || payment.getStatus() != PaymentStatus.PENDING) {
             throw new PaymentConflictException("the payment window has closed; start a new payment");
+        }
+        if (mapper.countTxnOnOtherApplication(txn, applicationId) > 0) {
+            throw new PaymentConflictException("this transaction number was already reported");
         }
         long userId = caller.requireUserId();
         long mediaId = media.upload(proof::getInputStream, proof.getOriginalFilename(), proof.getContentType(),

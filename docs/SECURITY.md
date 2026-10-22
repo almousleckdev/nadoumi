@@ -570,3 +570,39 @@ it completely. Both go through `AccountRetirement`: every module removes what it
 deleted. Only when a record such as payroll still references the row does it stay, anonymised: no username, email,
 phone or photo, and the identifiers are free to register again. A student can never be deleted from the staff
 screen, only through their applicant, so a login can no longer outlive its profile.
+
+## Application payment, generated documents and family data: EXISTING (2026-10-22)
+
+Reviewed with the `nadoumi-security-reviewer` agent on 2026-10-22; findings and their state below.
+
+**Rules enforced server-side**
+
+* **Submit is gated in the engine, not in an endpoint.** `WorkflowService.execute` runs `SubmitGate` for every `submit` transition, whoever
+  asks (student, or staff acting for one): the Nadoumi application fee must be settled and every mandatory document uploaded. A student can run
+  only `accept_offer`, `decline_offer` and `withdraw` through the generic transition endpoint (`StudentApplicationService.STUDENT_TRANSITIONS`);
+  every other transition is 403. Tests: `ApplicationSubmitPaymentGateTest`, `SubmitGateTest`, and the bypass cases in `ApplicationPaymentFlowTest`.
+* **Payments.** Student endpoints use `@na.canAccessApplication`; staff use `nad:payment:list|query|verify`. Decisions are single conditional
+  updates (`where status = ? and version = ?`; the proof also needs `expires_at > now`); one open session per application and one live
+  transaction number are database-enforced; a transaction number that already appears on another application, in any status, is refused;
+  a staff member cannot verify a payment opened by their own account; sessions per application are capped at 10 per 24 hours (429). The amount is
+  a server snapshot; the client never sends one. The fee setting fails closed: a garbled value throws, a cold cache falls back to the `sys_config`
+  row, and only an explicit zero (or no row) disables the payment step.
+* **The QR** is a classpath image served only while the caller's own session is open (`no-store`); proof screenshots are SENSITIVE media streamed by the backend.
+* **Generated PDFs** are built programmatically (no HTML or CSS parsing of student text), stored as SENSITIVE media, downloadable only by a caller
+  with `VIEW_APPLICATION` on that application. The university name can appear only through `ApplicationOpportunityService`, never when a scholarship is involved.
+* **Email.** Subjects are stripped of control characters and bounded; attachments are capped (10 MB) and never serialised; every send takes a unique
+  per-recipient claim first. The receipt can be re-sent at most once every 5 minutes (429).
+* **Family data.** Every route checks `VIEW_PROFILE` or `EDIT_PROFILE` on the applicant; records are scoped by `applicant_id`; erasure removes all three tables.
+  `ApplicantDossierService` has no access check by design and is reachable only from server jobs (never inject it into a controller).
+
+**Accepted risks and open items**
+
+* **The submitted Application Form PDF is emailed, unencrypted, to every active user holding a role in `nadoumi.application.notify-roles`** (default
+  `nadoumi_super_admin`). It contains passport data, family and supporter details. This is a product decision (administrators asked to receive it by
+  email). Anyone who can edit `sys_config` can widen the recipient list, so restrict who may edit that key; a later improvement is to send a link to an
+  authenticated staff download instead of the file.
+* `PaymentErasure` hard-deletes an applicant's payment rows (the revenue ledger keeps the reference); confirm this against the retention policy.
+* A father, a mother and a spouse are limited to one each in code (`FamilyService`), not by a database constraint, so two simultaneous requests could
+  create a duplicate. Low impact; the readiness rule still reads correctly.
+* Student-supplied transaction numbers are free text; staff compare the proof with the bank ledger by eye, the amount shown to them being the server snapshot.
+

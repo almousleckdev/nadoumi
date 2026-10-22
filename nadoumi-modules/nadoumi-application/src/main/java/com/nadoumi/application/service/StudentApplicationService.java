@@ -1,8 +1,6 @@
 package com.nadoumi.application.service;
 
 import com.nadoumi.application.domain.Application;
-import com.nadoumi.application.exception.DocumentsRequiredException;
-import com.nadoumi.application.exception.PaymentRequiredException;
 import com.nadoumi.application.domain.ApplicationEvent;
 import com.nadoumi.application.domain.WfStage;
 import com.nadoumi.application.mapper.ApplicationEventMapper;
@@ -35,15 +33,10 @@ public class StudentApplicationService {
     private final WorkflowService workflow;
     private final NadoumiAccessService access;
     private final CurrentCaller caller;
-    private final PaymentGuardProvider payments;
-    private final ApplicationChecklistService checklist;
 
     public StudentApplicationService(ApplicationMapper applicationMapper, WfDefinitionMapper definitionMapper,
             ApplicationEventMapper eventMapper, WorkflowService workflow, NadoumiAccessService access,
-            CurrentCaller caller, PaymentGuardProvider payments,
-            ApplicationChecklistService checklist) {
-        this.payments = payments;
-        this.checklist = checklist;
+            CurrentCaller caller) {
         this.applicationMapper = applicationMapper;
         this.definitionMapper = definitionMapper;
         this.eventMapper = eventMapper;
@@ -97,21 +90,19 @@ public class StudentApplicationService {
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse submit(Long id) {
         Application current = load(id);
-        // No application fee, no submission: a draft stays saved but cannot be submitted until it is paid.
-        if (!payments.isSettled(id, PaymentGuardProvider.APPLICATION_FEE)) {
-            throw new PaymentRequiredException("the application fee must be paid before the application can be submitted");
-        }
-        List<String> missing = checklist.missingMandatory(id);
-        if (!missing.isEmpty()) {
-            throw new DocumentsRequiredException("upload the required documents before submitting: " + String.join(", ", missing));
-        }
+        // the fee and the mandatory documents are checked by the engine itself (SubmitGate), for every actor
         Application updated = workflow.execute(id, "submit", caller.requireUserId(), false, null, current.getVersion());
         return toResponse(updated);
     }
 
-    /** {@code accept_offer} | {@code decline_offer} | {@code withdraw}. */
+    /** The only transitions a student may run directly; everything else belongs to staff or to {@link #submit}. */
+    static final java.util.Set<String> STUDENT_TRANSITIONS = java.util.Set.of("accept_offer", "decline_offer", "withdraw");
+
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse transition(Long id, String code, String reason) {
+        if (!STUDENT_TRANSITIONS.contains(code)) {
+            throw new NadForbiddenException("this action is not available to students");
+        }
         if ("withdraw".equals(code) && (reason == null || reason.isBlank())) {
             throw new NadBadRequestException("a reason is required to withdraw");
         }
