@@ -710,6 +710,20 @@ suggestions. A change that breaks them is not done, whatever else it does.
 * Do not invent new colours, gradients or per-page themes. If a new colour seems
   necessary, stop and ask.
 
+## Sidebars and flows
+
+* Every student sidebar (dashboard, onboarding) is `SidebarFrame` + `SidebarItem`, which use the
+  same tokens as the admin sidebar (`--sidebar-bg`, `--sidebar-bg-soft`, `--sidebar-fg`). The active
+  row is the only brand-coloured row. Never restyle a sidebar locally or add a second one.
+* A full-screen workflow (onboarding) is a fixed shell: the sidebar and the action bar stay put and only
+  the content area scrolls. The page itself never scrolls.
+* **Ask for a fact once.** Never make a student retype something already on their profile (names, date of
+  birth, contacts). The profile is the identity; documents only add what the document adds.
+* Progress is saved on the server. A returning student resumes where the server says they stopped, not
+  where the browser remembers.
+* Image pickers are compact (`FilePicker`): a small preview, one button, a hint. No large drop zones or
+  oversized previews for a single photo or scan.
+
 ## Detail pages
 
 * The **cover image is the hero background**, full width, with a neutral dark scrim

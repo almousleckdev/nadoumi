@@ -3,10 +3,7 @@ import { addMonths } from '~/utils/dates'
 import { isValidForAdmission, validatePassport, type PassportForm } from '~/utils/passportRules'
 
 const TODAY = new Date(2026, 8, 19)
-const valid: PassportForm = {
-  passportNo: 'P1234567', givenName: 'ANNA', familyName: 'ERIKSSON',
-  dob: '1990-01-01', issueDate: '2024-01-01', expiryDate: '2034-01-01',
-}
+const valid: PassportForm = { passportNo: 'P1234567', issueDate: '2024-01-01', expiryDate: '2034-01-01' }
 
 describe('six-month validity', () => {
   it('accepts a passport valid for more than six months', () => {
@@ -31,14 +28,13 @@ describe('validatePassport', () => {
     expect(check()).toEqual({})
   })
 
-  it('flags every missing field', () => {
-    expect(Object.keys(check({ passportNo: '', givenName: '', familyName: '', dob: '', issueDate: '', expiryDate: '' })).sort())
-      .toEqual(['dob', 'expiryDate', 'familyName', 'givenName', 'issueDate', 'passportNo'])
+  it('flags every missing field, and never asks for a name or birth date', () => {
+    expect(Object.keys(check({ passportNo: '', issueDate: '', expiryDate: '' })).sort())
+      .toEqual(['expiryDate', 'issueDate', 'passportNo'])
   })
 
-  it('rejects a malformed number and invalid names', () => {
+  it('rejects a malformed number', () => {
     expect(check({ passportNo: 'AB-1' }).passportNo).toBe('numberInvalid')
-    expect(check({ givenName: 'anna2' }).givenName).toBe('nameInvalid')
   })
 
   it('rejects a future issue date and an expiry not after issue', () => {

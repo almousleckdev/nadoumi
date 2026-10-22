@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import logoUrl from '~/assets/images/logo.jpg'
-
 const localePath = useLocalePath()
 
 const STORAGE_KEY = 'nadoumi-dashboard-sidebar-collapsed'
@@ -34,17 +32,13 @@ watch(collapsed, (v: boolean) => {
       @click="mobileOpen = false"
     />
 
-    <aside
-      class="fixed inset-y-0 start-0 z-40 flex w-[244px] -translate-x-full flex-col bg-[var(--ink-900)] transition-transform duration-200 lg:static lg:translate-x-0 lg:shrink-0 rtl:translate-x-full rtl:lg:translate-x-0"
+    <SidebarFrame
+      :home-to="localePath('/dashboard')"
+      class="fixed inset-y-0 start-0 z-40 w-[244px] -translate-x-full transition-transform duration-200 lg:static lg:translate-x-0 lg:shrink-0 rtl:translate-x-full rtl:lg:translate-x-0"
       :class="[mobileOpen ? 'translate-x-0 rtl:translate-x-0' : '', collapsed ? 'lg:w-[76px]' : 'lg:w-[244px]']"
     >
-      <div class="flex h-16 shrink-0 items-center justify-center border-b border-white/10 px-4">
-        <NuxtLink :to="localePath('/dashboard')" class="block">
-          <img :src="logoUrl" alt="Nadoumi" class="h-9 w-auto rounded-md bg-white p-1">
-        </NuxtLink>
-      </div>
       <DashboardSidebar :collapsed="collapsed && !mobileOpen" @navigate="mobileOpen = false" />
-    </aside>
+    </SidebarFrame>
 
     <div class="flex min-w-0 flex-1 flex-col">
       <header class="h-16 shrink-0 border-b border-slate-200 bg-white">

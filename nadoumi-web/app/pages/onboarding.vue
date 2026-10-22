@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, type Component, type ComputedRef } from 'vue'
-import logoUrl from '~/assets/images/logo.jpg'
 import type { ApplicantDto } from '~/types/catalog'
 import type { SelfApplicantBody } from '~/composables/useApplicant'
 import ContactSection from '~/components/applicant/ContactSection.vue'
@@ -9,6 +8,8 @@ import InterestsSection from '~/components/applicant/InterestsSection.vue'
 import ResidenceSection from '~/components/applicant/ResidenceSection.vue'
 import WorkSection from '~/components/applicant/WorkSection.vue'
 import { ONBOARDING_STEPS, STEP_SECTIONS, type OnboardingStep } from '~/constants/onboarding'
+import type { OnboardingStepView } from '~/types/onboarding'
+import { resumeStepIndex } from '~/utils/onboardingResume'
 
 definePageMeta({ layout: 'onboarding', middleware: ['auth', 'onboarding'] })
 const { t } = useI18n()
@@ -25,12 +26,9 @@ const SECTION_STEPS: Partial<Record<OnboardingStep, Component>> = {
 
 const current = ref(0)
 const stepKey: ComputedRef<OnboardingStep> = computed(() => ONBOARDING_STEPS[current.value] as OnboardingStep)
-const progressSteps = computed(() => ONBOARDING_STEPS.map(key => ({
-  key, label: t(`onboarding.steps.${key}`), optional: STEP_SECTIONS[key].length === 0 && key !== 'review',
-})))
-/** The furthest step reached so far: finished steps can be revisited from the sidebar, later ones cannot. */
-const reached = ref(0)
 const sectionStep = computed(() => SECTION_STEPS[stepKey.value] ?? null)
+const mainEl = ref<HTMLElement | null>(null)
+
 
 const applicant = ref<ApplicantDto | null>(null)
 const finishing = ref(false)
@@ -44,6 +42,17 @@ async function load() {
 }
 await load()
 await progress.refresh()
+// a returning student continues where they stopped; the server's section status is the record of that
+current.value = resumeStepIndex(applicant.value !== null, progress.isComplete)
+
+/** A step is done once the server reports all its sections complete; steps without sections are not tracked. */
+const progressSteps = computed<OnboardingStepView[]>(() => ONBOARDING_STEPS.map((key) => {
+  const sections = STEP_SECTIONS[key]
+  return {
+    key, label: t(`onboarding.steps.${key}`), optional: sections.length === 0 && key !== 'review',
+    done: sections.length ? sections.every(progress.isComplete) : null,
+  }
+}))
 
 async function saveProfile(body: SelfApplicantBody) {
   const saved = await run(async () => {
@@ -61,12 +70,10 @@ const canAdvance = computed(() => STEP_SECTIONS[stepKey.value].every(progress.is
 
 const moveTo = (index: number) => {
   current.value = index
-  reached.value = Math.max(reached.value, index)
-  if (import.meta.client) window.scrollTo({ top: 0, behavior: 'smooth' })
+  mainEl.value?.scrollTo({ top: 0, behavior: 'smooth' })
 }
 const goTo = (step: OnboardingStep) => moveTo(ONBOARDING_STEPS.indexOf(step))
 const next = () => { if (current.value < ONBOARDING_STEPS.length - 1) moveTo(current.value + 1) }
-const back = () => { if (current.value > 0) moveTo(current.value - 1) }
 const eyebrow = computed(() => t('onboarding.eyebrow', { n: current.value + 1, total: ONBOARDING_STEPS.length }))
 const isOptionalStep = computed(() => STEP_SECTIONS[stepKey.value].length === 0 && stepKey.value !== 'review')
 
@@ -103,36 +110,18 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
 
 <template>
   <OnboardingFinishing v-if="finishing" @done="toDashboard" />
-  <div v-else class="lg:grid lg:min-h-screen lg:grid-cols-[19rem_minmax(0,1fr)]">
-    <aside class="relative hidden overflow-hidden bg-[var(--ink-900)] text-white lg:flex lg:flex-col lg:p-8">
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-brand-900/40" aria-hidden="true" />
-      <div class="relative flex flex-1 flex-col lg:sticky lg:top-8 lg:max-h-[calc(100vh-4rem)]">
-        <div class="flex items-center gap-3">
-          <img :src="logoUrl" alt="Nadoumi" class="h-10 w-10 rounded-xl bg-white object-contain p-1">
-          <span class="font-display text-lg font-bold tracking-tight">Nadoumi</span>
-        </div>
-        <h1 class="mt-8 font-display text-xl font-bold leading-snug">{{ t('onboarding.title') }}</h1>
-        <p class="mt-2 text-sm leading-relaxed text-slate-300">{{ t('onboarding.intro') }}</p>
-        <div class="mt-8">
-          <OnboardingStepper :steps="progressSteps" :current="current" :reached="reached" @select="moveTo" />
-        </div>
-        <div class="mt-auto rounded-xl bg-white/5 p-4 text-sm">
-          <p class="font-semibold">{{ t('onboarding.helpTitle') }}</p>
-          <p class="mt-1 text-slate-300">{{ t('onboarding.helpBody') }}</p>
-        </div>
-      </div>
-    </aside>
+  <div v-else class="flex h-dvh overflow-hidden">
+    <SidebarFrame class="hidden w-[244px] shrink-0 lg:flex">
+      <OnboardingStepper :steps="progressSteps" :current="current" @select="moveTo" />
+    </SidebarFrame>
 
-    <div class="flex min-h-screen flex-col">
-      <header class="border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
-        <div class="mb-3 flex items-center gap-2.5">
-          <img :src="logoUrl" alt="Nadoumi" class="h-8 w-8 rounded-lg object-contain">
-          <span class="font-display text-base font-bold text-slate-900">{{ t('onboarding.title') }}</span>
-        </div>
-        <OnboardingProgress :steps="progressSteps" :current="current" />
+    <div class="flex min-w-0 flex-1 flex-col">
+      <header class="shrink-0 border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
+        <OnboardingProgress :steps="progressSteps" :current="current" @select="moveTo" />
       </header>
 
-      <main class="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-6 sm:px-8 lg:pt-12">
+      <main ref="mainEl" class="min-h-0 flex-1 overflow-y-auto">
+       <div class="mx-auto w-full max-w-3xl px-4 py-6 sm:px-8 lg:py-10">
         <NAlert v-if="error" tone="danger" class="mb-4">{{ error }}</NAlert>
 
         <Transition name="step" mode="out-in">
@@ -153,7 +142,6 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
                 <PassportUploadCard
                   v-if="applicant"
                   :applicant-id="applicant.id"
-                  :profile="{ givenName: applicant.givenName, familyName: applicant.familyName, dob: applicant.dob }"
                   @changed="progress.refresh"
                   @edit-profile="goTo('personal')"
                 />
@@ -174,13 +162,13 @@ useSeo(t('onboarding.title'), t('onboarding.intro'))
             </OnboardingStep>
           </div>
         </Transition>
+       </div>
       </main>
 
-      <footer class="sticky bottom-0 z-10 border-t border-slate-200 bg-white/90 backdrop-blur">
-        <div class="mx-auto flex w-full max-w-3xl items-center justify-between gap-3 px-4 py-3 sm:px-8">
-          <NButton variant="ghost" :disabled="current === 0" @click="back">{{ t('onboarding.back') }}</NButton>
+      <footer v-if="stepKey !== 'personal'" class="shrink-0 border-t border-slate-200 bg-white">
+        <div class="mx-auto flex w-full max-w-3xl items-center justify-end gap-3 px-4 py-3 sm:px-8">
           <NButton v-if="stepKey === 'review'" :loading="busy" @click="finish">{{ t('onboarding.finish') }}</NButton>
-          <NButton v-else-if="stepKey !== 'personal'" :disabled="!canAdvance" @click="next">{{ t('onboarding.next') }}</NButton>
+          <NButton v-else :disabled="!canAdvance" @click="next">{{ t('onboarding.next') }}</NButton>
         </div>
       </footer>
     </div>

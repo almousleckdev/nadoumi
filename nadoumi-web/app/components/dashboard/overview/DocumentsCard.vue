@@ -10,9 +10,9 @@ const localePath = useLocalePath()
 <template>
   <SectionCard :title="t('dashboard.home.documents')">
     <template #actions>
-      <NuxtLink :to="localePath('/dashboard/documents')" class="text-sm font-medium text-brand-700 hover:underline">
+      <NTextLink :to="localePath('/dashboard/documents')">
         {{ t('dashboard.home.manageDocuments') }}
-      </NuxtLink>
+      </NTextLink>
     </template>
     <div v-if="pending" class="grid gap-2">
       <NSkeleton class="h-6 w-full rounded" />

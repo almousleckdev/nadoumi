@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Saves the passport's holder data and reports how it lines up with the profile. A
+ * Saves the passport's number and dates (and holder data when given) and reports how it lines up with the profile. A
  * passport that will not stay valid for more than six months is refused outright; a
  * disagreement with the profile is saved (it is evidence) and reported so the student
  * can correct whichever side is wrong. Onboarding stays blocked until they agree.
@@ -48,8 +48,11 @@ public class PassportService {
         PassportRules.requireAcceptable(req.issueDate(), req.expiryDate(), today);
 
         applicant.setPassportNo(req.passportNo().toUpperCase(Locale.ROOT));
-        applicant.setPassportGivenName(NameRules.normalize(req.givenName()));
-        applicant.setPassportFamilyName(NameRules.normalize(req.familyName()));
+        // holder data is optional; without it the profile stays the only identity on record
+        applicant.setPassportGivenName(req.givenName() == null || req.givenName().isBlank()
+                ? null : NameRules.normalize(req.givenName()));
+        applicant.setPassportFamilyName(req.familyName() == null || req.familyName().isBlank()
+                ? null : NameRules.normalize(req.familyName()));
         applicant.setPassportDob(req.dob());
         applicant.setPassportIssueDate(req.issueDate());
         applicant.setPassportExpiryDate(req.expiryDate());

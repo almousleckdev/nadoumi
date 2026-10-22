@@ -32,8 +32,8 @@ public record PassportStatusResponse(
     }
 
     public static PassportStatusResponse of(Applicant a, LocalDate today, boolean includePii) {
-        boolean hasDetails = a.getPassportGivenName() != null;
-        List<Mismatch> mismatches = hasDetails ? mismatchesOf(a, includePii) : List.of();
+        boolean hasHolderData = a.getPassportGivenName() != null;
+        List<Mismatch> mismatches = hasHolderData ? mismatchesOf(a, includePii) : List.of();
         return new PassportStatusResponse(
                 includePii ? a.getPassportNo() : mask(a.getPassportNo()),
                 a.getPassportGivenName(),
@@ -45,7 +45,7 @@ public record PassportStatusResponse(
                 a.isPassportDataEdited(),
                 a.getPassportMediaId() != null,
                 PassportRules.isValidForAdmission(a.getPassportExpiryDate(), today),
-                hasDetails && mismatches.isEmpty(),
+                a.getPassportNo() != null && mismatches.isEmpty(),
                 mismatches);
     }
 

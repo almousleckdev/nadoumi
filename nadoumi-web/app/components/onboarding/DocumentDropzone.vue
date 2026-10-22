@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { validateFile } from '~/utils/files'
-
 /**
- * Pick or drop a file, validated against a type and size rule before it reaches the parent.
- * Shared by every upload so the checks and their messages exist once.
+ * Drop zone for documents of many kinds: pick or drop a file, validated before it reaches the parent.
+ * Single-image controls (profile photo, passport scan) use the compact `FilePicker` instead.
  */
 const props = defineProps<{
   accept: string
@@ -18,21 +16,9 @@ const props = defineProps<{
 const emit = defineEmits<{ select: [file: File] }>()
 const { t } = useI18n()
 const inputId = useId()
-const error = ref('')
 const over = ref(false)
 
-function handleFile(file: File | undefined) {
-  if (!file) return
-  const problem = validateFile(file, { mime: props.mime, maxMb: props.maxMb })
-  error.value = problem === 'badType' ? props.badTypeMessage : problem === 'tooBig' ? t('onboarding.upload.tooBig', { mb: props.maxMb }) : ''
-  if (!problem) emit('select', file)
-}
-
-function onPick(event: Event) {
-  const input = event.target as HTMLInputElement
-  handleFile(input.files?.[0])
-  input.value = '' // picking the same file again must still fire
-}
+const { error, handleFile, onInput } = useFilePick(() => props, file => emit('select', file))
 </script>
 
 <template>
@@ -50,7 +36,7 @@ function onPick(event: Event) {
         {{ replace ? t('onboarding.upload.replace') : t('onboarding.upload.choose') }}
       </span>
       <span v-if="hint" class="text-xs text-slate-500">{{ hint }}</span>
-      <input :id="inputId" type="file" :accept="accept" class="sr-only" @change="onPick">
+      <input :id="inputId" type="file" :accept="accept" class="sr-only" @change="onInput">
     </label>
   </div>
 </template>

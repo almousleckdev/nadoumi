@@ -24,7 +24,7 @@ const completeness = computed(() => profileCompleteness(props.applicant))
           <span class="font-semibold text-slate-700">{{ completeness }}%</span>
         </div>
         <div class="h-1.5 rounded-full bg-slate-100">
-          <div class="h-1.5 rounded-full bg-brand-500" :style="{ width: `${completeness}%` }" />
+          <div class="h-1.5 rounded-full bg-slate-900" :style="{ width: `${completeness}%` }" />
         </div>
         <NButton class="mt-2" size="sm" variant="secondary" :to="localePath('/dashboard/profile')">
           {{ t('dashboard.quickProfile') }}

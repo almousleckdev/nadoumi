@@ -39,7 +39,7 @@ defineExpose({ reset })
         v-for="m in messages"
         :key="m.id"
         class="max-w-[85%] rounded-lg px-4 py-3 text-sm"
-        :class="isOwn(m) ? 'ms-auto bg-brand-50 text-slate-900' : 'me-auto border border-slate-200 bg-white text-slate-800'"
+        :class="isOwn(m) ? 'ms-auto bg-slate-100 text-slate-900' : 'me-auto border border-slate-200 bg-white text-slate-800'"
       >
         <p class="mb-1 text-xs font-medium text-slate-500">
           {{ isOwn(m) ? t('dashboard.support.you') : (m.senderName || t('dashboard.support.staff')) }}
