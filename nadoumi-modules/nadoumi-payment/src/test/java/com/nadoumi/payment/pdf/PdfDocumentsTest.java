@@ -88,7 +88,7 @@ class PdfDocumentsTest {
                 model.dossier().supporter(), model.dossier().chinaEmergency());
 
         byte[] pdf = forms.render(new ApplicationFormModel(model.formNo(), model.generatedAt(), model.applicationRef(),
-                model.opportunity(), model.paymentReference(), dossier, model.photo()));
+                model.opportunity(), model.paymentReference(), dossier, model.photo(), model.signature(), model.signedOn()));
 
         try (PDDocument doc = Loader.loadPDF(pdf)) {
             assertThat(doc.getNumberOfPages()).isGreaterThan(1);
@@ -105,9 +105,9 @@ class PdfDocumentsTest {
     void shouldPlaceThePhotoInTheMasthead_andRenderWithoutOneWhenThereIsNone() throws IOException {
         var withPhoto = PdfFixtures.form(PdfFixtures.programme(), "Amina");
         var without = new ApplicationFormModel(withPhoto.formNo(), withPhoto.generatedAt(), withPhoto.applicationRef(),
-                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), null);
+                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), null, null, null);
         var garbage = new ApplicationFormModel(withPhoto.formNo(), withPhoto.generatedAt(), withPhoto.applicationRef(),
-                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), new byte[] {1, 2, 3, 4});
+                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), new byte[] {1, 2, 3, 4}, new byte[] {9, 9}, null);
 
         byte[] big = forms.render(withPhoto);
         byte[] plain = forms.render(without);
@@ -129,6 +129,16 @@ class PdfDocumentsTest {
             }
             return count;
         }
+    }
+
+    @Test
+    void shouldPrintTheSignatureDate_andLeaveTheBoxEmptyWhenUnsigned() throws IOException {
+        var signed = PdfFixtures.form(PdfFixtures.programme(), "Amina");
+        var unsigned = new ApplicationFormModel(signed.formNo(), signed.generatedAt(), signed.applicationRef(),
+                signed.opportunity(), signed.paymentReference(), signed.dossier(), signed.photo(), null, null);
+
+        assertThat(text(forms.render(signed))).contains("2026-10-22");
+        assertThat(text(forms.render(unsigned))).contains("Applicant's signature").doesNotContain("Date 2026");
     }
 
     @Test

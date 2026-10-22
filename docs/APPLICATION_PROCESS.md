@@ -80,8 +80,15 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 > * **Form content = what the portal collects.** Applying for, personal and passport, marital status, religion, place of
 >   birth, official language and permanent address, test scores, education, work experience, **family members, financial
 >   supporter and emergency contact in China**, study plan, the affirmation and a signature line. A section a student has
->   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** the signature image, Chinese labels, the verification QR.
+>   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** Chinese labels, the verification QR.
 > * **Erasure.** `PaymentErasure` also deletes the generated documents and soft-deletes their PDFs.
+>
+> **Update 2026-10-22 (signature): the handwritten signature is IMPLEMENTED.** A student draws it on a pad or uploads a picture, once
+> (`POST /api/student/applicants/{id}/signature`). The image is decoded and redrawn as a bounded PNG on white (an empty pad or a
+> non-image is refused, 400), stored as a SENSITIVE `APPLICANT_SIGNATURE` media asset on `nad_applicant_personal` (V118), and shown only to the
+> owner through the backend (`GET .../signature/image`). It is printed above the signature line of the Application Form with the day it was given.
+> **Submit is refused (409) until the applicant has signed** (the form is not valid without it), as part of the engine's `SubmitGate`. The readiness
+> hint lists `SIGNATURE`. Replacing it soft-deletes the old image; erasing the applicant removes it.
 >
 > **Update 2026-10-22 (documents checklist): Step 3 is IMPLEMENTED in its first form.** The documents an application needs come from the
 > programme (new **Required documents** section in the admin programme drawer, stored as `nad_document_requirement` scope PROGRAM)

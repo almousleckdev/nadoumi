@@ -258,19 +258,39 @@ public class PdfRenderer {
             add(table);
         }
 
-        /** A ruled box with a caption underneath, for signatures. */
-        public void signatureLine(String caption) {
+        /** A ruled box with a caption underneath for the signature, with the signature image and the date when given. */
+        public void signatureLine(String caption, byte[] signaturePng, String date) {
             PdfPTable table = new PdfPTable(new float[] {1f, 1f});
             table.setWidthPercentage(100);
-            table.setSpacingBefore(mm(10));
+            table.setSpacingBefore(mm(8));
             table.setKeepTogether(true);
-            for (String label : new String[] {caption, "Date"}) {
-                PdfPCell c = cell(Rectangle.TOP, 4);
-                c.setBorderColor(MUTED);
-                c.setFixedHeight(mm(14));
-                c.setPhrase(new Phrase(text(label), assets.regular(8.5f, MUTED)));
-                table.addCell(c);
+            PdfPCell signature = cell(Rectangle.BOTTOM, 4);
+            signature.setBorderColor(MUTED);
+            signature.setFixedHeight(mm(20));
+            signature.setVerticalAlignment(Element.ALIGN_BOTTOM);
+            if (signaturePng != null) {
+                try {
+                    Image image = Image.getInstance(signaturePng);
+                    image.scaleToFit(mm(60), mm(16));
+                    signature.addElement(image);
+                }
+                catch (IOException | DocumentException e) {
+                    // an unusable image leaves the box empty for a handwritten signature
+                }
             }
+            table.addCell(signature);
+            PdfPCell day = cell(Rectangle.BOTTOM, 4);
+            day.setBorderColor(MUTED);
+            day.setFixedHeight(mm(20));
+            day.setVerticalAlignment(Element.ALIGN_BOTTOM);
+            day.setPhrase(new Phrase(date == null ? "" : text(date), assets.regular(10, INK)));
+            table.addCell(day);
+            PdfPCell captionLeft = cell(Rectangle.NO_BORDER, 3);
+            captionLeft.setPhrase(new Phrase(text(caption), assets.regular(8.5f, MUTED)));
+            table.addCell(captionLeft);
+            PdfPCell captionRight = cell(Rectangle.NO_BORDER, 3);
+            captionRight.setPhrase(new Phrase("Date", assets.regular(8.5f, MUTED)));
+            table.addCell(captionRight);
             add(table);
         }
 

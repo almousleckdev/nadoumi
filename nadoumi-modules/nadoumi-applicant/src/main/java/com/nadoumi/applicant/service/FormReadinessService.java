@@ -19,6 +19,7 @@ public class FormReadinessService {
     public static final String FAMILY = "FAMILY";
     public static final String SUPPORTER = "SUPPORTER";
     public static final String CHINA_EMERGENCY = "CHINA_EMERGENCY";
+    public static final String SIGNATURE = "SIGNATURE";
 
     private final FamilyMapper mapper;
     private final ApplicantAccessGuard guard;
@@ -43,6 +44,10 @@ public class FormReadinessService {
         }
         if (mapper.findPerson(applicantId, PersonRole.CHINA_EMERGENCY) == null) {
             missing.add(CHINA_EMERGENCY);
+        }
+        ApplicantPersonal personal = mapper.findPersonal(applicantId);
+        if (personal == null || personal.getSignatureMediaId() == null) {
+            missing.add(SIGNATURE);
         }
         return new FormReadinessResponse(List.copyOf(missing));
     }

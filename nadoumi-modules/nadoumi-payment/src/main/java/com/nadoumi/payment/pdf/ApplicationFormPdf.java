@@ -62,7 +62,7 @@ public class ApplicationFormPdf {
                 page.paragraph((i + 1) + ".  " + AFFIRMATION.get(i));
             }
             page.note("The application is not valid without the applicant's signature.");
-            page.signatureLine("Applicant's signature");
+            page.signatureLine("Applicant's signature", m.signature(), m.signedOn() == null ? null : m.signedOn().toString());
         });
     }
 

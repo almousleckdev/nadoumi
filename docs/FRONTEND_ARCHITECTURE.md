@@ -718,3 +718,7 @@ and two `PersonSection`s (supporter, China emergency), on `useApplicantFamily`, 
 Document checklist (EXISTING, 2026-10-22): `DocumentChecklistCard` and `ChecklistRow` on the draft application page (with `useApplications().checklist`
 and the existing `useDocuments`), pure helpers in `utils/checklistView.ts`; Submit stays locked, with the reason shown, until the fee is paid and the
 mandatory rows are attached. Admin: `views/programs/form/DocumentsSection.vue` in the programme drawer.
+
+Signature (EXISTING, 2026-10-22): `SignatureCard` and `SignaturePad` (canvas, pointer events, or upload) on the draft application page, with
+`useApplicantSignature`; the image is fetched as a blob. Submit stays locked, with the reason, until a signature is on file.
+

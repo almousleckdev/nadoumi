@@ -2598,7 +2598,8 @@
       "PERSONAL_DETAILS": "个人信息",
       "FAMILY": "家庭成员",
       "SUPPORTER": "经济资助人",
-      "CHINA_EMERGENCY": "中国境内紧急联系人"
+      "CHINA_EMERGENCY": "中国境内紧急联系人",
+      "SIGNATURE": "签名"
     }
   },
   "checklist": {
@@ -2616,6 +2617,22 @@
     },
     "errors": {
       "required": "提交前请上传必需的材料。"
+    }
+  },
+  "signature": {
+    "title": "你的签名",
+    "blurb": "申请表没有你的签名无效。请在下方手写签名，或上传一张清晰的签名图片。只需签一次。",
+    "padLabel": "签名区域",
+    "clear": "清除",
+    "save": "保存签名",
+    "upload": "上传图片",
+    "redo": "重新签名",
+    "saved": "签名已保存",
+    "onFile": "你的签名已保存，将打印在申请表上。",
+    "badType": "请上传不超过大小限制的 PNG 或 JPEG 图片。",
+    "signToSubmit": "请先添加签名，再提交申请。",
+    "errors": {
+      "required": "提交前请添加你的签名。"
     }
   }
 }

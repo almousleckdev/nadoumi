@@ -121,6 +121,10 @@ public final class MediaCategoryPolicy {
         RULES.put(MediaCategory.PAYMENT_DOCUMENT, new CategoryRule(
                 MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 5 * MB, RESOURCE_RAW, "payment/document"));
 
+        // the applicant's handwritten signature (re-encoded PNG): only the owner, and server jobs that print the form
+        RULES.put(MediaCategory.APPLICANT_SIGNATURE, new CategoryRule(
+                MediaAccessClass.SENSITIVE, Set.of("image/png"), 1 * MB, RESOURCE_RAW, "applicant/signature"));
+
         for (MediaCategory category : MediaCategory.values()) {
             if (!RULES.containsKey(category)) {
                 throw new IllegalStateException("MediaCategoryPolicy has no rule for " + category);

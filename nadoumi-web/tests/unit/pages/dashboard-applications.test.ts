@@ -22,6 +22,10 @@ mockNuxtImport('useRoute', () => () => ({ params: { id: '7' }, path: '/dashboard
 mockNuxtImport('useApplicationPayment', () => () => ({
   overview: async () => ({ state: 'CONFIRMED', required: true, settled: true, canStart: false, amount: 300, currency: 'CNY', payee: '', reference: 'NAD-TEST0001', expiresAt: null, secondsLeft: 0, rejectionReason: null }),
 }))
+mockNuxtImport('useApplicantSignature', () => () => ({
+  status: async () => ({ signed: true, signedAt: '2026-10-22T10:00:00' }),
+  image: async () => new Blob(['x'], { type: 'image/png' }),
+}))
 vi.mock('~/composables/useApplications', () => ({
   useApplications: () => ({ list, get, submit, withdraw, checklist }),
 }))

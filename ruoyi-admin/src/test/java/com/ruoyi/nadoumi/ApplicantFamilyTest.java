@@ -43,7 +43,7 @@ class ApplicantFamilyTest extends AbstractStudentIntegrationTest {
     void shouldSaveEachSection_andReportWhatTheFormStillLacks() throws Exception {
         Student s = register("fam", "all");
         send(s, "GET", "/form-readiness", null).andExpect(status().isOk())
-                .andExpect(jsonPath("$.missing.length()").value(4));
+                .andExpect(jsonPath("$.missing.length()").value(5));
 
         send(s, "PUT", "/personal-details", "{\"maritalStatus\":\"SINGLE\",\"religion\":\"Muslim\",\"placeOfBirth\":\"Conakry\","
                 + "\"officialLanguage\":\"French\",\"permanentAddress\":\"12 Rue du Port\"}")
@@ -53,7 +53,8 @@ class ApplicantFamilyTest extends AbstractStudentIntegrationTest {
         send(s, "PUT", "/people/china-emergency", PERSON).andExpect(status().isOk());
         send(s, "POST", "/family", FATHER).andExpect(status().isCreated());
         send(s, "GET", "/form-readiness", null).andExpect(jsonPath("$.missing[0]").value("FAMILY"))
-                .andExpect(jsonPath("$.missing.length()").value(1));
+                .andExpect(jsonPath("$.missing[1]").value("SIGNATURE"))
+                .andExpect(jsonPath("$.missing.length()").value(2));
 
         send(s, "POST", "/family", MOTHER_DECEASED).andExpect(status().isCreated());
         // a parent has died, so the form also needs two siblings or relatives
@@ -61,6 +62,12 @@ class ApplicantFamilyTest extends AbstractStudentIntegrationTest {
         for (int i = 0; i < 2; i++) {
             send(s, "POST", "/family", "{\"relation\":\"SIBLING\",\"fullName\":\"Sibling " + i + "\"}").andExpect(status().isCreated());
         }
+        send(s, "GET", "/form-readiness", null).andExpect(jsonPath("$.missing.length()").value(1)); // only the signature
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart(url(s, "/signature"))
+                        .file(new org.springframework.mock.web.MockMultipartFile("file", "s.png", "image/png",
+                                ApplicationPaymentFlowTest.signaturePng()))
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk());
         send(s, "GET", "/form-readiness", null).andExpect(jsonPath("$.missing.length()").value(0));
     }
 

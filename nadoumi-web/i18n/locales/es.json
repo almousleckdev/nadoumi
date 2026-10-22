@@ -2598,7 +2598,8 @@
       "PERSONAL_DETAILS": "Datos personales",
       "FAMILY": "Familiares",
       "SUPPORTER": "Patrocinador financiero",
-      "CHINA_EMERGENCY": "Contacto de emergencia en China"
+      "CHINA_EMERGENCY": "Contacto de emergencia en China",
+      "SIGNATURE": "Firma"
     }
   },
   "checklist": {
@@ -2616,6 +2617,22 @@
     },
     "errors": {
       "required": "Sube los documentos obligatorios antes de enviar."
+    }
+  },
+  "signature": {
+    "title": "Tu firma",
+    "blurb": "El formulario de solicitud no es válido sin tu firma. Dibújala abajo o sube una imagen clara. Solo lo haces una vez.",
+    "padLabel": "Zona para dibujar la firma",
+    "clear": "Borrar",
+    "save": "Guardar firma",
+    "upload": "Subir una imagen",
+    "redo": "Firmar de nuevo",
+    "saved": "Firma guardada",
+    "onFile": "Tu firma está guardada y se imprimirá en el formulario de solicitud.",
+    "badType": "Sube una imagen PNG o JPEG dentro del límite de tamaño.",
+    "signToSubmit": "Añade tu firma para enviar tu solicitud.",
+    "errors": {
+      "required": "Añade tu firma antes de enviar."
     }
   }
 }

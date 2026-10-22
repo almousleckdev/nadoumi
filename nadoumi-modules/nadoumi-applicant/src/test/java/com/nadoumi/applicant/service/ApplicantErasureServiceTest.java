@@ -48,7 +48,8 @@ class ApplicantErasureServiceTest {
         applicant.setPassportMediaId(12L);
         when(applicants.findById(APPLICANT)).thenReturn(applicant);
         when(accounts.usersOf(APPLICANT)).thenReturn(List.of(50L));
-        return new ApplicantErasureService(applicants, erasure, accounts, participants, media, caller);
+        return new ApplicantErasureService(applicants, erasure, accounts, participants, media, caller,
+                mock(com.nadoumi.applicant.mapper.FamilyMapper.class));
     }
 
     @Test

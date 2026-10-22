@@ -512,3 +512,7 @@ Document checklist (EXISTING, 2026-10-22): `GET /api/student/applications/{id}/d
 `{docType, mandatory, note, status, documentId, rejectionReason}`; uploads use the existing `POST /api/student/documents` with the
 application id. `POST .../submit` answers **409** while a mandatory document is missing. Staff edit a programme's list with
 `GET|PUT /api/staff/document-requirements/programs/{programId}` (`nad:program:view` / `nad:program:edit`; a doc type may appear once).
+
+Signature (EXISTING, 2026-10-22), under `/api/student/applicants/{id}/signature`: `GET` status `{signed, signedAt}`, `POST` multipart `file` (`EDIT_PROFILE`;
+re-encoded to PNG; 400 for an empty or non-image file), `GET /image` (the owner's PNG, `no-store`). `POST .../submit` answers **409** until a signature is on file.
+

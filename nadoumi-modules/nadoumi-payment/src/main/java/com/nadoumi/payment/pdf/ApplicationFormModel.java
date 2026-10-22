@@ -13,5 +13,8 @@ public record ApplicationFormModel(
         String paymentReference,
         ApplicantDossier dossier,
         /** A small JPEG of the applicant, or null when there is no usable photo. */
-        byte[] photo) {
+        byte[] photo,
+        /** The applicant's signature as PNG bytes and the day it was given; both null when unsigned. */
+        byte[] signature,
+        java.time.LocalDate signedOn) {
 }

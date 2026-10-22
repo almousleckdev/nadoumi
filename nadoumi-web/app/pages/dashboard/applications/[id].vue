@@ -39,12 +39,14 @@ await load()
 
 // the fee gates Submit: a draft stays saved, but it cannot be submitted until the fee is paid
 const feeSettled = ref(false)
+const signatureReady = ref(false)
 const documentsReady = ref(true) // nothing is held back until the checklist says otherwise
 
 // say why Submit is locked, never just grey it out
 const submitHint = computed(() => {
   if (!feeSettled.value) return t('payment.payToSubmit')
   if (!documentsReady.value) return t('checklist.uploadToSubmit')
+  if (!signatureReady.value) return t('signature.signToSubmit')
   return t('dashboard.applications.submitHint')
 })
 
@@ -119,6 +121,7 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
         <NAlert v-if="actionError" tone="danger">{{ actionError }}</NAlert>
 
         <FormReadinessCard v-if="isDraft" :applicant-id="application.applicantId" />
+        <SignatureCard v-if="isDraft" :applicant-id="application.applicantId" @ready="signatureReady = $event" />
         <DocumentChecklistCard
           v-if="isDraft"
           :application-id="id"
@@ -143,7 +146,7 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
               <p class="mb-2 text-sm text-slate-500">
                 {{ submitHint }}
               </p>
-              <NButton :loading="busy" :disabled="!feeSettled || !documentsReady" data-test="submit" @click="onSubmit">{{ t('dashboard.applications.submit') }}</NButton>
+              <NButton :loading="busy" :disabled="!feeSettled || !documentsReady || !signatureReady" data-test="submit" @click="onSubmit">{{ t('dashboard.applications.submit') }}</NButton>
             </div>
 
             <div v-if="canWithdraw">

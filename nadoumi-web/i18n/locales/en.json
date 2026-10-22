@@ -2598,7 +2598,8 @@
       "PERSONAL_DETAILS": "Personal details",
       "FAMILY": "Family members",
       "SUPPORTER": "Financial supporter",
-      "CHINA_EMERGENCY": "Emergency contact in China"
+      "CHINA_EMERGENCY": "Emergency contact in China",
+      "SIGNATURE": "Signature"
     }
   },
   "checklist": {
@@ -2616,6 +2617,22 @@
     },
     "errors": {
       "required": "Upload the required documents before submitting."
+    }
+  },
+  "signature": {
+    "title": "Your signature",
+    "blurb": "The application form is not valid without your signature. Draw it below or upload a clear picture of it. You only do this once.",
+    "padLabel": "Signature drawing area",
+    "clear": "Clear",
+    "save": "Save signature",
+    "upload": "Upload an image",
+    "redo": "Sign again",
+    "saved": "Signature saved",
+    "onFile": "Your signature is on file and will be printed on the application form.",
+    "badType": "Upload a PNG or JPEG image within the size limit.",
+    "signToSubmit": "Add your signature to submit your application.",
+    "errors": {
+      "required": "Add your signature before submitting."
     }
   }
 }

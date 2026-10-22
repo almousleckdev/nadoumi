@@ -578,7 +578,7 @@ Reviewed with the `nadoumi-security-reviewer` agent on 2026-10-22; findings and 
 **Rules enforced server-side**
 
 * **Submit is gated in the engine, not in an endpoint.** `WorkflowService.execute` runs `SubmitGate` for every `submit` transition, whoever
-  asks (student, or staff acting for one): the Nadoumi application fee must be settled and every mandatory document uploaded. A student can run
+  asks (student, or staff acting for one): the Nadoumi application fee must be settled, every mandatory document uploaded and the form signed. A student can run
   only `accept_offer`, `decline_offer` and `withdraw` through the generic transition endpoint (`StudentApplicationService.STUDENT_TRANSITIONS`);
   every other transition is 403. Tests: `ApplicationSubmitPaymentGateTest`, `SubmitGateTest`, and the bypass cases in `ApplicationPaymentFlowTest`.
 * **Payments.** Student endpoints use `@na.canAccessApplication`; staff use `nad:payment:list|query|verify`. Decisions are single conditional
@@ -590,6 +590,7 @@ Reviewed with the `nadoumi-security-reviewer` agent on 2026-10-22; findings and 
 * **The QR** is a classpath image served only while the caller's own session is open (`no-store`); proof screenshots are SENSITIVE media streamed by the backend.
 * **Generated PDFs** are built programmatically (no HTML or CSS parsing of student text), stored as SENSITIVE media, downloadable only by a caller
   with `VIEW_APPLICATION` on that application. The university name can appear only through `ApplicationOpportunityService`, never when a scholarship is involved.
+* **Signature.** SENSITIVE media, re-encoded server-side (only pixels are kept), owner-only read through the backend; server jobs read it only to print the form. Submit also requires it.
 * **Email.** Subjects are stripped of control characters and bounded; attachments are capped (10 MB) and never serialised; every send takes a unique
   per-recipient claim first. The receipt can be re-sent at most once every 5 minutes (429).
 * **Family data.** Every route checks `VIEW_PROFILE` or `EDIT_PROFILE` on the applicant; records are scoped by `applicant_id`; erasure removes all three tables.

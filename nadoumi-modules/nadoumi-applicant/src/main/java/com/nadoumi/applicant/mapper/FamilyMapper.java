@@ -16,6 +16,10 @@ public interface FamilyMapper {
 
     int updatePersonal(ApplicantPersonal personal);
 
+    /** Points the applicant at a new signature, creating the personal row if there is none yet. */
+    int upsertSignature(@Param("applicantId") long applicantId, @Param("mediaId") long mediaId,
+            @Param("at") java.time.LocalDateTime at);
+
     List<ApplicantFamilyMember> findMembers(@Param("applicantId") long applicantId);
 
     ApplicantFamilyMember findMember(@Param("id") long id);

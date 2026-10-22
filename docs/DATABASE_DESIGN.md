@@ -437,3 +437,6 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - **V117** aligns the document-type vocabulary: scholarship `doc_type` codes are renamed to the `nad_document_type` dictionary codes
   (DEGREE, LANGUAGE_CERT, BANK_STATEMENT become DEGREE_CERTIFICATE, LANGUAGE_TEST_REPORT, FINANCIAL_PROOF) and STUDY_PLAN,
   PHYSICAL_EXAM, PHOTO and CV are added to the dictionary. Manual rollback is in the file header.
+- **V118** adds `signature_media_id` (FK to `nad_media_asset`, SET NULL) and `signature_at` to `nad_applicant_personal`: the applicant's handwritten
+  signature, a SENSITIVE media asset. Manual rollback is in the file header.
+

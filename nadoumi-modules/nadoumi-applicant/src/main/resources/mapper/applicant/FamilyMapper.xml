@@ -11,6 +11,8 @@
         <result property="officialLanguage"  column="official_language"/>
         <result property="permanentAddress"  column="permanent_address"/>
         <result property="permanentPostcode" column="permanent_postcode"/>
+        <result property="signatureMediaId"  column="signature_media_id"/>
+        <result property="signatureAt"       column="signature_at"/>
     </resultMap>
 
     <resultMap id="member" type="com.nadoumi.applicant.domain.ApplicantFamilyMember">
@@ -56,9 +58,15 @@
 
     <select id="findPersonal" resultMap="personal">
         select id, applicant_id, marital_status, religion, place_of_birth, official_language, permanent_address,
-               permanent_postcode
+               permanent_postcode, signature_media_id, signature_at
         from nad_applicant_personal where applicant_id = #{applicantId}
     </select>
+
+    <insert id="upsertSignature">
+        insert into nad_applicant_personal (applicant_id, signature_media_id, signature_at, create_by, create_time)
+        values (#{applicantId}, #{mediaId}, #{at}, '', now())
+        on duplicate key update signature_media_id = #{mediaId}, signature_at = #{at}, update_time = now()
+    </insert>
 
     <insert id="insertPersonal" parameterType="com.nadoumi.applicant.domain.ApplicantPersonal"
             useGeneratedKeys="true" keyProperty="id">

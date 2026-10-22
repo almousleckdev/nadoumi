@@ -39,8 +39,14 @@ export interface PersonDto {
   homeAddress: string | null
 }
 
-export type ReadinessCode = 'PERSONAL_DETAILS' | 'FAMILY' | 'SUPPORTER' | 'CHINA_EMERGENCY'
+export type ReadinessCode = 'PERSONAL_DETAILS' | 'FAMILY' | 'SUPPORTER' | 'CHINA_EMERGENCY' | 'SIGNATURE'
 
 export interface FormReadinessDto {
   missing: ReadinessCode[]
+}
+
+/** `GET /api/student/applicants/{id}/signature`: whether a signature is on file, never the image itself. */
+export interface SignatureStatusDto {
+  signed: boolean
+  signedAt: string | null
 }

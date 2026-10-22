@@ -126,7 +126,7 @@ class FamilyServiceTest {
     void shouldReportEverythingMissing_forAnEmptyProfile() {
         FormReadinessResponse r = readiness.of(ID);
 
-        assertThat(r.missing()).containsExactly("PERSONAL_DETAILS", "FAMILY", "SUPPORTER", "CHINA_EMERGENCY");
+        assertThat(r.missing()).containsExactly("PERSONAL_DETAILS", "FAMILY", "SUPPORTER", "CHINA_EMERGENCY", "SIGNATURE");
         assertThat(r.complete()).isFalse();
     }
 
@@ -137,6 +137,7 @@ class FamilyServiceTest {
         personal.setReligion("Muslim");
         personal.setPlaceOfBirth("Conakry");
         personal.setPermanentAddress("12 Rue du Port");
+        personal.setSignatureMediaId(77L);
         when(mapper.findPersonal(ID)).thenReturn(personal);
         when(mapper.findMembers(ID)).thenReturn(List.of(stored(1L, FamilyRelation.FATHER), stored(2L, FamilyRelation.MOTHER)));
         when(mapper.findPerson(ID, PersonRole.SUPPORTER)).thenReturn(new ApplicantPerson());

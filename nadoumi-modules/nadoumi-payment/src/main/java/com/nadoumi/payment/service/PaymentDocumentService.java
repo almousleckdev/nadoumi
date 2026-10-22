@@ -2,6 +2,7 @@ package com.nadoumi.payment.service;
 
 import com.nadoumi.applicant.service.ApplicantDossier;
 import com.nadoumi.applicant.service.ApplicantDossierService;
+import com.nadoumi.applicant.service.SignatureService;
 import com.nadoumi.application.service.ApplicationOpportunityService;
 import com.nadoumi.application.service.ApplicationOpportunityService.Description;
 import com.nadoumi.common.exception.NadNotFoundException;
@@ -202,8 +203,11 @@ public class PaymentDocumentService {
 
     private ApplicationFormModel formModel(ApplicationPayment payment, Description opportunity,
             ApplicantDossier dossier, Instant now) {
+        var signature = dossiers.signature(payment.getApplicantId());
         return new ApplicationFormModel(PaymentDocumentNumbers.applicationForm(payment), now, applicationRef(payment),
-                opportunity, payment.getReference(), dossier, dossiers.photoJpeg(payment.getApplicantId()).orElse(null));
+                opportunity, payment.getReference(), dossier, dossiers.photoJpeg(payment.getApplicantId()).orElse(null),
+                signature.map(SignatureService.SignatureOnFile::png).orElse(null),
+                signature.map(SignatureService.SignatureOnFile::signedOn).orElse(null));
     }
 
     private static String studentName(ApplicationPayment payment, ApplicantDossier dossier) {

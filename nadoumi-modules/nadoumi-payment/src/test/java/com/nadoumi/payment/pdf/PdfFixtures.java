@@ -65,7 +65,28 @@ final class PdfFixtures {
                 new PersonResponse("CHINA_EMERGENCY", "Li Wei", "Friend", "MALE", null, "+8613800000000",
                         null, "Shanghai Language School", null, "Shanghai"));
         return new ApplicationFormModel("NAD-APP-2026-000042", Instant.parse("2026-10-22T06:30:00Z"), "APP-42",
-                opportunity, "NAD-AB12CD34", dossier, photo());
+                opportunity, "NAD-AB12CD34", dossier, photo(), signature(), java.time.LocalDate.of(2026, 10, 22));
+    }
+
+    /** A small hand-drawn-looking PNG on white. */
+    static byte[] signature() {
+        try {
+            var image = new java.awt.image.BufferedImage(400, 120, java.awt.image.BufferedImage.TYPE_INT_RGB);
+            var g = image.createGraphics();
+            g.setColor(java.awt.Color.WHITE);
+            g.fillRect(0, 0, 400, 120);
+            g.setColor(java.awt.Color.BLACK);
+            g.setStroke(new java.awt.BasicStroke(4f));
+            g.drawArc(20, 20, 160, 90, 30, 280);
+            g.drawLine(180, 90, 380, 30);
+            g.dispose();
+            var out = new java.io.ByteArrayOutputStream();
+            javax.imageio.ImageIO.write(image, "png", out);
+            return out.toByteArray();
+        }
+        catch (java.io.IOException e) {
+            throw new java.io.UncheckedIOException(e);
+        }
     }
 
     /** A small portrait-shaped JPEG. */

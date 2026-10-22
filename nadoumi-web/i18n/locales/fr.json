@@ -2598,7 +2598,8 @@
       "PERSONAL_DETAILS": "Informations personnelles",
       "FAMILY": "Membres de la famille",
       "SUPPORTER": "Garant financier",
-      "CHINA_EMERGENCY": "Contact d’urgence en Chine"
+      "CHINA_EMERGENCY": "Contact d’urgence en Chine",
+      "SIGNATURE": "Signature"
     }
   },
   "checklist": {
@@ -2616,6 +2617,22 @@
     },
     "errors": {
       "required": "Téléversez les documents obligatoires avant de soumettre."
+    }
+  },
+  "signature": {
+    "title": "Votre signature",
+    "blurb": "Le formulaire de candidature n’est pas valable sans votre signature. Dessinez-la ci-dessous ou téléversez une image nette. Vous ne le faites qu’une fois.",
+    "padLabel": "Zone de dessin de la signature",
+    "clear": "Effacer",
+    "save": "Enregistrer la signature",
+    "upload": "Téléverser une image",
+    "redo": "Signer à nouveau",
+    "saved": "Signature enregistrée",
+    "onFile": "Votre signature est enregistrée et sera imprimée sur le formulaire de candidature.",
+    "badType": "Téléversez une image PNG ou JPEG dans la limite de taille.",
+    "signToSubmit": "Ajoutez votre signature pour soumettre votre candidature.",
+    "errors": {
+      "required": "Ajoutez votre signature avant de soumettre."
     }
   }
 }

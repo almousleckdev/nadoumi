@@ -37,4 +37,11 @@ public class ApplicationApiExceptionHandler {
         pd.setDetail(e.getMessage());
         return pd;
     }
+
+    @ExceptionHandler(SignatureRequiredException.class)
+    public ProblemDetail signatureRequired(SignatureRequiredException e) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setDetail(e.getMessage());
+        return pd;
+    }
 }

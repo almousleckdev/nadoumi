@@ -13,6 +13,8 @@ public class ApplicantPersonal {
     private String officialLanguage;
     private String permanentAddress;
     private String permanentPostcode;
+    private Long signatureMediaId;
+    private java.time.LocalDateTime signatureAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -30,4 +32,8 @@ public class ApplicantPersonal {
     public void setPermanentAddress(String permanentAddress) { this.permanentAddress = permanentAddress; }
     public String getPermanentPostcode() { return permanentPostcode; }
     public void setPermanentPostcode(String permanentPostcode) { this.permanentPostcode = permanentPostcode; }
+    public Long getSignatureMediaId() { return signatureMediaId; }
+    public void setSignatureMediaId(Long signatureMediaId) { this.signatureMediaId = signatureMediaId; }
+    public java.time.LocalDateTime getSignatureAt() { return signatureAt; }
+    public void setSignatureAt(java.time.LocalDateTime signatureAt) { this.signatureAt = signatureAt; }
 }

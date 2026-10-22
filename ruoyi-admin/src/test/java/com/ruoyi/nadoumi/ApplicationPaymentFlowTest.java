@@ -185,6 +185,7 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
 
         mvc.perform(get(url(app, "")).header("Authorization", bearer(s.token())))
                 .andExpect(jsonPath("$.state").value("CONFIRMED")).andExpect(jsonPath("$.settled").value(true));
+        sign(s);
         submitApplication(s, app).andExpect(status().isOk());
         assertThat(jdbc.queryForObject("select count(*) from nad_revenue where source = 'APPLICATION_FEE' and related_id = ?",
                 Integer.class, app)).isEqualTo(1);
@@ -270,10 +271,34 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
 
         mvc.perform(get(url(app, "")).header("Authorization", bearer(s.token())))
                 .andExpect(jsonPath("$.state").value("NOT_REQUIRED")).andExpect(jsonPath("$.settled").value(true));
+        submitApplication(s, app).andExpect(status().isConflict()); // not signed yet
+        sign(s);
         submitApplication(s, app).andExpect(status().isOk());
     }
 
+    /** A drawn-looking signature PNG, as the apply screen would upload. */
+    static byte[] signaturePng() throws java.io.IOException {
+        var image = new java.awt.image.BufferedImage(400, 120, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        var g = image.createGraphics();
+        g.setColor(java.awt.Color.BLACK);
+        g.setStroke(new java.awt.BasicStroke(5f));
+        g.drawArc(20, 20, 160, 90, 30, 280);
+        g.drawLine(180, 90, 380, 30);
+        g.dispose();
+        var out = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(image, "png", out);
+        return out.toByteArray();
+    }
+
+    private void sign(Student s) throws Exception {
+        mvc.perform(multipart(s.applicantUrl() + "/signature")
+                        .file(new MockMultipartFile("file", "signature.png", "image/png", signaturePng()))
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk());
+    }
+
     private void payAndConfirm(Student s, long app, String txn) throws Exception {
+        sign(s);
         openSession(s, app);
         reportPayment(s, app, txn).andExpect(status().isOk());
         mvc.perform(post("/api/staff/payments/" + paymentId(app) + "/confirm").header("Authorization", staffAuth))
@@ -597,5 +622,63 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
 
         mvc.perform(get(url(app, "/documents/APPLICATION_FORM")).header("Authorization", bearer(s.token())))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_PDF));
+    }
+
+    @Test
+    void shouldHoldBackSubmission_untilTheApplicantHasSigned() throws Exception {
+        Student s = register("pay", "nosign");
+        long app = draftFor(s);
+        openSession(s, app);
+        reportPayment(s, app, "BANK9999996").andExpect(status().isOk());
+        mvc.perform(post("/api/staff/payments/" + paymentId(app) + "/confirm").header("Authorization", staffAuth))
+                .andExpect(status().isOk());
+
+        submitApplication(s, app).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("sign")));
+        sign(s);
+        submitApplication(s, app).andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldStoreTheSignaturePrivately_andRefuseAnEmptyPadOrAnotherStudent() throws Exception {
+        Student s = register("pay", "sigown");
+        Student intruder = register("pay", "sigint");
+        mvc.perform(get(s.applicantUrl() + "/signature").header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$.signed").value(false));
+
+        var blank = new java.io.ByteArrayOutputStream();
+        var white = new java.awt.image.BufferedImage(300, 100, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        javax.imageio.ImageIO.write(white, "png", blank);
+        mvc.perform(multipart(s.applicantUrl() + "/signature")
+                        .file(new MockMultipartFile("file", "s.png", "image/png", blank.toByteArray()))
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().isBadRequest());
+        mvc.perform(multipart(s.applicantUrl() + "/signature")
+                        .file(new MockMultipartFile("file", "s.png", "image/png", "not an image".getBytes()))
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().isBadRequest());
+
+        sign(s);
+        mvc.perform(get(s.applicantUrl() + "/signature").header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$.signed").value(true)).andExpect(jsonPath("$.signedAt").isNotEmpty());
+        mvc.perform(get(s.applicantUrl() + "/signature/image").header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.IMAGE_PNG));
+
+        mvc.perform(get(s.applicantUrl() + "/signature").header("Authorization", bearer(intruder.token()))).andExpect(status().isForbidden());
+        mvc.perform(get(s.applicantUrl() + "/signature/image").header("Authorization", bearer(intruder.token()))).andExpect(status().isForbidden());
+        mvc.perform(multipart(s.applicantUrl() + "/signature")
+                        .file(new MockMultipartFile("file", "s.png", "image/png", signaturePng()))
+                        .header("Authorization", bearer(intruder.token())))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldReplaceTheSignature_withoutLeavingTheOldOneReachable() throws Exception {
+        Student s = register("pay", "sigtwice");
+        sign(s);
+        sign(s);
+
+        assertThat(jdbc.queryForObject("select count(*) from nad_media_asset where category = 'APPLICANT_SIGNATURE' "
+                + "and deleted_at is null and owner_id = ?", Integer.class, s.applicantId())).isEqualTo(1);
     }
 }

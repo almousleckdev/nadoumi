@@ -46,16 +46,18 @@ public class ApplicantDossierService {
     private final InterestService interests;
     private final FamilyMapper family;
     private final MediaGateway media;
+    private final SignatureService signatures;
 
     public ApplicantDossierService(ApplicantMapper applicants, ResidenceMapper residences, WorkMapper work,
             InterestService interests, FamilyMapper family,
-            MediaGateway media) {
+            MediaGateway media, SignatureService signatures) {
         this.applicants = applicants;
         this.residences = residences;
         this.work = work;
         this.interests = interests;
         this.family = family;
         this.media = media;
+        this.signatures = signatures;
     }
 
     /** The profile photo as a small JPEG for a printed document, or empty when there is none or it cannot be decoded. */
@@ -73,6 +75,12 @@ public class ApplicantDossierService {
             log.warn("could not read the profile photo of applicant {}", applicantId, e);
             return Optional.empty();
         }
+    }
+
+    /** The signature image and the day it was given, for the printed form; empty when the applicant has not signed. */
+    @Transactional(readOnly = true)
+    public Optional<SignatureService.SignatureOnFile> signature(long applicantId) {
+        return signatures.onFile(applicantId);
     }
 
     @Transactional(readOnly = true)

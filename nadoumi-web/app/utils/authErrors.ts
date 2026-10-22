@@ -41,6 +41,7 @@ const DETAIL_RULES: [RegExp, string][] = [
   [/already reported and is being verified/i, 'payment.errors.beingVerified'],
   [/application fee must be paid/i, 'payment.errors.paymentRequired'],
   [/upload the required documents/i, 'checklist.errors.required'],
+  [/sign the application form/i, 'signature.errors.required'],
 ]
 
 export function authErrorMessage(err: unknown, t: Translate): string {

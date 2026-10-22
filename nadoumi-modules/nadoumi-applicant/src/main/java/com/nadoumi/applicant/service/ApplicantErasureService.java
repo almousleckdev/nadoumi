@@ -3,6 +3,7 @@ package com.nadoumi.applicant.service;
 import com.nadoumi.applicant.domain.Applicant;
 import com.nadoumi.applicant.mapper.ApplicantErasureMapper;
 import com.nadoumi.applicant.mapper.ApplicantMapper;
+import com.nadoumi.applicant.mapper.FamilyMapper;
 import com.nadoumi.common.erasure.ApplicantErasureParticipant;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.media.MediaGateway;
@@ -34,16 +35,18 @@ public class ApplicantErasureService {
     private final AccountRetirement accounts;
     private final ObjectProvider<ApplicantErasureParticipant> participants;
     private final MediaGateway media;
+    private final FamilyMapper family;
     private final CurrentCaller caller;
 
     public ApplicantErasureService(ApplicantMapper applicants, ApplicantErasureMapper erasure,
             AccountRetirement accounts, ObjectProvider<ApplicantErasureParticipant> participants,
-            MediaGateway media, CurrentCaller caller) {
+            MediaGateway media, CurrentCaller caller, FamilyMapper family) {
         this.applicants = applicants;
         this.erasure = erasure;
         this.accounts = accounts;
         this.participants = participants;
         this.media = media;
+        this.family = family;
         this.caller = caller;
     }
 
@@ -59,6 +62,7 @@ public class ApplicantErasureService {
         }
         List<Long> users = accounts.usersOf(applicantId);
 
+        var personal = family.findPersonal(applicantId);
         accounts.eraseGrants(applicantId);
         participants.orderedStream().forEach(p -> p.erase(applicantId));
         erasure.deleteContacts(applicantId);
@@ -72,7 +76,8 @@ public class ApplicantErasureService {
         erasure.deletePersons(applicantId);
         erasure.deletePersonal(applicantId);
         erasure.deleteApplicant(applicantId);
-        Stream.of(applicant.getPhotoMediaId(), applicant.getPassportMediaId())
+        Stream.of(applicant.getPhotoMediaId(), applicant.getPassportMediaId(),
+                        personal == null ? null : personal.getSignatureMediaId())
                 .filter(Objects::nonNull)
                 .forEach(id -> media.softDelete(id, staffId));
         accounts.retireOrphans(users, staffId);
