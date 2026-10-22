@@ -35,9 +35,9 @@ function deadlineDays(s: ScholarshipCard): number | null {
 }
 const DEADLINE_TONE_CLASS: Record<DeadlineTone, string> = {
   passed: 'bg-slate-100 text-slate-500',
-  urgent: 'bg-red-100 text-red-700',
-  soon: 'bg-amber-100 text-amber-700',
-  ok: 'bg-emerald-100 text-emerald-700',
+  urgent: 'bg-slate-100 text-slate-900',
+  soon: 'bg-slate-100 text-slate-900',
+  ok: 'bg-slate-100 text-slate-700',
 }
 function deadlineClass(s: ScholarshipCard): string {
   return DEADLINE_TONE_CLASS[deadlineTone(deadlineDays(s))]
@@ -83,18 +83,18 @@ function deadlineClass(s: ScholarshipCard): string {
           <p class="mt-1 text-slate-600">
             {{ hasActiveFilters ? t('catalog.noResultsBody') : t('scholarships.noneBody') }}
           </p>
-          <button v-if="hasActiveFilters" type="button" class="mt-3 text-sm font-medium text-brand-700" @click="emit('clear')">
+          <button v-if="hasActiveFilters" type="button" class="mt-3 text-sm font-medium text-slate-900 underline" @click="emit('clear')">
             {{ t('catalog.clearFilters') }}
           </button>
         </td>
       </tr>
       <tr v-for="s in items" v-else :key="s.id" class="align-top hover:bg-slate-50/60">
         <td class="px-4 py-3">
-          <NuxtLink :to="localePath(`/scholarships/${s.slug}`)" class="font-medium text-slate-900 hover:text-brand-800">
+          <NuxtLink :to="localePath(`/scholarships/${s.slug}`)" class="font-medium text-slate-900 hover:underline">
             {{ s.title }}
           </NuxtLink>
-          <span v-if="s.hot" class="ms-2 rounded-full bg-amber-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-amber-800">{{ t('scholarships.hot') }}</span>
-          <span v-else-if="s.featured" class="ms-2 rounded-full bg-brand-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-brand-800">{{ t('catalog.featured') }}</span>
+          <span v-if="s.hot" class="ms-2 rounded-full bg-slate-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-slate-700">{{ t('scholarships.hot') }}</span>
+          <span v-else-if="s.featured" class="ms-2 rounded-full bg-slate-100 px-1.5 py-0.5 text-[0.65rem] font-semibold text-slate-700">{{ t('catalog.featured') }}</span>
           <span v-if="s.referenceCode" class="mt-0.5 block font-mono text-[0.7rem] text-slate-400">{{ s.referenceCode }}</span>
         </td>
         <td class="whitespace-nowrap px-4 py-3 text-slate-600">{{ place(s) || '' }}</td>
@@ -102,14 +102,14 @@ function deadlineClass(s: ScholarshipCard): string {
         <td class="whitespace-nowrap px-4 py-3 text-slate-600">{{ nextIntake(s) || t('catalog.rollingDeadline') }}</td>
         <td class="whitespace-nowrap px-4 py-3">
           <span class="text-slate-700">{{ fundingLabel(s.fundingModel) }}</span>
-          <span v-if="s.hasStipend" class="ms-1 text-emerald-600" :title="t('scholarships.withStipend')">●</span>
+          <span v-if="s.hasStipend" class="ms-1 text-slate-500" :title="t('scholarships.withStipend')">●</span>
         </td>
         <td class="whitespace-nowrap px-4 py-3 text-right">
           <template v-if="fee(s)">
             <span class="block font-semibold tabular-nums text-red-600">¥{{ fee(s)!.amountRmb.toLocaleString('en') }}</span>
-            <span class="block text-xs tabular-nums text-red-400">${{ fee(s)!.amountUsd.toLocaleString('en') }}</span>
+            <span class="block text-xs tabular-nums text-red-600">${{ fee(s)!.amountUsd.toLocaleString('en') }}</span>
           </template>
-          <span v-else-if="s.fundingModel === 'FULLY'" class="text-emerald-600">{{ t('scholarships.feesNone') }}</span>
+          <span v-else-if="s.fundingModel === 'FULLY'" class="text-slate-700">{{ t('scholarships.feesNone') }}</span>
           <span v-else class="text-slate-300">·</span>
         </td>
         <td class="whitespace-nowrap px-4 py-3">

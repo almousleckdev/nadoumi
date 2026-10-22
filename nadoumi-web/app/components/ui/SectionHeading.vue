@@ -10,7 +10,7 @@ withDefaults(defineProps<{
 <template>
   <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div class="max-w-2xl">
-      <p v-if="eyebrow" class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-600">
+      <p v-if="eyebrow" class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
         {{ eyebrow }}
       </p>
       <component

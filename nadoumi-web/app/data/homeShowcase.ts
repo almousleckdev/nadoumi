@@ -1,26 +1,27 @@
-export interface ShowcaseTab {
-  /** Suffix of the `home.showcase.tabs.*` label. */
-  key: string
+export interface HomeRail {
+  /** Suffix of the `home.rails.*` copy and of the async-data key. */
+  id: string
+  kind: 'scholarship' | 'program'
   /** Query sent to the public list endpoint. */
   query: Record<string, string | boolean>
   /** Query string for the "view all" link on the catalog page, when the catalog supports the filter. */
   viewAll?: string
 }
 
-/** Non-empty by type: the first tab is the default selection. */
-export type ShowcaseTabs = readonly [ShowcaseTab, ...ShowcaseTab[]]
-
-export const SCHOLARSHIP_TABS: ShowcaseTabs = [
-  { key: 'featured', query: { featured: true } },
-  { key: 'recommended', query: { recommended: true } },
-  { key: 'hot', query: { hot: true } },
-  { key: 'full', query: { funding: 'FULLY' }, viewAll: 'funding=FULLY' },
-  { key: 'partial', query: { funding: 'PARTIAL' }, viewAll: 'funding=PARTIAL' },
-  { key: 'self', query: { funding: 'SELF' }, viewAll: 'funding=SELF' },
+export const SCHOLARSHIP_HIGHLIGHT_RAILS: HomeRail[] = [
+  { id: 'scholarshipFeatured', kind: 'scholarship', query: { featured: true } },
+  { id: 'scholarshipRecommended', kind: 'scholarship', query: { recommended: true } },
+  { id: 'scholarshipHot', kind: 'scholarship', query: { hot: true } },
 ]
 
-export const PROGRAM_TABS: ShowcaseTabs = [
-  { key: 'featured', query: { featured: true }, viewAll: 'featured=true' },
-  { key: 'hot', query: { hot: true } },
-  { key: 'newest', query: { sort: 'newest' } },
+/** One section per funding type, as the catalog filter understands them. */
+export const SCHOLARSHIP_FUNDING_RAILS: HomeRail[] = [
+  { id: 'scholarshipFull', kind: 'scholarship', query: { funding: 'FULLY' }, viewAll: 'funding=FULLY' },
+  { id: 'scholarshipPartial', kind: 'scholarship', query: { funding: 'PARTIAL' }, viewAll: 'funding=PARTIAL' },
+  { id: 'scholarshipSelf', kind: 'scholarship', query: { funding: 'SELF' }, viewAll: 'funding=SELF' },
+]
+
+export const PROGRAM_RAILS: HomeRail[] = [
+  { id: 'programFeatured', kind: 'program', query: { featured: true }, viewAll: 'featured=true' },
+  { id: 'programHot', kind: 'program', query: { hot: true } },
 ]

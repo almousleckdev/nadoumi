@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { imagery } from '~/data/imagery'
+import { PROGRAM_RAILS, SCHOLARSHIP_FUNDING_RAILS, SCHOLARSHIP_HIGHLIGHT_RAILS } from '~/data/homeShowcase'
 import profileImage from '~/assets/images/image1.png'
 import discoverImage from '~/assets/images/image.png'
 
@@ -58,9 +59,7 @@ const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => (
       </StorySplit>
     </NContainer>
 
-    <NContainer>
-      <CategoryShowcase kind="scholarship" />
-    </NContainer>
+    <CatalogRail v-for="rail in SCHOLARSHIP_HIGHLIGHT_RAILS" :key="rail.id" :rail="rail" />
 
     <NContainer>
       <StorySplit
@@ -77,9 +76,7 @@ const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => (
       </StorySplit>
     </NContainer>
 
-    <NContainer>
-      <CategoryShowcase kind="program" />
-    </NContainer>
+    <CatalogRail v-for="rail in [...SCHOLARSHIP_FUNDING_RAILS, ...PROGRAM_RAILS]" :key="rail.id" :rail="rail" />
 
     <NContainer>
       <DiscoverySection

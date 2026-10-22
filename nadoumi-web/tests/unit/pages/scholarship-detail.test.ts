@@ -60,10 +60,14 @@ describe('scholarship detail page', () => {
     // guest Apply routes to register
     expect(w.findAll('a').some(a => a.text() === 'Apply now' && a.attributes('href') === '/register')).toBe(true)
 
-    // the resolved (absolute) hero URL is used verbatim — not routed through /media
-    const srcs = w.findAll('img').map(i => i.attributes('src'))
-    expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/csc-hero.jpg')
-    expect(srcs.some(s => s?.startsWith('/media/'))).toBe(false)
+    // the cover is the full-bleed hero background (resolved URL used verbatim, never a side image)
+    const imgs = w.findAll('img')
+    expect(imgs.map(i => i.attributes('src'))).toEqual(['https://res.cloudinary.com/demo/image/upload/v1/csc-cover.jpg'])
+    expect(imgs[0]!.classes()).toContain('absolute')
+
+    // every price is red
+    const fee = w.findAll('span').find(el => el.text() === '¥710 · $100')
+    expect(fee?.classes()).toContain('text-red-600')
   })
 
   it('shows a not-available state for an unknown slug', async () => {

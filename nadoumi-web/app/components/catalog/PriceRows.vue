@@ -2,7 +2,7 @@
 export interface PriceRow {
   label: string
   note?: string | null
-  /** Shown on the right, e.g. "¥1,000 · $140". */
+  /** Shown on the right, e.g. "¥1,000 · $140". Always rendered red. */
   price: string
 }
 
@@ -18,9 +18,9 @@ defineProps<{ rows: PriceRow[] }>()
     >
       <span class="min-w-0 text-slate-700">
         {{ r.label }}
-        <span v-if="r.note" class="block text-xs text-slate-400">{{ r.note }}</span>
+        <span v-if="r.note" class="block text-xs text-slate-500">{{ r.note }}</span>
       </span>
-      <span class="shrink-0 font-semibold tabular-nums text-slate-900">{{ r.price }}</span>
+      <span class="shrink-0 font-semibold tabular-nums text-red-600">{{ r.price }}</span>
     </li>
   </ul>
 </template>

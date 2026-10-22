@@ -659,6 +659,7 @@ export default {
     summary: '简介', field: '专业方向',
     country: '国家', province: '省份', city: '城市',
     fundingModel: '资助方式', teachingLanguage: '授课语言',
+    websiteSections: '网站展示分区', recommendedByNadoumi: 'Nadoumi 推荐', websiteSectionsHint: '资助类型以及精选、推荐、热门决定该奖学金出现在首页的哪些分区。', categoriesSelfHint: '自费奖学金没有奖学金类别。',
     categories: '类别', categoriesHint: 'CSC、省级、A 类等',
     categoriesPartialHint: 'CSC、中国政府奖学金及政府 A 至 D 类均为全额资助项目，不适用于部分资助的奖学金。',
     levels: '学历层次',

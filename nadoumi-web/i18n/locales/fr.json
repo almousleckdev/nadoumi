@@ -155,29 +155,47 @@
       "show": "Afficher le témoignage {n}",
       "photoAlt": "Portrait de {name}"
     },
-    "showcase": {
-      "scholarships": {
+    "rails": {
+      "scholarshipFeatured": {
         "eyebrow": "Bourses",
-        "title": "Trouvez la bourse qui vous correspond",
-        "description": "Parcourez par catégorie : sélection à la une, recommandations Nadoumi, bourses populaires et tous les niveaux de financement.",
-        "empty": "Aucune bourse dans cette catégorie pour le moment."
+        "title": "Bourses à la une",
+        "description": "Des opportunités sélectionnées par notre équipe."
       },
-      "programs": {
+      "scholarshipRecommended": {
+        "eyebrow": "Bourses",
+        "title": "Recommandées par Nadoumi",
+        "description": "Les bourses que nos conseillers proposent en premier."
+      },
+      "scholarshipHot": {
+        "eyebrow": "Bourses",
+        "title": "Bourses populaires",
+        "description": "Ce que les étudiants demandent en ce moment."
+      },
+      "scholarshipFull": {
+        "eyebrow": "Financement complet",
+        "title": "Bourses entièrement financées",
+        "description": "Frais de scolarité, logement et vie quotidienne couverts."
+      },
+      "scholarshipPartial": {
+        "eyebrow": "Financement partiel",
+        "title": "Bourses partiellement financées",
+        "description": "Une partie de vos frais d’études est couverte."
+      },
+      "scholarshipSelf": {
+        "eyebrow": "Autofinancé",
+        "title": "Options autofinancées",
+        "description": "Étudiez avec le soutien de Nadoumi en prenant vos frais en charge."
+      },
+      "programFeatured": {
         "eyebrow": "Programmes",
-        "title": "Des programmes à découvrir",
-        "description": "Programmes à la une et tendances des universités de notre catalogue.",
-        "empty": "Aucun programme dans cette catégorie pour le moment."
+        "title": "Programmes à la une",
+        "description": "Des programmes à découvrir dans les universités de notre catalogue."
       },
-      "tabs": {
-        "featured": "À la une",
-        "recommended": "Recommandé par Nadoumi",
-        "hot": "Populaire",
-        "full": "Complète",
-        "partial": "Partielle",
-        "self": "Autofinancé",
-        "newest": "Récents"
-      },
-      "tablistLabel": "Catégories"
+      "programHot": {
+        "eyebrow": "Programmes",
+        "title": "Programmes populaires",
+        "description": "Programmes et cours de langue en vogue."
+      }
     }
   },
   "about": {

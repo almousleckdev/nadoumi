@@ -155,29 +155,47 @@
       "show": "عرض القصة {n}",
       "photoAlt": "صورة {name}"
     },
-    "showcase": {
-      "scholarships": {
+    "rails": {
+      "scholarshipFeatured": {
         "eyebrow": "المنح الدراسية",
-        "title": "اعثر على المنحة المناسبة لك",
-        "description": "تصفّح حسب الفئة: المنح المميزة وتوصيات نادومي والمنح الأكثر طلبًا وجميع مستويات التمويل.",
-        "empty": "لا توجد منح في هذه الفئة حتى الآن."
+        "title": "منح مميزة",
+        "description": "فرص اختارها فريقنا بعناية."
       },
-      "programs": {
+      "scholarshipRecommended": {
+        "eyebrow": "المنح الدراسية",
+        "title": "بتوصية من نادومي",
+        "description": "المنح التي يقترحها مستشارونا أولًا."
+      },
+      "scholarshipHot": {
+        "eyebrow": "المنح الدراسية",
+        "title": "منح الأكثر طلبًا",
+        "description": "ما يتقدم إليه الطلاب الآن."
+      },
+      "scholarshipFull": {
+        "eyebrow": "تمويل كامل",
+        "title": "منح ممولة بالكامل",
+        "description": "تغطي الرسوم الدراسية والسكن والمعيشة."
+      },
+      "scholarshipPartial": {
+        "eyebrow": "تمويل جزئي",
+        "title": "منح ممولة جزئيًا",
+        "description": "تغطية جزء من تكاليف دراستك."
+      },
+      "scholarshipSelf": {
+        "eyebrow": "تمويل ذاتي",
+        "title": "خيارات بالتمويل الذاتي",
+        "description": "ادرس بدعم نادومي مع تحمّل تكاليفك بنفسك."
+      },
+      "programFeatured": {
         "eyebrow": "البرامج",
-        "title": "برامج تستحق الاطلاع",
-        "description": "برامج مميزة ورائجة من الجامعات في كتالوجنا.",
-        "empty": "لا توجد برامج في هذه الفئة حتى الآن."
+        "title": "برامج مميزة",
+        "description": "برامج تستحق الاطلاع من جامعات كتالوجنا."
       },
-      "tabs": {
-        "featured": "مميزة",
-        "recommended": "بتوصية من نادومي",
-        "hot": "الأكثر طلبًا",
-        "full": "كاملة",
-        "partial": "جزئية",
-        "self": "تمويل ذاتي",
-        "newest": "الأحدث"
-      },
-      "tablistLabel": "الفئات"
+      "programHot": {
+        "eyebrow": "البرامج",
+        "title": "برامج رائجة",
+        "description": "برامج ودورات لغة رائجة."
+      }
     }
   },
   "about": {

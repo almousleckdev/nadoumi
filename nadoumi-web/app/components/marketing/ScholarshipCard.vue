@@ -21,9 +21,9 @@ const place = computed(() =>
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
     <CardMedia :src="scholarship.coverUrl ?? scholarship.coverImageUrl ?? scholarship.heroUrl ?? scholarship.heroImageUrl" :label="scholarship.title">
-      <span v-if="scholarship.hot" class="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-amber-950 shadow-xs">{{ t('scholarships.hot') }}</span>
-      <span v-else-if="scholarship.featured" class="rounded-full bg-brand-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs">{{ t('catalog.featured') }}</span>
-      <span v-if="scholarship.recommended" class="rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-brand-800 shadow-xs">{{ t('catalog.recommendedShort') }}</span>
+      <CardBadge v-if="scholarship.hot">{{ t('scholarships.hot') }}</CardBadge>
+      <CardBadge v-if="scholarship.featured">{{ t('catalog.featured') }}</CardBadge>
+      <CardBadge v-if="scholarship.recommended">{{ t('catalog.recommendedShort') }}</CardBadge>
     </CardMedia>
     <div class="flex flex-1 flex-col p-5">
     <div class="flex flex-wrap items-center gap-2">
@@ -32,7 +32,7 @@ const place = computed(() =>
       </span>
     </div>
 
-    <h3 class="mt-3 font-display text-base font-semibold text-slate-900 group-hover:text-brand-800">
+    <h3 class="mt-3 font-display text-base font-semibold text-slate-900 group-hover:underline">
       {{ scholarship.title }}
     </h3>
     <p v-if="scholarship.levels.length" class="mt-1 text-sm text-slate-500">
@@ -44,7 +44,7 @@ const place = computed(() =>
       <span class="text-slate-500">
         {{ scholarship.deadline ? t('catalog.deadline', { date: scholarship.deadline }) : t('catalog.rollingDeadline') }}
       </span>
-      <span class="inline-flex items-center gap-1 font-medium text-brand-700 group-hover:gap-2">
+      <span class="inline-flex items-center gap-1 font-medium text-slate-900 group-hover:gap-2">
         {{ t('scholarships.view') }}<span aria-hidden="true">→</span>
       </span>
     </div>

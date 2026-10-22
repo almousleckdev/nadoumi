@@ -155,29 +155,47 @@
       "show": "Mostrar la historia {n}",
       "photoAlt": "Retrato de {name}"
     },
-    "showcase": {
-      "scholarships": {
+    "rails": {
+      "scholarshipFeatured": {
         "eyebrow": "Becas",
-        "title": "Encuentra la beca que va contigo",
-        "description": "Explora por categoría: destacadas, recomendadas por Nadoumi, más buscadas y todos los niveles de financiación.",
-        "empty": "Todavía no hay becas en esta categoría."
+        "title": "Becas destacadas",
+        "description": "Oportunidades seleccionadas por nuestro equipo."
       },
-      "programs": {
+      "scholarshipRecommended": {
+        "eyebrow": "Becas",
+        "title": "Recomendadas por Nadoumi",
+        "description": "Las becas que nuestros asesores sugieren primero."
+      },
+      "scholarshipHot": {
+        "eyebrow": "Becas",
+        "title": "Becas populares",
+        "description": "A lo que los estudiantes aplican ahora mismo."
+      },
+      "scholarshipFull": {
+        "eyebrow": "Financiación total",
+        "title": "Becas totalmente financiadas",
+        "description": "Matrícula, alojamiento y gastos de vida cubiertos."
+      },
+      "scholarshipPartial": {
+        "eyebrow": "Financiación parcial",
+        "title": "Becas parcialmente financiadas",
+        "description": "Una parte de tus costes de estudio cubierta."
+      },
+      "scholarshipSelf": {
+        "eyebrow": "Autofinanciado",
+        "title": "Opciones autofinanciadas",
+        "description": "Estudia con el apoyo de Nadoumi cubriendo tus propios costes."
+      },
+      "programFeatured": {
         "eyebrow": "Programas",
-        "title": "Programas que vale la pena ver",
-        "description": "Programas destacados y en tendencia de las universidades de nuestro catálogo.",
-        "empty": "Todavía no hay programas en esta categoría."
+        "title": "Programas destacados",
+        "description": "Programas que vale la pena ver en las universidades de nuestro catálogo."
       },
-      "tabs": {
-        "featured": "Destacadas",
-        "recommended": "Recomendadas por Nadoumi",
-        "hot": "Populares",
-        "full": "Completa",
-        "partial": "Parcial",
-        "self": "Autofinanciada",
-        "newest": "Recientes"
-      },
-      "tablistLabel": "Categorías"
+      "programHot": {
+        "eyebrow": "Programas",
+        "title": "Programas populares",
+        "description": "Programas y cursos de idioma en tendencia."
+      }
     }
   },
   "about": {

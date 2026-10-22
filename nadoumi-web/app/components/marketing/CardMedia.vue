@@ -25,7 +25,7 @@ const initial = computed(() => props.label.trim().charAt(0).toUpperCase() || 'N'
     >
     <div
       v-else
-      class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-700 to-slate-900 font-display text-4xl font-bold text-white/80"
+      class="flex h-full w-full items-center justify-center bg-slate-100 font-display text-4xl font-bold text-slate-400"
       aria-hidden="true"
     >
       {{ initial }}

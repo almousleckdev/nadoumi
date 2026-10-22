@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProgramDetail } from '~/types/catalog'
+import type { DetailFact } from '~/components/catalog/DetailFacts.vue'
 import { programTuition } from '~/utils/programDisplay'
 
 const { t } = useI18n()
@@ -16,49 +17,69 @@ const applyTo = computed(() => localePath(status.value === 'authed' ? '/dashboar
 const universityTo = computed(() =>
   p.value ? localePath(`/universities/${p.value.universitySlug ?? p.value.universityId}`) : '#')
 
-const tuition = computed(() => (p.value ? programTuition(p.value) : { cny: '', usd: '' }))
-
-const facts = computed(() => {
+const levelLabels = computed(() => {
   const x = p.value
-  if (!x) return [] as { label: string, value: string }[]
-  return [
-    { label: t('program.language'), value: x.teachingLanguage ? t(`program.lang.${x.teachingLanguage}`) : '' },
-    { label: t('program.field'), value: x.field ?? '' },
-    { label: t('program.durationLabel'), value: x.durationMonths ? t('program.duration', { months: x.durationMonths }) : '' },
-    { label: t('program.tuition'), value: tuition.value.cny },
-  ].filter(f => f.value)
+  if (!x) return []
+  return x.programType === 'DEGREE' && x.levels?.length
+    ? x.levels.map(l => t(`program.level.${l}`))
+    : [t(`program.level.${x.programType}`)]
+})
+
+const facts = computed<DetailFact[]>(() => {
+  const x = p.value
+  if (!x) return []
+  const all: DetailFact[] = [
+    { label: t('program.language'), value: x.teachingLanguage ? t(`program.lang.${x.teachingLanguage}`) : '', icon: 'messages' },
+    { label: t('program.field'), value: x.field ?? '', icon: 'education' },
+    { label: t('program.durationLabel'), value: x.durationMonths ? t('program.duration', { months: x.durationMonths }) : '', icon: 'clock' },
+    { label: t('program.tuition'), value: programTuition(x).cny, icon: 'award', tone: 'price' },
+  ]
+  return all.filter(f => f.value)
 })
 </script>
 
 <template>
-  <div v-if="p">
-    <ProgramHero :program="p" :apply-to="applyTo" :university-to="universityTo" />
+  <DetailPage v-if="p" aside-first>
+    <template #hero>
+      <DetailHero
+        :image="p.imageUrl"
+        :title="p.name"
+        :eyebrow="p.nameCn"
+        :subtitle="p.universityName ? t('program.offeredBy', { university: p.universityName }) : null"
+        :back-to="localePath('/programs')"
+        :back-label="t('program.viewAll')"
+      >
+        <template #badges>
+          <HeroBadge v-for="lv in levelLabels" :key="lv">{{ lv }}</HeroBadge>
+          <HeroBadge v-if="p.hot">{{ t('program.hot') }}</HeroBadge>
+          <HeroBadge v-if="p.featured">{{ t('catalog.featured') }}</HeroBadge>
+        </template>
+        <template #actions>
+          <NButton :to="applyTo" size="lg">{{ t('program.applyNow') }}</NButton>
+        </template>
+      </DetailHero>
+    </template>
 
-    <NContainer>
-      <FactTiles v-if="facts.length" :items="facts" class="relative z-10 mt-6 lg:-mt-6" />
-      <div class="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-10 lg:py-10">
-        <div class="min-w-0 space-y-6">
-          <DetailCard v-if="p.summary" :title="t('program.fallbackTitle')">
-            <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
-          </DetailCard>
+    <template #facts>
+      <DetailFacts :items="facts" />
+    </template>
 
-          <ProgramMajors :majors="p.majors ?? []" />
+    <DetailCard v-if="p.summary" :title="t('program.fallbackTitle')">
+      <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
+    </DetailCard>
+    <ProgramMajors :majors="p.majors ?? []" />
+    <ProgramIntakes :intakes="p.intakes" />
 
-          <ProgramIntakes :intakes="p.intakes" />
-        </div>
+    <template #aside>
+      <ProgramAside :program="p" :apply-to="applyTo" :university-to="universityTo" />
+    </template>
+  </DetailPage>
 
-        <ProgramSidebar :program="p" :apply-to="applyTo" :university-to="universityTo" class="order-first lg:order-none" />
-      </div>
-    </NContainer>
-  </div>
-
-  <div v-else>
-    <PageHero :title="t('program.fallbackTitle')" />
-    <NContainer>
-      <p class="py-10 text-slate-600">{{ t('program.notAvailable') }}</p>
-      <NuxtLink :to="localePath('/universities')" class="text-sm font-medium text-brand-700 hover:text-brand-800">
-        ← {{ t('catalog.allUniversities') }}
-      </NuxtLink>
-    </NContainer>
-  </div>
+  <DetailNotFound
+    v-else
+    :title="t('program.fallbackTitle')"
+    :message="t('program.notAvailable')"
+    :back-to="localePath('/programs')"
+    :back-label="t('program.viewAll')"
+  />
 </template>

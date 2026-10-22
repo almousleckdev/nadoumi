@@ -88,7 +88,7 @@ function clearAll() {
               <button
                 v-if="hasActiveFilters"
                 type="button"
-                class="mt-4 text-sm font-medium text-brand-700 hover:text-brand-800"
+                class="mt-4 text-sm font-medium text-slate-900 underline"
                 @click="clearAll"
               >
                 {{ t('catalog.clearFilters') }}

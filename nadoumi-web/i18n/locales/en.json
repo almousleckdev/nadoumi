@@ -155,29 +155,47 @@
       "show": "Show story {n}",
       "photoAlt": "Portrait of {name}"
     },
-    "showcase": {
-      "scholarships": {
+    "rails": {
+      "scholarshipFeatured": {
         "eyebrow": "Scholarships",
-        "title": "Find the scholarship that fits you",
-        "description": "Browse by category: featured picks, Nadoumi recommendations, hot deals and every funding level.",
-        "empty": "No scholarships in this category yet."
+        "title": "Featured scholarships",
+        "description": "Hand-picked opportunities from our team."
       },
-      "programs": {
+      "scholarshipRecommended": {
+        "eyebrow": "Scholarships",
+        "title": "Recommended by Nadoumi",
+        "description": "The scholarships our advisers suggest first."
+      },
+      "scholarshipHot": {
+        "eyebrow": "Scholarships",
+        "title": "Hot scholarships",
+        "description": "What students are applying to right now."
+      },
+      "scholarshipFull": {
+        "eyebrow": "Fully funded",
+        "title": "Fully funded scholarships",
+        "description": "Tuition, accommodation and living costs covered."
+      },
+      "scholarshipPartial": {
+        "eyebrow": "Partially funded",
+        "title": "Partially funded scholarships",
+        "description": "A share of your study costs covered."
+      },
+      "scholarshipSelf": {
+        "eyebrow": "Self-funded",
+        "title": "Self-funded options",
+        "description": "Study with Nadoumi support while covering your own costs."
+      },
+      "programFeatured": {
         "eyebrow": "Programmes",
-        "title": "Programmes worth a look",
-        "description": "Featured and trending programmes from universities in our catalog.",
-        "empty": "No programmes in this category yet."
+        "title": "Featured programmes",
+        "description": "Programmes worth a look from universities in our catalog."
       },
-      "tabs": {
-        "featured": "Featured",
-        "recommended": "Recommended by Nadoumi",
-        "hot": "Hot",
-        "full": "Full",
-        "partial": "Partial",
-        "self": "Self funded",
-        "newest": "Newest"
-      },
-      "tablistLabel": "Categories"
+      "programHot": {
+        "eyebrow": "Programmes",
+        "title": "Hot programmes",
+        "description": "Trending programmes and language courses."
+      }
     }
   },
   "about": {

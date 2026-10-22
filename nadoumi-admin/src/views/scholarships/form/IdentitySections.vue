@@ -77,42 +77,53 @@ watch(() => form.fundingModel, () => {
   </FormSection>
 
   <FormSection :title="t('scholarship.secClassification')">
-    <div class="row">
-      <el-form-item
-        :label="t('scholarship.fundingModel')"
-        prop="fundingModel"
-      >
-        <el-select v-model="form.fundingModel">
-          <el-option
-            v-for="f in FUNDING"
-            :key="f"
-            :value="f"
-            :label="t(`scholarship.funding.${f}`)"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item :label="t('scholarship.teachingLanguage')">
-        <el-select
-          v-model="form.teachingLanguage"
-          clearable
-        >
-          <el-option
-            v-for="l in LANGS"
-            :key="l"
-            :value="l"
-            :label="t(`scholarship.lang.${l}`)"
-          />
-        </el-select>
-      </el-form-item>
-    </div>
     <el-form-item
-      v-if="form.fundingModel !== 'SELF'"
-      :label="t('scholarship.categories')"
+      :label="t('scholarship.websiteSections')"
+      prop="fundingModel"
     >
+      <el-radio-group v-model="form.fundingModel">
+        <el-radio-button
+          v-for="f in FUNDING"
+          :key="f"
+          :value="f"
+        >
+          {{ t(`scholarship.funding.${f}`) }}
+        </el-radio-button>
+      </el-radio-group>
+      <div class="flags">
+        <el-checkbox v-model="form.featured">
+          {{ t('scholarship.featured') }}
+        </el-checkbox>
+        <el-checkbox v-model="form.recommended">
+          {{ t('scholarship.recommendedByNadoumi') }}
+        </el-checkbox>
+        <el-checkbox v-model="form.hot">
+          {{ t('scholarship.hot') }}
+        </el-checkbox>
+      </div>
+      <p class="hint">
+        {{ t('scholarship.websiteSectionsHint') }}
+      </p>
+    </el-form-item>
+    <el-form-item :label="t('scholarship.teachingLanguage')">
+      <el-select
+        v-model="form.teachingLanguage"
+        clearable
+      >
+        <el-option
+          v-for="l in LANGS"
+          :key="l"
+          :value="l"
+          :label="t(`scholarship.lang.${l}`)"
+        />
+      </el-select>
+    </el-form-item>
+    <el-form-item :label="t('scholarship.categories')">
       <el-select
         v-model="form.categoryCodes"
         multiple
         filterable
+        :disabled="form.fundingModel === 'SELF'"
         :placeholder="t('scholarship.categoriesHint')"
       >
         <el-option
@@ -127,6 +138,12 @@ watch(() => form.fundingModel, () => {
         class="hint"
       >
         {{ t('scholarship.categoriesPartialHint') }}
+      </p>
+      <p
+        v-else-if="form.fundingModel === 'SELF'"
+        class="hint"
+      >
+        {{ t('scholarship.categoriesSelfHint') }}
       </p>
     </el-form-item>
     <el-form-item

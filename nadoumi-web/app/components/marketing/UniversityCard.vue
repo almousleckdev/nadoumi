@@ -26,7 +26,7 @@ const typeLabel = computed(() => {
     class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[17rem] sm:w-[19rem]' : 'w-full'"
   >
-    <div class="relative flex h-28 items-center justify-center overflow-hidden bg-gradient-to-br from-brand-500 to-brand-700">
+    <div class="relative flex h-28 items-center justify-center overflow-hidden bg-slate-100">
       <img
         v-if="university.bannerUrl ?? university.coverImageUrl"
         :src="mediaUrl(university.bannerUrl ?? university.coverImageUrl)"
@@ -43,15 +43,12 @@ const typeLabel = computed(() => {
         decoding="async"
         class="absolute bottom-2 right-2 h-12 w-12 rounded-lg bg-white/95 object-contain p-1 shadow-md ring-1 ring-white/40"
       >
-      <span v-else class="relative font-display text-3xl font-bold text-white/95">{{ monogram }}</span>
-      <span
-        v-if="university.featured"
-        class="absolute right-3 top-3 rounded-full bg-white/90 px-2 py-0.5 text-[0.7rem] font-semibold text-brand-800"
-      >{{ t('catalog.featured') }}</span>
+      <span v-else class="relative font-display text-3xl font-bold text-slate-400">{{ monogram }}</span>
+      <CardBadge v-if="university.featured" class="absolute left-3 top-3">{{ t('catalog.featured') }}</CardBadge>
     </div>
 
     <div class="flex flex-1 flex-col gap-1 p-4">
-      <h3 class="font-display text-base font-semibold text-slate-900 group-hover:text-brand-800">
+      <h3 class="font-display text-base font-semibold text-slate-900 group-hover:underline">
         {{ university.name }}
       </h3>
       <p v-if="university.nameCn" class="text-sm text-slate-500">{{ university.nameCn }}</p>
@@ -59,7 +56,7 @@ const typeLabel = computed(() => {
       <div class="mt-3 flex items-center gap-2">
         <NBadge v-if="typeLabel" tone="neutral">{{ typeLabel }}</NBadge>
       </div>
-      <span class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-brand-700 group-hover:gap-2">
+      <span class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-slate-900 group-hover:gap-2">
         {{ t('catalog.viewUniversity') }}<span aria-hidden="true">→</span>
       </span>
     </div>

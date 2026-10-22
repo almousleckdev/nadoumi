@@ -673,3 +673,65 @@ Inspect the code.
 When an architectural decision is required, document the decision and explain the trade-offs.
 
 Prioritize correctness, security, maintainability, and business integrity over speed of implementation.
+
+---
+
+# 24. Frontend Design System (MANDATORY)
+
+These rules apply to every page and component in `nadoumi-web`. They are not
+suggestions. A change that breaks them is not done, whatever else it does.
+
+## Shared components first
+
+* **Never create a one-off page layout.** Pages of the same kind are built from the
+  same shared components. Scholarship, programme and university detail pages all
+  use `DetailPage`, `DetailHero`, `DetailFacts`, `DetailCard`, `DetailSidebarCard`,
+  `PriceRows` and `DetailNotFound` from `app/components/catalog/`. A new detail
+  page (or a change to one) is made by changing or reusing those components, never
+  by copying markup into a page.
+* Before writing markup, look in `app/components/` for an existing component. If
+  two places need the same thing, extract it once and reuse it. Duplicated markup
+  across pages is a defect.
+* Cards (`ScholarshipCard`, `ProgramCard`, `UniversityCard`) share `CardMedia`.
+  Home category sections share `CategoryShowcase`.
+
+## Colour
+
+* The canvas is **plain white** (`bg-white`), text is neutral (`slate`), borders are
+  neutral (`slate-200`). Nothing else gets a colour.
+* The **Nadoumi brand colour is for buttons and icons only.** Do not use brand
+  colour for headings, links, chips, badges, card borders, backgrounds, gradients or
+  sections.
+* **Prices and fees are always red** (`text-red-600`): fees, tuition, stipend and
+  accommodation amounts, application and service fees. Use `PriceRows` or the
+  `price` fact tone so this cannot drift.
+* No other accent colours (amber, emerald, blue, ...) for decoration or status
+  chips. Use neutral chips. Error and validation states may use red.
+* Do not invent new colours, gradients or per-page themes. If a new colour seems
+  necessary, stop and ask.
+
+## Detail pages
+
+* The **cover image is the hero background**, full width, with a neutral dark scrim
+  so white text stays legible. It is never placed in a side column or a card.
+  Scholarship uses its cover (then hero) image, programme its image, university its
+  banner (then cover) image. No image means a plain neutral dark hero.
+* Every detail page has the same skeleton: hero, key facts, main column of
+  `DetailCard`s, sidebar of `DetailSidebarCard`s (sidebar first on mobile when it
+  carries the deadline or price). Order, spacing and typography are identical.
+* Layouts are mobile-first and must not scroll horizontally; use stacked or wrapping
+  rows rather than wide tables.
+
+## Home and catalog
+
+* Each scholarship funding type (Fully funded, Partially funded, Self-funded) has
+  its **own section** on the home page, in addition to the Featured, Recommended by
+  Nadoumi and Hot sections.
+
+## Enforcement
+
+* Update `docs/FRONTEND_ARCHITECTURE.md` in the same change when a shared component
+  is added or its contract changes.
+* Reviewers reject: copied detail-page markup, brand-coloured text or chips,
+  non-red prices, side-column cover images, new colour themes.
+

@@ -10,3 +10,4 @@
 .line > .w-52 { flex: 0 0 13rem; }
 .line > .w-56 { flex: 0 0 14rem; }
 .hint { margin: 2px 0 8px; font-size: 12px; color: var(--nad-ink-soft); }
+.flags { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 10px; width: 100%; }

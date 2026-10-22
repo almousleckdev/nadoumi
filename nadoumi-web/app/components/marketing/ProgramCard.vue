@@ -32,8 +32,8 @@ const levelLabel = computed(() => {
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
     <CardMedia :src="program.imageUrl" :label="program.name">
-      <span v-if="program.hot" class="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-amber-950 shadow-xs">{{ t('program.hot') }}</span>
-      <span v-else-if="program.featured" class="rounded-full bg-brand-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs">{{ t('catalog.featured') }}</span>
+      <CardBadge v-if="program.hot">{{ t('program.hot') }}</CardBadge>
+      <CardBadge v-if="program.featured">{{ t('catalog.featured') }}</CardBadge>
     </CardMedia>
     <div class="flex flex-1 flex-col p-5">
       <div class="flex flex-wrap items-center gap-2">
@@ -48,7 +48,7 @@ const levelLabel = computed(() => {
         </span>
       </div>
 
-      <h3 class="mt-3 font-display text-base font-semibold text-slate-900 group-hover:text-brand-800">
+      <h3 class="mt-3 font-display text-base font-semibold text-slate-900 group-hover:underline">
         {{ program.name }}
       </h3>
       <p v-if="program.nameCn" class="mt-0.5 text-sm text-slate-400">{{ program.nameCn }}</p>
@@ -62,7 +62,7 @@ const levelLabel = computed(() => {
           <template v-if="program.durationMonths">{{ t('program.duration', { months: program.durationMonths }) }}</template>
           <template v-else-if="tuition">{{ tuition }}</template>
         </span>
-        <span class="inline-flex items-center gap-1 font-medium text-brand-700 group-hover:gap-2">
+        <span class="inline-flex items-center gap-1 font-medium text-slate-900 group-hover:gap-2">
           {{ t('program.view') }}<span aria-hidden="true">→</span>
         </span>
       </div>

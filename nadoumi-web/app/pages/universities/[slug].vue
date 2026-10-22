@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProgramCard, UniversityDetail, UniversityHighlight } from '~/types/catalog'
+import type { DetailFact } from '~/components/catalog/DetailFacts.vue'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -23,17 +24,23 @@ function highlightsOf(kind: UniversityHighlight['kind']): UniversityHighlight[] 
   return (u.value?.highlights ?? []).filter(h => h.kind === kind)
 }
 
-const facts = computed(() => {
+const facts = computed<DetailFact[]>(() => {
   const x = u.value
-  if (!x) return [] as { label: string, value: string }[]
-  return [
-    { label: t('university.founded'), value: x.foundedYear ? String(x.foundedYear) : '' },
-    { label: t('university.students'), value: num(x.totalStudents) },
-    { label: t('university.intlStudents'), value: num(x.internationalStudents) },
-    { label: t('university.faculty'), value: num(x.facultyCount) },
-    { label: t('university.rankingTier'), value: x.rankingTier ?? '' },
-  ].filter(f => f.value)
+  if (!x) return []
+  const all: DetailFact[] = [
+    { label: t('university.founded'), value: x.foundedYear ? String(x.foundedYear) : '', icon: 'calendar' },
+    { label: t('university.students'), value: num(x.totalStudents), icon: 'contacts' },
+    { label: t('university.intlStudents'), value: num(x.internationalStudents), icon: 'location' },
+    { label: t('university.faculty'), value: num(x.facultyCount), icon: 'profile' },
+    { label: t('university.rankingTier'), value: x.rankingTier ?? '', icon: 'award' },
+  ]
+  return all.filter(f => f.value)
 })
+
+const place = computed(() => [u.value?.city, u.value?.province, u.value?.country].filter(Boolean).join(', '))
+const typeLabel = computed(() =>
+  u.value?.type === 'PUBLIC' ? t('catalog.typePublic') : u.value?.type === 'PRIVATE' ? t('catalog.typePrivate') : '',
+)
 
 const prose = computed(() => {
   const x = u.value
@@ -49,63 +56,61 @@ const prose = computed(() => {
 </script>
 
 <template>
-  <div v-if="u">
-    <UniversityHero :university="u" />
+  <DetailPage v-if="u">
+    <template #hero>
+      <DetailHero
+        :image="u.bannerUrl ?? u.coverImageUrl"
+        :logo="u.logoUrl ?? u.logoImageUrl"
+        :title="u.name"
+        :eyebrow="u.nameCn"
+        :subtitle="place"
+        :back-to="localePath('/universities')"
+        :back-label="t('catalog.allUniversities')"
+      >
+        <template #badges>
+          <HeroBadge v-if="typeLabel">{{ typeLabel }}</HeroBadge>
+          <HeroBadge v-if="u.recommended">{{ t('catalog.recommendedShort') }}</HeroBadge>
+          <HeroBadge v-if="u.featured">{{ t('catalog.featured') }}</HeroBadge>
+        </template>
+      </DetailHero>
+    </template>
 
-    <NContainer>
-      <FactTiles v-if="facts.length" :items="facts" class="relative z-10 mt-6 lg:-mt-6" />
-      <div class="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10 lg:py-10">
-        <div class="min-w-0 space-y-6">
-          <DetailCard v-for="p in prose" :key="p.heading" :title="p.heading">
-            <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.body }}</p>
-          </DetailCard>
+    <template #facts>
+      <DetailFacts :items="facts" />
+    </template>
 
-          <div v-if="highlightsOf('HIGHLIGHT').length || highlightsOf('ADVANTAGE').length" class="grid gap-6 md:grid-cols-2">
-            <DetailCard v-if="highlightsOf('HIGHLIGHT').length" :title="t('university.highlights')">
-              <ul class="space-y-2.5">
-                <li v-for="h in highlightsOf('HIGHLIGHT')" :key="h.id" class="flex gap-2.5 text-slate-700">
-                  <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
-                </li>
-              </ul>
-            </DetailCard>
-            <DetailCard v-if="highlightsOf('ADVANTAGE').length" :title="t('university.advantages')">
-              <ul class="space-y-2.5">
-                <li v-for="h in highlightsOf('ADVANTAGE')" :key="h.id" class="flex gap-2.5 text-slate-700">
-                  <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
-                </li>
-              </ul>
-            </DetailCard>
-          </div>
+    <DetailCard v-for="p in prose" :key="p.heading" :title="p.heading">
+      <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.body }}</p>
+    </DetailCard>
 
-          <DetailCard :title="t('university.programmes')" :description="t('program.sectionIntro')">
-            <div v-if="programs.length" class="grid gap-4 sm:grid-cols-2">
-              <ProgramCard
-                v-for="p in programs"
-                :key="p.id"
-                :program="p"
-                :show-university="false"
-              />
-            </div>
-            <p v-else class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-sm text-slate-500">
-              {{ t('university.programmesEmpty') }}
-            </p>
-          </DetailCard>
+    <DetailCard v-if="highlightsOf('HIGHLIGHT').length" :title="t('university.highlights')">
+      <BulletList :items="highlightsOf('HIGHLIGHT').map(h => ({ text: h.text }))" />
+    </DetailCard>
+    <DetailCard v-if="highlightsOf('ADVANTAGE').length" :title="t('university.advantages')">
+      <BulletList :items="highlightsOf('ADVANTAGE').map(h => ({ text: h.text }))" />
+    </DetailCard>
 
-          <UniversityGallery :images="u.gallery" />
-        </div>
-
-        <UniversitySidebar :university="u" />
+    <DetailCard :title="t('university.programmes')" :description="t('program.sectionIntro')">
+      <div v-if="programs.length" class="grid gap-4 sm:grid-cols-2">
+        <ProgramCard v-for="p in programs" :key="p.id" :program="p" :show-university="false" />
       </div>
-    </NContainer>
-  </div>
+      <p v-else class="rounded-xl border border-dashed border-slate-200 p-6 text-sm text-slate-500">
+        {{ t('university.programmesEmpty') }}
+      </p>
+    </DetailCard>
 
-  <div v-else>
-    <PageHero :title="t('catalog.universityFallbackTitle')" />
-    <NContainer>
-      <p class="py-10 text-slate-600">{{ t('catalog.universityUnavailable') }}</p>
-      <NuxtLink :to="localePath('/universities')" class="text-sm font-medium text-brand-700 hover:text-brand-800">
-        ← {{ t('catalog.allUniversities') }}
-      </NuxtLink>
-    </NContainer>
-  </div>
+    <UniversityGallery :images="u.gallery" />
+
+    <template #aside>
+      <UniversityAside :university="u" />
+    </template>
+  </DetailPage>
+
+  <DetailNotFound
+    v-else
+    :title="t('catalog.universityFallbackTitle')"
+    :message="t('catalog.universityUnavailable')"
+    :back-to="localePath('/universities')"
+    :back-label="t('catalog.allUniversities')"
+  />
 </template>

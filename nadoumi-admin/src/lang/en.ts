@@ -659,6 +659,7 @@ export default {
     summary: 'Summary', field: 'Field / discipline',
     country: 'Country', province: 'Province', city: 'City',
     fundingModel: 'Funding model', teachingLanguage: 'Teaching language',
+    websiteSections: 'Website sections', recommendedByNadoumi: 'Recommended by Nadoumi', websiteSectionsHint: 'Funding type, Featured, Recommended and Hot decide which home page sections list this scholarship.', categoriesSelfHint: 'Self-funded scholarships have no scholarship scheme.',
     categories: 'Categories', categoriesHint: 'CSC, provincial, Type A…',
     categoriesPartialHint: 'CSC, CGS and government Type A to D are fully-funded schemes and are not available for a partially-funded scholarship.',
     levels: 'Education levels',

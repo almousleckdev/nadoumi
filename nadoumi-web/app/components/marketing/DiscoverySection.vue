@@ -37,10 +37,6 @@ const carousel = ref<{ scrollPrev: () => void, scrollNext: () => void, atStart: 
       </template>
     </SectionHeading>
 
-    <div v-if="$slots.tabs" class="mt-5">
-      <slot name="tabs" />
-    </div>
-
     <div class="mt-6">
       <div v-if="pending" class="flex gap-4 overflow-hidden" aria-hidden="true">
         <NSkeleton
@@ -61,7 +57,7 @@ const carousel = ref<{ scrollPrev: () => void, scrollNext: () => void, atStart: 
     <div v-if="viewAllTo && !pending && !error && !empty" class="mt-6 flex justify-end">
       <NuxtLink
         :to="viewAllTo"
-        class="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 no-underline hover:gap-2.5 hover:text-brand-800"
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-slate-900 no-underline hover:gap-2.5"
       >
         {{ viewAllLabel || 'View all' }}
         <span aria-hidden="true">→</span>

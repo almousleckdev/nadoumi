@@ -106,17 +106,6 @@ defineExpose({ uploadTasks })
         />
       </el-form-item>
     </div>
-    <el-form-item>
-      <el-checkbox v-model="form.featured">
-        {{ t('scholarship.featured') }}
-      </el-checkbox>
-      <el-checkbox v-model="form.recommended">
-        {{ t('scholarship.recommended') }}
-      </el-checkbox>
-      <el-checkbox v-model="form.hot">
-        {{ t('scholarship.hot') }}
-      </el-checkbox>
-    </el-form-item>
     <div class="row">
       <el-form-item
         :label="t('scholarship.status')"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ScholarshipDetail } from '~/types/catalog'
+import type { DetailFact } from '~/components/catalog/DetailFacts.vue'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -11,44 +12,75 @@ useSeo(
   s.value?.summary?.slice(0, 155) ?? t('catalog.scholarshipsSubtitle'),
 )
 
-const facts = computed(() => {
+const applyTo = computed(() => localePath(status.value === 'authed' ? '/dashboard' : '/register'))
+const place = computed(() => [s.value?.city, s.value?.province, s.value?.country].filter(Boolean).join(', '))
+const heroImage = computed(() => s.value?.coverUrl ?? s.value?.coverImageUrl ?? s.value?.heroUrl ?? s.value?.heroImageUrl)
+
+const facts = computed<DetailFact[]>(() => {
   const x = s.value
   if (!x) return []
   const channel = x.applicationChannel
     ? t(`scholarships.channel.${x.applicationChannel}`, x.applicationChannel) + (x.agencyNumber ? ` (${x.agencyNumber})` : '')
     : ''
-  return [
-    { label: t('scholarships.colDeadline'), value: x.deadline ?? t('catalog.rollingDeadline') },
-    { label: t('scholarships.colLevel'), value: x.levels.map(l => t(`scholarships.level.${l}`)).join(', ') },
-    { label: t('scholarships.colLanguage'), value: x.teachingLanguage ? t(`scholarships.lang.${x.teachingLanguage}`) : '' },
-    { label: t('scholarships.colField'), value: fieldsLabel(x.fields, t) },
-    { label: t('scholarships.nonDegreeDuration'), value: x.nonDegreeDuration ? t(`scholarships.nonDegree.${x.nonDegreeDuration}`, x.nonDegreeDuration) : '' },
-    { label: t('scholarships.studyDuration'), value: x.studyDurationMonths ? t('scholarships.stipendDuration', { n: x.studyDurationMonths }) : '' },
-    { label: t('scholarships.applicationChannel'), value: channel },
-  ].filter(f => f.value)
+  const duration = x.nonDegreeDuration
+    ? t(`scholarships.nonDegree.${x.nonDegreeDuration}`, x.nonDegreeDuration)
+    : x.studyDurationMonths ? t('scholarships.stipendDuration', { n: x.studyDurationMonths }) : ''
+  const all: (DetailFact | false)[] = [
+    { label: t('scholarships.colDeadline'), value: x.deadline ?? t('catalog.rollingDeadline'), icon: 'calendar' },
+    { label: t('scholarships.colLevel'), value: x.levels.map(l => t(`scholarships.level.${l}`)).join(', '), icon: 'award' },
+    { label: t('scholarships.colLanguage'), value: x.teachingLanguage ? t(`scholarships.lang.${x.teachingLanguage}`) : '', icon: 'messages' },
+    { label: t('scholarships.colField'), value: fieldsLabel(x.fields, t), icon: 'education' },
+    { label: t('scholarships.studyDuration'), value: duration, icon: 'clock' },
+    { label: t('scholarships.applicationChannel'), value: channel, icon: 'applications' },
+  ]
+  return all.filter((f): f is DetailFact => f !== false && f.value !== '')
 })
-
-const applyTo = computed(() => localePath(status.value === 'authed' ? '/dashboard' : '/register'))
 </script>
 
 <template>
-  <div v-if="s">
-    <ScholarshipHero :s="s" :apply-to="applyTo" />
+  <DetailPage v-if="s" aside-first>
+    <template #hero>
+      <DetailHero
+        :image="heroImage"
+        :title="s.title"
+        :eyebrow="s.referenceCode"
+        :subtitle="place"
+        :back-to="localePath('/scholarships')"
+        :back-label="t('catalog.backToList')"
+      >
+        <template #badges>
+          <HeroBadge>{{ t(`scholarships.funding.${s.fundingModel}`) }}</HeroBadge>
+          <HeroBadge v-if="s.hasStipend">{{ t('scholarships.withStipend') }}</HeroBadge>
+          <HeroBadge v-if="s.hot">{{ t('scholarships.hot') }}</HeroBadge>
+          <HeroBadge v-if="s.featured">{{ t('catalog.featured') }}</HeroBadge>
+          <HeroBadge v-if="s.recommended">{{ t('catalog.recommendedShort') }}</HeroBadge>
+          <HeroBadge v-for="c in s.categories" :key="c">{{ t(`scholarships.category.${c}`, c) }}</HeroBadge>
+        </template>
+        <template #actions>
+          <NButton :to="applyTo" size="lg">{{ t('scholarships.applyNow') }}</NButton>
+        </template>
+      </DetailHero>
+    </template>
 
-    <NContainer>
-      <FactTiles v-if="facts.length" :items="facts" class="relative z-10 mt-6 lg:-mt-6" />
-      <div class="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-10 lg:py-10">
-        <ScholarshipSections :s="s" />
-        <ScholarshipSidebar :s="s" class="order-first lg:order-none" />
-      </div>
-    </NContainer>
-  </div>
+    <template #facts>
+      <DetailFacts :items="facts" />
+    </template>
 
-  <div v-else>
-    <PageHero :title="t('catalog.scholarshipsTitle')" />
-    <NContainer>
-      <p class="py-10 text-slate-600">{{ t('scholarships.notFound') }}</p>
-      <NuxtLink :to="localePath('/scholarships')" class="text-sm font-medium text-brand-700">← {{ t('catalog.backToList') }}</NuxtLink>
-    </NContainer>
-  </div>
+    <DetailCard v-if="s.summary">
+      <p class="leading-7 text-slate-700">{{ s.summary }}</p>
+    </DetailCard>
+    <ScholarshipSections :s="s" />
+
+    <template #aside>
+      <ScholarshipAside :s="s" />
+    </template>
+  </DetailPage>
+
+  <DetailNotFound
+    v-else
+    :title="t('catalog.scholarshipsTitle')"
+    :message="t('scholarships.notFound')"
+    :back-to="localePath('/scholarships')"
+    :back-label="t('catalog.backToList')"
+  />
 </template>
