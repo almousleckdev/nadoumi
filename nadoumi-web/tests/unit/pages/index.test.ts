@@ -1,6 +1,6 @@
-import { describe, it, expect, vi } from 'vitest'
+import { afterEach, describe, it, expect, vi } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
-import { flushPromises } from '@vue/test-utils'
+import { enableAutoUnmount, flushPromises } from '@vue/test-utils'
 import Home from '~/pages/index.vue'
 import type { Page, ProgramCard, ScholarshipCard, UniversitySummary } from '~/types/catalog'
 
@@ -29,7 +29,12 @@ const prog: ProgramCard = {
 const publicGet = vi.fn<(p: string, q?: Record<string, unknown>) => Promise<unknown>>()
 mockNuxtImport('useApi', () => () => ({ publicGet, publicPost: vi.fn(), studentFetch: vi.fn() }))
 
+// async-data is shared by key across the Nuxt app, so a still-mounted page from an earlier test would answer a tab refresh
+enableAutoUnmount(afterEach)
+
 describe('home landing page', () => {
+  afterEach(() => clearNuxtData())
+
   it('renders the hero, real university + scholarship carousels, the journey and the CTA', async () => {
     publicGet.mockImplementation((resource) => {
       if (resource === 'scholarships') return Promise.resolve(page([sch]))
@@ -44,11 +49,14 @@ describe('home landing page', () => {
     expect(text).toContain('Featured universities')
     expect(text).toContain('Peking University')
     // real scholarship carousels
-    expect(text).toContain('New scholarships')
-    expect(text).toContain('Fully funded scholarships')
+    expect(text).toContain('Find the scholarship that fits you')
     expect(text).toContain('CSC Master Scholarship')
-    // real hot-programmes carousel (R2)
-    expect(text).toContain('Hot programmes and language courses')
+    // category tabs for scholarships: featured, recommended, hot, then every funding level
+    for (const tab of ['Featured', 'Recommended by Nadoumi', 'Hot', 'Full', 'Partial', 'Self funded']) {
+      expect(text).toContain(tab)
+    }
+    // real programmes carousel with its own category tabs
+    expect(text).toContain('Programmes worth a look')
     expect(text).toContain('Chinese Language Programme')
     expect(text).toContain('Your journey with Nadoumi')
     expect(text).toContain('Apply now')
@@ -64,8 +72,25 @@ describe('home landing page', () => {
     const w = await mountSuspended(Home)
     await flushPromises()
     expect(w.text()).toContain('No featured universities are published yet.')
-    expect(w.text()).toContain('No scholarships are published yet.')
-    expect(w.text()).toContain('No programmes are featured yet.')
+    expect(w.text()).toContain('No scholarships in this category yet.')
+    expect(w.text()).toContain('No programmes in this category yet.')
     expect(w.text()).not.toContain('undefined')
+  })
+
+  it('queries the matching filter when a category tab is selected', async () => {
+    publicGet.mockImplementation((resource) => {
+      if (resource === 'scholarships') return Promise.resolve(page([sch]))
+      if (resource === 'programs') return Promise.resolve(page([prog]))
+      return Promise.resolve(page([uni]))
+    })
+    const w = await mountSuspended(Home)
+    await flushPromises()
+
+    const partial = w.findAll('button').find(b => b.text() === 'Partial')
+    await partial?.trigger('click')
+
+    await vi.waitFor(() => {
+      expect(publicGet).toHaveBeenCalledWith('scholarships', expect.objectContaining({ funding: 'PARTIAL' }))
+    })
   })
 })

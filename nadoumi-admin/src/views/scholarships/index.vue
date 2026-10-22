@@ -81,6 +81,28 @@
       @retry="load"
       @row-click="(row) => router.push(`/scholarships/${row.view.id}`)"
     >
+      <template #cell-media="{ row }">
+        <div class="s-media">
+          <img
+            v-if="logoOf(row as Scholarship)"
+            :src="logoOf(row as Scholarship)"
+            alt=""
+            class="s-media__logo"
+            loading="lazy"
+          >
+          <img
+            v-if="coverOf(row as Scholarship)"
+            :src="coverOf(row as Scholarship)"
+            alt=""
+            class="s-media__cover"
+            loading="lazy"
+          >
+          <span
+            v-if="!logoOf(row as Scholarship) && !coverOf(row as Scholarship)"
+            class="s-media__none"
+          >&mdash;</span>
+        </div>
+      </template>
       <template #cell-referenceCode="{ row }">
         <span class="s-ref">{{ (row as Scholarship).view.referenceCode || '' }}</span>
       </template>
@@ -114,10 +136,31 @@
         {{ t(`scholarship.funding.${(row as Scholarship).view.fundingModel}`) }}
       </template>
       <template #cell-levels="{ row }">
-        {{ (row as Scholarship).view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '' }}
+        <div class="s-tags">
+          <el-tag
+            v-for="l in (row as Scholarship).view.levels"
+            :key="l"
+            size="small"
+            effect="plain"
+            disable-transitions
+          >
+            {{ t(`scholarship.level.${l}`) }}
+          </el-tag>
+        </div>
       </template>
       <template #cell-categories="{ row }">
-        {{ (row as Scholarship).view.categories.join(', ') || '' }}
+        <div class="s-tags">
+          <el-tag
+            v-for="c in (row as Scholarship).view.categories"
+            :key="c"
+            size="small"
+            type="info"
+            effect="plain"
+            disable-transitions
+          >
+            {{ c }}
+          </el-tag>
+        </div>
       </template>
       <template #cell-publishStatus="{ row }">
         <StatusBadge
@@ -171,6 +214,7 @@ import StatusBadge from '@/components/ui/StatusBadge.vue'
 import type { DataTableColumn } from '@/components/ui/types'
 import ScholarshipDrawer from './ScholarshipDrawer.vue'
 import { usePagedList } from '@/composables/usePagedList'
+import { assetUrl } from '@/utils/asset'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -195,15 +239,19 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
   })
 
 const columns: DataTableColumn[] = [
+  { prop: 'media', label: t('scholarship.secMedia'), width: 130 },
   { prop: 'referenceCode', label: t('scholarship.referenceCode'), width: 130 },
   { prop: 'title', label: t('scholarship.title'), minWidth: 240 },
   { prop: 'country', label: t('scholarship.country'), width: 80, align: 'center' },
   { prop: 'funding', label: t('scholarship.fundingModel'), width: 130 },
-  { prop: 'levels', label: t('scholarship.levels'), width: 180 },
-  { prop: 'categories', label: t('scholarship.categories'), width: 150 },
+  { prop: 'levels', label: t('scholarship.levels'), minWidth: 200 },
+  { prop: 'categories', label: t('scholarship.categories'), minWidth: 160 },
   { prop: 'publishStatus', label: t('scholarship.publishStatus'), width: 120 },
   { prop: 'actions', label: '', width: 130, align: 'right' },
 ]
+
+const logoOf = (s: Scholarship) => assetUrl(s.view.heroUrl ?? s.view.heroImageUrl)
+const coverOf = (s: Scholarship) => assetUrl(s.view.coverUrl ?? s.view.coverImageUrl)
 
 const drawerOpen = ref(false)
 const editing = ref<Scholarship | null>(null)
@@ -230,5 +278,10 @@ onMounted(load)
 <style scoped>
 .mono { font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
 .s-title { display: flex; align-items: center; gap: 8px; }
+.s-media { display: flex; align-items: center; gap: 6px; }
+.s-media__logo { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; border: 1px solid var(--nad-border, #e5e7eb); }
+.s-media__cover { width: 64px; height: 36px; border-radius: 6px; object-fit: cover; border: 1px solid var(--nad-border, #e5e7eb); }
+.s-media__none { color: var(--nad-ink-soft); }
+.s-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 .s-ref { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--nad-ink-soft); }
 </style>

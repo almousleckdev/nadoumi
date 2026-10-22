@@ -20,21 +20,16 @@ const place = computed(() =>
     class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
-    <img
-      v-if="scholarship.coverUrl ?? scholarship.coverImageUrl"
-      :src="mediaUrl(scholarship.coverUrl ?? scholarship.coverImageUrl)"
-      alt=""
-      loading="lazy"
-      decoding="async"
-      class="h-32 w-full object-cover"
-    >
+    <CardMedia :src="scholarship.coverUrl ?? scholarship.coverImageUrl ?? scholarship.heroUrl ?? scholarship.heroImageUrl" :label="scholarship.title">
+      <span v-if="scholarship.hot" class="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-amber-950 shadow-xs">{{ t('scholarships.hot') }}</span>
+      <span v-else-if="scholarship.featured" class="rounded-full bg-brand-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs">{{ t('catalog.featured') }}</span>
+      <span v-if="scholarship.recommended" class="rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-brand-800 shadow-xs">{{ t('catalog.recommendedShort') }}</span>
+    </CardMedia>
     <div class="flex flex-1 flex-col p-5">
-    <div class="flex items-center gap-2">
+    <div class="flex flex-wrap items-center gap-2">
       <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
         {{ t(`scholarships.funding.${scholarship.fundingModel}`) }}
       </span>
-      <span v-if="scholarship.hot" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">{{ t('scholarships.hot') }}</span>
-      <span v-else-if="scholarship.featured" class="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-800">{{ t('catalog.featured') }}</span>
     </div>
 
     <h3 class="mt-3 font-display text-base font-semibold text-slate-900 group-hover:text-brand-800">

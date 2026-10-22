@@ -677,10 +677,8 @@ export default {
     // eligibility
     ageMin: 'Min age', ageMax: 'Max age', age: 'Age',
     inChina: 'Applicant location',
-    inChinaYes: 'Must currently be in China',
-    inChinaNo: 'Must currently be outside China',
-    inChinaEither: 'Either (in or outside China)',
-    inChinaHint: 'Whether the applicant must already be inside China when they apply. Leave empty if it does not matter.',
+    location: { BOTH: 'Both (in China or outside China)', IN_CHINA: 'Must currently be in China', OUTSIDE_CHINA: 'Must currently be outside China' },
+    inChinaHint: 'Whether the applicant must already be inside China when they apply. Choose Both when it does not matter.',
     nationality: 'Nationality', countryList: 'Countries', countryListHint: 'Comma-separated ISO codes, e.g. NG,KE,GH',
     eligNotes: 'Eligibility notes',
     scopeAnyHint: 'Open to all international students.',

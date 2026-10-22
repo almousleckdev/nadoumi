@@ -31,14 +31,10 @@ const levelLabel = computed(() => {
     class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white no-underline shadow-xs transition-shadow hover:shadow-md"
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
-    <img
-      v-if="program.imageUrl"
-      :src="mediaUrl(program.imageUrl)"
-      alt=""
-      loading="lazy"
-      decoding="async"
-      class="h-32 w-full object-cover"
-    >
+    <CardMedia :src="program.imageUrl" :label="program.name">
+      <span v-if="program.hot" class="rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-semibold text-amber-950 shadow-xs">{{ t('program.hot') }}</span>
+      <span v-else-if="program.featured" class="rounded-full bg-brand-600 px-2.5 py-0.5 text-xs font-semibold text-white shadow-xs">{{ t('catalog.featured') }}</span>
+    </CardMedia>
     <div class="flex flex-1 flex-col p-5">
       <div class="flex flex-wrap items-center gap-2">
         <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
@@ -50,8 +46,6 @@ const levelLabel = computed(() => {
         >
           {{ t(`program.lang.${program.teachingLanguage}`) }}
         </span>
-        <span v-if="program.hot" class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">{{ t('program.hot') }}</span>
-        <span v-else-if="program.featured" class="rounded-full bg-brand-100 px-2 py-0.5 text-xs font-semibold text-brand-800">{{ t('catalog.featured') }}</span>
       </div>
 
       <h3 class="mt-3 font-display text-base font-semibold text-slate-900 group-hover:text-brand-800">

@@ -38,7 +38,8 @@ const eligibilityItems = computed(() => {
   const items: { label: string, value: string | number }[] = []
   if (e.ageMin != null || e.ageMax != null) items.push({ label: t('scholarship.age'), value: `${e.ageMin ?? ''} to ${e.ageMax ?? ''}`.trim() })
   items.push({ label: t('scholarship.nationality'), value: nationalityText(e) })
-  if (e.inChina != null) items.push({ label: t('scholarship.inChina'), value: e.inChina ? t('common.yes') : t('common.no') })
+  const rule = e.inChina == null ? 'BOTH' : e.inChina ? 'IN_CHINA' : 'OUTSIDE_CHINA'
+  items.push({ label: t('scholarship.inChina'), value: t(`scholarship.location.${rule}`) })
   if (e.gpaMin != null) items.push({ label: 'GPA', value: `≥ ${e.gpaMin}` })
   if (e.ieltsMin != null) items.push({ label: 'IELTS', value: `≥ ${e.ieltsMin}` })
   if (e.toeflMin != null) items.push({ label: 'TOEFL', value: `≥ ${e.toeflMin}` })
@@ -78,17 +79,47 @@ const eligibilityItems = computed(() => {
         { label: t('scholarship.field'), value: fieldsSummary },
         { label: t('scholarship.teachingLanguage'), value: view.teachingLanguage ? t(`scholarship.lang.${view.teachingLanguage}`) : '' },
         { label: t('scholarship.deadline'), value: view.deadline || t('scholarship.rolling') },
-        { label: t('scholarship.levels'), value: view.levels.map(l => t(`scholarship.level.${l}`)).join(', ') || '' },
+        { label: t('scholarship.levels'), value: '', slot: 'levels' },
         { label: t('scholarship.nonDegreeDuration'), value: view.nonDegreeDuration ? t(`scholarship.nonDegree.${view.nonDegreeDuration}`) : '' },
         { label: t('scholarship.studyDurationMonths'), value: view.studyDurationMonths ?? '' },
         { label: t('scholarship.applicationChannel'), value: view.applicationChannel ? t(`scholarship.channel.${view.applicationChannel}`) : '' },
         { label: t('scholarship.agencyNumber'), value: view.agencyNumber || '' },
         { label: t('scholarship.requiresFinancialProof'), value: view.requiresFinancialProof ? t('common.yes') : t('common.no') },
         { label: t('scholarship.requiresFoundationYear'), value: view.requiresFoundationYear ? t('common.yes') : t('common.no') },
-        { label: t('scholarship.categories'), value: view.categories.join(', ') || '' },
+        { label: t('scholarship.categories'), value: '', slot: 'categories' },
         { label: t('scholarship.slots'), value: view.slots ?? '' },
       ]"
-    />
+    >
+      <template #levels>
+        <div class="tags">
+          <el-tag
+            v-for="l in view.levels"
+            :key="l"
+            size="small"
+            effect="plain"
+            disable-transitions
+          >
+            {{ t(`scholarship.level.${l}`) }}
+          </el-tag>
+          <span v-if="!view.levels.length">&mdash;</span>
+        </div>
+      </template>
+      <template #categories>
+        <div class="tags">
+          <el-tag
+            v-for="c in view.categories"
+            :key="c"
+            size="small"
+            type="info"
+            effect="plain"
+            disable-transitions
+          >
+            {{ c }}
+          </el-tag>
+          <span v-if="!view.categories.length">&mdash;</span>
+        </div>
+      </template>
+    </DescriptionList>
     <p
       v-if="view.summary"
       class="prose"

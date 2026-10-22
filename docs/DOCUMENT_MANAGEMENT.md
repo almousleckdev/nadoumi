@@ -212,13 +212,13 @@ Cloudinary call:
 
 | Category | Default access class | Allowed MIME | Max size | `resource_type` |
 | --- | --- | --- | --- | --- |
-| `UNIVERSITY_LOGO` | PUBLIC | jpeg, png, webp | 4 MB | image |
-| `UNIVERSITY_BANNER` | PUBLIC | jpeg, png, webp | 8 MB | image |
-| `UNIVERSITY_GALLERY` | PUBLIC | jpeg, png, webp | 8 MB | image |
-| `SCHOLARSHIP_HERO` | PUBLIC | jpeg, png, webp | 8 MB | image |
-| `SCHOLARSHIP_COVER` | PUBLIC | jpeg, png, webp | 6 MB | image |
-| `PROGRAM_IMAGE` | PUBLIC | jpeg, png, webp | 6 MB | image |
-| `APPLICANT_PHOTO` | PROTECTED | jpeg, png, webp | 5 MB | image |
+| `UNIVERSITY_LOGO` | PUBLIC | jpeg, png, webp, avif | 4 MB | image |
+| `UNIVERSITY_BANNER` | PUBLIC | jpeg, png, webp, avif | 8 MB | image |
+| `UNIVERSITY_GALLERY` | PUBLIC | jpeg, png, webp, avif | 8 MB | image |
+| `SCHOLARSHIP_HERO` | PUBLIC | jpeg, png, webp, avif | 8 MB | image |
+| `SCHOLARSHIP_COVER` | PUBLIC | jpeg, png, webp, avif | 6 MB | image |
+| `PROGRAM_IMAGE` | PUBLIC | jpeg, png, webp, avif | 6 MB | image |
+| `APPLICANT_PHOTO` | PROTECTED | jpeg, png, webp, avif | 5 MB | image |
 | `APPLICANT_PASSPORT` | PROTECTED | pdf, jpeg, png | 10 MB | raw |
 | `APPLICANT_DOCUMENT` | PROTECTED | pdf, jpeg, png | 20 MB | raw / image |
 | `APPLICATION_DOCUMENT` | PROTECTED | pdf, jpeg, png | 20 MB | raw / image |

@@ -33,7 +33,7 @@ public final class MediaCategoryPolicy {
     private static final String RESOURCE_RAW = "raw";
 
     /** Allow-list shared by every image category. */
-    private static final Set<String> IMAGE_MIME = Set.of("image/jpeg", "image/png", "image/webp");
+    private static final Set<String> IMAGE_MIME = Set.of("image/jpeg", "image/png", "image/webp", "image/avif");
 
     /** Allow-list shared by every document / attachment category. */
     private static final Set<String> DOCUMENT_MIME = Set.of("application/pdf", "image/jpeg", "image/png");

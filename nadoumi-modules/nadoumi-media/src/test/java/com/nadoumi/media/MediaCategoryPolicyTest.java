@@ -13,7 +13,7 @@ class MediaCategoryPolicyTest {
     void logoIsPublicImage4mb() {
         var r = MediaCategoryPolicy.of(MediaCategory.UNIVERSITY_LOGO);
         assertThat(r.defaultAccessClass()).isEqualTo(MediaAccessClass.PUBLIC);
-        assertThat(r.allowedMime()).containsExactlyInAnyOrder("image/jpeg", "image/png", "image/webp");
+        assertThat(r.allowedMime()).containsExactlyInAnyOrder("image/jpeg", "image/png", "image/webp", "image/avif");
         assertThat(r.maxBytes()).isEqualTo(4L * 1024 * 1024);
         assertThat(r.resourceType()).isEqualTo("image");
     }

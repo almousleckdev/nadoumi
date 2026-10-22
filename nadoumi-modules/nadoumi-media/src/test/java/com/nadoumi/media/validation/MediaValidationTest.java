@@ -25,6 +25,13 @@ class MediaValidationTest {
             0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
             0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, (byte) 0xC4, (byte) 0x89
     };
+    // ISO-BMFF "ftyp" box with the avif major brand.
+    private static final byte[] AVIF = {
+            0x00, 0x00, 0x00, 0x1C, 0x66, 0x74, 0x79, 0x70,
+            0x61, 0x76, 0x69, 0x66, 0x00, 0x00, 0x00, 0x00,
+            0x61, 0x76, 0x69, 0x66, 0x6D, 0x69, 0x66, 0x31,
+            0x6D, 0x69, 0x61, 0x66
+    };
     private static final byte[] PDF = "%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\n"
             .getBytes(StandardCharsets.US_ASCII);
     private static final byte[] SVG = "<?xml version=\"1.0\"?><svg xmlns=\"http://www.w3.org/2000/svg\"/>"
@@ -46,6 +53,13 @@ class MediaValidationTest {
             throw new AssertionError("expected MediaValidationException, got " + t, t);
         }
         return fail("expected MediaValidationException, none thrown");
+    }
+
+    @Test
+    void acceptsAvifForPublicImageCategories() {
+        var ok = MediaValidation.check(
+                head(AVIF), "image/avif", "hero.avif", AVIF.length, MediaCategory.SCHOLARSHIP_HERO);
+        assertThat(ok.resolvedContentType()).isEqualTo("image/avif");
     }
 
     @Test

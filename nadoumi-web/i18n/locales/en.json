@@ -143,18 +143,6 @@
       "apply": "Apply now",
       "contact": "Contact us"
     },
-    "newScholarships": {
-      "eyebrow": "Scholarships",
-      "title": "New scholarships",
-      "description": "The latest opportunities published on Nadoumi.",
-      "empty": "No scholarships are published yet."
-    },
-    "fundedScholarships": {
-      "eyebrow": "Fully funded",
-      "title": "Fully funded scholarships",
-      "description": "Tuition, accommodation and a stipend covered.",
-      "empty": "No fully funded scholarships are published yet."
-    },
     "testimonials": {
       "eyebrow": "Student stories",
       "title": "Hear from students already in China",
@@ -166,6 +154,30 @@
       "next": "Next story",
       "show": "Show story {n}",
       "photoAlt": "Portrait of {name}"
+    },
+    "showcase": {
+      "scholarships": {
+        "eyebrow": "Scholarships",
+        "title": "Find the scholarship that fits you",
+        "description": "Browse by category: featured picks, Nadoumi recommendations, hot deals and every funding level.",
+        "empty": "No scholarships in this category yet."
+      },
+      "programs": {
+        "eyebrow": "Programmes",
+        "title": "Programmes worth a look",
+        "description": "Featured and trending programmes from universities in our catalog.",
+        "empty": "No programmes in this category yet."
+      },
+      "tabs": {
+        "featured": "Featured",
+        "recommended": "Recommended by Nadoumi",
+        "hot": "Hot",
+        "full": "Full",
+        "partial": "Partial",
+        "self": "Self funded",
+        "newest": "Newest"
+      },
+      "tablistLabel": "Categories"
     }
   },
   "about": {
@@ -940,7 +952,8 @@
     "noMajors": "Majors for this programme will be listed soon.",
     "majorsIntro": "Fields of study you can specialise in within this programme.",
     "tuitionNote": "Set by the university. The USD figure is indicative.",
-    "universityLabel": "University"
+    "universityLabel": "University",
+    "viewAll": "View all programmes"
   },
   "scholarships": {
     "searchLabel": "Search scholarships",

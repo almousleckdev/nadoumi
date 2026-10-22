@@ -11,7 +11,7 @@ const deadline = computed(() => deadlineSummary(props.s.deadline, t))
 
 <template>
 <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
-  <div v-if="s.stipends.length" class="rounded-xl border border-slate-200 bg-white p-5">
+  <div v-if="s.stipends.length" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
     <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('scholarships.stipend') }}</h2>
     <ul class="mt-2 space-y-3">
       <li v-for="st in s.stipends" :key="st.level">
@@ -26,7 +26,7 @@ const deadline = computed(() => deadlineSummary(props.s.deadline, t))
     </ul>
   </div>
 
-  <div v-if="moneyOf(s.applicationFee) || moneyOf(s.serviceFee)" class="rounded-xl border border-slate-200 bg-white p-5 text-sm">
+  <div v-if="moneyOf(s.applicationFee) || moneyOf(s.serviceFee)" class="rounded-2xl border border-slate-200 bg-white p-5 text-sm shadow-xs">
     <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('scholarships.upfront') }}</h2>
     <ul class="mt-3 space-y-1 text-slate-700">
       <li v-if="moneyOf(s.applicationFee)">{{ t('scholarships.fee.APPLICATION') }}: {{ moneyOf(s.applicationFee) }}</li>
@@ -34,7 +34,7 @@ const deadline = computed(() => deadlineSummary(props.s.deadline, t))
     </ul>
   </div>
 
-  <div v-if="s.intakes.length" class="rounded-xl border border-slate-200 bg-white p-5 text-sm">
+  <div v-if="s.intakes.length" class="rounded-2xl border border-slate-200 bg-white p-5 text-sm shadow-xs">
     <h2 class="font-display text-sm font-semibold uppercase tracking-wide text-slate-500">{{ t('scholarships.intakes') }}</h2>
     <ul class="mt-3 space-y-1 text-slate-700">
       <li v-for="(it, i) in s.intakes" :key="i">
@@ -46,7 +46,7 @@ const deadline = computed(() => deadlineSummary(props.s.deadline, t))
 
   <!-- animated deadline card — sits below Upfront fee + Intakes -->
   <div
-    class="deadline-banner relative overflow-hidden rounded-xl border p-5"
+    class="deadline-banner relative overflow-hidden rounded-2xl border p-5"
     :class="{
       'border-red-200 bg-red-50 text-red-900': deadline.tone === 'urgent' || deadline.tone === 'passed',
       'border-amber-200 bg-amber-50 text-amber-900': deadline.tone === 'soon',

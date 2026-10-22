@@ -35,28 +35,19 @@ const facts = computed(() => {
     <ProgramHero :program="p" :apply-to="applyTo" :university-to="universityTo" />
 
     <NContainer>
-      <div class="grid gap-10 py-12 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <div class="min-w-0 space-y-12">
-          <!-- facts -->
-          <dl v-if="facts.length" class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div v-for="f in facts" :key="f.label" class="rounded-xl border border-slate-200 bg-white p-4">
-              <dt class="text-xs uppercase tracking-wide text-slate-400">{{ f.label }}</dt>
-              <dd class="mt-1 font-display text-base font-semibold text-slate-900">{{ f.value }}</dd>
-            </div>
-          </dl>
-
-          <!-- overview -->
-          <section v-if="p.summary">
-            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('program.fallbackTitle') }}</h2>
-            <p class="mt-2 whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
-          </section>
+      <FactTiles v-if="facts.length" :items="facts" class="relative z-10 mt-6 lg:-mt-6" />
+      <div class="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-10 lg:py-10">
+        <div class="min-w-0 space-y-6">
+          <DetailCard v-if="p.summary" :title="t('program.fallbackTitle')">
+            <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
+          </DetailCard>
 
           <ProgramMajors :majors="p.majors ?? []" />
 
           <ProgramIntakes :intakes="p.intakes" />
         </div>
 
-        <ProgramSidebar :program="p" :apply-to="applyTo" :university-to="universityTo" />
+        <ProgramSidebar :program="p" :apply-to="applyTo" :university-to="universityTo" class="order-first lg:order-none" />
       </div>
     </NContainer>
   </div>

@@ -10,14 +10,14 @@ const tuition = computed(() => programTuition(props.program))
 
 <template>
   <aside class="space-y-5 lg:sticky lg:top-24 lg:self-start">
-      <div v-if="tuition.cny" class="rounded-2xl border border-slate-200 bg-white p-5">
+      <div v-if="tuition.cny" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ t('program.tuition') }}</p>
         <p class="mt-1 font-display text-2xl font-bold text-slate-900">{{ tuition.cny }}</p>
         <p v-if="tuition.usd" class="text-sm text-slate-500">≈ {{ tuition.usd }}</p>
         <p class="mt-2 text-xs text-slate-400">{{ t('program.tuitionNote') }}</p>
       </div>
 
-      <div v-if="program.universityName" class="rounded-2xl border border-slate-200 bg-white p-5">
+      <div v-if="program.universityName" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs">
         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">{{ t('program.universityLabel') }}</p>
         <NuxtLink :to="universityTo" class="mt-1 block font-display text-base font-semibold text-slate-900 hover:text-brand-800">
           {{ program.universityName }}

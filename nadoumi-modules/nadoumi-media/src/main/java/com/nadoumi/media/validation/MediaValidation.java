@@ -60,6 +60,7 @@ public final class MediaValidation {
             "image/png", "png",
             "image/jpeg", "jpg",
             "image/webp", "webp",
+            "image/avif", "avif",
             "application/pdf", "pdf");
 
     private static final Detector DETECTOR = new DefaultDetector();

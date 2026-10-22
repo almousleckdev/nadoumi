@@ -143,18 +143,6 @@
       "apply": "立即申请",
       "contact": "联系我们"
     },
-    "newScholarships": {
-      "eyebrow": "奖学金",
-      "title": "最新奖学金",
-      "description": "Nadoumi 上最新发布的申请机会。",
-      "empty": "暂无已发布的奖学金。"
-    },
-    "fundedScholarships": {
-      "eyebrow": "全额资助",
-      "title": "全额资助奖学金",
-      "description": "涵盖学费、住宿及生活补贴。",
-      "empty": "暂无已发布的全额资助奖学金。"
-    },
     "testimonials": {
       "eyebrow": "学生故事",
       "title": "听听已在中国学习的学生怎么说",
@@ -166,6 +154,30 @@
       "next": "下一篇",
       "show": "查看第 {n} 篇",
       "photoAlt": "{name} 的照片"
+    },
+    "showcase": {
+      "scholarships": {
+        "eyebrow": "奖学金",
+        "title": "找到适合你的奖学金",
+        "description": "按类别浏览：精选推荐、Nadoumi 推荐、热门以及各类资助额度。",
+        "empty": "该类别暂无奖学金。"
+      },
+      "programs": {
+        "eyebrow": "专业项目",
+        "title": "值得关注的专业项目",
+        "description": "我们目录中各大学的精选与热门专业项目。",
+        "empty": "该类别暂无专业项目。"
+      },
+      "tabs": {
+        "featured": "精选",
+        "recommended": "Nadoumi 推荐",
+        "hot": "热门",
+        "full": "全额",
+        "partial": "部分",
+        "self": "自费",
+        "newest": "最新"
+      },
+      "tablistLabel": "类别"
     }
   },
   "about": {
@@ -940,7 +952,8 @@
     "noMajors": "该专业项目的方向信息即将公布。",
     "majorsIntro": "您可在该专业项目下选择的具体方向。",
     "tuitionNote": "由院校设定,美元金额仅供参考。",
-    "universityLabel": "院校"
+    "universityLabel": "院校",
+    "viewAll": "查看全部专业项目"
   },
   "scholarships": {
     "searchLabel": "搜索奖学金",

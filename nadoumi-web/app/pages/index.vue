@@ -7,7 +7,7 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 useSeo(t('home.hero.title'), t('home.hero.subtitle'))
 
-const { featured, recommended, newScholarships, fundedScholarships, hotProgrammes, partners } = useHomeFeeds()
+const { featured, recommended, partners } = useHomeFeeds()
 
 const JOURNEY_STEPS = 8
 const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => ({
@@ -59,25 +59,7 @@ const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => (
     </NContainer>
 
     <NContainer>
-      <DiscoverySection
-        :eyebrow="t('home.newScholarships.eyebrow')"
-        :title="t('home.newScholarships.title')"
-        :description="t('home.newScholarships.description')"
-        :carousel-label="t('home.newScholarships.title')"
-        :view-all-to="localePath('/scholarships')"
-        :view-all-label="t('scholarships.viewAll')"
-        :pending="newScholarships.pending.value"
-        :error="newScholarships.error.value ? t('errors.loadSection') : ''"
-        :empty="!newScholarships.items.value.length"
-        :empty-text="t('home.newScholarships.empty')"
-      >
-        <ScholarshipCard
-          v-for="sch in newScholarships.items.value"
-          :key="sch.id"
-          :scholarship="sch"
-          variant="carousel"
-        />
-      </DiscoverySection>
+      <CategoryShowcase kind="scholarship" />
     </NContainer>
 
     <NContainer>
@@ -96,47 +78,7 @@ const journey = computed(() => Array.from({ length: JOURNEY_STEPS }, (_, i) => (
     </NContainer>
 
     <NContainer>
-      <DiscoverySection
-        :eyebrow="t('home.fundedScholarships.eyebrow')"
-        :title="t('home.fundedScholarships.title')"
-        :description="t('home.fundedScholarships.description')"
-        :carousel-label="t('home.fundedScholarships.title')"
-        :view-all-to="localePath('/scholarships?funding=FULLY')"
-        :view-all-label="t('scholarships.viewAll')"
-        :pending="fundedScholarships.pending.value"
-        :error="fundedScholarships.error.value ? t('errors.loadSection') : ''"
-        :empty="!fundedScholarships.items.value.length"
-        :empty-text="t('home.fundedScholarships.empty')"
-      >
-        <ScholarshipCard
-          v-for="sch in fundedScholarships.items.value"
-          :key="sch.id"
-          :scholarship="sch"
-          variant="carousel"
-        />
-      </DiscoverySection>
-    </NContainer>
-
-    <NContainer>
-      <DiscoverySection
-        :eyebrow="t('home.programDiscovery.eyebrow')"
-        :title="t('home.programDiscovery.title')"
-        :description="t('home.programDiscovery.description')"
-        :carousel-label="t('home.programDiscovery.title')"
-        :view-all-to="localePath('/universities')"
-        :view-all-label="t('catalog.viewAllUniversities')"
-        :pending="hotProgrammes.pending.value"
-        :error="hotProgrammes.error.value ? t('errors.loadSection') : ''"
-        :empty="!hotProgrammes.items.value.length"
-        :empty-text="t('home.programDiscovery.empty')"
-      >
-        <ProgramCard
-          v-for="p in hotProgrammes.items.value"
-          :key="p.id"
-          :program="p"
-          variant="carousel"
-        />
-      </DiscoverySection>
+      <CategoryShowcase kind="program" />
     </NContainer>
 
     <NContainer>

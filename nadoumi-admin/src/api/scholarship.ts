@@ -16,14 +16,14 @@ export type CoverageKind =
   | 'TRAVEL' | 'REGISTRATION_FEE' | 'VISA_FEE' | 'OTHER'
 export type ApplicationChannel = 'DIRECT_UNIVERSITY' | 'CSC_AGENCY' | 'NADOUMI' | 'OTHER'
 export type FeeKind =
-  | 'TUITION_BEFORE' | 'TUITION_AFTER'
+  | 'TUITION_BEFORE' | 'TUITION_AFTER' | 'ACCOMMODATION_BEFORE' | 'ACCOMMODATION_AFTER'
   | 'REGISTRATION' | 'APPLICATION' | 'NADOUMI_APPLICATION' | 'NADOUMI_SERVICE'
   | 'INSURANCE' | 'VISA' | 'OTHER'
 
 // ACCOMMODATION_BEFORE/AFTER are retired from the picker — accommodation is now
 // its own room-type section — but stay valid codes for historical rows.
 export const FEE_KINDS: FeeKind[] = [
-  'TUITION_BEFORE', 'TUITION_AFTER',
+  'TUITION_BEFORE', 'TUITION_AFTER', 'ACCOMMODATION_BEFORE', 'ACCOMMODATION_AFTER',
   'REGISTRATION', 'APPLICATION', 'NADOUMI_APPLICATION', 'NADOUMI_SERVICE', 'INSURANCE', 'VISA', 'OTHER',
 ]
 export const ROOM_TYPES: RoomType[] = ['SINGLE', 'DOUBLE', 'TRIPLE', 'QUAD', 'SHARED']

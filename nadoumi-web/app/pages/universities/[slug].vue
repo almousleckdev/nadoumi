@@ -53,45 +53,32 @@ const prose = computed(() => {
     <UniversityHero :university="u" />
 
     <NContainer>
-      <div class="grid gap-10 py-10 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div class="min-w-0 space-y-12">
-          <dl v-if="facts.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <div v-for="f in facts" :key="f.label" class="rounded-xl border border-slate-200 bg-white p-4">
-              <dt class="text-xs uppercase tracking-wide text-slate-400">{{ f.label }}</dt>
-              <dd class="mt-1 font-display text-lg font-semibold text-slate-900">{{ f.value }}</dd>
-            </div>
-          </dl>
+      <FactTiles v-if="facts.length" :items="facts" class="relative z-10 mt-6 lg:-mt-6" />
+      <div class="grid gap-8 py-8 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-10 lg:py-10">
+        <div class="min-w-0 space-y-6">
+          <DetailCard v-for="p in prose" :key="p.heading" :title="p.heading">
+            <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.body }}</p>
+          </DetailCard>
 
-          <section v-for="p in prose" :key="p.heading">
-            <h2 class="font-display text-xl font-semibold text-slate-900">{{ p.heading }}</h2>
-            <p class="mt-2 whitespace-pre-line leading-7 text-slate-700">{{ p.body }}</p>
-          </section>
+          <div v-if="highlightsOf('HIGHLIGHT').length || highlightsOf('ADVANTAGE').length" class="grid gap-6 md:grid-cols-2">
+            <DetailCard v-if="highlightsOf('HIGHLIGHT').length" :title="t('university.highlights')">
+              <ul class="space-y-2.5">
+                <li v-for="h in highlightsOf('HIGHLIGHT')" :key="h.id" class="flex gap-2.5 text-slate-700">
+                  <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
+                </li>
+              </ul>
+            </DetailCard>
+            <DetailCard v-if="highlightsOf('ADVANTAGE').length" :title="t('university.advantages')">
+              <ul class="space-y-2.5">
+                <li v-for="h in highlightsOf('ADVANTAGE')" :key="h.id" class="flex gap-2.5 text-slate-700">
+                  <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
+                </li>
+              </ul>
+            </DetailCard>
+          </div>
 
-          <section v-if="highlightsOf('HIGHLIGHT').length || highlightsOf('ADVANTAGE').length">
-            <div class="grid gap-8 sm:grid-cols-2">
-              <div v-if="highlightsOf('HIGHLIGHT').length">
-                <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.highlights') }}</h2>
-                <ul class="mt-3 space-y-2">
-                  <li v-for="h in highlightsOf('HIGHLIGHT')" :key="h.id" class="flex gap-2 text-slate-700">
-                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
-                  </li>
-                </ul>
-              </div>
-              <div v-if="highlightsOf('ADVANTAGE').length">
-                <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.advantages') }}</h2>
-                <ul class="mt-3 space-y-2">
-                  <li v-for="h in highlightsOf('ADVANTAGE')" :key="h.id" class="flex gap-2 text-slate-700">
-                    <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />{{ h.text }}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <section>
-            <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.programmes') }}</h2>
-            <p class="mt-1 text-sm text-slate-600">{{ t('program.sectionIntro') }}</p>
-            <div v-if="programs.length" class="mt-4 grid gap-4 sm:grid-cols-2">
+          <DetailCard :title="t('university.programmes')" :description="t('program.sectionIntro')">
+            <div v-if="programs.length" class="grid gap-4 sm:grid-cols-2">
               <ProgramCard
                 v-for="p in programs"
                 :key="p.id"
@@ -99,10 +86,10 @@ const prose = computed(() => {
                 :show-university="false"
               />
             </div>
-            <p v-else class="mt-3 rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-sm text-slate-500">
+            <p v-else class="rounded-xl border border-dashed border-slate-200 bg-slate-50/60 p-6 text-sm text-slate-500">
               {{ t('university.programmesEmpty') }}
             </p>
-          </section>
+          </DetailCard>
 
           <UniversityGallery :images="u.gallery" />
         </div>

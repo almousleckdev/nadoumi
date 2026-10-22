@@ -9,9 +9,8 @@ const lightboxIndex = ref<number | null>(null)
 
 <template>
   <div>
-    <section v-if="images.length">
-      <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('university.gallery') }}</h2>
-      <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+    <DetailCard v-if="images.length" :title="t('university.gallery')">
+      <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <figure
           v-for="(g, i) in images"
           :key="g.id"
@@ -34,7 +33,7 @@ const lightboxIndex = ref<number | null>(null)
           <figcaption v-if="g.caption" class="px-2 py-1.5 text-xs text-slate-500">{{ g.caption }}</figcaption>
         </figure>
       </div>
-    </section>
+    </DetailCard>
     <GalleryLightbox v-model="lightboxIndex" :images="images" />
   </div>
 </template>

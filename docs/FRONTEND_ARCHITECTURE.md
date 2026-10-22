@@ -647,3 +647,19 @@ phones. The pages hold only the form (the register stepper is a three-segment pr
 (portrait, quote in the language the student wrote it, route "Chad to China") with previous/next, face thumbnails,
 arrow keys and a read-more clamp. Stories live in `app/data/testimonials.ts`; photos are optimized JPEGs in
 `public/students` (originals are kept out of `public`, in the git-ignored `design/students-originals`).
+
+### Catalog home categories and detail pages (2026-10-22)
+
+- **Home.** The scholarship and programme carousels are now `CategoryShowcase`
+  (`kind="scholarship" | "program"`) with tab chips driven by
+  `app/data/homeShowcase.ts`. Scholarships: Featured, Recommended by Nadoumi, Hot,
+  Full, Partial, Self funded (`featured` / `recommended` / `hot` / `funding`
+  filters on `/api/public/scholarships`). Programmes: Featured, Hot, Newest. A tab
+  switch refetches that tab only. `home.showcase.*` is in all five locales.
+- **Cards.** `ScholarshipCard` / `ProgramCard` use `CardMedia` (cover, gradient
+  fallback with the title initial) and overlay the Hot / Featured / Recommended badges.
+- **Detail pages** (scholarship, programme, university) share `DetailCard`,
+  `FactTiles` and `PriceRows`. Layout is mobile-first: facts strip under the hero,
+  key sidebar (deadline, stipend, tuition) above the long-form sections on small
+  screens, price tables replaced by wrapping rows (no horizontal scroll).
+

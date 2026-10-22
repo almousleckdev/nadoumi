@@ -11,6 +11,15 @@ const form = useScholarshipForm()
 
 const SCOPES: NationalityScope[] = ['ANY', 'INCLUDE', 'EXCLUDE']
 
+type LocationRule = 'BOTH' | 'IN_CHINA' | 'OUTSIDE_CHINA'
+const LOCATION_RULES: LocationRule[] = ['BOTH', 'IN_CHINA', 'OUTSIDE_CHINA']
+
+// The API stores the rule as a nullable boolean: null means the applicant may be anywhere.
+const locationRule = computed<LocationRule>({
+  get: () => (form.eligibility.inChina == null ? 'BOTH' : form.eligibility.inChina ? 'IN_CHINA' : 'OUTSIDE_CHINA'),
+  set: (rule) => { form.eligibility.inChina = rule === 'BOTH' ? null : rule === 'IN_CHINA' },
+})
+
 const scopeHint = computed(() => {
   if (form.eligibility.nationalityScope === 'INCLUDE') return t('scholarship.scopeIncludeHint')
   if (form.eligibility.nationalityScope === 'EXCLUDE') return t('scholarship.scopeExcludeHint')
@@ -91,18 +100,12 @@ const scopeHint = computed(() => {
         />
       </el-form-item>
       <el-form-item :label="t('scholarship.inChina')">
-        <el-select
-          v-model="form.eligibility.inChina"
-          clearable
-          :placeholder="t('scholarship.inChinaEither')"
-        >
+        <el-select v-model="locationRule">
           <el-option
-            :value="true"
-            :label="t('scholarship.inChinaYes')"
-          />
-          <el-option
-            :value="false"
-            :label="t('scholarship.inChinaNo')"
+            v-for="rule in LOCATION_RULES"
+            :key="rule"
+            :value="rule"
+            :label="t(`scholarship.location.${rule}`)"
           />
         </el-select>
       </el-form-item>

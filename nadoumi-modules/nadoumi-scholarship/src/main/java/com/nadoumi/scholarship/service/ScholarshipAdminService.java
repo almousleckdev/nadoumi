@@ -64,6 +64,7 @@ public class ScholarshipAdminService {
         PageHelper.startPage(page + 1, size);
         List<Scholarship> rows = mapper.searchStaff(filter);
         long total = new PageInfo<>(rows).getTotal();
+        rows.forEach(this::loadListChildren);
         return PageResponse.of(rows.stream().map(this::toResponse).toList(), page, size, total);
     }
 
@@ -174,6 +175,12 @@ public class ScholarshipAdminService {
             throw new NadNotFoundException("scholarship not found");
         }
         return s;
+    }
+
+    /** The list shows levels and categories per row; the other child collections stay detail-only. */
+    private void loadListChildren(Scholarship s) {
+        s.setLevels(mapper.findLevels(s.getId()));
+        s.setCategories(mapper.findCategories(s.getId()));
     }
 
     private Scholarship loadWithChildren(Long id) {

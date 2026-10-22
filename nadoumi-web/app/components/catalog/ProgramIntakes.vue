@@ -7,25 +7,20 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <section v-if="intakes.length">
-    <h2 class="font-display text-xl font-semibold text-slate-900">{{ t('program.intakes') }}</h2>
-    <div class="mt-3 overflow-x-auto">
-      <table class="w-full min-w-[30rem] overflow-hidden rounded-xl border border-slate-200 text-left text-sm">
-        <thead class="bg-slate-50 text-xs font-medium uppercase tracking-wide text-slate-500">
-          <tr>
-            <th class="px-4 py-2.5">{{ t('program.term') }}</th>
-            <th class="px-4 py-2.5">{{ t('program.opens') }}</th>
-            <th class="px-4 py-2.5">{{ t('program.closes') }}</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          <tr v-for="i in intakes" :key="i.id" class="odd:bg-white even:bg-slate-50/40">
-            <td class="px-4 py-3 font-medium text-slate-900">{{ t(`program.intake.${i.term}`, i.term) }}</td>
-            <td class="px-4 py-3 text-slate-600">{{ i.applicationOpen || t('program.rolling') }}</td>
-            <td class="px-4 py-3 text-slate-600">{{ i.applicationClose || t('program.rolling') }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+  <DetailCard v-if="intakes.length" :title="t('program.intakes')">
+    <ul class="divide-y divide-slate-100">
+      <li
+        v-for="i in intakes"
+        :key="i.id"
+        class="flex flex-col gap-1 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+      >
+        <span class="font-medium text-slate-900">{{ t(`program.intake.${i.term}`, i.term) }}</span>
+        <span class="text-sm text-slate-600">
+          {{ t('program.opens') }}: {{ i.applicationOpen || t('program.rolling') }}
+          <span class="mx-1 text-slate-300" aria-hidden="true">/</span>
+          {{ t('program.closes') }}: {{ i.applicationClose || t('program.rolling') }}
+        </span>
+      </li>
+    </ul>
+  </DetailCard>
 </template>

@@ -143,18 +143,6 @@
       "apply": "Postuler maintenant",
       "contact": "Nous contacter"
     },
-    "newScholarships": {
-      "eyebrow": "Bourses",
-      "title": "Nouvelles bourses",
-      "description": "Les dernières opportunités publiées sur Nadoumi.",
-      "empty": "Aucune bourse n'est encore publiée."
-    },
-    "fundedScholarships": {
-      "eyebrow": "Entièrement financées",
-      "title": "Bourses entièrement financées",
-      "description": "Frais de scolarité, hébergement et une allocation pris en charge.",
-      "empty": "Aucune bourse entièrement financée n'est encore publiée."
-    },
     "testimonials": {
       "eyebrow": "Témoignages d'étudiants",
       "title": "La parole aux étudiants déjà en Chine",
@@ -166,6 +154,30 @@
       "next": "Témoignage suivant",
       "show": "Afficher le témoignage {n}",
       "photoAlt": "Portrait de {name}"
+    },
+    "showcase": {
+      "scholarships": {
+        "eyebrow": "Bourses",
+        "title": "Trouvez la bourse qui vous correspond",
+        "description": "Parcourez par catégorie : sélection à la une, recommandations Nadoumi, bourses populaires et tous les niveaux de financement.",
+        "empty": "Aucune bourse dans cette catégorie pour le moment."
+      },
+      "programs": {
+        "eyebrow": "Programmes",
+        "title": "Des programmes à découvrir",
+        "description": "Programmes à la une et tendances des universités de notre catalogue.",
+        "empty": "Aucun programme dans cette catégorie pour le moment."
+      },
+      "tabs": {
+        "featured": "À la une",
+        "recommended": "Recommandé par Nadoumi",
+        "hot": "Populaire",
+        "full": "Complète",
+        "partial": "Partielle",
+        "self": "Autofinancé",
+        "newest": "Récents"
+      },
+      "tablistLabel": "Catégories"
     }
   },
   "about": {
@@ -940,7 +952,8 @@
     "noMajors": "Les spécialités de ce programme seront bientôt répertoriées.",
     "majorsIntro": "Domaines dans lesquels vous pouvez vous spécialiser au sein de ce programme.",
     "tuitionNote": "Défini par l'université. Le montant en USD est indicatif.",
-    "universityLabel": "Université"
+    "universityLabel": "Université",
+    "viewAll": "Voir tous les programmes"
   },
   "scholarships": {
     "searchLabel": "Rechercher des bourses",

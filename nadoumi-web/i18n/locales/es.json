@@ -143,18 +143,6 @@
       "apply": "Postular ahora",
       "contact": "Contáctanos"
     },
-    "newScholarships": {
-      "eyebrow": "Becas",
-      "title": "Becas nuevas",
-      "description": "Las últimas oportunidades publicadas en Nadoumi.",
-      "empty": "Todavía no hay becas publicadas."
-    },
-    "fundedScholarships": {
-      "eyebrow": "Totalmente financiadas",
-      "title": "Becas totalmente financiadas",
-      "description": "Matrícula, alojamiento y una asignación cubiertos.",
-      "empty": "Todavía no hay becas totalmente financiadas publicadas."
-    },
     "testimonials": {
       "eyebrow": "Historias de estudiantes",
       "title": "La voz de los estudiantes que ya están en China",
@@ -166,6 +154,30 @@
       "next": "Historia siguiente",
       "show": "Mostrar la historia {n}",
       "photoAlt": "Retrato de {name}"
+    },
+    "showcase": {
+      "scholarships": {
+        "eyebrow": "Becas",
+        "title": "Encuentra la beca que va contigo",
+        "description": "Explora por categoría: destacadas, recomendadas por Nadoumi, más buscadas y todos los niveles de financiación.",
+        "empty": "Todavía no hay becas en esta categoría."
+      },
+      "programs": {
+        "eyebrow": "Programas",
+        "title": "Programas que vale la pena ver",
+        "description": "Programas destacados y en tendencia de las universidades de nuestro catálogo.",
+        "empty": "Todavía no hay programas en esta categoría."
+      },
+      "tabs": {
+        "featured": "Destacadas",
+        "recommended": "Recomendadas por Nadoumi",
+        "hot": "Populares",
+        "full": "Completa",
+        "partial": "Parcial",
+        "self": "Autofinanciada",
+        "newest": "Recientes"
+      },
+      "tablistLabel": "Categorías"
     }
   },
   "about": {
@@ -940,7 +952,8 @@
     "noMajors": "Las especialidades de este programa se publicarán pronto.",
     "majorsIntro": "Áreas en las que puedes especializarte dentro de este programa.",
     "tuitionNote": "Establecido por la universidad. La cifra en USD es orientativa.",
-    "universityLabel": "Universidad"
+    "universityLabel": "Universidad",
+    "viewAll": "Ver todos los programas"
   },
   "scholarships": {
     "searchLabel": "Buscar becas",

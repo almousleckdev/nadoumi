@@ -37,6 +37,10 @@ const carousel = ref<{ scrollPrev: () => void, scrollNext: () => void, atStart: 
       </template>
     </SectionHeading>
 
+    <div v-if="$slots.tabs" class="mt-5">
+      <slot name="tabs" />
+    </div>
+
     <div class="mt-6">
       <div v-if="pending" class="flex gap-4 overflow-hidden" aria-hidden="true">
         <NSkeleton

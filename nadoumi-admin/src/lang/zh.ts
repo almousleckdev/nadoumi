@@ -677,10 +677,8 @@ export default {
     // eligibility
     ageMin: '最小年龄', ageMax: '最大年龄', age: '年龄',
     inChina: '申请人所在地要求',
-    inChinaYes: '申请时必须已在中国境内',
-    inChinaNo: '申请时必须在中国境外',
-    inChinaEither: '不限（境内或境外均可）',
-    inChinaHint: '申请人提交申请时是否必须已在中国境内。若无此要求可留空。',
+    location: { BOTH: '不限（境内或境外均可）', IN_CHINA: '申请时必须已在中国境内', OUTSIDE_CHINA: '申请时必须在中国境外' },
+    inChinaHint: '申请人提交申请时是否必须已在中国境内。无此要求请选择“不限”。',
     nationality: '国籍', countryList: '国家 / 地区', countryListHint: '以逗号分隔的 ISO 代码，如 NG,KE,GH',
     eligNotes: '资格备注',
     scopeAnyHint: '面向所有国际学生开放。',

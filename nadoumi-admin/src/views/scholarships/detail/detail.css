@@ -3,5 +3,6 @@
 .muted { color: var(--nad-ink-faint); }
 .imgs { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
 .imgs figure { margin: 0; }
-.imgs img { width: 280px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--nad-border, #e5e7eb); }
+.imgs img { max-width: 100%; width: 280px; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--nad-border, #e5e7eb); }
 .imgs figcaption { margin-top: 4px; font-size: 12px; color: var(--nad-ink-soft); }
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }

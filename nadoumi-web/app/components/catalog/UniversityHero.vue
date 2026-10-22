@@ -13,7 +13,7 @@ const typeLabel = computed(() =>
 </script>
 
 <template>
-  <section class="relative isolate flex min-h-[20rem] items-end overflow-hidden bg-slate-900 text-white sm:min-h-[26rem] lg:min-h-[30rem]">
+  <section class="relative isolate flex min-h-[18rem] items-end overflow-hidden bg-slate-900 text-white sm:min-h-[24rem] lg:min-h-[28rem]">
     <img
       v-if="university.bannerUrl ?? university.coverImageUrl"
       :src="mediaUrl(university.bannerUrl ?? university.coverImageUrl)"
@@ -38,9 +38,9 @@ const typeLabel = computed(() =>
     </span>
 
     <NContainer class="w-full">
-      <div class="pb-8 pt-24 pe-20 sm:pb-12 sm:pe-28">
-        <h1 class="font-display text-3xl font-bold tracking-tight sm:text-4xl">{{ university.name }}</h1>
-        <p v-if="university.nameCn" class="mt-1 text-lg text-white/70">{{ university.nameCn }}</p>
+      <div class="pb-6 pt-24 pe-20 sm:pb-12 sm:pe-28">
+        <h1 class="text-balance font-display text-2xl font-bold tracking-tight sm:text-4xl">{{ university.name }}</h1>
+        <p v-if="university.nameCn" class="mt-1 text-base text-white/70 sm:text-lg">{{ university.nameCn }}</p>
         <p class="mt-2 text-white/80">{{ place }}</p>
         <div class="mt-3 flex flex-wrap items-center gap-2">
           <span v-if="typeLabel" class="rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium ring-1 ring-white/20">{{ typeLabel }}</span>
