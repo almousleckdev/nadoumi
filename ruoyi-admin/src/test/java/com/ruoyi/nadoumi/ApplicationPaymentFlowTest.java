@@ -700,4 +700,79 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
                 .andExpect(jsonPath("$[?(@.docType=='PASSPORT')]").isNotEmpty())
                 .andExpect(jsonPath("$[?(@.docType=='STUDY_PLAN')]").isEmpty()); // doctorate only
     }
+
+    private static final byte[] TEMPLATE_PDF = ("%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<< /Root 1 0 R >>\n%%EOF\n").getBytes();
+
+    private long addProgramTemplate(String title) throws Exception {
+        String created = mvc.perform(multipart("/api/staff/document-templates/programs/" + programId)
+                        .file(new MockMultipartFile("file", "form-template.pdf", "application/pdf", TEMPLATE_PDF))
+                        .param("title", title).header("Authorization", staffAuth))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.mediaId").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+        return ((Number) JsonPath.read(created, "$.id")).longValue();
+    }
+
+    @Test
+    void shouldLetAStudentDownloadTheTemplatesOfTheirOwnProgramme() throws Exception {
+        long templateId = addProgramTemplate("Application form template");
+        Student s = register("pay", "tpl1");
+        long app = draftFor(s);
+
+        mvc.perform(get("/api/student/applications/" + app + "/templates").header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].title").value("Application form template"))
+                .andExpect(jsonPath("$[0].fileName").isNotEmpty());
+        byte[] bytes = mvc.perform(get("/api/student/applications/" + app + "/templates/" + templateId)
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header()
+                        .string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
+                .andReturn().getResponse().getContentAsByteArray();
+        assertThat(new String(bytes, 0, 4)).isEqualTo("%PDF");
+    }
+
+    @Test
+    void shouldKeepTemplatesAwayFromAnotherStudentAndFromAnotherOpportunity() throws Exception {
+        long templateId = addProgramTemplate("Template");
+        Student owner = register("pay", "tpl2");
+        Student intruder = register("pay", "tpl3");
+        long app = draftFor(owner);
+
+        mvc.perform(get("/api/student/applications/" + app + "/templates").header("Authorization", bearer(intruder.token())))
+                .andExpect(status().isForbidden());
+        mvc.perform(get("/api/student/applications/" + app + "/templates/" + templateId).header("Authorization", bearer(intruder.token())))
+                .andExpect(status().isForbidden());
+        // a scholarship-only application does not get a programme's template
+        String scholarship = mvc.perform(post("/api/staff/scholarships").header("Authorization", staffAuth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Template Scholarship\",\"country\":\"cn\",\"fundingModel\":\"FULLY\","
+                                + "\"status\":\"ACTIVE\",\"publishStatus\":\"PUBLISHED\",\"levels\":[\"MASTER\"]}"))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        long sid = ((Number) JsonPath.read(scholarship, "$.view.id")).longValue();
+        String other = startScholarshipOnly(owner, sid).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        long otherApp = ((Number) JsonPath.read(other, "$.id")).longValue();
+        mvc.perform(get("/api/student/applications/" + otherApp + "/templates/" + templateId).header("Authorization", bearer(owner.token())))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void shouldRefuseABadTemplateUpload_andKeepTheEditorForStaff() throws Exception {
+        Student s = register("pay", "tpl4");
+        mvc.perform(multipart("/api/staff/document-templates/programs/" + programId)
+                        .file(new MockMultipartFile("file", "tool.exe", "application/x-msdownload", "MZ".getBytes()))
+                        .param("title", "Bad").header("Authorization", staffAuth))
+                .andExpect(status().is4xxClientError());
+        mvc.perform(multipart("/api/staff/document-templates/programs/" + programId)
+                        .file(new MockMultipartFile("file", "t.pdf", "application/pdf", TEMPLATE_PDF))
+                        .param("title", "Student upload").header("Authorization", bearer(s.token())))
+                .andExpect(status().isForbidden());
+
+        long id = addProgramTemplate("Removable");
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/staff/document-templates/" + id)
+                .header("Authorization", bearer(s.token()))).andExpect(status().isForbidden());
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete("/api/staff/document-templates/" + id)
+                .header("Authorization", staffAuth)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/staff/document-templates/programs/" + programId).header("Authorization", staffAuth))
+                .andExpect(jsonPath("$.length()").value(0));
+    }
 }

@@ -83,6 +83,12 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 >   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** Chinese labels, the verification QR.
 > * **Erasure.** `PaymentErasure` also deletes the generated documents and soft-deletes their PDFs.
 >
+> **Update 2026-10-22 (templates): downloadable form templates are IMPLEMENTED (V120).** An admin attaches PDF or Word templates to a programme or a scholarship
+> (a **Form templates** section in each drawer, available once the record exists; up to 10 per opportunity, 10 MB each, validated by content, never macro-enabled).
+> The student's application page shows **Forms to fill in** with a download per template. A template is a PROTECTED `DOCUMENT_TEMPLATE` media asset delivered through
+> the backend (`GET /api/student/applications/{id}/templates[/{templateId}]`); a template is served only if it belongs to the application's own programme or
+> scholarship, so another opportunity's id is a 404 and another student is a 403.
+>
 > **Update 2026-10-22 (conditional requirements): requirement conditions are IMPLEMENTED (V119).** A required document (programme or scholarship) can carry an
 > `appliesWhen` condition: `MINOR` (under 18), `IN_CHINA`, `STUDIED_IN_CHINA`, `MASTER_OR_DOCTORAL`, `DOCTORAL`. Admins pick it in the programme and scholarship
 > drawers; the checklist leaves a requirement off when it does not apply to that student (`RequirementApplicability`, evaluated from the profile: date of birth,

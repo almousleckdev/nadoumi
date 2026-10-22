@@ -460,6 +460,16 @@ export default {
       },
     },
   },
+  template: {
+    title: '表格模板',
+    hint: '申请人下载、填写后寄回的文件，例如申请表。支持 PDF 或 Word，最大 10 MB。',
+    saveFirst: '请先保存，然后再添加模板。',
+    titlePlaceholder: '标题，例如“申请表模板”',
+    upload: '上传文件',
+    titleRequired: '请先填写标题。',
+    tooLarge: '文件超过 {mb} MB。',
+  },
+
   program: {
     title: '专业项目',
     subtitle: '院校开设的课程项目。每个专业项目均归属于一所院校。',

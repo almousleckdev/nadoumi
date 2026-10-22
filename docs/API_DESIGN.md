@@ -517,3 +517,5 @@ Signature (EXISTING, 2026-10-22), under `/api/student/applicants/{id}/signature`
 re-encoded to PNG; 400 for an empty or non-image file), `GET /image` (the owner's PNG, `no-store`). `POST .../submit` answers **409** until a signature is on file.
 
 Requirement conditions (EXISTING, 2026-10-22): programme requirement items and scholarship `documentRequirements` carry `appliesWhen` (`MINOR|IN_CHINA|STUDIED_IN_CHINA|MASTER_OR_DOCTORAL|DOCTORAL`, optional); the checklist endpoint returns only the rows that apply.
+
+Templates (EXISTING, 2026-10-22): staff `GET|POST /api/staff/document-templates/programs/{id}` and `.../scholarships/{id}` (multipart `title` + `file`; `nad:program:*` / `nad:scholarship:*`), `DELETE /api/staff/document-templates/{id}`; students `GET /api/student/applications/{id}/templates` and `.../templates/{templateId}` (attachment, `no-store`).

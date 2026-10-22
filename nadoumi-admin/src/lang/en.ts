@@ -460,6 +460,16 @@ export default {
       },
     },
   },
+  template: {
+    title: 'Form templates',
+    hint: 'Files the applicant downloads, fills in and sends back, such as the application form. PDF or Word, up to 10 MB.',
+    saveFirst: 'Save the record first, then add templates.',
+    titlePlaceholder: 'Title, for example Application form template',
+    upload: 'Upload a file',
+    titleRequired: 'Enter a title first.',
+    tooLarge: 'The file is larger than {mb} MB.',
+  },
+
   program: {
     title: 'Programmes',
     subtitle: 'Courses of study offered by a university. A programme always belongs to one university.',

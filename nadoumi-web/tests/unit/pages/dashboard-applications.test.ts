@@ -17,6 +17,7 @@ const get = vi.fn()
 const submit = vi.fn()
 const withdraw = vi.fn()
 const checklist = vi.fn()
+const templates = vi.fn()
 mockNuxtImport('useRoute', () => () => ({ params: { id: '7' }, path: '/dashboard/applications/7' }))
 // the fee is settled in these tests; the payment panel has its own suite
 mockNuxtImport('useApplicationPayment', () => () => ({
@@ -27,7 +28,7 @@ mockNuxtImport('useApplicantSignature', () => () => ({
   image: async () => new Blob(['x'], { type: 'image/png' }),
 }))
 vi.mock('~/composables/useApplications', () => ({
-  useApplications: () => ({ list, get, submit, withdraw, checklist }),
+  useApplications: () => ({ list, get, submit, withdraw, checklist, templates, template: vi.fn() }),
 }))
 
 beforeEach(() => {
@@ -36,6 +37,7 @@ beforeEach(() => {
   submit.mockReset()
   withdraw.mockReset()
   checklist.mockReset().mockResolvedValue([])
+  templates.mockReset().mockResolvedValue([])
 })
 
 async function mountList() {

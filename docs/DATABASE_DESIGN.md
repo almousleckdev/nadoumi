@@ -441,3 +441,5 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
   signature, a SENSITIVE media asset. Manual rollback is in the file header.
 
 - **V119** adds `applies_when` (a RequirementCondition code, null = always) to `nad_document_requirement` and `nad_scholarship_document_requirement`. Manual rollback is in the file header.
+
+- **V120** adds `nad_document_template` (polymorphic `scope` PROGRAM/SCHOLARSHIP + `ref_id`, title, file name, `media_id` to a PROTECTED media asset). Manual rollback is in the file header.

@@ -10,6 +10,7 @@ import EligibilitySections from './form/EligibilitySections.vue'
 import FundingSections from './form/FundingSections.vue'
 import ApplicationSections from './form/ApplicationSections.vue'
 import PublishingSections from './form/PublishingSections.vue'
+import TemplatesSection from '../shared/TemplatesSection.vue'
 import { blankForm, buildPayload, formFromScholarship, scholarshipFormKey } from './scholarshipForm'
 
 const props = defineProps<{ modelValue: boolean, scholarship: Scholarship | null }>()
@@ -95,6 +96,10 @@ async function save() {
       <EligibilitySections />
       <FundingSections />
       <ApplicationSections />
+      <TemplatesSection
+        scope="scholarships"
+        :ref-id="scholarship?.view.id ?? null"
+      />
       <PublishingSections
         ref="publishing"
         :scholarship="scholarship"

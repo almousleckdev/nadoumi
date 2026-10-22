@@ -53,6 +53,11 @@ public final class MediaCategoryPolicy {
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             "text/plain");
 
+    /** A template an admin gives applicants to fill in: a PDF or a Word file (never macro-enabled). */
+    private static final Set<String> TEMPLATE_MIME = Set.of(
+            "application/pdf", "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
     /**
      * Resolved policy for one {@link MediaCategory}.
      *
@@ -120,6 +125,10 @@ public final class MediaCategoryPolicy {
         // a receipt or application form the system rendered: only ever the owner or staff, streamed by the backend
         RULES.put(MediaCategory.PAYMENT_DOCUMENT, new CategoryRule(
                 MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 5 * MB, RESOURCE_RAW, "payment/document"));
+
+        // a form template for applicants to download: not confidential, but still delivered through the backend
+        RULES.put(MediaCategory.DOCUMENT_TEMPLATE, new CategoryRule(
+                MediaAccessClass.PROTECTED, TEMPLATE_MIME, 10 * MB, RESOURCE_RAW, "document/template"));
 
         // the applicant's handwritten signature (re-encoded PNG): only the owner, and server jobs that print the form
         RULES.put(MediaCategory.APPLICANT_SIGNATURE, new CategoryRule(

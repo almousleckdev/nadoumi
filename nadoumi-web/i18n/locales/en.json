@@ -2641,5 +2641,11 @@
     "errors": {
       "required": "Add your signature before submitting."
     }
+  },
+  "templates": {
+    "title": "Forms to fill in",
+    "blurb": "Download these forms, complete them and upload them with your documents below.",
+    "download": "Download",
+    "failed": "The file could not be downloaded. Try again."
   }
 }

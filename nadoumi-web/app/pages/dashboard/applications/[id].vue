@@ -121,6 +121,7 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
         <NAlert v-if="actionError" tone="danger">{{ actionError }}</NAlert>
 
         <FormReadinessCard v-if="isDraft" :applicant-id="application.applicantId" />
+        <TemplateDownloadCard v-if="isDraft" :application-id="id" />
         <SignatureCard v-if="isDraft" :applicant-id="application.applicantId" @ready="signatureReady = $event" />
         <DocumentChecklistCard
           v-if="isDraft"

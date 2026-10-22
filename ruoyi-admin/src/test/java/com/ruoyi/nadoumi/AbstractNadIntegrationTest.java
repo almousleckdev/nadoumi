@@ -111,6 +111,7 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_media_access_log");
         jdbc.update("delete from nad_user_applicant_access");
         jdbc.update("delete from nad_document_requirement");
+        jdbc.update("delete from nad_document_template");
         jdbc.update("delete from nad_payment_document"); // RESTRICT to the payment; cascades its deliveries
         jdbc.update("delete from nad_application_payment"); // RESTRICT to nad_application; cascades its events
         jdbc.update("delete from nad_application"); // cascades events, tasks, decisions, snapshots, workflow instance

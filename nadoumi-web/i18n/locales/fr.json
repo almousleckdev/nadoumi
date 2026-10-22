@@ -2641,5 +2641,11 @@
     "errors": {
       "required": "Ajoutez votre signature avant de soumettre."
     }
+  },
+  "templates": {
+    "title": "Formulaires à remplir",
+    "blurb": "Téléchargez ces formulaires, remplissez-les puis téléversez-les avec vos documents ci-dessous.",
+    "download": "Télécharger",
+    "failed": "Le fichier n’a pas pu être téléchargé. Réessayez."
   }
 }

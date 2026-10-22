@@ -13,6 +13,7 @@ import OfferingSections from './form/OfferingSections.vue'
 import AdmissionSections from './form/AdmissionSections.vue'
 import StructureSections from './form/StructureSections.vue'
 import DocumentsSection from './form/DocumentsSection.vue'
+import TemplatesSection from '../shared/TemplatesSection.vue'
 import PublishingSections from './form/PublishingSections.vue'
 import { blankProgramForm, buildProgramPayload, formFromProgram, offeringProblems, programFormKey } from './programForm'
 
@@ -146,6 +147,10 @@ defineExpose({ form, save, rules })
       <AdmissionSections />
       <StructureSections :departments="departments" />
       <DocumentsSection />
+      <TemplatesSection
+        scope="programs"
+        :ref-id="program?.id ?? null"
+      />
       <PublishingSections
         ref="publishing"
         :program="program"
