@@ -16,7 +16,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,6 +54,14 @@ public class StudentPaymentDocumentController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
                         .filename(opened.document().getDocNumber() + ".pdf").build().toString())
                 .body(new InputStreamResource(opened.stream().body()));
+    }
+
+    /** Emails the receipt to the student again (at most once every few minutes). */
+    @PostMapping("/RECEIPT/resend")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    @PreAuthorize("@na.canAccessApplication(#id, 'VIEW_APPLICATION')")
+    public void resendReceipt(@PathVariable Long id) {
+        service.resendReceipt(id);
     }
 
     private static DocumentKind parse(String kind) {

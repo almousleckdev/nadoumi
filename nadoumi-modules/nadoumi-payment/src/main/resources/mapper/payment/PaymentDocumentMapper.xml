@@ -111,6 +111,18 @@
         where document_id = #{documentId} and recipient_user_id = #{userId} and sent_at is null
     </delete>
 
+    <select id="lastSentAt" resultType="java.time.LocalDateTime">
+        select max(sent_at) from nad_payment_document_delivery where document_id = #{documentId}
+    </select>
+
+    <delete id="clearDeliveries">
+        delete from nad_payment_document_delivery where document_id = #{documentId}
+    </delete>
+
+    <update id="markUndelivered">
+        update nad_payment_document set delivered_at = null where id = #{documentId}
+    </update>
+
     <select id="countSent" resultType="int">
         select count(*) from nad_payment_document_delivery
         where document_id = #{documentId} and recipient_user_id = #{userId} and sent_at is not null

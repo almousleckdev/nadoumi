@@ -119,6 +119,32 @@ public class PaymentDocumentService {
         return new OpenedDocument(document, media.openProxyStream(document.getMediaId(), context));
     }
 
+    /** How long a student must wait before the receipt can be emailed to them again. */
+    public static final java.time.Duration RESEND_COOLDOWN = java.time.Duration.ofMinutes(5);
+
+    /**
+     * Has the receipt emailed again: forgets its deliveries so the documents job sends it on its next pass. Allowed
+     * once the cooldown since the last send has passed, so it cannot be used to flood an inbox.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void resendReceipt(long applicationId) {
+        PaymentDocument receipt = listFor(applicationId).stream()
+                .filter(d -> d.getKind() == DocumentKind.RECEIPT)
+                .findFirst()
+                .orElseThrow(() -> new NadNotFoundException("document not found"));
+        LocalDateTime last = documents.lastSentAt(receipt.getId());
+        LocalDateTime now = LocalDateTime.now(clock.withZone(ZoneOffset.UTC));
+        if (last == null) {
+            return; // never sent yet: the job is about to send it
+        }
+        if (last.plus(RESEND_COOLDOWN).isAfter(now)) {
+            throw new com.nadoumi.payment.exception.PaymentThrottledException(
+                    "the receipt was sent a moment ago; try again in a few minutes");
+        }
+        documents.clearDeliveries(receipt.getId());
+        documents.markUndelivered(receipt.getId());
+    }
+
     /** The bytes of a stored document, for attaching to an email. */
     public byte[] read(PaymentDocument document, MediaAccessLogContext context) {
         try (var stream = media.openProxyStream(document.getMediaId(), context).body()) {

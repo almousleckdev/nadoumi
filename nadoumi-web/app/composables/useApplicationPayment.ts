@@ -14,6 +14,8 @@ export function useApplicationPayment(applicationId: number) {
     documents: () => studentFetch<PaymentDocumentDto[]>(`${base}/documents`),
     /** A PDF needs the session, so it is fetched as a blob and saved from an object URL. */
     document: (kind: PaymentDocumentKind) => studentFetch<Blob>(`${base}/documents/${kind}`, { responseType: 'blob' }),
+    /** Emails the receipt to the student again; the server allows it once every few minutes. */
+    resendReceipt: () => studentFetch(`${base}/documents/RECEIPT/resend`, { method: 'POST' }).then(() => undefined),
     submitProof: (transactionNo: string, file: File) => {
       const form = new FormData()
       form.append('transactionNo', transactionNo)

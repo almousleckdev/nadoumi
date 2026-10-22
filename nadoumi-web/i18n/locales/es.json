@@ -2515,7 +2515,10 @@
       "receipt": "Recibo de pago",
       "form": "Formulario de solicitud",
       "download": "Descargar PDF",
-      "failed": "No se pudo descargar el documento. Inténtalo de nuevo."
+      "failed": "No se pudo descargar el documento. Inténtalo de nuevo.",
+      "resend": "Enviarme el recibo de nuevo",
+      "resent": "Recibo enviado. Revisa tu bandeja de entrada.",
+      "resendWait": "El recibo se envió hace un momento. Inténtalo de nuevo en unos minutos."
     }
   },
   "apply": {

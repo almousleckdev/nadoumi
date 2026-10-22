@@ -14,6 +14,7 @@ const MAX_POLLS = 15
 const documents = ref<PaymentDocumentDto[]>([])
 const polls = ref(0)
 const downloading = ref<PaymentDocumentKind | null>(null)
+const resending = ref(false)
 let timer: ReturnType<typeof setTimeout> | null = null
 
 const READY_KINDS: readonly PaymentDocumentKind[] = ['RECEIPT', 'APPLICATION_FORM']
@@ -48,6 +49,21 @@ async function download(doc: PaymentDocumentDto) {
   }
 }
 
+async function resend() {
+  resending.value = true
+  try {
+    await api.resendReceipt()
+    toast.success(t('payment.documents.resent'))
+  }
+  catch (e) {
+    const status = (e as { statusCode?: number, status?: number }).statusCode ?? (e as { status?: number }).status
+    toast.error(status === 429 ? t('payment.documents.resendWait') : t('payment.documents.failed'))
+  }
+  finally {
+    resending.value = false
+  }
+}
+
 onMounted(load)
 onBeforeUnmount(() => {
   if (timer !== null) clearTimeout(timer)
@@ -69,5 +85,10 @@ onBeforeUnmount(() => {
         </NButton>
       </li>
     </ul>
+    <div v-if="documents.some((d: PaymentDocumentDto) => d.kind === 'RECEIPT')">
+      <NButton variant="ghost" size="sm" :loading="resending" data-test="resend-receipt" @click="resend">
+        {{ t('payment.documents.resend') }}
+      </NButton>
+    </div>
   </div>
 </template>

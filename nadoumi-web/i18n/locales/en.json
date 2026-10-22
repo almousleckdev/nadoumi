@@ -2515,7 +2515,10 @@
       "receipt": "Payment receipt",
       "form": "Application form",
       "download": "Download PDF",
-      "failed": "The document could not be downloaded. Try again."
+      "failed": "The document could not be downloaded. Try again.",
+      "resend": "Email me the receipt again",
+      "resent": "Receipt sent. Check your inbox.",
+      "resendWait": "The receipt was sent a moment ago. Try again in a few minutes."
     }
   },
   "apply": {

@@ -38,6 +38,14 @@ public interface PaymentDocumentMapper {
 
     int releaseClaim(@Param("documentId") long documentId, @Param("userId") long userId);
 
+    /** When the document was last emailed to anyone, or null if never. */
+    LocalDateTime lastSentAt(@Param("documentId") long documentId);
+
+    /** Forgets every delivery of the document so it is emailed again by the next worker pass. */
+    int clearDeliveries(@Param("documentId") long documentId);
+
+    int markUndelivered(@Param("documentId") long documentId);
+
     /** 1 once the document was really sent to this user. */
     int countSent(@Param("documentId") long documentId, @Param("userId") long userId);
 

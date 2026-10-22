@@ -5,7 +5,7 @@ import PaymentPanel from '~/components/payment/PaymentPanel.vue'
 import type { StudentPaymentDto } from '~/types/payment'
 
 const api = vi.hoisted(() => ({
-  overview: vi.fn(), start: vi.fn(), cancel: vi.fn(), qr: vi.fn(), submitProof: vi.fn(), documents: vi.fn(), document: vi.fn(),
+  overview: vi.fn(), start: vi.fn(), cancel: vi.fn(), qr: vi.fn(), submitProof: vi.fn(), documents: vi.fn(), document: vi.fn(), resendReceipt: vi.fn(),
 }))
 mockNuxtImport('useApplicationPayment', () => () => api)
 
@@ -81,6 +81,11 @@ describe('PaymentPanel', () => {
     await w.find('[data-test="download-RECEIPT"]').trigger('click')
     await flushPromises()
     expect(api.document).toHaveBeenCalledWith('RECEIPT')
+
+    api.resendReceipt.mockResolvedValue(undefined)
+    await w.find('[data-test="resend-receipt"]').trigger('click')
+    await flushPromises()
+    expect(api.resendReceipt).toHaveBeenCalledOnce()
   })
 
   it('tells the student the documents are being prepared until they exist', async () => {
