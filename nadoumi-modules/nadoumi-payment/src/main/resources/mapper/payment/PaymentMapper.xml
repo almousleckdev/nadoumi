@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.payment.mapper.PaymentMapper">
+
+    <resultMap id="payment" type="com.nadoumi.payment.domain.ApplicationPayment">
+        <id     property="id"              column="id"/>
+        <result property="applicationId"   column="application_id"/>
+        <result property="applicantId"     column="applicant_id"/>
+        <result property="applicantName"   column="applicant_name"/>
+        <result property="kind"            column="kind"/>
+        <result property="amount"          column="amount"/>
+        <result property="currency"        column="currency"/>
+        <result property="method"          column="method"/>
+        <result property="reference"       column="reference"/>
+        <result property="status"          column="status"/>
+        <result property="expiresAt"       column="expires_at"/>
+        <result property="studentTxnNo"    column="student_txn_no"/>
+        <result property="proofMediaId"    column="proof_media_id"/>
+        <result property="submittedAt"     column="submitted_at"/>
+        <result property="verifiedBy"      column="verified_by"/>
+        <result property="verifiedAt"      column="verified_at"/>
+        <result property="rejectionReason" column="rejection_reason"/>
+        <result property="version"         column="version"/>
+        <result property="createBy"        column="create_by"/>
+        <result property="createTime"      column="create_time"/>
+        <result property="updateBy"        column="update_by"/>
+        <result property="updateTime"      column="update_time"/>
+    </resultMap>
+
+    <sql id="cols">
+        id, application_id, applicant_id, applicant_name, kind, amount, currency, method, reference, status,
+        expires_at, student_txn_no, proof_media_id, submitted_at, verified_by, verified_at, rejection_reason,
+        version, create_by, create_time, update_by, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.payment.domain.ApplicationPayment"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_payment
+            (application_id, applicant_id, applicant_name, kind, amount, currency, method, reference, status,
+             expires_at, create_by, create_time)
+        values
+            (#{applicationId}, #{applicantId}, #{applicantName}, #{kind}, #{amount}, #{currency}, #{method},
+             #{reference}, #{status}, #{expiresAt}, #{createBy}, #{createTime})
+    </insert>
+
+    <select id="findById" resultMap="payment">
+        select <include refid="cols"/> from nad_application_payment where id = #{id}
+    </select>
+
+    <select id="findOpen" resultMap="payment">
+        select <include refid="cols"/> from nad_application_payment
+        where application_id = #{applicationId} and kind = #{kind} and status in ('PENDING', 'PROOF_SUBMITTED')
+        limit 1
+    </select>
+
+    <select id="findLatest" resultMap="payment">
+        select <include refid="cols"/> from nad_application_payment
+        where application_id = #{applicationId} and kind = #{kind}
+        order by id desc limit 1
+    </select>
+
+    <select id="countConfirmed" resultType="java.lang.Integer">
+        select count(*) from nad_application_payment
+        where application_id = #{applicationId} and kind = #{kind} and status = 'CONFIRMED'
+    </select>
+
+    <select id="search" resultMap="payment">
+        select <include refid="cols"/> from nad_application_payment
+        <where>
+            <if test="status != null">and status = #{status}</if>
+            <if test="q != null and q != ''">
+                and (reference like concat('%', #{q}, '%')
+                     or student_txn_no like concat('%', #{q}, '%')
+                     or applicant_name like concat('%', #{q}, '%'))
+            </if>
+        </where>
+        order by (status = 'PROOF_SUBMITTED') desc, coalesce(submitted_at, create_time) desc, id desc
+    </select>
+
+    <update id="markProofSubmitted">
+        update nad_application_payment
+        set status = 'PROOF_SUBMITTED', student_txn_no = #{txnNo}, proof_media_id = #{proofMediaId},
+            submitted_at = #{now}, version = version + 1, update_by = #{by}, update_time = #{now}
+        where id = #{id} and status = 'PENDING' and version = #{version} and expires_at > #{now}
+    </update>
+
+    <update id="markConfirmed">
+        update nad_application_payment
+        set status = 'CONFIRMED', verified_by = #{verifiedBy}, verified_at = #{now}, rejection_reason = null,
+            version = version + 1, update_by = #{verifiedBy}, update_time = #{now}
+        where id = #{id} and status = 'PROOF_SUBMITTED' and version = #{version}
+    </update>
+
+    <update id="markRejected">
+        update nad_application_payment
+        set status = 'REJECTED', verified_by = #{verifiedBy}, verified_at = #{now}, rejection_reason = #{reason},
+            version = version + 1, update_by = #{verifiedBy}, update_time = #{now}
+        where id = #{id} and status = 'PROOF_SUBMITTED' and version = #{version}
+    </update>
+
+    <update id="markCancelled">
+        update nad_application_payment
+        set status = 'CANCELLED', version = version + 1, update_by = #{by}, update_time = #{now}
+        where id = #{id} and status = 'PENDING' and version = #{version}
+    </update>
+
+    <update id="markExpired">
+        update nad_application_payment
+        set status = 'EXPIRED', version = version + 1, update_by = 'system', update_time = #{now}
+        where id = #{id} and status = 'PENDING' and expires_at &lt;= #{now}
+    </update>
+
+    <select id="findOverdueIds" resultType="java.lang.Long">
+        select id from nad_application_payment where status = 'PENDING' and expires_at &lt;= #{now}
+    </select>
+
+    <select id="findProofMediaIdsByApplicant" resultType="java.lang.Long">
+        select proof_media_id from nad_application_payment
+        where applicant_id = #{applicantId} and proof_media_id is not null
+    </select>
+
+    <delete id="deleteByApplicantId">
+        delete from nad_application_payment where applicant_id = #{applicantId}
+    </delete>
+
+    <insert id="insertEvent">
+        insert into nad_application_payment_event (payment_id, from_status, to_status, actor_kind, actor_id, note, created_at)
+        values (#{paymentId}, #{from}, #{to}, #{actorKind}, #{actorId}, #{note}, #{at})
+    </insert>
+
+</mapper>

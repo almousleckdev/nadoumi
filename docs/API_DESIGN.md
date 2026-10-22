@@ -285,6 +285,20 @@ cross-module SQL join. No commercial data. `ProgramResponse` (staff) carries
 `intakes`; `PublicProgramResponse` drops the operational fields, and list rows
 drop `majors` / `intakes` (the detail endpoint fills them).
 
+**Offerings (V108).** A programme carries `offerings[]`: one entry per level and
+duration with `tuitionAmount` / `tuitionPeriod` and `accommodationAmount` /
+`accommodationPeriod` (plus computed `*AmountUsd`). The request no longer takes
+`durationMonths` / `tuitionAmount`; `durationMonths` and `tuitionAmount` on the
+response are the derived "from" values. The request also takes the admission
+content (`admissionRequirements`, `applicationDocuments`, `careerProspects`,
+`scholarshipInfo`, `minHsk`, `minIelts`, `minToefl`, `applicationFeeAmount`).
+Durations below the level minimum (Bachelor 48, Master 24, PhD 36 months) are
+rejected with 400. Public list rows leave `offerings` and the prose fields null.
+
+**University (V109).** Staff and public university responses carry `address` and
+`links[]`; the public detail also carries `departments[]` (name, nameCn,
+programCount).
+
 **Staff** — `/api/staff/programs`, `StaffProgramController`.
 
 | Method | Path | Permission | Notes |
@@ -470,3 +484,31 @@ Responses use explicit DTOs (`ConversationSummaryResponse`, `MessageResponse`, `
 ### Scholarship fields of study (EXISTING, 2026-10-09, V104)
 
 `POST/PUT /api/staff/scholarships` accepts `fields: [{ level?, name }]`: one or many fields, each for every level (`level` omitted) or for one education level. A `level` the scholarship does not offer is a `400`. Names are trimmed and de-duplicated per level. The older single `field` string is still accepted when `fields` is absent (it becomes one every-level entry). Responses (`view.fields` on staff, `fields` on `/api/public/scholarships[/{slug}]`) list every entry; `field` is only the joined summary. `GET /api/public/scholarships?field=Medicine` matches a scholarship that lists that field at any level.
+
+## Application fee payment: EXISTING (2026-10-22)
+
+Student (`@na.canAccessApplication`), base `/api/student/applications/{id}/payment`: `GET` overview (state, amount,
+`secondsLeft`), `POST /session` (open the 15-minute QR session), `GET /qr` (PNG, only while a session is open,
+`no-store`), `POST /proof` (multipart `transactionNo` + `file`), `POST /cancel`. `POST .../submit` answers **402**
+until the fee is confirmed. Staff (`nad:payment:list|query|verify`), base `/api/staff/payments`: `GET` queue,
+`GET /{id}`, `GET /{id}/proof` (streamed), `POST /{id}/confirm`, `POST /{id}/reject` `{reason}`. Errors: 402 fee
+unpaid, 409 window closed / already decided / transaction number reused, 403 not your application or self-verify.
+Responses never carry a media id or storage URL.
+
+Documents (EXISTING, 2026-10-22), `VIEW_APPLICATION`: `GET /api/student/applications/{id}/payment/documents` lists the latest
+receipt and application form (`kind, number, version, generatedAt, sizeBytes`; no media id); `GET .../documents/{kind}`
+streams the PDF (`kind` is `RECEIPT` or `APPLICATION_FORM`, case-insensitive; unknown kind or not yet generated is 404).
+
+`POST /api/student/applications` (EXISTING, 2026-10-22; same service as `POST /api/public/applications`): body
+`{applicantId, applicationType: PROGRAM_ONLY | PROGRAM_WITH_SCHOLARSHIP | SCHOLARSHIP_ONLY, programId?, scholarshipId?, intakeId?}`; the
+columns each type may carry are validated server-side (400); the caller needs `CREATE_APPLICATION` on the applicant (403).
+
+Family data (EXISTING, 2026-10-22), under `/api/student/applicants/{id}` with `VIEW_PROFILE` for reads and `EDIT_PROFILE` for writes:
+`GET|PUT /personal-details` (204 until saved), `GET|POST /family` and `PUT|DELETE /family/{memberId}`,
+`GET|PUT /people/{supporter|china-emergency}`, and `GET /form-readiness` (`{missing: [PERSONAL_DETAILS|FAMILY|SUPPORTER|CHINA_EMERGENCY]}`).
+Validation failures are 400 (second father, a death without a note, a future birth date); another student's applicant is 403.
+
+Document checklist (EXISTING, 2026-10-22): `GET /api/student/applications/{id}/documents/checklist` (`VIEW_APPLICATION`) lists
+`{docType, mandatory, note, status, documentId, rejectionReason}`; uploads use the existing `POST /api/student/documents` with the
+application id. `POST .../submit` answers **409** while a mandatory document is missing. Staff edit a programme's list with
+`GET|PUT /api/staff/document-requirements/programs/{programId}` (`nad:program:view` / `nad:program:edit`; a doc type may appear once).

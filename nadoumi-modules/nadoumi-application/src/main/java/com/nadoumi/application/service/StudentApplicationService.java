@@ -1,6 +1,8 @@
 package com.nadoumi.application.service;
 
 import com.nadoumi.application.domain.Application;
+import com.nadoumi.application.exception.DocumentsRequiredException;
+import com.nadoumi.application.exception.PaymentRequiredException;
 import com.nadoumi.application.domain.ApplicationEvent;
 import com.nadoumi.application.domain.WfStage;
 import com.nadoumi.application.mapper.ApplicationEventMapper;
@@ -33,10 +35,15 @@ public class StudentApplicationService {
     private final WorkflowService workflow;
     private final NadoumiAccessService access;
     private final CurrentCaller caller;
+    private final PaymentGuardProvider payments;
+    private final ApplicationChecklistService checklist;
 
     public StudentApplicationService(ApplicationMapper applicationMapper, WfDefinitionMapper definitionMapper,
             ApplicationEventMapper eventMapper, WorkflowService workflow, NadoumiAccessService access,
-            CurrentCaller caller) {
+            CurrentCaller caller, PaymentGuardProvider payments,
+            ApplicationChecklistService checklist) {
+        this.payments = payments;
+        this.checklist = checklist;
         this.applicationMapper = applicationMapper;
         this.definitionMapper = definitionMapper;
         this.eventMapper = eventMapper;
@@ -78,6 +85,7 @@ public class StudentApplicationService {
         if (!"DRAFT".equals(application.getCurrentStatus())) {
             throw new NadBadRequestException("the opportunity can only be changed while the application is a draft");
         }
+        ApplicationShape.validate(application.getApplicationType(), req.programId(), req.scholarshipId(), req.intakeId());
         application.setProgramId(req.programId());
         application.setScholarshipId(req.scholarshipId());
         application.setIntakeId(req.intakeId());
@@ -89,6 +97,14 @@ public class StudentApplicationService {
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse submit(Long id) {
         Application current = load(id);
+        // No application fee, no submission: a draft stays saved but cannot be submitted until it is paid.
+        if (!payments.isSettled(id, PaymentGuardProvider.APPLICATION_FEE)) {
+            throw new PaymentRequiredException("the application fee must be paid before the application can be submitted");
+        }
+        List<String> missing = checklist.missingMandatory(id);
+        if (!missing.isEmpty()) {
+            throw new DocumentsRequiredException("upload the required documents before submitting: " + String.join(", ", missing));
+        }
         Application updated = workflow.execute(id, "submit", caller.requireUserId(), false, null, current.getVersion());
         return toResponse(updated);
     }

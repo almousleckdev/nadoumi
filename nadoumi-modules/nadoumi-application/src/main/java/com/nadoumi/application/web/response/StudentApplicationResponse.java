@@ -10,6 +10,7 @@ import java.util.List;
  */
 public record StudentApplicationResponse(
         Long id,
+        Long applicantId,
         String applicationType,
         Long programId,
         Long scholarshipId,
@@ -21,7 +22,7 @@ public record StudentApplicationResponse(
 
     public static StudentApplicationResponse of(Application a, WfStage stage, List<String> timeline) {
         return new StudentApplicationResponse(
-                a.getId(), a.getApplicationType() == null ? null : a.getApplicationType().name(),
+                a.getId(), a.getApplicantId(), a.getApplicationType() == null ? null : a.getApplicationType().name(),
                 a.getProgramId(), a.getScholarshipId(), a.getIntakeId(),
                 stage == null ? null : stage.getName(), a.getCurrentStatus(),
                 a.getSubmittedAt() == null ? null : a.getSubmittedAt().toString(), timeline);

@@ -37,4 +37,8 @@
         insert into nad_document_requirement (scope, ref_id, doc_type, mandatory, waivable, notes, create_by, create_time)
         values (#{scope}, #{refId}, #{docType}, #{mandatory}, #{waivable}, #{notes}, #{createBy}, now())
     </insert>
+
+    <delete id="deleteByScope">
+        delete from nad_document_requirement where scope = #{scope} and ref_id = #{refId}
+    </delete>
 </mapper>

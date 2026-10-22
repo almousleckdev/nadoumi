@@ -425,7 +425,8 @@
       "interests": "Interests",
       "location": "Location",
       "work": "Work",
-      "applications": "My Applications"
+      "applications": "My Applications",
+      "family": "Family and supporters"
     },
     "welcome": "Welcome back, {name}",
     "overviewBlurb": "Complete your applicant profile so staff can start matching you to opportunities.",
@@ -710,7 +711,8 @@
       "type": {
         "PROGRAM_WITH_SCHOLARSHIP": "Programme with scholarship",
         "PROGRAM_ONLY": "Programme application",
-        "UNKNOWN": "Application"
+        "UNKNOWN": "Application",
+        "SCHOLARSHIP_ONLY": "Scholarship application"
       },
       "status": {
         "DRAFT": "Draft",
@@ -787,7 +789,6 @@
     "intro": "A few steps to get your applicant profile ready. You can come back and edit any section later.",
     "progress": "Step {n} of {total}",
     "next": "Next",
-    "back": "Back",
     "finish": "Finish",
     "skip": "Skip for now",
     "saved": "Saved",
@@ -854,7 +855,6 @@
       "none": "No photo",
       "tooSmall": "Image must be at least {px}x{px} pixels.",
       "saved": "Photo saved",
-      "current": "Current photo",
       "save": "Save photo"
     },
     "upload": {
@@ -894,8 +894,6 @@
     },
     "progressLabel": "Onboarding progress",
     "optionalTag": "Optional",
-    "helpTitle": "Need help?",
-    "helpBody": "Our team is happy to guide you. Email support{'@'}nadoumi.com.",
     "eyebrow": "Step {n} of {total}"
   },
   "university": {
@@ -919,7 +917,30 @@
     "contact": "Official contact",
     "website": "Official website",
     "admissionsEmail": "Admissions",
-    "officePhone": "Phone"
+    "officePhone": "Phone",
+    "address": "Address",
+    "viewOnMap": "View on map",
+    "channels": "Official channels",
+    "departments": "Departments and colleges",
+    "programmeCount": "{n} programmes",
+    "statIntlShare": "International students",
+    "statProgrammes": "Programmes",
+    "statLevels": "Levels offered",
+    "statTuitionFrom": "Tuition from",
+    "link": {
+      "ADMISSIONS": "Admissions page",
+      "VIRTUAL_TOUR": "Virtual tour",
+      "WIKIPEDIA": "Wikipedia",
+      "FACEBOOK": "Facebook",
+      "X": "X",
+      "INSTAGRAM": "Instagram",
+      "YOUTUBE": "YouTube",
+      "LINKEDIN": "LinkedIn",
+      "TIKTOK": "TikTok",
+      "WECHAT": "WeChat",
+      "WEIBO": "Weibo"
+    },
+    "wechatId": "WeChat ID"
   },
   "program": {
     "fallbackTitle": "Programme",
@@ -971,7 +992,36 @@
     "majorsIntro": "Fields of study you can specialise in within this programme.",
     "tuitionNote": "Set by the university. The USD figure is indicative.",
     "universityLabel": "University",
-    "viewAll": "View all programmes"
+    "viewAll": "View all programmes",
+    "durationYears": "{n} year | {n} years",
+    "tuitionFrom": "Tuition from",
+    "accommodationFrom": "Accommodation from",
+    "offerings": {
+      "title": "Programme options",
+      "description": "Duration, tuition and accommodation for each level.",
+      "duration": "Duration",
+      "tuition": "Tuition",
+      "accommodation": "Accommodation",
+      "noPrice": "Ask our team",
+      "period": {
+        "PER_YEAR": "per year",
+        "PER_SEMESTER": "per semester",
+        "PER_MONTH": "per month",
+        "TOTAL": "in total"
+      },
+      "notePrefix": "Note"
+    },
+    "admission": {
+      "requirements": "Admission requirements",
+      "language": "Language requirements",
+      "hsk": "HSK {n} or above",
+      "ielts": "IELTS {n} or above",
+      "toefl": "TOEFL {n} or above",
+      "documents": "Required documents",
+      "applicationFee": "Application fee",
+      "scholarships": "Scholarships",
+      "career": "Career prospects"
+    }
   },
   "scholarships": {
     "searchLabel": "Search scholarships",
@@ -1112,14 +1162,19 @@
     },
     "doc": {
       "PASSPORT": "Passport",
-      "DEGREE": "Degree certificate",
       "TRANSCRIPT": "Academic transcript",
-      "LANGUAGE_CERT": "Language certificate",
       "VISA": "Visa",
       "PHYSICAL_EXAM": "Physical examination",
       "STUDY_PLAN": "Study plan",
       "RECOMMENDATION_LETTER": "Recommendation letter",
-      "OTHER": "Other document"
+      "OTHER": "Other document",
+      "DEGREE_CERTIFICATE": "Degree certificate",
+      "LANGUAGE_TEST_REPORT": "Language certificate",
+      "PERSONAL_STATEMENT": "Personal statement",
+      "FINANCIAL_PROOF": "Financial proof (bank statement)",
+      "POLICE_CLEARANCE": "Police clearance",
+      "PHOTO": "Passport photo",
+      "CV": "CV"
     },
     "elig": {
       "age": "Age",
@@ -2124,10 +2179,9 @@
   },
   "passport": {
     "title": "Passport",
-    "guidance": "Upload a clear photo or scan of your passport photo page, then confirm the details below.",
+    "guidance": "Upload a clear photo or scan of your passport photo page, then enter its number and dates.",
     "none": "No passport uploaded",
     "formats": "JPEG, PNG or PDF, up to 10 MB",
-    "expiresOn": "Expires {date}",
     "detailsTitle": "Passport details",
     "fields": {
       "passportNo": "Passport number",
@@ -2329,6 +2383,23 @@
       "EN": "English",
       "ZH": "Chinese",
       "EN_ZH": "English and Chinese"
+    },
+    "maritalStatus": {
+      "SINGLE": "Single",
+      "MARRIED": "Married",
+      "OTHER": "Other"
+    },
+    "familyRelation": {
+      "FATHER": "Father",
+      "MOTHER": "Mother",
+      "SPOUSE": "Spouse",
+      "SIBLING": "Sibling",
+      "OTHER": "Other relative"
+    },
+    "personGender": {
+      "FEMALE": "Female",
+      "MALE": "Male",
+      "UNSPECIFIED": "Prefer not to say"
     }
   },
   "news": {
@@ -2395,5 +2466,153 @@
     "visaExpired": "This visa has already expired.",
     "needOne": "Add at least one.",
     "needCities": "Add at least three provinces or cities."
+  },
+  "payment": {
+    "title": "Application fee",
+    "intro": "Pay the Nadoumi application fee to submit your application. Your application stays saved until you pay.",
+    "amount": "Amount",
+    "payee": "Pay to",
+    "reference": "Payment reference",
+    "referenceHint": "Write this reference in the payment note if your app allows it.",
+    "copy": "Copy",
+    "copied": "Reference copied",
+    "pay": "Pay now",
+    "payAgain": "Pay again",
+    "payToSubmit": "Pay the application fee to submit your application.",
+    "timeLeft": "Time left to pay",
+    "qrAlt": "Payment QR code",
+    "step1": "Open your banking or payment app and scan the QR code.",
+    "step2": "Pay exactly {amount}.",
+    "step3": "Write the reference in the payment note.",
+    "step4": "Then enter the transaction number and upload a screenshot below.",
+    "transactionNo": "Transaction number",
+    "transactionNoHint": "Shown on your payment receipt (6 to 40 letters or digits).",
+    "screenshot": "Payment screenshot",
+    "fileHint": "JPEG, PNG or PDF, up to {mb} MB",
+    "iHavePaid": "I have paid",
+    "cancel": "Close payment",
+    "verifyingTitle": "Verification in progress",
+    "verifyingBody": "We received your payment details. Our team will confirm your payment and you will be notified.",
+    "confirmedTitle": "Payment confirmed",
+    "confirmedBody": "Your application fee is paid. You can now submit your application.",
+    "rejectedTitle": "Your payment was not accepted",
+    "expiredTitle": "The payment time ran out",
+    "expiredBody": "You have 15 minutes to pay once the QR code is shown. Start again when you are ready. If you already paid, contact support with your reference.",
+    "errors": {
+      "qrFailed": "The QR code could not be loaded. Close the payment and try again.",
+      "txnInvalid": "Enter the transaction number from your payment (6 to 40 letters or digits).",
+      "screenshotRequired": "Upload a screenshot of your payment.",
+      "fileType": "Upload a JPEG, PNG or PDF file.",
+      "windowClosed": "The payment time ran out. Start a new payment.",
+      "txnReused": "This transaction number was already used.",
+      "noSession": "There is no open payment. Start a payment first.",
+      "beingVerified": "Your payment was already reported and is being verified.",
+      "paymentRequired": "Pay the application fee before submitting."
+    },
+    "documents": {
+      "title": "Your documents",
+      "preparing": "We are preparing your receipt and application form. They appear here in a moment, and the receipt is emailed to you.",
+      "receipt": "Payment receipt",
+      "form": "Application form",
+      "download": "Download PDF",
+      "failed": "The document could not be downloaded. Try again."
+    }
+  },
+  "apply": {
+    "title": "Apply",
+    "blurb": "Start your application.",
+    "back": "Back",
+    "noTarget": "Choose a programme or scholarship to apply for.",
+    "notFound": "We could not find what you want to apply for. It may no longer be open.",
+    "studentTitle": "Who is applying",
+    "studentLegend": "Student",
+    "unnamedStudent": "Student",
+    "noStudents": "Complete your student profile before applying.",
+    "intakeTitle": "Intake",
+    "intakeLabel": "Choose an intake",
+    "intakePlaceholder": "Select an intake",
+    "noIntake": "This programme has no intake open for applications right now.",
+    "nextTitle": "What happens next",
+    "nextBody": "We save a draft application straight away. Next you pay the Nadoumi application fee, which you can do any time, then submit your application. Your draft stays saved until you submit.",
+    "start": "Start application",
+    "continueDraft": "Continue your draft",
+    "draftExists": "You already have a draft application for this."
+  },
+  "family": {
+    "title": "Family and supporters",
+    "blurb": "The Nadoumi application form asks for these details. Fill them in once and we reuse them for every application.",
+    "personal": {
+      "title": "Personal details",
+      "marital": "Marital status",
+      "religion": "Religion",
+      "placeOfBirth": "Place of birth",
+      "officialLanguage": "Official language of your country",
+      "permanentAddress": "Permanent address",
+      "postcode": "Post code"
+    },
+    "member": {
+      "title": "Family members",
+      "rule": "Add both parents. If a parent has died, say so and add at least two siblings or other relatives instead.",
+      "empty": "No family members added yet.",
+      "add": "Add a family member",
+      "relation": "Relationship",
+      "fullName": "Full name",
+      "dateOfBirth": "Date of birth",
+      "nationality": "Nationality",
+      "deceased": "This person has died",
+      "deceasedTag": "Deceased",
+      "note": "Note",
+      "noteHint": "For example, the year and a short reason.",
+      "company": "Company",
+      "position": "Position",
+      "companyAddress": "Company address",
+      "phone": "Phone",
+      "email": "Email"
+    },
+    "supporter": {
+      "title": "Financial supporter",
+      "hint": "The person who pays for your studies. Their details must match your bank statement or guarantee letter."
+    },
+    "chinaEmergency": {
+      "title": "Emergency contact in China",
+      "hint": "Someone in China we can reach if we cannot reach you."
+    },
+    "person": {
+      "fullName": "Full name",
+      "relationship": "Relationship to you",
+      "gender": "Gender",
+      "phone": "Phone",
+      "email": "Email",
+      "position": "Position",
+      "company": "Company or institution",
+      "companyAddress": "Company address",
+      "homeAddress": "Home address"
+    },
+    "readiness": {
+      "title": "Complete your application form",
+      "body": "These parts of the Nadoumi application form are still empty. You can still submit, but the form will print them as not provided.",
+      "fill": "Fill them in",
+      "PERSONAL_DETAILS": "Personal details",
+      "FAMILY": "Family members",
+      "SUPPORTER": "Financial supporter",
+      "CHINA_EMERGENCY": "Emergency contact in China"
+    }
+  },
+  "checklist": {
+    "title": "Documents to upload",
+    "blurb": "These are the documents this application needs. Upload each one as a PDF, JPEG or PNG. The Nadoumi team reviews them after you submit.",
+    "mandatory": "Required",
+    "optional": "Optional",
+    "upload": "Upload",
+    "uploadAgain": "Upload again",
+    "uploaded": "Document uploaded",
+    "badType": "Upload a PDF, JPEG or PNG file within the size limit.",
+    "uploadToSubmit": "Upload the required documents to submit your application.",
+    "status": {
+      "MISSING": "Not uploaded"
+    },
+    "errors": {
+      "required": "Upload the required documents before submitting."
+    }
   }
 }

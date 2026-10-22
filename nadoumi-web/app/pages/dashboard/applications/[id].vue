@@ -37,6 +37,17 @@ async function load() {
 }
 await load()
 
+// the fee gates Submit: a draft stays saved, but it cannot be submitted until the fee is paid
+const feeSettled = ref(false)
+const documentsReady = ref(true) // nothing is held back until the checklist says otherwise
+
+// say why Submit is locked, never just grey it out
+const submitHint = computed(() => {
+  if (!feeSettled.value) return t('payment.payToSubmit')
+  if (!documentsReady.value) return t('checklist.uploadToSubmit')
+  return t('dashboard.applications.submitHint')
+})
+
 const timeline = computed(() => safeTimeline(application.value?.timeline ?? []))
 const isDraft = computed(() => application.value?.currentStatus === 'DRAFT')
 const canWithdraw = computed(() => !isClosed(application.value?.currentStatus ?? null))
@@ -107,6 +118,15 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
         <NAlert v-if="notice" tone="success">{{ notice }}</NAlert>
         <NAlert v-if="actionError" tone="danger">{{ actionError }}</NAlert>
 
+        <FormReadinessCard v-if="isDraft" :applicant-id="application.applicantId" />
+        <DocumentChecklistCard
+          v-if="isDraft"
+          :application-id="id"
+          :applicant-id="application.applicantId"
+          @ready="documentsReady = $event"
+        />
+        <PaymentPanel v-if="isDraft" :application-id="id" @settled="feeSettled = $event" />
+
         <SectionCard :title="t('dashboard.applications.timeline')">
           <p v-if="!timeline.length" class="text-sm text-slate-500">{{ t('dashboard.applications.timelineEmpty') }}</p>
           <ol v-else class="grid gap-3" data-test="timeline">
@@ -120,8 +140,10 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
         <SectionCard v-if="isDraft || canWithdraw" :title="t('dashboard.applications.actions')">
           <div class="grid gap-4">
             <div v-if="isDraft">
-              <p class="mb-2 text-sm text-slate-500">{{ t('dashboard.applications.submitHint') }}</p>
-              <NButton :loading="busy" data-test="submit" @click="onSubmit">{{ t('dashboard.applications.submit') }}</NButton>
+              <p class="mb-2 text-sm text-slate-500">
+                {{ submitHint }}
+              </p>
+              <NButton :loading="busy" :disabled="!feeSettled || !documentsReady" data-test="submit" @click="onSubmit">{{ t('dashboard.applications.submit') }}</NButton>
             </div>
 
             <div v-if="canWithdraw">

@@ -86,9 +86,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V107 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V117 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(98);
+        assertThat(applied).isEqualTo(108);
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
         assertThat(single(ds, "SELECT character_maximum_length FROM information_schema.columns WHERE table_schema = DATABASE() "
@@ -257,7 +257,9 @@ class FlywayMigrationsIT {
         // + 1 from V83 (MESSAGE_POSTED) + 3 from V89 (TICKET_OPENED/ASSIGNED/STATUS_CHANGED)
         // + 2 from V94 (ARTICLE_PUBLISHED, IN_APP + EMAIL)
         // - 4 from V98 (EMAIL templates of the four student-only announcements) + 1 (APPLICATION_RECEIVED IN_APP)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("21");
+        // + 5 from V111 (PAYMENT_PROOF_SUBMITTED IN_APP; PAYMENT_CONFIRMED and PAYMENT_REJECTED, each IN_APP + EMAIL)
+        // - 1 from V113 (the PAYMENT_CONFIRMED EMAIL: the receipt email replaces it)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("25");
         // V34 — notification dispatch Quartz job, seeded active
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");
@@ -408,7 +410,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(97); // V2..V107, same gaps as above
+        assertThat(applied).isEqualTo(107); // V2..V117, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

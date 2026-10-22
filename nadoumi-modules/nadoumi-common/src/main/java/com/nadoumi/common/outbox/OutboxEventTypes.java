@@ -50,6 +50,15 @@ public final class OutboxEventTypes {
      */
     public static final String APPLICATION_STATUS_CHANGED = "ApplicationStatusChanged";
 
+    /** A student reported an application-fee payment; staff who verify payments are told. Aggregate: {@code application}. */
+    public static final String PAYMENT_PROOF_SUBMITTED = "PaymentProofSubmitted";
+
+    /** Staff confirmed an application-fee payment; the applicant's users are told. Aggregate: {@code application}. */
+    public static final String PAYMENT_CONFIRMED = "PaymentConfirmed";
+
+    /** Staff rejected an application-fee payment proof; the applicant's users are told. Aggregate: {@code application}. */
+    public static final String PAYMENT_REJECTED = "PaymentRejected";
+
     /**
      * A student's application reached the staff queue. Aggregate: {@code application}. Audience: staff holding
      * the application list permission, minus the person who submitted it.

@@ -68,6 +68,9 @@ public class ApplicantErasureService {
         erasure.deleteResidence(applicantId);
         erasure.deleteTestScores(applicantId);
         erasure.deleteWork(applicantId);
+        erasure.deleteFamilyMembers(applicantId);
+        erasure.deletePersons(applicantId);
+        erasure.deletePersonal(applicantId);
         erasure.deleteApplicant(applicantId);
         Stream.of(applicant.getPhotoMediaId(), applicant.getPassportMediaId())
                 .filter(Objects::nonNull)

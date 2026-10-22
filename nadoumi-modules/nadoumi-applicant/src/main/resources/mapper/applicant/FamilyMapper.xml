@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.applicant.mapper.FamilyMapper">
+
+    <resultMap id="personal" type="com.nadoumi.applicant.domain.ApplicantPersonal">
+        <id     property="id"                column="id"/>
+        <result property="applicantId"       column="applicant_id"/>
+        <result property="maritalStatus"     column="marital_status"/>
+        <result property="religion"          column="religion"/>
+        <result property="placeOfBirth"      column="place_of_birth"/>
+        <result property="officialLanguage"  column="official_language"/>
+        <result property="permanentAddress"  column="permanent_address"/>
+        <result property="permanentPostcode" column="permanent_postcode"/>
+    </resultMap>
+
+    <resultMap id="member" type="com.nadoumi.applicant.domain.ApplicantFamilyMember">
+        <id     property="id"             column="id"/>
+        <result property="applicantId"    column="applicant_id"/>
+        <result property="relation"       column="relation"/>
+        <result property="fullName"       column="full_name"/>
+        <result property="dateOfBirth"    column="date_of_birth"/>
+        <result property="nationality"    column="nationality"/>
+        <result property="deceased"       column="deceased"/>
+        <result property="note"           column="note"/>
+        <result property="company"        column="company"/>
+        <result property="position"       column="position"/>
+        <result property="companyAddress" column="company_address"/>
+        <result property="phone"          column="phone"/>
+        <result property="email"          column="email"/>
+    </resultMap>
+
+    <resultMap id="person" type="com.nadoumi.applicant.domain.ApplicantPerson">
+        <id     property="id"             column="id"/>
+        <result property="applicantId"    column="applicant_id"/>
+        <result property="role"           column="role"/>
+        <result property="fullName"       column="full_name"/>
+        <result property="relationship"   column="relationship"/>
+        <result property="gender"         column="gender"/>
+        <result property="email"          column="email"/>
+        <result property="phone"          column="phone"/>
+        <result property="position"       column="position"/>
+        <result property="company"        column="company"/>
+        <result property="companyAddress" column="company_address"/>
+        <result property="homeAddress"    column="home_address"/>
+    </resultMap>
+
+    <sql id="memberCols">
+        id, applicant_id, relation, full_name, date_of_birth, nationality, deceased, note, company, position,
+        company_address, phone, email
+    </sql>
+
+    <sql id="personCols">
+        id, applicant_id, role, full_name, relationship, gender, email, phone, position, company, company_address,
+        home_address
+    </sql>
+
+    <select id="findPersonal" resultMap="personal">
+        select id, applicant_id, marital_status, religion, place_of_birth, official_language, permanent_address,
+               permanent_postcode
+        from nad_applicant_personal where applicant_id = #{applicantId}
+    </select>
+
+    <insert id="insertPersonal" parameterType="com.nadoumi.applicant.domain.ApplicantPersonal"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_personal
+            (applicant_id, marital_status, religion, place_of_birth, official_language, permanent_address,
+             permanent_postcode, create_by, create_time)
+        values
+            (#{applicantId}, #{maritalStatus}, #{religion}, #{placeOfBirth}, #{officialLanguage}, #{permanentAddress},
+             #{permanentPostcode}, '', now())
+    </insert>
+
+    <update id="updatePersonal" parameterType="com.nadoumi.applicant.domain.ApplicantPersonal">
+        update nad_applicant_personal set
+            marital_status = #{maritalStatus}, religion = #{religion}, place_of_birth = #{placeOfBirth},
+            official_language = #{officialLanguage}, permanent_address = #{permanentAddress},
+            permanent_postcode = #{permanentPostcode}, update_time = now()
+        where applicant_id = #{applicantId}
+    </update>
+
+    <select id="findMembers" resultMap="member">
+        select <include refid="memberCols"/> from nad_applicant_family_member
+        where applicant_id = #{applicantId} order by field(relation, 'FATHER', 'MOTHER', 'SPOUSE', 'SIBLING', 'OTHER'), id
+    </select>
+
+    <select id="findMember" resultMap="member">
+        select <include refid="memberCols"/> from nad_applicant_family_member where id = #{id}
+    </select>
+
+    <insert id="insertMember" parameterType="com.nadoumi.applicant.domain.ApplicantFamilyMember"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_family_member
+            (applicant_id, relation, full_name, date_of_birth, nationality, deceased, note, company, position,
+             company_address, phone, email, create_by, create_time)
+        values
+            (#{applicantId}, #{relation}, #{fullName}, #{dateOfBirth}, #{nationality}, #{deceased}, #{note}, #{company},
+             #{position}, #{companyAddress}, #{phone}, #{email}, '', now())
+    </insert>
+
+    <update id="updateMember" parameterType="com.nadoumi.applicant.domain.ApplicantFamilyMember">
+        update nad_applicant_family_member set
+            relation = #{relation}, full_name = #{fullName}, date_of_birth = #{dateOfBirth},
+            nationality = #{nationality}, deceased = #{deceased}, note = #{note}, company = #{company},
+            position = #{position}, company_address = #{companyAddress}, phone = #{phone}, email = #{email},
+            update_time = now()
+        where id = #{id} and applicant_id = #{applicantId}
+    </update>
+
+    <delete id="deleteMember">
+        delete from nad_applicant_family_member where id = #{id} and applicant_id = #{applicantId}
+    </delete>
+
+    <select id="findPerson" resultMap="person">
+        select <include refid="personCols"/> from nad_applicant_person
+        where applicant_id = #{applicantId} and role = #{role}
+    </select>
+
+    <insert id="insertPerson" parameterType="com.nadoumi.applicant.domain.ApplicantPerson"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_applicant_person
+            (applicant_id, role, full_name, relationship, gender, email, phone, position, company, company_address,
+             home_address, create_by, create_time)
+        values
+            (#{applicantId}, #{role}, #{fullName}, #{relationship}, #{gender}, #{email}, #{phone}, #{position},
+             #{company}, #{companyAddress}, #{homeAddress}, '', now())
+    </insert>
+
+    <update id="updatePerson" parameterType="com.nadoumi.applicant.domain.ApplicantPerson">
+        update nad_applicant_person set
+            full_name = #{fullName}, relationship = #{relationship}, gender = #{gender}, email = #{email},
+            phone = #{phone}, position = #{position}, company = #{company}, company_address = #{companyAddress},
+            home_address = #{homeAddress}, update_time = now()
+        where applicant_id = #{applicantId} and role = #{role}
+    </update>
+</mapper>

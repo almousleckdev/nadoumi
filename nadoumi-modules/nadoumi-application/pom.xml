@@ -32,6 +32,11 @@
             <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-scholarship</artifactId>
         </dependency>
+        <!-- the checklist matches a student's uploaded documents against what the opportunity asks for -->
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-document</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.nadoumi</groupId>
             <artifactId>nadoumi-applicant</artifactId>

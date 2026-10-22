@@ -36,8 +36,11 @@ class ApplicationAuthorizationTest {
     private final NadoumiAccessService access = mock(NadoumiAccessService.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
 
-    private final StudentApplicationService service =
-            new StudentApplicationService(applicationMapper, definitionMapper, eventMapper, workflow, access, caller);
+    private final PaymentGuardProvider payments = mock(PaymentGuardProvider.class);
+
+    private final StudentApplicationService service = new StudentApplicationService(
+            applicationMapper, definitionMapper, eventMapper, workflow, access, caller, payments,
+            mock(ApplicationChecklistService.class));
 
     @Test
     void starting_a_draft_for_an_applicant_with_no_grant_is_refused_before_the_engine_runs() {

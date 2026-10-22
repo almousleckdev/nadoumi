@@ -57,8 +57,10 @@ describe('scholarship detail page', () => {
     // document requirements come from config, not hard-coded
     expect(text).toContain('Passport')
     expect(text).toContain('Study plan')
-    // guest Apply routes to register
-    expect(w.findAll('a').some(a => a.text() === 'Apply now' && a.attributes('href') === '/register')).toBe(true)
+    // a guest signs in first and is returned to the apply screen for this scholarship
+    const apply = w.findAll('a').find(a => a.text() === 'Apply now')
+    expect(apply?.attributes('href')).toContain('/login?redirect=')
+    expect(decodeURIComponent(apply?.attributes('href') ?? '')).toContain('/dashboard/apply?scholarship=')
 
     // the cover is the full-bleed hero background (resolved URL used verbatim, never a side image)
     const imgs = w.findAll('img')

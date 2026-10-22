@@ -15,4 +15,6 @@ public interface DocumentRequirementMapper {
             @Param("refIds") Collection<Long> refIds);
 
     int insert(DocumentRequirement requirement);
+
+    int deleteByScope(@Param("scope") RequirementScope scope, @Param("refId") long refId);
 }

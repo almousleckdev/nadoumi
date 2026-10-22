@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { applyRoute } from '~/utils/applyView'
 import type { ScholarshipDetail } from '~/types/catalog'
 import type { DetailFact } from '~/components/catalog/DetailFacts.vue'
 
@@ -12,7 +13,13 @@ useSeo(
   s.value?.summary?.slice(0, 155) ?? t('catalog.scholarshipsSubtitle'),
 )
 
-const applyTo = computed(() => localePath(status.value === 'authed' ? '/dashboard' : '/register'))
+// a signed-in student goes straight to the apply screen; a guest signs in first and is returned to it
+const applyTo = computed(() => {
+  const slug = s.value?.slug
+  if (!slug) return localePath('/register')
+  const apply = localePath(applyRoute('scholarship', slug))
+  return status.value === 'authed' ? apply : localePath({ path: '/login', query: { redirect: apply } })
+})
 const place = computed(() => [s.value?.city, s.value?.province, s.value?.country].filter(Boolean).join(', '))
 const heroImage = computed(() => s.value?.coverUrl ?? s.value?.coverImageUrl ?? s.value?.heroUrl ?? s.value?.heroImageUrl)
 

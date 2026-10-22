@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
@@ -37,8 +38,11 @@ public class SmtpMailSender implements MailSender {
 
     @Override
     public void send(EmailMessage message) {
+        if (message.attachmentBytes() > EmailMessage.MAX_ATTACHMENT_BYTES) {
+            throw new MailSendException("attachments exceed the size limit");
+        }
         try {
-            if (message.htmlBody() == null) {
+            if (message.htmlBody() == null && message.attachments().isEmpty()) {
                 mail.send(plainText(message));
             }
             else {
@@ -63,7 +67,7 @@ public class SmtpMailSender implements MailSender {
         return smtp;
     }
 
-    /** {@code multipart/alternative}: plain-text part first, HTML part second. */
+    /** {@code multipart/alternative} (plain text first, HTML second), plus any attachments. */
     private MimeMessage multipart(EmailMessage message) {
         MimeMessage mime = mail.createMimeMessage();
         try {
@@ -71,7 +75,16 @@ public class SmtpMailSender implements MailSender {
             helper.setFrom(from);
             helper.setTo(message.to());
             helper.setSubject(message.subject());
-            helper.setText(message.body(), message.htmlBody());
+            if (message.htmlBody() == null) {
+                helper.setText(message.body());
+            }
+            else {
+                helper.setText(message.body(), message.htmlBody());
+            }
+            for (EmailAttachment attachment : message.attachments()) {
+                helper.addAttachment(attachment.filename(),
+                        new ByteArrayResource(attachment.content()), attachment.contentType());
+            }
         }
         catch (MessagingException e) {
             throw new MailSendException("could not assemble MIME message", e);

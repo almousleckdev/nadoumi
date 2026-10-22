@@ -17,6 +17,10 @@ public interface RevenueMapper {
 
     int deleteById(@Param("id") long id);
 
+    /** How many revenue rows already reference this related record with this reference (idempotency check). */
+    int countByRelated(@Param("relatedType") String relatedType, @Param("relatedId") long relatedId,
+            @Param("reference") String reference);
+
     List<Revenue> search(@Param("q") String q, @Param("source") String source,
             @Param("from") LocalDate from, @Param("to") LocalDate to);
 

@@ -113,6 +113,14 @@ public final class MediaCategoryPolicy {
         RULES.put(MediaCategory.MESSAGE_ATTACHMENT, new CategoryRule(
                 MediaAccessClass.PROTECTED, MESSAGE_ATTACHMENT_MIME, 15 * MB, RESOURCE_RAW, "message/attachment"));
 
+        // a bank screenshot or receipt of an application-fee payment: staff-only, never a public URL
+        RULES.put(MediaCategory.PAYMENT_PROOF, new CategoryRule(
+                MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 5 * MB, RESOURCE_RAW, "payment/proof"));
+
+        // a receipt or application form the system rendered: only ever the owner or staff, streamed by the backend
+        RULES.put(MediaCategory.PAYMENT_DOCUMENT, new CategoryRule(
+                MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 5 * MB, RESOURCE_RAW, "payment/document"));
+
         for (MediaCategory category : MediaCategory.values()) {
             if (!RULES.containsKey(category)) {
                 throw new IllegalStateException("MediaCategoryPolicy has no rule for " + category);

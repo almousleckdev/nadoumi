@@ -51,6 +51,11 @@
         where r.id = #{id}
     </select>
 
+    <select id="countByRelated" resultType="java.lang.Integer">
+        select count(*) from nad_revenue
+        where related_type = #{relatedType} and related_id = #{relatedId} and reference = #{reference}
+    </select>
+
     <delete id="deleteById">
         delete from nad_revenue where id = #{id}
     </delete>

@@ -2,14 +2,19 @@
 import { computed, provide, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance } from 'element-plus'
-import { createProgram, updateProgram, isDegree as isDegreeKind, type Program } from '@/api/program'
+import {
+  createProgram, updateProgram, getProgramDocuments, saveProgramDocuments, isDegree as isDegreeKind, type Program,
+} from '@/api/program'
 import { listUniversities, listDepartments, type University, type Department } from '@/api/university'
 import Drawer from '@/components/ui/Drawer.vue'
 import { useDeferredImages } from '@/composables/useDeferredImages'
 import IdentitySections from './form/IdentitySections.vue'
+import OfferingSections from './form/OfferingSections.vue'
+import AdmissionSections from './form/AdmissionSections.vue'
 import StructureSections from './form/StructureSections.vue'
+import DocumentsSection from './form/DocumentsSection.vue'
 import PublishingSections from './form/PublishingSections.vue'
-import { blankProgramForm, buildProgramPayload, formFromProgram, programFormKey } from './programForm'
+import { blankProgramForm, buildProgramPayload, formFromProgram, offeringProblems, programFormKey } from './programForm'
 
 const props = defineProps<{
   modelValue: boolean
@@ -79,6 +84,9 @@ watch(() => props.modelValue, (open) => {
   }
   Object.assign(form, formFromProgram(p))
   loadDepartments(p.universityId)
+  getProgramDocuments(p.id)
+    .then(list => { form.documentRequirements = list.map(d => ({ docType: d.docType, mandatory: d.mandatory, notes: d.notes ?? '' })) })
+    .catch(() => {})
 }, { immediate: true })
 
 async function save() {
@@ -87,11 +95,18 @@ async function save() {
     ElMessage.warning(t('program.levelsRequired'))
     return
   }
+  if (offeringProblems(form).length) {
+    ElMessage.warning(t('program.offerings.fixBeforeSaving'))
+    return
+  }
   saving.value = true
   try {
     const saved = props.program
       ? await updateProgram(props.program.id, buildProgramPayload(form))
       : await createProgram(buildProgramPayload(form))
+    await saveProgramDocuments(saved.id, form.documentRequirements.map(d => ({
+      docType: d.docType, mandatory: d.mandatory, notes: d.notes.trim() || null,
+    })))
     const imagesOk = props.program
       ? true
       : await deferredImages.flush(publishing.value?.uploadTasks(saved.id) ?? [])
@@ -127,7 +142,10 @@ defineExpose({ form, save, rules })
         :locked-university="lockedUniversity"
         @university-change="onUniversityChange"
       />
+      <OfferingSections />
+      <AdmissionSections />
       <StructureSections :departments="departments" />
+      <DocumentsSection />
       <PublishingSections
         ref="publishing"
         :program="program"

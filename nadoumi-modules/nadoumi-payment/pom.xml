@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.nadoumi</groupId>
+        <artifactId>nadoumi-modules</artifactId>
+        <version>3.9.2</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>nadoumi-payment</artifactId>
+    <packaging>jar</packaging>
+
+    <description>
+        Payment slice: the Nadoumi application fee. A student opens a 15-minute QR payment session, reports the
+        payment with a proof, staff confirm it, and only then can the application be submitted. Implements the
+        application module's PaymentGuardProvider; books confirmed fees as finance revenue.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-identity</artifactId>
+        </dependency>
+        <!-- cross-module: the application owns the guard SPI and the facts a payment needs about it -->
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-application</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-applicant</artifactId>
+        </dependency>
+        <!-- confirmed fees are booked as revenue through RevenueService -->
+        <dependency>
+            <groupId>com.nadoumi</groupId>
+            <artifactId>nadoumi-finance</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ruoyi</groupId>
+            <artifactId>ruoyi-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+        </dependency>
+        <!-- programmatic PDF: student text never passes through an HTML/CSS parser, so there is no resource-loading surface -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

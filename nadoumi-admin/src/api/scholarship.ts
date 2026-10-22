@@ -34,9 +34,11 @@ export const COVERAGE_KINDS: CoverageKind[] = [
 ]
 export const APPLICATION_CHANNELS: ApplicationChannel[] = ['DIRECT_UNIVERSITY', 'CSC_AGENCY', 'NADOUMI', 'OTHER']
 export const EDUCATION_LEVELS: EducationLevel[] = ['NON_DEGREE', 'DIPLOMA', 'BACHELOR', 'MASTER', 'PHD']
+/** The `nad_document_type` dictionary codes: a student's uploads are matched to requirements by these. */
 export const DOC_TYPES = [
-  'PASSPORT', 'DEGREE', 'TRANSCRIPT', 'LANGUAGE_CERT', 'VISA', 'PHYSICAL_EXAM',
-  'STUDY_PLAN', 'RECOMMENDATION_LETTER', 'BANK_STATEMENT', 'PHOTO', 'CV', 'OTHER',
+  'PASSPORT', 'DEGREE_CERTIFICATE', 'TRANSCRIPT', 'LANGUAGE_TEST_REPORT', 'VISA', 'PHYSICAL_EXAM',
+  'STUDY_PLAN', 'PERSONAL_STATEMENT', 'RECOMMENDATION_LETTER', 'FINANCIAL_PROOF', 'POLICE_CLEARANCE', 'PHOTO', 'CV',
+  'OTHER',
 ]
 export const INTAKE_TERMS = ['SPRING_MARCH', 'AUTUMN_SEPTEMBER']
 

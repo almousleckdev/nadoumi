@@ -425,7 +425,8 @@
       "interests": "Intereses",
       "location": "Ubicación",
       "work": "Experiencia",
-      "applications": "Mis solicitudes"
+      "applications": "Mis solicitudes",
+      "family": "Familia y apoyos"
     },
     "welcome": "Bienvenido de nuevo, {name}",
     "overviewBlurb": "Completa tu perfil de solicitante para que el equipo pueda empezar a proponerte oportunidades.",
@@ -710,7 +711,8 @@
       "type": {
         "PROGRAM_WITH_SCHOLARSHIP": "Programa con beca",
         "PROGRAM_ONLY": "Solicitud de programa",
-        "UNKNOWN": "Solicitud"
+        "UNKNOWN": "Solicitud",
+        "SCHOLARSHIP_ONLY": "Solicitud de beca"
       },
       "status": {
         "DRAFT": "Borrador",
@@ -787,7 +789,6 @@
     "intro": "Unos pasos para preparar tu perfil de solicitante. Puedes volver y editar cualquier sección más adelante.",
     "progress": "Paso {n} de {total}",
     "next": "Siguiente",
-    "back": "Atrás",
     "finish": "Finalizar",
     "skip": "Omitir por ahora",
     "saved": "Guardado",
@@ -854,7 +855,6 @@
       "none": "Sin foto",
       "tooSmall": "La imagen debe medir al menos {px}x{px} píxeles.",
       "saved": "Foto guardada",
-      "current": "Foto actual",
       "save": "Guardar foto"
     },
     "upload": {
@@ -894,8 +894,6 @@
     },
     "progressLabel": "Progreso de la configuración",
     "optionalTag": "Opcional",
-    "helpTitle": "¿Necesitas ayuda?",
-    "helpBody": "Nuestro equipo te guiará con gusto. Escribe a support{'@'}nadoumi.com.",
     "eyebrow": "Paso {n} de {total}"
   },
   "university": {
@@ -919,7 +917,30 @@
     "contact": "Contacto oficial",
     "website": "Sitio web oficial",
     "admissionsEmail": "Admisiones",
-    "officePhone": "Teléfono"
+    "officePhone": "Teléfono",
+    "address": "Dirección",
+    "viewOnMap": "Ver en el mapa",
+    "channels": "Canales oficiales",
+    "departments": "Departamentos y facultades",
+    "programmeCount": "{n} programas",
+    "statIntlShare": "Estudiantes internacionales",
+    "statProgrammes": "Programas",
+    "statLevels": "Niveles ofrecidos",
+    "statTuitionFrom": "Matrícula desde",
+    "link": {
+      "ADMISSIONS": "Página de admisiones",
+      "VIRTUAL_TOUR": "Visita virtual",
+      "WIKIPEDIA": "Wikipedia",
+      "FACEBOOK": "Facebook",
+      "X": "X",
+      "INSTAGRAM": "Instagram",
+      "YOUTUBE": "YouTube",
+      "LINKEDIN": "LinkedIn",
+      "TIKTOK": "TikTok",
+      "WECHAT": "WeChat",
+      "WEIBO": "Weibo"
+    },
+    "wechatId": "ID de WeChat"
   },
   "program": {
     "fallbackTitle": "Programa",
@@ -971,7 +992,36 @@
     "majorsIntro": "Áreas en las que puedes especializarte dentro de este programa.",
     "tuitionNote": "Establecido por la universidad. La cifra en USD es orientativa.",
     "universityLabel": "Universidad",
-    "viewAll": "Ver todos los programas"
+    "viewAll": "Ver todos los programas",
+    "durationYears": "{n} año | {n} años",
+    "tuitionFrom": "Matrícula desde",
+    "accommodationFrom": "Alojamiento desde",
+    "offerings": {
+      "title": "Opciones del programa",
+      "description": "Duración, matrícula y alojamiento de cada nivel.",
+      "duration": "Duración",
+      "tuition": "Matrícula",
+      "accommodation": "Alojamiento",
+      "noPrice": "Consulta a nuestro equipo",
+      "period": {
+        "PER_YEAR": "por año",
+        "PER_SEMESTER": "por semestre",
+        "PER_MONTH": "por mes",
+        "TOTAL": "en total"
+      },
+      "notePrefix": "Nota"
+    },
+    "admission": {
+      "requirements": "Requisitos de admisión",
+      "language": "Requisitos de idioma",
+      "hsk": "HSK {n} o superior",
+      "ielts": "IELTS {n} o superior",
+      "toefl": "TOEFL {n} o superior",
+      "documents": "Documentos requeridos",
+      "applicationFee": "Tasa de solicitud",
+      "scholarships": "Becas",
+      "career": "Salidas profesionales"
+    }
   },
   "scholarships": {
     "searchLabel": "Buscar becas",
@@ -1112,14 +1162,19 @@
     },
     "doc": {
       "PASSPORT": "Pasaporte",
-      "DEGREE": "Título académico",
       "TRANSCRIPT": "Expediente académico",
-      "LANGUAGE_CERT": "Certificado de idioma",
       "VISA": "Visado",
       "PHYSICAL_EXAM": "Examen médico",
       "STUDY_PLAN": "Plan de estudios",
       "RECOMMENDATION_LETTER": "Carta de recomendación",
-      "OTHER": "Otro documento"
+      "OTHER": "Otro documento",
+      "DEGREE_CERTIFICATE": "Título académico",
+      "LANGUAGE_TEST_REPORT": "Certificado de idioma",
+      "PERSONAL_STATEMENT": "Carta de motivación",
+      "FINANCIAL_PROOF": "Prueba de fondos (extracto bancario)",
+      "POLICE_CLEARANCE": "Antecedentes penales",
+      "PHOTO": "Foto de pasaporte",
+      "CV": "CV"
     },
     "elig": {
       "age": "Edad",
@@ -2124,10 +2179,9 @@
   },
   "passport": {
     "title": "Pasaporte",
-    "guidance": "Sube una foto o un escaneo nítido de la página de datos de tu pasaporte y confirma los datos a continuación.",
+    "guidance": "Sube una foto o un escaneo nítido de la página de la foto de tu pasaporte y luego introduce su número y fechas.",
     "none": "Ningún pasaporte subido",
     "formats": "JPEG, PNG o PDF, hasta 10 MB",
-    "expiresOn": "Caduca el {date}",
     "detailsTitle": "Datos del pasaporte",
     "fields": {
       "passportNo": "Número de pasaporte",
@@ -2329,6 +2383,23 @@
       "EN": "Inglés",
       "ZH": "Chino",
       "EN_ZH": "Inglés y chino"
+    },
+    "maritalStatus": {
+      "SINGLE": "Soltero/a",
+      "MARRIED": "Casado/a",
+      "OTHER": "Otro"
+    },
+    "familyRelation": {
+      "FATHER": "Padre",
+      "MOTHER": "Madre",
+      "SPOUSE": "Cónyuge",
+      "SIBLING": "Hermano/a",
+      "OTHER": "Otro familiar"
+    },
+    "personGender": {
+      "FEMALE": "Mujer",
+      "MALE": "Hombre",
+      "UNSPECIFIED": "Prefiero no decirlo"
     }
   },
   "news": {
@@ -2395,5 +2466,153 @@
     "visaExpired": "Este visado ya ha caducado.",
     "needOne": "Añade al menos uno.",
     "needCities": "Añade al menos tres provincias o ciudades."
+  },
+  "payment": {
+    "title": "Tasa de solicitud",
+    "intro": "Paga la tasa de solicitud de Nadoumi para enviar tu solicitud. Se guarda hasta que pagues.",
+    "amount": "Importe",
+    "payee": "Beneficiario",
+    "reference": "Referencia de pago",
+    "referenceHint": "Escribe esta referencia en la nota del pago si tu aplicación lo permite.",
+    "copy": "Copiar",
+    "copied": "Referencia copiada",
+    "pay": "Pagar ahora",
+    "payAgain": "Pagar de nuevo",
+    "payToSubmit": "Paga la tasa de solicitud para enviar tu solicitud.",
+    "timeLeft": "Tiempo restante para pagar",
+    "qrAlt": "Código QR de pago",
+    "step1": "Abre tu aplicación bancaria o de pago y escanea el código QR.",
+    "step2": "Paga exactamente {amount}.",
+    "step3": "Escribe la referencia en la nota del pago.",
+    "step4": "Después introduce el número de transacción y sube una captura abajo.",
+    "transactionNo": "Número de transacción",
+    "transactionNoHint": "Figura en tu recibo (de 6 a 40 letras o dígitos).",
+    "screenshot": "Captura del pago",
+    "fileHint": "JPEG, PNG o PDF, máximo {mb} MB",
+    "iHavePaid": "Ya pagué",
+    "cancel": "Cerrar el pago",
+    "verifyingTitle": "Verificación en curso",
+    "verifyingBody": "Recibimos los datos de tu pago. Nuestro equipo lo confirmará y te avisaremos.",
+    "confirmedTitle": "Pago confirmado",
+    "confirmedBody": "Tu tasa de solicitud está pagada. Ya puedes enviar tu solicitud.",
+    "rejectedTitle": "No se aceptó tu pago",
+    "expiredTitle": "Se agotó el tiempo de pago",
+    "expiredBody": "Tienes 15 minutos para pagar una vez mostrado el QR. Empieza de nuevo cuando estés listo. Si ya pagaste, contacta con soporte con tu referencia.",
+    "errors": {
+      "qrFailed": "No se pudo cargar el código QR. Cierra el pago e inténtalo de nuevo.",
+      "txnInvalid": "Introduce el número de transacción de tu pago (de 6 a 40 letras o dígitos).",
+      "screenshotRequired": "Sube una captura de tu pago.",
+      "fileType": "Sube un archivo JPEG, PNG o PDF.",
+      "windowClosed": "Se agotó el tiempo de pago. Inicia un nuevo pago.",
+      "txnReused": "Este número de transacción ya se usó.",
+      "noSession": "No hay un pago abierto. Inicia primero un pago.",
+      "beingVerified": "Tu pago ya se informó y se está verificando.",
+      "paymentRequired": "Paga la tasa de solicitud antes de enviar."
+    },
+    "documents": {
+      "title": "Tus documentos",
+      "preparing": "Estamos preparando tu recibo y tu formulario de solicitud. Aparecerán aquí en un momento y el recibo se envía a tu correo.",
+      "receipt": "Recibo de pago",
+      "form": "Formulario de solicitud",
+      "download": "Descargar PDF",
+      "failed": "No se pudo descargar el documento. Inténtalo de nuevo."
+    }
+  },
+  "apply": {
+    "title": "Solicitar",
+    "blurb": "Empieza tu solicitud.",
+    "back": "Volver",
+    "noTarget": "Elige un programa o una beca para solicitar.",
+    "notFound": "No encontramos lo que quieres solicitar. Puede que ya no esté abierto.",
+    "studentTitle": "Quién solicita",
+    "studentLegend": "Estudiante",
+    "unnamedStudent": "Estudiante",
+    "noStudents": "Completa tu perfil de estudiante antes de solicitar.",
+    "intakeTitle": "Convocatoria",
+    "intakeLabel": "Elige una convocatoria",
+    "intakePlaceholder": "Selecciona una convocatoria",
+    "noIntake": "Este programa no tiene ninguna convocatoria abierta ahora mismo.",
+    "nextTitle": "Qué sigue",
+    "nextBody": "Guardamos enseguida un borrador de solicitud. Después pagas la tasa de solicitud de Nadoumi cuando quieras y envías tu solicitud. El borrador queda guardado hasta que la envíes.",
+    "start": "Empezar solicitud",
+    "continueDraft": "Continuar tu borrador",
+    "draftExists": "Ya tienes un borrador de solicitud para esto."
+  },
+  "family": {
+    "title": "Familia y apoyos",
+    "blurb": "El formulario de solicitud de Nadoumi pide estos datos. Rellénalos una vez y los reutilizamos en cada solicitud.",
+    "personal": {
+      "title": "Datos personales",
+      "marital": "Estado civil",
+      "religion": "Religión",
+      "placeOfBirth": "Lugar de nacimiento",
+      "officialLanguage": "Idioma oficial de tu país",
+      "permanentAddress": "Dirección permanente",
+      "postcode": "Código postal"
+    },
+    "member": {
+      "title": "Familiares",
+      "rule": "Añade a ambos padres. Si uno ha fallecido, indícalo y añade al menos dos hermanos u otros familiares.",
+      "empty": "Aún no has añadido familiares.",
+      "add": "Añadir un familiar",
+      "relation": "Parentesco",
+      "fullName": "Nombre completo",
+      "dateOfBirth": "Fecha de nacimiento",
+      "nationality": "Nacionalidad",
+      "deceased": "Esta persona ha fallecido",
+      "deceasedTag": "Fallecido/a",
+      "note": "Nota",
+      "noteHint": "Por ejemplo, el año y un breve motivo.",
+      "company": "Empresa",
+      "position": "Puesto",
+      "companyAddress": "Dirección de la empresa",
+      "phone": "Teléfono",
+      "email": "Correo electrónico"
+    },
+    "supporter": {
+      "title": "Patrocinador financiero",
+      "hint": "La persona que paga tus estudios. Sus datos deben coincidir con tu extracto bancario o carta de garantía."
+    },
+    "chinaEmergency": {
+      "title": "Contacto de emergencia en China",
+      "hint": "Alguien en China a quien podamos llamar si no logramos contactarte."
+    },
+    "person": {
+      "fullName": "Nombre completo",
+      "relationship": "Relación contigo",
+      "gender": "Género",
+      "phone": "Teléfono",
+      "email": "Correo electrónico",
+      "position": "Puesto",
+      "company": "Empresa o institución",
+      "companyAddress": "Dirección de la empresa",
+      "homeAddress": "Domicilio"
+    },
+    "readiness": {
+      "title": "Completa tu formulario de solicitud",
+      "body": "Estas partes del formulario de solicitud de Nadoumi siguen vacías. Aún puedes enviar, pero el formulario las mostrará como no facilitadas.",
+      "fill": "Rellenarlas",
+      "PERSONAL_DETAILS": "Datos personales",
+      "FAMILY": "Familiares",
+      "SUPPORTER": "Patrocinador financiero",
+      "CHINA_EMERGENCY": "Contacto de emergencia en China"
+    }
+  },
+  "checklist": {
+    "title": "Documentos que subir",
+    "blurb": "Estos son los documentos que necesita esta solicitud. Sube cada uno en PDF, JPEG o PNG. El equipo de Nadoumi los revisa cuando envías la solicitud.",
+    "mandatory": "Obligatorio",
+    "optional": "Opcional",
+    "upload": "Subir",
+    "uploadAgain": "Subir de nuevo",
+    "uploaded": "Documento subido",
+    "badType": "Sube un archivo PDF, JPEG o PNG dentro del límite de tamaño.",
+    "uploadToSubmit": "Sube los documentos obligatorios para enviar tu solicitud.",
+    "status": {
+      "MISSING": "Sin subir"
+    },
+    "errors": {
+      "required": "Sube los documentos obligatorios antes de enviar."
+    }
   }
 }

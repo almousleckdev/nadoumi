@@ -12,21 +12,23 @@
       <slot />
     </div>
     <template #footer>
-      <div class="drawer__footer">
-        <el-button
-          :disabled="saving"
-          @click="emit('update:modelValue', false)"
-        >
-          {{ cancelLabel || t('common.cancel') }}
-        </el-button>
-        <el-button
-          type="primary"
-          :loading="saving"
-          @click="emit('save')"
-        >
-          {{ saveLabel || t('common.save') }}
-        </el-button>
-      </div>
+      <slot name="footer">
+        <div class="drawer__footer">
+          <el-button
+            :disabled="saving"
+            @click="emit('update:modelValue', false)"
+          >
+            {{ cancelLabel || t('common.cancel') }}
+          </el-button>
+          <el-button
+            type="primary"
+            :loading="saving"
+            @click="emit('save')"
+          >
+            {{ saveLabel || t('common.save') }}
+          </el-button>
+        </div>
+      </slot>
     </template>
   </el-drawer>
 </template>

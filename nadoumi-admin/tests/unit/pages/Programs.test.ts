@@ -7,12 +7,14 @@ import { mountOpts } from '../../helpers'
 const api = vi.hoisted(() => ({
   listPrograms: vi.fn(),
   deleteProgram: vi.fn(),
+  updateProgram: vi.fn(),
+  getProgramDocuments: vi.fn(),
+  saveProgramDocuments: vi.fn(),
 }))
 vi.mock('@/api/program', async (orig) => ({
   ...(await orig<typeof import('@/api/program')>()),
   ...api,
   createProgram: vi.fn(),
-  updateProgram: vi.fn(),
   getProgram: vi.fn(),
 }))
 vi.mock('@/api/university', () => ({
@@ -100,7 +102,11 @@ describe('Programs list', () => {
 })
 
 describe('ProgramDrawer image upload', () => {
-  beforeEach(() => setActivePinia(createPinia()))
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    api.getProgramDocuments.mockResolvedValue([])
+    api.saveProgramDocuments.mockResolvedValue([])
+  })
 
   function mountDrawer(program: Program | null) {
     return mount(ProgramDrawer, { props: { modelValue: true, program }, ...mountOpts() })
@@ -118,5 +124,39 @@ describe('ProgramDrawer image upload', () => {
     const editUpload = editing.findComponent(ImageUpload)
     expect(editUpload.props('deferred')).toBe(false)
     expect(editUpload.props('previewUrl')).toBe('https://res.cloudinary.com/program.png')
+  })
+})
+
+describe('ProgramDrawer required documents', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    api.getProgramDocuments.mockReset().mockResolvedValue([{ docType: 'PASSPORT', mandatory: true, notes: 'Photo page' }])
+    api.saveProgramDocuments.mockReset().mockResolvedValue([])
+    api.updateProgram.mockReset().mockResolvedValue({ ...row, id: 4 })
+  })
+
+  it('loads the programme\'s required documents when it is opened', async () => {
+    const w = mount(ProgramDrawer, { props: { modelValue: true, program: row as unknown as Program }, ...mountOpts() })
+    await flushPromises()
+
+    expect(api.getProgramDocuments).toHaveBeenCalledWith(4)
+    expect((w.vm as unknown as { form: { documentRequirements: unknown[] } }).form.documentRequirements)
+      .toEqual([{ docType: 'PASSPORT', mandatory: true, notes: 'Photo page' }])
+  })
+
+  it('saves the required documents after the programme itself', async () => {
+    const w = mount(ProgramDrawer, { props: { modelValue: true, program: row as unknown as Program }, ...mountOpts() })
+    await flushPromises()
+    const form = (w.vm as unknown as { form: { documentRequirements: { docType: string, mandatory: boolean, notes: string }[] } }).form
+    form.documentRequirements.push({ docType: 'CV', mandatory: false, notes: '  ' })
+
+    await (w.vm as unknown as { save: () => Promise<void> }).save()
+    await flushPromises()
+
+    expect(api.updateProgram).toHaveBeenCalledOnce()
+    expect(api.saveProgramDocuments).toHaveBeenCalledWith(4, [
+      { docType: 'PASSPORT', mandatory: true, notes: 'Photo page' },
+      { docType: 'CV', mandatory: false, notes: null },
+    ])
   })
 })
