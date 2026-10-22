@@ -16,6 +16,15 @@
         <result property="tuitionAmount"    column="tuition_amount"/>
         <result property="tuitionCurrency"  column="tuition_currency"/>
         <result property="summary"          column="summary"/>
+        <result property="admissionRequirements"  column="admission_requirements"/>
+        <result property="applicationDocuments"   column="application_documents"/>
+        <result property="careerProspects"        column="career_prospects"/>
+        <result property="scholarshipInfo"        column="scholarship_info"/>
+        <result property="minHsk"                 column="min_hsk"/>
+        <result property="minIelts"               column="min_ielts"/>
+        <result property="minToefl"               column="min_toefl"/>
+        <result property="applicationFeeAmount"   column="application_fee_amount"/>
+        <result property="applicationFeeCurrency" column="application_fee_currency"/>
         <result property="imageMediaId"     column="image_media_id"/>
         <result property="featured"         column="is_featured"/>
         <result property="hot"              column="is_hot"/>
@@ -31,6 +40,8 @@
     <sql id="cols">
         id, university_id, name, name_cn, slug, program_type, field, term_length, teaching_language,
         duration_months, tuition_amount, tuition_currency, summary, image_media_id,
+        admission_requirements, application_documents, career_prospects, scholarship_info,
+        min_hsk, min_ielts, min_toefl, application_fee_amount, application_fee_currency,
         is_featured, is_hot, publish_status, status,
         create_by, create_time, update_by, update_time, remark
     </sql>
@@ -72,10 +83,14 @@
         insert into nad_program
             (university_id, name, name_cn, slug, program_type, field, term_length, teaching_language,
              duration_months, tuition_amount, tuition_currency, summary, image_media_id,
+             admission_requirements, application_documents, career_prospects, scholarship_info,
+             min_hsk, min_ielts, min_toefl, application_fee_amount, application_fee_currency,
              is_featured, is_hot, publish_status, status, create_by, create_time, remark)
         values
             (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{termLength}, #{teachingLanguage},
              #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary}, #{imageMediaId},
+             #{admissionRequirements}, #{applicationDocuments}, #{careerProspects}, #{scholarshipInfo},
+             #{minHsk}, #{minIelts}, #{minToefl}, #{applicationFeeAmount}, #{applicationFeeCurrency},
              #{featured}, #{hot}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
     </insert>
 
@@ -87,6 +102,10 @@
             duration_months = #{durationMonths}, tuition_amount = #{tuitionAmount},
             tuition_currency = #{tuitionCurrency}, summary = #{summary},
             image_media_id = #{imageMediaId},
+            admission_requirements = #{admissionRequirements}, application_documents = #{applicationDocuments},
+            career_prospects = #{careerProspects}, scholarship_info = #{scholarshipInfo},
+            min_hsk = #{minHsk}, min_ielts = #{minIelts}, min_toefl = #{minToefl},
+            application_fee_amount = #{applicationFeeAmount}, application_fee_currency = #{applicationFeeCurrency},
             is_featured = #{featured}, is_hot = #{hot},
             publish_status = #{publishStatus}, status = #{status},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
@@ -169,6 +188,42 @@
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_program_intake (program_id, term, application_open, application_close, sort_order)
         values (#{programId}, #{term}, #{applicationOpen}, #{applicationClose}, #{sortOrder})
+    </insert>
+
+    <resultMap id="offering" type="com.nadoumi.program.domain.ProgramOffering">
+        <id     property="id"                    column="id"/>
+        <result property="programId"             column="program_id"/>
+        <result property="level"                 column="level"/>
+        <result property="durationMonths"        column="duration_months"/>
+        <result property="tuitionAmount"         column="tuition_amount"/>
+        <result property="tuitionCurrency"       column="tuition_currency"/>
+        <result property="tuitionPeriod"         column="tuition_period"/>
+        <result property="accommodationAmount"   column="accommodation_amount"/>
+        <result property="accommodationCurrency" column="accommodation_currency"/>
+        <result property="accommodationPeriod"   column="accommodation_period"/>
+        <result property="note"                  column="note"/>
+        <result property="sortOrder"             column="sort_order"/>
+    </resultMap>
+
+    <select id="findOfferings" resultMap="offering">
+        select id, program_id, level, duration_months, tuition_amount, tuition_currency, tuition_period,
+               accommodation_amount, accommodation_currency, accommodation_period, note, sort_order
+        from nad_program_offering where program_id = #{programId}
+        order by sort_order asc, id asc
+    </select>
+
+    <delete id="deleteOfferings">
+        delete from nad_program_offering where program_id = #{programId}
+    </delete>
+
+    <insert id="insertOffering" parameterType="com.nadoumi.program.domain.ProgramOffering"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_program_offering
+            (program_id, level, duration_months, tuition_amount, tuition_currency, tuition_period,
+             accommodation_amount, accommodation_currency, accommodation_period, note, sort_order)
+        values
+            (#{programId}, #{level}, #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{tuitionPeriod},
+             #{accommodationAmount}, #{accommodationCurrency}, #{accommodationPeriod}, #{note}, #{sortOrder})
     </insert>
 
 </mapper>

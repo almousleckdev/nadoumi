@@ -13,6 +13,7 @@ const api = vi.hoisted(() => ({
   updateDepartment: vi.fn(),
   deleteDepartment: vi.fn(),
   PARTNER_STATUSES: ['NONE', 'PROSPECT', 'PARTNER'],
+  UNIVERSITY_LINK_KINDS: ['FACEBOOK', 'INSTAGRAM', 'YOUTUBE'],
 }))
 vi.mock('@/api/university', () => api)
 

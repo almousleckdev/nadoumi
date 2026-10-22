@@ -14,6 +14,8 @@ import static org.mockito.Mockito.when;
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.media.MediaGateway;
 import com.nadoumi.university.domain.UniversityGalleryImage;
+import com.nadoumi.university.domain.UniversityLink;
+import com.nadoumi.university.web.request.UniversityRequest;
 import com.nadoumi.university.domain.UniversityHighlight;
 import com.nadoumi.university.domain.UniversityRanking;
 import com.nadoumi.university.domain.enums.HighlightKind;
@@ -114,4 +116,42 @@ class UniversityChildrenWriterTest {
         assertThatThrownBy(() -> writer.replace(ID, null, null, List.of(new GalleryInput(null, 99L, null))))
                 .isInstanceOf(NadBadRequestException.class).hasMessageContaining("99");
     }
+
+    @Test
+    void shouldStoreLinksInOrder_withTrimmedValues() {
+        writer.replaceLinks(ID, List.of(
+                new UniversityRequest.LinkInput("facebook", " https://facebook.com/pku "),
+                new UniversityRequest.LinkInput("WECHAT", " pku_official ")));
+
+        ArgumentCaptor<UniversityLink> saved = ArgumentCaptor.forClass(UniversityLink.class);
+        verify(mapper).deleteLinks(ID);
+        verify(mapper, times(2)).insertLink(eq(ID), saved.capture(), anyInt());
+        assertThat(saved.getAllValues()).extracting(UniversityLink::kind).containsExactly("FACEBOOK", "WECHAT");
+        assertThat(saved.getAllValues()).extracting(UniversityLink::value)
+                .containsExactly("https://facebook.com/pku", "pku_official");
+    }
+
+    @Test
+    void shouldRejectAWebLinkThatIsNotHttp() {
+        assertThatThrownBy(() -> writer.replaceLinks(ID,
+                List.of(new UniversityRequest.LinkInput("FACEBOOK", "javascript:alert(1)"))))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("FACEBOOK");
+        verify(mapper, never()).insertLink(any(), any(), anyInt());
+    }
+
+    @Test
+    void shouldRejectAnUnknownLinkKind() {
+        assertThatThrownBy(() -> writer.replaceLinks(ID,
+                List.of(new UniversityRequest.LinkInput("MYSPACE", "https://x.test"))))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("MYSPACE");
+    }
+
+    @Test
+    void shouldClearLinks_whenTheRequestOmitsThem() {
+        writer.replaceLinks(ID, null);
+
+        verify(mapper).deleteLinks(ID);
+        verify(mapper, never()).insertLink(any(), any(), anyInt());
+    }
 }
+

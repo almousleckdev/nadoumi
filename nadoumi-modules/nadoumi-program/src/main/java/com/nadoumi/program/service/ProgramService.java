@@ -19,6 +19,7 @@ import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.identity.money.FxRates;
 import com.nadoumi.program.domain.Program;
+import com.nadoumi.program.domain.ProgramOffering;
 import com.nadoumi.program.domain.enums.ProgramStatus;
 import com.nadoumi.program.domain.enums.ProgramTeachingLanguage;
 import com.nadoumi.program.domain.enums.ProgramType;
@@ -228,6 +229,13 @@ public class ProgramService {
         p.setLevels(mapper.findLevels(id));
         p.setMajors(mapper.findMajors(id));
         p.setIntakes(mapper.findIntakes(id));
+        List<ProgramOffering> offerings = mapper.findOfferings(id);
+        offerings.forEach(o -> {
+            o.setTuitionAmountUsd(fx.toUsd(o.getTuitionAmount(), o.getTuitionCurrency()));
+            o.setAccommodationAmountUsd(fx.toUsd(o.getAccommodationAmount(), o.getAccommodationCurrency()));
+        });
+        p.setOfferings(offerings);
+        p.setApplicationFeeAmountUsd(fx.toUsd(p.getApplicationFeeAmount(), p.getApplicationFeeCurrency()));
         return p;
     }
 
@@ -310,10 +318,22 @@ public class ProgramService {
         p.setTermLength(req.programType() != null && !req.programType().isDegree()
                 ? normalizeTermLength(req.termLength()) : null);
         p.setTeachingLanguage(req.teachingLanguage());
-        p.setDurationMonths(req.durationMonths());
-        p.setTuitionAmount(req.tuitionAmount());
-        p.setTuitionCurrency(upperOrNull(req.tuitionCurrency()));
+        // the programme row keeps only the "from" figures; the detail lives in the offerings
+        var summary = ProgramOfferingRules.summary(req.offerings());
+        p.setDurationMonths(summary.durationMonths());
+        p.setTuitionAmount(summary.tuitionAmount());
+        p.setTuitionCurrency(upperOrNull(summary.tuitionCurrency()));
         p.setSummary(Texts.blankToNull(req.summary()));
+        p.setAdmissionRequirements(Texts.blankToNull(req.admissionRequirements()));
+        p.setApplicationDocuments(Texts.blankToNull(req.applicationDocuments()));
+        p.setCareerProspects(Texts.blankToNull(req.careerProspects()));
+        p.setScholarshipInfo(Texts.blankToNull(req.scholarshipInfo()));
+        p.setMinHsk(req.minHsk());
+        p.setMinIelts(req.minIelts());
+        p.setMinToefl(req.minToefl());
+        p.setApplicationFeeAmount(req.applicationFeeAmount());
+        p.setApplicationFeeCurrency(req.applicationFeeAmount() == null ? null
+                : req.applicationFeeCurrency() == null ? "CNY" : upperOrNull(req.applicationFeeCurrency()));
         // Primarily set through the dedicated upload endpoint; only overwrite from
         // the request when the client actually sent a value.
         if (req.imageMediaId() != null) {

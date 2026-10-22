@@ -30,6 +30,15 @@ public class Program {
     private BigDecimal tuitionAmount;
     private String tuitionCurrency;
     private String summary;
+    private String admissionRequirements;
+    private String applicationDocuments;
+    private String careerProspects;
+    private String scholarshipInfo;
+    private Integer minHsk;
+    private BigDecimal minIelts;
+    private Integer minToefl;
+    private BigDecimal applicationFeeAmount;
+    private String applicationFeeCurrency;
     private Long imageMediaId;
     private boolean featured;
     private boolean hot;
@@ -41,12 +50,14 @@ public class Program {
     private LocalDateTime updateTime;
     private String remark;
 
+    private BigDecimal applicationFeeAmountUsd;
     private String universityName;
     private String universitySlug;
 
     private List<String> levels = new ArrayList<>();
     private List<ProgramMajor> majors = new ArrayList<>();
     private List<ProgramIntake> intakes = new ArrayList<>();
+    private List<ProgramOffering> offerings = new ArrayList<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -86,6 +97,36 @@ public class Program {
 
     public String getSummary() { return summary; }
     public void setSummary(String summary) { this.summary = summary; }
+
+    public String getAdmissionRequirements() { return admissionRequirements; }
+    public void setAdmissionRequirements(String admissionRequirements) { this.admissionRequirements = admissionRequirements; }
+
+    public String getApplicationDocuments() { return applicationDocuments; }
+    public void setApplicationDocuments(String applicationDocuments) { this.applicationDocuments = applicationDocuments; }
+
+    public String getCareerProspects() { return careerProspects; }
+    public void setCareerProspects(String careerProspects) { this.careerProspects = careerProspects; }
+
+    public String getScholarshipInfo() { return scholarshipInfo; }
+    public void setScholarshipInfo(String scholarshipInfo) { this.scholarshipInfo = scholarshipInfo; }
+
+    public Integer getMinHsk() { return minHsk; }
+    public void setMinHsk(Integer minHsk) { this.minHsk = minHsk; }
+
+    public BigDecimal getMinIelts() { return minIelts; }
+    public void setMinIelts(BigDecimal minIelts) { this.minIelts = minIelts; }
+
+    public Integer getMinToefl() { return minToefl; }
+    public void setMinToefl(Integer minToefl) { this.minToefl = minToefl; }
+
+    public BigDecimal getApplicationFeeAmount() { return applicationFeeAmount; }
+    public void setApplicationFeeAmount(BigDecimal applicationFeeAmount) { this.applicationFeeAmount = applicationFeeAmount; }
+
+    public String getApplicationFeeCurrency() { return applicationFeeCurrency; }
+    public void setApplicationFeeCurrency(String applicationFeeCurrency) { this.applicationFeeCurrency = applicationFeeCurrency; }
+
+    public BigDecimal getApplicationFeeAmountUsd() { return applicationFeeAmountUsd; }
+    public void setApplicationFeeAmountUsd(BigDecimal applicationFeeAmountUsd) { this.applicationFeeAmountUsd = applicationFeeAmountUsd; }
 
     public Long getImageMediaId() { return imageMediaId; }
     public void setImageMediaId(Long imageMediaId) { this.imageMediaId = imageMediaId; }
@@ -131,4 +172,7 @@ public class Program {
 
     public List<ProgramIntake> getIntakes() { return intakes; }
     public void setIntakes(List<ProgramIntake> intakes) { this.intakes = intakes; }
+
+    public List<ProgramOffering> getOfferings() { return offerings; }
+    public void setOfferings(List<ProgramOffering> offerings) { this.offerings = offerings; }
 }

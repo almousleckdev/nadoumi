@@ -4,6 +4,7 @@ import com.nadoumi.common.text.Texts;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.ProgramIntake;
 import com.nadoumi.program.domain.ProgramMajor;
+import com.nadoumi.program.domain.ProgramOffering;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +28,16 @@ public record ProgramResponse(
         String tuitionCurrency,
         BigDecimal tuitionAmountUsd,
         String summary,
+        String admissionRequirements,
+        String applicationDocuments,
+        String careerProspects,
+        String scholarshipInfo,
+        Integer minHsk,
+        BigDecimal minIelts,
+        Integer minToefl,
+        BigDecimal applicationFeeAmount,
+        String applicationFeeCurrency,
+        BigDecimal applicationFeeAmountUsd,
         Long imageMediaId,
         String imageUrl,
         boolean featured,
@@ -37,7 +48,21 @@ public record ProgramResponse(
         String createdAt,
         String updatedAt,
         List<Major> majors,
-        List<Intake> intakes) {
+        List<Intake> intakes,
+        List<Offering> offerings) {
+
+    public record Offering(
+            Long id, String level, int durationMonths,
+            BigDecimal tuitionAmount, String tuitionCurrency, String tuitionPeriod, BigDecimal tuitionAmountUsd,
+            BigDecimal accommodationAmount, String accommodationCurrency, String accommodationPeriod,
+            BigDecimal accommodationAmountUsd, String note) {
+        static Offering of(ProgramOffering o) {
+            return new Offering(o.getId(), o.getLevel(), o.getDurationMonths(),
+                    o.getTuitionAmount(), o.getTuitionCurrency(), o.getTuitionPeriod(), o.getTuitionAmountUsd(),
+                    o.getAccommodationAmount(), o.getAccommodationCurrency(), o.getAccommodationPeriod(),
+                    o.getAccommodationAmountUsd(), o.getNote());
+        }
+    }
 
     public record Major(Long id, String name, String nameCn, Long departmentId, String departmentName, String level) {
         static Major of(ProgramMajor m) {
@@ -70,11 +95,15 @@ public record ProgramResponse(
                 p.getTermLength(),
                 p.getTeachingLanguage() == null ? null : p.getTeachingLanguage().name(),
                 p.getDurationMonths(), p.getTuitionAmount(), p.getTuitionCurrency(), tuitionAmountUsd,
-                p.getSummary(), p.getImageMediaId(), imageUrl, p.isFeatured(), p.isHot(),
+                p.getSummary(), p.getAdmissionRequirements(), p.getApplicationDocuments(),
+                p.getCareerProspects(), p.getScholarshipInfo(), p.getMinHsk(), p.getMinIelts(), p.getMinToefl(),
+                p.getApplicationFeeAmount(), p.getApplicationFeeCurrency(), p.getApplicationFeeAmountUsd(),
+                p.getImageMediaId(), imageUrl, p.isFeatured(), p.isHot(),
                 p.getStatus() == null ? null : p.getStatus().name(),
                 p.getPublishStatus() == null ? null : p.getPublishStatus().name(),
                 p.getRemark(), Texts.stringOrNull(p.getCreateTime()), Texts.stringOrNull(p.getUpdateTime()),
                 p.getMajors().stream().map(Major::of).toList(),
-                p.getIntakes().stream().map(Intake::of).toList());
+                p.getIntakes().stream().map(Intake::of).toList(),
+                p.getOfferings().stream().map(Offering::of).toList());
     }
 }

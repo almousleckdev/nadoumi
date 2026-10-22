@@ -32,6 +32,7 @@ public record UniversityRequest(
         @Size(max = 4000) String campusInfo,
         @Size(max = 4000) String accommodationInfo,
         @Size(max = 4000) String nearbyInfo,
+        @Size(max = 300) String address,
         @Size(max = 120) String admissionsEmail,
         @Size(max = 64) String officePhone,
         @Size(max = 500) String logoImageUrl,
@@ -49,7 +50,15 @@ public record UniversityRequest(
         @Size(max = 500) String remark,
         @Valid List<RankingInput> rankings,
         @Valid List<HighlightInput> highlights,
-        @Valid @Size(max = 10, message = "at most 10 gallery images") List<GalleryInput> gallery) {
+        @Valid @Size(max = 10, message = "at most 10 gallery images") List<GalleryInput> gallery,
+        @Valid @Size(max = 12, message = "at most 12 links") List<LinkInput> links) {
+
+    /** One link per kind. {@code value} is a web URL, or the account id for WECHAT. */
+    public record LinkInput(
+            @NotBlank @Size(max = 16) String kind,
+            @NotBlank @Size(max = 500) String value) {
+    }
+
 
     public record RankingInput(
             @NotBlank @Size(max = 40) String source,

@@ -44,8 +44,13 @@ class ProgramChildrenWriterTest {
 
     private static ProgramRequest request(List<String> levels, List<ProgramRequest.MajorInput> majors,
             List<ProgramRequest.IntakeInput> intakes) {
-        return new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, levels, null, null, null, null,
-                null, null, null, null, null, null, null, null, null, majors, intakes);
+        return new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, levels,
+                null, null, null,                       // field, termLength, teachingLanguage
+                null, null, null, null, null,           // summary, admission, documents, career, scholarships
+                null, null, null, null, null,           // minHsk, minIelts, minToefl, application fee + currency
+                null,                                   // imageMediaId
+                false, false, null, null, null,         // featured, hot, status, publishStatus, remark
+                majors, intakes, null);
     }
 
     private static ProgramRequest.MajorInput major(String name, Long departmentId, String level) {
@@ -148,5 +153,38 @@ class ProgramChildrenWriterTest {
         verify(mapper).deleteLevels(eq(PROGRAM_ID));
         verify(mapper).deleteMajors(eq(PROGRAM_ID));
         verify(mapper).deleteIntakes(eq(PROGRAM_ID));
+    }
+
+    @Test
+    void shouldStoreEachOfferingWithDefaultPeriodsAndCurrency() {
+        var offering = new ProgramRequest.OfferingInput(" master ", 24, new java.math.BigDecimal("26000"), null, null,
+                new java.math.BigDecimal("1200"), null, null, " shared room ");
+        var req = new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("MASTER"),
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                false, false, null, null, null, null, null, List.of(offering));
+
+        writer.replace(program(ProgramType.DEGREE), req);
+
+        ArgumentCaptor<com.nadoumi.program.domain.ProgramOffering> saved =
+                ArgumentCaptor.forClass(com.nadoumi.program.domain.ProgramOffering.class);
+        verify(mapper).insertOffering(saved.capture());
+        var o = saved.getValue();
+        assertThat(o.getLevel()).isEqualTo("MASTER");
+        assertThat(o.getTuitionCurrency()).isEqualTo("CNY");
+        assertThat(o.getTuitionPeriod()).isEqualTo("PER_YEAR");
+        assertThat(o.getAccommodationPeriod()).isEqualTo("PER_MONTH");
+        assertThat(o.getNote()).isEqualTo("shared room");
+    }
+
+    @Test
+    void shouldRejectAnOfferingBelowTheLevelMinimum_beforeWritingAnything() {
+        var tooShort = new ProgramRequest.OfferingInput("BACHELOR", 36, null, null, null, null, null, null, null);
+        var req = new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("BACHELOR"),
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                false, false, null, null, null, null, null, List.of(tooShort));
+
+        assertThatThrownBy(() -> writer.replace(program(ProgramType.DEGREE), req))
+                .isInstanceOf(NadBadRequestException.class);
+        verify(mapper, never()).insertOffering(org.mockito.ArgumentMatchers.any());
     }
 }

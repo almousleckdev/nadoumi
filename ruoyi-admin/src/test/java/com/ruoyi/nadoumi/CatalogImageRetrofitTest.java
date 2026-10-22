@@ -208,7 +208,7 @@ class CatalogImageRetrofitTest extends AbstractNadIntegrationTest {
         String res = mvc.perform(post("/api/staff/programs").header("Authorization", bearer(token))
                         .contentType("application/json").content("""
                             {"universityId":%d,"name":"Retrofit MBA","programType":"DEGREE","levels":["MASTER"],"field":"Business",
-                             "teachingLanguage":"ENGLISH","durationMonths":24,"status":"ACTIVE","publishStatus":"PUBLISHED"}"""
+                             "teachingLanguage":"ENGLISH","offerings":[{"level":"MASTER","durationMonths":24}],"status":"ACTIVE","publishStatus":"PUBLISHED"}"""
                         .formatted(universityId)))
                 .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
         return ((Number) JsonPath.read(res, "$.id")).longValue();

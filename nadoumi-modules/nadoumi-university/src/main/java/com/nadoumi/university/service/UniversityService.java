@@ -22,6 +22,7 @@ import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.enums.PublishStatus;
 import com.nadoumi.university.domain.enums.UniversityStatus;
 import com.nadoumi.university.domain.enums.UniversityType;
+import com.nadoumi.university.mapper.DepartmentMapper;
 import com.nadoumi.university.mapper.UniversityMapper;
 import com.nadoumi.university.mapper.UniversitySearch;
 import com.nadoumi.university.web.request.UniversityRequest;
@@ -49,9 +50,11 @@ public class UniversityService {
     private final MediaGateway media;
     private final OutboxWriter outbox;
     private final UniversityChildrenWriter children;
+    private final DepartmentMapper departmentMapper;
 
     public UniversityService(UniversityMapper mapper, MediaGateway media, OutboxWriter outbox,
-            UniversityChildrenWriter children) {
+            UniversityChildrenWriter children, DepartmentMapper departmentMapper) {
+        this.departmentMapper = departmentMapper;
         this.mapper = mapper;
         this.media = media;
         this.outbox = outbox;
@@ -84,6 +87,7 @@ public class UniversityService {
         u.setCreateBy(AuditActor.username());
         mapper.insert(u);
         children.replace(u.getId(), req.rankings(), req.highlights(), req.gallery());
+        children.replaceLinks(u.getId(), req.links());
         if (u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED) {
             emitPublished(u);
         }
@@ -100,6 +104,7 @@ public class UniversityService {
         u.setUpdateBy(AuditActor.username());
         mapper.update(u);
         children.replace(id, req.rankings(), req.highlights(), req.gallery());
+        children.replaceLinks(id, req.links());
         boolean nowLive = u.getStatus() == UniversityStatus.ACTIVE && u.getPublishStatus() == PublishStatus.PUBLISHED;
         if (nowLive && !wasLive) {
             emitPublished(u);
@@ -182,7 +187,10 @@ public class UniversityService {
         if (u.getStatus() != UniversityStatus.ACTIVE || u.getPublishStatus() != PublishStatus.PUBLISHED) {
             throw new NadNotFoundException("university not found");
         }
-        return PublicUniversityResponse.of(toResponse(u));
+        List<PublicUniversityResponse.Department> departments = departmentMapper.findByUniversity(u.getId()).stream()
+                .map(d -> new PublicUniversityResponse.Department(d.getName(), d.getNameCn(), d.getProgramCount()))
+                .toList();
+        return PublicUniversityResponse.of(toResponse(u), departments);
     }
 
     /** Resolve the {@code {idOrSlug}} path segment (public routes are slug-first). */
@@ -212,6 +220,7 @@ public class UniversityService {
         u.setRankings(mapper.findRankings(id));
         u.setHighlights(mapper.findHighlights(id));
         u.setGallery(mapper.findGallery(id));
+        u.setLinks(mapper.findLinks(id));
         return u;
     }
 
@@ -252,6 +261,7 @@ public class UniversityService {
         u.setCampusInfo(Texts.blankToNull(req.campusInfo()));
         u.setAccommodationInfo(Texts.blankToNull(req.accommodationInfo()));
         u.setNearbyInfo(Texts.blankToNull(req.nearbyInfo()));
+        u.setAddress(Texts.blankToNull(req.address()));
         u.setAdmissionsEmail(Texts.blankToNull(req.admissionsEmail()));
         u.setOfficePhone(Texts.blankToNull(req.officePhone()));
         u.setLogoImageUrl(Texts.blankToNull(req.logoImageUrl()));

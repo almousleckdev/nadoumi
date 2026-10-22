@@ -101,3 +101,28 @@ describe('formFromUniversity', () => {
     expect(p.highlights).toEqual([{ kind: 'HIGHLIGHT', text: 'C9 League member' }])
   })
 })
+
+describe('university address and links', () => {
+  it('starts with no address and no links', () => {
+    expect(blankUniversityForm()).toMatchObject({ address: '', links: [] })
+  })
+
+  it('round-trips the address and links from a loaded university', () => {
+    const loaded = {
+      ...university, address: '5 Yiheyuan Road',
+      links: [{ id: 1, kind: 'FACEBOOK', value: 'https://facebook.com/fudan' }],
+    } as unknown as University
+    const form = formFromUniversity(loaded)
+    expect(form.address).toBe('5 Yiheyuan Road')
+    expect(buildUniversityPayload(form)).toMatchObject({
+      address: '5 Yiheyuan Road', links: [{ kind: 'FACEBOOK', value: 'https://facebook.com/fudan' }],
+    })
+  })
+
+  it('drops link rows without a value and trims the rest', () => {
+    const form = blankUniversityForm()
+    form.links.push({ kind: 'WECHAT', value: '  fudan_official ' }, { kind: 'X', value: '   ' })
+    expect(buildUniversityPayload(form).links).toEqual([{ kind: 'WECHAT', value: 'fudan_official' }])
+  })
+})
+

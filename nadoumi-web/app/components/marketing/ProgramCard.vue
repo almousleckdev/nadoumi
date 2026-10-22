@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProgramCard } from '~/types/catalog'
+import { formatDuration, offeringMoney } from '~/utils/programDisplay'
 
 const props = withDefaults(defineProps<{
   program: ProgramCard
@@ -10,12 +11,8 @@ const props = withDefaults(defineProps<{
 const { t } = useI18n()
 const localePath = useLocalePath()
 
-const tuition = computed(() => {
-  const p = props.program
-  return p.tuitionAmount != null
-    ? `${p.tuitionCurrency ?? ''} ${p.tuitionAmount.toLocaleString('en')}`.trim()
-    : ''
-})
+const tuition = computed(() =>
+  offeringMoney(props.program.tuitionAmount, props.program.tuitionAmountUsd, props.program.tuitionCurrency))
 
 const levelLabel = computed(() => {
   const p = props.program
@@ -57,10 +54,12 @@ const levelLabel = computed(() => {
       </p>
       <p v-if="program.field" class="mt-1 text-sm text-slate-500">{{ program.field }}</p>
 
+      <p v-if="tuition" class="mt-3 text-sm font-semibold tabular-nums text-red-600">
+        <span class="font-normal text-slate-500">{{ t('program.tuitionFrom') }}</span> {{ tuition }}
+      </p>
       <div class="mt-auto flex items-center justify-between pt-4 text-sm">
         <span class="text-slate-500">
-          <template v-if="program.durationMonths">{{ t('program.duration', { months: program.durationMonths }) }}</template>
-          <template v-else-if="tuition">{{ tuition }}</template>
+          <template v-if="program.durationMonths">{{ formatDuration(program.durationMonths, t) }}</template>
         </span>
         <span class="inline-flex items-center gap-1 font-medium text-slate-900 group-hover:gap-2">
           {{ t('program.view') }}<span aria-hidden="true">→</span>

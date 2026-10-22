@@ -44,9 +44,9 @@ class ProgramServiceTest {
             List<ProgramRequest.MajorInput> majors, List<ProgramRequest.IntakeInput> intakes) {
         return new ProgramRequest(
                 universityId, name, "计算机科学", ProgramType.DEGREE, List.of("BACHELOR"), "Engineering", null,
-                null, 48, null, "usd", "A four-year programme.", null,
+                null, "A four-year programme.", null, null, null, null, null, null, null, null, null, null,
                 false, false, ProgramStatus.ACTIVE, PublishStatus.DRAFT, "note",
-                majors, intakes);
+                majors, intakes, List.of());
     }
 
     private static ProgramRequest req(Long universityId, String name) {

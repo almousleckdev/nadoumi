@@ -3,6 +3,7 @@ package com.nadoumi.university.mapper;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
+import com.nadoumi.university.domain.UniversityLink;
 import com.nadoumi.university.domain.UniversityRanking;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
@@ -55,4 +56,11 @@ public interface UniversityMapper {
 
     int insertGalleryImage(@Param("universityId") Long universityId,
             @Param("img") UniversityGalleryImage image, @Param("sortOrder") int sortOrder);
+
+    List<UniversityLink> findLinks(@Param("universityId") Long universityId);
+
+    int deleteLinks(@Param("universityId") Long universityId);
+
+    int insertLink(@Param("universityId") Long universityId, @Param("link") UniversityLink link,
+            @Param("sortOrder") int sortOrder);
 }

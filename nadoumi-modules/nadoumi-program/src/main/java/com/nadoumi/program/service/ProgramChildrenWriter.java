@@ -5,6 +5,7 @@ import com.nadoumi.common.text.Texts;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.ProgramIntake;
 import com.nadoumi.program.domain.ProgramMajor;
+import com.nadoumi.program.domain.ProgramOffering;
 import com.nadoumi.program.mapper.ProgramMapper;
 import com.nadoumi.program.web.request.ProgramRequest;
 import com.nadoumi.university.service.DepartmentService;
@@ -32,6 +33,42 @@ public class ProgramChildrenWriter {
         List<String> levels = replaceLevels(program, req, degree);
         replaceMajors(program, req, degree, levels);
         replaceIntakes(program.getId(), req.intakes());
+        replaceOfferings(program, req, levels);
+    }
+
+    /** Offerings are optional; a null list leaves the programme with none. */
+    private void replaceOfferings(Program program, ProgramRequest req, List<String> levels) {
+        Long programId = program.getId();
+        ProgramOfferingRules.validate(program.getProgramType(), levels, req.offerings());
+        mapper.deleteOfferings(programId);
+        if (req.offerings() == null) {
+            return;
+        }
+        int order = 0;
+        for (ProgramRequest.OfferingInput in : req.offerings()) {
+            ProgramOffering offering = new ProgramOffering();
+            offering.setProgramId(programId);
+            offering.setLevel(ProgramOfferingRules.normalizedLevel(in.level()));
+            offering.setDurationMonths(in.durationMonths());
+            offering.setTuitionAmount(in.tuitionAmount());
+            offering.setTuitionCurrency(in.tuitionAmount() == null ? null : currencyOrCny(in.tuitionCurrency()));
+            offering.setTuitionPeriod(periodOr(in.tuitionPeriod(), "PER_YEAR"));
+            offering.setAccommodationAmount(in.accommodationAmount());
+            offering.setAccommodationCurrency(
+                    in.accommodationAmount() == null ? null : currencyOrCny(in.accommodationCurrency()));
+            offering.setAccommodationPeriod(periodOr(in.accommodationPeriod(), "PER_MONTH"));
+            offering.setNote(Texts.blankToNull(in.note()));
+            offering.setSortOrder(order++);
+            mapper.insertOffering(offering);
+        }
+    }
+
+    private static String currencyOrCny(String raw) {
+        return raw == null || raw.isBlank() ? "CNY" : raw.trim().toUpperCase();
+    }
+
+    private static String periodOr(String raw, String fallback) {
+        return raw == null || raw.isBlank() ? fallback : raw.trim().toUpperCase();
     }
 
     private List<String> replaceLevels(Program program, ProgramRequest req, boolean degree) {

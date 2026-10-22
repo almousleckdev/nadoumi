@@ -10,6 +10,7 @@ import Drawer from '@/components/ui/Drawer.vue'
 import { useDeferredImages } from '@/composables/useDeferredImages'
 import IdentitySections from './form/IdentitySections.vue'
 import ContentSections from './form/ContentSections.vue'
+import LinksSection from './form/LinksSection.vue'
 import MediaSections from './form/MediaSections.vue'
 import PublishingSection from './form/PublishingSection.vue'
 import { syncDepartments } from './syncDepartments'
@@ -114,6 +115,7 @@ async function save() {
     >
       <IdentitySections />
       <ContentSections />
+      <LinksSection />
       <MediaSections
         ref="media"
         :key="openSeq"

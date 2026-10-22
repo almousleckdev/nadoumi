@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { ProgramCard, UniversityDetail, UniversityHighlight } from '~/types/catalog'
 import type { DetailFact } from '~/components/catalog/DetailFacts.vue'
+import { offeringMoney } from '~/utils/programDisplay'
+import { cheapestProgram, internationalShare, levelsOffered } from '~/utils/universityDisplay'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -24,6 +26,11 @@ function highlightsOf(kind: UniversityHighlight['kind']): UniversityHighlight[] 
   return (u.value?.highlights ?? []).filter(h => h.kind === kind)
 }
 
+const fromTuition = computed(() => {
+  const p = cheapestProgram(programs.value)
+  return p ? offeringMoney(p.tuitionAmount, p.tuitionAmountUsd, p.tuitionCurrency) : ''
+})
+
 const facts = computed<DetailFact[]>(() => {
   const x = u.value
   if (!x) return []
@@ -32,7 +39,11 @@ const facts = computed<DetailFact[]>(() => {
     { label: t('university.students'), value: num(x.totalStudents), icon: 'contacts' },
     { label: t('university.intlStudents'), value: num(x.internationalStudents), icon: 'location' },
     { label: t('university.faculty'), value: num(x.facultyCount), icon: 'profile' },
+    { label: t('university.statIntlShare'), value: internationalShare(x.totalStudents, x.internationalStudents), icon: 'location' },
     { label: t('university.rankingTier'), value: x.rankingTier ?? '', icon: 'award' },
+    { label: t('university.statProgrammes'), value: programs.value.length ? String(programs.value.length) : '', icon: 'applications' },
+    { label: t('university.statLevels'), value: levelsOffered(programs.value).map(l => t(`program.level.${l}`)).join(', '), icon: 'education' },
+    { label: t('university.statTuitionFrom'), value: fromTuition.value, icon: 'documents', tone: 'price' },
   ]
   return all.filter(f => f.value)
 })
@@ -88,6 +99,15 @@ const prose = computed(() => {
     </DetailCard>
     <DetailCard v-if="highlightsOf('ADVANTAGE').length" :title="t('university.advantages')">
       <BulletList :items="highlightsOf('ADVANTAGE').map(h => ({ text: h.text }))" />
+    </DetailCard>
+
+    <DetailCard v-if="u.departments?.length" :title="t('university.departments')">
+      <ul class="grid gap-3 sm:grid-cols-2">
+        <li v-for="d in u.departments" :key="d.name" class="flex items-baseline justify-between gap-3 rounded-xl bg-slate-50 px-4 py-3">
+          <span class="min-w-0 break-words font-medium text-slate-900">{{ d.name }}<span v-if="d.nameCn" class="text-slate-500"> · {{ d.nameCn }}</span></span>
+          <span v-if="d.programCount" class="shrink-0 text-sm text-slate-500">{{ t('university.programmeCount', { n: d.programCount }) }}</span>
+        </li>
+      </ul>
     </DetailCard>
 
     <DetailCard :title="t('university.programmes')" :description="t('program.sectionIntro')">

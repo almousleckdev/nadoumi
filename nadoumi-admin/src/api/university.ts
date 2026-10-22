@@ -59,6 +59,7 @@ export interface University {
   campusInfo: string | null
   accommodationInfo: string | null
   nearbyInfo: string | null
+  address: string | null
   admissionsEmail: string | null
   officePhone: string | null
   logoDocumentId: number | null
@@ -85,6 +86,20 @@ export interface University {
   rankings: UniversityRanking[]
   highlights: UniversityHighlight[]
   gallery: UniversityGalleryImage[]
+  links: UniversityLink[]
+}
+
+export type UniversityLinkKind =
+  'ADMISSIONS' | 'VIRTUAL_TOUR' | 'WIKIPEDIA' | 'FACEBOOK' | 'X' | 'INSTAGRAM' | 'YOUTUBE' | 'LINKEDIN' | 'TIKTOK' | 'WECHAT' | 'WEIBO'
+export const UNIVERSITY_LINK_KINDS: UniversityLinkKind[] = [
+  'ADMISSIONS', 'VIRTUAL_TOUR', 'WIKIPEDIA', 'FACEBOOK', 'X', 'INSTAGRAM', 'YOUTUBE', 'LINKEDIN', 'TIKTOK', 'WECHAT', 'WEIBO',
+]
+
+/** An official or social channel. `value` is a web URL, or the account id for WECHAT. */
+export interface UniversityLink {
+  id?: number
+  kind: UniversityLinkKind
+  value: string
 }
 
 export interface UniversityInput {
@@ -105,6 +120,7 @@ export interface UniversityInput {
   campusInfo?: string | null
   accommodationInfo?: string | null
   nearbyInfo?: string | null
+  address?: string | null
   admissionsEmail?: string | null
   officePhone?: string | null
   /** @deprecated still accepted by the backend; new uploads set `logoMediaId`. */
@@ -123,6 +139,7 @@ export interface UniversityInput {
   rankings: UniversityRanking[]
   highlights: UniversityHighlight[]
   gallery: UniversityGalleryImage[]
+  links: UniversityLink[]
 }
 
 const BASE = '/api/staff/universities'

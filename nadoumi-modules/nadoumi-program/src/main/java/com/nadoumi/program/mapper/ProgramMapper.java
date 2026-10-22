@@ -3,6 +3,7 @@ package com.nadoumi.program.mapper;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.ProgramIntake;
 import com.nadoumi.program.domain.ProgramMajor;
+import com.nadoumi.program.domain.ProgramOffering;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
@@ -49,4 +50,10 @@ public interface ProgramMapper {
     int deleteIntakes(@Param("programId") Long programId);
 
     int insertIntake(ProgramIntake intake);
+
+    List<ProgramOffering> findOfferings(@Param("programId") Long programId);
+
+    int deleteOfferings(@Param("programId") Long programId);
+
+    int insertOffering(ProgramOffering offering);
 }

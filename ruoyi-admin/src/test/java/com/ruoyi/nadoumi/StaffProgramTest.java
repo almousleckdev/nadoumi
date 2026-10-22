@@ -31,8 +31,9 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
     private static String programBody(long universityId, String publishStatus) {
         return """
                 {"universityId":%d,"name":"  MBA  ","nameCn":"工商管理硕士","programType":"DEGREE","levels":["MASTER"],
-                 "field":"Business","teachingLanguage":"ENGLISH","durationMonths":24,
-                 "tuitionAmount":38000.00,"tuitionCurrency":"usd","summary":"A two-year MBA.",
+                 "field":"Business","teachingLanguage":"ENGLISH","summary":"A two-year MBA.",
+                 "offerings":[{"level":"MASTER","durationMonths":24,"tuitionAmount":38000.00,"tuitionCurrency":"usd",
+                               "accommodationAmount":1500.00,"accommodationCurrency":"cny"}],
                  "status":"ACTIVE","publishStatus":"%s",
                  "majors":[{"name":"Finance"},{"name":"Marketing"}],
                  "intakes":[{"term":"AUTUMN_SEPTEMBER","applicationOpen":"2026-03-01","applicationClose":"2026-06-30"}]}"""
@@ -53,6 +54,11 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
                 .andExpect(jsonPath("$.universityId").value((int) uni))
                 .andExpect(jsonPath("$.universityName").value("Fudan University"))
                 .andExpect(jsonPath("$.tuitionCurrency").value("USD"))
+                .andExpect(jsonPath("$.durationMonths").value(24))
+                .andExpect(jsonPath("$.offerings.length()").value(1))
+                .andExpect(jsonPath("$.offerings[0].level").value("MASTER"))
+                .andExpect(jsonPath("$.offerings[0].tuitionPeriod").value("PER_YEAR"))
+                .andExpect(jsonPath("$.offerings[0].accommodationPeriod").value("PER_MONTH"))
                 .andExpect(jsonPath("$.majors.length()").value(2))
                 .andExpect(jsonPath("$.programType").value("DEGREE"))
                 .andExpect(jsonPath("$.levels[0]").value("MASTER"))
