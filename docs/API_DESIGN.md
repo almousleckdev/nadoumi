@@ -516,3 +516,4 @@ application id. `POST .../submit` answers **409** while a mandatory document is 
 Signature (EXISTING, 2026-10-22), under `/api/student/applicants/{id}/signature`: `GET` status `{signed, signedAt}`, `POST` multipart `file` (`EDIT_PROFILE`;
 re-encoded to PNG; 400 for an empty or non-image file), `GET /image` (the owner's PNG, `no-store`). `POST .../submit` answers **409** until a signature is on file.
 
+Requirement conditions (EXISTING, 2026-10-22): programme requirement items and scholarship `documentRequirements` carry `appliesWhen` (`MINOR|IN_CHINA|STUDIED_IN_CHINA|MASTER_OR_DOCTORAL|DOCTORAL`, optional); the checklist endpoint returns only the rows that apply.

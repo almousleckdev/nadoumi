@@ -47,6 +47,7 @@ public class DocumentRequirementService {
             requirement.setRefId(refId);
             requirement.setDocType(item.docType());
             requirement.setMandatory(item.mandatory());
+            requirement.setAppliesWhen(item.appliesWhen() == null || item.appliesWhen().isBlank() ? null : item.appliesWhen());
             requirement.setNotes(item.notes() == null || item.notes().isBlank() ? null : item.notes().strip());
             requirement.setCreateBy("");
             mapper.insert(requirement);

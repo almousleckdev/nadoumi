@@ -78,7 +78,7 @@ export function blankProgramForm(lockedUniversityId: number | null) {
     applicationFeeAmount: null as number | null,
     offerings: [] as OfferingRow[],
     /** Saved through its own endpoint after the programme itself, so it is not part of `buildProgramPayload`. */
-    documentRequirements: [] as { docType: string, mandatory: boolean, notes: string }[],
+    documentRequirements: [] as { docType: string, mandatory: boolean, notes: string, appliesWhen: string }[],
     imageMediaId: null as number | null,
     majors: [] as { name: string, nameCn: string | null, departmentId: number | null, level: DegreeLevel | null }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],

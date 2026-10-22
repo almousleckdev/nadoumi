@@ -305,7 +305,7 @@
     </select>
 
     <select id="findDocumentRequirements" resultType="com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement">
-        select doc_type as docType, mandatory, note
+        select doc_type as docType, mandatory, note, applies_when as appliesWhen
         from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId} order by sort_order, id
     </select>
 
@@ -372,8 +372,8 @@
 
     <delete id="deleteDocumentRequirements">delete from nad_scholarship_document_requirement where scholarship_id = #{scholarshipId}</delete>
     <insert id="insertDocumentRequirement">
-        insert into nad_scholarship_document_requirement (scholarship_id, doc_type, mandatory, note, sort_order)
-        values (#{scholarshipId}, #{d.docType}, #{d.mandatory}, #{d.note}, #{sortOrder})
+        insert into nad_scholarship_document_requirement (scholarship_id, doc_type, mandatory, note, applies_when, sort_order)
+        values (#{scholarshipId}, #{d.docType}, #{d.mandatory}, #{d.note}, #{d.appliesWhen}, #{sortOrder})
     </insert>
 
     <!-- confidential linkage -->

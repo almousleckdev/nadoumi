@@ -85,7 +85,7 @@ watch(() => props.modelValue, (open) => {
   Object.assign(form, formFromProgram(p))
   loadDepartments(p.universityId)
   getProgramDocuments(p.id)
-    .then(list => { form.documentRequirements = list.map(d => ({ docType: d.docType, mandatory: d.mandatory, notes: d.notes ?? '' })) })
+    .then(list => { form.documentRequirements = list.map(d => ({ docType: d.docType, mandatory: d.mandatory, notes: d.notes ?? '', appliesWhen: d.appliesWhen ?? '' })) })
     .catch(() => {})
 }, { immediate: true })
 
@@ -105,7 +105,7 @@ async function save() {
       ? await updateProgram(props.program.id, buildProgramPayload(form))
       : await createProgram(buildProgramPayload(form))
     await saveProgramDocuments(saved.id, form.documentRequirements.map(d => ({
-      docType: d.docType, mandatory: d.mandatory, notes: d.notes.trim() || null,
+      docType: d.docType, mandatory: d.mandatory, notes: d.notes.trim() || null, appliesWhen: d.appliesWhen || null,
     })))
     const imagesOk = props.program
       ? true

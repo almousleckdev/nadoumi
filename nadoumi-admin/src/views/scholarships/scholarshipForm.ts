@@ -50,7 +50,7 @@ export function blankForm() {
     levelStipends: [] as { level: EducationLevel, amount: number | null, currency: string, frequency: StipendFrequency, durationMonths: number | null, conditions: string }[],
     accommodations: [] as { roomType: RoomType, amount: number | null, currency: string, note: string }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
-    documentRequirements: [] as { docType: string, mandatory: boolean, note: string }[],
+    documentRequirements: [] as { docType: string, mandatory: boolean, note: string, appliesWhen: string }[],
     featured: false, recommended: false, hot: false,
     id: undefined as number | undefined,
     heroImageUrl: null as string | null, coverImageUrl: null as string | null,
@@ -94,7 +94,7 @@ export function formFromScholarship(source: Scholarship): ScholarshipForm {
       roomType: a.roomType as RoomType, amount: a.amountRmb ?? null, currency: 'CNY', note: a.note ?? '',
     })),
     intakes: v.intakes.map(i => ({ term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null })),
-    documentRequirements: v.documentRequirements.map(d => ({ docType: d.docType, mandatory: d.mandatory, note: d.note ?? '' })),
+    documentRequirements: v.documentRequirements.map(d => ({ docType: d.docType, mandatory: d.mandatory, note: d.note ?? '', appliesWhen: d.appliesWhen ?? '' })),
     featured: v.featured, recommended: v.recommended, hot: v.hot,
     id: v.id,
     heroImageUrl: v.heroImageUrl ?? null, coverImageUrl: v.coverImageUrl ?? null,
@@ -170,6 +170,7 @@ export function buildPayload(form: ScholarshipForm): ScholarshipInput {
     coverage: form.coverage.filter(c => c.kind).map(c => ({ kind: c.kind, detail: textOrNull(c.detail) })),
     documentRequirements: form.documentRequirements.filter(d => d.docType.trim()).map(d => ({
       docType: d.docType.trim().toUpperCase(), mandatory: d.mandatory, note: textOrNull(d.note),
+      appliesWhen: textOrNull(d.appliesWhen),
     })),
   }
 }

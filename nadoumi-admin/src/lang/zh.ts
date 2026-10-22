@@ -812,6 +812,14 @@ export default {
       NADOUMI_APPLICATION: 'Nadoumi 申请费', NADOUMI_SERVICE: 'Nadoumi 服务费',
       INSURANCE: '保险费', VISA: '签证费', OTHER: '其他费用',
     },
+    cond: {
+      always: "始终需要",
+      MINOR: "仅限未满 18 岁",
+      IN_CHINA: "仅限目前在中国",
+      STUDIED_IN_CHINA: "仅限曾在中国学习",
+      MASTER_OR_DOCTORAL: "仅限硕士或博士",
+      DOCTORAL: "仅限博士",
+    },
     doc: {
       PASSPORT: '护照', DEGREE_CERTIFICATE: '学位证书', TRANSCRIPT: '成绩单',
       LANGUAGE_TEST_REPORT: '语言成绩证明', VISA: '签证', PHYSICAL_EXAM: '体检表',

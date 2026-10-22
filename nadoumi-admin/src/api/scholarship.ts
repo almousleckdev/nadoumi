@@ -40,6 +40,8 @@ export const DOC_TYPES = [
   'STUDY_PLAN', 'PERSONAL_STATEMENT', 'RECOMMENDATION_LETTER', 'FINANCIAL_PROOF', 'POLICE_CLEARANCE', 'PHOTO', 'CV',
   'OTHER',
 ]
+/** When a required document applies; the labels are `scholarship.cond.<code>`. */
+export const DOC_CONDITIONS = ['MINOR', 'IN_CHINA', 'STUDIED_IN_CHINA', 'MASTER_OR_DOCTORAL', 'DOCTORAL']
 export const INTAKE_TERMS = ['SPRING_MARCH', 'AUTUMN_SEPTEMBER']
 
 export interface Money { amountRmb: number, amountUsd: number, currency: string }
@@ -91,6 +93,8 @@ export interface ScholarshipDocumentRequirementInput {
   docType: string
   mandatory: boolean
   note?: string | null
+  /** A `DOC_CONDITIONS` code, or null when the document is always required. */
+  appliesWhen?: string | null
 }
 
 /** One field of study. A null level means it applies to every level the scholarship offers. */

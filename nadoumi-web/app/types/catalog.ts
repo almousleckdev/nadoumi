@@ -93,7 +93,7 @@ export interface ScholarshipDetail extends ScholarshipCard {
     note?: string | null
   }[]
   coverage: { kind: string, detail?: string | null }[]
-  documentRequirements: { docType: string, mandatory: boolean, note?: string | null }[]
+  documentRequirements: { docType: string, mandatory: boolean, note?: string | null, appliesWhen?: string | null }[]
 }
 
 export interface FacetBucket {

@@ -1193,7 +1193,14 @@
     "colPrice": "价格",
     "colDoc": "材料",
     "colRequirement": "要求",
-    "colNotes": "备注"
+    "colNotes": "备注",
+    "cond": {
+      "MINOR": "仅限未满 18 岁",
+      "IN_CHINA": "仅限目前在中国",
+      "STUDIED_IN_CHINA": "仅限曾在中国学习",
+      "MASTER_OR_DOCTORAL": "仅限申请硕士或博士",
+      "DOCTORAL": "仅限申请博士"
+    }
   },
   "guides": {
     "more": "更多留学指南",

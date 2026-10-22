@@ -130,7 +130,7 @@ describe('ProgramDrawer image upload', () => {
 describe('ProgramDrawer required documents', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    api.getProgramDocuments.mockReset().mockResolvedValue([{ docType: 'PASSPORT', mandatory: true, notes: 'Photo page' }])
+    api.getProgramDocuments.mockReset().mockResolvedValue([{ docType: 'PASSPORT', mandatory: true, notes: 'Photo page', appliesWhen: 'MINOR' }])
     api.saveProgramDocuments.mockReset().mockResolvedValue([])
     api.updateProgram.mockReset().mockResolvedValue({ ...row, id: 4 })
   })
@@ -141,22 +141,22 @@ describe('ProgramDrawer required documents', () => {
 
     expect(api.getProgramDocuments).toHaveBeenCalledWith(4)
     expect((w.vm as unknown as { form: { documentRequirements: unknown[] } }).form.documentRequirements)
-      .toEqual([{ docType: 'PASSPORT', mandatory: true, notes: 'Photo page' }])
+      .toEqual([{ docType: 'PASSPORT', mandatory: true, notes: 'Photo page', appliesWhen: 'MINOR' }])
   })
 
   it('saves the required documents after the programme itself', async () => {
     const w = mount(ProgramDrawer, { props: { modelValue: true, program: row as unknown as Program }, ...mountOpts() })
     await flushPromises()
-    const form = (w.vm as unknown as { form: { documentRequirements: { docType: string, mandatory: boolean, notes: string }[] } }).form
-    form.documentRequirements.push({ docType: 'CV', mandatory: false, notes: '  ' })
+    const form = (w.vm as unknown as { form: { documentRequirements: { docType: string, mandatory: boolean, notes: string, appliesWhen: string }[] } }).form
+    form.documentRequirements.push({ docType: 'CV', mandatory: false, notes: '  ', appliesWhen: '' })
 
     await (w.vm as unknown as { save: () => Promise<void> }).save()
     await flushPromises()
 
     expect(api.updateProgram).toHaveBeenCalledOnce()
     expect(api.saveProgramDocuments).toHaveBeenCalledWith(4, [
-      { docType: 'PASSPORT', mandatory: true, notes: 'Photo page' },
-      { docType: 'CV', mandatory: false, notes: null },
+      { docType: 'PASSPORT', mandatory: true, notes: 'Photo page', appliesWhen: 'MINOR' },
+      { docType: 'CV', mandatory: false, notes: null, appliesWhen: null },
     ])
   })
 })

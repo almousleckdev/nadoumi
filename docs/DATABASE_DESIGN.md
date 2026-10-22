@@ -440,3 +440,4 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - **V118** adds `signature_media_id` (FK to `nad_media_asset`, SET NULL) and `signature_at` to `nad_applicant_personal`: the applicant's handwritten
   signature, a SENSITIVE media asset. Manual rollback is in the file header.
 
+- **V119** adds `applies_when` (a RequirementCondition code, null = always) to `nad_document_requirement` and `nad_scholarship_document_requirement`. Manual rollback is in the file header.

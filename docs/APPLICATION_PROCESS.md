@@ -83,6 +83,12 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 >   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** Chinese labels, the verification QR.
 > * **Erasure.** `PaymentErasure` also deletes the generated documents and soft-deletes their PDFs.
 >
+> **Update 2026-10-22 (conditional requirements): requirement conditions are IMPLEMENTED (V119).** A required document (programme or scholarship) can carry an
+> `appliesWhen` condition: `MINOR` (under 18), `IN_CHINA`, `STUDIED_IN_CHINA`, `MASTER_OR_DOCTORAL`, `DOCTORAL`. Admins pick it in the programme and scholarship
+> drawers; the checklist leaves a requirement off when it does not apply to that student (`RequirementApplicability`, evaluated from the profile: date of birth,
+> location answers, study level from the study interests else the programme). **A fact that is not known yet counts as "applies"**, so a document is asked for
+> rather than skipped. The public scholarship page shows the condition under the document.
+>
 > **Update 2026-10-22 (signature): the handwritten signature is IMPLEMENTED.** A student draws it on a pad or uploads a picture, once
 > (`POST /api/student/applicants/{id}/signature`). The image is decoded and redrawn as a bounded PNG on white (an empty pad or a
 > non-image is refused, 400), stored as a SENSITIVE `APPLICANT_SIGNATURE` media asset on `nad_applicant_personal` (V118), and shown only to the

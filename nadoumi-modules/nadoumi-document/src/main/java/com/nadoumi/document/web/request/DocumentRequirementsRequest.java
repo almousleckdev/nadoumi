@@ -17,6 +17,8 @@ public record DocumentRequirementsRequest(
             String docType,
             boolean mandatory,
             @Size(max = 255)
-            String notes) {
+            String notes,
+            @Pattern(regexp = "MINOR|IN_CHINA|STUDIED_IN_CHINA|MASTER_OR_DOCTORAL|DOCTORAL")
+            String appliesWhen) {
     }
 }

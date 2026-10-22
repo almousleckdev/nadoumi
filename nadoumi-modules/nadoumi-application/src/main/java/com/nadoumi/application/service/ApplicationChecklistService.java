@@ -1,6 +1,13 @@
 package com.nadoumi.application.service;
 
+import com.nadoumi.applicant.service.ApplicantDossier;
+import com.nadoumi.applicant.service.ApplicantDossierService;
 import com.nadoumi.application.domain.Application;
+import com.nadoumi.application.service.RequirementApplicability.Facts;
+import com.nadoumi.common.document.RequirementCondition;
+import com.nadoumi.program.service.ProgramService;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import com.nadoumi.application.mapper.ApplicationMapper;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.document.domain.Document;
@@ -49,13 +56,18 @@ public class ApplicationChecklistService {
     private final DocumentRequirementService requirements;
     private final ScholarshipAdminService scholarships;
     private final DocumentService documents;
+    private final ApplicantDossierService dossiers;
+    private final ProgramService programs;
 
     public ApplicationChecklistService(ApplicationMapper applications, DocumentRequirementService requirements,
-            ScholarshipAdminService scholarships, DocumentService documents) {
+            ScholarshipAdminService scholarships, DocumentService documents,
+            ApplicantDossierService dossiers, ProgramService programs) {
         this.applications = applications;
         this.requirements = requirements;
         this.scholarships = scholarships;
         this.documents = documents;
+        this.dossiers = dossiers;
+        this.programs = programs;
     }
 
     @Transactional(readOnly = true)
@@ -68,7 +80,8 @@ public class ApplicationChecklistService {
                 .filter(d -> d.getApplicationId() == null || d.getApplicationId().equals(applicationId))
                 .toList();
         List<Item> items = new ArrayList<>();
-        for (Wanted wanted : wanted(application).values()) {
+        Facts facts = facts(application);
+        for (Wanted wanted : wanted(application, facts).values()) {
             Optional<Document> best = mine.stream()
                     .filter(d -> d.getDocType().equals(wanted.docType))
                     .min(BEST_FIRST);
@@ -89,21 +102,58 @@ public class ApplicationChecklistService {
                 .toList();
     }
 
-    private Map<String, Wanted> wanted(Application application) {
+    private Map<String, Wanted> wanted(Application application, Facts facts) {
         Map<String, Wanted> byType = new LinkedHashMap<>();
         if (application.getProgramId() != null) {
             for (DocumentRequirement r : requirements.checklistFor(RequirementScope.PROGRAM, application.getProgramId())) {
-                merge(byType, r.getDocType(), r.isMandatory(), r.getNotes());
+                if (applies(r.getAppliesWhen(), facts)) {
+                    merge(byType, r.getDocType(), r.isMandatory(), r.getNotes());
+                }
             }
         }
         if (application.getScholarshipId() != null) {
             List<PublicScholarshipResponse.DocumentRequirement> list =
                     scholarships.get(application.getScholarshipId()).view().documentRequirements();
             if (list != null) {
-                list.forEach(r -> merge(byType, r.docType(), r.mandatory(), r.note()));
+                list.stream().filter(r -> applies(r.appliesWhen(), facts))
+                        .forEach(r -> merge(byType, r.docType(), r.mandatory(), r.note()));
             }
         }
         return byType;
+    }
+
+    private static boolean applies(String condition, Facts facts) {
+        return RequirementApplicability.applies(RequirementCondition.ofOrNull(condition), facts, LocalDate.now(ZoneOffset.UTC));
+    }
+
+    /** The student's facts from their profile; the level comes from their study interests, else the programme. */
+    private Facts facts(Application application) {
+        ApplicantDossier dossier = dossiers.read(application.getApplicantId());
+        LocalDate dob = parseDate(dossier.profile().dob());
+        Boolean inChina = dossier.residence() == null ? null : dossier.residence().inChina();
+        Boolean studied = dossier.residence() == null ? null
+                : dossier.residence().inChina() || notBlank(dossier.residence().chinaEducationLevel()) || notBlank(dossier.residence().chinaSchool());
+        List<String> levels = new ArrayList<>();
+        if (dossier.interests() != null) {
+            levels.add(dossier.interests().desiredLevel());
+        }
+        if (levels.stream().allMatch(java.util.Objects::isNull) && application.getProgramId() != null) {
+            levels.addAll(programs.get(application.getProgramId()).levels());
+        }
+        return new Facts(dob, inChina, studied, RequirementApplicability.highestLevel(levels));
+    }
+
+    private static LocalDate parseDate(String iso) {
+        try {
+            return iso == null ? null : LocalDate.parse(iso);
+        }
+        catch (java.time.format.DateTimeParseException e) {
+            return null;
+        }
+    }
+
+    private static boolean notBlank(String value) {
+        return value != null && !value.isBlank();
     }
 
     private static void merge(Map<String, Wanted> byType, String docType, boolean mandatory, String note) {

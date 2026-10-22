@@ -812,6 +812,14 @@ export default {
       NADOUMI_APPLICATION: 'Nadoumi application fee', NADOUMI_SERVICE: 'Nadoumi service fee',
       INSURANCE: 'Insurance', VISA: 'Visa fee', OTHER: 'Other fee',
     },
+    cond: {
+      always: "Always required",
+      MINOR: "Only if under 18",
+      IN_CHINA: "Only if in China now",
+      STUDIED_IN_CHINA: "Only if studied in China",
+      MASTER_OR_DOCTORAL: "Only for master's or doctorate",
+      DOCTORAL: "Only for doctorate",
+    },
     doc: {
       PASSPORT: 'Passport', DEGREE_CERTIFICATE: 'Degree certificate', TRANSCRIPT: 'Academic transcript',
       LANGUAGE_TEST_REPORT: 'Language test report', VISA: 'Visa', PHYSICAL_EXAM: 'Physical examination form',

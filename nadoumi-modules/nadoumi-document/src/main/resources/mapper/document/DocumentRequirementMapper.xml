@@ -9,6 +9,7 @@
         <result property="docType"   column="doc_type"/>
         <result property="mandatory" column="mandatory"/>
         <result property="waivable"  column="waivable"/>
+        <result property="appliesWhen" column="applies_when"/>
         <result property="notes"     column="notes"/>
         <result property="createBy"  column="create_by"/>
         <result property="createTime" column="create_time"/>
@@ -17,7 +18,7 @@
     </resultMap>
 
     <sql id="cols">
-        id, scope, ref_id, doc_type, mandatory, waivable, notes, create_by, create_time, update_by, update_time
+        id, scope, ref_id, doc_type, mandatory, waivable, applies_when, notes, create_by, create_time, update_by, update_time
     </sql>
 
     <select id="findByScope" resultMap="requirement">
@@ -34,8 +35,8 @@
 
     <insert id="insert" parameterType="com.nadoumi.document.domain.DocumentRequirement"
             useGeneratedKeys="true" keyProperty="id">
-        insert into nad_document_requirement (scope, ref_id, doc_type, mandatory, waivable, notes, create_by, create_time)
-        values (#{scope}, #{refId}, #{docType}, #{mandatory}, #{waivable}, #{notes}, #{createBy}, now())
+        insert into nad_document_requirement (scope, ref_id, doc_type, mandatory, waivable, applies_when, notes, create_by, create_time)
+        values (#{scope}, #{refId}, #{docType}, #{mandatory}, #{waivable}, #{appliesWhen}, #{notes}, #{createBy}, now())
     </insert>
 
     <delete id="deleteByScope">

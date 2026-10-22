@@ -15,7 +15,7 @@ const scholarship = {
     stipends: [{ level: 'MASTER', amountRmb: 3000, amountUsd: 414, currency: 'CNY', frequency: 'MONTHLY', durationMonths: 24, conditions: null }],
     accommodation: [{ roomType: 'DOUBLE', amountRmb: null, amountUsd: null, currency: 'CNY', note: 'on campus' }],
     coverage: [{ kind: 'TUITION', detail: null }],
-    documentRequirements: [{ docType: 'PASSPORT', mandatory: true, note: null }],
+    documentRequirements: [{ docType: 'PASSPORT', mandatory: true, note: null, appliesWhen: null }],
     eligibility: { ageMax: 35, nationalityScope: 'EXCLUDE', acceptedCountries: 'CN', gpaMin: 3, notes: null },
     applicationFee: { amountRmb: 800, amountUsd: 110, currency: 'CNY' },
     serviceFee: null, slots: 20, deadline: '2026-04-01',
@@ -84,12 +84,12 @@ describe('buildPayload', () => {
     form.fees.push({ kind: 'REGISTRATION', amount: null, currency: 'CNY', note: '' })
     form.fees.push({ kind: 'REGISTRATION', amount: 400, currency: 'USD', note: ' x ' })
     form.intakes.push({ term: '', applicationOpen: null, applicationClose: null })
-    form.documentRequirements.push({ docType: '  ', mandatory: true, note: '' })
-    form.documentRequirements.push({ docType: ' passport ', mandatory: true, note: '' })
+    form.documentRequirements.push({ docType: '  ', mandatory: true, note: '', appliesWhen: '' })
+    form.documentRequirements.push({ docType: ' passport ', mandatory: true, note: '', appliesWhen: 'MINOR' })
     const p = buildPayload(form)
     expect(p.fees).toEqual([{ kind: 'REGISTRATION', amount: 400, currency: 'CNY', note: 'x' }])
     expect(p.intakes).toEqual([])
-    expect(p.documentRequirements).toEqual([{ docType: 'PASSPORT', mandatory: true, note: null }])
+    expect(p.documentRequirements).toEqual([{ docType: 'PASSPORT', mandatory: true, note: null, appliesWhen: 'MINOR' }])
   })
 
   it('flags a stipend only when a stipend amount is present', () => {

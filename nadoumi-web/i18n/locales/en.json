@@ -1193,7 +1193,14 @@
     "colPrice": "Price",
     "colDoc": "Document",
     "colRequirement": "Requirement",
-    "colNotes": "Notes"
+    "colNotes": "Notes",
+    "cond": {
+      "MINOR": "Only if you are under 18",
+      "IN_CHINA": "Only if you are in China now",
+      "STUDIED_IN_CHINA": "Only if you have studied in China",
+      "MASTER_OR_DOCTORAL": "Only for master’s or doctorate applicants",
+      "DOCTORAL": "Only for doctorate applicants"
+    }
   },
   "guides": {
     "more": "More guides",

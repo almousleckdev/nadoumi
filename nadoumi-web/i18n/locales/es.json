@@ -1193,7 +1193,14 @@
     "colPrice": "Precio",
     "colDoc": "Documento",
     "colRequirement": "Requisito",
-    "colNotes": "Notas"
+    "colNotes": "Notas",
+    "cond": {
+      "MINOR": "Solo si tienes menos de 18 años",
+      "IN_CHINA": "Solo si estás ahora en China",
+      "STUDIED_IN_CHINA": "Solo si has estudiado en China",
+      "MASTER_OR_DOCTORAL": "Solo para máster o doctorado",
+      "DOCTORAL": "Solo para doctorado"
+    }
   },
   "guides": {
     "more": "Más guías",

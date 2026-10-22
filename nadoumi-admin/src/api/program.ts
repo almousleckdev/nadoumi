@@ -180,6 +180,8 @@ export interface ProgramDocumentRequirement {
   docType: string
   mandatory: boolean
   notes: string | null
+  /** A condition code (`DOC_CONDITIONS`), or null when the document is always required. */
+  appliesWhen: string | null
 }
 
 export function getProgramDocuments(id: number): Promise<ProgramDocumentRequirement[]> {

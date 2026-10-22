@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { Plus, Delete } from '@element-plus/icons-vue'
-import { DOC_TYPES } from '@/api/scholarship'
+import { DOC_CONDITIONS, DOC_TYPES } from '@/api/scholarship'
 import FormSection from '@/components/ui/FormSection.vue'
 import { useProgramForm } from '../programForm'
 
@@ -34,6 +34,19 @@ const form = useProgramForm()
       <el-checkbox v-model="d.mandatory">
         {{ t('program.documents.mandatory') }}
       </el-checkbox>
+      <el-select
+        v-model="d.appliesWhen"
+        class="w-48"
+        clearable
+        :placeholder="t('scholarship.cond.always')"
+      >
+        <el-option
+          v-for="c in DOC_CONDITIONS"
+          :key="c"
+          :value="c"
+          :label="t(`scholarship.cond.${c}`)"
+        />
+      </el-select>
       <el-input
         v-model="d.notes"
         maxlength="255"
@@ -49,7 +62,7 @@ const form = useProgramForm()
     </div>
     <el-button
       :icon="Plus"
-      @click="form.documentRequirements.push({ docType: 'PASSPORT', mandatory: true, notes: '' })"
+      @click="form.documentRequirements.push({ docType: 'PASSPORT', mandatory: true, notes: '', appliesWhen: '' })"
     >
       {{ t('program.documents.add') }}
     </el-button>

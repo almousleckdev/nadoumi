@@ -681,4 +681,23 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         assertThat(jdbc.queryForObject("select count(*) from nad_media_asset where category = 'APPLICANT_SIGNATURE' "
                 + "and deleted_at is null and owner_id = ?", Integer.class, s.applicantId())).isEqualTo(1);
     }
+
+    @Test
+    void shouldLeaveAConditionalDocumentOffTheChecklist_whenItDoesNotApplyToTheStudent() throws Exception {
+        requireDocuments("{\"requirements\":[{\"docType\":\"PASSPORT\",\"mandatory\":true},"
+                + "{\"docType\":\"POLICE_CLEARANCE\",\"mandatory\":true,\"appliesWhen\":\"MINOR\"},"
+                + "{\"docType\":\"STUDY_PLAN\",\"mandatory\":true,\"appliesWhen\":\"DOCTORAL\"}]}");
+        Student s = register("pay", "cond");
+        long app = draftFor(s);
+        // an adult (born 2001) applying at master level
+        mvc.perform(put(s.applicantUrl() + "/interests").header("Authorization", bearer(s.token()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"desiredLevel\":\"MASTER\",\"fields\":[\"MEDICINE\"],\"cities\":[\"Beijing\",\"Shanghai\",\"Hangzhou\"]}"));
+
+        mvc.perform(get("/api/student/applications/" + app + "/documents/checklist").header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(org.hamcrest.Matchers.lessThanOrEqualTo(3)))
+                .andExpect(jsonPath("$[?(@.docType=='PASSPORT')]").isNotEmpty())
+                .andExpect(jsonPath("$[?(@.docType=='STUDY_PLAN')]").isEmpty()); // doctorate only
+    }
 }
