@@ -1,6 +1,6 @@
 import type { FamilyMemberBody, PersonalDetailsBody, PersonBody } from '~/composables/useApplicantFamily'
 import type { FieldErrors } from '~/constants/formErrors'
-import type { FamilyMemberDto, PersonalDetailsDto, PersonDto } from '~/types/family'
+import type { FamilyMemberDto, MailingChoice, PersonalDetailsDto, PersonDto } from '~/types/family'
 import { isoDate } from '~/utils/dates'
 
 /*
@@ -16,18 +16,24 @@ const blank = (value: string | undefined | null): boolean => !value?.trim()
 export interface PersonalDetailsForm {
   maritalStatus: string; religion: string; placeOfBirth: string; officialLanguage: string
   permanentAddress: string; permanentPostcode: string
+  currentPostcode: string; mailingChoice: MailingChoice; mailingAddress: string; mailingPostcode: string
 }
 
 export const personalForm = (dto: PersonalDetailsDto | null): PersonalDetailsForm => ({
   maritalStatus: text(dto?.maritalStatus), religion: text(dto?.religion), placeOfBirth: text(dto?.placeOfBirth),
   officialLanguage: text(dto?.officialLanguage), permanentAddress: text(dto?.permanentAddress),
-  permanentPostcode: text(dto?.permanentPostcode),
+  permanentPostcode: text(dto?.permanentPostcode), currentPostcode: text(dto?.currentPostcode),
+  mailingChoice: dto?.mailingChoice ?? 'CURRENT', mailingAddress: text(dto?.mailingAddress),
+  mailingPostcode: text(dto?.mailingPostcode),
 })
 
 export const personalBody = (f: PersonalDetailsForm): PersonalDetailsBody => ({
   maritalStatus: optional(f.maritalStatus), religion: optional(f.religion), placeOfBirth: optional(f.placeOfBirth),
   officialLanguage: optional(f.officialLanguage), permanentAddress: optional(f.permanentAddress),
-  permanentPostcode: optional(f.permanentPostcode),
+  permanentPostcode: optional(f.permanentPostcode), currentPostcode: optional(f.currentPostcode),
+  mailingChoice: f.mailingChoice,
+  mailingAddress: f.mailingChoice === 'OTHER' ? optional(f.mailingAddress) : undefined,
+  mailingPostcode: f.mailingChoice === 'OTHER' ? optional(f.mailingPostcode) : undefined,
 })
 
 export interface FamilyMemberForm {

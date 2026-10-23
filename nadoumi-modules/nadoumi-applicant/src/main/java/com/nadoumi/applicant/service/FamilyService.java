@@ -3,6 +3,7 @@ package com.nadoumi.applicant.service;
 import com.nadoumi.applicant.domain.ApplicantFamilyMember;
 import com.nadoumi.applicant.domain.ApplicantPerson;
 import com.nadoumi.applicant.domain.ApplicantPersonal;
+import com.nadoumi.applicant.domain.enums.MailingChoice;
 import com.nadoumi.applicant.domain.enums.PersonRole;
 import com.nadoumi.applicant.mapper.FamilyMapper;
 import com.nadoumi.applicant.rules.FamilyRules;
@@ -58,6 +59,11 @@ public class FamilyService {
         personal.setOfficialLanguage(blankToNull(req.officialLanguage()));
         personal.setPermanentAddress(blankToNull(req.permanentAddress()));
         personal.setPermanentPostcode(blankToNull(req.permanentPostcode()));
+        personal.setCurrentPostcode(blankToNull(req.currentPostcode()));
+        MailingChoice choice = req.mailingChoice() == null ? MailingChoice.CURRENT : req.mailingChoice();
+        personal.setMailingChoice(choice);
+        personal.setMailingAddress(choice == MailingChoice.OTHER ? blankToNull(req.mailingAddress()) : null);
+        personal.setMailingPostcode(choice == MailingChoice.OTHER ? blankToNull(req.mailingPostcode()) : null);
         if (mapper.findPersonal(applicantId) == null) {
             try {
                 mapper.insertPersonal(personal);

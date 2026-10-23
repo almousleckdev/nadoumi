@@ -9,6 +9,8 @@ const { t } = useI18n()
 const { options: statuses } = useEnumOptions('maritalStatus')
 
 const form = reactive(personalForm(props.record))
+const mailingOptions = computed(() => (['CURRENT', 'PERMANENT', 'OTHER'] as const)
+  .map(value => ({ value, label: t(`family.personal.mailing.${value}`) })))
 </script>
 
 <template>
@@ -21,6 +23,17 @@ const form = reactive(personalForm(props.record))
       <FormTextField id="pd-address" v-model="form.permanentAddress" :label="t('family.personal.permanentAddress')" autocomplete="street-address" :maxlength="300" />
     </div>
     <FormTextField id="pd-postcode" v-model="form.permanentPostcode" :label="t('family.personal.postcode')" autocomplete="postal-code" :maxlength="20" />
+    <FormTextField id="pd-current-postcode" v-model="form.currentPostcode" :label="t('family.personal.currentPostcode')" autocomplete="postal-code" :maxlength="20" />
+    <div class="sm:col-span-2">
+      <FormSelectField id="pd-mailing" v-model="form.mailingChoice" :label="t('family.personal.mailingTitle')" :options="mailingOptions" />
+      <p class="mt-1 text-sm text-slate-500">{{ t('family.personal.mailingHint') }}</p>
+    </div>
+    <template v-if="form.mailingChoice === 'OTHER'">
+      <div class="sm:col-span-2">
+        <FormTextField id="pd-mailing-address" v-model="form.mailingAddress" :label="t('family.personal.mailingAddress')" autocomplete="street-address" :maxlength="300" />
+      </div>
+      <FormTextField id="pd-mailing-postcode" v-model="form.mailingPostcode" :label="t('family.personal.postcode')" :maxlength="20" />
+    </template>
     <FormActions :busy="busy" />
   </form>
 </template>

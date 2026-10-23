@@ -1,5 +1,6 @@
 package com.nadoumi.applicant.domain;
 
+import com.nadoumi.applicant.domain.enums.MailingChoice;
 import com.nadoumi.applicant.domain.enums.MaritalStatus;
 
 /** Row of {@code nad_applicant_personal}. */
@@ -13,6 +14,10 @@ public class ApplicantPersonal {
     private String officialLanguage;
     private String permanentAddress;
     private String permanentPostcode;
+    private String currentPostcode;
+    private MailingChoice mailingChoice;
+    private String mailingAddress;
+    private String mailingPostcode;
     private Long signatureMediaId;
     private java.time.LocalDateTime signatureAt;
 
@@ -32,6 +37,14 @@ public class ApplicantPersonal {
     public void setPermanentAddress(String permanentAddress) { this.permanentAddress = permanentAddress; }
     public String getPermanentPostcode() { return permanentPostcode; }
     public void setPermanentPostcode(String permanentPostcode) { this.permanentPostcode = permanentPostcode; }
+    public String getCurrentPostcode() { return currentPostcode; }
+    public void setCurrentPostcode(String currentPostcode) { this.currentPostcode = currentPostcode; }
+    public MailingChoice getMailingChoice() { return mailingChoice; }
+    public void setMailingChoice(MailingChoice mailingChoice) { this.mailingChoice = mailingChoice; }
+    public String getMailingAddress() { return mailingAddress; }
+    public void setMailingAddress(String mailingAddress) { this.mailingAddress = mailingAddress; }
+    public String getMailingPostcode() { return mailingPostcode; }
+    public void setMailingPostcode(String mailingPostcode) { this.mailingPostcode = mailingPostcode; }
     public Long getSignatureMediaId() { return signatureMediaId; }
     public void setSignatureMediaId(Long signatureMediaId) { this.signatureMediaId = signatureMediaId; }
     public java.time.LocalDateTime getSignatureAt() { return signatureAt; }

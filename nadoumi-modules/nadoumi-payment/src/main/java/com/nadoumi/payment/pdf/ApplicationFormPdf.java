@@ -112,9 +112,26 @@ public class ApplicationFormPdf {
         }
         if (r != null) {
             rows.add(new String[] {"Currently in China", r.inChina() ? "Yes" : "No"});
-            rows.add(new String[] {"Current address", joinNonBlank(", ", r.address(), r.city(), r.country())});
+            rows.add(new String[] {"Current address", currentAddress(r, extra)});
         }
+        rows.add(new String[] {"Documents sent to", mailingAddress(r, extra)});
         page.pairs(rows);
+    }
+
+    private static String currentAddress(ResidenceResponse r, PersonalDetailsResponse extra) {
+        return joinNonBlank(", ", r.address(), r.city(), r.country(), extra == null ? null : extra.currentPostcode());
+    }
+
+    /** The address that receives the admission documents, resolved from the applicant's choice. */
+    private static String mailingAddress(ResidenceResponse r, PersonalDetailsResponse extra) {
+        String choice = extra == null ? "CURRENT" : extra.mailingChoice();
+        if ("OTHER".equals(choice)) {
+            return joinNonBlank(", ", extra.mailingAddress(), extra.mailingPostcode());
+        }
+        if ("PERMANENT".equals(choice) && extra != null) {
+            return joinNonBlank(", ", extra.permanentAddress(), extra.permanentPostcode());
+        }
+        return r == null ? "" : currentAddress(r, extra);
     }
 
     private void tests(Page page, List<TestScoreResponse> scores) {
@@ -166,7 +183,7 @@ public class ApplicationFormPdf {
         else {
             page.table(List.of("Relation", "Name", "Born", "Nationality", "Employer and position", "Contact"),
                     d.family().stream().map(f -> List.of(
-                            PdfText.label(f.relation()) + (f.deceased() ? " (deceased)" : ""),
+                            PdfText.label(f.relation()) + (f.deceased() ? " (unavailable)" : ""),
                             Objects.toString(f.fullName(), ""), Objects.toString(f.dateOfBirth(), ""),
                             Objects.toString(f.nationality(), ""),
                             joined(f.company(), f.position(), f.deceased() ? f.note() : null),

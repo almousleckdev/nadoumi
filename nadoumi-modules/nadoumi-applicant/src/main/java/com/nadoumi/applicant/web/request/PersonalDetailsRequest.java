@@ -1,5 +1,6 @@
 package com.nadoumi.applicant.web.request;
 
+import com.nadoumi.applicant.domain.enums.MailingChoice;
 import com.nadoumi.applicant.domain.enums.MaritalStatus;
 import jakarta.validation.constraints.Size;
 
@@ -15,5 +16,12 @@ public record PersonalDetailsRequest(
         @Size(max = 300)
         String permanentAddress,
         @Size(max = 20)
-        String permanentPostcode) {
+        String permanentPostcode,
+        @Size(max = 20)
+        String currentPostcode,
+        MailingChoice mailingChoice,
+        @Size(max = 300)
+        String mailingAddress,
+        @Size(max = 20)
+        String mailingPostcode) {
 }

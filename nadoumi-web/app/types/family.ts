@@ -1,3 +1,5 @@
+export type MailingChoice = 'CURRENT' | 'PERMANENT' | 'OTHER'
+
 /** What the Nadoumi application form asks about a student beyond identity (`/api/student/applicants/{id}/...`). */
 export interface PersonalDetailsDto {
   maritalStatus: string | null
@@ -6,6 +8,10 @@ export interface PersonalDetailsDto {
   officialLanguage: string | null
   permanentAddress: string | null
   permanentPostcode: string | null
+  currentPostcode: string | null
+  mailingChoice: MailingChoice
+  mailingAddress: string | null
+  mailingPostcode: string | null
 }
 
 export interface FamilyMemberDto {
