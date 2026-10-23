@@ -50,17 +50,18 @@ describe('TemplatesSection', () => {
     expect(w.text()).toContain('Save the record first')
   })
 
-  it('refuses an upload without a title, and uploads with one', async () => {
+  it('blocks the file picker until a title is entered, then uploads with it', async () => {
     api.addTemplate.mockResolvedValue({ id: 2, title: 'T', fileName: 't.pdf' })
     const w = mountSection(7)
     await flushPromises()
     const file = new File(['%PDF'], 't.pdf', { type: 'application/pdf' })
 
+    expect(w.find('input[type=file]').attributes('disabled')).toBeDefined()
     await pick(w, file)
     expect(api.addTemplate).not.toHaveBeenCalled()
-    expect(message.warning).toHaveBeenCalled()
 
     await w.find('input.el-input__inner').setValue('Form')
+    expect(w.find('input[type=file]').attributes('disabled')).toBeUndefined()
     await pick(w, file)
     expect(api.addTemplate).toHaveBeenCalledWith('programs', 7, 'Form', file)
   })

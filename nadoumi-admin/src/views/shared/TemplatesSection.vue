@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Delete, Upload } from '@element-plus/icons-vue'
@@ -19,6 +19,7 @@ const { t } = useI18n()
 const templates = ref<DocumentTemplate[]>([])
 const title = ref('')
 const busy = ref(false)
+const canPick = computed(() => !busy.value && title.value.trim().length > 0)
 
 async function load() {
   templates.value = props.refId == null ? [] : await listTemplates(props.scope, props.refId).catch(() => [])
@@ -28,11 +29,7 @@ async function onFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file || props.refId == null) return
-  if (!title.value.trim()) {
-    ElMessage.warning(t('template.titleRequired'))
-    return
-  }
+  if (!file || props.refId == null || !title.value.trim()) return
   if (file.size > TEMPLATE_MAX_MB * 1024 * 1024) {
     ElMessage.warning(t('template.tooLarge', { mb: TEMPLATE_MAX_MB }))
     return
@@ -99,10 +96,15 @@ defineExpose({ load })
           :placeholder="t('template.titlePlaceholder')"
           class="title"
         />
-        <label class="pick">
+        <label
+          class="pick"
+          :class="{ off: !canPick }"
+          :title="canPick ? undefined : t('template.titleRequired')"
+        >
           <el-button
             :icon="Upload"
             :loading="busy"
+            :disabled="!canPick"
             tag="span"
           >
             {{ t('template.upload') }}
@@ -111,7 +113,7 @@ defineExpose({ load })
             type="file"
             :accept="TEMPLATE_ACCEPT"
             class="sr-only"
-            :disabled="busy"
+            :disabled="!canPick"
             @change="onFile"
           >
         </label>
@@ -128,6 +130,7 @@ defineExpose({ load })
 .add { display: flex; gap: 8px; align-items: center; }
 .title { flex: 1; }
 .pick { cursor: pointer; }
+.pick.off { cursor: not-allowed; }
 .hint { color: var(--el-text-color-secondary); font-size: 13px; margin: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 </style>
