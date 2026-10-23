@@ -232,3 +232,18 @@ separate management port with its own auth is a later refinement.
 Still-to-do items from §3 (containerization, per-env profile files, prod hardening
 switches, storage, frontend delivery, observability shipping, deploy pipeline) remain
 **PLANNED**.
+
+## A migration that failed half way (EXISTING, 2026-10-23)
+
+MySQL DDL is not transactional. When a migration stops part way, Flyway records it as failed and the application refuses to
+start (`Detected failed migration to version N ... run repair`). To recover:
+
+1. Read the **first** error in the deploy log (the one that happened when the migration ran, not the later "failed validation").
+2. Look at what the half-run left: `select version, success from flyway_schema_history order by installed_rank desc limit 5;`
+   and the columns and indexes the migration touches.
+3. Remove only the failed history row: `delete from flyway_schema_history where version = 'N' and success = 0;`
+4. Redeploy. A migration written to be rerunnable (V121 is) finishes the remaining steps; otherwise first undo the half-done
+   steps by hand using the rollback note in the file header.
+
+Write new migrations so that each DDL step first checks what already exists, and filter a backfill `update` on the primary key as
+well (`where id > 0 and ...`) so it also runs when the server sets `sql_safe_updates`.
