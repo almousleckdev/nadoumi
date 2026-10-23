@@ -5,12 +5,12 @@
  * `Intl.DisplayNames` in the active locale, so no translated data files are
  * shipped and every locale is covered.
  */
-import { getAlpha2Codes } from 'i18n-iso-countries'
+import isoCountries from 'i18n-iso-countries' // CommonJS: only the default import survives the production server build
 import ISO6391 from 'iso-639-1'
 
 export interface Option { value: string, label: string }
 
-export const COUNTRY_CODES = Object.keys(getAlpha2Codes())
+export const COUNTRY_CODES = Object.keys(isoCountries.getAlpha2Codes())
 export const LANGUAGE_CODES = ISO6391.getAllCodes()
 
 /**
