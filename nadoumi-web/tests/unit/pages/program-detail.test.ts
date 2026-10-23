@@ -38,16 +38,22 @@ const mba: PDto = {
       tuitionAmountUsd: 5000, accommodationAmount: null, accommodationCurrency: null, accommodationPeriod: 'PER_MONTH' },
   ],
   admissionRequirements: 'A bachelor degree with good grades.',
-  applicationDocuments: 'Passport\nStudy plan\n',
+  applicationDocuments: 'Old free text document\n',
   minIelts: 6.5,
   applicationFeeAmount: 600, applicationFeeCurrency: 'CNY', applicationFeeAmountUsd: 84,
   scholarshipInfo: 'CSC and university scholarships.',
   careerProspects: 'Consulting and finance.',
 }
 
-const publicGet = vi.fn((path: string) =>
-  path === 'programs/fudan-university-mba' ? Promise.resolve(mba) : Promise.reject(new Error('404')),
-)
+const requirements = [
+  { docType: 'PASSPORT', mandatory: true, notes: 'Photo page', appliesWhen: null },
+  { docType: 'STUDY_PLAN', mandatory: false, notes: null, appliesWhen: 'MASTER_OR_DOCTORAL' },
+]
+const publicGet = vi.fn((path: string) => {
+  if (path === 'programs/fudan-university-mba') return Promise.resolve(mba)
+  if (path === 'document-requirements/programs/11') return Promise.resolve(requirements)
+  return Promise.reject(new Error('404'))
+})
 mockNuxtImport('useApi', () => () => ({ publicGet, studentFetch: vi.fn() }))
 
 describe('public programme detail page', () => {
@@ -97,10 +103,20 @@ describe('public programme detail page', () => {
     expect(text).toContain('A bachelor degree with good grades.')
     expect(text).toContain('IELTS 6.5 or above')
     expect(text).toContain('Passport')
+    expect(text).toContain('Photo page')
     expect(text).toContain('Study plan')
+    expect(text).not.toContain('Old free text document') // the structured list replaces the old free text
     expect(text).toContain('¥600 · $84')
     expect(text).toContain('CSC and university scholarships.')
     expect(text).toContain('Consulting and finance.')
+  })
+
+  it('falls back to the old free-text list while a programme has no structured documents', async () => {
+    requirements.splice(0, requirements.length)
+    const w = await mountSuspended(ProgramDetail, { route: '/programs/fudan-university-mba' })
+    await flushPromises()
+
+    expect(w.text()).toContain('Old free text document')
   })
 
   it('shows a not-available message when the programme is missing', async () => {

@@ -484,6 +484,18 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk());
     }
 
+    @Test
+    void shouldShowAnonymousVisitorsTheSameDocumentsStudentsAreAskedFor() throws Exception {
+        requireDocuments("{\"requirements\":[{\"docType\":\"PASSPORT\",\"mandatory\":true},"
+                + "{\"docType\":\"PHOTO\",\"mandatory\":false,\"notes\":\"white background\"}]}");
+
+        mvc.perform(get("/api/public/document-requirements/programs/" + programId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[?(@.docType=='PASSPORT')].mandatory").value(true))
+                .andExpect(jsonPath("$[?(@.docType=='PHOTO')].notes").value("white background"));
+    }
+
     private ResultActions uploadDocument(Student s, long app, String docType) throws Exception {
         return mvc.perform(multipart("/api/student/documents")
                 .file(new MockMultipartFile("file", "scan.png", "image/png", PNG))
