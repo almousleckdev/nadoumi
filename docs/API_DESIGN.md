@@ -533,3 +533,5 @@ and publish status stay staff-only and are never part of a public response; the 
 **Staff majors (2026-10-23).** `GET/POST /api/staff/majors`, `PUT/DELETE /api/staff/majors/{id}`, `POST /api/staff/majors/bulk` (pasted lines, existing names reused),
 `POST /api/staff/majors/{id}/merge` (moves programme links, deletes the duplicate). Perms `nad:major:list|add|edit|remove`. Deleting a major that programmes use is refused (merge it).
 A programme's `majors[]` input takes `majorId` (pick from the catalogue) or `name` (matched to, or added to, the catalogue); responses carry `majorId`.
+
+**Programme scholarship types (2026-10-23).** `ProgramRequest.scholarshipCategories` (codes such as `CSC`, `PROVINCIAL`; empty or null = no scholarships; unknown codes are a 400) and `ProgramResponse`/`PublicProgramResponse` (detail) `scholarshipCategories`. The public page shows the category names with the free-text details.

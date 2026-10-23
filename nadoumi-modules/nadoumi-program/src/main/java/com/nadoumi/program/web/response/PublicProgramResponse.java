@@ -47,7 +47,8 @@ public record PublicProgramResponse(
         boolean hot,
         List<ProgramResponse.Major> majors,
         List<ProgramResponse.Intake> intakes,
-        List<ProgramResponse.Offering> offerings) {
+        List<ProgramResponse.Offering> offerings,
+        List<String> scholarshipCategories) {
 
     public static PublicProgramResponse card(Program p) {
         return build(p, false, null, null);
@@ -96,6 +97,7 @@ public record PublicProgramResponse(
                 full.featured(), full.hot(),
                 detail ? full.majors() : null,
                 detail ? full.intakes() : null,
-                detail ? full.offerings() : null);
+                detail ? full.offerings() : null,
+                detail ? full.scholarshipCategories() : null);
     }
 }

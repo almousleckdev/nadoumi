@@ -74,6 +74,7 @@ export function blankProgramForm(lockedUniversityId: number | null) {
     teachingLanguage: null as ProgramInput['teachingLanguage'],
     summary: '',
     admissionRequirements: '', applicationDocuments: '', careerProspects: '', scholarshipInfo: '',
+    scholarshipCategories: [] as string[],
     minHsk: null as number | null, minIelts: null as number | null, minToefl: null as number | null,
     applicationFeeAmount: null as number | null,
     offerings: [] as OfferingRow[],
@@ -105,6 +106,7 @@ export function formFromProgram(p: Program): ProgramForm {
     summary: p.summary ?? '',
     admissionRequirements: p.admissionRequirements ?? '', applicationDocuments: p.applicationDocuments ?? '',
     careerProspects: p.careerProspects ?? '', scholarshipInfo: p.scholarshipInfo ?? '',
+    scholarshipCategories: [...(p.scholarshipCategories ?? [])],
     minHsk: p.minHsk ?? null, minIelts: p.minIelts ?? null, minToefl: p.minToefl ?? null,
     applicationFeeAmount: p.applicationFeeAmount ?? null,
     offerings: (p.offerings ?? []).map(o => ({
@@ -142,6 +144,7 @@ export function buildProgramPayload(form: ProgramForm): ProgramInput {
     applicationDocuments: textOrNull(form.applicationDocuments),
     careerProspects: textOrNull(form.careerProspects),
     scholarshipInfo: textOrNull(form.scholarshipInfo),
+    scholarshipCategories: [...form.scholarshipCategories],
     minHsk: numberOrNull(form.minHsk), minIelts: numberOrNull(form.minIelts), minToefl: numberOrNull(form.minToefl),
     applicationFeeAmount: numberOrNull(form.applicationFeeAmount),
     applicationFeeCurrency: form.applicationFeeAmount != null ? 'CNY' : null,

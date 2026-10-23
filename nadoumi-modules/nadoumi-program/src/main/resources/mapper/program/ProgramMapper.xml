@@ -153,6 +153,18 @@
         values (#{programId}, #{majorId}, #{departmentId}, #{level}, #{name}, #{nameCn}, #{sortOrder})
     </insert>
 
+    <select id="findScholarshipTypes" resultType="java.lang.String">
+        select category_code from nad_program_scholarship_type where program_id = #{programId} order by category_code
+    </select>
+
+    <delete id="deleteScholarshipTypes">
+        delete from nad_program_scholarship_type where program_id = #{programId}
+    </delete>
+
+    <insert id="insertScholarshipType">
+        insert into nad_program_scholarship_type (program_id, category_code) values (#{programId}, #{code})
+    </insert>
+
     <select id="findLevels" resultType="java.lang.String">
         select level from nad_program_level where program_id = #{programId} order by sort_order asc, id asc
     </select>

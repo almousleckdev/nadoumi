@@ -9,6 +9,15 @@ const localePath = useLocalePath()
 const { status } = useSession()
 const { data: p } = await usePublicDetail<ProgramDetail>('programs')
 const { publicGet } = useApi()
+// the scholarship categories carry their display names; a programme stores only their codes
+const { data: categoryNames } = await useAsyncData(
+  'scholarship-category-names',
+  async () => new Map((await publicGet<{ code: string, name: string }[]>('scholarships/categories').catch(() => []))
+    .map(c => [c.code, c.name])),
+  { default: () => new Map<string, string>() },
+)
+const scholarshipTypes = computed(() =>
+  (p.value?.scholarshipCategories ?? []).map((code: string) => categoryNames.value.get(code) ?? code))
 // the same rows that drive the student's checklist, so visitors read what students are asked for
 const { data: requirements } = await useAsyncData(
   () => `program-documents-${p.value?.id ?? 0}`,
@@ -95,7 +104,7 @@ const facts = computed<DetailFact[]>(() => {
       <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
     </DetailCard>
     <ProgramOfferings :offerings="p.offerings ?? []" />
-    <ProgramAdmission :program="p" :documents="requirements" />
+    <ProgramAdmission :program="p" :documents="requirements" :scholarship-types="scholarshipTypes" />
     <ProgramMajors :majors="p.majors ?? []" />
     <ProgramIntakes :intakes="p.intakes" />
 

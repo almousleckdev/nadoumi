@@ -34,6 +34,12 @@ public interface ProgramMapper {
 
     List<String> findLevels(@Param("programId") Long programId);
 
+    List<String> findScholarshipTypes(@Param("programId") Long programId);
+
+    int deleteScholarshipTypes(@Param("programId") Long programId);
+
+    int insertScholarshipType(@Param("programId") Long programId, @Param("code") String code);
+
     int deleteLevels(@Param("programId") Long programId);
 
     int insertLevel(@Param("programId") Long programId, @Param("level") String level,

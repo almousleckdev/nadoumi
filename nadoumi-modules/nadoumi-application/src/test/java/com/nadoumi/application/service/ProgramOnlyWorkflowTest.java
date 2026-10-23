@@ -25,7 +25,7 @@ class ProgramOnlyWorkflowTest {
         return new ProgramResponse(id, 1L, "Test Uni", "test-uni", "Computer Science", "computer-science",
                 null, "MASTER", List.of("MASTER"), null, null, "ENGLISH", 24, null, null, null, null,
                 null, null, null, null, null, null, null, null, null, null, null, null,
-                false, false, "ACTIVE", "PUBLISHED", null, null, null, List.of(), List.of(), List.of());
+                false, false, "ACTIVE", "PUBLISHED", null, null, null, List.of(), List.of(), List.of(), List.of());
     }
 
     @Test

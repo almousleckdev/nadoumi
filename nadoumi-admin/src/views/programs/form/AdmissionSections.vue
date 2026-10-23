@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { listScholarshipCategories, type ScholarshipCategoryOption } from '@/api/scholarship'
 import FormSection from '@/components/ui/FormSection.vue'
 import { useUsdHint } from '@/composables/useUsdHint'
 import { useProgramForm } from '../programForm'
@@ -7,6 +9,20 @@ import { useProgramForm } from '../programForm'
 const { t } = useI18n()
 const form = useProgramForm()
 const { usdHint } = useUsdHint()
+
+// some programmes have scholarships and some do not; "none" is a real choice, not an empty box
+const offersScholarships = ref(form.scholarshipCategories.length > 0 || form.scholarshipInfo.trim().length > 0)
+const categories = ref<ScholarshipCategoryOption[]>([])
+listScholarshipCategories().then(c => categories.value = c).catch(() => undefined)
+
+const needsTypes = computed(() => offersScholarships.value && form.scholarshipCategories.length === 0)
+
+function onOffersChange(offers: string | number | boolean | undefined) {
+  if (offers === false) {
+    form.scholarshipCategories = []
+    form.scholarshipInfo = ''
+  }
+}
 </script>
 
 <template>
@@ -63,13 +79,50 @@ const { usdHint } = useUsdHint()
       </el-form-item>
     </div>
     <el-form-item :label="t('program.admission.scholarships')">
-      <el-input
-        v-model="form.scholarshipInfo"
-        type="textarea"
-        :rows="3"
-        maxlength="4000"
-      />
+      <el-radio-group
+        v-model="offersScholarships"
+        @change="onOffersChange"
+      >
+        <el-radio :value="false">
+          {{ t('program.admission.scholarshipsNone') }}
+        </el-radio>
+        <el-radio :value="true">
+          {{ t('program.admission.scholarshipsAvailable') }}
+        </el-radio>
+      </el-radio-group>
     </el-form-item>
+    <template v-if="offersScholarships">
+      <el-form-item :label="t('program.admission.scholarshipTypes')">
+        <el-select
+          v-model="form.scholarshipCategories"
+          multiple
+          filterable
+          :placeholder="t('program.admission.scholarshipTypesPlaceholder')"
+          style="width: 100%"
+        >
+          <el-option
+            v-for="c in categories"
+            :key="c.code"
+            :value="c.code"
+            :label="c.name"
+          />
+        </el-select>
+        <p
+          v-if="needsTypes"
+          class="field-hint"
+        >
+          {{ t('program.admission.scholarshipTypesNeeded') }}
+        </p>
+      </el-form-item>
+      <el-form-item :label="t('program.admission.scholarshipDetails')">
+        <el-input
+          v-model="form.scholarshipInfo"
+          type="textarea"
+          :rows="3"
+          maxlength="4000"
+        />
+      </el-form-item>
+    </template>
     <el-form-item :label="t('program.admission.career')">
       <el-input
         v-model="form.careerProspects"

@@ -57,6 +57,7 @@ public class Program {
     private String universityProvince;
 
     private List<String> levels = new ArrayList<>();
+    private List<String> scholarshipCategories = new ArrayList<>();
     private List<ProgramMajor> majors = new ArrayList<>();
     private List<ProgramIntake> intakes = new ArrayList<>();
     private List<ProgramOffering> offerings = new ArrayList<>();
@@ -170,6 +171,8 @@ public class Program {
     public String getUniversitySlug() { return universitySlug; }
     public void setUniversitySlug(String universitySlug) { this.universitySlug = universitySlug; }
 
+    public List<String> getScholarshipCategories() { return scholarshipCategories; }
+    public void setScholarshipCategories(List<String> scholarshipCategories) { this.scholarshipCategories = scholarshipCategories; }
     public List<String> getLevels() { return levels; }
     public void setLevels(List<String> levels) { this.levels = levels; }
 

@@ -49,7 +49,8 @@ public record ProgramResponse(
         String updatedAt,
         List<Major> majors,
         List<Intake> intakes,
-        List<Offering> offerings) {
+        List<Offering> offerings,
+        List<String> scholarshipCategories) {
 
     public record Offering(
             Long id, String level, int durationMonths,
@@ -104,6 +105,7 @@ public record ProgramResponse(
                 p.getRemark(), Texts.stringOrNull(p.getCreateTime()), Texts.stringOrNull(p.getUpdateTime()),
                 p.getMajors().stream().map(Major::of).toList(),
                 p.getIntakes().stream().map(Intake::of).toList(),
-                p.getOfferings().stream().map(Offering::of).toList());
+                p.getOfferings().stream().map(Offering::of).toList(),
+                List.copyOf(p.getScholarshipCategories()));
     }
 }

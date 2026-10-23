@@ -54,6 +54,15 @@ describe('buildProgramPayload', () => {
     ])
   })
 
+  it('sends the chosen scholarship types, or none when the programme has no scholarships', () => {
+    const form = blankProgramForm(3)
+    Object.assign(form, { name: 'CS', levels: ['MASTER'] })
+    expect(buildProgramPayload(form).scholarshipCategories).toEqual([])
+
+    form.scholarshipCategories = ['CSC', 'PROVINCIAL']
+    expect(buildProgramPayload(form).scholarshipCategories).toEqual(['CSC', 'PROVINCIAL'])
+  })
+
   it('drops levels and majors and keeps the term length for non-degree programs', () => {
     const form = blankProgramForm(3)
     Object.assign(form, { name: 'Language', programType: 'LANGUAGE', levels: ['MASTER'], termLength: 'ONE_YEAR' })

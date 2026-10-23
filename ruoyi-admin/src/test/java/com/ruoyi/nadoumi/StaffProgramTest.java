@@ -176,4 +176,36 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value((int) pubId));
     }
+
+    @Test
+    void scholarship_types_are_chosen_from_the_categories_or_left_empty() throws Exception {
+        createStaff("prog_sch", "nadoumi_super_admin");
+        String token = staffToken("prog_sch");
+        long uni = createUniversity(token, "Zhejiang University", "PUBLISHED");
+
+        String body = programBody(uni, "PUBLISHED").replace("\"majors\":", "\"scholarshipCategories\":[\"csc\",\"PROVINCIAL\"],\"majors\":");
+        String created = mvc.perform(post("/api/staff/programs").header("Authorization", bearer(token))
+                        .contentType("application/json").content(body))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.scholarshipCategories.length()").value(2))
+                .andExpect(jsonPath("$.scholarshipCategories[0]").value("CSC"))
+                .andReturn().getResponse().getContentAsString();
+        long id = ((Number) JsonPath.read(created, "$.id")).longValue();
+
+        // visitors see the types on the programme page
+        mvc.perform(get("/api/public/programs/" + id))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.scholarshipCategories.length()").value(2));
+
+        // a code that is not a scholarship category is refused
+        mvc.perform(put("/api/staff/programs/" + id).header("Authorization", bearer(token))
+                        .contentType("application/json")
+                        .content(body.replace("[\"csc\",\"PROVINCIAL\"]", "[\"MADE_UP\"]")))
+                .andExpect(status().isBadRequest());
+
+        // a programme without scholarships simply has none
+        mvc.perform(put("/api/staff/programs/" + id).header("Authorization", bearer(token))
+                        .contentType("application/json")
+                        .content(body.replace("[\"csc\",\"PROVINCIAL\"]", "[]")))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.scholarshipCategories.length()").value(0));
+    }
 }
