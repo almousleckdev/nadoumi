@@ -730,3 +730,5 @@ the dashboard viewer; `onboarding/DocumentPreview` is a separate component for t
 
 **RequiredDocumentsCard (2026-10-23).** Scholarship and programme detail pages show the documents an opportunity asks for through one shared
 `RequiredDocumentsCard`. The programme page loads them from the public requirements endpoint; a programme with none falls back to its old free text.
+
+**Hidden file inputs (2026-10-23).** A visually hidden `<input type="file">` is absolutely positioned. When its wrapper is not positioned, it is placed against a far ancestor and does not scroll with an inner scroll area, so focusing it made the browser scroll that ancestor: the admin programme drawer jumped up and showed only its bottom edge after "Upload a file". Rules: in the admin, use a `hidden` input opened from a button through a ref (as `TemplatesSection` and the university gallery do); in the student site, the label that wraps an `sr-only` file input must be `relative`/`absolute` (`tests/unit/fileInputContainment.test.ts` enforces it).

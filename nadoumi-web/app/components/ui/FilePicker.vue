@@ -47,7 +47,7 @@ const showImage = computed(() => Boolean(props.src) && !props.pdf && !failed.val
     <div class="min-w-0">
       <label
         :for="inputId"
-        class="inline-flex cursor-pointer items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-brand-500 hover:bg-slate-50"
+        class="relative inline-flex cursor-pointer items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-brand-500 hover:bg-slate-50"
       >
         {{ label }}
         <input :id="inputId" type="file" :accept="accept" class="sr-only" @change="onInput">

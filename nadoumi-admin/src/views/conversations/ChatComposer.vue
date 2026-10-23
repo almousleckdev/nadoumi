@@ -314,7 +314,7 @@ defineExpose({ addFiles, focus: () => textarea.value?.focus() })
 .cc__x:hover { background: #e2e8f0; }
 .cc__row { display: flex; align-items: flex-end; gap: 4px; padding: 6px; border: 1px solid var(--nad-line); border-radius: 24px; background: #f8fafc; transition: border-color 0.15s, background 0.15s; }
 .cc__row:focus-within { border-color: var(--nad-brand-500); background: #fff; }
-.cc__icon { display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--nad-ink-soft); cursor: pointer; }
+.cc__icon { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 40px; height: 40px; border: 0; border-radius: 50%; background: transparent; color: var(--nad-ink-soft); cursor: pointer; }
 .cc__icon:hover { background: #f1f5f9; }
 .cc__icon:focus-within, .cc__icon:focus-visible { outline: 2px solid var(--nad-brand-500); }
 .cc__icon--off { pointer-events: none; opacity: 0.5; }

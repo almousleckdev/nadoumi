@@ -18,6 +18,7 @@ const props = defineProps<{ scope: TemplateScope, refId: number | null }>()
 
 const { t } = useI18n()
 const templates = ref<DocumentTemplate[]>([])
+const filePicker = ref<HTMLInputElement>()
 const staged = ref<{ title: string, file: File }[]>([])
 const title = ref('')
 const busy = ref(false)
@@ -145,27 +146,23 @@ defineExpose({ load, flush })
           :placeholder="t('template.titlePlaceholder')"
           class="title"
         />
-        <label
-          class="pick"
-          :class="{ off: !canPick }"
-          :title="canPick ? undefined : t('template.titleRequired')"
+        <!-- a hidden input opened from the button: an off-screen visible input makes the browser scroll the drawer when it takes focus -->
+        <input
+          ref="filePicker"
+          type="file"
+          :accept="TEMPLATE_ACCEPT"
+          hidden
+          @change="onFile"
         >
-          <el-button
-            :icon="Upload"
-            :loading="busy"
-            :disabled="!canPick"
-            tag="span"
-          >
-            {{ t('template.upload') }}
-          </el-button>
-          <input
-            type="file"
-            :accept="TEMPLATE_ACCEPT"
-            class="sr-only"
-            :disabled="!canPick"
-            @change="onFile"
-          >
-        </label>
+        <el-button
+          :icon="Upload"
+          :loading="busy"
+          :disabled="!canPick"
+          :title="canPick ? undefined : t('template.titleRequired')"
+          @click="filePicker?.click()"
+        >
+          {{ t('template.upload') }}
+        </el-button>
       </div>
     </div>
   </FormSection>
@@ -178,8 +175,5 @@ defineExpose({ load, flush })
 .file { color: var(--el-text-color-secondary); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .add { display: flex; gap: 8px; align-items: center; }
 .title { flex: 1; }
-.pick { cursor: pointer; }
-.pick.off { cursor: not-allowed; }
 .hint { color: var(--el-text-color-secondary); font-size: 13px; margin: 0; }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 </style>

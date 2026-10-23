@@ -60,7 +60,7 @@ function onPick(event: Event) {
       </NButton>
       <label
         :for="inputId"
-        class="inline-flex cursor-pointer items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 transition-colors focus-within:border-brand-500 hover:bg-slate-50"
+        class="relative inline-flex cursor-pointer items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 transition-colors focus-within:border-brand-500 hover:bg-slate-50"
         :class="busy ? 'pointer-events-none opacity-60' : ''"
       >
         {{ t('dashboard.docs.replace') }}
