@@ -11,7 +11,7 @@ const {
   setFilter, setPage, clearFilters, refresh,
 } = useDiscovery<ProgramCard>({
   resource: 'programs',
-  filterKeys: ['q', 'field', 'featured'],
+  filterKeys: ['q', 'field', 'featured', 'recommended'],
   pageSize: 12,
 })
 
@@ -26,6 +26,7 @@ const chips = computed<ActiveChip[]>(() => {
   if (typeof filters.q === 'string' && filters.q) out.push({ key: 'q', value: filters.q, label: `“${filters.q}”` })
   if (typeof filters.field === 'string' && filters.field) out.push({ key: 'field', value: filters.field, label: filters.field })
   if (filters.featured === 'true') out.push({ key: 'featured', value: 'true', label: t('catalog.featured') })
+  if (filters.recommended === 'true') out.push({ key: 'recommended', value: 'true', label: t('catalog.recommendedShort') })
   return out
 })
 function removeChip(chip: ActiveChip) {

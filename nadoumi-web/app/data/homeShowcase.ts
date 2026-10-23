@@ -23,5 +23,6 @@ export const SCHOLARSHIP_FUNDING_RAILS: HomeRail[] = [
 
 export const PROGRAM_RAILS: HomeRail[] = [
   { id: 'programFeatured', kind: 'program', query: { featured: true }, viewAll: 'featured=true' },
+  { id: 'programRecommended', kind: 'program', query: { recommended: true }, viewAll: 'recommended=true' },
   { id: 'programHot', kind: 'program', query: { hot: true } },
 ]

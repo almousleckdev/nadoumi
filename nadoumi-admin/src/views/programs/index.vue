@@ -92,6 +92,15 @@
           <div class="p-name__top">
             <span class="p-name__title">{{ row.name }}</span>
             <el-tag
+              v-if="row.recommended"
+              size="small"
+              type="success"
+              effect="plain"
+              disable-transitions
+            >
+              {{ t('program.recommendedShort') }}
+            </el-tag>
+            <el-tag
               v-if="row.hot"
               size="small"
               type="danger"

@@ -32,6 +32,7 @@ const levelLabel = computed(() => {
     :class="variant === 'carousel' ? 'w-[19rem] sm:w-[21rem]' : 'w-full'"
   >
     <CardMedia :src="program.imageUrl" :label="program.name">
+      <CardBadge v-if="program.recommended">{{ t('catalog.recommendedShort') }}</CardBadge>
       <CardBadge v-if="program.hot">{{ t('program.hot') }}</CardBadge>
       <CardBadge v-if="program.featured">{{ t('catalog.featured') }}</CardBadge>
     </CardMedia>

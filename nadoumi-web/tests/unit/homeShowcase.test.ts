@@ -12,7 +12,7 @@ describe('home rails', () => {
 
   it('only links "view all" with filters the catalog pages understand', () => {
     expect(SCHOLARSHIP_FUNDING_RAILS.every(r => r.viewAll?.startsWith('funding='))).toBe(true)
-    expect(PROGRAM_RAILS.map(r => r.viewAll).filter(Boolean)).toEqual(['featured=true'])
+    expect(PROGRAM_RAILS.map(r => r.viewAll).filter(Boolean)).toEqual(['featured=true', 'recommended=true'])
   })
 
   it('uses unique ids so each section has its own async-data key', () => {

@@ -535,3 +535,5 @@ and publish status stay staff-only and are never part of a public response; the 
 A programme's `majors[]` input takes `majorId` (pick from the catalogue) or `name` (matched to, or added to, the catalogue); responses carry `majorId`.
 
 **Programme scholarship types (2026-10-23).** `ProgramRequest.scholarshipCategories` (codes such as `CSC`, `PROVINCIAL`; empty or null = no scholarships; unknown codes are a 400) and `ProgramResponse`/`PublicProgramResponse` (detail) `scholarshipCategories`. The public page shows the category names with the free-text details.
+
+**Programme recommended flag (2026-10-23).** `ProgramRequest.recommended`, `recommended` on the programme responses, and `GET /api/public/programs?recommended=true`. The public card and detail page badge it; the home page has a "Recommended programmes" rail (`programRecommended`).

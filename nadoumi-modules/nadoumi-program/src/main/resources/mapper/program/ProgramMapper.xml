@@ -28,6 +28,7 @@
         <result property="imageMediaId"     column="image_media_id"/>
         <result property="featured"         column="is_featured"/>
         <result property="hot"              column="is_hot"/>
+        <result property="recommended"      column="is_recommended"/>
         <result property="publishStatus"    column="publish_status"/>
         <result property="status"           column="status"/>
         <result property="createBy"         column="create_by"/>
@@ -42,7 +43,7 @@
         duration_months, tuition_amount, tuition_currency, summary, image_media_id,
         admission_requirements, application_documents, career_prospects, scholarship_info,
         min_hsk, min_ielts, min_toefl, application_fee_amount, application_fee_currency,
-        is_featured, is_hot, publish_status, status,
+        is_featured, is_hot, is_recommended, publish_status, status,
         create_by, create_time, update_by, update_time, remark
     </sql>
 
@@ -64,10 +65,11 @@
             <if test="field != null and field != ''">and field = #{field}</if>
             <if test="featured != null">and is_featured = #{featured}</if>
             <if test="hot != null">and is_hot = #{hot}</if>
+            <if test="recommended != null">and is_recommended = #{recommended}</if>
             <if test="status != null">and status = #{status}</if>
             <if test="publishStatus != null">and publish_status = #{publishStatus}</if>
         </where>
-        order by is_featured desc, is_hot desc, name asc, id asc
+        order by is_featured desc, is_recommended desc, is_hot desc, name asc, id asc
     </select>
 
     <select id="findIdByUniversityAndName" resultType="java.lang.Long">
@@ -85,13 +87,13 @@
              duration_months, tuition_amount, tuition_currency, summary, image_media_id,
              admission_requirements, application_documents, career_prospects, scholarship_info,
              min_hsk, min_ielts, min_toefl, application_fee_amount, application_fee_currency,
-             is_featured, is_hot, publish_status, status, create_by, create_time, remark)
+             is_featured, is_hot, is_recommended, publish_status, status, create_by, create_time, remark)
         values
             (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{termLength}, #{teachingLanguage},
              #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary}, #{imageMediaId},
              #{admissionRequirements}, #{applicationDocuments}, #{careerProspects}, #{scholarshipInfo},
              #{minHsk}, #{minIelts}, #{minToefl}, #{applicationFeeAmount}, #{applicationFeeCurrency},
-             #{featured}, #{hot}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
+             #{featured}, #{hot}, #{recommended}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
     </insert>
 
     <update id="update" parameterType="com.nadoumi.program.domain.Program">
@@ -106,7 +108,7 @@
             career_prospects = #{careerProspects}, scholarship_info = #{scholarshipInfo},
             min_hsk = #{minHsk}, min_ielts = #{minIelts}, min_toefl = #{minToefl},
             application_fee_amount = #{applicationFeeAmount}, application_fee_currency = #{applicationFeeCurrency},
-            is_featured = #{featured}, is_hot = #{hot},
+            is_featured = #{featured}, is_hot = #{hot}, is_recommended = #{recommended},
             publish_status = #{publishStatus}, status = #{status},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}
         where id = #{id}

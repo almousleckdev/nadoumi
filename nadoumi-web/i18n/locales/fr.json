@@ -191,6 +191,11 @@
         "title": "Programmes à la une",
         "description": "Des programmes à découvrir dans les universités de notre catalogue."
       },
+      "programRecommended": {
+        "eyebrow": "Programmes",
+        "title": "Programmes recommandés",
+        "description": "Programmes choisis par l'équipe Nadoumi."
+      },
       "programHot": {
         "eyebrow": "Programmes",
         "title": "Programmes populaires",

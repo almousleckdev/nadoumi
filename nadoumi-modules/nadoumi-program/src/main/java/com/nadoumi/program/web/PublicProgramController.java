@@ -38,10 +38,11 @@ public class PublicProgramController {
             @RequestParam(required = false) ProgramTeachingLanguage language,
             @RequestParam(required = false) String field,
             @RequestParam(required = false) Boolean featured,
+            @RequestParam(required = false) Boolean recommended,
             @RequestParam(required = false) Boolean hot,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "12") int size) {
-        return service.publicList(q, universityId, type, language, field, featured, hot, page, size);
+        return service.publicList(q, universityId, type, language, field, featured, recommended, hot, page, size);
     }
 
     @Anonymous

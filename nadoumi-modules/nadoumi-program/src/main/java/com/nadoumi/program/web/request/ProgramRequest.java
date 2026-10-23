@@ -53,7 +53,9 @@ public record ProgramRequest(
         /** Per level and duration: tuition and accommodation. Duration / tuition on the programme are derived from these. */
         @Valid List<OfferingInput> offerings,
         /** Codes from the scholarship categories (CSC, PROVINCIAL, ...) that fund the programme; empty or null means none. */
-        List<@Size(max = 32) String> scholarshipCategories) {
+        List<@Size(max = 32) String> scholarshipCategories,
+        /** "Recommended by Nadoumi": shown with a badge and listed on the home page. */
+        Boolean recommended) {
 
     public record OfferingInput(
             /** DIPLOMA / BACHELOR / MASTER / PHD for degree programmes; null otherwise. */
