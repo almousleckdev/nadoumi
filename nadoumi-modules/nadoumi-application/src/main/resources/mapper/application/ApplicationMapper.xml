@@ -4,6 +4,7 @@
 
     <resultMap id="application" type="com.nadoumi.application.domain.Application">
         <id     property="id"                 column="id"/>
+        <result property="reference"          column="reference"/>
         <result property="applicantId"        column="applicant_id"/>
         <result property="applicationType"    column="application_type"/>
         <result property="programId"          column="program_id"/>
@@ -34,7 +35,7 @@
             <if test="stageId != null">and current_stage_id = #{stageId}</if>
             <if test="assigneeUserId != null">and assignee_user_id = #{assigneeUserId}</if>
             <if test="scopeUserId != null">and (assignee_user_id = #{scopeUserId} or assignee_user_id is null)</if>
-            <if test="q != null and q != ''">and id = cast(#{q} as unsigned)</if>
+            <if test="q != null and q != ''">and (reference like concat('%', #{q}, '%') or id = cast(#{q} as unsigned))</if>
         </where>
         order by create_time desc
     </select>
@@ -54,11 +55,11 @@
     <insert id="insert" parameterType="com.nadoumi.application.domain.Application"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_application
-            (applicant_id, application_type, program_id, scholarship_id, intake_id,
+            (reference, applicant_id, application_type, program_id, scholarship_id, intake_id,
              workflow_instance_id, current_stage_id, current_status, version,
              create_by, create_time)
         values
-            (#{applicantId}, #{applicationType}, #{programId}, #{scholarshipId}, #{intakeId},
+            (#{reference}, #{applicantId}, #{applicationType}, #{programId}, #{scholarshipId}, #{intakeId},
              #{workflowInstanceId}, #{currentStageId}, #{currentStatus}, #{version},
              #{createBy}, now())
     </insert>

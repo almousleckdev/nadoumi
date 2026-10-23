@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class Application {
 
     private Long id;
+    private String reference;
     private Long applicantId;
     private ApplicationType applicationType;
     private Long programId;
@@ -28,6 +29,8 @@ public class Application {
     private LocalDateTime updateTime;
     private String remark;
 
+    public String getReference() { return reference; }
+    public void setReference(String reference) { this.reference = reference; }
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

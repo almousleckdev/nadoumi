@@ -58,13 +58,15 @@ public class WorkflowService {
     private final ApplicationSnapshotWriter snapshots;
     private final ApplicationOutboxEmitter emitter;
     private final SubmitGate submitGate;
+    private final ApplicationReferenceService references;
 
     public WorkflowService(WfDefinitionMapper definitionMapper, ApplicationMapper applicationMapper,
             WfInstanceMapper instanceMapper, ApplicationTaskMapper taskMapper,
             ApplicationStageHistoryMapper historyMapper, ApplicationEventMapper eventMapper,
             ApplicationDecisionMapper decisionMapper, GuardEvaluator guards, ProgramService programService,
             ScholarshipAdminService scholarshipAdminService, WorkflowDefinitionService definitions,
-            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter, SubmitGate submitGate) {
+            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter, SubmitGate submitGate,
+            ApplicationReferenceService references) {
         this.definitionMapper = definitionMapper;
         this.applicationMapper = applicationMapper;
         this.instanceMapper = instanceMapper;
@@ -79,6 +81,7 @@ public class WorkflowService {
         this.snapshots = snapshots;
         this.emitter = emitter;
         this.submitGate = submitGate;
+        this.references = references;
     }
 
     // draft creation
@@ -116,6 +119,7 @@ public class WorkflowService {
                 .orElseThrow(() -> new IllegalStateException("definition " + definitionCode + " has no START stage"));
 
         Application application = new Application();
+        application.setReference(references.next());
         application.setApplicantId(applicantId);
         application.setApplicationType(type);
         application.setProgramId(programId);

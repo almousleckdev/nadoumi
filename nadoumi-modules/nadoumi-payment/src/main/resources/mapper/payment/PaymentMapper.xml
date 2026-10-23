@@ -6,6 +6,7 @@
         <id     property="id"              column="id"/>
         <result property="applicationId"   column="application_id"/>
         <result property="applicantId"     column="applicant_id"/>
+        <result property="applicationReference" column="application_reference"/>
         <result property="applicantName"   column="applicant_name"/>
         <result property="kind"            column="kind"/>
         <result property="amount"          column="amount"/>
@@ -28,7 +29,7 @@
     </resultMap>
 
     <sql id="cols">
-        id, application_id, applicant_id, applicant_name, kind, amount, currency, method, reference, status,
+        id, application_id, application_reference, applicant_id, applicant_name, kind, amount, currency, method, reference, status,
         expires_at, student_txn_no, proof_media_id, submitted_at, verified_by, verified_at, rejection_reason,
         version, create_by, create_time, update_by, update_time
     </sql>
@@ -36,10 +37,10 @@
     <insert id="insert" parameterType="com.nadoumi.payment.domain.ApplicationPayment"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_application_payment
-            (application_id, applicant_id, applicant_name, kind, amount, currency, method, reference, status,
+            (application_id, application_reference, applicant_id, applicant_name, kind, amount, currency, method, reference, status,
              expires_at, create_by, create_time)
         values
-            (#{applicationId}, #{applicantId}, #{applicantName}, #{kind}, #{amount}, #{currency}, #{method},
+            (#{applicationId}, #{applicationReference}, #{applicantId}, #{applicantName}, #{kind}, #{amount}, #{currency}, #{method},
              #{reference}, #{status}, #{expiresAt}, #{createBy}, #{createTime})
     </insert>
 

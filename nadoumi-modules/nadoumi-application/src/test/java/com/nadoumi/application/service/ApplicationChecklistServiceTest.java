@@ -36,8 +36,9 @@ class ApplicationChecklistServiceTest {
     private final DocumentService documents = mock(DocumentService.class);
     private final ApplicantDossierService dossiers = mock(ApplicantDossierService.class);
     private final ProgramService programs = mock(ProgramService.class);
+    private final ApplicationTemplateService templates = mock(ApplicationTemplateService.class);
     private final ApplicationChecklistService service =
-            new ApplicationChecklistService(applications, requirements, scholarships, documents, dossiers, programs);
+            new ApplicationChecklistService(applications, requirements, scholarships, documents, dossiers, programs, templates);
 
     @BeforeEach
     void application() {
@@ -195,5 +196,27 @@ class ApplicationChecklistServiceTest {
         profile(null, null, null); // nothing known about the student ...
         when(programs.get(5L).levels()).thenReturn(List.of()); // ... nor about the programme: ask for everything
         assertThat(service.checklist(APP)).hasSize(2);
+    }
+
+    @Test
+    void shouldRequireTheFilledInApplicationForm_whenTheProgrammeGivesAFormToFillIn() {
+        when(requirements.checklistFor(com.nadoumi.document.domain.enums.RequirementScope.PROGRAM, 5L))
+                .thenReturn(List.of(requirement("PASSPORT", true, null)));
+        when(templates.forApplication(APP)).thenReturn(List.of(new com.nadoumi.document.domain.DocumentTemplate()));
+
+        var items = service.checklist(APP);
+
+        assertThat(items.get(0).docType()).isEqualTo("APPLICATION_FORM"); // first, and required
+        assertThat(items.get(0).mandatory()).isTrue();
+        assertThat(service.missingMandatory(APP)).contains("APPLICATION_FORM", "PASSPORT");
+    }
+
+    @Test
+    void shouldNotAskForAFilledInForm_whenThereIsNoFormToFillIn() {
+        when(requirements.checklistFor(com.nadoumi.document.domain.enums.RequirementScope.PROGRAM, 5L))
+                .thenReturn(List.of(requirement("PASSPORT", true, null)));
+        when(templates.forApplication(APP)).thenReturn(List.of());
+
+        assertThat(service.checklist(APP)).extracting(ApplicationChecklistService.Item::docType).containsExactly("PASSPORT");
     }
 }

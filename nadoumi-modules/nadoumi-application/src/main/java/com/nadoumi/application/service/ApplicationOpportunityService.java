@@ -23,7 +23,7 @@ public class ApplicationOpportunityService {
     public enum Kind { PROGRAM, SCHOLARSHIP }
 
     /** @param universityName {@code null} for any application that involves a scholarship; {@code intake} may be null */
-    public record Description(Kind kind, String title, String universityName, String intake) {
+    public record Description(String reference, Kind kind, String title, String universityName, String intake) {
     }
 
     private final ApplicationMapper applications;
@@ -45,13 +45,13 @@ public class ApplicationOpportunityService {
         }
         boolean withScholarship = application.getScholarshipId() != null;
         if (application.getProgramId() == null) {
-            return new Description(Kind.SCHOLARSHIP, scholarshipTitle(application.getScholarshipId()), null, null);
+            return new Description(application.getReference(), Kind.SCHOLARSHIP, scholarshipTitle(application.getScholarshipId()), null, null);
         }
         ProgramResponse program = programs.get(application.getProgramId());
         String title = withScholarship
                 ? program.name() + " + " + scholarshipTitle(application.getScholarshipId())
                 : program.name();
-        return new Description(withScholarship ? Kind.SCHOLARSHIP : Kind.PROGRAM, title,
+        return new Description(application.getReference(), withScholarship ? Kind.SCHOLARSHIP : Kind.PROGRAM, title,
                 withScholarship ? null : program.universityName(), intakeOf(program, application.getIntakeId()));
     }
 

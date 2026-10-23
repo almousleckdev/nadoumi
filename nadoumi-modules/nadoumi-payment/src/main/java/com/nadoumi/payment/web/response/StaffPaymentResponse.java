@@ -26,7 +26,7 @@ public record StaffPaymentResponse(
 
     public static StaffPaymentResponse of(ApplicationPayment p) {
         return new StaffPaymentResponse(
-                p.getId(), p.getApplicationId(), "APP-" + p.getApplicationId(), p.getApplicantName(), p.getKind(),
+                p.getId(), p.getApplicationId(), p.getApplicationReference(), p.getApplicantName(), p.getKind(),
                 p.getAmount(), p.getCurrency(), p.getReference(), p.getStatus().name(), p.getStudentTxnNo(),
                 p.getProofMediaId() != null, utc(p.getCreateTime()), utc(p.getSubmittedAt()),
                 utc(p.getExpiresAt()), utc(p.getVerifiedAt()), p.getRejectionReason());

@@ -10,6 +10,7 @@ public class ApplicationPayment {
     private Long id;
     private Long applicationId;
     private Long applicantId;
+    private String applicationReference;
     private String applicantName;
     private String kind;
     private BigDecimal amount;
@@ -39,6 +40,8 @@ public class ApplicationPayment {
     public Long getApplicantId() { return applicantId; }
     public void setApplicantId(Long applicantId) { this.applicantId = applicantId; }
 
+    public String getApplicationReference() { return applicationReference; }
+    public void setApplicationReference(String applicationReference) { this.applicationReference = applicationReference; }
     public String getApplicantName() { return applicantName; }
     public void setApplicantName(String applicantName) { this.applicantName = applicantName; }
 

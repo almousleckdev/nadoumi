@@ -4,6 +4,8 @@ import type { Page } from './applicant'
 /** Row of `GET /api/staff/applications` (`ApplicationResponse`). */
 export interface Application {
   id: number
+  /** The readable application number, for example NAD20261023001. */
+  reference: string | null
   applicantId: number
   applicationType: string | null
   programId: number | null

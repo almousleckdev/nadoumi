@@ -180,6 +180,7 @@ public class ApplicationPaymentService {
     private void insertSession(ApplicationFacts app, BigDecimal fee) {
         ApplicationPayment payment = new ApplicationPayment();
         payment.setApplicationId(app.id());
+        payment.setApplicationReference(app.reference());
         payment.setApplicantId(app.applicantId());
         payment.setApplicantName(applicantNames.of(app.applicantId()));
         payment.setKind(KIND);

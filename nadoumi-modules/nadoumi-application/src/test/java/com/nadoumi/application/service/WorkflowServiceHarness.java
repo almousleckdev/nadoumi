@@ -49,6 +49,7 @@ class WorkflowServiceHarness {
     final UserApplicantAccessService accessService = mock(UserApplicantAccessService.class);
 
     final SubmitGate submitGate = mock(SubmitGate.class);
+    final ApplicationReferenceService references = mock(ApplicationReferenceService.class);
 
     final GuardEvaluator guards = new GuardEvaluator(taskMapper, decisionMapper, Optional.empty(), Optional.empty());
 
@@ -60,7 +61,7 @@ class WorkflowServiceHarness {
 
     final WorkflowService service = new WorkflowService(definitionMapper, applicationMapper, instanceMapper,
             taskMapper, historyMapper, eventMapper, decisionMapper, guards, programService,
-            scholarshipAdminService, definitions, snapshots, emitter, submitGate);
+            scholarshipAdminService, definitions, snapshots, emitter, submitGate, references);
 
     /** Everything defaults to "there is nothing to materialise / notify" so a test only stubs what it asserts on. */
     void stubQuietDefaults() {

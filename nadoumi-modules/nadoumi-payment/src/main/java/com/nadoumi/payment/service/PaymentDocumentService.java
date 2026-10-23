@@ -109,6 +109,21 @@ public class PaymentDocumentService {
                 formPdf.render(formModel(payment, opportunity, dossier, clock.instant(), verification.url(number, code))));
     }
 
+    /**
+     * The application form as it stands now, for the student to look over before paying. Not stored, not numbered and
+     * without a verification code: it is only a preview of what will be sent.
+     */
+    @Transactional(readOnly = true)
+    public byte[] previewForm(long applicationId, long applicantId) {
+        Description opportunity = opportunities.describe(applicationId);
+        ApplicantDossier dossier = dossiers.read(applicantId);
+        var signature = dossiers.signature(applicantId);
+        return formPdf.render(new ApplicationFormModel("PREVIEW", clock.instant(), opportunity.reference(), opportunity,
+                null, dossier, dossiers.photoJpeg(applicantId).orElse(null),
+                signature.map(SignatureService.SignatureOnFile::png).orElse(null),
+                signature.map(SignatureService.SignatureOnFile::signedOn).orElse(null), null));
+    }
+
     /** The latest receipt and form of an application, newest version of each kind. */
     @Transactional(readOnly = true)
     public List<PaymentDocument> listFor(long applicationId) {
@@ -228,7 +243,7 @@ public class PaymentDocumentService {
     }
 
     static String applicationRef(ApplicationPayment payment) {
-        return "APP-" + payment.getApplicationId();
+        return payment.getApplicationReference() == null ? "APP-" + payment.getApplicationId() : payment.getApplicationReference();
     }
 
     private static String filename(DocumentKind kind, String number) {

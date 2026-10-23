@@ -382,8 +382,9 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         var adminMail = mailbox.last("pay_ops@staff.test");
         assertThat(adminMail).isPresent();
         assertThat(adminMail.get().attachmentNames()).singleElement().asString().startsWith("NAD-APP-");
-        assertThat(adminMail.get().subject()).startsWith("[Nadoumi] New application APP-" + app);
-        assertThat(mailbox.last("pay_case@staff.test").filter(m -> m.subject().contains("APP-" + app + ":"))).isEmpty();
+        String reference = jdbc.queryForObject("select reference from nad_application where id = ?", String.class, app);
+        assertThat(adminMail.get().subject()).startsWith("[Nadoumi] New application " + reference);
+        assertThat(mailbox.last("pay_case@staff.test").filter(m -> m.subject().contains(reference + ":"))).isEmpty();
         assertThat(jdbc.queryForObject("select max(version) from nad_payment_document where kind = 'APPLICATION_FORM' "
                 + "and application_id = ?", Integer.class, app)).isEqualTo(2);
         assertThat(jdbc.queryForObject("select count(*) from nad_payment_document where delivered_at is null and application_id = ?",
@@ -482,6 +483,49 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     private void requireDocuments(String json) throws Exception {
         mvc.perform(put("/api/staff/document-requirements/programs/" + programId).header("Authorization", staffAuth)
                 .contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldPreviewTheApplicationFormBeforePaying_forTheStudentOnly() throws Exception {
+        Student s = register("pay", "prev");
+        Student stranger = register("pay", "prev2");
+        long app = draftFor(s);
+
+        byte[] pdf = mvc.perform(get("/api/student/applications/" + app + "/form-preview").header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("Content-Type", "application/pdf"))
+                .andReturn().getResponse().getContentAsByteArray();
+        assertThat(new String(pdf, 0, 5)).isEqualTo("%PDF-");
+        mvc.perform(get("/api/student/applications/" + app + "/form-preview").header("Authorization", bearer(stranger.token())))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void shouldRequireTheFilledInApplicationForm_whenTheProgrammeHasAFormToFillIn() throws Exception {
+        addProgramTemplate("Application form");
+        Student s = register("pay", "formreq");
+        long app = draftFor(s);
+
+        mvc.perform(get("/api/student/applications/" + app + "/documents/checklist").header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].docType").value("APPLICATION_FORM"))
+                .andExpect(jsonPath("$[0].mandatory").value(true))
+                .andExpect(jsonPath("$[0].status").value("MISSING"));
+    }
+
+    @Test
+    void shouldNumberApplicationsNadDateAndTheDaysRunningNumber() throws Exception {
+        Student s = register("pay", "ref1");
+        long first = draftFor(s);
+        String one = JsonPath.read(mvc.perform(get("/api/student/applications/" + first).header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), "$.reference");
+        assertThat(one).matches("NAD\\d{8}\\d{3,}");
+
+        // a second application on the same day continues the day's numbering
+        long second = draftFor(register("pay", "ref2"));
+        String two = JsonPath.read(mvc.perform(get("/api/staff/applications/" + second).header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), "$.application.reference");
+        assertThat(Long.parseLong(two.substring(3))).isEqualTo(Long.parseLong(one.substring(3)) + 1);
     }
 
     @Test
