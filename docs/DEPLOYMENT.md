@@ -247,3 +247,8 @@ start (`Detected failed migration to version N ... run repair`). To recover:
 
 Write new migrations so that each DDL step first checks what already exists, and filter a backfill `update` on the primary key as
 well (`where id > 0 and ...`) so it also runs when the server sets `sql_safe_updates`.
+
+**Recovering without SQL access.** Set the environment variable `NADOUMI_FLYWAY_REPAIR_ON_START=true` on the service and redeploy
+once. That start runs Flyway's `repair` (it removes the failed history rows and realigns checksums; it never touches application
+tables) and then migrates. **Remove the variable after the first successful start**: repairing on every start would hide real
+migration failures. It only helps for a migration that is safe to rerun (V121 is).
