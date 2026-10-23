@@ -230,9 +230,16 @@ public class PaymentDocumentService {
             ApplicantDossier dossier, Instant now, String verifyUrl) {
         var signature = dossiers.signature(payment.getApplicantId());
         return new ApplicationFormModel(PaymentDocumentNumbers.applicationForm(payment), now, applicationRef(payment),
-                opportunity, payment.getReference(), dossier, dossiers.photoJpeg(payment.getApplicantId()).orElse(null),
+                opportunity, payment.getReference(), payment.getStudentTxnNo(), paidAt(payment), dossier,
+                dossiers.photoJpeg(payment.getApplicantId()).orElse(null),
                 signature.map(SignatureService.SignatureOnFile::png).orElse(null),
                 signature.map(SignatureService.SignatureOnFile::signedOn).orElse(null), verifyUrl);
+    }
+
+    /** When the money was confirmed, or reported while staff have not decided yet. */
+    private static Instant paidAt(ApplicationPayment payment) {
+        var at = payment.getVerifiedAt() != null ? payment.getVerifiedAt() : payment.getSubmittedAt();
+        return at == null ? null : at.toInstant(ZoneOffset.UTC);
     }
 
     private static String studentName(ApplicationPayment payment, ApplicantDossier dossier) {

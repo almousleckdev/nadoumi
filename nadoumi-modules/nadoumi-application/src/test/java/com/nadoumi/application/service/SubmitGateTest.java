@@ -36,14 +36,14 @@ class SubmitGateTest {
 
     @Test
     void shouldRequirePaymentFirst() {
-        when(payments.isSettled(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(false);
+        when(payments.isPaidOrReported(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(false);
 
         assertThatThrownBy(() -> gate.require(ID)).isInstanceOf(PaymentRequiredException.class);
     }
 
     @Test
     void shouldNameTheMissingDocuments() {
-        when(payments.isSettled(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
+        when(payments.isPaidOrReported(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
         when(checklist.missingMandatory(ID)).thenReturn(List.of("PASSPORT", "TRANSCRIPT"));
 
         assertThatThrownBy(() -> gate.require(ID))
@@ -53,7 +53,7 @@ class SubmitGateTest {
 
     @Test
     void shouldLetItThrough_whenPaidAndDocumentsAreIn() {
-        when(payments.isSettled(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
+        when(payments.isPaidOrReported(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
         when(checklist.missingMandatory(ID)).thenReturn(List.of());
         application();
         when(signatures.isOnFile(9L)).thenReturn(true);
@@ -64,7 +64,7 @@ class SubmitGateTest {
 
     @Test
     void shouldRequireTheSignature_afterPaymentAndDocuments() {
-        when(payments.isSettled(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
+        when(payments.isPaidOrReported(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
         when(checklist.missingMandatory(ID)).thenReturn(List.of());
         application();
         when(signatures.isOnFile(9L)).thenReturn(false);
@@ -74,7 +74,7 @@ class SubmitGateTest {
 
     @Test
     void shouldNameTheUnfinishedProfileSections_beforeTheSignature() {
-        when(payments.isSettled(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
+        when(payments.isPaidOrReported(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
         when(checklist.missingMandatory(ID)).thenReturn(List.of());
         application();
         when(readiness.missing(9L)).thenReturn(List.of("ONBOARDING", "FAMILY"));

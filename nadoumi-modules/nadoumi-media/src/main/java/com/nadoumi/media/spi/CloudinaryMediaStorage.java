@@ -124,7 +124,11 @@ public class CloudinaryMediaStorage extends AbstractMediaStorage {
             throw new IllegalStateException("provider returned HTTP " + response.statusCode()
                     + " for media asset " + row.getId());
         }
-        String contentType = response.headers().firstValue("content-type").orElse(row.getContentType());
+        // the type validated at upload wins: the provider answers a signed download with a generic octet-stream, which
+        // made browsers show an uploaded JPEG as a bare file full of raw bytes
+        String contentType = row.getContentType() != null && !row.getContentType().isBlank()
+                ? row.getContentType()
+                : response.headers().firstValue("content-type").orElse("application/octet-stream");
         long contentLength = response.headers().firstValueAsLong("content-length")
                 .orElse(row.getByteSize() == null ? UNKNOWN_LENGTH : row.getByteSize());
         log.info("media asset proxied: id={} public_id={} bytes={}", row.getId(), row.getPublicId(), contentLength);

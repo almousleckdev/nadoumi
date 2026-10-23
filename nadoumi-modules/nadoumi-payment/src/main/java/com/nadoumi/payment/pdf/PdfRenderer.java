@@ -108,7 +108,7 @@ public class PdfRenderer {
         /** As {@link #masthead(String, List)}, with the applicant's photo (JPEG bytes) in a framed box on the right. */
         public void masthead(String title, List<String[]> references, byte[] photoJpeg) {
             boolean withPhoto = photoJpeg != null;
-            PdfPTable table = new PdfPTable(withPhoto ? new float[] {1.0f, 2.8f, 2.0f, 1.1f} : new float[] {1.1f, 2.6f, 2.3f});
+            PdfPTable table = new PdfPTable(withPhoto ? new float[] {1.0f, 5.0f, 1.2f} : new float[] {1.1f, 5.9f});
             table.setWidthPercentage(100);
             Image logo = assets.logo();
             logo.scaleToFit(mm(22), mm(22));
@@ -122,22 +122,31 @@ public class PdfRenderer {
             String zhTitle = PdfLabels.zh(title);
             titleCell.addElement(paragraph((zhTitle == null ? "" : zhTitle + "  \u00b7  ") + "Nadoumi Education Consulting", 9, false, MUTED));
             table.addCell(titleCell);
-
-            PdfPCell refs = cell(Rectangle.NO_BORDER, 0);
-            refs.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            for (String[] reference : references) {
-                Paragraph line = new Paragraph();
-                line.setAlignment(Element.ALIGN_RIGHT);
-                line.add(phrase(reference[0], 8, false, MUTED));
-                line.add(new com.lowagie.text.Chunk("   ", assets.regular(8, MUTED)));
-                line.add(phrase(reference[1], 9, true, INK));
-                refs.addElement(line);
-            }
-            table.addCell(refs);
             if (withPhoto) {
                 table.addCell(photoCell(photoJpeg));
             }
             add(table);
+
+            // the references sit in their own full-width grid under the masthead, so nothing can run under the photo:
+            // short ones share a row, the last (the fee line, with its transaction number) gets a row of its own
+            PdfPTable refs = new PdfPTable(references.size() > 1 ? references.size() - 1 : 1);
+            refs.setWidthPercentage(100);
+            refs.setSpacingBefore(mm(2));
+            int last = references.size() - 1;
+            for (int i = 0; i < references.size(); i++) {
+                String[] reference = references.get(i);
+                PdfPCell cell = cell(Rectangle.NO_BORDER, 1.5f);
+                if (i == last && last > 0) {
+                    cell.setColspan(refs.getNumberOfColumns());
+                }
+                Paragraph line = new Paragraph();
+                line.add(phrase(reference[0], 8, false, MUTED));
+                line.add(new com.lowagie.text.Chunk("   ", assets.regular(8, MUTED)));
+                line.add(phrase(reference[1], 9, true, INK));
+                cell.addElement(line);
+                refs.addCell(cell);
+            }
+            add(refs);
             add(rule(BRAND, 1.2f, mm(3), mm(5)));
         }
 
@@ -147,7 +156,7 @@ public class PdfRenderer {
             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
             try {
                 Image photo = Image.getInstance(jpeg);
-                photo.scaleToFit(mm(24), mm(31));
+                photo.scaleToFit(mm(22), mm(29));
                 cell.addElement(photo);
             }
             catch (IOException | DocumentException e) {

@@ -3,7 +3,7 @@ import type { StudentPaymentDto } from '~/types/payment'
 import { URGENT_SECONDS, formatCountdown } from '~/utils/paymentView'
 
 /** The open payment session: the QR, the time left, the exact amount and the reference to write in the note. */
-const props = defineProps<{ payment: StudentPaymentDto, qrSrc: string, qrFailed: boolean }>()
+const props = defineProps<{ payment: StudentPaymentDto, qrSrc: string, qrFailed: boolean, holding?: boolean }>()
 const emit = defineEmits<{ elapsed: [], cancel: [] }>()
 
 const { t } = useI18n()
@@ -38,6 +38,11 @@ async function copyReference() {
 
     <div class="grid gap-4">
       <div>
+        <template v-if="holding">
+          <p class="font-display text-lg font-semibold text-slate-900" data-test="payment-held">{{ t('payment.held') }}</p>
+          <p class="text-sm text-slate-600">{{ t('payment.heldBody') }}</p>
+        </template>
+        <template v-else>
         <p class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ t('payment.timeLeft') }}</p>
         <p
           class="font-display text-3xl font-bold tabular-nums text-slate-900"
@@ -48,6 +53,7 @@ async function copyReference() {
         >
           {{ formatCountdown(remaining) }}
         </p>
+        </template>
       </div>
 
       <dl class="grid gap-3 text-sm">

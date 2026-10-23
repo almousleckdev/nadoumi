@@ -20,6 +20,15 @@
 > the filled-in **Application form** (`APPLICATION_FORM`) is a required document: the student downloads the form on its row, fills it in and uploads it back.
 >
 > **Last step.** Preview (the application form PDF as it stands, `GET /api/student/applications/{id}/form-preview`, marked as a preview), the
+> **UPDATED 2026-10-24 (payment and staff inbox).** The student can Submit as soon as the payment is *reported* (transaction
+> number and receipt, `PROOF_SUBMITTED`); staff verify the money afterwards from the submitted application. The 15-minute QR
+> clock stops when the student starts the receipt (`POST /payment/hold` extends the session to 30 minutes, never shortens it).
+> A static bank QR has no callback, so the payment cannot be detected automatically. Staff receive only submitted
+> applications (never `DRAFT` or `CLOSED_WITHDRAWN`) and only reported payments on them (`PROOF_SUBMITTED`, `CONFIRMED`,
+> `REJECTED`): open, cancelled and expired sessions are never listed. The paid application form shows the payment reference,
+> the transaction number and the date. The proof is served with the content type validated at upload, not the provider's
+> generic octet-stream.
+>
 > Nadoumi application fee by QR (15 minutes), then Submit. Submit is locked, with the reason shown, until every step is done and the fee is paid;
 > the server enforces the same (`SubmitGate`: fee, documents, the applicant's onboarding and form data, signature) for every actor.
 >

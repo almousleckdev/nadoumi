@@ -2,9 +2,10 @@
 export const APPLICATION_TYPES = ['PROGRAM_WITH_SCHOLARSHIP', 'PROGRAM_ONLY', 'SCHOLARSHIP_ONLY']
 
 /** `nad_wf_stage.status_label` values of the seeded workflow definitions. */
+// staff only receive submitted applications: drafts and withdrawn ones are never listed, so they are not filters
 export const STATUSES = [
-  'DRAFT', 'IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION', 'OFFER', 'PRE_DEPARTURE',
-  'CLOSED_SUCCESS', 'CLOSED_UNSUCCESSFUL', 'CLOSED_WITHDRAWN',
+  'IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION', 'OFFER', 'PRE_DEPARTURE',
+  'CLOSED_SUCCESS', 'CLOSED_UNSUCCESSFUL',
 ]
 
 type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger'

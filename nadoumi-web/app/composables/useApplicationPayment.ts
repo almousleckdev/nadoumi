@@ -8,6 +8,7 @@ export function useApplicationPayment(applicationId: MaybeRefOrGetter<number>) {
   return {
     overview: () => studentFetch<StudentPaymentDto>(base()),
     start: () => studentFetch<StudentPaymentDto>(`${base()}/session`, { method: 'POST' }),
+    hold: () => studentFetch<StudentPaymentDto>(`${base()}/hold`, { method: 'POST' }),
     cancel: () => studentFetch<StudentPaymentDto>(`${base()}/cancel`, { method: 'POST' }),
     /** The QR is private to an open session, so it is fetched with the session cookie and shown from a blob URL. */
     qr: () => studentFetch<Blob>(`${base()}/qr`, { responseType: 'blob' }),

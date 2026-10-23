@@ -26,6 +26,18 @@ class PdfDocumentsTest {
     }
 
     @Test
+    void shouldPrintThePaidLineWithTheTransactionNumber_andKeepThePhotoClearOfIt() throws Exception {
+        var base = PdfFixtures.form(PdfFixtures.programme(), "Amina");
+        var paid = new ApplicationFormModel(base.formNo(), base.generatedAt(), base.applicationRef(), base.opportunity(),
+                "NAD-AB12CD34", "BANK1234567", java.time.Instant.parse("2026-10-22T07:00:00Z"), base.dossier(),
+                base.photo(), base.signature(), base.signedOn(), base.verifyUrl());
+        byte[] pdf = forms.render(paid);
+
+        String text = text(pdf).replaceAll("\\s+", " ");
+        assertThat(text).contains("PAID", "NAD-AB12CD34", "Transaction BANK1234567", "Form no.", "Generated");
+    }
+
+    @Test
     void shouldPrintTheReceiptFacts_andTheCompanyFooter() throws IOException {
         byte[] pdf = receipts.render(PdfFixtures.receipt("Fudan University"));
 

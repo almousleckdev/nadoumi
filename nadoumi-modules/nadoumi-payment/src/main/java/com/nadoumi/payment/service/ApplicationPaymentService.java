@@ -157,6 +157,22 @@ public class ApplicationPaymentService {
         return respond(app);
     }
 
+    /**
+     * The student has paid and is filling in the receipt: stop the clock. The session is pushed out by the hold window
+     * (never shortened) so a slow upload cannot expire a payment that was already made.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public StudentPaymentResponse hold(long applicationId) {
+        ApplicationFacts app = requireApplication(applicationId);
+        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, KIND));
+        if (payment != null && payment.getStatus() == PaymentStatus.PENDING) {
+            LocalDateTime now = now();
+            mapper.extendExpiry(payment.getId(), now.plus(PaymentSettings.PAYMENT_HOLD_WINDOW), now,
+                    String.valueOf(caller.requireUserId()));
+        }
+        return respond(app);
+    }
+
     /** Closes the session. Once a proof is reported it can no longer be cancelled; staff decide. */
     @Transactional(rollbackFor = Exception.class)
     public StudentPaymentResponse cancel(long applicationId) {
@@ -234,7 +250,8 @@ public class ApplicationPaymentService {
                     PaymentSettings.CURRENCY, settings.payee(), null, null, 0, null);
         }
         PaymentStatus status = latest.getStatus();
-        boolean settled = status == PaymentStatus.CONFIRMED;
+        // reported counts as paid for the student: the Submit button follows it, staff verify the money afterwards
+        boolean settled = status == PaymentStatus.CONFIRMED || status == PaymentStatus.PROOF_SUBMITTED;
         boolean canStart = app.draft() && !status.isOpen() && !settled;
         long secondsLeft = status == PaymentStatus.PENDING
                 ? Math.max(0, Duration.between(now(), latest.getExpiresAt()).getSeconds()) : 0;

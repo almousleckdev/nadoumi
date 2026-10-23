@@ -4,7 +4,7 @@ import { readAsDataUrl } from '~/utils/files'
 
 /** Reports the payment: the transaction number from the receipt and a screenshot. */
 defineProps<{ busy: boolean }>()
-const emit = defineEmits<{ submit: [transactionNo: string, file: File] }>()
+const emit = defineEmits<{ submit: [transactionNo: string, file: File], started: [] }>()
 
 const { t } = useI18n()
 
@@ -13,8 +13,18 @@ const file = ref<File | null>(null)
 const preview = ref('')
 const errors = reactive({ transactionNo: '', file: '' })
 
+// the student has paid and is reporting it: tell the parent once so the payment clock can stop
+let announced = false
+function announceStarted() {
+  if (announced) return
+  announced = true
+  emit('started')
+}
+watch(transactionNo, (value: string) => value.trim() && announceStarted())
+
 async function onSelect(picked: File) {
   file.value = picked
+  announceStarted()
   errors.file = ''
   preview.value = picked.type === 'application/pdf' ? '' : await readAsDataUrl(picked)
 }

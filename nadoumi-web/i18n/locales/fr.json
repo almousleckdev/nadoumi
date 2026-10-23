@@ -2501,6 +2501,8 @@
     "payAgain": "Payer à nouveau",
     "payToSubmit": "Réglez les frais de dossier pour soumettre votre candidature.",
     "timeLeft": "Temps restant pour payer",
+    "held": "Paiement en cours",
+    "heldBody": "Prenez votre temps : saisissez le numéro de transaction, ajoutez le reçu et appuyez sur J'ai payé. Votre paiement n'expirera pas.",
     "qrAlt": "QR code de paiement",
     "step1": "Ouvrez votre application bancaire ou de paiement et scannez le QR code.",
     "step2": "Payez exactement {amount}.",

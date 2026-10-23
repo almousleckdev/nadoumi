@@ -65,9 +65,19 @@
         where application_id = #{applicationId} and kind = #{kind} and status = 'CONFIRMED'
     </select>
 
+    <select id="countPaidOrReported" resultType="java.lang.Integer">
+        select count(*) from nad_application_payment
+        where application_id = #{applicationId} and kind = #{kind} and status in ('PROOF_SUBMITTED', 'CONFIRMED')
+    </select>
+
+    <!-- Staff only receive payments the student reported, on an application that has actually been submitted:
+         open, cancelled and expired sessions and draft applications never reach them. -->
     <select id="search" resultMap="payment">
         select <include refid="cols"/> from nad_application_payment
         <where>
+            status in ('PROOF_SUBMITTED', 'CONFIRMED', 'REJECTED')
+            and exists (select 1 from nad_application a
+                        where a.id = nad_application_payment.application_id and a.current_status &lt;&gt; 'DRAFT')
             <if test="status != null">and status = #{status}</if>
             <if test="q != null and q != ''">
                 and (reference like concat('%', #{q}, '%')
@@ -97,6 +107,12 @@
         set status = 'PROOF_SUBMITTED', student_txn_no = #{txnNo}, proof_media_id = #{proofMediaId},
             submitted_at = #{now}, version = version + 1, update_by = #{by}, update_time = #{now}
         where id = #{id} and status = 'PENDING' and version = #{version} and expires_at > #{now}
+    </update>
+
+    <update id="extendExpiry">
+        update nad_application_payment
+        set expires_at = #{expiresAt}, version = version + 1, update_by = #{by}, update_time = #{now}
+        where id = #{id} and status = 'PENDING' and expires_at &lt; #{expiresAt}
     </update>
 
     <update id="markConfirmed">
