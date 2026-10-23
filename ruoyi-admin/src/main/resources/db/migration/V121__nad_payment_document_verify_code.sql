@@ -18,7 +18,7 @@ execute nad_step;
 deallocate prepare nad_step;
 
 update nad_payment_document
-   set verify_code = upper(substr(md5(concat(id, rand(), uuid())), 1, 12))
+   set verify_code = upper(substr(sha2(concat(id, rand(), uuid()), 256), 1, 12))
  where id > 0 and verify_code = '';
 
 set @has_key := (select count(*) from information_schema.statistics
