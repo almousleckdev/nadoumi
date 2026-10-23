@@ -68,11 +68,12 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
       <ul class="grid gap-3">
         <li v-for="a in items" :key="a.id">
           <NuxtLink
-            :to="localePath(`/dashboard/applications/${a.id}`)"
+            :to="a.currentStatus === 'DRAFT' ? localePath(`/apply/${a.id}`) : localePath(`/dashboard/applications/${a.id}`)"
             class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 no-underline transition-colors hover:border-brand-300"
           >
             <span class="min-w-0">
-              <span class="block font-semibold text-slate-900">{{ typeLabel(a.applicationType) }}</span>
+              <span v-if="a.reference" class="block font-display font-semibold tabular-nums text-slate-900" data-test="application-reference">{{ a.reference }}</span>
+              <span class="block text-sm font-medium text-slate-700">{{ typeLabel(a.applicationType) }}</span>
               <span class="mt-0.5 block text-sm text-slate-500">
                 <template v-if="a.currentStageName">{{ a.currentStageName }}</template>
                 <template v-if="a.submittedAt">
@@ -80,7 +81,10 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
                 </template>
               </span>
             </span>
-            <ApplicationStatusBadge :status="a.currentStatus" />
+            <span class="flex items-center gap-3">
+              <span v-if="a.currentStatus === 'DRAFT'" class="text-sm font-semibold text-slate-900">{{ t('dashboard.applications.continue') }}</span>
+              <ApplicationStatusBadge :status="a.currentStatus" />
+            </span>
           </NuxtLink>
         </li>
       </ul>

@@ -55,6 +55,8 @@ export function useApplicant() {
   return {
     listMine: () => p<ApplicantDto[]>('applicants', undefined),
     create: (b: SelfApplicantBody) => p<ApplicantDto>('applicants', { method: 'POST', body: clean(b) }),
+    /** A new applicant for another person, whom the caller then completes and applies for as their agent. */
+    createForOther: (b: SelfApplicantBody) => p<ApplicantDto>('applicants/other', { method: 'POST', body: clean(b) }),
     get: (id: number) => p<ApplicantDto>(`applicants/${id}`, undefined),
     update: (id: number, b: SelfApplicantBody) => p<ApplicantDto>(`applicants/${id}`, { method: 'PUT', body: clean(b) }),
 

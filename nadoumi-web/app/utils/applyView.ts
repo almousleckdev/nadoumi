@@ -46,5 +46,5 @@ export function findDraft(
 
 /** The apply page route for an opportunity (pass it through `localePath`). */
 export function applyRoute(kind: ApplyTarget['kind'], slug: string) {
-  return { path: '/dashboard/apply', query: { [kind]: slug } }
+  return { path: '/apply', query: { [kind]: slug } }
 }

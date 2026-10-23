@@ -60,7 +60,7 @@ describe('scholarship detail page', () => {
     // a guest signs in first and is returned to the apply screen for this scholarship
     const apply = w.findAll('a').find(a => a.text() === 'Apply now')
     expect(apply?.attributes('href')).toContain('/login?redirect=')
-    expect(decodeURIComponent(apply?.attributes('href') ?? '')).toContain('/dashboard/apply?scholarship=')
+    expect(decodeURIComponent(apply?.attributes('href') ?? '')).toContain('/apply?scholarship=')
 
     // the cover is the full-bleed hero background (resolved URL used verbatim, never a side image)
     const imgs = w.findAll('img')

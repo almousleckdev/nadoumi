@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
 import type { DocumentTypeOption, StudentDocumentDto } from '~/types/documents'
-import type { PreviewFile } from '~/utils/documents'
-import { previewKind, saveBlob } from '~/utils/documents'
+import { saveBlob } from '~/utils/documents'
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t } = useI18n()
@@ -87,30 +86,13 @@ async function onRemove(doc: StudentDocumentDto) {
   if (done) await loadDocuments()
 }
 
-const preview = ref<PreviewFile | null>(null)
-const previewOpen = computed({
-  get: () => preview.value !== null,
-  set: (open: boolean) => { if (!open) closePreview() },
-})
-
-function closePreview() {
-  if (preview.value?.src.startsWith('blob:')) URL.revokeObjectURL(preview.value.src)
-  preview.value = null
-}
+const { file: previewFile, open: previewOpen, show: showPreview } = useDocumentPreview()
 
 async function onPreview(doc: StudentDocumentDto) {
   const version = doc.currentVersion
-  const kind = version ? previewKind(version.contentType) : null
-  if (!version || !kind) return
-  await run(async () => {
-    const access = await documents.fileAccess(doc.id, version.versionNo)
-    const src = access.kind === 'url' ? access.url : URL.createObjectURL(access.blob)
-    closePreview()
-    preview.value = { title: labelFor(doc.docType), src, kind }
-  })
+  if (!version) return
+  await run(() => showPreview(labelFor(doc.docType), doc.id, version))
 }
-
-onBeforeUnmount(closePreview)
 
 async function onDownload(doc: StudentDocumentDto) {
   const version = doc.currentVersion
@@ -231,7 +213,7 @@ useSeo(t('dashboard.documentsTitle'), t('dashboard.documentsBlurb'))
         </section>
       </div>
     </AsyncState>
-    <DocumentViewer v-model="previewOpen" :file="preview" />
+    <DocumentViewer v-model="previewOpen" :file="previewFile" />
   </div>
 </template>
 

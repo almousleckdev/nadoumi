@@ -695,6 +695,7 @@
     "locationTitle": "Current location",
     "workTitle": "Work experience",
     "applications": {
+      "continue": "Continue",
       "title": "My Applications",
       "blurb": "Track every application you have started, from draft to decision.",
       "detailTitle": "Application",
@@ -763,6 +764,10 @@
     }
   },
   "errors": {
+    "submitProfile": "The student's profile is not finished. Complete the steps marked open, then submit.",
+    "submitDocuments": "Some required documents are still missing. Upload them, then submit.",
+    "submitSignature": "The application form still needs the student's signature.",
+    "submitPayment": "The application fee must be paid before the application can be submitted.",
     "network": "Can't reach the server. Check your connection and try again.",
     "server": "Something went wrong on our side. Please try again shortly.",
     "rateLimited": "Too many attempts. Please wait a minute and try again.",
@@ -953,7 +958,6 @@
     "notAvailable": "This programme is not available.",
     "offeredBy": "Offered by {university}",
     "backToUniversity": "Back to {university}",
-    "view": "View programme",
     "hot": "Hot",
     "duration": "{months} months",
     "durationLabel": "Duration",
@@ -1169,6 +1173,7 @@
       "OTHER": "Other fee"
     },
     "doc": {
+      "APPLICATION_FORM": "Application form (filled in)",
       "PASSPORT": "Passport",
       "TRANSCRIPT": "Academic transcript",
       "VISA": "Visa",
@@ -1229,6 +1234,7 @@
           "title": "Six steps to enrolment"
         },
         "checklist": {
+    "view": "View",
           "eyebrow": "Checklist",
           "title": "Documents you will need"
         },
@@ -2536,6 +2542,82 @@
       "resendWait": "The receipt was sent a moment ago. Try again in a few minutes."
     }
   },
+  "applyFlow": {
+    "onBehalf": "You are completing the details of {name}. Wherever a question says \"you\" or \"your\", it means {name}.",
+    "title": "Your application",
+    "blurb": "Complete your application step by step.",
+    "browse": "Browse programmes",
+    "exit": "Save and exit",
+    "back": "Back",
+    "next": "Next",
+    "steps": {
+      "start": "Applying for",
+      "profile": "Student profile",
+      "identity": "Photo and passport",
+      "address": "Address and contact",
+      "education": "Education",
+      "work": "Work experience",
+      "family": "Family",
+      "support": "Supporter and contacts",
+      "study": "Study plan",
+      "documents": "Documents",
+      "signature": "Signature",
+      "review": "Preview and payment"
+    },
+    "blurbs": {
+      "start": "What you are applying for, and who the application is for.",
+      "profile": "The student's identity, as written in the passport.",
+      "identity": "A passport photo and the passport page.",
+      "address": "Where the student lives now, the permanent address, and where Nadoumi should send the admission documents.",
+      "education": "Every school and university attended, from primary school until now.",
+      "work": "Jobs and gap periods since graduating. Add them if the student has graduated.",
+      "family": "Parents first. If a parent is not living or not in contact, add at least two siblings or relatives instead.",
+      "support": "Who pays for the studies, and who can be reached in China.",
+      "study": "The degree, subjects, cities and scholarship the student wants.",
+      "documents": "Upload the documents asked for. Download the application form, fill it in and upload it back.",
+      "signature": "The student's handwritten signature, printed on the application form.",
+      "review": "Check everything, look at the form, pay the application fee and submit."
+    },
+    "context": {
+      "applyingFor": "Applying for",
+      "student": "Student"
+    },
+    "start": {
+      "whoTitle": "Who is this application for?",
+      "whoHint": "Choose a student you apply for, or add another student. For another student you complete their details in the next steps.",
+      "anotherStudent": "Apply for another student",
+      "newStudentHint": "Add the student's name. You will enter the rest of their details step by step.",
+      "givenName": "Given name (as in passport)",
+      "familyName": "Surname (as in passport)",
+      "addStudent": "Add student",
+      "begin": "Start the application",
+      "savedAs": "Your application is saved as {reference}. Continue with the next step."
+    },
+    "sections": {
+      "currentAddress": "Current address",
+      "permanentAddress": "Personal details and permanent address",
+      "contacts": "Emergency contacts"
+    },
+    "review": {
+      "checkTitle": "Check the application",
+      "allDone": "Every step is complete.",
+      "stillOpen": "These steps still need your attention before you can submit.",
+      "open": "Open",
+      "previewTitle": "Application form preview",
+      "previewBlurb": "This is the application form Nadoumi receives, built from everything you entered.",
+      "previewButton": "Preview the form",
+      "previewFailed": "The preview could not be created. Please try again.",
+      "finishSteps": "Complete the steps above to submit.",
+      "readyHint": "Everything is ready. Submit the application to send it to Nadoumi.",
+      "submit": "Submit application"
+    },
+    "submitted": {
+      "title": "Application submitted",
+      "body": "Nadoumi has received the application and the application form. We email you at every step.",
+      "viewApplications": "View my applications",
+      "applyAgain": "Apply to another programme"
+    }
+  },
   "apply": {
     "title": "Apply",
     "blurb": "Start your application.",
@@ -2612,19 +2694,11 @@
       "company": "Company or institution",
       "companyAddress": "Company address",
       "homeAddress": "Home address"
-    },
-    "readiness": {
-      "title": "Complete your application form",
-      "body": "These parts of the Nadoumi application form are still empty. You can still submit, but the form will print them as not provided.",
-      "fill": "Fill them in",
-      "PERSONAL_DETAILS": "Personal details",
-      "FAMILY": "Family members",
-      "SUPPORTER": "Financial supporter",
-      "CHINA_EMERGENCY": "Emergency contact in China",
-      "SIGNATURE": "Signature"
     }
   },
   "checklist": {
+    "view": "View",
+    "formSteps": "Download the form, fill it in, then upload the filled form here. It is required.",
     "title": "Documents to upload",
     "blurb": "These are the documents this application needs. Upload each one as a PDF, JPEG or PNG. The Nadoumi team reviews them after you submit.",
     "mandatory": "Required",

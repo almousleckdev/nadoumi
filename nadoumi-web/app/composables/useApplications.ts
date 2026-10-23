@@ -23,6 +23,10 @@ export function useApplications() {
   function template(id: number, templateId: number) {
     return studentFetch<Blob>(`applications/${id}/templates/${templateId}`, { responseType: 'blob' })
   }
+  /** The application form as it stands now (a PDF, marked as a preview), fetched with the session. */
+  function formPreview(id: number) {
+    return studentFetch<Blob>(`applications/${id}/form-preview`, { responseType: 'blob' })
+  }
   function get(id: number) {
     return studentFetch<StudentApplicationDto>(`applications/${id}`)
   }
@@ -35,5 +39,5 @@ export function useApplications() {
       body: reason ? { reason } : {},
     })
   }
-  return { list, get, start, checklist, templates, template, submit, withdraw }
+  return { list, get, start, checklist, templates, template, formPreview, submit, withdraw }
 }

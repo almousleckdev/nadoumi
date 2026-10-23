@@ -7,7 +7,7 @@ import ApplicationDetail from '~/pages/dashboard/applications/[id].vue'
 import type { StudentApplicationDto } from '~/types/catalog'
 
 const APP = (over: Partial<StudentApplicationDto> = {}): StudentApplicationDto => ({
-  id: 7, applicantId: 1, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
+  id: 7, reference: 'NAD20261023001', applicantId: 1, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
   currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-15T10:00:00',
   timeline: ['APPLICATION_CREATED', 'STAGE_SUBMIT', 'CASE_ASSIGNED', 'STAGE_CLAIM'], ...over,
 })
@@ -18,6 +18,8 @@ const submit = vi.fn()
 const withdraw = vi.fn()
 const checklist = vi.fn()
 const templates = vi.fn()
+const navigateTo = vi.hoisted(() => vi.fn())
+mockNuxtImport('navigateTo', () => navigateTo)
 mockNuxtImport('useRoute', () => () => ({ params: { id: '7' }, path: '/dashboard/applications/7' }))
 // the fee is settled in these tests; the payment panel has its own suite
 mockNuxtImport('useApplicationPayment', () => () => ({
@@ -32,6 +34,7 @@ vi.mock('~/composables/useApplications', () => ({
 }))
 
 beforeEach(() => {
+  navigateTo.mockReset()
   list.mockReset().mockResolvedValue([APP()])
   get.mockReset().mockResolvedValue(APP())
   submit.mockReset()
@@ -66,7 +69,15 @@ describe('dashboard applications list', () => {
     expect(w.text()).toContain('Programme with scholarship')
     expect(w.text()).toContain('Eligibility review')
     expect(w.text()).toContain('In review')
+    expect(w.text()).toContain('NAD20261023001')
     expect(w.findAll('a').some(a => a.attributes('href')?.endsWith('/dashboard/applications/7'))).toBe(true)
+  })
+
+  it('sends a draft to the step-by-step flow and invites the student to continue', async () => {
+    list.mockResolvedValueOnce([APP({ currentStatus: 'DRAFT', submittedAt: null, currentStageName: null })])
+    const w = await mountList()
+    expect(w.findAll('a').some(a => a.attributes('href')?.endsWith('/apply/7'))).toBe(true)
+    expect(w.text()).toContain('Continue')
   })
 
   it('shows an error with retry when loading fails', async () => {
@@ -104,15 +115,16 @@ describe('dashboard application detail', () => {
     expect(w.text()).toContain('This section could not be loaded')
   })
 
-  it('submits a draft and shows the returned application', async () => {
-    get.mockResolvedValue(APP({ currentStatus: 'DRAFT', currentStageName: 'Draft', submittedAt: null, timeline: ['APPLICATION_CREATED'] }))
-    submit.mockResolvedValue(APP())
+  it('names the application by its reference, not by its database id', async () => {
     const w = await mountDetail()
-    await w.find('[data-test="submit"]').trigger('click')
-    await flushPromises()
-    expect(submit).toHaveBeenCalledWith(7)
-    expect(toastMessages()).toContain('Your application has been submitted.')
-    expect(w.text()).toContain('In review')
+    expect(w.find('[data-test="application-reference"]').text()).toBe('NAD20261023001')
+    expect(w.text()).not.toContain('#7')
+  })
+
+  it('sends an unsubmitted application to the step-by-step flow instead of editing it here', async () => {
+    get.mockResolvedValue(APP({ currentStatus: 'DRAFT', currentStageName: 'Draft', submittedAt: null, timeline: ['APPLICATION_CREATED'] }))
+    await mountDetail()
+    expect(navigateTo).toHaveBeenCalledWith('/apply/7', { replace: true })
   })
 
   it('requires a reason before withdrawing, then withdraws', async () => {
@@ -130,14 +142,5 @@ describe('dashboard application detail', () => {
     expect(withdraw).toHaveBeenCalledWith(7, 'Changed plans')
     expect(toastMessages()).toContain('Your application has been withdrawn.')
     expect(w.find('[data-test="withdraw-start"]').exists()).toBe(false)
-  })
-
-  it('shows the server error when an action is refused', async () => {
-    get.mockResolvedValue(APP({ currentStatus: 'DRAFT', submittedAt: null }))
-    submit.mockRejectedValue({ statusCode: 400, data: { detail: 'program_id is required to submit' } })
-    const w = await mountDetail()
-    await w.find('[data-test="submit"]').trigger('click')
-    await flushPromises()
-    expect(w.text()).toContain('program_id is required to submit')
   })
 })

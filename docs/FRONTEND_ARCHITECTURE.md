@@ -732,3 +732,11 @@ the dashboard viewer; `onboarding/DocumentPreview` is a separate component for t
 `RequiredDocumentsCard`. The programme page loads them from the public requirements endpoint; a programme with none falls back to its old free text.
 
 **Hidden file inputs (2026-10-23).** A visually hidden `<input type="file">` is absolutely positioned. When its wrapper is not positioned, it is placed against a far ancestor and does not scroll with an inner scroll area, so focusing it made the browser scroll that ancestor: the admin programme drawer jumped up and showed only its bottom edge after "Upload a file". Rules: in the admin, use a `hidden` input opened from a button through a ref (as `TemplatesSection` and the university gallery do); in the student site, the label that wraps an `sr-only` file input must be `relative`/`absolute` (`tests/unit/fileInputContainment.test.ts` enforces it).
+
+**Application wizard (2026-10-23).** `pages/apply/[[id]].vue` (layout `onboarding`, middleware `auth` only: the account's own onboarding is not a prerequisite for applying for someone else) is the whole application, outside the dashboard.
+It reuses the onboarding step components for any applicant id (profile, photo, passport, residence, education, work, interests, contacts), the family
+sections, `DocumentChecklistCard`, `SignatureCard` and `PaymentPanel`, and adds `ApplyStartStep` (what and who, including adding another student),
+`ApplyReviewStep` (open steps, form preview, fee, Submit), `ApplyContext` (sidebar header with the reference) and `ApplySubmitted`. Step order, the sections each
+step needs and which steps are optional are data in `constants/apply.ts`; whether a step is done is the pure `utils/applyProgress.ts`, fed by
+`useApplyProgress`. `/dashboard/apply` only redirects here, a draft opened from the dashboard goes to `/apply/{id}`, and the dashboard detail page shows
+submitted applications only. `useDocumentPreview` (document viewer) and `useTemplateDownload` are shared by the documents page and the checklist.

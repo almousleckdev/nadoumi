@@ -1,5 +1,32 @@
 # Nadoumi — Student Application Process
 
+> **REBUILT 2026-10-23 — read this block first; it replaces every earlier description of the student-facing flow below.**
+>
+> The application is its own step-by-step flow at `/apply` (outside the student dashboard, in the same fixed full-screen shell as onboarding: step
+> list and action bar stay put, only the content scrolls). Everything is saved on the server as the student goes, so they can leave and continue on
+> any device (`/apply/{id}?step=...`, resuming at the first step the server says is open).
+>
+> **Who it is for.** Step 1 asks what the application is for and *who*: a student the account already acts for, or a new one ("Apply for another
+> student": `POST /api/student/applicants/other` creates the applicant, the caller becomes its ACTIVE AGENT). For another student the account
+> completes that student's whole profile inside the application; for themselves the profile is loaded and only confirmed or corrected.
+>
+> **Steps.** Applying for -> Student profile -> Photo and passport -> Address and contact -> Education -> Work experience (optional) -> Family ->
+> Supporter and contacts -> Study plan -> Documents -> Signature -> Preview and payment. They cover the onboarding sections *and* what the
+> NADOUMI APPLICATION FORM asks beyond them (current and permanent address, the address that receives the admission documents, family, financial
+> supporter, China emergency contact). A step is done when the server says its sections are complete (`GET .../onboarding`, `GET .../form-readiness`,
+> the checklist, the signature and the payment state); Next stays locked until then, except for optional steps.
+>
+> **Documents.** Each uploaded document can be viewed (PDF, JPEG, PNG) without downloading. When the programme or scholarship has a form to fill in,
+> the filled-in **Application form** (`APPLICATION_FORM`) is a required document: the student downloads the form on its row, fills it in and uploads it back.
+>
+> **Last step.** Preview (the application form PDF as it stands, `GET /api/student/applications/{id}/form-preview`, marked as a preview), the
+> Nadoumi application fee by QR (15 minutes), then Submit. Submit is locked, with the reason shown, until every step is done and the fee is paid;
+> the server enforces the same (`SubmitGate`: fee, documents, the applicant's onboarding and form data, signature) for every actor.
+>
+> **Application number.** `NAD` + the start date (China time) + the day's running number: `NAD20261023001`, `NAD20261023002`, ... It replaces the database id
+> everywhere a person sees it (student and staff screens, emails, receipts, the form PDF, the payment queue).
+
+
 Status: **PROPOSED** (development spec, nothing in §5–§16 is built yet) · written 2026-10-22 · revised with the product owner's decisions (§16)
 
 Legend used throughout, as required by `CLAUDE.md` §5:

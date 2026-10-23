@@ -695,6 +695,7 @@
     "locationTitle": "当前所在地",
     "workTitle": "工作经历",
     "applications": {
+      "continue": "继续",
       "title": "我的申请",
       "blurb": "跟踪您已开始的每一份申请，从草稿到结果。",
       "detailTitle": "申请",
@@ -763,6 +764,10 @@
     }
   },
   "errors": {
+    "submitProfile": "学生资料尚未完成。请完成标为未完成的步骤后再提交。",
+    "submitDocuments": "仍缺少必填材料。请上传后再提交。",
+    "submitSignature": "申请表还需要学生签名。",
+    "submitPayment": "提交申请前必须先支付申请费。",
     "network": "无法连接到服务器,请检查网络连接后重试。",
     "server": "我们这边出现了问题,请稍后重试。",
     "rateLimited": "尝试次数过多,请等待一分钟后重试。",
@@ -953,7 +958,6 @@
     "notAvailable": "该专业项目暂不可用。",
     "offeredBy": "由 {university} 提供",
     "backToUniversity": "返回 {university}",
-    "view": "查看专业项目",
     "hot": "热门",
     "duration": "{months} 个月",
     "durationLabel": "学制时长",
@@ -1169,6 +1173,7 @@
       "OTHER": "其他费用"
     },
     "doc": {
+      "APPLICATION_FORM": "申请表（已填写）",
       "PASSPORT": "护照",
       "TRANSCRIPT": "成绩单",
       "VISA": "签证",
@@ -1229,6 +1234,7 @@
           "title": "入学六步走"
         },
         "checklist": {
+    "view": "查看",
           "eyebrow": "材料清单",
           "title": "所需材料"
         },
@@ -2536,6 +2542,82 @@
       "resendWait": "收据刚刚发送过，请几分钟后再试。"
     }
   },
+  "applyFlow": {
+    "onBehalf": "您正在填写 {name} 的资料。问题中的“您”或“您的”均指 {name}。",
+    "title": "您的申请",
+    "blurb": "请按步骤完成申请。",
+    "browse": "浏览专业项目",
+    "exit": "保存并退出",
+    "back": "上一步",
+    "next": "下一步",
+    "steps": {
+      "start": "申请对象",
+      "profile": "学生资料",
+      "identity": "照片与护照",
+      "address": "地址与联系方式",
+      "education": "教育背景",
+      "work": "工作经历",
+      "family": "家庭成员",
+      "support": "经济担保人与联系人",
+      "study": "学习计划",
+      "documents": "申请材料",
+      "signature": "签名",
+      "review": "预览与付款"
+    },
+    "blurbs": {
+      "start": "您要申请的项目，以及为谁申请。",
+      "profile": "学生身份信息，与护照一致。",
+      "identity": "护照照片和护照资料页。",
+      "address": "学生当前住址、永久地址，以及 Nadoumi 寄送录取材料的地址。",
+      "education": "从小学至今的所有学校和大学。",
+      "work": "毕业后的工作或空档期。已毕业的学生请填写。",
+      "family": "请先填写父母。如父母一方已去世或失联，请改为至少添加两位兄弟姐妹或亲属。",
+      "support": "谁支付学习费用，以及在华紧急联系人。",
+      "study": "学生想申请的学位、专业、城市和奖学金。",
+      "documents": "上传所需材料。请下载申请表，填写后上传。",
+      "signature": "学生的手写签名，将打印在申请表上。",
+      "review": "检查全部内容，预览申请表，支付申请费并提交。"
+    },
+    "context": {
+      "applyingFor": "申请项目",
+      "student": "学生"
+    },
+    "start": {
+      "whoTitle": "这份申请是为谁申请的？",
+      "whoHint": "选择一位学生，或添加另一位学生。为其他学生申请时，您将在后续步骤中填写其资料。",
+      "anotherStudent": "为其他学生申请",
+      "newStudentHint": "请先添加学生姓名，其余资料将在后续步骤中逐步填写。",
+      "givenName": "名（与护照一致）",
+      "familyName": "姓（与护照一致）",
+      "addStudent": "添加学生",
+      "begin": "开始申请",
+      "savedAs": "您的申请已保存，编号为 {reference}。请继续下一步。"
+    },
+    "sections": {
+      "currentAddress": "当前地址",
+      "permanentAddress": "个人信息与永久地址",
+      "contacts": "紧急联系人"
+    },
+    "review": {
+      "checkTitle": "检查申请",
+      "allDone": "所有步骤均已完成。",
+      "stillOpen": "提交前，以下步骤仍需处理。",
+      "open": "打开",
+      "previewTitle": "申请表预览",
+      "previewBlurb": "这是 Nadoumi 收到的申请表，由您填写的全部信息生成。",
+      "previewButton": "预览申请表",
+      "previewFailed": "无法生成预览，请重试。",
+      "finishSteps": "请先完成上面的步骤再提交。",
+      "readyHint": "一切就绪，请提交申请发送给 Nadoumi。",
+      "submit": "提交申请"
+    },
+    "submitted": {
+      "title": "申请已提交",
+      "body": "Nadoumi 已收到申请和申请表，每一步我们都会通过邮件通知您。",
+      "viewApplications": "查看我的申请",
+      "applyAgain": "申请其他项目"
+    }
+  },
   "apply": {
     "title": "申请",
     "blurb": "开始你的申请。",
@@ -2612,19 +2694,11 @@
       "company": "单位或机构",
       "companyAddress": "单位地址",
       "homeAddress": "家庭住址"
-    },
-    "readiness": {
-      "title": "完善你的申请表",
-      "body": "Nadoumi 申请表的以下部分仍为空。你仍可提交，但申请表上会显示为未提供。",
-      "fill": "去填写",
-      "PERSONAL_DETAILS": "个人信息",
-      "FAMILY": "家庭成员",
-      "SUPPORTER": "经济资助人",
-      "CHINA_EMERGENCY": "中国境内紧急联系人",
-      "SIGNATURE": "签名"
     }
   },
   "checklist": {
+    "view": "查看",
+    "formSteps": "请下载表格，填写后在此上传。此项为必填。",
     "title": "需上传的材料",
     "blurb": "以下是本次申请所需的材料。请以 PDF、JPEG 或 PNG 格式逐项上传。提交后 Nadoumi 团队会进行审核。",
     "mandatory": "必填",

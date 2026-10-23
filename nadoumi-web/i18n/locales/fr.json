@@ -695,6 +695,7 @@
     "locationTitle": "Localisation actuelle",
     "workTitle": "Expérience professionnelle",
     "applications": {
+      "continue": "Continuer",
       "title": "Mes candidatures",
       "blurb": "Suivez chaque candidature commencée, du brouillon à la décision.",
       "detailTitle": "Candidature",
@@ -763,6 +764,10 @@
     }
   },
   "errors": {
+    "submitProfile": "Le profil de l'étudiant n'est pas terminé. Complétez les étapes ouvertes, puis envoyez.",
+    "submitDocuments": "Il manque encore des documents obligatoires. Importez-les, puis envoyez.",
+    "submitSignature": "Le formulaire de candidature attend encore la signature de l'étudiant.",
+    "submitPayment": "Les frais de dossier doivent être payés avant d'envoyer la candidature.",
     "network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
     "server": "Une erreur s'est produite de notre côté. Veuillez réessayer sous peu.",
     "rateLimited": "Trop de tentatives. Veuillez patienter une minute puis réessayer.",
@@ -953,7 +958,6 @@
     "notAvailable": "Ce programme n'est pas disponible.",
     "offeredBy": "Proposé par {university}",
     "backToUniversity": "Retour à {university}",
-    "view": "Voir le programme",
     "hot": "Populaire",
     "duration": "{months} mois",
     "durationLabel": "Durée",
@@ -1169,6 +1173,7 @@
       "OTHER": "Autre frais"
     },
     "doc": {
+      "APPLICATION_FORM": "Formulaire de candidature (rempli)",
       "PASSPORT": "Passeport",
       "TRANSCRIPT": "Relevé de notes",
       "VISA": "Visa",
@@ -1229,6 +1234,7 @@
           "title": "Six étapes jusqu'à l'inscription"
         },
         "checklist": {
+    "view": "Voir",
           "eyebrow": "Liste de contrôle",
           "title": "Documents nécessaires"
         },
@@ -2536,6 +2542,82 @@
       "resendWait": "Le reçu vient d’être envoyé. Réessayez dans quelques minutes."
     }
   },
+  "applyFlow": {
+    "onBehalf": "Vous renseignez les informations de {name}. Partout où une question dit « vous » ou « votre », il s'agit de {name}.",
+    "title": "Votre candidature",
+    "blurb": "Complétez votre candidature étape par étape.",
+    "browse": "Voir les programmes",
+    "exit": "Enregistrer et quitter",
+    "back": "Retour",
+    "next": "Suivant",
+    "steps": {
+      "start": "Candidature pour",
+      "profile": "Profil de l'étudiant",
+      "identity": "Photo et passeport",
+      "address": "Adresse et contact",
+      "education": "Études",
+      "work": "Expérience professionnelle",
+      "family": "Famille",
+      "support": "Garant et contacts",
+      "study": "Projet d'études",
+      "documents": "Documents",
+      "signature": "Signature",
+      "review": "Aperçu et paiement"
+    },
+    "blurbs": {
+      "start": "Ce pour quoi vous candidatez et pour qui.",
+      "profile": "L'identité de l'étudiant, telle qu'écrite sur le passeport.",
+      "identity": "Une photo d'identité et la page du passeport.",
+      "address": "Où vit l'étudiant, son adresse permanente et où Nadoumi doit envoyer les documents d'admission.",
+      "education": "Chaque école et université fréquentée, de l'école primaire à aujourd'hui.",
+      "work": "Emplois et périodes d'interruption depuis le diplôme. À remplir si l'étudiant est diplômé.",
+      "family": "Les parents d'abord. Si un parent est décédé ou sans contact, ajoutez au moins deux frères et sœurs ou proches.",
+      "support": "Qui finance les études et qui peut être joint en Chine.",
+      "study": "Le diplôme, les matières, les villes et la bourse souhaités.",
+      "documents": "Importez les documents demandés. Téléchargez le formulaire de candidature, remplissez-le et importez-le.",
+      "signature": "La signature manuscrite de l'étudiant, imprimée sur le formulaire.",
+      "review": "Vérifiez tout, regardez le formulaire, payez les frais de dossier et envoyez."
+    },
+    "context": {
+      "applyingFor": "Candidature pour",
+      "student": "Étudiant"
+    },
+    "start": {
+      "whoTitle": "Pour qui est cette candidature ?",
+      "whoHint": "Choisissez un étudiant ou ajoutez-en un autre. Pour un autre étudiant, vous renseignez ses informations dans les étapes suivantes.",
+      "anotherStudent": "Candidater pour un autre étudiant",
+      "newStudentHint": "Ajoutez le nom de l'étudiant. Vous saisirez le reste étape par étape.",
+      "givenName": "Prénom (comme sur le passeport)",
+      "familyName": "Nom (comme sur le passeport)",
+      "addStudent": "Ajouter l'étudiant",
+      "begin": "Commencer la candidature",
+      "savedAs": "Votre candidature est enregistrée sous {reference}. Passez à l'étape suivante."
+    },
+    "sections": {
+      "currentAddress": "Adresse actuelle",
+      "permanentAddress": "Informations personnelles et adresse permanente",
+      "contacts": "Contacts d'urgence"
+    },
+    "review": {
+      "checkTitle": "Vérifier la candidature",
+      "allDone": "Toutes les étapes sont complètes.",
+      "stillOpen": "Ces étapes demandent encore votre attention avant l'envoi.",
+      "open": "Ouvrir",
+      "previewTitle": "Aperçu du formulaire de candidature",
+      "previewBlurb": "Voici le formulaire que reçoit Nadoumi, construit à partir de tout ce que vous avez saisi.",
+      "previewButton": "Voir le formulaire",
+      "previewFailed": "L'aperçu n'a pas pu être créé. Réessayez.",
+      "finishSteps": "Terminez les étapes ci-dessus pour envoyer.",
+      "readyHint": "Tout est prêt. Envoyez la candidature à Nadoumi.",
+      "submit": "Envoyer la candidature"
+    },
+    "submitted": {
+      "title": "Candidature envoyée",
+      "body": "Nadoumi a reçu la candidature et le formulaire. Nous vous écrivons à chaque étape.",
+      "viewApplications": "Voir mes candidatures",
+      "applyAgain": "Candidater à un autre programme"
+    }
+  },
   "apply": {
     "title": "Postuler",
     "blurb": "Commencez votre candidature.",
@@ -2612,19 +2694,11 @@
       "company": "Entreprise ou établissement",
       "companyAddress": "Adresse de l’entreprise",
       "homeAddress": "Adresse personnelle"
-    },
-    "readiness": {
-      "title": "Complétez votre formulaire de candidature",
-      "body": "Ces parties du formulaire de candidature Nadoumi sont encore vides. Vous pouvez soumettre quand même, mais le formulaire les indiquera comme non renseignées.",
-      "fill": "Les remplir",
-      "PERSONAL_DETAILS": "Informations personnelles",
-      "FAMILY": "Membres de la famille",
-      "SUPPORTER": "Garant financier",
-      "CHINA_EMERGENCY": "Contact d’urgence en Chine",
-      "SIGNATURE": "Signature"
     }
   },
   "checklist": {
+    "view": "Voir",
+    "formSteps": "Téléchargez le formulaire, remplissez-le, puis importez-le ici. Il est obligatoire.",
     "title": "Documents à téléverser",
     "blurb": "Voici les documents nécessaires à cette candidature. Téléversez chacun en PDF, JPEG ou PNG. L’équipe Nadoumi les examine après votre soumission.",
     "mandatory": "Obligatoire",
