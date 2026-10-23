@@ -80,8 +80,14 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 > * **Form content = what the portal collects.** Applying for, personal and passport, marital status, religion, place of
 >   birth, official language and permanent address, test scores, education, work experience, **family members, financial
 >   supporter and emergency contact in China**, study plan, the affirmation and a signature line. A section a student has
->   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** Chinese labels, the verification QR.
+>   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** the verification QR.
 > * **Erasure.** `PaymentErasure` also deletes the generated documents and soft-deletes their PDFs.
+>
+> **Update 2026-10-23 (Chinese labels): both PDFs are bilingual.** Every fixed label, heading, table header, note and the five affirmation statements print as
+> "English  中文" (`PdfLabels`); the receipt and form titles carry the Chinese under the title. A student's own text is never translated. Text is drawn with a
+> per-character fallback to a bundled Chinese font, so a student's Chinese name or address also prints (a glyph that no font has becomes `?`). The font is a
+> 1 MB subset of Noto Sans SC (about 3,800 common characters, renamed "Nadoumi Sans SC" because the original carries a Reserved Font Name; licence in
+> `payment/pdf/OFL-NotoSansSC.txt`). Rare characters outside that set print as `?`. A test checks that every Chinese label has a glyph.
 >
 > **Update 2026-10-22 (templates): downloadable form templates are IMPLEMENTED (V120).** An admin attaches PDF or Word templates to a programme or a scholarship
 > (a **Form templates** section in each drawer, available once the record exists; up to 10 per opportunity, 10 MB each, validated by content, never macro-enabled).

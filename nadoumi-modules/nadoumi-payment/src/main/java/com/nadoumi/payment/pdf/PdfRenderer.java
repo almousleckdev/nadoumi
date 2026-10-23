@@ -49,6 +49,7 @@ public class PdfRenderer {
     private static final float BOTTOM_MARGIN = mm(30);
     private static final float FOOTER_RULE_Y = mm(24);
     private static final float SECTION_MIN_ROOM = mm(45);
+    private static final float LEADING_FACTOR = 1.4f;
     private static final int MAX_PAGES = 30;
 
     private final PdfAssets assets;
@@ -116,8 +117,9 @@ public class PdfRenderer {
 
             PdfPCell titleCell = cell(Rectangle.NO_BORDER, 0);
             titleCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            titleCell.addElement(new Paragraph(text(title), assets.bold(20, INK)));
-            titleCell.addElement(new Paragraph("Nadoumi Education Consulting", assets.regular(9, MUTED)));
+            titleCell.addElement(paragraph(title, 20, true, INK));
+            String zhTitle = PdfLabels.zh(title);
+            titleCell.addElement(paragraph((zhTitle == null ? "" : zhTitle + "  \u00b7  ") + "Nadoumi Education Consulting", 9, false, MUTED));
             table.addCell(titleCell);
 
             PdfPCell refs = cell(Rectangle.NO_BORDER, 0);
@@ -125,8 +127,9 @@ public class PdfRenderer {
             for (String[] reference : references) {
                 Paragraph line = new Paragraph();
                 line.setAlignment(Element.ALIGN_RIGHT);
-                line.add(new Phrase(text(reference[0]) + "  ", assets.regular(8, MUTED)));
-                line.add(new Phrase(text(reference[1]), assets.bold(9, INK)));
+                line.add(phrase(reference[0], 8, false, MUTED));
+                line.add(new com.lowagie.text.Chunk("   ", assets.regular(8, MUTED)));
+                line.add(phrase(reference[1], 9, true, INK));
                 refs.addElement(line);
             }
             table.addCell(refs);
@@ -171,14 +174,20 @@ public class PdfRenderer {
             PdfPCell label = cell(Rectangle.BOTTOM, 4);
             label.setBorderColor(RULE);
             label.setPaddingLeft(mm(2));
-            label.setPhrase(new Phrase(text(title), assets.bold(12, INK)));
+            label.setPhrase(phrase(label(title), 12, true, INK));
             heading.addCell(label);
             add(heading);
         }
 
+        /** English text, followed by its Chinese translation on the next line when there is one. */
+        private String bilingualBlock(String english) {
+            String zh = PdfLabels.zh(english);
+            return zh == null ? english : english + "\n" + zh;
+        }
+
         /** A small heading inside a section. */
         public void subheading(String value) {
-            Paragraph p = new Paragraph(text(value), assets.bold(9.5f, INK));
+            Paragraph p = paragraph(label(value), 9.5f, true, INK);
             p.setSpacingBefore(mm(2));
             p.setSpacingAfter(mm(1));
             add(p);
@@ -208,7 +217,7 @@ public class PdfRenderer {
                 PdfPCell h = cell(Rectangle.BOX, 4);
                 h.setBorderColor(RULE);
                 h.setBackgroundColor(BAND);
-                h.setPhrase(new Phrase(text(header), assets.bold(8, MUTED)));
+                h.setPhrase(phrase(label(header), 8, true, MUTED));
                 table.addCell(h);
             }
             for (List<String> row : rows) {
@@ -216,7 +225,7 @@ public class PdfRenderer {
                     PdfPCell c = cell(Rectangle.BOX, 4);
                     c.setBorderColor(RULE);
                     c.setBackgroundColor(Color.WHITE);
-                    c.setPhrase(new Phrase(text(PdfText.orEmpty(value)), assets.regular(9, INK)));
+                    c.setPhrase(phrase(PdfText.orEmpty(value), 9, false, INK));
                     table.addCell(c);
                 }
             }
@@ -224,13 +233,13 @@ public class PdfRenderer {
         }
 
         public void note(String value) {
-            Paragraph p = new Paragraph(text(value), assets.regular(8.5f, MUTED));
+            Paragraph p = paragraph(bilingualBlock(value), 8.5f, false, MUTED);
             p.setSpacingBefore(mm(2));
             add(p);
         }
 
         public void paragraph(String value) {
-            Paragraph p = new Paragraph(text(value), assets.regular(10, INK));
+            Paragraph p = paragraph(bilingualBlock(value), 10, false, INK);
             p.setSpacingBefore(mm(1));
             p.setLeading(14);
             add(p);
@@ -245,15 +254,15 @@ public class PdfRenderer {
             PdfPCell left = cell(Rectangle.BOX, 10);
             left.setBorderColor(RULE);
             left.setBackgroundColor(Color.WHITE);
-            left.addElement(new Paragraph(text(caption), assets.regular(8.5f, MUTED)));
-            left.addElement(new Paragraph(text(amount), assets.bold(26, PRICE)));
+            left.addElement(paragraph(label(caption), 8.5f, false, MUTED));
+            left.addElement(paragraph(amount, 26, true, PRICE));
             table.addCell(left);
             PdfPCell right = cell(Rectangle.BOX, 10);
             right.setBorderColor(RULE);
             right.setBackgroundColor(Color.WHITE);
             right.setHorizontalAlignment(Element.ALIGN_CENTER);
             right.setVerticalAlignment(Element.ALIGN_MIDDLE);
-            right.setPhrase(new Phrase(text(stamp), assets.bold(16, INK)));
+            right.setPhrase(phrase(label(stamp), 16, true, INK));
             table.addCell(right);
             add(table);
         }
@@ -283,26 +292,27 @@ public class PdfRenderer {
             day.setBorderColor(MUTED);
             day.setFixedHeight(mm(20));
             day.setVerticalAlignment(Element.ALIGN_BOTTOM);
-            day.setPhrase(new Phrase(date == null ? "" : text(date), assets.regular(10, INK)));
+            day.setPhrase(phrase(date == null ? "" : date, 10, false, INK));
             table.addCell(day);
             PdfPCell captionLeft = cell(Rectangle.NO_BORDER, 3);
-            captionLeft.setPhrase(new Phrase(text(caption), assets.regular(8.5f, MUTED)));
+            captionLeft.setPhrase(phrase(label(caption), 8.5f, false, MUTED));
             table.addCell(captionLeft);
             PdfPCell captionRight = cell(Rectangle.NO_BORDER, 3);
-            captionRight.setPhrase(new Phrase("Date", assets.regular(8.5f, MUTED)));
+            captionRight.setPhrase(phrase(label("Date"), 8.5f, false, MUTED));
             table.addCell(captionRight);
             add(table);
         }
 
         private PdfPCell labelCell(String label) {
             PdfPCell c = cell(Rectangle.NO_BORDER, 3);
-            c.setPhrase(new Phrase(text(label), assets.regular(8, MUTED)));
+            String zh = PdfLabels.zh(label);
+            c.setPhrase(phrase(zh == null ? label : label + "\n" + zh, 8, false, MUTED));
             return c;
         }
 
         private PdfPCell valueCell(String value, boolean strong) {
             PdfPCell c = cell(Rectangle.NO_BORDER, 3);
-            c.setPhrase(new Phrase(text(PdfText.orEmpty(value)), strong ? assets.bold(10, INK) : assets.regular(10, INK)));
+            c.setPhrase(phrase(PdfText.orEmpty(value), 10, strong, INK));
             return c;
         }
 
@@ -329,6 +339,21 @@ public class PdfRenderer {
 
         private String text(String value) {
             return PdfText.printable(value, assets::canDraw);
+        }
+
+        /** A fixed word of the document, with its Chinese translation when there is one. */
+        private String label(String english) {
+            return PdfLabels.bilingual(english);
+        }
+
+        private Phrase phrase(String value, float size, boolean bold, Color color) {
+            return assets.phrase(text(value), size, bold, color);
+        }
+
+        private Paragraph paragraph(String value, float size, boolean bold, Color color) {
+            Paragraph p = new Paragraph(phrase(value, size, bold, color));
+            p.setLeading(size * LEADING_FACTOR);
+            return p;
         }
 
         private void add(Element element) {

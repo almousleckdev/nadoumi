@@ -66,13 +66,13 @@ class PdfDocumentsTest {
 
     @Test
     void shouldDrawHostileOrUnsupportedTextAsPlainText_withoutFailing() throws IOException {
-        String hostile = "<img src=\"http://127.0.0.1:1/x\"> @import url(file:///etc/passwd) \u0001 中文";
+        String hostile = "<img src=\"http://127.0.0.1:1/x\"> @import url(file:///etc/passwd) \u0001 \ud83d\ude00 中文";
 
         byte[] pdf = forms.render(PdfFixtures.form(PdfFixtures.programme(), hostile));
 
         String text = text(pdf);
         assertThat(text).contains("<img src=\"http://127.0.0.1:1/x\">").doesNotContain("\u0001");
-        assertThat(text).contains("??"); // glyphs the font lacks become '?', never a failure
+        assertThat(text).contains("?", "中", "文"); // a glyph no font has becomes '?'; Chinese prints with the Chinese font
     }
 
     @Test
