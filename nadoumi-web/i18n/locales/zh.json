@@ -449,6 +449,7 @@
       "uploadedOn": "上传于 {date}",
       "expiresOn": "有效期至 {date}",
       "reason": "原因：{reason}",
+      "preview": "预览",
       "download": "下载",
       "replace": "上传新版本",
       "remove": "删除",

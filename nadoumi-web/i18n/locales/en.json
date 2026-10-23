@@ -449,6 +449,7 @@
       "uploadedOn": "Uploaded {date}",
       "expiresOn": "Expires {date}",
       "reason": "Reason: {reason}",
+      "preview": "Preview",
       "download": "Download",
       "replace": "Upload new version",
       "remove": "Delete",

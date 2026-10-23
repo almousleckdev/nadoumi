@@ -449,6 +449,7 @@
       "uploadedOn": "Téléversé le {date}",
       "expiresOn": "Expire le {date}",
       "reason": "Motif : {reason}",
+      "preview": "Aperçu",
       "download": "Télécharger",
       "replace": "Téléverser une nouvelle version",
       "remove": "Supprimer",

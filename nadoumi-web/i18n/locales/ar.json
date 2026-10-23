@@ -449,6 +449,7 @@
       "uploadedOn": "تم الرفع في {date}",
       "expiresOn": "ينتهي في {date}",
       "reason": "السبب: {reason}",
+      "preview": "معاينة",
       "download": "تنزيل",
       "replace": "رفع نسخة جديدة",
       "remove": "حذف",

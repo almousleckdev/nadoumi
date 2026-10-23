@@ -16,3 +16,16 @@ export function saveBlob(blob: Blob, filename: string): void {
   link.click()
   URL.revokeObjectURL(url)
 }
+
+/** What the preview window shows: where to load it from and how to draw it. */
+export interface PreviewFile {
+  title: string
+  src: string
+  kind: 'image' | 'pdf'
+}
+
+/** The preview kind for a stored content type, or null when the browser cannot show it. */
+export function previewKind(contentType: string): PreviewFile['kind'] | null {
+  if (/^image\/(jpeg|png)$/.test(contentType)) return 'image'
+  return contentType === 'application/pdf' ? 'pdf' : null
+}
