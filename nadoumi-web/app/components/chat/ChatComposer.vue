@@ -187,7 +187,7 @@ defineExpose({ addFiles, focus: () => textarea.value?.focus() })
     <div class="relative flex items-end gap-1 rounded-3xl border border-slate-200 bg-slate-50 p-1.5 transition-colors focus-within:border-brand-500 focus-within:bg-white">
       <label
         :for="fileInputId"
-        class="grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full text-slate-600 hover:bg-slate-100 focus-within:outline focus-within:outline-2 focus-within:outline-brand-500"
+        class="relative grid h-10 w-10 shrink-0 cursor-pointer place-items-center rounded-full text-slate-600 hover:bg-slate-100 focus-within:outline focus-within:outline-2 focus-within:outline-brand-500"
         :class="disabled ? 'pointer-events-none opacity-50' : ''"
         :title="t('dashboard.messages.attach')"
       >

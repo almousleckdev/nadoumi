@@ -26,7 +26,7 @@ const { error, handleFile, onInput } = useFilePick(() => props, file => emit('se
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
     <label
       :for="inputId"
-      class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-colors focus-within:border-brand-500 hover:bg-slate-50"
+      class="relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-center transition-colors focus-within:border-brand-500 hover:bg-slate-50"
       :class="over ? 'border-brand-500 bg-brand-50' : 'border-slate-300'"
       @dragover.prevent="over = true"
       @dragleave="over = false"

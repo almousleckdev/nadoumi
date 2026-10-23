@@ -58,6 +58,19 @@ describe('TemplatesSection', () => {
     expect(api.addTemplate).toHaveBeenCalledWith('programs', 9, 'Form', file)
   })
 
+  it('opens the file chooser from a hidden input, never a visible one that can scroll the drawer', async () => {
+    const w = mountSection(7)
+    await flushPromises()
+    const input = w.find('input[type=file]')
+    const click = vi.spyOn(input.element as HTMLInputElement, 'click').mockImplementation(() => undefined)
+    await w.find('input.el-input__inner').setValue('Form')
+
+    await w.findAll('button').find(b => b.text().includes('Upload a file'))!.trigger('click')
+
+    expect(input.attributes('hidden')).toBeDefined()
+    expect(click).toHaveBeenCalledTimes(1)
+  })
+
   it('labels a Word file with its real type when the browser reports none', async () => {
     api.addTemplate.mockResolvedValue({ id: 2, title: 'Form', fileName: 'form.doc' })
     const w = mountSection(7)
@@ -75,12 +88,13 @@ describe('TemplatesSection', () => {
     await flushPromises()
     const file = new File(['%PDF'], 't.pdf', { type: 'application/pdf' })
 
-    expect(w.find('input[type=file]').attributes('disabled')).toBeDefined()
+    const button = () => w.findAll('button').find(b => b.text().includes('Upload a file'))!
+    expect(button().attributes('disabled')).toBeDefined()
     await pick(w, file)
     expect(api.addTemplate).not.toHaveBeenCalled()
 
     await w.find('input.el-input__inner').setValue('Form')
-    expect(w.find('input[type=file]').attributes('disabled')).toBeUndefined()
+    expect(button().attributes('disabled')).toBeUndefined()
     await pick(w, file)
     expect(api.addTemplate).toHaveBeenCalledWith('programs', 7, 'Form', file)
   })
