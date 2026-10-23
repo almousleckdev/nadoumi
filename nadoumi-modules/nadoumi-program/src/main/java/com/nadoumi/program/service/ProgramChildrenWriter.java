@@ -2,6 +2,7 @@ package com.nadoumi.program.service;
 
 import com.nadoumi.common.exception.NadBadRequestException;
 import com.nadoumi.common.text.Texts;
+import com.nadoumi.program.domain.Major;
 import com.nadoumi.program.domain.Program;
 import com.nadoumi.program.domain.ProgramIntake;
 import com.nadoumi.program.domain.ProgramMajor;
@@ -22,10 +23,12 @@ public class ProgramChildrenWriter {
 
     private final ProgramMapper mapper;
     private final DepartmentService departmentService;
+    private final MajorService majors;
 
-    public ProgramChildrenWriter(ProgramMapper mapper, DepartmentService departmentService) {
+    public ProgramChildrenWriter(ProgramMapper mapper, DepartmentService departmentService, MajorService majors) {
         this.mapper = mapper;
         this.departmentService = departmentService;
+        this.majors = majors;
     }
 
     public void replace(Program program, ProgramRequest req) {
@@ -116,7 +119,8 @@ public class ProgramChildrenWriter {
         }
         int order = 0;
         for (ProgramRequest.MajorInput in : req.majors()) {
-            if (in.name() == null || in.name().isBlank()) {
+            Major catalogue = catalogueMajor(in);
+            if (catalogue == null) {
                 continue;
             }
             requireDepartmentOfUniversity(in.departmentId(), program.getUniversityId());
@@ -128,11 +132,20 @@ public class ProgramChildrenWriter {
             major.setProgramId(programId);
             major.setDepartmentId(in.departmentId());
             major.setLevel(majorLevel);
-            major.setName(in.name().trim());
-            major.setNameCn(Texts.blankToNull(in.nameCn()));
+            major.setMajorId(catalogue.getId());
+            major.setName(Texts.blankToNull(in.name()) == null ? catalogue.getName() : in.name().trim());
+            major.setNameCn(Texts.blankToNull(in.nameCn()) == null ? catalogue.getNameCn() : in.nameCn().trim());
             major.setSortOrder(order++);
             mapper.insertMajor(major);
         }
+    }
+
+    /** The catalogue major a programme row stands for: the picked one, or the typed name matched to (or added to) it. */
+    private Major catalogueMajor(ProgramRequest.MajorInput in) {
+        if (in.majorId() != null) {
+            return majors.require(in.majorId());
+        }
+        return Texts.blankToNull(in.name()) == null ? null : majors.findOrCreate(in.name(), in.nameCn());
     }
 
     private void requireDepartmentOfUniversity(Long departmentId, Long universityId) {

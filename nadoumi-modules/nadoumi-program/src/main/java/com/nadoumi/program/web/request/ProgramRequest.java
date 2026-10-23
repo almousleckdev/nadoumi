@@ -69,12 +69,19 @@ public record ProgramRequest(
     }
 
     public record MajorInput(
-            @NotBlank @Size(max = 200) String name,
+            /** The programme's own title for the major; blank means "use the catalogue title". */
+            @Size(max = 200) String name,
             @Size(max = 200) String nameCn,
             /** nad_department.id — must belong to the programme's university (degree types only). */
             Long departmentId,
             /** DIPLOMA / BACHELOR / MASTER / PHD — must be one of the programme's levels. */
-            @Size(max = 16) String level) {
+            @Size(max = 16) String level,
+            /** nad_major.id from the shared catalogue; when absent, {@code name} is matched to (or added to) it. */
+            Long majorId) {
+
+        public MajorInput(String name, String nameCn, Long departmentId, String level) {
+            this(name, nameCn, departmentId, level, null);
+        }
     }
 
     public record IntakeInput(

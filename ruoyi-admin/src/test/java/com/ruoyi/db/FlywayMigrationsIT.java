@@ -81,14 +81,34 @@ class FlywayMigrationsIT {
     }
 
     @Test
+    void majorBackfill_buildsTheCatalogueFromTypedMajors_mergingSpellings() throws Exception {
+        DataSource ds = freshSchema("major_backfill_db");
+        flyway(ds).target(MigrationVersion.fromVersion("123")).load().migrate();
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            st.execute("INSERT INTO nad_university (name, slug, country) VALUES ('Fudan', 'fudan', 'CN')");
+            st.execute("INSERT INTO nad_program (university_id, name, slug, program_type) SELECT id, 'Business', 'fudan-business', 'BACHELOR' FROM nad_university WHERE slug = 'fudan'");
+            st.execute("INSERT INTO nad_program (university_id, name, slug, program_type) SELECT id, 'Tech', 'fudan-tech', 'BACHELOR' FROM nad_university WHERE slug = 'fudan'");
+            st.execute("INSERT INTO nad_program_major (program_id, name, name_cn) SELECT id, 'Computer Science', '计算机科学' FROM nad_program WHERE name = 'Tech'");
+            st.execute("INSERT INTO nad_program_major (program_id, name) SELECT id, 'computer science' FROM nad_program WHERE name = 'Business'");
+            st.execute("INSERT INTO nad_program_major (program_id, name) SELECT id, 'Finance' FROM nad_program WHERE name = 'Business'");
+        }
+
+        flyway(ds).load().migrate();
+
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_major WHERE create_by = 'flyway-V125'")).isEqualTo("2"); // two spellings became one
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_program_major WHERE major_id IS NULL AND program_id IN (SELECT id FROM nad_program WHERE slug LIKE 'fudan-%')")).isEqualTo("0");
+        assertThat(single(ds, "SELECT COUNT(DISTINCT major_id) FROM nad_program_major")).isEqualTo("2");
+    }
+
+    @Test
     void freshDatabase_appliesTheWholeChain() throws Exception {
         DataSource ds = freshSchema("fresh_db");
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V123 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V126 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(114);
+        assertThat(applied).isEqualTo(117);
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_wf_definition WHERE status = 'ACTIVE'")).isEqualTo("3");
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
@@ -411,7 +431,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(113); // V2..V123, same gaps as above
+        assertThat(applied).isEqualTo(116); // V2..V126, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

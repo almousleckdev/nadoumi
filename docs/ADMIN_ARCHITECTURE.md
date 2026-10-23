@@ -579,3 +579,6 @@ the httpOnly session cookie authenticates it). One search box narrows the staff 
 through `useStudentSearch.ts` (300 ms debounce, race-safe, 2+ characters or an id), lists students from
 `/api/staff/chat/students` to start a private chat with. Students are never bulk-loaded into the browser. English and
 Chinese strings under `conversations.*`.
+
+**Majors catalogue (2026-10-23).** `/majors` (Education group, `nad:major:list`) manages the shared catalogue: search, add, paste a list, merge duplicates. In the programme drawer each
+major row is a searchable `MajorPicker` (type a new name to add it) and "Add several majors" adds picked, typed or pasted majors for every ticked level at once.

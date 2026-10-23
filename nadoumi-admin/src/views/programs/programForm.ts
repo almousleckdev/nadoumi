@@ -80,7 +80,7 @@ export function blankProgramForm(lockedUniversityId: number | null) {
     /** Saved through its own endpoint after the programme itself, so it is not part of `buildProgramPayload`. */
     documentRequirements: [] as { docType: string, mandatory: boolean, notes: string, appliesWhen: string }[],
     imageMediaId: null as number | null,
-    majors: [] as { name: string, nameCn: string | null, departmentId: number | null, level: DegreeLevel | null }[],
+    majors: [] as { majorId: number | null, name: string, nameCn: string | null, departmentId: number | null, level: DegreeLevel | null }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
     featured: false, hot: false,
     status: 'ACTIVE' as ProgramInput['status'],
@@ -115,7 +115,8 @@ export function formFromProgram(p: Program): ProgramForm {
     })),
     imageMediaId: p.imageMediaId ?? null,
     majors: p.majors.map(m => ({
-      name: m.name, nameCn: m.nameCn ?? null, departmentId: m.departmentId ?? null, level: m.level ?? null,
+      majorId: m.majorId ?? null, name: m.name, nameCn: m.nameCn ?? null, departmentId: m.departmentId ?? null,
+      level: m.level ?? null,
     })),
     intakes: p.intakes.map(i => ({
       term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null,
@@ -159,8 +160,12 @@ export function buildProgramPayload(form: ProgramForm): ProgramInput {
     featured: form.featured, hot: form.hot,
     status: form.status, publishStatus: form.publishStatus, remark: textOrNull(form.remark),
     majors: isDegree
-      ? form.majors.filter(m => m.name.trim()).map(m => ({
-          name: m.name.trim(), nameCn: textOrNull(m.nameCn ?? ''), departmentId: m.departmentId ?? null,
+      ? form.majors.filter(m => m.majorId != null || m.name.trim()).map(m => ({
+          // a picked major sends only its id (the catalogue supplies the title); a typed one is added to the catalogue
+          majorId: m.majorId ?? null,
+          name: m.majorId != null ? '' : m.name.trim(),
+          nameCn: m.majorId != null ? null : textOrNull(m.nameCn ?? ''),
+          departmentId: m.departmentId ?? null,
           level: m.level ?? null,
         }))
       : [],

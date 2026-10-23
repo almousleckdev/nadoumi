@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Plus, Delete } from '@element-plus/icons-vue'
 import { INTAKE_TERMS, isDegree as isDegreeKind } from '@/api/program'
 import type { Department } from '@/api/university'
 import FormSection from '@/components/ui/FormSection.vue'
+import AddMajorsDialog, { type NewMajorRow } from './AddMajorsDialog.vue'
+import MajorPicker from './MajorPicker.vue'
 import { useProgramForm } from '../programForm'
 
 defineProps<{ departments: Department[] }>()
@@ -13,6 +15,16 @@ const { t } = useI18n()
 const form = useProgramForm()
 
 const isDegree = computed(() => isDegreeKind(form.programType))
+const addSeveralOpen = ref(false)
+
+/** Adds the dialog's rows, skipping a major already listed at the same level. */
+function addMajors(rows: NewMajorRow[]) {
+  const same = (a: NewMajorRow, b: NewMajorRow) =>
+    a.level === b.level && (a.majorId != null ? a.majorId === b.majorId : a.name.toLowerCase() === b.name.toLowerCase())
+  for (const row of rows) {
+    if (!form.majors.some(existing => same(existing, row))) form.majors.push(row)
+  }
+}
 </script>
 
 <template>
@@ -59,15 +71,9 @@ const isDegree = computed(() => isDegreeKind(form.programType))
           :label="d.name"
         />
       </el-select>
-      <el-input
-        v-model="m.name"
-        :placeholder="t('program.majorName')"
-        maxlength="200"
-      />
-      <el-input
-        v-model="m.nameCn"
-        :placeholder="t('program.majorNameCn')"
-        maxlength="200"
+      <MajorPicker
+        :row="m"
+        class="line__major"
       />
       <el-button
         link
@@ -78,10 +84,22 @@ const isDegree = computed(() => isDegreeKind(form.programType))
     </div>
     <el-button
       :icon="Plus"
-      @click="form.majors.push({ name: '', nameCn: null, departmentId: null, level: form.levels[0] ?? null })"
+      @click="addSeveralOpen = true"
+    >
+      {{ t('program.addSeveral') }}
+    </el-button>
+    <el-button
+      :icon="Plus"
+      @click="form.majors.push({ majorId: null, name: '', nameCn: null, departmentId: null, level: form.levels[0] ?? null })"
     >
       {{ t('program.addMajor') }}
     </el-button>
+    <AddMajorsDialog
+      v-model="addSeveralOpen"
+      :program-levels="form.levels"
+      :departments="departments"
+      @add="addMajors"
+    />
   </FormSection>
 
   <FormSection

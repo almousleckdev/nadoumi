@@ -125,6 +125,7 @@
     <resultMap id="major" type="com.nadoumi.program.domain.ProgramMajor">
         <id     property="id"             column="id"/>
         <result property="programId"      column="program_id"/>
+        <result property="majorId"        column="major_id"/>
         <result property="departmentId"   column="department_id"/>
         <result property="departmentName" column="department_name"/>
         <result property="level"          column="level"/>
@@ -134,7 +135,7 @@
     </resultMap>
 
     <select id="findMajors" resultMap="major">
-        select m.id, m.program_id, m.department_id, d.name as department_name, m.level,
+        select m.id, m.program_id, m.major_id, m.department_id, d.name as department_name, m.level,
                m.name, m.name_cn, m.sort_order
         from nad_program_major m
         left join nad_department d on d.id = m.department_id
@@ -148,8 +149,8 @@
 
     <insert id="insertMajor" parameterType="com.nadoumi.program.domain.ProgramMajor"
             useGeneratedKeys="true" keyProperty="id">
-        insert into nad_program_major (program_id, department_id, level, name, name_cn, sort_order)
-        values (#{programId}, #{departmentId}, #{level}, #{name}, #{nameCn}, #{sortOrder})
+        insert into nad_program_major (program_id, major_id, department_id, level, name, name_cn, sort_order)
+        values (#{programId}, #{majorId}, #{departmentId}, #{level}, #{name}, #{nameCn}, #{sortOrder})
     </insert>
 
     <select id="findLevels" resultType="java.lang.String">

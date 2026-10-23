@@ -27,6 +27,7 @@ import com.nadoumi.university.service.UniversityService;
 import com.nadoumi.university.web.response.PublicUniversityResponse;
 import com.nadoumi.university.web.response.UniversityResponse;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ProgramServiceTest {
@@ -36,9 +37,10 @@ class ProgramServiceTest {
     private final DepartmentService departmentService = mock(DepartmentService.class);
     private final MediaGateway media = mock(MediaGateway.class);
     private final FxRates fx = mock(FxRates.class);
+    private final MajorService majors = mock(MajorService.class);
     private final com.nadoumi.common.outbox.OutboxWriter outbox = mock(com.nadoumi.common.outbox.OutboxWriter.class);
     private final ProgramService service =
-            new ProgramService(mapper, universityService, new ProgramChildrenWriter(mapper, departmentService), media, fx, outbox);
+            new ProgramService(mapper, universityService, new ProgramChildrenWriter(mapper, departmentService, majors), media, fx, outbox);
 
     private static ProgramRequest req(Long universityId, String name,
             List<ProgramRequest.MajorInput> majors, List<ProgramRequest.IntakeInput> intakes) {
@@ -68,6 +70,20 @@ class ProgramServiceTest {
         u.setCountry("CN");
         u.setStatus(UniversityStatus.ACTIVE);
         return PublicUniversityResponse.of(u);
+    }
+
+    @BeforeEach
+    void stubCatalogue() {
+        when(majors.findOrCreate(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any()))
+                .thenAnswer(call -> catalogueMajor(1L, call.getArgument(0), call.getArgument(1)));
+    }
+
+    static com.nadoumi.program.domain.Major catalogueMajor(long id, String name, String nameCn) {
+        com.nadoumi.program.domain.Major m = new com.nadoumi.program.domain.Major();
+        m.setId(id);
+        m.setName(name);
+        m.setNameCn(nameCn);
+        return m;
     }
 
     @Test
