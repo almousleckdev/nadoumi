@@ -9,6 +9,7 @@
         <result property="kind"          column="kind"/>
         <result property="version"       column="version"/>
         <result property="docNumber"     column="doc_number"/>
+        <result property="verifyCode"    column="verify_code"/>
         <result property="mediaId"       column="media_id"/>
         <result property="sha256"        column="sha256"/>
         <result property="byteSize"      column="byte_size"/>
@@ -27,17 +28,17 @@
     </resultMap>
 
     <sql id="cols">
-        id, payment_id, application_id, kind, version, doc_number, media_id, sha256, byte_size, generated_at,
+        id, payment_id, application_id, kind, version, doc_number, verify_code, media_id, sha256, byte_size, generated_at,
         delivered_at, create_by, create_time
     </sql>
 
     <insert id="insert" parameterType="com.nadoumi.payment.domain.PaymentDocument"
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_payment_document
-            (payment_id, application_id, kind, version, doc_number, media_id, sha256, byte_size, generated_at,
+            (payment_id, application_id, kind, version, doc_number, verify_code, media_id, sha256, byte_size, generated_at,
              delivered_at, create_by, create_time)
         values
-            (#{paymentId}, #{applicationId}, #{kind}, #{version}, #{docNumber}, #{mediaId}, #{sha256}, #{byteSize},
+            (#{paymentId}, #{applicationId}, #{kind}, #{version}, #{docNumber}, #{verifyCode}, #{mediaId}, #{sha256}, #{byteSize},
              #{generatedAt}, #{deliveredAt}, #{createBy}, #{createTime})
     </insert>
 
@@ -45,6 +46,10 @@
         select <include refid="cols"/> from nad_payment_document
         where payment_id = #{paymentId} and kind = #{kind}
         order by version desc limit 1
+    </select>
+
+    <select id="findByNumber" resultMap="document">
+        select <include refid="cols"/> from nad_payment_document where doc_number = #{docNumber}
     </select>
 
     <select id="findLatestByApplication" resultMap="document">

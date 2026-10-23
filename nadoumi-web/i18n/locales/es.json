@@ -2647,5 +2647,21 @@
     "blurb": "Descarga estos formularios, rellénalos y súbelos junto con tus documentos más abajo.",
     "download": "Descargar",
     "failed": "No se pudo descargar el archivo. Inténtalo de nuevo."
+  },
+  "verify": {
+    "title": "Verificar un documento",
+    "blurb": "Comprueba que Nadoumi emitió el recibo o el formulario de solicitud que te entregaron.",
+    "missing": "Escanea el código QR del documento para abrir esta página con sus datos.",
+    "failed": "No podemos verificar este documento ahora mismo. Inténtalo de nuevo en un momento.",
+    "valid": "Este documento fue emitido por Nadoumi.",
+    "invalid": "No pudimos verificar este documento. Puede haber sido alterado o el código es incorrecto.",
+    "kind": "Documento",
+    "number": "Número",
+    "issuedOn": "Emitido el",
+    "privacy": "Por privacidad, aquí no se muestran datos personales.",
+    "kinds": {
+      "RECEIPT": "Recibo de pago",
+      "APPLICATION_FORM": "Formulario de solicitud"
+    }
   }
 }

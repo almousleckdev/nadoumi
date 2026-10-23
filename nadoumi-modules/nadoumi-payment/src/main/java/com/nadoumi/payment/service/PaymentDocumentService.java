@@ -65,10 +65,11 @@ public class PaymentDocumentService {
     private final MediaGateway media;
     private final PaymentSettings settings;
     private final Clock clock;
+    private final DocumentVerification verification;
 
     public PaymentDocumentService(PaymentDocumentMapper documents, ReceiptPdf receiptPdf, ApplicationFormPdf formPdf,
             ApplicationOpportunityService opportunities, ApplicantDossierService dossiers, MediaGateway media,
-            PaymentSettings settings, Clock clock) {
+            PaymentSettings settings, Clock clock, DocumentVerification verification) {
         this.documents = documents;
         this.receiptPdf = receiptPdf;
         this.formPdf = formPdf;
@@ -77,6 +78,7 @@ public class PaymentDocumentService {
         this.media = media;
         this.settings = settings;
         this.clock = clock;
+        this.verification = verification;
     }
 
     /** The receipt and version 1 of the application form for a confirmed payment. Safe to call again. */
@@ -86,10 +88,14 @@ public class PaymentDocumentService {
         ApplicantDossier dossier = dossiers.read(payment.getApplicantId());
         Instant now = clock.instant();
 
-        store(payment, DocumentKind.RECEIPT, FIRST_VERSION, PaymentDocumentNumbers.receipt(payment),
-                receiptPdf.render(receiptModel(payment, opportunity, dossier, now)));
-        store(payment, DocumentKind.APPLICATION_FORM, FIRST_VERSION, PaymentDocumentNumbers.applicationForm(payment),
-                formPdf.render(formModel(payment, opportunity, dossier, now)));
+        String receiptNumber = PaymentDocumentNumbers.receipt(payment);
+        String receiptCode = verification.newCode();
+        store(payment, DocumentKind.RECEIPT, FIRST_VERSION, receiptNumber, receiptCode,
+                receiptPdf.render(receiptModel(payment, opportunity, dossier, now, verification.url(receiptNumber, receiptCode))));
+        String formNumber = PaymentDocumentNumbers.applicationForm(payment);
+        String formCode = verification.newCode();
+        store(payment, DocumentKind.APPLICATION_FORM, FIRST_VERSION, formNumber, formCode,
+                formPdf.render(formModel(payment, opportunity, dossier, now, verification.url(formNumber, formCode))));
     }
 
     /** The application form as it stands now, stored as the version the administrators receive. */
@@ -97,8 +103,10 @@ public class PaymentDocumentService {
     public void generateSubmittedForm(ApplicationPayment payment) {
         Description opportunity = opportunities.describe(payment.getApplicationId());
         ApplicantDossier dossier = dossiers.read(payment.getApplicantId());
-        store(payment, DocumentKind.APPLICATION_FORM, SUBMITTED_VERSION, PaymentDocumentNumbers.applicationForm(payment),
-                formPdf.render(formModel(payment, opportunity, dossier, clock.instant())));
+        String number = PaymentDocumentNumbers.applicationForm(payment);
+        String code = verification.newCode();
+        store(payment, DocumentKind.APPLICATION_FORM, SUBMITTED_VERSION, number, code,
+                formPdf.render(formModel(payment, opportunity, dossier, clock.instant(), verification.url(number, code))));
     }
 
     /** The latest receipt and form of an application, newest version of each kind. */
@@ -159,7 +167,8 @@ public class PaymentDocumentService {
     public record OpenedDocument(PaymentDocument document, ProxyStream stream) {
     }
 
-    private void store(ApplicationPayment payment, DocumentKind kind, int version, String number, byte[] pdf) {
+    private void store(ApplicationPayment payment, DocumentKind kind, int version, String number, String verifyCode,
+            byte[] pdf) {
         long uploader = payment.getVerifiedBy() == null ? 0L : payment.getVerifiedBy();
         long mediaId = media.upload(new ByteArrayInputStream(pdf), filename(kind, number), PDF, pdf.length,
                 MediaCategory.PAYMENT_DOCUMENT, null, new MediaOwnerRef(MediaOwnerKind.PAYMENT, payment.getId()),
@@ -171,6 +180,7 @@ public class PaymentDocumentService {
         row.setKind(kind);
         row.setVersion(version);
         row.setDocNumber(number);
+        row.setVerifyCode(verifyCode);
         row.setMediaId(mediaId);
         row.setSha256(sha256(pdf));
         row.setByteSize(pdf.length);
@@ -192,22 +202,22 @@ public class PaymentDocumentService {
     }
 
     private ReceiptModel receiptModel(ApplicationPayment payment, Description opportunity, ApplicantDossier dossier,
-            Instant now) {
+            Instant now, String verifyUrl) {
         var profile = dossier.profile();
         return new ReceiptModel(PaymentDocumentNumbers.receipt(payment), now, studentName(payment, dossier),
                 profile.publicId(), profile.email(), applicationRef(payment), opportunity.title(),
                 opportunity.universityName(), opportunity.intake(), payment.getReference(),
                 payment.getStudentTxnNo(), payment.getVerifiedAt().toInstant(ZoneOffset.UTC), payment.getAmount(),
-                payment.getCurrency(), CJK_BRACKETS.matcher(settings.payee()).replaceAll(""));
+                payment.getCurrency(), CJK_BRACKETS.matcher(settings.payee()).replaceAll(""), verifyUrl);
     }
 
     private ApplicationFormModel formModel(ApplicationPayment payment, Description opportunity,
-            ApplicantDossier dossier, Instant now) {
+            ApplicantDossier dossier, Instant now, String verifyUrl) {
         var signature = dossiers.signature(payment.getApplicantId());
         return new ApplicationFormModel(PaymentDocumentNumbers.applicationForm(payment), now, applicationRef(payment),
                 opportunity, payment.getReference(), dossier, dossiers.photoJpeg(payment.getApplicantId()).orElse(null),
                 signature.map(SignatureService.SignatureOnFile::png).orElse(null),
-                signature.map(SignatureService.SignatureOnFile::signedOn).orElse(null));
+                signature.map(SignatureService.SignatureOnFile::signedOn).orElse(null), verifyUrl);
     }
 
     private static String studentName(ApplicationPayment payment, ApplicantDossier dossier) {

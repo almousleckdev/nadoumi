@@ -22,5 +22,7 @@ public record ReceiptModel(
         Instant paidAt,
         BigDecimal amount,
         String currency,
-        String payee) {
+        String payee,
+        /** The address the printed QR code opens, or null for none. */
+        String verifyUrl) {
 }

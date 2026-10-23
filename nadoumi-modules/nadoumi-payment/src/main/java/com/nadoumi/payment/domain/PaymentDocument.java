@@ -12,6 +12,7 @@ public class PaymentDocument {
     private DocumentKind kind;
     private int version;
     private String docNumber;
+    private String verifyCode;
     private Long mediaId;
     private String sha256;
     private int byteSize;
@@ -32,6 +33,8 @@ public class PaymentDocument {
     public void setVersion(int version) { this.version = version; }
     public String getDocNumber() { return docNumber; }
     public void setDocNumber(String docNumber) { this.docNumber = docNumber; }
+    public String getVerifyCode() { return verifyCode; }
+    public void setVerifyCode(String verifyCode) { this.verifyCode = verifyCode; }
     public Long getMediaId() { return mediaId; }
     public void setMediaId(Long mediaId) { this.mediaId = mediaId; }
     public String getSha256() { return sha256; }

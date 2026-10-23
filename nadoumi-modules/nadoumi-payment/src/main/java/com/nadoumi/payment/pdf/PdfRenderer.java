@@ -50,6 +50,7 @@ public class PdfRenderer {
     private static final float FOOTER_RULE_Y = mm(24);
     private static final float SECTION_MIN_ROOM = mm(45);
     private static final float LEADING_FACTOR = 1.4f;
+    private static final float QR_SIZE_MM = 17;
     private static final int MAX_PAGES = 30;
 
     private final PdfAssets assets;
@@ -61,12 +62,12 @@ public class PdfRenderer {
     }
 
     /** Writes a document: {@code body} adds content to the {@link Page}. */
-    public byte[] render(String title, String documentNumber, Consumer<Page> body) {
+    public byte[] render(String title, String documentNumber, String verifyUrl, Consumer<Page> body) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, SIDE_MARGIN, SIDE_MARGIN, TOP_MARGIN, BOTTOM_MARGIN);
         try {
             PdfWriter writer = PdfWriter.getInstance(doc, out);
-            writer.setPageEvent(new BrandedPages(documentNumber));
+            writer.setPageEvent(new BrandedPages(documentNumber, verifyUrl));
             doc.addTitle(PdfText.printable(title, assets::canDraw));
             doc.addSubject(PdfText.printable(documentNumber, assets::canDraw));
             doc.addAuthor("Nadoumi Education Consulting");
@@ -370,10 +371,12 @@ public class PdfRenderer {
     private final class BrandedPages extends PdfPageEventHelper {
 
         private final String documentNumber;
+        private final String verifyUrl;
         private PdfTemplate totalPages;
 
-        private BrandedPages(String documentNumber) {
+        private BrandedPages(String documentNumber, String verifyUrl) {
             this.documentNumber = documentNumber;
+            this.verifyUrl = verifyUrl;
         }
 
         @Override
@@ -415,6 +418,29 @@ public class PdfRenderer {
             }
         }
 
+        /** A small QR code at the foot of the page that opens the public page confirming Nadoumi issued this document. */
+        private void verificationCode(PdfContentByte canvas, float left) {
+            com.google.zxing.common.BitMatrix matrix = QrCodes.matrix(verifyUrl);
+            float side = mm(QR_SIZE_MM);
+            float module = side / matrix.getWidth();
+            float x0 = left;
+            float y0 = FOOTER_RULE_Y - mm(2) - side;
+            canvas.saveState();
+            canvas.setColorFill(INK);
+            for (int y = 0; y < matrix.getHeight(); y++) {
+                for (int x = 0; x < matrix.getWidth(); x++) {
+                    if (matrix.get(x, y)) {
+                        canvas.rectangle(x0 + x * module, y0 + (matrix.getHeight() - 1 - y) * module, module + 0.05f, module + 0.05f);
+                    }
+                }
+            }
+            canvas.fill();
+            canvas.restoreState();
+            ColumnText.showTextAligned(canvas, Element.ALIGN_LEFT,
+                    assets.phrase(PdfLabels.bilingual("Verify this document"), 6.5f, false, MUTED),
+                    x0 + side + mm(1.5f), y0 + side / 2, 0);
+        }
+
         private void footer(PdfWriter writer, Document document) {
             PdfContentByte canvas = writer.getDirectContent();
             float left = document.left();
@@ -426,6 +452,10 @@ public class PdfRenderer {
             canvas.lineTo(right, FOOTER_RULE_Y);
             canvas.stroke();
             canvas.restoreState();
+
+            if (verifyUrl != null) {
+                verificationCode(canvas, left);
+            }
 
             BrandProperties.Contact contact = brand.contact();
             String address = contact.officeEn() == null ? "" : contact.officeEn();

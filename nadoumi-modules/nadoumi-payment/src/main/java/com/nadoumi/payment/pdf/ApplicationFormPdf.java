@@ -44,7 +44,7 @@ public class ApplicationFormPdf {
 
     public byte[] render(ApplicationFormModel m) {
         ApplicantDossier d = m.dossier();
-        return renderer.render(TITLE + " " + m.formNo(), m.formNo(), page -> {
+        return renderer.render(TITLE + " " + m.formNo(), m.formNo(), m.verifyUrl(), page -> {
             page.masthead(TITLE, List.of(
                     new String[] {"Form no.", m.formNo()},
                     new String[] {"Application", m.applicationRef()},

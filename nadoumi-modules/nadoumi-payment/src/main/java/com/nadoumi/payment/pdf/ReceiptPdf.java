@@ -17,7 +17,7 @@ public class ReceiptPdf {
     }
 
     public byte[] render(ReceiptModel m) {
-        return renderer.render(TITLE + " " + m.receiptNo(), m.receiptNo(), page -> {
+        return renderer.render(TITLE + " " + m.receiptNo(), m.receiptNo(), m.verifyUrl(), page -> {
             page.masthead(TITLE, List.of(
                     new String[] {"Receipt no.", m.receiptNo()},
                     new String[] {"Issued", PdfText.stamp(m.issuedAt())},

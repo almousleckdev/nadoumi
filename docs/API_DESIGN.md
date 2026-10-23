@@ -519,3 +519,5 @@ re-encoded to PNG; 400 for an empty or non-image file), `GET /image` (the owner'
 Requirement conditions (EXISTING, 2026-10-22): programme requirement items and scholarship `documentRequirements` carry `appliesWhen` (`MINOR|IN_CHINA|STUDIED_IN_CHINA|MASTER_OR_DOCTORAL|DOCTORAL`, optional); the checklist endpoint returns only the rows that apply.
 
 Templates (EXISTING, 2026-10-22): staff `GET|POST /api/staff/document-templates/programs/{id}` and `.../scholarships/{id}` (multipart `title` + `file`; `nad:program:*` / `nad:scholarship:*`), `DELETE /api/staff/document-templates/{id}`; students `GET /api/student/applications/{id}/templates` and `.../templates/{templateId}` (attachment, `no-store`).
+
+Document verification (EXISTING, 2026-10-23): `GET /api/public/documents/verify?number=&code=` (anonymous, 20/min/IP) returns `{valid, kind, number, issuedOn}`; `valid` is false and the rest null for any pair that does not match.

@@ -80,8 +80,14 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 > * **Form content = what the portal collects.** Applying for, personal and passport, marital status, religion, place of
 >   birth, official language and permanent address, test scores, education, work experience, **family members, financial
 >   supporter and emergency contact in China**, study plan, the affirmation and a signature line. A section a student has
->   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). **Not built:** the verification QR.
+>   not filled is printed as "Not provided". The applicant's profile photo is printed in the masthead (re-encoded to a bounded JPEG; a format the JDK cannot decode, such as AVIF or WebP, simply leaves it out). Everything planned for the two documents is now built.
 > * **Erasure.** `PaymentErasure` also deletes the generated documents and soft-deletes their PDFs.
+>
+> **Update 2026-10-23 (verification QR): every receipt and form carries a verification QR code (V121).** Each generated document gets a random 12-character code
+> (60 bits, from a look-alike-free alphabet, **not derived from the file**, so it can be printed inside it). A QR code at the foot of every page opens
+> `/verify?number=…&code=…` on the public site, which calls `GET /api/public/documents/verify` (anonymous, **20 requests per minute per IP**). The answer is only
+> whether the pair matches (compared in constant time), the kind of document, its number and the day it was issued: never a name, an amount or an application, and a
+> wrong code and an unknown number look the same. The page is `noindex`. A re-rendered form version gets its own code.
 >
 > **Update 2026-10-23 (Chinese labels): both PDFs are bilingual.** Every fixed label, heading, table header, note and the five affirmation statements print as
 > "English  中文" (`PdfLabels`); the receipt and form titles carry the Chinese under the title. A student's own text is never translated. Text is drawn with a

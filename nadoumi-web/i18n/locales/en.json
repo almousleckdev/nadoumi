@@ -2647,5 +2647,21 @@
     "blurb": "Download these forms, complete them and upload them with your documents below.",
     "download": "Download",
     "failed": "The file could not be downloaded. Try again."
+  },
+  "verify": {
+    "title": "Verify a document",
+    "blurb": "Check that Nadoumi issued a receipt or application form you were given.",
+    "missing": "Scan the QR code on the document to open this page with its details.",
+    "failed": "We could not check this document right now. Try again in a moment.",
+    "valid": "This document was issued by Nadoumi.",
+    "invalid": "We could not verify this document. It may be altered, or the code is wrong.",
+    "kind": "Document",
+    "number": "Number",
+    "issuedOn": "Issued on",
+    "privacy": "For privacy, no personal details are shown here.",
+    "kinds": {
+      "RECEIPT": "Payment receipt",
+      "APPLICATION_FORM": "Application form"
+    }
   }
 }

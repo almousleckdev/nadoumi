@@ -16,5 +16,7 @@ public record ApplicationFormModel(
         byte[] photo,
         /** The applicant's signature as PNG bytes and the day it was given; both null when unsigned. */
         byte[] signature,
-        java.time.LocalDate signedOn) {
+        java.time.LocalDate signedOn,
+        /** The address the printed QR code opens, or null for none. */
+        String verifyUrl) {
 }

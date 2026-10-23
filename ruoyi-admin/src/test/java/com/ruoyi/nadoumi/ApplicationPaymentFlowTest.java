@@ -775,4 +775,26 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         mvc.perform(get("/api/staff/document-templates/programs/" + programId).header("Authorization", staffAuth))
                 .andExpect(jsonPath("$.length()").value(0));
     }
+
+    @Test
+    void shouldLetAnyoneVerifyAPrintedDocument_withoutLearningWhoItIsFor() throws Exception {
+        Student s = register("pay", "verify");
+        long app = draftFor(s);
+        payAndConfirm(s, app, "BANK9999997");
+        documentsWorker.runOnce();
+        var row = jdbc.queryForMap("select doc_number, verify_code from nad_payment_document "
+                + "where application_id = ? and kind = 'RECEIPT'", app);
+        String number = (String) row.get("doc_number");
+        String code = (String) row.get("verify_code");
+
+        mvc.perform(get("/api/public/documents/verify").param("number", number).param("code", code))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(true))
+                .andExpect(jsonPath("$.kind").value("RECEIPT")).andExpect(jsonPath("$.number").value(number))
+                .andExpect(jsonPath("$.issuedOn").isNotEmpty())
+                .andExpect(jsonPath("$.studentName").doesNotExist()).andExpect(jsonPath("$.amount").doesNotExist());
+        mvc.perform(get("/api/public/documents/verify").param("number", number).param("code", "AAAAAAAAAAAA"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(false)).andExpect(jsonPath("$.kind").doesNotExist());
+        mvc.perform(get("/api/public/documents/verify").param("number", "NAD-RCT-2099-999999").param("code", code))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(false));
+    }
 }

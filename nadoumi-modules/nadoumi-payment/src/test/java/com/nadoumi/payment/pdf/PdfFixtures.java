@@ -22,6 +22,7 @@ import java.util.List;
 /** Shared builders for the PDF tests. */
 final class PdfFixtures {
 
+    static final String VERIFY_URL = "https://nadoumi.test/verify?number=NAD-RCT-2026-000007&code=ABCD2345EFGH";
     static final String ADDRESS = "Room 02, Floor 8, Unit 1, Building 6, Jiuzhou Beijun, Mianyang, Sichuan, China";
 
     private PdfFixtures() {
@@ -38,7 +39,7 @@ final class PdfFixtures {
         return new ReceiptModel("NAD-RCT-2026-000007", Instant.parse("2026-10-22T06:30:00Z"), "Amina Diallo",
                 "APL-1234", "amina@example.test", "APP-42", "MBBS", university, "AUTUMN_SEPTEMBER",
                 "NAD-AB12CD34", "BANK1234567", Instant.parse("2026-10-22T06:29:00Z"),
-                new BigDecimal("300"), "CNY", "Sichuan Nadoumi Education Consulting Co., Ltd.");
+                new BigDecimal("300"), "CNY", "Sichuan Nadoumi Education Consulting Co., Ltd.", VERIFY_URL);
     }
 
     static ApplicationFormModel form(Description opportunity, String studentName) {
@@ -65,7 +66,7 @@ final class PdfFixtures {
                 new PersonResponse("CHINA_EMERGENCY", "Li Wei", "Friend", "MALE", null, "+8613800000000",
                         null, "Shanghai Language School", null, "Shanghai"));
         return new ApplicationFormModel("NAD-APP-2026-000042", Instant.parse("2026-10-22T06:30:00Z"), "APP-42",
-                opportunity, "NAD-AB12CD34", dossier, photo(), signature(), java.time.LocalDate.of(2026, 10, 22));
+                opportunity, "NAD-AB12CD34", dossier, photo(), signature(), java.time.LocalDate.of(2026, 10, 22), VERIFY_URL);
     }
 
     /** A small hand-drawn-looking PNG on white. */

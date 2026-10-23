@@ -16,6 +16,9 @@ public interface PaymentDocumentMapper {
 
     int insert(PaymentDocument document);
 
+    /** Every version issued under a document number (the number is shared by the versions of one document). */
+    List<PaymentDocument> findByNumber(@Param("docNumber") String docNumber);
+
     PaymentDocument findLatest(@Param("paymentId") long paymentId, @Param("kind") DocumentKind kind);
 
     List<PaymentDocument> findLatestByApplication(@Param("applicationId") long applicationId);

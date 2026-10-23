@@ -88,7 +88,7 @@ class PdfDocumentsTest {
                 model.dossier().supporter(), model.dossier().chinaEmergency());
 
         byte[] pdf = forms.render(new ApplicationFormModel(model.formNo(), model.generatedAt(), model.applicationRef(),
-                model.opportunity(), model.paymentReference(), dossier, model.photo(), model.signature(), model.signedOn()));
+                model.opportunity(), model.paymentReference(), dossier, model.photo(), model.signature(), model.signedOn(), model.verifyUrl()));
 
         try (PDDocument doc = Loader.loadPDF(pdf)) {
             assertThat(doc.getNumberOfPages()).isGreaterThan(1);
@@ -105,9 +105,9 @@ class PdfDocumentsTest {
     void shouldPlaceThePhotoInTheMasthead_andRenderWithoutOneWhenThereIsNone() throws IOException {
         var withPhoto = PdfFixtures.form(PdfFixtures.programme(), "Amina");
         var without = new ApplicationFormModel(withPhoto.formNo(), withPhoto.generatedAt(), withPhoto.applicationRef(),
-                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), null, null, null);
+                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), null, null, null, null);
         var garbage = new ApplicationFormModel(withPhoto.formNo(), withPhoto.generatedAt(), withPhoto.applicationRef(),
-                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), new byte[] {1, 2, 3, 4}, new byte[] {9, 9}, null);
+                withPhoto.opportunity(), withPhoto.paymentReference(), withPhoto.dossier(), new byte[] {1, 2, 3, 4}, new byte[] {9, 9}, null, null);
 
         byte[] big = forms.render(withPhoto);
         byte[] plain = forms.render(without);
@@ -135,10 +135,38 @@ class PdfDocumentsTest {
     void shouldPrintTheSignatureDate_andLeaveTheBoxEmptyWhenUnsigned() throws IOException {
         var signed = PdfFixtures.form(PdfFixtures.programme(), "Amina");
         var unsigned = new ApplicationFormModel(signed.formNo(), signed.generatedAt(), signed.applicationRef(),
-                signed.opportunity(), signed.paymentReference(), signed.dossier(), signed.photo(), null, null);
+                signed.opportunity(), signed.paymentReference(), signed.dossier(), signed.photo(), null, null, signed.verifyUrl());
 
         assertThat(text(forms.render(signed))).contains("2026-10-22");
         assertThat(text(forms.render(unsigned))).contains("Applicant's signature").doesNotContain("Date 2026");
+    }
+
+    @Test
+    void shouldPrintAQrCodeThatOpensTheVerificationPage_onEveryPage() throws Exception {
+        byte[] pdf = receipts.render(PdfFixtures.receipt("Fudan University"));
+
+        try (PDDocument doc = Loader.loadPDF(pdf)) {
+            BufferedImage page = new PDFRenderer(doc).renderImageWithDPI(0, 200);
+            var bitmap = new com.google.zxing.BinaryBitmap(new com.google.zxing.common.HybridBinarizer(
+                    new com.google.zxing.RGBLuminanceSource(page.getWidth(), page.getHeight(),
+                            page.getRGB(0, 0, page.getWidth(), page.getHeight(), null, 0, page.getWidth()))));
+            var result = new com.google.zxing.MultiFormatReader().decode(bitmap,
+                    java.util.Map.of(com.google.zxing.DecodeHintType.TRY_HARDER, Boolean.TRUE,
+                            com.google.zxing.DecodeHintType.POSSIBLE_FORMATS, java.util.List.of(com.google.zxing.BarcodeFormat.QR_CODE)));
+            assertThat(result.getText()).isEqualTo(PdfFixtures.VERIFY_URL);
+        }
+        assertThat(text(pdf)).contains("Verify this document");
+    }
+
+    @Test
+    void shouldLeaveTheQrOut_whenThereIsNoVerificationAddress() throws IOException {
+        var model = PdfFixtures.receipt("Fudan University");
+        byte[] pdf = receipts.render(new ReceiptModel(model.receiptNo(), model.issuedAt(), model.studentName(),
+                model.studentPublicId(), model.studentEmail(), model.applicationRef(), model.opportunityTitle(),
+                model.universityName(), model.intake(), model.paymentReference(), model.transactionNo(), model.paidAt(),
+                model.amount(), model.currency(), model.payee(), null));
+
+        assertThat(text(pdf)).doesNotContain("Verify this document");
     }
 
     @Test

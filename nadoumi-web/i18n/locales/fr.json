@@ -2647,5 +2647,21 @@
     "blurb": "Téléchargez ces formulaires, remplissez-les puis téléversez-les avec vos documents ci-dessous.",
     "download": "Télécharger",
     "failed": "Le fichier n’a pas pu être téléchargé. Réessayez."
+  },
+  "verify": {
+    "title": "Vérifier un document",
+    "blurb": "Vérifiez que Nadoumi a bien émis le reçu ou le formulaire de candidature qui vous a été remis.",
+    "missing": "Scannez le QR code du document pour ouvrir cette page avec ses informations.",
+    "failed": "Nous ne pouvons pas vérifier ce document pour le moment. Réessayez dans un instant.",
+    "valid": "Ce document a bien été émis par Nadoumi.",
+    "invalid": "Nous n’avons pas pu vérifier ce document. Il a peut-être été modifié, ou le code est incorrect.",
+    "kind": "Document",
+    "number": "Numéro",
+    "issuedOn": "Émis le",
+    "privacy": "Par confidentialité, aucune donnée personnelle n’est affichée ici.",
+    "kinds": {
+      "RECEIPT": "Reçu de paiement",
+      "APPLICATION_FORM": "Formulaire de candidature"
+    }
   }
 }

@@ -607,3 +607,4 @@ Reviewed with the `nadoumi-security-reviewer` agent on 2026-10-22; findings and 
   create a duplicate. Low impact; the readiness rule still reads correctly.
 * Student-supplied transaction numbers are free text; staff compare the proof with the bank ledger by eye, the amount shown to them being the server snapshot.
 
+**Document verification (2026-10-23).** The public verify endpoint is anonymous and rate-limited per IP; its code is random (not derived from the document), compared in constant time, and the response never carries personal data. A wrong code and an unknown number answer identically.
