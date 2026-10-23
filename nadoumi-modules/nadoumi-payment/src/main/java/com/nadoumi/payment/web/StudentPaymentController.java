@@ -61,6 +61,12 @@ public class StudentPaymentController {
         return service.submitProof(id, transactionNo, file);
     }
 
+    @PostMapping("/hold")
+    @PreAuthorize("@na.canAccessApplication(#id, 'SUBMIT_APPLICATION')")
+    public StudentPaymentResponse hold(@PathVariable Long id) {
+        return service.hold(id);
+    }
+
     @PostMapping("/cancel")
     @PreAuthorize("@na.canAccessApplication(#id, 'SUBMIT_APPLICATION')")
     public StudentPaymentResponse cancel(@PathVariable Long id) {

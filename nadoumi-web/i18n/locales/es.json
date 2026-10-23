@@ -2501,6 +2501,8 @@
     "payAgain": "Pagar de nuevo",
     "payToSubmit": "Paga la tasa de solicitud para enviar tu solicitud.",
     "timeLeft": "Tiempo restante para pagar",
+    "held": "Pago en curso",
+    "heldBody": "Tómese su tiempo: introduzca el número de transacción, añada el recibo y pulse He pagado. Su pago no caducará.",
     "qrAlt": "Código QR de pago",
     "step1": "Abre tu aplicación bancaria o de pago y escanea el código QR.",
     "step2": "Paga exactamente {amount}.",

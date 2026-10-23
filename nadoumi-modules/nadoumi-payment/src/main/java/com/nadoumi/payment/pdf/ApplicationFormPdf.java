@@ -42,6 +42,21 @@ public class ApplicationFormPdf {
         this.renderer = renderer;
     }
 
+    /** Unpaid, or paid with the payment reference, the transaction number and the day it was paid. */
+    private static String feeLine(ApplicationFormModel m) {
+        if (m.paymentReference() == null) {
+            return "Not paid yet";
+        }
+        StringBuilder line = new StringBuilder("PAID  \u00b7  ").append(m.paymentReference());
+        if (m.transactionNo() != null) {
+            line.append("  \u00b7  Transaction ").append(m.transactionNo());
+        }
+        if (m.paidAt() != null) {
+            line.append("  \u00b7  ").append(PdfText.stamp(m.paidAt()));
+        }
+        return line.toString();
+    }
+
     public byte[] render(ApplicationFormModel m) {
         ApplicantDossier d = m.dossier();
         return renderer.render(TITLE + " " + m.formNo(), m.formNo(), m.verifyUrl(), page -> {
@@ -49,7 +64,7 @@ public class ApplicationFormPdf {
                     new String[] {"Form no.", m.formNo()},
                     new String[] {"Application", m.applicationRef()},
                     new String[] {"Generated", PdfText.stamp(m.generatedAt())},
-                    new String[] {"Application fee", m.paymentReference() == null ? "Not paid yet" : "PAID  " + m.paymentReference()}), m.photo());
+                    new String[] {"Application fee", feeLine(m)}), m.photo());
             opportunity(page, m);
             personal(page, d);
             tests(page, d.testScores());

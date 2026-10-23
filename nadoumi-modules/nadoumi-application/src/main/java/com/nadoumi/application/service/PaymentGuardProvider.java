@@ -14,4 +14,10 @@ public interface PaymentGuardProvider {
     String APPLICATION_FEE = "APPLICATION_FEE";
 
     boolean isSettled(long applicationId, String kind);
+
+    /**
+     * The student has paid and reported it (transaction number and receipt) or staff already confirmed it. This is what
+     * lets a student submit: Nadoumi staff verify the money afterwards, from the submitted application.
+     */
+    boolean isPaidOrReported(long applicationId, String kind);
 }

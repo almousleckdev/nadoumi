@@ -30,6 +30,8 @@
     <select id="searchStaff" resultMap="application" parameterType="com.nadoumi.application.mapper.ApplicationSearch">
         select * from nad_application
         <where>
+            <!-- staff receive submitted applications only: a draft is still the student's, a withdrawn one is closed -->
+            current_status not in ('DRAFT', 'CLOSED_WITHDRAWN')
             <if test="applicationType != null">and application_type = #{applicationType}</if>
             <if test="currentStatus != null">and current_status = #{currentStatus}</if>
             <if test="stageId != null">and current_stage_id = #{stageId}</if>

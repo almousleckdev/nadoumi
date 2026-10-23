@@ -21,6 +21,9 @@ public class PaymentSettings {
     /** How long a student has to pay and report the payment once the QR is shown. */
     public static final Duration PAYMENT_WINDOW = Duration.ofMinutes(15);
 
+    /** Once the student starts reporting the payment the session is held this long so the upload cannot time out. */
+    public static final Duration PAYMENT_HOLD_WINDOW = Duration.ofMinutes(30);
+
     /** Catalog and fee money is entered in RMB. */
     public static final String CURRENCY = "CNY";
 

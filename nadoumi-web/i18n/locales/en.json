@@ -2501,6 +2501,8 @@
     "payAgain": "Pay again",
     "payToSubmit": "Pay the application fee to submit your application.",
     "timeLeft": "Time left to pay",
+    "held": "Payment in progress",
+    "heldBody": "Take your time: enter the transaction number, add the receipt and press I have paid. Your payment will not expire.",
     "qrAlt": "Payment QR code",
     "step1": "Open your banking or payment app and scan the QR code.",
     "step2": "Pay exactly {amount}.",

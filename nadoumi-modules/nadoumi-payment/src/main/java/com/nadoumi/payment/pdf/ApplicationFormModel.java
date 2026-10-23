@@ -11,6 +11,9 @@ public record ApplicationFormModel(
         String applicationRef,
         Description opportunity,
         String paymentReference,
+        /** The bank transaction number the student reported and when it was paid; null while unpaid. */
+        String transactionNo,
+        Instant paidAt,
         ApplicantDossier dossier,
         /** A small JPEG of the applicant, or null when there is no usable photo. */
         byte[] photo,
@@ -19,4 +22,12 @@ public record ApplicationFormModel(
         java.time.LocalDate signedOn,
         /** The address the printed QR code opens, or null for none. */
         String verifyUrl) {
+
+    /** A form with no payment details beyond the reference (previews and fixtures). */
+    public ApplicationFormModel(String formNo, Instant generatedAt, String applicationRef, Description opportunity,
+            String paymentReference, ApplicantDossier dossier, byte[] photo, byte[] signature,
+            java.time.LocalDate signedOn, String verifyUrl) {
+        this(formNo, generatedAt, applicationRef, opportunity, paymentReference, null, null, dossier, photo, signature,
+                signedOn, verifyUrl);
+    }
 }

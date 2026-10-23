@@ -1,10 +1,10 @@
 import request from '@/utils/request'
 import type { Page } from './applicant'
 
-export const PAYMENT_STATUSES = [
-  'PENDING', 'PROOF_SUBMITTED', 'CONFIRMED', 'REJECTED', 'EXPIRED', 'CANCELLED',
-] as const
-export type PaymentStatus = typeof PAYMENT_STATUSES[number]
+export type PaymentStatus = 'PENDING' | 'PROOF_SUBMITTED' | 'CONFIRMED' | 'REJECTED' | 'EXPIRED' | 'CANCELLED'
+
+/** The only states staff receive: a reported payment on a submitted application, then the decision on it. */
+export const PAYMENT_STATUSES: readonly PaymentStatus[] = ['PROOF_SUBMITTED', 'CONFIRMED', 'REJECTED']
 
 export interface StaffPayment {
   id: number

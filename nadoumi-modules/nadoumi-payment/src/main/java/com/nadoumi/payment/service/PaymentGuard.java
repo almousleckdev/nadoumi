@@ -29,4 +29,13 @@ public class PaymentGuard implements PaymentGuardProvider {
         }
         return settings.applicationFee().signum() <= 0 || mapper.countConfirmed(applicationId, kind) > 0;
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public boolean isPaidOrReported(long applicationId, String kind) {
+        if (!APPLICATION_FEE.equals(kind)) {
+            return false;
+        }
+        return settings.applicationFee().signum() <= 0 || mapper.countPaidOrReported(applicationId, kind) > 0;
+    }
 }

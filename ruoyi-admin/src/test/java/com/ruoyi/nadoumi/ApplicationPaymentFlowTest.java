@@ -163,17 +163,24 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
-    void shouldLetStaffConfirm_thenAllowSubmission_andBookTheRevenueExactlyOnce() throws Exception {
+    void shouldAllowSubmission_onceThePaymentIsReported_andThenLetStaffConfirm() throws Exception {
         Student s = register("pay", "ok");
         long app = draftFor(s);
         openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        submitApplication(s, app).andExpect(status().isPaymentRequired()); // nothing reported yet
 
         reportPayment(s, app, "bank1234567").andExpect(status().isOk())
-                .andExpect(jsonPath("$.state").value("PROOF_SUBMITTED"));
-        submitApplication(s, app).andExpect(status().isPaymentRequired()); // reported is not yet paid
-
+                .andExpect(jsonPath("$.state").value("PROOF_SUBMITTED")).andExpect(jsonPath("$.settled").value(true));
         long id = paymentId(app);
-        mvc.perform(get("/api/staff/payments").param("status", "PROOF_SUBMITTED").header("Authorization", staffAuth))
+        // the application is still a draft: staff do not receive the payment yet
+        mvc.perform(get("/api/staff/payments").param("q", "BANK1234567").header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.content.length()").value(0));
+
+        submitApplication(s, app).andExpect(status().isOk());
+
+        mvc.perform(get("/api/staff/payments").param("status", "PROOF_SUBMITTED").param("q", "BANK1234567")
+                        .header("Authorization", staffAuth))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].reference").isNotEmpty())
                 .andExpect(jsonPath("$.content[0].studentTxnNo").value("BANK1234567"))
@@ -184,13 +191,42 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
 
         mvc.perform(post("/api/staff/payments/" + id + "/confirm").header("Authorization", staffAuth))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("CONFIRMED"));
-
         mvc.perform(get(url(app, "")).header("Authorization", bearer(s.token())))
                 .andExpect(jsonPath("$.state").value("CONFIRMED")).andExpect(jsonPath("$.settled").value(true));
-        sign(s);
-        submitApplication(s, app).andExpect(status().isOk());
         assertThat(jdbc.queryForObject("select count(*) from nad_revenue where source = 'APPLICATION_FEE' and related_id = ?",
                 Integer.class, app)).isEqualTo(1);
+    }
+
+    @Test
+    void shouldHideOpenCancelledAndExpiredPaymentsAndDraftApplications_fromStaff() throws Exception {
+        Student s = register("pay", "inbox");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        String ref = jdbc.queryForObject("select reference from nad_application where id = ?", String.class, app);
+
+        mvc.perform(get("/api/staff/payments").param("q", ref).header("Authorization", staffAuth))
+                .andExpect(jsonPath("$.content.length()").value(0));
+        mvc.perform(get("/api/staff/applications").param("q", ref).header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.content.length()").value(0));
+
+        mvc.perform(post(url(app, "/cancel")).header("Authorization", bearer(s.token()))).andExpect(status().isOk());
+        mvc.perform(get("/api/staff/payments").param("q", ref).header("Authorization", staffAuth))
+                .andExpect(jsonPath("$.content.length()").value(0));
+        jdbc.update("update nad_application set current_status = 'CLOSED_WITHDRAWN' where id = ?", app);
+        mvc.perform(get("/api/staff/applications").param("q", ref).header("Authorization", staffAuth))
+                .andExpect(jsonPath("$.content.length()").value(0));
+    }
+
+    @Test
+    void shouldStopTheClock_whenTheStudentStartsReportingThePayment() throws Exception {
+        Student s = register("pay", "hold");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+
+        mvc.perform(post(url(app, "/hold")).header("Authorization", bearer(s.token())))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.state").value("PENDING"))
+                .andExpect(jsonPath("$.secondsLeft").value(org.hamcrest.Matchers.greaterThan(20 * 60)));
+        reportPayment(s, app, "BANKHOLD123").andExpect(status().isOk());
     }
 
     @Test

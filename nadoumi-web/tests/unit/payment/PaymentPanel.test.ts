@@ -5,7 +5,7 @@ import PaymentPanel from '~/components/payment/PaymentPanel.vue'
 import type { StudentPaymentDto } from '~/types/payment'
 
 const api = vi.hoisted(() => ({
-  overview: vi.fn(), start: vi.fn(), cancel: vi.fn(), qr: vi.fn(), submitProof: vi.fn(), documents: vi.fn(), document: vi.fn(), resendReceipt: vi.fn(),
+  overview: vi.fn(), start: vi.fn(), hold: vi.fn(), cancel: vi.fn(), qr: vi.fn(), submitProof: vi.fn(), documents: vi.fn(), document: vi.fn(), resendReceipt: vi.fn(),
 }))
 mockNuxtImport('useApplicationPayment', () => () => api)
 
@@ -41,6 +41,30 @@ describe('PaymentPanel', () => {
     expect(w.find('[data-test="reference"]').text()).toBe('NAD-AB12CD34')
     expect(w.find('img').attributes('src')).toBe('blob:qr')
     expect(w.find('[data-test="amount"]').classes()).toContain('text-red-600')
+  })
+
+  it('stops the countdown and holds the session as soon as the student starts the receipt', async () => {
+    api.overview.mockResolvedValue(dto({ state: 'PENDING', reference: 'NAD-AB12CD34', secondsLeft: 600, canStart: false }))
+    api.hold.mockResolvedValue(dto({ state: 'PENDING', reference: 'NAD-AB12CD34', secondsLeft: 1800, canStart: false }))
+    api.qr.mockResolvedValue(new Blob(['x'], { type: 'image/png' }))
+    const w = await mountSuspended(PaymentPanel, { props: { applicationId: 5 } })
+    await flushPromises()
+
+    await w.find('#payment-txn').setValue('BANK1234567')
+    await flushPromises()
+
+    expect(api.hold).toHaveBeenCalledOnce()
+    expect(w.find('[data-test="countdown"]').exists()).toBe(false)
+    expect(w.find('[data-test="payment-held"]').exists()).toBe(true)
+  })
+
+  it('lets the student submit once the payment is reported, before staff confirm it', async () => {
+    api.overview.mockResolvedValue(dto({ state: 'PROOF_SUBMITTED', settled: true, reference: 'NAD-AB12CD34', canStart: false }))
+    const w = await mountSuspended(PaymentPanel, { props: { applicationId: 5 } })
+    await flushPromises()
+
+    expect(w.find('[data-test="state-verifying"]').exists()).toBe(true)
+    expect(w.emitted('settled')?.at(-1)).toEqual([true])
   })
 
   it('starts a session when Pay now is pressed', async () => {

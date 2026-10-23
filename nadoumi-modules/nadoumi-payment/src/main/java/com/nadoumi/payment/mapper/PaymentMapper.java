@@ -30,6 +30,11 @@ public interface PaymentMapper {
     /** Rows (any status) that carry this transaction number on a different application. */
     int countTxnOnOtherApplication(@Param("txnNo") String txnNo, @Param("applicationId") long applicationId);
 
+    int countPaidOrReported(@Param("applicationId") long applicationId, @Param("kind") String kind);
+
+    int extendExpiry(@Param("id") long id, @Param("expiresAt") java.time.LocalDateTime expiresAt,
+            @Param("now") java.time.LocalDateTime now, @Param("by") String by);
+
     int countConfirmed(@Param("applicationId") long applicationId, @Param("kind") String kind);
 
     List<ApplicationPayment> search(@Param("status") PaymentStatus status, @Param("q") String q);

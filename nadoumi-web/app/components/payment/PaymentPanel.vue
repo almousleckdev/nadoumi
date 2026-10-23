@@ -18,6 +18,7 @@ const payment = ref<StudentPaymentDto | null>(null)
 const loadFailed = ref(false)
 const qrSrc = ref('')
 const qrFailed = ref(false)
+const holding = ref(false)
 
 function setPayment(next: StudentPaymentDto) {
   payment.value = next
@@ -60,6 +61,17 @@ onBeforeUnmount(revokeQr)
 async function start() {
   const next = await run(() => api.start())
   if (next) setPayment(next)
+}
+
+// the student started reporting the payment: stop the clock server side so a slow upload cannot expire it
+async function hold() {
+  holding.value = true
+  try {
+    setPayment(await api.hold())
+  }
+  catch {
+    holding.value = false
+  }
 }
 
 async function cancel() {
@@ -109,8 +121,8 @@ const amount = computed(() => offeringMoney(payment.value?.amount, null, payment
 
       <!-- QR session open -->
       <template v-else-if="state === 'PENDING'">
-        <PaymentQrCard :payment="payment" :qr-src="qrSrc" :qr-failed="qrFailed" @elapsed="load" @cancel="cancel" />
-        <PaymentProofForm :busy="busy" @submit="submitProof" />
+        <PaymentQrCard :payment="payment" :qr-src="qrSrc" :qr-failed="qrFailed" :holding="holding" @elapsed="load" @cancel="cancel" />
+        <PaymentProofForm :busy="busy" @submit="submitProof" @started="hold" />
       </template>
 
       <!-- not paid yet, expired, cancelled or rejected: offer to pay -->

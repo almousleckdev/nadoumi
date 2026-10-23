@@ -12,7 +12,7 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * What must be true before an application leaves DRAFT: the Nadoumi application fee is settled, every mandatory
+ * What must be true before an application leaves DRAFT: the Nadoumi application fee is paid and reported, every mandatory
  * document is uploaded and the applicant has signed the form (it is not valid without the signature). {@link WorkflowService} runs it for every {@code submit} transition whoever asks (a student,
  * or staff acting for one), so no endpoint can submit around it.
  */
@@ -35,7 +35,7 @@ public class SubmitGate {
     }
 
     public void require(long applicationId) {
-        if (!payments.isSettled(applicationId, PaymentGuardProvider.APPLICATION_FEE)) {
+        if (!payments.isPaidOrReported(applicationId, PaymentGuardProvider.APPLICATION_FEE)) {
             throw new PaymentRequiredException("the application fee must be paid before the application can be submitted");
         }
         List<String> missing = checklist.missingMandatory(applicationId);
