@@ -449,6 +449,7 @@
       "uploadedOn": "Subido el {date}",
       "expiresOn": "Caduca el {date}",
       "reason": "Motivo: {reason}",
+      "preview": "Vista previa",
       "download": "Descargar",
       "replace": "Subir una nueva versión",
       "remove": "Eliminar",

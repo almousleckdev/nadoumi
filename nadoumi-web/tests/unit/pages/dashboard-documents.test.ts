@@ -183,6 +183,21 @@ describe('dashboard documents page', () => {
     open.mockRestore()
   })
 
+  it('previews a PDF from the bytes without leaving the page', async () => {
+    const create = vi.fn(() => 'blob:preview-1')
+    const revoke = vi.fn()
+    vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: create, revokeObjectURL: revoke }))
+    api.fileAccess.mockResolvedValue({ kind: 'blob', blob: new Blob(['%PDF']), filename: 'p.pdf' })
+    const w = await mountPage()
+
+    await w.find('[data-test="doc-preview"]').trigger('click')
+    await flushPromises()
+
+    expect(api.fileAccess).toHaveBeenCalledWith(10, 2)
+    expect(document.body.querySelector('[data-test="preview-pdf"]')?.getAttribute('src')).toBe('blob:preview-1')
+    vi.unstubAllGlobals()
+  })
+
   it('uploads a replacement as a new version of the same document', async () => {
     api.replace.mockResolvedValue(doc())
     const w = await mountPage()

@@ -722,3 +722,8 @@ mandatory rows are attached. Admin: `views/programs/form/DocumentsSection.vue` i
 Signature (EXISTING, 2026-10-22): `SignatureCard` and `SignaturePad` (canvas, pointer events, or upload) on the draft application page, with
 `useApplicantSignature`; the image is fetched as a blob. Submit stays locked, with the reason, until a signature is on file.
 
+
+**Document preview (2026-10-23).** `/dashboard/documents` lets a student look at an uploaded PDF, JPEG or PNG without downloading it: `DocumentRow`
+emits `preview`, the page fetches the file through the same `fileAccess` call as Download (signed URL or streamed bytes, never a stored
+location) and `DocumentViewer` shows it in a wide `NModal` (`wide` prop, `max-w-4xl`). Object URLs are revoked on close. `DocumentViewer` is
+the dashboard viewer; `onboarding/DocumentPreview` is a separate component for the onboarding upload step.

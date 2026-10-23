@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
 import type { DocumentTypeOption, StudentDocumentDto } from '~/types/documents'
-import { saveBlob } from '~/utils/documents'
+import type { PreviewFile } from '~/utils/documents'
+import { previewKind, saveBlob } from '~/utils/documents'
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
 const { t } = useI18n()
@@ -85,6 +86,31 @@ async function onRemove(doc: StudentDocumentDto) {
   }, t('dashboard.docs.removed'))
   if (done) await loadDocuments()
 }
+
+const preview = ref<PreviewFile | null>(null)
+const previewOpen = computed({
+  get: () => preview.value !== null,
+  set: (open: boolean) => { if (!open) closePreview() },
+})
+
+function closePreview() {
+  if (preview.value?.src.startsWith('blob:')) URL.revokeObjectURL(preview.value.src)
+  preview.value = null
+}
+
+async function onPreview(doc: StudentDocumentDto) {
+  const version = doc.currentVersion
+  const kind = version ? previewKind(version.contentType) : null
+  if (!version || !kind) return
+  await run(async () => {
+    const access = await documents.fileAccess(doc.id, version.versionNo)
+    const src = access.kind === 'url' ? access.url : URL.createObjectURL(access.blob)
+    closePreview()
+    preview.value = { title: labelFor(doc.docType), src, kind }
+  })
+}
+
+onBeforeUnmount(closePreview)
 
 async function onDownload(doc: StudentDocumentDto) {
   const version = doc.currentVersion
@@ -194,6 +220,7 @@ useSeo(t('dashboard.documentsTitle'), t('dashboard.documentsBlurb'))
                   :doc="doc"
                   :type-label="labelFor(doc.docType)"
                   :busy="busy"
+                  @preview="onPreview(doc)"
                   @download="onDownload(doc)"
                   @replace="onReplace(doc, $event)"
                   @remove="onRemove(doc)"
@@ -204,6 +231,7 @@ useSeo(t('dashboard.documentsTitle'), t('dashboard.documentsBlurb'))
         </section>
       </div>
     </AsyncState>
+    <DocumentViewer v-model="previewOpen" :file="preview" />
   </div>
 </template>
 

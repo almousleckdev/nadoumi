@@ -2,14 +2,15 @@
 import { DOCUMENT_ACCEPT, DOCUMENT_LIFECYCLE_TONES, DOCUMENT_MAX_MB, DOCUMENT_MIME, canDeleteDocument } from '~/constants/documents'
 import type { StudentDocumentDto } from '~/types/documents'
 import { validateFile } from '~/utils/files'
-import { formatFileSize } from '~/utils/documents'
+import { formatFileSize, previewKind } from '~/utils/documents'
 
 /** One of the student's documents: state, version facts, the reviewer's reason if rejected, and its actions. */
 const props = defineProps<{ doc: StudentDocumentDto, typeLabel: string, busy: boolean }>()
-const emit = defineEmits<{ download: [], replace: [file: File], remove: [] }>()
+const emit = defineEmits<{ preview: [], download: [], replace: [file: File], remove: [] }>()
 const { t, locale } = useI18n()
 const inputId = useId()
 const fileProblem = ref('')
+const canPreview = computed(() => !!props.doc.currentVersion && previewKind(props.doc.currentVersion.contentType) !== null)
 
 const dateFormat = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium' }))
 const uploadedOn = computed(() =>
@@ -51,6 +52,9 @@ function onPick(event: Event) {
     <NAlert v-if="fileProblem" tone="danger">{{ fileProblem }}</NAlert>
 
     <div class="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
+      <NButton v-if="canPreview" size="sm" variant="secondary" :disabled="busy" data-test="doc-preview" @click="emit('preview')">
+        {{ t('dashboard.docs.preview') }}
+      </NButton>
       <NButton v-if="doc.currentVersion" size="sm" variant="secondary" :disabled="busy" data-test="doc-download" @click="emit('download')">
         {{ t('dashboard.docs.download') }}
       </NButton>

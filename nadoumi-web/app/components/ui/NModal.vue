@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps<{ modelValue: boolean; title?: string }>()
+const props = defineProps<{ modelValue: boolean; title?: string; wide?: boolean }>()
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
 const panel = ref<HTMLElement | null>(null)
 
@@ -28,7 +28,8 @@ onBeforeUnmount(() => {
           role="dialog"
           aria-modal="true"
           tabindex="-1"
-          class="relative w-full max-w-md rounded-lg bg-white p-6 shadow-md outline-none"
+          :class="wide ? 'max-w-4xl' : 'max-w-md'"
+          class="relative w-full rounded-lg bg-white p-6 shadow-md outline-none"
         >
           <h2 v-if="title" class="mb-3 font-display text-lg font-semibold">{{ title }}</h2>
           <div><slot /></div>
