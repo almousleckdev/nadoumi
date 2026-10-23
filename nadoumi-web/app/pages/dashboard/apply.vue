@@ -49,6 +49,17 @@ async function load() {
 }
 await load()
 
+const chosen = computed(() => applicants.value.find((a: ApplicantDto) => a.id === applicantId.value))
+const chosenName = computed(() =>
+  `${chosen.value?.givenName ?? ''} ${chosen.value?.familyName ?? ''}`.trim() || t('apply.unnamedStudent'))
+const profileUnfinished = computed(() => !!chosen.value && !chosen.value.onboardingComplete)
+
+function finishProfile() {
+  if (applicantId.value === null) return
+  activeApplicantId.value = applicantId.value
+  return navigateTo(localePath('/onboarding'))
+}
+
 const needsIntake = computed(() => target.value?.kind === 'programme')
 const noIntakeOpen = computed(() => target.value?.kind === 'programme' && target.value.intakes.length === 0)
 const draft = computed(() =>
@@ -98,6 +109,12 @@ useSeo(t('apply.title'), t('apply.blurb'))
       <SectionCard :title="t('apply.studentTitle')">
         <p v-if="!applicants.length" class="text-sm text-slate-500">{{ t('apply.noStudents') }}</p>
         <ApplyStudentPicker v-else v-model="applicantId" :applicants="applicants" />
+        <NAlert v-if="profileUnfinished" tone="warning" class="mt-3" data-test="profile-unfinished">
+          <p>{{ t('apply.profileUnfinished', { name: chosenName }) }}</p>
+          <NButton size="sm" variant="secondary" class="mt-2" data-test="finish-profile" @click="finishProfile">
+            {{ t('apply.finishProfile', { name: chosenName }) }}
+          </NButton>
+        </NAlert>
       </SectionCard>
 
       <SectionCard v-if="needsIntake" :title="t('apply.intakeTitle')">

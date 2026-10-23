@@ -2535,6 +2535,8 @@
     "back": "Retour",
     "noTarget": "Choisissez un programme ou une bourse pour postuler.",
     "notFound": "Nous n’avons pas trouvé ce pour quoi vous souhaitez postuler. Il n’est peut-être plus ouvert.",
+    "profileUnfinished": "{name} n'a pas terminé son profil. Vous pouvez commencer la candidature, mais elle ne pourra être soumise qu'une fois son profil complet.",
+    "finishProfile": "Terminer le profil de {name}",
     "studentTitle": "Qui postule",
     "studentLegend": "Étudiant",
     "unnamedStudent": "Étudiant",

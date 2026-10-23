@@ -2535,6 +2535,8 @@
     "back": "返回",
     "noTarget": "请选择要申请的项目或奖学金。",
     "notFound": "找不到你要申请的内容，可能已不再开放。",
+    "profileUnfinished": "{name} 尚未完成个人资料。您可以先开始申请，但需在其资料完整后才能提交。",
+    "finishProfile": "完成 {name} 的资料",
     "studentTitle": "申请人",
     "studentLegend": "学生",
     "unnamedStudent": "学生",

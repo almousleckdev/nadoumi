@@ -133,6 +133,12 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 > form PDF prints the resolved address ("Documents sent to"). The family checkbox "This person has died" is now "Not living or not in
 > contact" (the form rule is unchanged: a parent who is unavailable needs a note and at least two siblings or relatives).
 
+> **Update 2026-10-23 (applying for another student): the submit gate also checks the applicant's profile. IMPLEMENTED.** An application can be
+> started for any student the account may act for, but `SubmitGate` (every actor, student or staff) now refuses a submit with HTTP 409
+> until the *applicant* has finished onboarding and filled the form data: `ONBOARDING`, `PERSONAL_DETAILS`, `FAMILY`, `SUPPORTER`,
+> `CHINA_EMERGENCY` (`SubmissionReadinessService`, server-side, not exposed to the web). The order is fee, documents, profile, signature. The apply
+> screen warns when the chosen student is unfinished and offers "Finish <name>'s profile", which switches to that student's onboarding.
+
 > **Update 2026-10-22 (family data): the missing onboarding data is IMPLEMENTED (§6.3).** `/dashboard/family` holds four
 > sections, each saved once on the applicant and reused for every application: **personal details** (marital status, religion,
 > place of birth, official language, permanent address and post code), **family members** (father, mother, spouse, siblings,
