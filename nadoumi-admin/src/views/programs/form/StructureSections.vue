@@ -17,6 +17,18 @@ const form = useProgramForm()
 const isDegree = computed(() => isDegreeKind(form.programType))
 const addSeveralOpen = ref(false)
 
+/** Rows that repeat an earlier row's major at the same level; the server keeps only the first. */
+const repeated = computed(() => {
+  const seen = new Set<string>()
+  return form.majors.map((m) => {
+    const key = `${m.majorId ?? m.name.trim().toLowerCase()}:${m.level ?? ''}`
+    if (!m.majorId && !m.name.trim()) return false
+    const again = seen.has(key)
+    seen.add(key)
+    return again
+  })
+})
+
 /** Adds the dialog's rows, skipping a major already listed at the same level. */
 function addMajors(rows: NewMajorRow[]) {
   const same = (a: NewMajorRow, b: NewMajorRow) =>
@@ -75,6 +87,18 @@ function addMajors(rows: NewMajorRow[]) {
         :row="m"
         class="line__major"
       />
+      <el-tooltip
+        v-if="repeated[i]"
+        :content="t('program.majorRepeated')"
+      >
+        <el-tag
+          type="warning"
+          effect="plain"
+          disable-transitions
+        >
+          {{ t('program.majorRepeatedShort') }}
+        </el-tag>
+      </el-tooltip>
       <el-button
         link
         type="danger"

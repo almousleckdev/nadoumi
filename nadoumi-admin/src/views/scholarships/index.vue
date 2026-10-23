@@ -250,7 +250,7 @@ const columns: DataTableColumn[] = [
   { prop: 'actions', label: '', width: 130, align: 'right' },
 ]
 
-const logoOf = (s: Scholarship) => assetUrl(s.view.heroUrl ?? s.view.heroImageUrl)
+const logoOf = (s: Scholarship) => assetUrl(s.view.coverUrl ?? s.view.coverImageUrl ?? s.view.heroUrl ?? s.view.heroImageUrl)
 const coverOf = (s: Scholarship) => assetUrl(s.view.coverUrl ?? s.view.coverImageUrl)
 
 const drawerOpen = ref(false)

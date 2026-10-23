@@ -15,11 +15,10 @@ const form = useScholarshipForm()
 const STATUSES = ['ACTIVE', 'INACTIVE'] as const
 const PUBLISH = ['DRAFT', 'PUBLISHED'] as const
 
-const heroUp = ref<InstanceType<typeof ImageUpload>>()
 const coverUp = ref<InstanceType<typeof ImageUpload>>()
 
 function uploadTasks(id: number | string): DeferredTask[] {
-  return [uploaderTask(heroUp.value, id), uploaderTask(coverUp.value, id)]
+  return [uploaderTask(coverUp.value, id)]
 }
 
 defineExpose({ uploadTasks })
@@ -59,27 +58,19 @@ defineExpose({ uploadTasks })
     </el-form-item>
   </FormSection>
 
-  <FormSection :title="t('scholarship.secMedia')">
+  <FormSection
+    :title="t('scholarship.secMedia')"
+    :description="t('scholarship.imageHint')"
+  >
     <div class="imgs">
-      <el-form-item :label="t('scholarship.heroImage')">
-        <ImageUpload
-          ref="heroUp"
-          v-model="form.heroMediaId"
-          :action="`/api/staff/scholarships/${form.id}/hero`"
-          :resolve-action="(id) => `/api/staff/scholarships/${id}/hero`"
-          :deferred="!form.id"
-          :preview-url="scholarship?.view.heroUrl ?? scholarship?.view.heroImageUrl"
-          aspect="wide"
-        />
-      </el-form-item>
-      <el-form-item :label="t('scholarship.coverImage')">
+      <el-form-item :label="t('scholarship.image')">
         <ImageUpload
           ref="coverUp"
           v-model="form.coverMediaId"
           :action="`/api/staff/scholarships/${form.id}/cover`"
           :resolve-action="(id) => `/api/staff/scholarships/${id}/cover`"
           :deferred="!form.id"
-          :preview-url="scholarship?.view.coverUrl ?? scholarship?.view.coverImageUrl"
+          :preview-url="scholarship?.view.coverUrl ?? scholarship?.view.coverImageUrl ?? scholarship?.view.heroUrl ?? scholarship?.view.heroImageUrl"
           aspect="wide"
         />
       </el-form-item>

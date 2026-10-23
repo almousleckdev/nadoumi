@@ -23,8 +23,8 @@ const fieldsSummary = computed(() => {
   return (shared.length ? [`${t('scholarship.fieldsAllShort')}: ${shared.join(', ')}`, ...parts] : parts).join(' · ')
 })
 
-const heroSrc = computed(() => assetUrl(props.view.heroUrl ?? props.view.heroImageUrl))
-const coverSrc = computed(() => assetUrl(props.view.coverUrl ?? props.view.coverImageUrl))
+// one image: the cover, or the older hero image for scholarships that only have that
+const imageSrc = computed(() => assetUrl(props.view.coverUrl ?? props.view.coverImageUrl ?? props.view.heroUrl ?? props.view.heroImageUrl))
 
 function nationalityText(e: NonNullable<ScholarshipView['eligibility']>) {
   if (e.nationalityScope === 'INCLUDE') return `${t('scholarship.scope.INCLUDE')}: ${e.acceptedCountries || ''}`
@@ -50,23 +50,15 @@ const eligibilityItems = computed(() => {
 
 <template>
   <FormSection
-    v-if="heroSrc || coverSrc"
+    v-if="imageSrc"
     :title="t('scholarship.secMedia')"
   >
     <div class="imgs">
-      <figure v-if="heroSrc">
+      <figure>
         <img
-          :src="heroSrc"
+          :src="imageSrc"
           alt=""
         >
-        <figcaption>{{ t('scholarship.heroImage') }}</figcaption>
-      </figure>
-      <figure v-if="coverSrc">
-        <img
-          :src="coverSrc"
-          alt=""
-        >
-        <figcaption>{{ t('scholarship.coverImage') }}</figcaption>
       </figure>
     </div>
   </FormSection>
