@@ -50,18 +50,6 @@ const { usdHint } = useUsdHint()
         />
       </el-form-item>
     </div>
-    <el-form-item :label="t('program.admission.documents')">
-      <el-input
-        v-model="form.applicationDocuments"
-        type="textarea"
-        :rows="4"
-        maxlength="4000"
-        :placeholder="t('program.admission.documentsPlaceholder')"
-      />
-    <p class="field-hint">
-        {{ t('program.admission.documentsHint') }}
-      </p>
-    </el-form-item>
     <div class="row">
       <el-form-item :label="t('program.admission.applicationFee')">
         <el-input-number

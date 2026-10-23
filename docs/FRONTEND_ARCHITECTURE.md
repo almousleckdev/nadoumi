@@ -727,3 +727,6 @@ Signature (EXISTING, 2026-10-22): `SignatureCard` and `SignaturePad` (canvas, po
 emits `preview`, the page fetches the file through the same `fileAccess` call as Download (signed URL or streamed bytes, never a stored
 location) and `DocumentViewer` shows it in a wide `NModal` (`wide` prop, `max-w-4xl`). Object URLs are revoked on close. `DocumentViewer` is
 the dashboard viewer; `onboarding/DocumentPreview` is a separate component for the onboarding upload step.
+
+**RequiredDocumentsCard (2026-10-23).** Scholarship and programme detail pages show the documents an opportunity asks for through one shared
+`RequiredDocumentsCard`. The programme page loads them from the public requirements endpoint; a programme with none falls back to its old free text.

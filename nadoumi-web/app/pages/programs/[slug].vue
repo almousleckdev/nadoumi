@@ -8,6 +8,17 @@ const { t } = useI18n()
 const localePath = useLocalePath()
 const { status } = useSession()
 const { data: p } = await usePublicDetail<ProgramDetail>('programs')
+const { publicGet } = useApi()
+// the same rows that drive the student's checklist, so visitors read what students are asked for
+const { data: requirements } = await useAsyncData(
+  () => `program-documents-${p.value?.id ?? 0}`,
+  async () => p.value
+    ? (await publicGet<{ docType: string, mandatory: boolean, notes?: string | null, appliesWhen?: string | null }[]>(
+        `document-requirements/programs/${p.value.id}`).catch(() => []))
+        .map(({ notes, ...rest }) => ({ ...rest, note: notes ?? null }))
+    : [],
+  { default: () => [] },
+)
 
 useSeo(
   p.value?.name ?? t('program.fallbackTitle'),
@@ -82,7 +93,7 @@ const facts = computed<DetailFact[]>(() => {
       <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
     </DetailCard>
     <ProgramOfferings :offerings="p.offerings ?? []" />
-    <ProgramAdmission :program="p" />
+    <ProgramAdmission :program="p" :documents="requirements" />
     <ProgramMajors :majors="p.majors ?? []" />
     <ProgramIntakes :intakes="p.intakes" />
 

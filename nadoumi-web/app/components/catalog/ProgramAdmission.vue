@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { ProgramDetail } from '~/types/catalog'
+import type { RequiredDocument } from '~/components/catalog/RequiredDocumentsCard.vue'
 
-const props = defineProps<{ program: ProgramDetail }>()
+const props = defineProps<{ program: ProgramDetail, documents: RequiredDocument[] }>()
 
 const { t } = useI18n()
 
@@ -11,11 +12,10 @@ const languageItems = computed(() => [
   props.program.minToefl != null ? { text: t('program.admission.toefl', { n: props.program.minToefl }) } : null,
 ].filter((i): i is { text: string } => i !== null))
 
-const documents = computed(() => (props.program.applicationDocuments ?? '')
-  .split('\n')
-  .map(line => line.trim())
-  .filter(Boolean)
-  .map(text => ({ text })))
+// programmes saved before the structured list existed still carry a free-text list; it is shown until one is set
+const legacyDocuments = computed(() => props.documents.length
+  ? []
+  : (props.program.applicationDocuments ?? '').split('\n').map(line => line.trim()).filter(Boolean).map(text => ({ text })))
 
 const prose = computed(() => [
   { title: t('program.admission.scholarships'), body: props.program.scholarshipInfo },
@@ -35,8 +35,9 @@ const prose = computed(() => [
     </div>
   </DetailCard>
 
-  <DetailCard v-if="documents.length" :title="t('program.admission.documents')">
-    <BulletList :items="documents" :columns="2" />
+  <RequiredDocumentsCard :documents="documents" />
+  <DetailCard v-if="legacyDocuments.length" :title="t('program.admission.documents')">
+    <BulletList :items="legacyDocuments" :columns="2" />
   </DetailCard>
 
   <DetailCard v-for="p in prose" :key="p.title" :title="p.title">
