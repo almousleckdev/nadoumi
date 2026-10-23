@@ -151,6 +151,18 @@ class ProgramChildrenWriterTest {
     }
 
     @Test
+    void shouldDropARepeatedMajorAtTheSameLevel_butKeepItAtAnotherLevel() {
+        when(majors.require(7L)).thenReturn(catalogueMajor(7L, "Computer Science", null));
+
+        writer.replace(program(ProgramType.DEGREE), request(List.of("BACHELOR", "MASTER"), List.of(
+                new ProgramRequest.MajorInput(null, null, null, "BACHELOR", 7L),
+                new ProgramRequest.MajorInput(null, null, null, "BACHELOR", 7L),
+                new ProgramRequest.MajorInput(null, null, null, "MASTER", 7L)), null));
+
+        verify(mapper, times(2)).insertMajor(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
     void shouldAddATypedMajorToTheCatalogue_soEveryRowIsLinked() {
         var captor = org.mockito.ArgumentCaptor.forClass(com.nadoumi.program.domain.ProgramMajor.class);
 

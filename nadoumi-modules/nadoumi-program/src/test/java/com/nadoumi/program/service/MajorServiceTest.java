@@ -37,6 +37,12 @@ class MajorServiceTest {
     }
 
     @Test
+    void shouldTreatSpacingDifferencesAsTheSameMajor() {
+        assertThat(MajorService.normalise("  Computer   Science ")).isEqualTo("Computer Science");
+        assertThat(MajorService.parseLine("Computer   Science | 计算机科学")[0]).isEqualTo("Computer Science");
+    }
+
+    @Test
     void shouldRejectADuplicateName_onCreate() {
         when(mapper.findByName("Finance")).thenReturn(major(1, "Finance"));
 

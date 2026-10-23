@@ -106,17 +106,17 @@ describe('ScholarshipDrawer media uploads', () => {
     return mount(ScholarshipDrawer, { props: { modelValue: true, scholarship }, ...mountOpts() })
   }
 
-  it('defers the hero/cover uploads until the scholarship has an id', async () => {
+  it('defers the single image upload until the scholarship has an id', async () => {
     const creating = mountDrawer(null)
     await flushPromises()
     const uploads = creating.findAllComponents(ImageUpload)
-    expect(uploads.length).toBe(2)
+    expect(uploads.length).toBe(1) // one image is enough
     expect(uploads.every(u => u.props('deferred') === true)).toBe(true)
 
     const editing = mountDrawer(row as unknown as Scholarship)
     await flushPromises()
     const editUploads = editing.findAllComponents(ImageUpload)
     expect(editUploads.every(u => u.props('deferred') === false)).toBe(true)
-    expect(editUploads[0]!.props('previewUrl')).toBe('https://res.cloudinary.com/hero.png')
+    expect(editUploads[0]!.props('previewUrl')).toBe('https://res.cloudinary.com/cover.png')
   })
 })
