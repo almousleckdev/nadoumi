@@ -8,7 +8,7 @@ const whatsappHref = buildWhatsappHref()
 </script>
 
 <template>
-  <div class="group relative inline-block">
+  <div class="group inline-block sm:relative">
     <a
       :href="whatsappHref"
       target="_blank"
