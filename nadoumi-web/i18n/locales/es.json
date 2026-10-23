@@ -695,6 +695,7 @@
     "locationTitle": "Ubicación actual",
     "workTitle": "Experiencia laboral",
     "applications": {
+      "continue": "Continuar",
       "title": "Mis solicitudes",
       "blurb": "Sigue cada solicitud que has iniciado, desde el borrador hasta la decisión.",
       "detailTitle": "Solicitud",
@@ -763,6 +764,10 @@
     }
   },
   "errors": {
+    "submitProfile": "El perfil del estudiante no está terminado. Completa los pasos abiertos y envía.",
+    "submitDocuments": "Aún faltan documentos obligatorios. Súbelos y envía.",
+    "submitSignature": "El formulario aún necesita la firma del estudiante.",
+    "submitPayment": "La tasa de solicitud debe pagarse antes de enviar la solicitud.",
     "network": "No se puede contactar con el servidor. Comprueba tu conexión e inténtalo de nuevo.",
     "server": "Algo salió mal por nuestra parte. Inténtalo de nuevo en breve.",
     "rateLimited": "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
@@ -953,7 +958,6 @@
     "notAvailable": "Este programa no está disponible.",
     "offeredBy": "Ofrecido por {university}",
     "backToUniversity": "Volver a {university}",
-    "view": "Ver programa",
     "hot": "Popular",
     "duration": "{months} meses",
     "durationLabel": "Duración",
@@ -1169,6 +1173,7 @@
       "OTHER": "Otra tasa"
     },
     "doc": {
+      "APPLICATION_FORM": "Formulario de solicitud (rellenado)",
       "PASSPORT": "Pasaporte",
       "TRANSCRIPT": "Expediente académico",
       "VISA": "Visado",
@@ -1229,6 +1234,7 @@
           "title": "Seis pasos hasta la matrícula"
         },
         "checklist": {
+    "view": "Ver",
           "eyebrow": "Lista de verificación",
           "title": "Documentos que necesitarás"
         },
@@ -2536,6 +2542,82 @@
       "resendWait": "El recibo se envió hace un momento. Inténtalo de nuevo en unos minutos."
     }
   },
+  "applyFlow": {
+    "onBehalf": "Estás completando los datos de {name}. Donde una pregunta diga «tú» o «tu», se refiere a {name}.",
+    "title": "Tu solicitud",
+    "blurb": "Completa tu solicitud paso a paso.",
+    "browse": "Ver programas",
+    "exit": "Guardar y salir",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "steps": {
+      "start": "Solicitud para",
+      "profile": "Perfil del estudiante",
+      "identity": "Foto y pasaporte",
+      "address": "Dirección y contacto",
+      "education": "Estudios",
+      "work": "Experiencia laboral",
+      "family": "Familia",
+      "support": "Garante y contactos",
+      "study": "Plan de estudios",
+      "documents": "Documentos",
+      "signature": "Firma",
+      "review": "Vista previa y pago"
+    },
+    "blurbs": {
+      "start": "A qué te presentas y para quién es la solicitud.",
+      "profile": "La identidad del estudiante, tal como está en el pasaporte.",
+      "identity": "Una foto tipo pasaporte y la página del pasaporte.",
+      "address": "Dónde vive ahora el estudiante, su dirección permanente y adónde enviar los documentos de admisión.",
+      "education": "Cada escuela y universidad, desde primaria hasta hoy.",
+      "work": "Trabajos y periodos sin actividad desde que se graduó. Añádelos si ya se graduó.",
+      "family": "Primero los padres. Si uno ha fallecido o no hay contacto, añade al menos dos hermanos u otros familiares.",
+      "support": "Quién paga los estudios y a quién se puede contactar en China.",
+      "study": "El título, las materias, las ciudades y la beca que desea.",
+      "documents": "Sube los documentos pedidos. Descarga el formulario de solicitud, rellénalo y súbelo.",
+      "signature": "La firma manuscrita del estudiante, impresa en el formulario.",
+      "review": "Revisa todo, mira el formulario, paga la tasa y envía."
+    },
+    "context": {
+      "applyingFor": "Solicitud para",
+      "student": "Estudiante"
+    },
+    "start": {
+      "whoTitle": "¿Para quién es esta solicitud?",
+      "whoHint": "Elige un estudiante o añade otro. Para otro estudiante completarás sus datos en los siguientes pasos.",
+      "anotherStudent": "Solicitar para otro estudiante",
+      "newStudentHint": "Añade el nombre del estudiante. El resto lo irás completando paso a paso.",
+      "givenName": "Nombre (como en el pasaporte)",
+      "familyName": "Apellidos (como en el pasaporte)",
+      "addStudent": "Añadir estudiante",
+      "begin": "Empezar la solicitud",
+      "savedAs": "Tu solicitud está guardada como {reference}. Continúa con el siguiente paso."
+    },
+    "sections": {
+      "currentAddress": "Dirección actual",
+      "permanentAddress": "Datos personales y dirección permanente",
+      "contacts": "Contactos de emergencia"
+    },
+    "review": {
+      "checkTitle": "Revisar la solicitud",
+      "allDone": "Todos los pasos están completos.",
+      "stillOpen": "Estos pasos aún necesitan tu atención antes de enviar.",
+      "open": "Abrir",
+      "previewTitle": "Vista previa del formulario",
+      "previewBlurb": "Este es el formulario que recibe Nadoumi, creado con todo lo que introdujiste.",
+      "previewButton": "Ver el formulario",
+      "previewFailed": "No se pudo crear la vista previa. Inténtalo de nuevo.",
+      "finishSteps": "Completa los pasos de arriba para enviar.",
+      "readyHint": "Todo está listo. Envía la solicitud a Nadoumi.",
+      "submit": "Enviar solicitud"
+    },
+    "submitted": {
+      "title": "Solicitud enviada",
+      "body": "Nadoumi recibió la solicitud y el formulario. Te escribimos en cada paso.",
+      "viewApplications": "Ver mis solicitudes",
+      "applyAgain": "Solicitar otro programa"
+    }
+  },
   "apply": {
     "title": "Solicitar",
     "blurb": "Empieza tu solicitud.",
@@ -2612,19 +2694,11 @@
       "company": "Empresa o institución",
       "companyAddress": "Dirección de la empresa",
       "homeAddress": "Domicilio"
-    },
-    "readiness": {
-      "title": "Completa tu formulario de solicitud",
-      "body": "Estas partes del formulario de solicitud de Nadoumi siguen vacías. Aún puedes enviar, pero el formulario las mostrará como no facilitadas.",
-      "fill": "Rellenarlas",
-      "PERSONAL_DETAILS": "Datos personales",
-      "FAMILY": "Familiares",
-      "SUPPORTER": "Patrocinador financiero",
-      "CHINA_EMERGENCY": "Contacto de emergencia en China",
-      "SIGNATURE": "Firma"
     }
   },
   "checklist": {
+    "view": "Ver",
+    "formSteps": "Descarga el formulario, rellénalo y súbelo aquí. Es obligatorio.",
     "title": "Documentos que subir",
     "blurb": "Estos son los documentos que necesita esta solicitud. Sube cada uno en PDF, JPEG o PNG. El equipo de Nadoumi los revisa cuando envías la solicitud.",
     "mandatory": "Obligatorio",
