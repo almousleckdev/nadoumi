@@ -75,7 +75,7 @@ class WelcomeContentComposerTest {
     // fields the composer reads carry meaningful values; the rest are null/false.
     private static PublicProgramResponse program(String name, String uni, String slug) {
         return new PublicProgramResponse(
-                1L, 2L, uni, "uni-slug", name, slug, null, "Bachelor", List.of(), "Medicine",
+                1L, 2L, uni, "uni-slug", "Hangzhou", "Zhejiang", name, slug, null, "Bachelor", List.of(), "Medicine",
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
                 null, null, false, false, null, null, null);
     }

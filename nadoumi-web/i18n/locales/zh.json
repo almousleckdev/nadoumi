@@ -995,6 +995,8 @@
     "universityLabel": "院校",
     "viewAll": "查看全部专业项目",
     "durationYears": "{n} 年 | {n} 年",
+    "location": "所在地",
+    "termLabel": "学制",
     "tuitionFrom": "学费起价",
     "accommodationFrom": "住宿费起价",
     "offerings": {

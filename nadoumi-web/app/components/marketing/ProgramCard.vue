@@ -14,6 +14,9 @@ const localePath = useLocalePath()
 const tuition = computed(() =>
   offeringMoney(props.program.tuitionAmount, props.program.tuitionAmountUsd, props.program.tuitionCurrency))
 
+const location = computed(() =>
+  [props.program.universityCity, props.program.universityProvince].filter(Boolean).join(', '))
+
 const levelLabel = computed(() => {
   const p = props.program
   return p.programType === 'DEGREE' && p.levels?.length
@@ -52,6 +55,7 @@ const levelLabel = computed(() => {
       <p v-if="showUniversity && program.universityName" class="mt-1 text-sm text-slate-600">
         {{ t('program.offeredBy', { university: program.universityName }) }}
       </p>
+      <p v-if="location" class="mt-1 text-sm text-slate-500" data-test="program-location">{{ location }}</p>
       <p v-if="program.field" class="mt-1 text-sm text-slate-500">{{ program.field }}</p>
 
       <p v-if="tuition" class="mt-3 text-sm font-semibold tabular-nums text-red-600">

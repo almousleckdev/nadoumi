@@ -53,6 +53,8 @@ const facts = computed<DetailFact[]>(() => {
   const tuition = cheapest(x.offerings ?? [], 'tuitionAmount')
   const room = cheapest(x.offerings ?? [], 'accommodationAmount')
   const all: DetailFact[] = [
+    { label: t('program.location'), value: [x.universityCity, x.universityProvince].filter(Boolean).join(', '), icon: 'location' },
+    { label: t('program.termLabel'), value: x.termLength ?? '', icon: 'clock' },
     { label: t('program.language'), value: x.teachingLanguage ? t(`program.lang.${x.teachingLanguage}`) : '', icon: 'messages' },
     { label: t('program.field'), value: x.field ?? '', icon: 'education' },
     { label: t('program.durationLabel'), value: duration, icon: 'clock' },

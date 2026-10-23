@@ -218,6 +218,9 @@ export interface ProgramCard {
   slug: string
   universityId: number
   universitySlug: string | null
+  termLength?: string | null
+  universityCity?: string | null
+  universityProvince?: string | null
   universityName: string | null
   name: string
   nameCn?: string | null

@@ -525,3 +525,7 @@ Document verification (EXISTING, 2026-10-23): `GET /api/public/documents/verify?
 **Public: `GET /api/public/document-requirements/programs/{programId}` (2026-10-23, anonymous).** Returns `[{docType, mandatory, notes, appliesWhen}]`: the same
 rows that drive an applicant's checklist, for the public programme page. Nothing confidential. The free-text `applicationDocuments` on a
 programme is no longer edited in the admin; the public page shows it only for programmes that have no structured list yet.
+
+**Public programme location (2026-10-23).** `PublicProgramResponse` carries `universityCity` and `universityProvince` (read from the owning university through
+`UniversityService`, never a join) so the programme card and detail page can show where it is. `remark` (internal notes), `partnerStatus`, `referenceCode`
+and publish status stay staff-only and are never part of a public response; the admin university page shows them.

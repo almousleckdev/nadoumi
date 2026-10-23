@@ -180,6 +180,8 @@ const profile = computed<DescriptionItem[]>(() => {
     { label: t('university.intlStudents'), value: x.internationalStudents?.toLocaleString() },
     { label: t('university.facultyCount'), value: x.facultyCount?.toLocaleString() },
     { label: t('university.rankingTier'), value: x.rankingTier },
+    { label: t('university.referenceCode'), value: x.referenceCode },
+    { label: t('university.partnerStatus'), value: x.partnerStatus ? titleCase(x.partnerStatus) : null },
     { label: t('university.website'), value: x.website, slot: 'website' },
     { label: t('university.admissionsEmail'), value: x.admissionsEmail },
     { label: t('university.officePhone'), value: x.officePhone },
@@ -197,6 +199,7 @@ const prose = computed(() => {
     { label: t('university.campusInfo'), value: x.campusInfo },
     { label: t('university.accommodationInfo'), value: x.accommodationInfo },
     { label: t('university.nearbyInfo'), value: x.nearbyInfo },
+    { label: t('university.remark'), value: x.remark },
   ].filter(b => b.value)
 })
 
