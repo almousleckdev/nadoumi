@@ -41,13 +41,32 @@ describe('TemplatesSection', () => {
     expect(w.text()).toContain('form.pdf')
   })
 
-  it('asks to save the record first when it has no id yet', async () => {
+  it('holds files for a record that does not exist yet and uploads them after it is created', async () => {
+    api.addTemplate.mockResolvedValue({ id: 2, title: 'Form', fileName: 'form.pdf' })
     const w = mountSection(null)
     await flushPromises()
+    const file = new File(['%PDF'], 'form.pdf', { type: 'application/pdf' })
 
     expect(api.listTemplates).not.toHaveBeenCalled()
-    expect(w.find('input[type="file"]').exists()).toBe(false)
-    expect(w.text()).toContain('Save the record first')
+    await w.find('input.el-input__inner').setValue('Form')
+    await pick(w, file)
+    expect(api.addTemplate).not.toHaveBeenCalled() // nothing to attach it to yet
+    expect(w.text()).toContain('form.pdf')
+
+    const saved = await (w.vm as unknown as { flush: (id: number) => Promise<boolean> }).flush(9)
+    expect(saved).toBe(true)
+    expect(api.addTemplate).toHaveBeenCalledWith('programs', 9, 'Form', file)
+  })
+
+  it('labels a Word file with its real type when the browser reports none', async () => {
+    api.addTemplate.mockResolvedValue({ id: 2, title: 'Form', fileName: 'form.doc' })
+    const w = mountSection(7)
+    await flushPromises()
+    await w.find('input.el-input__inner').setValue('Form')
+    await pick(w, new File(['x'], 'NADOUMI FORM.doc', { type: '' }))
+
+    const sent = api.addTemplate.mock.calls[0]![3] as File
+    expect(sent.type).toBe('application/msword')
   })
 
   it('blocks the file picker until a title is entered, then uploads with it', async () => {

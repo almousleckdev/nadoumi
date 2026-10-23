@@ -20,6 +20,7 @@ const { t } = useI18n()
 
 const formRef = ref<FormInstance>()
 const saving = ref(false)
+const templatesRef = ref<InstanceType<typeof TemplatesSection>>()
 const publishing = ref<InstanceType<typeof PublishingSections>>()
 const deferredImages = useDeferredImages()
 
@@ -67,7 +68,8 @@ async function save() {
     const imagesOk = props.scholarship
       ? true
       : await deferredImages.flush(publishing.value?.uploadTasks(saved.view.id) ?? [])
-    if (imagesOk) ElMessage.success(t('common.saved'))
+    const templatesOk = props.scholarship ? true : await (templatesRef.value?.flush(saved.view.id) ?? true)
+    if (imagesOk && templatesOk) ElMessage.success(t('common.saved'))
     emit('update:modelValue', false)
     emit('saved', saved)
   }
@@ -97,6 +99,7 @@ async function save() {
       <FundingSections />
       <ApplicationSections />
       <TemplatesSection
+        ref="templatesRef"
         scope="scholarships"
         :ref-id="scholarship?.view.id ?? null"
       />
