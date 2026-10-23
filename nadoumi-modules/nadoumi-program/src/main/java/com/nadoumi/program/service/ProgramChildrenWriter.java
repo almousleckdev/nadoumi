@@ -1,6 +1,7 @@
 package com.nadoumi.program.service;
 
 import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.scholarship.ScholarshipCategoryCatalogue;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.program.domain.Major;
 import com.nadoumi.program.domain.Program;
@@ -13,6 +14,7 @@ import com.nadoumi.university.service.DepartmentService;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /** Replaces a programme's levels, majors and intakes with the request's, inside the caller's transaction. */
@@ -24,11 +26,14 @@ public class ProgramChildrenWriter {
     private final ProgramMapper mapper;
     private final DepartmentService departmentService;
     private final MajorService majors;
+    private final ScholarshipCategoryCatalogue scholarshipCategories;
 
-    public ProgramChildrenWriter(ProgramMapper mapper, DepartmentService departmentService, MajorService majors) {
+    public ProgramChildrenWriter(ProgramMapper mapper, DepartmentService departmentService, MajorService majors,
+            ScholarshipCategoryCatalogue scholarshipCategories) {
         this.mapper = mapper;
         this.departmentService = departmentService;
         this.majors = majors;
+        this.scholarshipCategories = scholarshipCategories;
     }
 
     public void replace(Program program, ProgramRequest req) {
@@ -37,6 +42,25 @@ public class ProgramChildrenWriter {
         replaceMajors(program, req, degree, levels);
         replaceIntakes(program.getId(), req.intakes());
         replaceOfferings(program, req, levels);
+        replaceScholarshipTypes(program.getId(), req.scholarshipCategories());
+    }
+
+    /** Empty or null means the programme has no scholarships; every code must be a known scholarship category. */
+    private void replaceScholarshipTypes(Long programId, List<String> requested) {
+        mapper.deleteScholarshipTypes(programId);
+        if (requested == null || requested.isEmpty()) {
+            return;
+        }
+        Set<String> known = scholarshipCategories.codes();
+        Set<String> wanted = new java.util.LinkedHashSet<>();
+        for (String raw : requested) {
+            String code = raw == null ? "" : raw.trim().toUpperCase();
+            if (!known.contains(code)) {
+                throw new NadBadRequestException("unknown scholarship category: " + raw);
+            }
+            wanted.add(code);
+        }
+        wanted.forEach(code -> mapper.insertScholarshipType(programId, code));
     }
 
     /** Offerings are optional; a null list leaves the programme with none. */

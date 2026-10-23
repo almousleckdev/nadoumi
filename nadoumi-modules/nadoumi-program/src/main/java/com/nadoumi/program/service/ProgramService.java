@@ -228,6 +228,7 @@ public class ProgramService {
         Program p = load(id);
         p.setLevels(mapper.findLevels(id));
         p.setMajors(mapper.findMajors(id));
+        p.setScholarshipCategories(mapper.findScholarshipTypes(id));
         p.setIntakes(mapper.findIntakes(id));
         List<ProgramOffering> offerings = mapper.findOfferings(id);
         offerings.forEach(o -> {

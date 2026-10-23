@@ -97,6 +97,8 @@ export interface Program {
   applicationDocuments: string | null
   careerProspects: string | null
   scholarshipInfo: string | null
+  /** Codes of the scholarship categories that fund the programme; empty means it has no scholarships. */
+  scholarshipCategories?: string[]
   minHsk: number | null
   minIelts: number | null
   minToefl: number | null
@@ -131,6 +133,7 @@ export interface ProgramInput {
   applicationDocuments?: string | null
   careerProspects?: string | null
   scholarshipInfo?: string | null
+  scholarshipCategories?: string[]
   minHsk?: number | null
   minIelts?: number | null
   minToefl?: number | null

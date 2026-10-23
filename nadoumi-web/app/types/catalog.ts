@@ -219,6 +219,8 @@ export interface ProgramCard {
   universityId: number
   universitySlug: string | null
   termLength?: string | null
+  /** Codes of the scholarship categories that fund this programme (detail only); empty or absent means none. */
+  scholarshipCategories?: string[] | null
   universityCity?: string | null
   universityProvince?: string | null
   universityName: string | null

@@ -44,6 +44,7 @@ const mba: PDto = {
   minIelts: 6.5,
   applicationFeeAmount: 600, applicationFeeCurrency: 'CNY', applicationFeeAmountUsd: 84,
   scholarshipInfo: 'CSC and university scholarships.',
+  scholarshipCategories: ['CSC', 'PROVINCIAL'],
   careerProspects: 'Consulting and finance.',
 }
 
@@ -54,6 +55,9 @@ const requirements = [
 const publicGet = vi.fn((path: string) => {
   if (path === 'programs/fudan-university-mba') return Promise.resolve(mba)
   if (path === 'document-requirements/programs/11') return Promise.resolve(requirements)
+  if (path === 'scholarships/categories') {
+    return Promise.resolve([{ code: 'CSC', name: 'China Scholarship Council (CSC)' }, { code: 'PROVINCIAL', name: 'Provincial scholarship' }])
+  }
   return Promise.reject(new Error('404'))
 })
 mockNuxtImport('useApi', () => () => ({ publicGet, studentFetch: vi.fn() }))
@@ -111,6 +115,8 @@ describe('public programme detail page', () => {
     expect(text).not.toContain('Old free text document') // the structured list replaces the old free text
     expect(text).toContain('¥600 · $84')
     expect(text).toContain('CSC and university scholarships.')
+    expect(text).toContain('China Scholarship Council (CSC)') // the funding types, by their category names
+    expect(text).toContain('Provincial scholarship')
     expect(text).toContain('Consulting and finance.')
   })
 

@@ -51,7 +51,9 @@ public record ProgramRequest(
         @Valid List<MajorInput> majors,
         @Valid List<IntakeInput> intakes,
         /** Per level and duration: tuition and accommodation. Duration / tuition on the programme are derived from these. */
-        @Valid List<OfferingInput> offerings) {
+        @Valid List<OfferingInput> offerings,
+        /** Codes from the scholarship categories (CSC, PROVINCIAL, ...) that fund the programme; empty or null means none. */
+        List<@Size(max = 32) String> scholarshipCategories) {
 
     public record OfferingInput(
             /** DIPLOMA / BACHELOR / MASTER / PHD for degree programmes; null otherwise. */

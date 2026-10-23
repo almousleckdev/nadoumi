@@ -34,7 +34,9 @@ class ProgramChildrenWriterTest {
     private final ProgramMapper mapper = mock(ProgramMapper.class);
     private final DepartmentService departmentService = mock(DepartmentService.class);
     private final MajorService majors = mock(MajorService.class);
-    private final ProgramChildrenWriter writer = new ProgramChildrenWriter(mapper, departmentService, majors);
+    private final com.nadoumi.common.scholarship.ScholarshipCategoryCatalogue categories =
+            mock(com.nadoumi.common.scholarship.ScholarshipCategoryCatalogue.class);
+    private final ProgramChildrenWriter writer = new ProgramChildrenWriter(mapper, departmentService, majors, categories);
 
     private static Program program(ProgramType type) {
         Program p = new Program();
@@ -52,7 +54,7 @@ class ProgramChildrenWriterTest {
                 null, null, null, null, null,           // minHsk, minIelts, minToefl, application fee + currency
                 null,                                   // imageMediaId
                 false, false, null, null, null,         // featured, hot, status, publishStatus, remark
-                majors, intakes, null);
+                majors, intakes, null, null);
     }
 
     private static ProgramRequest.MajorInput major(String name, Long departmentId, String level) {
@@ -150,6 +152,41 @@ class ProgramChildrenWriterTest {
         assertThat(captor.getValue().getName()).isEqualTo("Software Engineering");
     }
 
+    private ProgramRequest withScholarships(List<String> codes) {
+        return new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("BACHELOR"),
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                false, false, null, null, null, null, null, null, codes);
+    }
+
+    @Test
+    void shouldStoreTheScholarshipTypesThatFundTheProgramme() {
+        when(categories.codes()).thenReturn(java.util.Set.of("CSC", "PROVINCIAL"));
+
+        writer.replace(program(ProgramType.DEGREE), withScholarships(List.of("csc", " PROVINCIAL ", "CSC")));
+
+        verify(mapper).deleteScholarshipTypes(PROGRAM_ID);
+        verify(mapper).insertScholarshipType(PROGRAM_ID, "CSC");
+        verify(mapper).insertScholarshipType(PROGRAM_ID, "PROVINCIAL");
+        verify(mapper, times(2)).insertScholarshipType(eq(PROGRAM_ID), anyString()); // the repeat is stored once
+    }
+
+    @Test
+    void shouldLeaveAProgrammeWithoutScholarships_whenNoneAreChosen() {
+        writer.replace(program(ProgramType.DEGREE), withScholarships(List.of()));
+        writer.replace(program(ProgramType.DEGREE), withScholarships(null));
+
+        verify(mapper, times(2)).deleteScholarshipTypes(PROGRAM_ID);
+        verify(mapper, never()).insertScholarshipType(anyLong(), anyString());
+    }
+
+    @Test
+    void shouldRefuseAnUnknownScholarshipCategory() {
+        when(categories.codes()).thenReturn(java.util.Set.of("CSC"));
+
+        assertThatThrownBy(() -> writer.replace(program(ProgramType.DEGREE), withScholarships(List.of("MADE_UP"))))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("MADE_UP");
+    }
+
     @Test
     void shouldAddATypedMajorToTheCatalogue_soEveryRowIsLinked() {
         var captor = org.mockito.ArgumentCaptor.forClass(com.nadoumi.program.domain.ProgramMajor.class);
@@ -216,7 +253,7 @@ class ProgramChildrenWriterTest {
                 new java.math.BigDecimal("1200"), null, null, " shared room ");
         var req = new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("MASTER"),
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                false, false, null, null, null, null, null, List.of(offering));
+                false, false, null, null, null, null, null, List.of(offering), null);
 
         writer.replace(program(ProgramType.DEGREE), req);
 
@@ -236,7 +273,7 @@ class ProgramChildrenWriterTest {
         var tooShort = new ProgramRequest.OfferingInput("BACHELOR", 36, null, null, null, null, null, null, null);
         var req = new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("BACHELOR"),
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-                false, false, null, null, null, null, null, List.of(tooShort));
+                false, false, null, null, null, null, null, List.of(tooShort), null);
 
         assertThatThrownBy(() -> writer.replace(program(ProgramType.DEGREE), req))
                 .isInstanceOf(NadBadRequestException.class);

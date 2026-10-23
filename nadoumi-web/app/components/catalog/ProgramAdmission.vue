@@ -2,7 +2,7 @@
 import type { ProgramDetail } from '~/types/catalog'
 import type { RequiredDocument } from '~/components/catalog/RequiredDocumentsCard.vue'
 
-const props = defineProps<{ program: ProgramDetail, documents: RequiredDocument[] }>()
+const props = defineProps<{ program: ProgramDetail, documents: RequiredDocument[], scholarshipTypes: string[] }>()
 
 const { t } = useI18n()
 
@@ -18,7 +18,6 @@ const legacyDocuments = computed(() => props.documents.length
   : (props.program.applicationDocuments ?? '').split('\n').map(line => line.trim()).filter(Boolean).map(text => ({ text })))
 
 const prose = computed(() => [
-  { title: t('program.admission.scholarships'), body: props.program.scholarshipInfo },
   { title: t('program.admission.career'), body: props.program.careerProspects },
 ].filter(p => p.body))
 </script>
@@ -38,6 +37,15 @@ const prose = computed(() => [
   <RequiredDocumentsCard :documents="documents" />
   <DetailCard v-if="legacyDocuments.length" :title="t('program.admission.documents')">
     <BulletList :items="legacyDocuments" :columns="2" />
+  </DetailCard>
+
+  <DetailCard v-if="scholarshipTypes.length || program.scholarshipInfo" :title="t('program.admission.scholarships')">
+    <ul v-if="scholarshipTypes.length" class="flex flex-wrap gap-2" data-test="scholarship-types">
+      <li v-for="type in scholarshipTypes" :key="type" class="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
+        {{ type }}
+      </li>
+    </ul>
+    <p v-if="program.scholarshipInfo" class="whitespace-pre-line leading-7 text-slate-700" :class="scholarshipTypes.length ? 'mt-4' : ''">{{ program.scholarshipInfo }}</p>
   </DetailCard>
 
   <DetailCard v-for="p in prose" :key="p.title" :title="p.title">
