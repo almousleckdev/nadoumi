@@ -43,7 +43,7 @@
              uploaded_by, uploaded_at, verification_status, scan_status)
         values
             (#{documentId}, #{versionNo}, #{mediaAssetId}, #{contentType}, #{sizeBytes}, #{checksumSha256},
-             #{uploadedBy}, now(), #{verificationStatus}, 'PENDING')
+             #{uploadedBy}, now(), #{verificationStatus}, #{scanStatus})
     </insert>
 
     <update id="updateVerification">
