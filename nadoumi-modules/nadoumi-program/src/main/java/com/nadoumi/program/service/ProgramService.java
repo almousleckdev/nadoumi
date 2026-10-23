@@ -188,7 +188,7 @@ public class ProgramService {
         var uni = universityService.publicGet(universityIdOrSlug); // 404 if not public
         List<Program> rows = mapper.search(
                 ProgramSearch.publicCatalog(null, uni.id(), null, null, null, null, null));
-        rows.forEach(p -> applyUniversity(p, new UniRef(uni.name(), uni.slug())));
+        rows.forEach(p -> applyUniversity(p, new UniRef(uni.name(), uni.slug(), uni.city(), uni.province())));
         return rows.stream().map(p -> PublicProgramResponse.card(p, imageUrl(p), usd(p))).toList();
     }
 
@@ -199,7 +199,7 @@ public class ProgramService {
         }
         // the university must itself be public
         var uni = universityService.publicGet(String.valueOf(p.getUniversityId()));
-        applyUniversity(p, new UniRef(uni.name(), uni.slug()));
+        applyUniversity(p, new UniRef(uni.name(), uni.slug(), uni.city(), uni.province()));
         return PublicProgramResponse.detail(p, imageUrl(p), usd(p));
     }
 
@@ -262,19 +262,21 @@ public class ProgramService {
     }
 
     /** A university's public-facing name + slug, resolved via UniversityService. */
-    private record UniRef(String name, String slug) {
+    private record UniRef(String name, String slug, String city, String province) {
     }
 
     private static void applyUniversity(Program p, UniRef ref) {
         p.setUniversityName(ref == null ? null : ref.name());
         p.setUniversitySlug(ref == null ? null : ref.slug());
+        p.setUniversityCity(ref == null ? null : ref.city());
+        p.setUniversityProvince(ref == null ? null : ref.province());
     }
 
     private UniRef staffUniversity(Long universityId, Map<Long, UniRef> cache) {
         return cache.computeIfAbsent(universityId, id -> {
             try {
                 var u = universityService.get(id);
-                return new UniRef(u.name(), u.slug());
+                return new UniRef(u.name(), u.slug(), u.city(), u.province());
             }
             catch (NadNotFoundException e) {
                 return null;
@@ -286,7 +288,7 @@ public class ProgramService {
         return cache.computeIfAbsent(universityId, id -> {
             try {
                 var u = universityService.publicGet(String.valueOf(id));
-                return new UniRef(u.name(), u.slug());
+                return new UniRef(u.name(), u.slug(), u.city(), u.province());
             }
             catch (NadNotFoundException e) {
                 return null;

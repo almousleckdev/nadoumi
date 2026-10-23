@@ -995,6 +995,8 @@
     "universityLabel": "Université",
     "viewAll": "Voir tous les programmes",
     "durationYears": "{n} an | {n} ans",
+    "location": "Localisation",
+    "termLabel": "Durée du programme",
     "tuitionFrom": "Frais de scolarité à partir de",
     "accommodationFrom": "Hébergement à partir de",
     "offerings": {

@@ -16,6 +16,8 @@ public record PublicProgramResponse(
         Long universityId,
         String universityName,
         String universitySlug,
+        String universityCity,
+        String universityProvince,
         String name,
         String slug,
         String nameCn,
@@ -80,6 +82,7 @@ public record PublicProgramResponse(
         ProgramResponse full = ProgramResponse.of(p, imageUrl, tuitionAmountUsd);
         return new PublicProgramResponse(
                 full.id(), full.universityId(), full.universityName(), full.universitySlug(),
+                p.getUniversityCity(), p.getUniversityProvince(),
                 full.name(), full.slug(), full.nameCn(), full.programType(), full.levels(), full.field(),
                 full.termLength(), full.teachingLanguage(), full.durationMonths(),
                 full.tuitionAmount(), full.tuitionCurrency(), full.tuitionAmountUsd(), full.summary(),

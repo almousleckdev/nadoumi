@@ -24,6 +24,16 @@ const base: PCard = {
 }
 
 describe('ProgramCard', () => {
+  it('shows the city and province of the offering university, and nothing when they are unknown', async () => {
+    const located = await mountSuspended(ProgramCard, {
+      props: { program: { ...base, universityCity: 'Beijing', universityProvince: 'Beijing Municipality' } },
+    })
+    expect(located.find('[data-test="program-location"]').text()).toBe('Beijing, Beijing Municipality')
+
+    const unknown = await mountSuspended(ProgramCard, { props: { program: base } })
+    expect(unknown.find('[data-test="program-location"]').exists()).toBe(false)
+  })
+
   it('renders the resolved (absolute) image URL verbatim', async () => {
     const w = await mountSuspended(ProgramCard, {
       props: { program: { ...base, imageUrl: 'https://res.cloudinary.com/demo/image/upload/v1/clp.jpg' } },

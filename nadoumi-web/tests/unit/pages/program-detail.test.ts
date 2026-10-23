@@ -10,6 +10,8 @@ const mba: PDto = {
   universityId: 7,
   universitySlug: 'fudan-university',
   universityName: 'Fudan University',
+  universityCity: 'Shanghai',
+  universityProvince: 'Shanghai Municipality',
   name: 'MBA',
   nameCn: '工商管理硕士',
   programType: 'DEGREE',
@@ -65,6 +67,7 @@ describe('public programme detail page', () => {
     expect(text).toContain('MBA')
     expect(text).toContain('工商管理硕士')
     expect(text).toContain('Fudan University')
+    expect(text).toContain('Shanghai, Shanghai Municipality') // where the programme is, from its university
     expect(text).toContain('A two-year MBA taught in English.')
     expect(text).toContain('Finance')
     expect(text).toContain('Marketing')

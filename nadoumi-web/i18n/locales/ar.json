@@ -995,6 +995,8 @@
     "universityLabel": "الجامعة",
     "viewAll": "عرض كل البرامج",
     "durationYears": "{n} سنة | {n} سنوات",
+    "location": "الموقع",
+    "termLabel": "مدة الفصل",
     "tuitionFrom": "الرسوم الدراسية تبدأ من",
     "accommodationFrom": "السكن يبدأ من",
     "offerings": {

@@ -53,6 +53,8 @@ public class Program {
     private BigDecimal applicationFeeAmountUsd;
     private String universityName;
     private String universitySlug;
+    private String universityCity;
+    private String universityProvince;
 
     private List<String> levels = new ArrayList<>();
     private List<ProgramMajor> majors = new ArrayList<>();
@@ -161,6 +163,10 @@ public class Program {
     public String getUniversityName() { return universityName; }
     public void setUniversityName(String universityName) { this.universityName = universityName; }
 
+    public String getUniversityCity() { return universityCity; }
+    public void setUniversityCity(String universityCity) { this.universityCity = universityCity; }
+    public String getUniversityProvince() { return universityProvince; }
+    public void setUniversityProvince(String universityProvince) { this.universityProvince = universityProvince; }
     public String getUniversitySlug() { return universitySlug; }
     public void setUniversitySlug(String universitySlug) { this.universitySlug = universitySlug; }
 
