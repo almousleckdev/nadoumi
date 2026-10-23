@@ -12,7 +12,9 @@ import com.nadoumi.program.web.request.ProgramRequest;
 import com.nadoumi.university.service.DepartmentService;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /** Replaces a programme's levels, majors and intakes with the request's, inside the caller's transaction. */
@@ -118,6 +120,7 @@ public class ProgramChildrenWriter {
             return;
         }
         int order = 0;
+        Set<String> listed = new HashSet<>();
         for (ProgramRequest.MajorInput in : req.majors()) {
             Major catalogue = catalogueMajor(in);
             if (catalogue == null) {
@@ -127,6 +130,10 @@ public class ProgramChildrenWriter {
             String majorLevel = in.level() == null || in.level().isBlank() ? null : in.level().trim().toUpperCase();
             if (majorLevel != null && !levels.contains(majorLevel)) {
                 throw new NadBadRequestException("major level " + majorLevel + " is not one of the programme's levels");
+            }
+            // the same major at the same level is one offering, whatever the department: a repeat is dropped
+            if (!listed.add(catalogue.getId() + ":" + majorLevel)) {
+                continue;
             }
             ProgramMajor major = new ProgramMajor();
             major.setProgramId(programId);

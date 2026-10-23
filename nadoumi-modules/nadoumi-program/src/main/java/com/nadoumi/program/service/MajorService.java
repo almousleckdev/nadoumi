@@ -53,7 +53,7 @@ public class MajorService {
 
     @Transactional(rollbackFor = Exception.class)
     public MajorResponse create(MajorRequest req) {
-        String name = req.name().trim();
+        String name = normalise(req.name());
         if (mapper.findByName(name) != null) {
             throw new NadBadRequestException("a major named \"" + name + "\" already exists");
         }
@@ -63,7 +63,7 @@ public class MajorService {
     @Transactional(rollbackFor = Exception.class)
     public MajorResponse update(Long id, MajorRequest req) {
         Major major = require(id);
-        String name = req.name().trim();
+        String name = normalise(req.name());
         Major sameName = mapper.findByName(name);
         if (sameName != null && !sameName.getId().equals(id)) {
             throw new NadBadRequestException("a major named \"" + name + "\" already exists; merge them instead");
@@ -131,7 +131,7 @@ public class MajorService {
      */
     @Transactional(rollbackFor = Exception.class)
     public Major findOrCreate(String name, String nameCn) {
-        String trimmed = name.trim();
+        String trimmed = normalise(name);
         Major existing = mapper.findByName(trimmed);
         return existing != null ? existing : insert(trimmed, Texts.blankToNull(nameCn), null);
     }
@@ -155,6 +155,11 @@ public class MajorService {
         return major;
     }
 
+    /** Trimmed with inner runs of whitespace collapsed, so "Computer  Science " and "Computer Science" are one major. */
+    static String normalise(String name) {
+        return name.trim().replaceAll("\\s+", " ");
+    }
+
     private static String discipline(String value) {
         String trimmed = Texts.blankToNull(value);
         return trimmed == null ? null : trimmed.toUpperCase().replaceAll("[^A-Z0-9_]", "_");
@@ -168,11 +173,11 @@ public class MajorService {
         }
         String[] cells = CELL_SEPARATOR.split(line, 2);
         if (cells.length == 2) {
-            return new String[] {cells[0].trim(), Texts.blankToNull(cells[1].trim())};
+            return new String[] {normalise(cells[0]), Texts.blankToNull(cells[1].trim())};
         }
         var split = LATIN_THEN_CJK.matcher(line);
         return split.matches()
-                ? new String[] {split.group(1).trim(), split.group(2).trim()}
-                : new String[] {line, null};
+                ? new String[] {normalise(split.group(1)), split.group(2).trim()}
+                : new String[] {normalise(line), null};
     }
 }

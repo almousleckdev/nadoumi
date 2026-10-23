@@ -582,3 +582,5 @@ Chinese strings under `conversations.*`.
 
 **Majors catalogue (2026-10-23).** `/majors` (Education group, `nad:major:list`) manages the shared catalogue: search, add, paste a list, merge duplicates. In the programme drawer each
 major row is a searchable `MajorPicker` (type a new name to add it) and "Add several majors" adds picked, typed or pasted majors for every ticked level at once.
+
+**One scholarship image, no duplicate majors (2026-10-23).** The scholarship form has a single image (the cover; the older hero image is only a fallback for scholarships that have just that one, matching the public pages). A programme keeps one row per major and level: the server drops a repeat, the form flags it, names compare ignoring case and inner spacing.
