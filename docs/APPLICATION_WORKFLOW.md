@@ -12,6 +12,11 @@ Status: **BASELINE** (approved) · **EXISTING** (in the repo today) · **PLANNED
 
 ## 1. What exists today (EXISTING)
 
+> **Note (2026-10-22):** the application aggregate, workflow engine and student/staff APIs described in §3 are
+> built (migrations V66/V67 onward). The paragraph below is the original pre-implementation baseline. The
+> student-facing journey (apply screen, documents, payment, Nadoumi form PDF) is specified in
+> `APPLICATION_PROCESS.md`.
+
 **Nothing application-specific.** No application entity, no workflow engine.
 
 Reusable primitives:

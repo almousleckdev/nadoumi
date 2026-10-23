@@ -10,7 +10,7 @@ const { applicants, activeApplicantId, setActiveApplicant } = useSession()
       :key="a.applicantId"
       type="button"
       class="block w-full px-3 py-2 text-start text-sm hover:bg-slate-50"
-      :class="a.applicantId === activeApplicantId ? 'font-semibold text-brand-700' : 'text-slate-700'"
+      :class="a.applicantId === activeApplicantId ? 'font-semibold text-slate-900' : 'text-slate-700'"
       @click="setActiveApplicant(a.applicantId)"
     >
       {{ t('dashboard.applicantLabel') }} #{{ a.applicantId }} · {{ a.accessRole }}

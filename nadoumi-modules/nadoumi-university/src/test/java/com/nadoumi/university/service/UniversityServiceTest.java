@@ -28,7 +28,8 @@ class UniversityServiceTest {
     private final UniversityMapper mapper = mock(UniversityMapper.class);
     private final MediaGateway media = mock(MediaGateway.class);
     private final com.nadoumi.common.outbox.OutboxWriter outbox = mock(com.nadoumi.common.outbox.OutboxWriter.class);
-    private final UniversityService service = new UniversityService(mapper, media, outbox, new UniversityChildrenWriter(mapper, media));
+    private final UniversityService service = new UniversityService(mapper, media, outbox, new UniversityChildrenWriter(mapper, media),
+            mock(com.nadoumi.university.mapper.DepartmentMapper.class));
 
     private static UniversityRequest req(String name, String country,
             List<UniversityRequest.RankingInput> rankings,
@@ -36,10 +37,10 @@ class UniversityServiceTest {
         return new UniversityRequest(
                 name, "清华大学", country, UniversityType.PUBLIC, "Beijing", "Beijing",
                 (short) 1911, 50_000, 6_000, 3_000, "https://x.edu", "T1",
-                "intro", "history", "campus", "accommodation", "nearby",
+                "intro", "history", "campus", "accommodation", "nearby", "1 Campus Road",
                 "adm@x.edu", "+86 10 0000", null, null, null, null, true, false, true, "PARTNER",
                 UniversityStatus.ACTIVE, PublishStatus.DRAFT, "note",
-                rankings, highlights, List.of());
+                rankings, highlights, List.of(), List.of());
     }
 
     private static UniversityRequest req(String name, String country) {
@@ -52,10 +53,10 @@ class UniversityServiceTest {
                 base.name(), base.nameCn(), base.country(), base.type(), base.city(), base.province(),
                 base.foundedYear(), base.totalStudents(), base.internationalStudents(), base.facultyCount(),
                 base.website(), base.rankingTier(), base.introduction(), base.history(), base.campusInfo(),
-                base.accommodationInfo(), base.nearbyInfo(), base.admissionsEmail(), base.officePhone(),
+                base.accommodationInfo(), base.nearbyInfo(), base.address(), base.admissionsEmail(), base.officePhone(),
                 base.logoImageUrl(), base.coverImageUrl(), logoMediaId, null, base.recommended(),
                 base.featured(), base.publicPartner(), base.partnerStatus(), base.status(), base.publishStatus(), base.remark(),
-                base.rankings(), base.highlights(), base.gallery());
+                base.rankings(), base.highlights(), base.gallery(), base.links());
     }
 
     private static UniversityRequest reqWithGallery(String name, String country,
@@ -65,10 +66,10 @@ class UniversityServiceTest {
                 b.name(), b.nameCn(), b.country(), b.type(), b.city(), b.province(),
                 b.foundedYear(), b.totalStudents(), b.internationalStudents(), b.facultyCount(),
                 b.website(), b.rankingTier(), b.introduction(), b.history(), b.campusInfo(),
-                b.accommodationInfo(), b.nearbyInfo(), b.admissionsEmail(), b.officePhone(),
+                b.accommodationInfo(), b.nearbyInfo(), b.address(), b.admissionsEmail(), b.officePhone(),
                 b.logoImageUrl(), b.coverImageUrl(), b.logoMediaId(), b.bannerMediaId(), b.recommended(),
                 b.featured(), b.publicPartner(), b.partnerStatus(), b.status(), b.publishStatus(), b.remark(),
-                b.rankings(), b.highlights(), gallery);
+                b.rankings(), b.highlights(), gallery, b.links());
     }
 
     @Test

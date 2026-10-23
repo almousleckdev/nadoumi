@@ -77,7 +77,7 @@ function reset() {
       <OtpInput v-model="otp" :busy="busy" :invalid="Boolean(error)" />
       <button
         type="button"
-        class="-mt-1 text-start text-sm font-medium text-brand-700 hover:underline disabled:text-slate-400 disabled:no-underline"
+        class="-mt-1 text-start text-sm font-medium text-slate-900 underline underline-offset-2 hover:text-slate-600 disabled:text-slate-400 disabled:no-underline"
         :disabled="cooldown > 0 || busy"
         @click="sendCode"
       >

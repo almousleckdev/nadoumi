@@ -27,6 +27,7 @@ public record PublicUniversityResponse(
         String campusInfo,
         String accommodationInfo,
         String nearbyInfo,
+        String address,
         String admissionsEmail,
         String officePhone,
         Long logoDocumentId,
@@ -43,7 +44,15 @@ public record PublicUniversityResponse(
         boolean publicPartner,
         List<UniversityResponse.Ranking> rankings,
         List<UniversityResponse.Highlight> highlights,
-        List<UniversityResponse.GalleryImage> gallery) {
+        List<UniversityResponse.GalleryImage> gallery,
+        List<UniversityResponse.Link> links,
+        /** Detail only; null on list rows. */
+        List<Department> departments) {
+
+    /** A department with the number of programme majors it hosts. */
+    public record Department(String name, String nameCn, int programCount) {
+    }
+
 
     /** Legacy factory — used where no MediaGateway resolution is available (e.g. cross-module tests). */
     public static PublicUniversityResponse of(University u) {
@@ -52,18 +61,23 @@ public record PublicUniversityResponse(
 
     /** Projects an already media-resolved {@link UniversityResponse} down to the public shape. */
     public static PublicUniversityResponse of(UniversityResponse full) {
+        return of(full, null);
+    }
+
+    /** Detail view: adds the university's departments. */
+    public static PublicUniversityResponse of(UniversityResponse full, List<Department> departments) {
         return new PublicUniversityResponse(
                 full.id(), full.name(), full.nameCn(), full.slug(), full.country(), full.type(),
                 full.city(), full.province(), full.foundedYear(),
                 full.totalStudents(), full.internationalStudents(), full.facultyCount(),
                 full.website(), full.rankingTier(),
                 full.introduction(), full.history(), full.campusInfo(),
-                full.accommodationInfo(), full.nearbyInfo(),
+                full.accommodationInfo(), full.nearbyInfo(), full.address(),
                 full.admissionsEmail(), full.officePhone(),
                 full.logoDocumentId(), full.bannerDocumentId(),
                 full.logoImageUrl(), full.coverImageUrl(),
                 full.logoMediaId(), full.logoUrl(), full.bannerMediaId(), full.bannerUrl(),
                 full.recommended(), full.featured(), full.publicPartner(),
-                full.rankings(), full.highlights(), full.gallery());
+                full.rankings(), full.highlights(), full.gallery(), full.links(), departments);
     }
 }

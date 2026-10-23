@@ -10,9 +10,9 @@ const localePath = useLocalePath()
 <template>
   <SectionCard :title="t('dashboard.home.applications')">
     <template #actions>
-      <NuxtLink :to="localePath('/dashboard/applications')" class="text-sm font-medium text-brand-700 hover:underline">
+      <NTextLink :to="localePath('/dashboard/applications')">
         {{ t('dashboard.home.viewAll') }}
-      </NuxtLink>
+      </NTextLink>
     </template>
     <NSkeleton v-if="pending" class="h-20 w-full rounded-lg" />
     <NAlert v-else-if="error" tone="danger">{{ t('errors.loadSection') }}</NAlert>
@@ -26,7 +26,7 @@ const localePath = useLocalePath()
       <li v-for="a in items" :key="a.id">
         <NuxtLink
           :to="localePath(`/dashboard/applications/${a.id}`)"
-          class="flex items-center justify-between gap-3 text-sm no-underline hover:text-brand-700"
+          class="flex items-center justify-between gap-3 text-sm no-underline hover:underline"
         >
           <span class="min-w-0 truncate text-slate-700">
             {{ t(`dashboard.applications.type.${a.applicationType ?? 'UNKNOWN'}`, t('dashboard.applications.type.UNKNOWN')) }}

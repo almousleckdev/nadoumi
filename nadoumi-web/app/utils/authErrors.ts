@@ -33,6 +33,15 @@ const DETAIL_RULES: [RegExp, string][] = [
   [/verify the new email/i, 'errors.verifyEmailFirst'],
   [/name is required/i, 'validation.required'],
   [/name may contain only letters/i, 'profileForm.nameInvalid'],
+  [/payment window has closed/i, 'payment.errors.windowClosed'],
+  [/transaction number was already reported/i, 'payment.errors.txnReused'],
+  [/enter the transaction number/i, 'payment.errors.txnInvalid'],
+  [/screenshot of the payment is required/i, 'payment.errors.screenshotRequired'],
+  [/no open payment session/i, 'payment.errors.noSession'],
+  [/already reported and is being verified/i, 'payment.errors.beingVerified'],
+  [/application fee must be paid/i, 'payment.errors.paymentRequired'],
+  [/upload the required documents/i, 'checklist.errors.required'],
+  [/sign the application form/i, 'signature.errors.required'],
 ]
 
 export function authErrorMessage(err: unknown, t: Translate): string {

@@ -12,6 +12,9 @@ export const OPTION_GROUPS = {
   chinaVisaType: ['X1', 'X2', 'Z', 'F', 'L', 'S1', 'S2', 'OTHER'],
   employmentType: ['FULL_TIME', 'PART_TIME', 'INTERNSHIP', 'FREELANCE'],
   contactRelation: ['GUARDIAN', 'EMERGENCY', 'OTHER'],
+  maritalStatus: ['SINGLE', 'MARRIED', 'OTHER'],
+  familyRelation: ['FATHER', 'MOTHER', 'SPOUSE', 'SIBLING', 'OTHER'],
+  personGender: ['FEMALE', 'MALE', 'UNSPECIFIED'],
   fieldOfStudy: [
     'BUSINESS', 'ECONOMICS', 'LAW', 'ENGINEERING', 'COMPUTER_SCIENCE', 'MEDICINE', 'NURSING', 'SCIENCE',
     'EDUCATION', 'ARTS_DESIGN', 'LANGUAGES', 'SOCIAL_SCIENCES', 'AGRICULTURE', 'ARCHITECTURE', 'TOURISM',

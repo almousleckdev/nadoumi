@@ -53,6 +53,11 @@ public final class MediaCategoryPolicy {
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
             "text/plain");
 
+    /** A template an admin gives applicants to fill in: a PDF or a Word file (never macro-enabled). */
+    private static final Set<String> TEMPLATE_MIME = Set.of(
+            "application/pdf", "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+
     /**
      * Resolved policy for one {@link MediaCategory}.
      *
@@ -112,6 +117,22 @@ public final class MediaCategoryPolicy {
                 MediaAccessClass.PROTECTED, DOCUMENT_MIME, 20 * MB, RESOURCE_RAW, "application/other"));
         RULES.put(MediaCategory.MESSAGE_ATTACHMENT, new CategoryRule(
                 MediaAccessClass.PROTECTED, MESSAGE_ATTACHMENT_MIME, 15 * MB, RESOURCE_RAW, "message/attachment"));
+
+        // a bank screenshot or receipt of an application-fee payment: staff-only, never a public URL
+        RULES.put(MediaCategory.PAYMENT_PROOF, new CategoryRule(
+                MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 5 * MB, RESOURCE_RAW, "payment/proof"));
+
+        // a receipt or application form the system rendered: only ever the owner or staff, streamed by the backend
+        RULES.put(MediaCategory.PAYMENT_DOCUMENT, new CategoryRule(
+                MediaAccessClass.SENSITIVE, DOCUMENT_MIME, 5 * MB, RESOURCE_RAW, "payment/document"));
+
+        // a form template for applicants to download: not confidential, but still delivered through the backend
+        RULES.put(MediaCategory.DOCUMENT_TEMPLATE, new CategoryRule(
+                MediaAccessClass.PROTECTED, TEMPLATE_MIME, 10 * MB, RESOURCE_RAW, "document/template"));
+
+        // the applicant's handwritten signature (re-encoded PNG): only the owner, and server jobs that print the form
+        RULES.put(MediaCategory.APPLICANT_SIGNATURE, new CategoryRule(
+                MediaAccessClass.SENSITIVE, Set.of("image/png"), 1 * MB, RESOURCE_RAW, "applicant/signature"));
 
         for (MediaCategory category : MediaCategory.values()) {
             if (!RULES.containsKey(category)) {

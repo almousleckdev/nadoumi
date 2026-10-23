@@ -664,3 +664,61 @@ arrow keys and a read-more clamp. Stories live in `app/data/testimonials.ts`; ph
   Fully funded, Partially funded and Self-funded scholarships (one section each);
   Featured and Hot programmes. Empty sections are hidden. Copy lives in
   `home.rails.*` in all five locales.
+
+### Catalog depth (2026-10-22)
+
+- **Programme page** shows every level and duration (`ProgramOfferings`: duration,
+  tuition, accommodation, each with its billing period, prices red), the "from"
+  prices and duration range in the facts strip, and the admission content
+  (`ProgramAdmission`: requirements, HSK / IELTS / TOEFL, documents, scholarships,
+  career prospects; the application fee sits in `ProgramAside`). Helpers live in
+  `app/utils/programDisplay.ts`.
+- **University page** adds derived facts (international share, programme count, levels
+  offered, cheapest tuition), a departments card, the campus address with a map link,
+  and the official / social channels (`UniversityAside`). Only http(s) values are ever
+  rendered as links (`linkHref`). Helpers live in `app/utils/universityDisplay.ts`.
+
+### Student sidebars, onboarding and dashboard (2026-10-22)
+
+- **One sidebar.** `SidebarFrame` (brand header + slot) and `SidebarItem` (link or button row) are used by
+  `DashboardShell`/`DashboardSidebar` and by the onboarding `OnboardingStepper`. Colours come from
+  `--sidebar-*` tokens that equal the admin's `--nad-sidebar-*` values.
+- **Onboarding shell.** `h-dvh`: fixed sidebar (desktop) or progress bar (mobile), scrolling content area,
+  fixed action bar. No Back button and no help box; every step is reachable from the sidebar; Next is gated
+  by the server's section status.
+- **Resume.** On load the wizard opens `resumeStepIndex()`: the first step whose required sections the
+  server reports incomplete, or review. This survives a closed browser or a different device; nothing is
+  stored locally.
+- **Identity step.** `FilePicker` (compact circle for the photo, document thumbnail for the passport).
+  The passport form asks for number, issue and expiry dates only; the holder name and birth date are never
+  asked again (`PassportRequest` makes them optional; the profile stays the identity).
+- **Dashboard.** The recommended-scholarships card is a list of `ScholarshipListItem` rows (thumbnail via
+  `CardMedia square`); text links use `NTextLink` (neutral, underlined).
+
+## Application fee payment UI: EXISTING (2026-10-22)
+
+`nadoumi-web`: `components/payment/{PaymentPanel,PaymentQrCard,PaymentProofForm}.vue` on
+`/dashboard/applications/[id]`, with `useApplicationPayment` (BFF `studentFetch`) and `usePaymentCountdown`. The QR is
+fetched as a blob (it needs the session) and shown from an object URL that is revoked on close. The countdown only
+ticks the server's `secondsLeft`. Submit stays disabled until the panel reports `settled`. Amounts use the red price
+style. `nadoumi-admin`: `views/payments/` queue plus a review drawer (proof preview fetched as a blob; Confirm and
+Reject only for `PROOF_SUBMITTED` with `nad:payment:verify`). Locales: web en, fr, zh, ar, es; admin en, zh.
+
+`PaymentDocuments.vue` (inside `PaymentPanel`, confirmed state) lists the receipt and the application form and downloads each
+as a blob; it polls the list for about a minute because the PDFs are rendered by a background job.
+
+Apply screen (EXISTING, 2026-10-22): `pages/dashboard/apply.vue` with `ApplyStudentPicker`, `useApplyTarget` (student-safe public catalog
+read), `useApplications().start`, and the pure helpers in `utils/applyView.ts` (query parsing, request building, draft matching).
+Apply buttons on `programs/[slug]` and `scholarships/[slug]` route to it; guests go through `/login?redirect=`.
+
+Family page (EXISTING, 2026-10-22): `pages/dashboard/family.vue` composes `PersonalDetailsSection`, `FamilyMemberSection` (the shared `RecordList`)
+and two `PersonSection`s (supporter, China emergency), on `useApplicantFamily`, `useApplicantRecord(s)` and the pure form helpers in
+`utils/familyForms.ts`. `FormReadinessCard` on the draft application page links to it. Sidebar entry: Profile > Family and supporters.
+
+Document checklist (EXISTING, 2026-10-22): `DocumentChecklistCard` and `ChecklistRow` on the draft application page (with `useApplications().checklist`
+and the existing `useDocuments`), pure helpers in `utils/checklistView.ts`; Submit stays locked, with the reason shown, until the fee is paid and the
+mandatory rows are attached. Admin: `views/programs/form/DocumentsSection.vue` in the programme drawer.
+
+Signature (EXISTING, 2026-10-22): `SignatureCard` and `SignaturePad` (canvas, pointer events, or upload) on the draft application page, with
+`useApplicantSignature`; the image is fetched as a blob. Submit stays locked, with the reason, until a signature is on file.
+

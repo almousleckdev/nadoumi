@@ -57,47 +57,45 @@ mockNuxtImport('navigateTo', () => nav)
 mockNuxtImport('useLocalePath', () => () => (p: string) => p)
 
 const section = (key: string, complete: boolean) => ({ key, complete, missing: complete ? [] : ['x'] })
-const progress = (photo: boolean, passport: boolean) => ({
-  complete: false, ready: photo && passport,
+const progress = (profile: boolean, photo: boolean, passport: boolean, rest = true) => ({
+  complete: false, ready: profile && photo && passport && rest,
   sections: [
-    section('PROFILE', true), section('PHOTO', photo), section('PASSPORT', passport),
-    section('EDUCATION', true), section('INTERESTS', true), section('LOCATION', true), section('CONTACT', true),
+    section('PROFILE', profile), section('PHOTO', photo), section('PASSPORT', passport),
+    section('EDUCATION', rest), section('INTERESTS', rest), section('LOCATION', rest), section('CONTACT', rest),
   ],
 })
 
 const button = (w: VueWrapper, label: string) =>
   w.findAll('button').find(b => b.text().toLowerCase() === label.toLowerCase())
 
+/** A returning student with everything filled in lands on the review step. */
 async function reviewStep() {
-  status.mockResolvedValue(progress(true, true))
+  status.mockResolvedValue(progress(true, true, true))
   const w = await mountSuspended(Onboarding)
   await flushPromises()
-  await w.find('form').trigger('submit') // Save and continue
-  await flushPromises()
-  for (let i = 0; i < 6; i++) {
-    await button(w, 'next')?.trigger('click')
-    await flushPromises()
-  }
   return w
 }
 
 beforeEach(() => {
   nav.mockReset()
   complete.mockReset()
-  status.mockReset().mockResolvedValue(progress(false, false))
+  status.mockReset().mockResolvedValue(progress(false, false, false))
 })
 
 describe('onboarding wizard', () => {
-  it('starts on the profile step with a save-and-continue action', async () => {
+  it('starts on the profile step with a save-and-continue action and no Back button', async () => {
     const w = await mountSuspended(Onboarding)
     await flushPromises()
 
     expect(w.text()).toContain('Create your profile')
     expect(button(w, 'Save and continue')).toBeTruthy()
     expect(button(w, 'Next')).toBeUndefined()
+    expect(button(w, 'Back')).toBeUndefined()
+    expect(w.text()).not.toContain('Need help')
   })
 
   it('advances past the profile only after it is saved', async () => {
+    status.mockResolvedValueOnce(progress(false, false, false)).mockResolvedValue(progress(true, false, false))
     const w = await mountSuspended(Onboarding)
     await flushPromises()
     await w.find('form').trigger('submit')
@@ -107,20 +105,49 @@ describe('onboarding wizard', () => {
     expect(w.text()).toContain('Passport')
   })
 
-  it('keeps Next disabled on the identity step until the server reports photo and passport complete', async () => {
+  it('resumes at the first unfinished step after the student comes back', async () => {
+    status.mockResolvedValue(progress(true, false, false))
     const w = await mountSuspended(Onboarding)
     await flushPromises()
-    await w.find('form').trigger('submit')
+
+    expect(w.text()).toContain('Profile photo')
+    expect(w.text()).not.toContain('Create your profile')
+  })
+
+  it('asks for the passport number and dates only — never the name or date of birth again', async () => {
+    status.mockResolvedValue(progress(true, true, false))
+    const w = await mountSuspended(Onboarding)
+    await flushPromises()
+
+    expect(w.find('#passportGivenName').exists()).toBe(false)
+    expect(w.find('#passportFamilyName').exists()).toBe(false)
+    expect(w.find('#passportDob').exists()).toBe(false)
+  })
+
+  it('lets the student open any step from the sidebar', async () => {
+    status.mockResolvedValue(progress(true, false, false))
+    const w = await mountSuspended(Onboarding)
+    await flushPromises()
+
+    await w.findAll('[data-test="step"]')[0]!.trigger('click')
+    await flushPromises()
+
+    expect(w.text()).toContain('Create your profile')
+  })
+
+  it('keeps Next disabled on the identity step until the server reports photo and passport complete', async () => {
+    status.mockResolvedValue(progress(true, false, false))
+    const w = await mountSuspended(Onboarding)
     await flushPromises()
 
     expect(button(w, 'Next')!.attributes('disabled')).toBeDefined()
   })
 
   it('enables Next once the server reports photo and passport complete', async () => {
-    status.mockResolvedValue(progress(true, true))
+    status.mockResolvedValue(progress(true, true, true, false))
     const w = await mountSuspended(Onboarding)
     await flushPromises()
-    await w.find('form').trigger('submit')
+    await w.findAll('[data-test="step"]')[1]!.trigger('click')
     await flushPromises()
 
     expect(button(w, 'Next')!.attributes('disabled')).toBeUndefined()

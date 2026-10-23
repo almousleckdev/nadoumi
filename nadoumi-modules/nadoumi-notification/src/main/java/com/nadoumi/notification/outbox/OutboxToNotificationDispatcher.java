@@ -37,7 +37,8 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
 
     /** Targeted types whose audience is "staff who can work this queue", resolved by permission. */
     private static final Set<NotificationType> STAFF_QUEUE_TYPES = EnumSet.of(
-            NotificationType.CONTACT_INQUIRY_RECEIVED, NotificationType.TICKET_OPENED, NotificationType.APPLICATION_RECEIVED);
+            NotificationType.CONTACT_INQUIRY_RECEIVED, NotificationType.TICKET_OPENED, NotificationType.APPLICATION_RECEIVED,
+            NotificationType.PAYMENT_PROOF_SUBMITTED);
 
     private final NotificationService notificationService;
     private final NotificationRenderer renderer;
@@ -125,6 +126,9 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             case OutboxEventTypes.TICKET_OPENED -> NotificationType.TICKET_OPENED;
             case OutboxEventTypes.TICKET_ASSIGNED -> NotificationType.TICKET_ASSIGNED;
             case OutboxEventTypes.TICKET_STATUS_CHANGED -> NotificationType.TICKET_STATUS_CHANGED;
+            case OutboxEventTypes.PAYMENT_PROOF_SUBMITTED -> NotificationType.PAYMENT_PROOF_SUBMITTED;
+            case OutboxEventTypes.PAYMENT_CONFIRMED -> NotificationType.PAYMENT_CONFIRMED;
+            case OutboxEventTypes.PAYMENT_REJECTED -> NotificationType.PAYMENT_REJECTED;
             default -> null;
         };
     }

@@ -70,7 +70,7 @@ function onVerified(applicant: ApplicantDto) {
       <div class="grid gap-3 sm:col-span-2">
         <FormTextField id="pemail" v-model="form.email" type="email" :label="t('auth.email')" :error="emailNeedsVerification ? undefined : errors.email" autocomplete="email" :maxlength="120" required>
           <template v-if="emailShownVerified" #suffix>
-            <span class="text-xs font-medium text-emerald-700">✓ {{ t('profileForm.emailVerified') }}</span>
+            <span class="text-xs font-medium text-slate-700">✓ {{ t('profileForm.emailVerified') }}</span>
           </template>
         </FormTextField>
         <ApplicantEmailVerify
@@ -82,7 +82,7 @@ function onVerified(applicant: ApplicantDto) {
         <button
           v-if="emailChanged"
           type="button"
-          class="justify-self-start text-sm font-medium text-brand-700 hover:underline"
+          class="justify-self-start text-sm font-medium text-slate-900 underline underline-offset-2 hover:text-slate-600"
           @click="form.email = savedEmail"
         >
           {{ t('profileForm.keepEmail', { email: savedEmail }) }}

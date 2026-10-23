@@ -76,7 +76,8 @@ class WelcomeContentComposerTest {
     private static PublicProgramResponse program(String name, String uni, String slug) {
         return new PublicProgramResponse(
                 1L, 2L, uni, "uni-slug", name, slug, null, "Bachelor", List.of(), "Medicine",
-                null, null, null, null, null, null, null, null, null, false, false, null, null);
+                null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null, false, false, null, null, null);
     }
 
     private static PublicScholarshipResponse scholarship(String title, String country, String slug,

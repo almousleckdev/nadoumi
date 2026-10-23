@@ -12,6 +12,7 @@ public class DocumentRequirement {
     private String docType;
     private boolean mandatory;
     private boolean waivable;
+    private String appliesWhen;
     private String notes;
     private String createBy;
     private LocalDateTime createTime;
@@ -35,6 +36,9 @@ public class DocumentRequirement {
 
     public boolean isWaivable() { return waivable; }
     public void setWaivable(boolean waivable) { this.waivable = waivable; }
+
+    public String getAppliesWhen() { return appliesWhen; }
+    public void setAppliesWhen(String appliesWhen) { this.appliesWhen = appliesWhen; }
 
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }

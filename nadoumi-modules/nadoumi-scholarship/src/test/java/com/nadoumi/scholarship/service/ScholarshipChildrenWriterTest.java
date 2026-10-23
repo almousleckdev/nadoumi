@@ -137,7 +137,7 @@ class ScholarshipChildrenWriterTest {
 
     @Test
     void shouldUppercaseDocumentTypesAndDefaultToMandatory() {
-        var doc = new ScholarshipRequest.DocumentRequirementInput(" passport ", null, null);
+        var doc = new ScholarshipRequest.DocumentRequirementInput(" passport ", null, null, "MINOR");
         writer.replace(ID, request(FundingModel.FULLY, null, null, null, null, null, List.of(doc)));
 
         ArgumentCaptor<com.nadoumi.scholarship.domain.ScholarshipDocumentRequirement> saved =
@@ -145,5 +145,6 @@ class ScholarshipChildrenWriterTest {
         verify(mapper).insertDocumentRequirement(eq(ID), saved.capture(), anyInt());
         assertThat(saved.getValue().docType()).isEqualTo("PASSPORT");
         assertThat(saved.getValue().mandatory()).isTrue();
+        assertThat(saved.getValue().appliesWhen()).isEqualTo("MINOR");
     }
 }

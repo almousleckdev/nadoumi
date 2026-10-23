@@ -57,13 +57,14 @@ public class WorkflowService {
     private final WorkflowDefinitionService definitions;
     private final ApplicationSnapshotWriter snapshots;
     private final ApplicationOutboxEmitter emitter;
+    private final SubmitGate submitGate;
 
     public WorkflowService(WfDefinitionMapper definitionMapper, ApplicationMapper applicationMapper,
             WfInstanceMapper instanceMapper, ApplicationTaskMapper taskMapper,
             ApplicationStageHistoryMapper historyMapper, ApplicationEventMapper eventMapper,
             ApplicationDecisionMapper decisionMapper, GuardEvaluator guards, ProgramService programService,
             ScholarshipAdminService scholarshipAdminService, WorkflowDefinitionService definitions,
-            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter) {
+            ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter, SubmitGate submitGate) {
         this.definitionMapper = definitionMapper;
         this.applicationMapper = applicationMapper;
         this.instanceMapper = instanceMapper;
@@ -77,29 +78,34 @@ public class WorkflowService {
         this.definitions = definitions;
         this.snapshots = snapshots;
         this.emitter = emitter;
+        this.submitGate = submitGate;
     }
 
     // draft creation
 
+    private static String definitionCodeFor(ApplicationType type) {
+        return switch (type) {
+            case PROGRAM_WITH_SCHOLARSHIP -> "PROGRAM_WITH_SCHOLARSHIP_V1";
+            case PROGRAM_ONLY -> "PROGRAM_ONLY_V1";
+            case SCHOLARSHIP_ONLY -> "SCHOLARSHIP_ONLY_V1";
+        };
+    }
+
     @Transactional(rollbackFor = Exception.class)
-    public Application startDraft(long applicantId, ApplicationType type, long programId, Long scholarshipId,
+    public Application startDraft(long applicantId, ApplicationType type, Long programId, Long scholarshipId,
             Long intakeId, long actorUserId) {
-        if (type == ApplicationType.PROGRAM_ONLY && scholarshipId != null) {
-            throw new NadBadRequestException("a PROGRAM_ONLY application may not carry a scholarship_id");
-        }
-        if (type == ApplicationType.PROGRAM_WITH_SCHOLARSHIP && scholarshipId == null) {
-            throw new NadBadRequestException("a PROGRAM_WITH_SCHOLARSHIP application requires a scholarship_id");
-        }
-        ProgramResponse program = programService.get(programId); // 404 if missing
-        if (intakeId != null && program.intakes().stream().noneMatch(i -> i.id().equals(intakeId))) {
-            throw new NadBadRequestException("intake does not belong to the programme");
+        ApplicationShape.validate(type, programId, scholarshipId, intakeId);
+        if (programId != null) {
+            ProgramResponse program = programService.get(programId); // 404 if missing
+            if (intakeId != null && program.intakes().stream().noneMatch(i -> i.id().equals(intakeId))) {
+                throw new NadBadRequestException("intake does not belong to the programme");
+            }
         }
         if (scholarshipId != null) {
             scholarshipAdminService.get(scholarshipId); // 404 if missing
         }
 
-        String definitionCode = type == ApplicationType.PROGRAM_WITH_SCHOLARSHIP
-                ? "PROGRAM_WITH_SCHOLARSHIP_V1" : "PROGRAM_ONLY_V1";
+        String definitionCode = definitionCodeFor(type);
         WfDefinition definition = definitionMapper.findActiveByCode(definitionCode);
         if (definition == null) {
             throw new IllegalStateException("no ACTIVE workflow definition for " + definitionCode);
@@ -158,6 +164,9 @@ public class WorkflowService {
                 application.getCurrentStageId());
         if (transition == null) {
             throw new NadBadRequestException("no transition '" + transitionCode + "' from the current stage");
+        }
+        if ("submit".equals(transition.getCode())) {
+            submitGate.require(applicationId); // fee paid and documents in, for any actor
         }
         if (staffActor && transition.getRoleRequired() != null && !SecurityUtils.hasRole(transition.getRoleRequired())) {
             throw new NadForbiddenException("this transition requires the '" + transition.getRoleRequired() + "' role");

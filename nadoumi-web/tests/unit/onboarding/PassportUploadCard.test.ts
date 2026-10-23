@@ -18,15 +18,13 @@ const EMPTY = {
   readMethod: null, edited: false, scanUploaded: false, validForAdmission: false, matchesProfile: false, mismatches: [],
 }
 const SAVED_OK = {
-  ...EMPTY, passportNo: 'L898902C3', givenName: 'ANNA', familyName: 'ERIKSSON', dob: '1990-01-01',
+  ...EMPTY, passportNo: 'L898902C3', givenName: null, familyName: null, dob: null,
   issueDate: '2024-01-01', expiryDate: '2099-01-01', readMethod: 'MANUAL', scanUploaded: true,
   validForAdmission: true, matchesProfile: true,
 }
 
-const PROFILE = { givenName: 'ANNA', familyName: 'ERIKSSON', dob: '1990-01-01' }
-
 async function mountCard() {
-  const w = await mountSuspended(PassportUploadCard, { props: { applicantId: 1, profile: PROFILE } })
+  const w = await mountSuspended(PassportUploadCard, { props: { applicantId: 1 } })
   await flushPromises()
   return w
 }
@@ -48,7 +46,7 @@ describe('PassportUploadCard', () => {
     expect(w.find('#passportNo').exists()).toBe(false)
   })
 
-  it('shows a plain preview and a details form prefilled from the profile — no re-typing name/dob', async () => {
+  it('shows a small preview and a form for the number and dates only', async () => {
     const w = await mountCard()
 
     await pickFile(w, fakeFile('passport.png', 'image/png'))
@@ -56,9 +54,9 @@ describe('PassportUploadCard', () => {
 
     expect(w.find('img').attributes('src')).toBe('data:image/png;base64,AAAA')
     expect(value(w, '#passportNo')).toBe('')
-    expect(value(w, '#passportGivenName')).toBe(PROFILE.givenName)
-    expect(value(w, '#passportFamilyName')).toBe(PROFILE.familyName)
-    expect(value(w, '#passportDob')).toBe(PROFILE.dob)
+    expect(w.find('#passportGivenName').exists()).toBe(false)
+    expect(w.find('#passportFamilyName').exists()).toBe(false)
+    expect(w.find('#passportDob').exists()).toBe(false)
   })
 
   it('shows a file card, not an image preview, for a PDF', async () => {
@@ -69,6 +67,7 @@ describe('PassportUploadCard', () => {
 
     expect(w.find('img').exists()).toBe(false)
     expect(w.text()).toContain('passport.pdf')
+    expect(w.text()).toContain('PDF')
   })
 
   it('uploads the scan then saves the details as a manual entry', async () => {
@@ -90,36 +89,15 @@ describe('PassportUploadCard', () => {
     expect(w.text()).not.toContain('matches your profile')
   })
 
-  it('collapses to a compact summary once verified and matching, and Edit expands it', async () => {
-    api.passportStatus.mockResolvedValue(SAVED_OK)
-    const w = await mountCard()
-
-    expect(w.text()).toContain(SAVED_OK.passportNo)
-    expect(w.find('#passportNo').exists()).toBe(false)
-    const editButton = w.findAll('button').find(b => b.text() === 'Edit')
-    expect(editButton).toBeTruthy()
-
-    await editButton!.trigger('click')
-
-    expect(w.find('#passportNo').exists()).toBe(true)
-  })
-
-  it('shows the already-saved scan (not just a freshly-picked file) — collapsed thumbnail', async () => {
+  it('shows the saved number and dates and the saved scan, with the form always available', async () => {
     api.passportStatus.mockResolvedValue(SAVED_OK)
     const w = await mountCard()
 
     expect(api.passportScanUrl).toHaveBeenCalledWith(1)
     expect(w.find('img').attributes('src')).toBe('https://cdn.example.com/passport-scan.jpg')
-  })
-
-  it('shows the already-saved scan when expanded, with no file just picked', async () => {
-    api.passportStatus.mockResolvedValue(SAVED_OK)
-    const w = await mountCard()
-
-    await w.findAll('button').find(b => b.text() === 'Edit')!.trigger('click')
-
-    const images = w.findAll('img')
-    expect(images.some(img => img.attributes('src') === 'https://cdn.example.com/passport-scan.jpg')).toBe(true)
+    expect(value(w, '#passportNo')).toBe(SAVED_OK.passportNo)
+    expect(value(w, '#passportExpiryDate')).toBe(SAVED_OK.expiryDate)
+    expect(w.text()).toContain('Complete')
   })
 
   it('does not fetch a scan URL when nothing has been uploaded yet', async () => {

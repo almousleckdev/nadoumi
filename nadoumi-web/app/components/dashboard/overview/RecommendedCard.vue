@@ -10,15 +10,17 @@ const localePath = useLocalePath()
 <template>
   <SectionCard :title="t('dashboard.home.recommended')">
     <template #actions>
-      <NuxtLink :to="localePath('/scholarships')" class="text-sm font-medium text-brand-700 hover:underline">
-        {{ t('dashboard.home.viewAll') }}
-      </NuxtLink>
+      <NTextLink :to="localePath('/scholarships')">{{ t('dashboard.home.viewAll') }}</NTextLink>
     </template>
-    <NSkeleton v-if="pending" class="h-40 w-full rounded-lg" />
+    <div v-if="pending" class="grid gap-3">
+      <NSkeleton v-for="n in 3" :key="n" class="h-20 w-full rounded-xl" />
+    </div>
     <NAlert v-else-if="error" tone="danger">{{ t('errors.loadSection') }}</NAlert>
     <p v-else-if="!items.length" class="py-4 text-center text-sm text-slate-500">{{ t('dashboard.home.recommendedEmpty') }}</p>
-    <div v-else class="grid gap-4 sm:grid-cols-2">
-      <ScholarshipCard v-for="s in items" :key="s.id" :scholarship="s" />
-    </div>
+    <ul v-else class="grid gap-3">
+      <li v-for="s in items" :key="s.id">
+        <ScholarshipListItem :scholarship="s" />
+      </li>
+    </ul>
   </SectionCard>
 </template>

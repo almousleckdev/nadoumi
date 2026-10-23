@@ -110,6 +110,25 @@ class OnboardingRulesTest {
     }
 
     @Test
+    void shouldAcceptAPassportWithoutHolderNamesOrBirthDate_becauseTheProfileIsTheIdentity() {
+        assertThat(section(with(a -> {
+            a.setPassportGivenName(null);
+            a.setPassportFamilyName(null);
+            a.setPassportDob(null);
+        }), "PASSPORT").missing()).isEmpty();
+    }
+
+    @Test
+    void shouldStillRequireThePassportNumberAndDates() {
+        assertThat(section(with(a -> {
+            a.setPassportGivenName(null);
+            a.setPassportFamilyName(null);
+            a.setPassportDob(null);
+            a.setPassportIssueDate(null);
+        }), "PASSPORT").missing()).containsExactly("passportDetails");
+    }
+
+    @Test
     void shouldReportProfileComplete_whenEveryRequiredFieldIsPresent() {
         OnboardingSection section = profile(complete());
 

@@ -14,8 +14,10 @@
      photo, mirrors nadoumi-admin's --nad-sidebar-bg. */
   --ink-900: #10192f;
 
-  /* Dashboard sidebar — mirrors nadoumi-admin's --nad-sidebar-* tokens so both
-     apps' shells share one visual language. */
+  /* Student sidebars (dashboard and onboarding) use exactly nadoumi-admin's --nad-sidebar-* values
+     so both apps' shells share one visual language. */
+  --sidebar-bg: #10192f;
+  --sidebar-bg-soft: #17223d;
   --ink-800: #17223d;
   --sidebar-fg: #aeb9d0;
   --sidebar-fg-muted: #6b7794;

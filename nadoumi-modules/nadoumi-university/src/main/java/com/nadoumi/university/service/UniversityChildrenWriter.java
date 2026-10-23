@@ -6,10 +6,15 @@ import com.nadoumi.common.media.MediaUrls;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
+import com.nadoumi.university.domain.UniversityLink;
+import com.nadoumi.university.domain.enums.LinkKind;
 import com.nadoumi.university.domain.UniversityRanking;
 import com.nadoumi.university.mapper.UniversityMapper;
 import com.nadoumi.university.web.request.UniversityRequest;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /** Replaces a university's rankings, highlights and gallery with the request's, inside the caller's transaction. */
@@ -29,6 +34,36 @@ public class UniversityChildrenWriter {
         replaceRankings(universityId, rankings);
         replaceHighlights(universityId, highlights);
         replaceGallery(universityId, gallery);
+    }
+
+    /** Replaces the official / social links; one link per kind, web kinds must be http(s) URLs. */
+    public void replaceLinks(Long universityId, List<UniversityRequest.LinkInput> links) {
+        mapper.deleteLinks(universityId);
+        if (links == null) {
+            return;
+        }
+        Set<LinkKind> seen = new HashSet<>();
+        int order = 0;
+        for (UniversityRequest.LinkInput in : links) {
+            LinkKind kind = parseKind(in.kind());
+            String value = in.value().trim();
+            if (kind.isWebLink() && !value.matches("(?i)https?://\\S+")) {
+                throw new NadBadRequestException(kind + " link must be an http(s) URL");
+            }
+            if (!seen.add(kind)) {
+                throw new NadBadRequestException("only one " + kind + " link is allowed");
+            }
+            mapper.insertLink(universityId, new UniversityLink(null, kind.name(), value), order++);
+        }
+    }
+
+    private static LinkKind parseKind(String raw) {
+        try {
+            return LinkKind.valueOf(raw.trim().toUpperCase(Locale.ROOT));
+        }
+        catch (IllegalArgumentException e) {
+            throw new NadBadRequestException("unknown link kind: " + raw);
+        }
     }
 
     private void replaceRankings(Long universityId, List<UniversityRequest.RankingInput> rankings) {

@@ -34,10 +34,14 @@ export const COVERAGE_KINDS: CoverageKind[] = [
 ]
 export const APPLICATION_CHANNELS: ApplicationChannel[] = ['DIRECT_UNIVERSITY', 'CSC_AGENCY', 'NADOUMI', 'OTHER']
 export const EDUCATION_LEVELS: EducationLevel[] = ['NON_DEGREE', 'DIPLOMA', 'BACHELOR', 'MASTER', 'PHD']
+/** The `nad_document_type` dictionary codes: a student's uploads are matched to requirements by these. */
 export const DOC_TYPES = [
-  'PASSPORT', 'DEGREE', 'TRANSCRIPT', 'LANGUAGE_CERT', 'VISA', 'PHYSICAL_EXAM',
-  'STUDY_PLAN', 'RECOMMENDATION_LETTER', 'BANK_STATEMENT', 'PHOTO', 'CV', 'OTHER',
+  'PASSPORT', 'DEGREE_CERTIFICATE', 'TRANSCRIPT', 'LANGUAGE_TEST_REPORT', 'VISA', 'PHYSICAL_EXAM',
+  'STUDY_PLAN', 'PERSONAL_STATEMENT', 'RECOMMENDATION_LETTER', 'FINANCIAL_PROOF', 'POLICE_CLEARANCE', 'PHOTO', 'CV',
+  'OTHER',
 ]
+/** When a required document applies; the labels are `scholarship.cond.<code>`. */
+export const DOC_CONDITIONS = ['MINOR', 'IN_CHINA', 'STUDIED_IN_CHINA', 'MASTER_OR_DOCTORAL', 'DOCTORAL']
 export const INTAKE_TERMS = ['SPRING_MARCH', 'AUTUMN_SEPTEMBER']
 
 export interface Money { amountRmb: number, amountUsd: number, currency: string }
@@ -89,6 +93,8 @@ export interface ScholarshipDocumentRequirementInput {
   docType: string
   mandatory: boolean
   note?: string | null
+  /** A `DOC_CONDITIONS` code, or null when the document is always required. */
+  appliesWhen?: string | null
 }
 
 /** One field of study. A null level means it applies to every level the scholarship offers. */

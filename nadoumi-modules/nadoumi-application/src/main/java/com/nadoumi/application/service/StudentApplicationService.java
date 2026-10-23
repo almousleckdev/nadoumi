@@ -78,6 +78,7 @@ public class StudentApplicationService {
         if (!"DRAFT".equals(application.getCurrentStatus())) {
             throw new NadBadRequestException("the opportunity can only be changed while the application is a draft");
         }
+        ApplicationShape.validate(application.getApplicationType(), req.programId(), req.scholarshipId(), req.intakeId());
         application.setProgramId(req.programId());
         application.setScholarshipId(req.scholarshipId());
         application.setIntakeId(req.intakeId());
@@ -89,13 +90,19 @@ public class StudentApplicationService {
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse submit(Long id) {
         Application current = load(id);
+        // the fee and the mandatory documents are checked by the engine itself (SubmitGate), for every actor
         Application updated = workflow.execute(id, "submit", caller.requireUserId(), false, null, current.getVersion());
         return toResponse(updated);
     }
 
-    /** {@code accept_offer} | {@code decline_offer} | {@code withdraw}. */
+    /** The only transitions a student may run directly; everything else belongs to staff or to {@link #submit}. */
+    static final java.util.Set<String> STUDENT_TRANSITIONS = java.util.Set.of("accept_offer", "decline_offer", "withdraw");
+
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse transition(Long id, String code, String reason) {
+        if (!STUDENT_TRANSITIONS.contains(code)) {
+            throw new NadForbiddenException("this action is not available to students");
+        }
         if ("withdraw".equals(code) && (reason == null || reason.isBlank())) {
             throw new NadBadRequestException("a reason is required to withdraw");
         }

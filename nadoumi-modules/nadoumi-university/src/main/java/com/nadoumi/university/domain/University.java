@@ -35,6 +35,7 @@ public class University {
     private String campusInfo;
     private String accommodationInfo;
     private String nearbyInfo;
+    private String address;
     private String admissionsEmail;
     private String officePhone;
     private Long logoDocumentId;
@@ -57,6 +58,7 @@ public class University {
     private List<UniversityRanking> rankings = new ArrayList<>();
     private List<UniversityHighlight> highlights = new ArrayList<>();
     private List<UniversityGalleryImage> gallery = new ArrayList<>();
+    private List<UniversityLink> links = new ArrayList<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -121,6 +123,9 @@ public class University {
     public String getNearbyInfo() { return nearbyInfo; }
     public void setNearbyInfo(String nearbyInfo) { this.nearbyInfo = nearbyInfo; }
 
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
     public String getAdmissionsEmail() { return admissionsEmail; }
     public void setAdmissionsEmail(String admissionsEmail) { this.admissionsEmail = admissionsEmail; }
 
@@ -183,4 +188,7 @@ public class University {
 
     public List<UniversityGalleryImage> getGallery() { return gallery; }
     public void setGallery(List<UniversityGalleryImage> gallery) { this.gallery = gallery; }
+
+    public List<UniversityLink> getLinks() { return links; }
+    public void setLinks(List<UniversityLink> links) { this.links = links; }
 }

@@ -44,17 +44,13 @@ describe('PhotoUploadCard', () => {
     expect(w.text()).toContain('Complete')
   })
 
-  it('collapses to a compact summary once a photo is saved, and Replace expands it', async () => {
+  it('keeps one compact picker whether or not a photo is saved, offering Replace once there is one', async () => {
     api.photoUrl.mockResolvedValue({ url: 'https://signed.example/photo.jpg', expiresAt: 'x' })
     const w = await mountCard()
 
-    expect(w.findAll('button').find(b => b.text() === 'Replace')).toBeTruthy()
-    expect(w.find('input[type="file"]').exists()).toBe(false)
-
-    await w.findAll('button').find(b => b.text() === 'Replace')!.trigger('click')
-
-    expect(w.findAll('button').find(b => b.text() === 'Replace')).toBeUndefined()
     expect(w.find('input[type="file"]').exists()).toBe(true)
+    expect(w.text()).toContain('Replace')
+    expect(w.findAll('img')).toHaveLength(1)
   })
 
   it('rejects a photo that is too small', async () => {

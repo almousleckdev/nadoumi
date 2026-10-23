@@ -23,8 +23,9 @@ class ProgramOnlyWorkflowTest {
 
     private static ProgramResponse program(long id) {
         return new ProgramResponse(id, 1L, "Test Uni", "test-uni", "Computer Science", "computer-science",
-                null, "MASTER", List.of("MASTER"), null, null, "ENGLISH", 24, null, null, null, null, null, null,
-                false, false, "ACTIVE", "PUBLISHED", null, null, null, List.of(), List.of());
+                null, "MASTER", List.of("MASTER"), null, null, "ENGLISH", 24, null, null, null, null,
+                null, null, null, null, null, null, null, null, null, null, null, null,
+                false, false, "ACTIVE", "PUBLISHED", null, null, null, List.of(), List.of(), List.of());
     }
 
     @Test
@@ -80,6 +81,62 @@ class ProgramOnlyWorkflowTest {
         assertThat(captor.getValue().getApplicationType()).isEqualTo(ApplicationType.PROGRAM_ONLY);
         assertThat(captor.getValue().getScholarshipId()).isNull();
         assertThat(captor.getValue().getCurrentStageId()).isEqualTo(10L);
+    }
+
+    @Test
+    void a_PROGRAM_ONLY_application_without_a_programId_is_rejected() {
+        assertThatThrownBy(() -> h.service.startDraft(9L, ApplicationType.PROGRAM_ONLY, null, null, null, 50L))
+                .isInstanceOf(NadBadRequestException.class)
+                .hasMessageContaining("program_id");
+    }
+
+    @Test
+    void a_SCHOLARSHIP_ONLY_application_carrying_a_programme_or_an_intake_is_rejected() {
+        assertThatThrownBy(() -> h.service.startDraft(9L, ApplicationType.SCHOLARSHIP_ONLY, 1L, 77L, null, 50L))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("program_id");
+        assertThatThrownBy(() -> h.service.startDraft(9L, ApplicationType.SCHOLARSHIP_ONLY, null, 77L, 5L, 50L))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("intake_id");
+        assertThatThrownBy(() -> h.service.startDraft(9L, ApplicationType.SCHOLARSHIP_ONLY, null, null, null, 50L))
+                .isInstanceOf(NadBadRequestException.class).hasMessageContaining("scholarship_id");
+    }
+
+    @Test
+    void a_valid_SCHOLARSHIP_ONLY_draft_routes_to_SCHOLARSHIP_ONLY_V1_without_a_programme() {
+        WfDefinition def = new WfDefinition();
+        def.setId(4L);
+        def.setCode("SCHOLARSHIP_ONLY_V1");
+        def.setVersion(1);
+        def.setStatus(WfDefinitionStatus.ACTIVE);
+        when(h.definitionMapper.findActiveByCode("SCHOLARSHIP_ONLY_V1")).thenReturn(def);
+        WfStage start = new WfStage();
+        start.setId(20L);
+        start.setCode("DRAFT");
+        start.setStageType(WfStageType.START);
+        start.setStatusLabel("DRAFT");
+        when(h.definitionMapper.findStages(4L)).thenReturn(List.of(start));
+        when(h.definitionMapper.findTaskTemplates(20L)).thenReturn(List.of());
+        org.mockito.Mockito.doAnswer(inv -> {
+            com.nadoumi.application.domain.Application a = inv.getArgument(0);
+            a.setId(2L);
+            return 1;
+        }).when(h.applicationMapper).insert(org.mockito.ArgumentMatchers.any());
+        when(h.applicationMapper.findById(2L)).thenAnswer(inv -> {
+            var a = new com.nadoumi.application.domain.Application();
+            a.setId(2L);
+            a.setCurrentStageId(20L);
+            a.setCurrentStatus("DRAFT");
+            return a;
+        });
+
+        h.service.startDraft(9L, ApplicationType.SCHOLARSHIP_ONLY, null, 77L, null, 50L);
+
+        ArgumentCaptor<com.nadoumi.application.domain.Application> captor =
+                ArgumentCaptor.forClass(com.nadoumi.application.domain.Application.class);
+        org.mockito.Mockito.verify(h.applicationMapper).insert(captor.capture());
+        assertThat(captor.getValue().getApplicationType()).isEqualTo(ApplicationType.SCHOLARSHIP_ONLY);
+        assertThat(captor.getValue().getProgramId()).isNull();
+        assertThat(captor.getValue().getScholarshipId()).isEqualTo(77L);
+        org.mockito.Mockito.verifyNoInteractions(h.programService);
     }
 
     @Test

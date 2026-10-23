@@ -11,6 +11,7 @@ import com.nadoumi.finance.web.request.RevenueRequest;
 import com.nadoumi.finance.web.response.RevenueResponse;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.ruoyi.common.utils.AuditActor;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 /** Revenue records — plain CRUD; the finance summary derives net earnings from these. */
 @Service
 public class RevenueService {
+
+    private static final String SOURCE_APPLICATION_FEE = "APPLICATION_FEE";
+    private static final String RELATED_APPLICATION = "application";
 
     private final RevenueMapper mapper;
 
@@ -51,6 +55,31 @@ public class RevenueService {
         r.setCreateBy(AuditActor.username());
         mapper.insert(r);
         return get(r.getId());
+    }
+
+    /**
+     * Books a confirmed application-fee payment as revenue. Called by the payment module inside its own
+     * transaction when staff confirm a payment, so bookkeeping needs no second entry. Idempotent per
+     * (application, payment reference): a repeated call does nothing.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void recordApplicationFee(BigDecimal amount, String currency, LocalDate receivedOn, String reference,
+            long applicationId, long recordedBy) {
+        if (mapper.countByRelated(RELATED_APPLICATION, applicationId, reference) > 0) {
+            return;
+        }
+        Revenue r = new Revenue();
+        r.setSource(SOURCE_APPLICATION_FEE);
+        r.setTitle("Application fee " + reference);
+        r.setAmount(amount);
+        r.setCurrency(currency.toUpperCase(Locale.ROOT));
+        r.setReceivedOn(receivedOn);
+        r.setReference(reference);
+        r.setRelatedType(RELATED_APPLICATION);
+        r.setRelatedId(applicationId);
+        r.setRecordedBy(recordedBy);
+        r.setCreateBy(String.valueOf(recordedBy));
+        mapper.insert(r);
     }
 
     @Transactional(rollbackFor = Exception.class)

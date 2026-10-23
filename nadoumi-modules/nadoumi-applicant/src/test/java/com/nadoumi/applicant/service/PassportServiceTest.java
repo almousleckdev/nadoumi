@@ -69,6 +69,24 @@ class PassportServiceTest {
     }
 
     @Test
+    void shouldSaveOnlyNumberAndDates_whenNoHolderDataIsSent_andMatchTheProfile() {
+        studentCanEdit(profile());
+        var req = new PassportRequest("p1234567", null, null, null, LocalDate.now().minusYears(2),
+                LocalDate.now().plusYears(3), "MANUAL", false);
+
+        PassportStatusResponse status = service.save(ID, req);
+
+        ArgumentCaptor<Applicant> saved = ArgumentCaptor.forClass(Applicant.class);
+        verify(mapper).updatePassportData(saved.capture());
+        assertThat(saved.getValue().getPassportNo()).isEqualTo("P1234567");
+        assertThat(saved.getValue().getPassportGivenName()).isNull();
+        assertThat(saved.getValue().getPassportDob()).isNull();
+        assertThat(status.matchesProfile()).isTrue();
+        assertThat(status.mismatches()).isEmpty();
+        assertThat(status.validForAdmission()).isTrue();
+    }
+
+    @Test
     void shouldStillSave_butReportTheDifferingFields_whenPassportAndProfileDisagree() {
         studentCanEdit(profile());
 

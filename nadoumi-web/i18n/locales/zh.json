@@ -425,7 +425,8 @@
       "interests": "兴趣意向",
       "location": "所在地",
       "work": "工作经历",
-      "applications": "我的申请"
+      "applications": "我的申请",
+      "family": "家庭与资助人"
     },
     "welcome": "欢迎回来，{name}",
     "overviewBlurb": "请完善您的申请人档案,以便工作人员为您匹配合适的申请机会。",
@@ -710,7 +711,8 @@
       "type": {
         "PROGRAM_WITH_SCHOLARSHIP": "项目加奖学金",
         "PROGRAM_ONLY": "项目申请",
-        "UNKNOWN": "申请"
+        "UNKNOWN": "申请",
+        "SCHOLARSHIP_ONLY": "奖学金申请"
       },
       "status": {
         "DRAFT": "草稿",
@@ -787,7 +789,6 @@
     "intro": "只需几个步骤即可完成申请人档案的准备,您可以随时返回修改任意部分。",
     "progress": "第 {n} 步，共 {total} 步",
     "next": "下一步",
-    "back": "返回",
     "finish": "完成",
     "skip": "暂时跳过",
     "saved": "已保存",
@@ -854,7 +855,6 @@
       "none": "暂无照片",
       "tooSmall": "图片尺寸至少需为 {px}x{px} 像素。",
       "saved": "照片已保存",
-      "current": "当前照片",
       "save": "保存照片"
     },
     "upload": {
@@ -894,8 +894,6 @@
     },
     "progressLabel": "资料设置进度",
     "optionalTag": "可选",
-    "helpTitle": "需要帮助？",
-    "helpBody": "我们的团队乐意为您指引。请发邮件至 support{'@'}nadoumi.com。",
     "eyebrow": "第 {n} 步，共 {total} 步"
   },
   "university": {
@@ -919,7 +917,30 @@
     "contact": "官方联系方式",
     "website": "官方网站",
     "admissionsEmail": "招生邮箱",
-    "officePhone": "联系电话"
+    "officePhone": "联系电话",
+    "address": "地址",
+    "viewOnMap": "在地图上查看",
+    "channels": "官方渠道",
+    "departments": "院系",
+    "programmeCount": "{n} 个项目",
+    "statIntlShare": "国际学生占比",
+    "statProgrammes": "项目数量",
+    "statLevels": "开设层次",
+    "statTuitionFrom": "学费起价",
+    "link": {
+      "ADMISSIONS": "招生页面",
+      "VIRTUAL_TOUR": "虚拟参观",
+      "WIKIPEDIA": "维基百科",
+      "FACEBOOK": "Facebook",
+      "X": "X",
+      "INSTAGRAM": "Instagram",
+      "YOUTUBE": "YouTube",
+      "LINKEDIN": "LinkedIn",
+      "TIKTOK": "TikTok",
+      "WECHAT": "微信",
+      "WEIBO": "微博"
+    },
+    "wechatId": "微信号"
   },
   "program": {
     "fallbackTitle": "专业项目",
@@ -971,7 +992,36 @@
     "majorsIntro": "您可在该专业项目下选择的具体方向。",
     "tuitionNote": "由院校设定,美元金额仅供参考。",
     "universityLabel": "院校",
-    "viewAll": "查看全部专业项目"
+    "viewAll": "查看全部专业项目",
+    "durationYears": "{n} 年 | {n} 年",
+    "tuitionFrom": "学费起价",
+    "accommodationFrom": "住宿费起价",
+    "offerings": {
+      "title": "项目选项",
+      "description": "各层次的学制、学费与住宿费。",
+      "duration": "学制",
+      "tuition": "学费",
+      "accommodation": "住宿费",
+      "noPrice": "请咨询我们的团队",
+      "period": {
+        "PER_YEAR": "每年",
+        "PER_SEMESTER": "每学期",
+        "PER_MONTH": "每月",
+        "TOTAL": "合计"
+      },
+      "notePrefix": "备注"
+    },
+    "admission": {
+      "requirements": "入学要求",
+      "language": "语言要求",
+      "hsk": "HSK {n} 级及以上",
+      "ielts": "雅思 {n} 及以上",
+      "toefl": "托福 {n} 及以上",
+      "documents": "所需材料",
+      "applicationFee": "申请费",
+      "scholarships": "奖学金",
+      "career": "就业前景"
+    }
   },
   "scholarships": {
     "searchLabel": "搜索奖学金",
@@ -1112,14 +1162,19 @@
     },
     "doc": {
       "PASSPORT": "护照",
-      "DEGREE": "学位证书",
       "TRANSCRIPT": "成绩单",
-      "LANGUAGE_CERT": "语言成绩证明",
       "VISA": "签证",
       "PHYSICAL_EXAM": "体检报告",
       "STUDY_PLAN": "学习计划",
       "RECOMMENDATION_LETTER": "推荐信",
-      "OTHER": "其他材料"
+      "OTHER": "其他材料",
+      "DEGREE_CERTIFICATE": "学位证书",
+      "LANGUAGE_TEST_REPORT": "语言成绩证明",
+      "PERSONAL_STATEMENT": "个人陈述",
+      "FINANCIAL_PROOF": "资金证明（银行流水）",
+      "POLICE_CLEARANCE": "无犯罪记录证明",
+      "PHOTO": "证件照",
+      "CV": "简历"
     },
     "elig": {
       "age": "年龄",
@@ -1138,7 +1193,14 @@
     "colPrice": "价格",
     "colDoc": "材料",
     "colRequirement": "要求",
-    "colNotes": "备注"
+    "colNotes": "备注",
+    "cond": {
+      "MINOR": "仅限未满 18 岁",
+      "IN_CHINA": "仅限目前在中国",
+      "STUDIED_IN_CHINA": "仅限曾在中国学习",
+      "MASTER_OR_DOCTORAL": "仅限申请硕士或博士",
+      "DOCTORAL": "仅限申请博士"
+    }
   },
   "guides": {
     "more": "更多留学指南",
@@ -2124,10 +2186,9 @@
   },
   "passport": {
     "title": "护照",
-    "guidance": "请上传清晰的护照资料页照片或扫描件，然后在下方确认信息。",
+    "guidance": "上传护照照片页的清晰照片或扫描件，然后填写护照号码和日期。",
     "none": "尚未上传护照",
     "formats": "JPEG、PNG 或 PDF，最大 10 MB",
-    "expiresOn": "有效期至 {date}",
     "detailsTitle": "护照信息",
     "fields": {
       "passportNo": "护照号码",
@@ -2329,6 +2390,23 @@
       "EN": "英语",
       "ZH": "中文",
       "EN_ZH": "英语和中文"
+    },
+    "maritalStatus": {
+      "SINGLE": "未婚",
+      "MARRIED": "已婚",
+      "OTHER": "其他"
+    },
+    "familyRelation": {
+      "FATHER": "父亲",
+      "MOTHER": "母亲",
+      "SPOUSE": "配偶",
+      "SIBLING": "兄弟姐妹",
+      "OTHER": "其他亲属"
+    },
+    "personGender": {
+      "FEMALE": "女",
+      "MALE": "男",
+      "UNSPECIFIED": "不愿透露"
     }
   },
   "news": {
@@ -2395,5 +2473,195 @@
     "visaExpired": "此签证已过期。",
     "needOne": "至少添加一项。",
     "needCities": "至少添加三个省份或城市。"
+  },
+  "payment": {
+    "title": "申请费",
+    "intro": "支付 Nadoumi 申请费后才能提交申请。在你付款之前，申请会一直保存。",
+    "amount": "金额",
+    "payee": "收款方",
+    "reference": "付款参考号",
+    "referenceHint": "如果支付应用支持备注，请在备注中填写此参考号。",
+    "copy": "复制",
+    "copied": "参考号已复制",
+    "pay": "立即支付",
+    "payAgain": "重新支付",
+    "payToSubmit": "请先支付申请费，再提交申请。",
+    "timeLeft": "剩余支付时间",
+    "qrAlt": "支付二维码",
+    "step1": "打开银行或支付应用，扫描二维码。",
+    "step2": "准确支付 {amount}。",
+    "step3": "在付款备注中填写参考号。",
+    "step4": "然后在下方填写交易单号并上传截图。",
+    "transactionNo": "交易单号",
+    "transactionNoHint": "见付款凭证（6 至 40 位字母或数字）。",
+    "screenshot": "付款截图",
+    "fileHint": "JPEG、PNG 或 PDF，最大 {mb} MB",
+    "iHavePaid": "我已付款",
+    "cancel": "关闭支付",
+    "verifyingTitle": "正在核实",
+    "verifyingBody": "我们已收到你的付款信息。团队确认后会通知你。",
+    "confirmedTitle": "付款已确认",
+    "confirmedBody": "你的申请费已支付，现在可以提交申请。",
+    "rejectedTitle": "你的付款未被接受",
+    "expiredTitle": "支付时间已用完",
+    "expiredBody": "显示二维码后你有 15 分钟完成支付。准备好后请重新开始。如果你已付款，请携带参考号联系客服。",
+    "errors": {
+      "qrFailed": "二维码加载失败。请关闭支付后重试。",
+      "txnInvalid": "请填写付款的交易单号（6 至 40 位字母或数字）。",
+      "screenshotRequired": "请上传付款截图。",
+      "fileType": "请上传 JPEG、PNG 或 PDF 文件。",
+      "windowClosed": "支付时间已用完，请重新发起支付。",
+      "txnReused": "该交易单号已被使用。",
+      "noSession": "当前没有进行中的支付，请先发起支付。",
+      "beingVerified": "你的付款已提交，正在核实。",
+      "paymentRequired": "请先支付申请费再提交。"
+    },
+    "documents": {
+      "title": "你的文件",
+      "preparing": "我们正在生成收据和申请表，稍后会显示在这里，收据也会发送到你的邮箱。",
+      "receipt": "付款收据",
+      "form": "申请表",
+      "download": "下载 PDF",
+      "failed": "文件下载失败，请重试。",
+      "resend": "重新发送收据到我的邮箱",
+      "resent": "收据已发送，请查收邮箱。",
+      "resendWait": "收据刚刚发送过，请几分钟后再试。"
+    }
+  },
+  "apply": {
+    "title": "申请",
+    "blurb": "开始你的申请。",
+    "back": "返回",
+    "noTarget": "请选择要申请的项目或奖学金。",
+    "notFound": "找不到你要申请的内容，可能已不再开放。",
+    "studentTitle": "申请人",
+    "studentLegend": "学生",
+    "unnamedStudent": "学生",
+    "noStudents": "申请前请先完善学生资料。",
+    "intakeTitle": "入学批次",
+    "intakeLabel": "选择入学批次",
+    "intakePlaceholder": "请选择入学批次",
+    "noIntake": "该项目目前没有开放申请的入学批次。",
+    "nextTitle": "接下来",
+    "nextBody": "我们会立即保存一份申请草稿。接着你可以随时支付 Nadoumi 申请费，然后提交申请。提交之前，草稿会一直保存。",
+    "start": "开始申请",
+    "continueDraft": "继续你的草稿",
+    "draftExists": "你已经有一份针对此项目的申请草稿。"
+  },
+  "family": {
+    "title": "家庭与资助人",
+    "blurb": "Nadoumi 申请表需要这些信息。只需填写一次，之后每份申请都会沿用。",
+    "personal": {
+      "title": "个人信息",
+      "marital": "婚姻状况",
+      "religion": "宗教",
+      "placeOfBirth": "出生地",
+      "officialLanguage": "所在国官方语言",
+      "permanentAddress": "永久地址",
+      "postcode": "邮编"
+    },
+    "member": {
+      "title": "家庭成员",
+      "rule": "请添加父母双方。如父母一方已去世，请注明，并改为至少添加两位兄弟姐妹或其他亲属。",
+      "empty": "尚未添加家庭成员。",
+      "add": "添加家庭成员",
+      "relation": "关系",
+      "fullName": "姓名",
+      "dateOfBirth": "出生日期",
+      "nationality": "国籍",
+      "deceased": "此人已去世",
+      "deceasedTag": "已故",
+      "note": "备注",
+      "noteHint": "例如去世年份和简短原因。",
+      "company": "工作单位",
+      "position": "职务",
+      "companyAddress": "单位地址",
+      "phone": "电话",
+      "email": "邮箱"
+    },
+    "supporter": {
+      "title": "经济资助人",
+      "hint": "为你的学习支付费用的人。其信息须与银行流水或担保信一致。"
+    },
+    "chinaEmergency": {
+      "title": "中国境内紧急联系人",
+      "hint": "在无法联系到你时，我们可以联系的中国境内人员。"
+    },
+    "person": {
+      "fullName": "姓名",
+      "relationship": "与你的关系",
+      "gender": "性别",
+      "phone": "电话",
+      "email": "邮箱",
+      "position": "职务",
+      "company": "单位或机构",
+      "companyAddress": "单位地址",
+      "homeAddress": "家庭住址"
+    },
+    "readiness": {
+      "title": "完善你的申请表",
+      "body": "Nadoumi 申请表的以下部分仍为空。你仍可提交，但申请表上会显示为未提供。",
+      "fill": "去填写",
+      "PERSONAL_DETAILS": "个人信息",
+      "FAMILY": "家庭成员",
+      "SUPPORTER": "经济资助人",
+      "CHINA_EMERGENCY": "中国境内紧急联系人",
+      "SIGNATURE": "签名"
+    }
+  },
+  "checklist": {
+    "title": "需上传的材料",
+    "blurb": "以下是本次申请所需的材料。请以 PDF、JPEG 或 PNG 格式逐项上传。提交后 Nadoumi 团队会进行审核。",
+    "mandatory": "必填",
+    "optional": "选填",
+    "upload": "上传",
+    "uploadAgain": "重新上传",
+    "uploaded": "材料已上传",
+    "badType": "请上传不超过大小限制的 PDF、JPEG 或 PNG 文件。",
+    "uploadToSubmit": "请先上传必需的材料，再提交申请。",
+    "status": {
+      "MISSING": "未上传"
+    },
+    "errors": {
+      "required": "提交前请上传必需的材料。"
+    }
+  },
+  "signature": {
+    "title": "你的签名",
+    "blurb": "申请表没有你的签名无效。请在下方手写签名，或上传一张清晰的签名图片。只需签一次。",
+    "padLabel": "签名区域",
+    "clear": "清除",
+    "save": "保存签名",
+    "upload": "上传图片",
+    "redo": "重新签名",
+    "saved": "签名已保存",
+    "onFile": "你的签名已保存，将打印在申请表上。",
+    "badType": "请上传不超过大小限制的 PNG 或 JPEG 图片。",
+    "signToSubmit": "请先添加签名，再提交申请。",
+    "errors": {
+      "required": "提交前请添加你的签名。"
+    }
+  },
+  "templates": {
+    "title": "需填写的表格",
+    "blurb": "请下载这些表格，填写完成后与下方的材料一并上传。",
+    "download": "下载",
+    "failed": "文件下载失败，请重试。"
+  },
+  "verify": {
+    "title": "验证文件",
+    "blurb": "核实你收到的收据或申请表是否由 Nadoumi 签发。",
+    "missing": "请扫描文件上的二维码，打开本页面查看详情。",
+    "failed": "暂时无法核实该文件，请稍后再试。",
+    "valid": "该文件由 Nadoumi 签发。",
+    "invalid": "无法核实该文件。它可能被修改，或验证码有误。",
+    "kind": "文件类型",
+    "number": "编号",
+    "issuedOn": "签发日期",
+    "privacy": "为保护隐私，此处不显示任何个人信息。",
+    "kinds": {
+      "RECEIPT": "付款收据",
+      "APPLICATION_FORM": "申请表"
+    }
   }
 }

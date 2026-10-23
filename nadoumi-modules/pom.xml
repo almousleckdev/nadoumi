@@ -34,6 +34,7 @@
         <module>nadoumi-content</module>
         <module>nadoumi-hr</module>
         <module>nadoumi-finance</module>
+        <module>nadoumi-payment</module>
     </modules>
 
 </project>

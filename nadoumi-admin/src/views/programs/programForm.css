@@ -6,3 +6,11 @@
 .line > .w-32 { flex: 0 0 8rem; }
 .tuition-usd { color: var(--nad-ink-soft, #64748b); font-variant-numeric: tabular-nums; }
 .fx-note { margin: 4px 0 0; font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }
+.offering { border: 1px solid var(--nad-border, #e5e7eb); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: grid; gap: 8px; }
+.offering__head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.offering__head > .w-32 { flex: 0 0 8rem; }
+.offering__head > .w-44 { flex: 0 0 12rem; }
+.offering__money { display: grid; gap: 4px; }
+.offering__money :deep(.el-form-item__content) { gap: 8px; flex-wrap: wrap; }
+.offering__money :deep(.w-32) { width: 8rem; }
+.offering__problem { margin-top: 8px; }

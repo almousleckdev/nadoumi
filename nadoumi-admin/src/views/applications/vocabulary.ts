@@ -1,5 +1,5 @@
 /** Enumerations shared by the application screens; they mirror the backend's fixed vocabularies. */
-export const APPLICATION_TYPES = ['PROGRAM_WITH_SCHOLARSHIP', 'PROGRAM_ONLY']
+export const APPLICATION_TYPES = ['PROGRAM_WITH_SCHOLARSHIP', 'PROGRAM_ONLY', 'SCHOLARSHIP_ONLY']
 
 /** `nad_wf_stage.status_label` values of the seeded workflow definitions. */
 export const STATUSES = [

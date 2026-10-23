@@ -110,6 +110,10 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_conversation");
         jdbc.update("delete from nad_media_access_log");
         jdbc.update("delete from nad_user_applicant_access");
+        jdbc.update("delete from nad_document_requirement");
+        jdbc.update("delete from nad_document_template");
+        jdbc.update("delete from nad_payment_document"); // RESTRICT to the payment; cascades its deliveries
+        jdbc.update("delete from nad_application_payment"); // RESTRICT to nad_application; cascades its events
         jdbc.update("delete from nad_application"); // cascades events, tasks, decisions, snapshots, workflow instance
         jdbc.update("delete from nad_document_event");
         jdbc.update("delete from nad_document_version");
@@ -128,6 +132,9 @@ public abstract class AbstractNadIntegrationTest {
         jdbc.update("delete from nad_applicant_work");
         jdbc.update("delete from nad_applicant_test_score");
         jdbc.update("delete from nad_applicant_contact");
+        jdbc.update("delete from nad_applicant_family_member");
+        jdbc.update("delete from nad_applicant_person");
+        jdbc.update("delete from nad_applicant_personal");
         jdbc.update("delete from nad_applicant");
         jdbc.update("delete from nad_scholarship"); // cascades levels/categories/intakes/fees/stipends/accommodation/coverage/docs/internal
         jdbc.update("delete from nad_program"); // cascades majors/intakes/levels; FK RESTRICT to nad_university

@@ -4,6 +4,8 @@ const props = defineProps<{
   src?: string | null
   /** Text whose first letter fills the placeholder. */
   label: string
+  /** A square thumbnail (list rows) instead of the 16:9 card header. */
+  square?: boolean
 }>()
 
 const failed = ref(false)
@@ -13,7 +15,7 @@ const initial = computed(() => props.label.trim().charAt(0).toUpperCase() || 'N'
 </script>
 
 <template>
-  <div class="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+  <div class="relative w-full overflow-hidden bg-slate-100" :class="square ? 'aspect-square' : 'aspect-[16/9]'">
     <img
       v-if="src && !failed"
       :src="mediaUrl(src)"
@@ -25,7 +27,7 @@ const initial = computed(() => props.label.trim().charAt(0).toUpperCase() || 'N'
     >
     <div
       v-else
-      class="flex h-full w-full items-center justify-center bg-slate-100 font-display text-4xl font-bold text-slate-400"
+      class="flex h-full w-full items-center justify-center bg-slate-100 font-display font-bold text-slate-400" :class="square ? 'text-xl' : 'text-4xl'"
       aria-hidden="true"
     >
       {{ initial }}

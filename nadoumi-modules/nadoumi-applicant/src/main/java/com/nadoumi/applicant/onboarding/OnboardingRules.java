@@ -80,9 +80,10 @@ public final class OnboardingRules {
     }
 
     /**
-     * The passport must be scanned, its details saved, valid for more than six months, and
-     * agree with the profile. Editing the profile names or date of birth afterwards
-     * re-opens this section, because the comparison is re-run here.
+     * The passport must be scanned, its number and dates saved, and valid for more than six
+     * months. When holder names and date of birth were recorded with it they must agree with
+     * the profile; editing the profile afterwards re-opens this section, because the
+     * comparison is re-run here.
      */
     private static OnboardingSection passport(Applicant a, LocalDate today) {
         List<String> missing = new ArrayList<>();
@@ -90,8 +91,7 @@ public final class OnboardingRules {
             missing.add("passportScan");
         }
         boolean hasDetails = !isBlank(a.getPassportNo()) && a.getPassportIssueDate() != null
-                && a.getPassportExpiryDate() != null && a.getPassportGivenName() != null
-                && a.getPassportFamilyName() != null && a.getPassportDob() != null;
+                && a.getPassportExpiryDate() != null;
         if (!hasDetails) {
             missing.add("passportDetails");
             return OnboardingSection.of(PASSPORT, missing);
@@ -99,8 +99,8 @@ public final class OnboardingRules {
         if (!PassportRules.isValidForAdmission(a.getPassportExpiryDate(), today)) {
             missing.add("passportExpiry");
         }
-        if (!PassportRules.mismatches(a.getGivenName(), a.getFamilyName(), a.getDob(),
-                a.getPassportGivenName(), a.getPassportFamilyName(), a.getPassportDob()).isEmpty()) {
+        if (a.getPassportGivenName() != null && !PassportRules.mismatches(a.getGivenName(), a.getFamilyName(),
+                a.getDob(), a.getPassportGivenName(), a.getPassportFamilyName(), a.getPassportDob()).isEmpty()) {
             missing.add("passportMatchesProfile");
         }
         return OnboardingSection.of(PASSPORT, missing);

@@ -93,6 +93,7 @@ public class ApplicationAdminService {
     @Transactional(rollbackFor = Exception.class)
     public ApplicationResponse update(Long id, UpdateApplicationRequest req) {
         Application application = load(id);
+        ApplicationShape.validate(application.getApplicationType(), req.programId(), req.scholarshipId(), req.intakeId());
         application.setProgramId(req.programId());
         application.setScholarshipId(req.scholarshipId());
         application.setIntakeId(req.intakeId());

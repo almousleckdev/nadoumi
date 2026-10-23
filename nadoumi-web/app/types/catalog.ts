@@ -93,7 +93,7 @@ export interface ScholarshipDetail extends ScholarshipCard {
     note?: string | null
   }[]
   coverage: { kind: string, detail?: string | null }[]
-  documentRequirements: { docType: string, mandatory: boolean, note?: string | null }[]
+  documentRequirements: { docType: string, mandatory: boolean, note?: string | null, appliesWhen?: string | null }[]
 }
 
 export interface FacetBucket {
@@ -155,12 +155,32 @@ export interface UniversityDetail extends UniversitySummary {
   campusInfo?: string | null
   accommodationInfo?: string | null
   nearbyInfo?: string | null
+  address?: string | null
   admissionsEmail?: string | null
   officePhone?: string | null
   recommended: boolean
   rankings: UniversityRanking[]
   highlights: UniversityHighlight[]
   gallery: UniversityGalleryImage[]
+  links: UniversityLink[]
+  /** Detail only. */
+  departments: UniversityDepartment[]
+}
+
+export type UniversityLinkKind =
+  'ADMISSIONS' | 'VIRTUAL_TOUR' | 'WIKIPEDIA' | 'FACEBOOK' | 'X' | 'INSTAGRAM' | 'YOUTUBE' | 'LINKEDIN' | 'TIKTOK' | 'WECHAT' | 'WEIBO'
+
+/** An official or social channel. `value` is a web URL, or the account id for WECHAT. */
+export interface UniversityLink {
+  id: number
+  kind: UniversityLinkKind
+  value: string
+}
+
+export interface UniversityDepartment {
+  name: string
+  nameCn?: string | null
+  programCount: number
 }
 
 export interface UniversityGalleryImage {
@@ -218,9 +238,41 @@ export interface ProgramCard {
   imageUrl?: string | null
 }
 
+export type TuitionPeriod = 'PER_YEAR' | 'PER_SEMESTER' | 'TOTAL'
+export type AccommodationPeriod = 'PER_MONTH' | 'PER_YEAR' | 'TOTAL'
+
+/** One duration of one level of a programme, with its tuition and accommodation. */
+export interface ProgramOffering {
+  id: number
+  /** Null for language / non-degree programmes. */
+  level: DegreeLevel | null
+  durationMonths: number
+  tuitionAmount?: number | null
+  tuitionCurrency?: string | null
+  tuitionPeriod: TuitionPeriod
+  tuitionAmountUsd?: number | null
+  accommodationAmount?: number | null
+  accommodationCurrency?: string | null
+  accommodationPeriod: AccommodationPeriod
+  accommodationAmountUsd?: number | null
+  note?: string | null
+}
+
 export interface ProgramDetail extends ProgramCard {
   majors: ProgramMajor[]
   intakes: ProgramIntake[]
+  offerings: ProgramOffering[]
+  admissionRequirements?: string | null
+  /** One required document per line. */
+  applicationDocuments?: string | null
+  careerProspects?: string | null
+  scholarshipInfo?: string | null
+  minHsk?: number | null
+  minIelts?: number | null
+  minToefl?: number | null
+  applicationFeeAmount?: number | null
+  applicationFeeCurrency?: string | null
+  applicationFeeAmountUsd?: number | null
 }
 
 export interface Page<T> {
@@ -374,6 +426,8 @@ export interface NotificationView {
  */
 export interface StudentApplicationDto {
   id: number
+  /** The student the application is for (the caller may act for several). */
+  applicantId: number
   applicationType: string | null
   programId: number | null
   scholarshipId: number | null

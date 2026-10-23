@@ -58,11 +58,11 @@ watch(() => props.email, () => {
 </script>
 
 <template>
-  <div class="grid gap-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
+  <div class="grid gap-3 rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
     <NAlert v-if="error" tone="danger">{{ error }}</NAlert>
 
     <template v-if="stage === 'idle'">
-      <p class="text-sm text-amber-900">{{ t('profileForm.verifyBeforeSave') }}</p>
+      <p class="text-sm text-slate-700">{{ t('profileForm.verifyBeforeSave') }}</p>
       <div>
         <NButton size="sm" :loading="busy" @click="sendCode">{{ t('profileForm.verifyEmail') }}</NButton>
       </div>
@@ -73,7 +73,7 @@ watch(() => props.email, () => {
       <OtpInput v-model="otp" :busy="busy" :invalid="Boolean(error)" @complete="submit" />
       <button
         type="button"
-        class="text-start text-sm font-medium text-brand-700 hover:underline disabled:text-slate-400 disabled:no-underline"
+        class="text-start text-sm font-medium text-slate-900 underline underline-offset-2 hover:text-slate-600 disabled:text-slate-400 disabled:no-underline"
         :disabled="cooldown > 0 || busy"
         @click="sendCode"
       >

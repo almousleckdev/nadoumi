@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { Plus, Delete } from '@element-plus/icons-vue'
-import { APPLICATION_CHANNELS, DOC_TYPES } from '@/api/scholarship'
+import { APPLICATION_CHANNELS, DOC_CONDITIONS, DOC_TYPES } from '@/api/scholarship'
 import FormSection from '@/components/ui/FormSection.vue'
 import { useScholarshipForm } from '../scholarshipForm'
 
@@ -81,6 +81,19 @@ const form = useScholarshipForm()
       <el-checkbox v-model="d.mandatory">
         {{ t('scholarship.mandatory') }}
       </el-checkbox>
+      <el-select
+        v-model="d.appliesWhen"
+        class="w-48"
+        clearable
+        :placeholder="t('scholarship.cond.always')"
+      >
+        <el-option
+          v-for="c in DOC_CONDITIONS"
+          :key="c"
+          :value="c"
+          :label="t(`scholarship.cond.${c}`)"
+        />
+      </el-select>
       <el-input
         v-model="d.note"
         :placeholder="t('scholarship.note')"
@@ -94,7 +107,7 @@ const form = useScholarshipForm()
     </div>
     <el-button
       :icon="Plus"
-      @click="form.documentRequirements.push({ docType: 'PASSPORT', mandatory: true, note: '' })"
+      @click="form.documentRequirements.push({ docType: 'PASSPORT', mandatory: true, note: '', appliesWhen: '' })"
     >
       {{ t('scholarship.addDocument') }}
     </el-button>

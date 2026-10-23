@@ -4,6 +4,7 @@ import com.nadoumi.common.text.Texts;
 import com.nadoumi.university.domain.University;
 import com.nadoumi.university.domain.UniversityGalleryImage;
 import com.nadoumi.university.domain.UniversityHighlight;
+import com.nadoumi.university.domain.UniversityLink;
 import com.nadoumi.university.domain.UniversityRanking;
 import java.util.List;
 import java.util.function.Function;
@@ -31,6 +32,7 @@ public record UniversityResponse(
         String campusInfo,
         String accommodationInfo,
         String nearbyInfo,
+        String address,
         String admissionsEmail,
         String officePhone,
         Long logoDocumentId,
@@ -51,7 +53,15 @@ public record UniversityResponse(
         String updatedAt,
         List<Ranking> rankings,
         List<Highlight> highlights,
-        List<GalleryImage> gallery) {
+        List<GalleryImage> gallery,
+        List<Link> links) {
+
+    public record Link(Long id, String kind, String value) {
+        static Link of(UniversityLink l) {
+            return new Link(l.id(), l.kind(), l.value());
+        }
+    }
+
 
     public record GalleryImage(Long id, String imageUrl, Long mediaId, String url, String caption) {
         static GalleryImage of(UniversityGalleryImage g, Function<UniversityGalleryImage, String> urlResolver) {
@@ -88,7 +98,7 @@ public record UniversityResponse(
                 u.getTotalStudents(), u.getInternationalStudents(), u.getFacultyCount(),
                 u.getWebsite(), u.getRankingTier(),
                 u.getIntroduction(), u.getHistory(), u.getCampusInfo(),
-                u.getAccommodationInfo(), u.getNearbyInfo(),
+                u.getAccommodationInfo(), u.getNearbyInfo(), u.getAddress(),
                 u.getAdmissionsEmail(), u.getOfficePhone(),
                 u.getLogoDocumentId(), u.getBannerDocumentId(),
                 u.getLogoImageUrl(), u.getCoverImageUrl(),
@@ -99,6 +109,7 @@ public record UniversityResponse(
                 u.getRemark(), Texts.stringOrNull(u.getCreateTime()), Texts.stringOrNull(u.getUpdateTime()),
                 u.getRankings().stream().map(Ranking::of).toList(),
                 u.getHighlights().stream().map(Highlight::of).toList(),
-                u.getGallery().stream().map(g -> GalleryImage.of(g, galleryUrl)).toList());
+                u.getGallery().stream().map(g -> GalleryImage.of(g, galleryUrl)).toList(),
+                u.getLinks().stream().map(Link::of).toList());
     }
 }

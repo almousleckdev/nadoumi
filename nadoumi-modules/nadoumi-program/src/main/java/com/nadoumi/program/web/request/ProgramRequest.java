@@ -5,6 +5,10 @@ import com.nadoumi.program.domain.enums.ProgramTeachingLanguage;
 import com.nadoumi.program.domain.enums.ProgramType;
 import com.nadoumi.program.domain.enums.PublishStatus;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,10 +31,17 @@ public record ProgramRequest(
         /** ONE_SEMESTER | ONE_YEAR — LANGUAGE / NON_DEGREE only; ignored for degree types. */
         @Size(max = 16) String termLength,
         ProgramTeachingLanguage teachingLanguage,
-        @Positive Integer durationMonths,
-        @PositiveOrZero BigDecimal tuitionAmount,
-        @Size(min = 3, max = 3) String tuitionCurrency,
         @Size(max = 4000) String summary,
+        @Size(max = 4000) String admissionRequirements,
+        /** One required document per line. */
+        @Size(max = 4000) String applicationDocuments,
+        @Size(max = 4000) String careerProspects,
+        @Size(max = 4000) String scholarshipInfo,
+        @Min(1) @Max(6) Integer minHsk,
+        @DecimalMin("0.0") @DecimalMax("9.0") BigDecimal minIelts,
+        @Min(0) @Max(120) Integer minToefl,
+        @PositiveOrZero BigDecimal applicationFeeAmount,
+        @Size(min = 3, max = 3) String applicationFeeCurrency,
         Long imageMediaId,
         Boolean featured,
         Boolean hot,
@@ -38,7 +49,24 @@ public record ProgramRequest(
         @NotNull PublishStatus publishStatus,
         @Size(max = 500) String remark,
         @Valid List<MajorInput> majors,
-        @Valid List<IntakeInput> intakes) {
+        @Valid List<IntakeInput> intakes,
+        /** Per level and duration: tuition and accommodation. Duration / tuition on the programme are derived from these. */
+        @Valid List<OfferingInput> offerings) {
+
+    public record OfferingInput(
+            /** DIPLOMA / BACHELOR / MASTER / PHD for degree programmes; null otherwise. */
+            @Size(max = 16) String level,
+            @NotNull @Positive @Max(120) Integer durationMonths,
+            @PositiveOrZero BigDecimal tuitionAmount,
+            @Size(min = 3, max = 3) String tuitionCurrency,
+            /** PER_YEAR (default) | PER_SEMESTER | TOTAL. */
+            @Size(max = 16) String tuitionPeriod,
+            @PositiveOrZero BigDecimal accommodationAmount,
+            @Size(min = 3, max = 3) String accommodationCurrency,
+            /** PER_MONTH (default) | PER_YEAR | TOTAL. */
+            @Size(max = 16) String accommodationPeriod,
+            @Size(max = 300) String note) {
+    }
 
     public record MajorInput(
             @NotBlank @Size(max = 200) String name,

@@ -7,17 +7,19 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
- * The passport's holder data as read from, or typed off, the passport. The server
- * compares it with the profile; it does not trust it as identity verification.
+ * The passport's number and validity dates. The holder's names and date of birth are
+ * optional: the profile is the identity, so a student is not asked to type them again.
+ * When they are sent (staff entry, scan reading) the server compares them with the
+ * profile; it does not trust them as identity verification.
  */
 public record PassportRequest(
         @NotBlank @Pattern(regexp = "[A-Za-z0-9]{5,20}")
         String passportNo,
-        @NotBlank @Size(max = 100)
+        @Size(max = 100)
         String givenName,
-        @NotBlank @Size(max = 100)
+        @Size(max = 100)
         String familyName,
-        @NotNull LocalDate dob,
+        LocalDate dob,
         @NotNull LocalDate issueDate,
         @NotNull LocalDate expiryDate,
         @NotNull @Pattern(regexp = "MRZ|MANUAL")

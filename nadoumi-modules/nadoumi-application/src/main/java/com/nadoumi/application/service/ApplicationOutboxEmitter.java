@@ -80,12 +80,13 @@ public class ApplicationOutboxEmitter {
 
     private String opportunityTitle(Application application) {
         try {
-            ProgramResponse program = programService.get(application.getProgramId());
-            if (application.getScholarshipId() != null) {
-                ScholarshipResponse scholarship = scholarshipAdminService.get(application.getScholarshipId());
-                return program.name() + " + " + scholarship.view().title();
+            ScholarshipResponse scholarship = application.getScholarshipId() == null
+                    ? null : scholarshipAdminService.get(application.getScholarshipId());
+            if (application.getProgramId() == null) {
+                return scholarship == null ? FALLBACK_TITLE : scholarship.view().title();
             }
-            return program.name();
+            ProgramResponse program = programService.get(application.getProgramId());
+            return scholarship == null ? program.name() : program.name() + " + " + scholarship.view().title();
         }
         catch (RuntimeException e) {
             log.warn("could not resolve the opportunity title for application {}; using a generic label",

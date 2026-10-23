@@ -29,6 +29,16 @@ const fudan: UDto = {
   campusInfo: null,
   accommodationInfo: null,
   nearbyInfo: null,
+  address: '220 Handan Road, Shanghai',
+  links: [
+    { id: 1, kind: 'FACEBOOK', value: 'https://facebook.com/fudan' },
+    { id: 2, kind: 'WECHAT', value: 'fudan_official' },
+    { id: 3, kind: 'X', value: 'javascript:alert(1)' },
+  ],
+  departments: [
+    { name: 'School of Management', nameCn: '管理学院', programCount: 3 },
+    { name: 'School of Medicine', programCount: 0 },
+  ],
   admissionsEmail: 'admissions@fudan.edu.cn',
   officePhone: null,
   recommended: true,
@@ -47,7 +57,7 @@ const programs = [
   {
     id: 11, slug: 'fudan-university-mba', universityId: 7, universitySlug: 'fudan-university',
     universityName: 'Fudan University', name: 'MBA',
-    nameCn: null, programType: 'MASTER', field: 'Business', teachingLanguage: 'ENGLISH',
+    nameCn: null, programType: 'DEGREE', levels: ['MASTER'], field: 'Business', teachingLanguage: 'ENGLISH',
     durationMonths: 24, tuitionAmount: 38000, tuitionCurrency: 'USD', summary: null,
     featured: false, hot: true,
   },
@@ -89,6 +99,27 @@ describe('public university detail page', () => {
     expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/fudan-banner.jpg')
     expect(srcs).toContain('https://res.cloudinary.com/demo/image/upload/v1/campus.jpg')
     expect(srcs.some(s => s?.startsWith('/media/'))).toBe(false)
+  })
+
+  it('shows the derived stats, departments, address and official channels', async () => {
+    const w = await mountSuspended(UniversityDetail, { route: '/universities/fudan-university' })
+    await flushPromises()
+    const text = w.text()
+
+    expect(text).toContain('11%')
+    expect(text).toContain('Master')
+    expect(text).toContain('USD 38,000')
+    expect(text).toContain('School of Management')
+    expect(text).toContain('管理学院')
+    expect(text).toContain('3 programmes')
+    expect(text).toContain('School of Medicine')
+    expect(text).toContain('220 Handan Road, Shanghai')
+    const hrefs = w.findAll('a').map(a => a.attributes('href'))
+    expect(hrefs).toContain('https://facebook.com/fudan')
+    expect(hrefs.some(h => h?.startsWith('https://www.google.com/maps/search/'))).toBe(true)
+    // an account id is shown as text, and a non-http value is never turned into a link
+    expect(text).toContain('fudan_official')
+    expect(hrefs.some(h => h?.startsWith('javascript:'))).toBe(false)
   })
 
   it('falls back to the legacy relative ref through the /media proxy when the resolved URL is null', async () => {

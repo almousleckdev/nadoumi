@@ -30,6 +30,18 @@
         delete from nad_applicant_work where applicant_id = #{applicantId}
     </delete>
 
+    <delete id="deleteFamilyMembers">
+        delete from nad_applicant_family_member where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deletePersons">
+        delete from nad_applicant_person where applicant_id = #{applicantId}
+    </delete>
+
+    <delete id="deletePersonal">
+        delete from nad_applicant_personal where applicant_id = #{applicantId}
+    </delete>
+
     <delete id="deleteApplicant">
         delete from nad_applicant where id = #{applicantId}
     </delete>

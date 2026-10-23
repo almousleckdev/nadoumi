@@ -47,4 +47,30 @@ class RevenueServiceTest {
                         .collect(Collectors.toSet()))
                 .doesNotContain("recordedBy", "createBy", "updateBy");
     }
+
+    @Test
+    void recordApplicationFee_booksTheFeeAsApplicationRevenueLinkedToTheApplication() {
+        service.recordApplicationFee(new BigDecimal("300.00"), "cny", LocalDate.of(2026, 10, 22), "NAD-PAY-7K3Q9F", 41L, 9L);
+
+        org.mockito.ArgumentCaptor<Revenue> saved = org.mockito.ArgumentCaptor.forClass(Revenue.class);
+        org.mockito.Mockito.verify(mapper).insert(saved.capture());
+        Revenue r = saved.getValue();
+        assertThat(r.getSource()).isEqualTo("APPLICATION_FEE");
+        assertThat(r.getAmount()).isEqualByComparingTo("300.00");
+        assertThat(r.getCurrency()).isEqualTo("CNY");
+        assertThat(r.getReference()).isEqualTo("NAD-PAY-7K3Q9F");
+        assertThat(r.getRelatedType()).isEqualTo("application");
+        assertThat(r.getRelatedId()).isEqualTo(41L);
+        assertThat(r.getRecordedBy()).isEqualTo(9L);
+    }
+
+    @Test
+    void recordApplicationFee_isIdempotent_soARepeatedConfirmationNeverBooksTheFeeTwice() {
+        when(mapper.countByRelated("application", 41L, "NAD-PAY-7K3Q9F")).thenReturn(1);
+
+        service.recordApplicationFee(new BigDecimal("300.00"), "CNY", LocalDate.of(2026, 10, 22), "NAD-PAY-7K3Q9F", 41L, 9L);
+
+        org.mockito.Mockito.verify(mapper, org.mockito.Mockito.never()).insert(org.mockito.ArgumentMatchers.any());
+    }
 }
+

@@ -122,7 +122,7 @@ public record PublicScholarshipResponse(
     public record Coverage(String kind, String detail) {
     }
 
-    public record DocumentRequirement(String docType, boolean mandatory, String note) {
+    public record DocumentRequirement(String docType, boolean mandatory, String note, String appliesWhen) {
     }
 
     /** Legacy factory — the {@code *_image_url} strings pass through unchanged. */
@@ -182,7 +182,7 @@ public record PublicScholarshipResponse(
                 detail ? s.getCoverage().stream()
                         .map(c -> new Coverage(c.kind(), c.detail())).toList() : null,
                 detail ? s.getDocumentRequirements().stream()
-                        .map(d -> new DocumentRequirement(d.docType(), d.mandatory(), d.note())).toList() : null);
+                        .map(d -> new DocumentRequirement(d.docType(), d.mandatory(), d.note(), d.appliesWhen())).toList() : null);
     }
 
     private static Eligibility eligibility(Scholarship s) {

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.payment.mapper.PaymentDocumentMapper">
+
+    <resultMap id="document" type="com.nadoumi.payment.domain.PaymentDocument">
+        <id     property="id"            column="id"/>
+        <result property="paymentId"     column="payment_id"/>
+        <result property="applicationId" column="application_id"/>
+        <result property="kind"          column="kind"/>
+        <result property="version"       column="version"/>
+        <result property="docNumber"     column="doc_number"/>
+        <result property="verifyCode"    column="verify_code"/>
+        <result property="mediaId"       column="media_id"/>
+        <result property="sha256"        column="sha256"/>
+        <result property="byteSize"      column="byte_size"/>
+        <result property="generatedAt"   column="generated_at"/>
+        <result property="deliveredAt"   column="delivered_at"/>
+        <result property="createBy"      column="create_by"/>
+        <result property="createTime"    column="create_time"/>
+    </resultMap>
+
+    <resultMap id="recipient" type="com.nadoumi.payment.mapper.PaymentDocumentMapper$Recipient">
+        <constructor>
+            <idArg  column="user_id"   javaType="java.lang.Long"/>
+            <arg    column="email"     javaType="java.lang.String"/>
+            <arg    column="nick_name" javaType="java.lang.String"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="cols">
+        id, payment_id, application_id, kind, version, doc_number, verify_code, media_id, sha256, byte_size, generated_at,
+        delivered_at, create_by, create_time
+    </sql>
+
+    <insert id="insert" parameterType="com.nadoumi.payment.domain.PaymentDocument"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_payment_document
+            (payment_id, application_id, kind, version, doc_number, verify_code, media_id, sha256, byte_size, generated_at,
+             delivered_at, create_by, create_time)
+        values
+            (#{paymentId}, #{applicationId}, #{kind}, #{version}, #{docNumber}, #{verifyCode}, #{mediaId}, #{sha256}, #{byteSize},
+             #{generatedAt}, #{deliveredAt}, #{createBy}, #{createTime})
+    </insert>
+
+    <select id="findLatest" resultMap="document">
+        select <include refid="cols"/> from nad_payment_document
+        where payment_id = #{paymentId} and kind = #{kind}
+        order by version desc limit 1
+    </select>
+
+    <select id="findByNumber" resultMap="document">
+        select <include refid="cols"/> from nad_payment_document where doc_number = #{docNumber}
+    </select>
+
+    <select id="findLatestByApplication" resultMap="document">
+        select <include refid="cols"/> from nad_payment_document d
+        where d.application_id = #{applicationId}
+          and d.version = (select max(x.version) from nad_payment_document x
+                           where x.payment_id = d.payment_id and x.kind = d.kind)
+        order by d.kind, d.id
+    </select>
+
+    <select id="findConfirmedWithoutReceipt" resultMap="com.nadoumi.payment.mapper.PaymentMapper.payment">
+        select p.id, p.application_id, p.applicant_id, p.applicant_name, p.kind, p.amount, p.currency, p.method,
+               p.reference, p.status, p.expires_at, p.student_txn_no, p.proof_media_id, p.submitted_at,
+               p.verified_by, p.verified_at, p.rejection_reason, p.version, p.create_by, p.create_time,
+               p.update_by, p.update_time
+        from nad_application_payment p
+        where p.status = 'CONFIRMED'
+          and not exists (select 1 from nad_payment_document d where d.payment_id = p.id and d.kind = 'RECEIPT')
+        order by p.id limit #{limit}
+    </select>
+
+    <select id="findAwaitingFinalForm" resultMap="com.nadoumi.payment.mapper.PaymentMapper.payment">
+        select p.id, p.application_id, p.applicant_id, p.applicant_name, p.kind, p.amount, p.currency, p.method,
+               p.reference, p.status, p.expires_at, p.student_txn_no, p.proof_media_id, p.submitted_at,
+               p.verified_by, p.verified_at, p.rejection_reason, p.version, p.create_by, p.create_time,
+               p.update_by, p.update_time
+        from nad_application_payment p
+        where p.status = 'CONFIRMED'
+          and exists (select 1 from nad_payment_document d
+                      where d.payment_id = p.id and d.kind = 'APPLICATION_FORM' and d.version = 1)
+          and not exists (select 1 from nad_payment_document d
+                          where d.payment_id = p.id and d.kind = 'APPLICATION_FORM' and d.version = 2)
+        order by p.id limit #{limit}
+    </select>
+
+    <select id="findUndelivered" resultMap="document">
+        select <include refid="cols"/> from nad_payment_document
+        where kind = #{kind} and version = #{version} and delivered_at is null
+        order by id limit #{limit}
+    </select>
+
+    <update id="markDelivered">
+        update nad_payment_document set delivered_at = #{now} where id = #{documentId} and delivered_at is null
+    </update>
+
+    <delete id="deleteStaleClaim">
+        delete from nad_payment_document_delivery
+        where document_id = #{documentId} and recipient_user_id = #{userId} and sent_at is null
+          and claimed_at &lt; #{cutoff}
+    </delete>
+
+    <insert id="claimDelivery">
+        insert into nad_payment_document_delivery (document_id, recipient_user_id, claimed_at)
+        values (#{documentId}, #{userId}, #{now})
+    </insert>
+
+    <update id="markSent">
+        update nad_payment_document_delivery set sent_at = #{now}
+        where document_id = #{documentId} and recipient_user_id = #{userId}
+    </update>
+
+    <delete id="releaseClaim">
+        delete from nad_payment_document_delivery
+        where document_id = #{documentId} and recipient_user_id = #{userId} and sent_at is null
+    </delete>
+
+    <select id="lastSentAt" resultType="java.time.LocalDateTime">
+        select max(sent_at) from nad_payment_document_delivery where document_id = #{documentId}
+    </select>
+
+    <delete id="clearDeliveries">
+        delete from nad_payment_document_delivery where document_id = #{documentId}
+    </delete>
+
+    <update id="markUndelivered">
+        update nad_payment_document set delivered_at = null where id = #{documentId}
+    </update>
+
+    <select id="countSent" resultType="int">
+        select count(*) from nad_payment_document_delivery
+        where document_id = #{documentId} and recipient_user_id = #{userId} and sent_at is not null
+    </select>
+
+    <select id="findActiveByRoleKeys" resultMap="recipient">
+        select distinct u.user_id, u.email, u.nick_name
+        from sys_user u
+        join sys_user_role ur on ur.user_id = u.user_id
+        join sys_role r on r.role_id = ur.role_id and r.status = '0' and r.del_flag = '0'
+        where u.del_flag = '0' and u.status = '0' and u.user_type = '00'
+          and u.email is not null and u.email != ''
+          and r.role_key in
+          <foreach collection="roleKeys" item="key" open="(" separator="," close=")">#{key}</foreach>
+    </select>
+
+    <select id="findMediaIdsByApplicant" resultType="java.lang.Long">
+        select d.media_id from nad_payment_document d
+        join nad_application_payment p on p.id = d.payment_id
+        where p.applicant_id = #{applicantId} and d.media_id is not null
+    </select>
+
+    <delete id="deleteByApplicantId">
+        delete from nad_payment_document
+        where payment_id in (select id from nad_application_payment where applicant_id = #{applicantId})
+    </delete>
+
+    <select id="findRecipient" resultMap="recipient">
+        select user_id, email, nick_name from sys_user
+        where user_id = #{userId} and del_flag = '0' and status = '0'
+    </select>
+
+</mapper>

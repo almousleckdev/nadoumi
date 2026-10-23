@@ -67,7 +67,19 @@ public enum NotificationType {
     TICKET_ASSIGNED(false, "Support ticket assigned", Set.of(), NotificationScope.TARGETED),
 
     /** A support ticket was resolved or is waiting on the student -- the opener is told. */
-    TICKET_STATUS_CHANGED(true, "Support ticket updated", Set.of(), NotificationScope.TARGETED);
+    TICKET_STATUS_CHANGED(true, "Support ticket updated", Set.of(), NotificationScope.TARGETED),
+
+    /** A student reported an application-fee payment -- staff who verify payments are told. */
+    PAYMENT_PROOF_SUBMITTED(false, "Payment to verify", Set.of(), NotificationScope.TARGETED),
+
+    /**
+     * An application-fee payment was confirmed -- the applicant's linked users are told in the app. The email is
+     * the receipt (with its PDF), sent by the payment module, so there is no second email here.
+     */
+    PAYMENT_CONFIRMED(true, "Payment confirmed", Set.of(), NotificationScope.TARGETED),
+
+    /** An application-fee payment proof was rejected -- the applicant's linked users are told. */
+    PAYMENT_REJECTED(true, "Payment not accepted", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED);
 
     private final boolean transactional;
     private final String defaultTitle;

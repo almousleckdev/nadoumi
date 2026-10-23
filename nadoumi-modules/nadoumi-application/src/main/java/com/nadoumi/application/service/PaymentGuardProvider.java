@@ -1,12 +1,17 @@
 package com.nadoumi.application.service;
 
 /**
- * Backs {@code PAYMENT_SETTLED(kind)}. No bean exists until the Payment module
- * (platform Step 9) ships — {@link GuardEvaluator#activate} rejects any definition
- * that references it while this is unbacked (DA3, fail-closed). The seeded
- * definitions gate on a recorded {@code FEE_SETTLED} decision instead.
+ * Whether an application's payment of a given kind is settled. Implemented by the Payment module
+ * ({@code nadoumi-payment}); this module owns the interface so it never depends on the implementation.
+ *
+ * <p>It backs {@code PAYMENT_SETTLED(kind)} in workflow guards and, directly, the submit gate in
+ * {@link StudentApplicationService#submit}: an application whose fee is not settled cannot be submitted.
+ * A kind with no fee configured counts as settled.</p>
  */
 public interface PaymentGuardProvider {
+
+    /** The Nadoumi application fee a student pays before submitting. */
+    String APPLICATION_FEE = "APPLICATION_FEE";
 
     boolean isSettled(long applicationId, String kind);
 }

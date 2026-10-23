@@ -54,7 +54,9 @@ public class LoggingMailSender implements MailSender {
         return "{\"to\":" + quote(m.to())
                 + ",\"subject\":" + quote(m.subject())
                 + ",\"body\":" + quote(m.body())
-                + ",\"html\":" + (m.htmlBody() == null ? "null" : quote(m.htmlBody())) + "}";
+                + ",\"html\":" + (m.htmlBody() == null ? "null" : quote(m.htmlBody()))
+                + ",\"attachments\":" + m.attachmentNames().stream().map(LoggingMailSender::quote)
+                        .collect(java.util.stream.Collectors.joining(",", "[", "]")) + "}";
     }
 
     private static String quote(String s) {

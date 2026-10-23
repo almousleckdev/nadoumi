@@ -91,8 +91,8 @@ describe('ScholarshipDrawer', () => {
   it('prunes selected categories that the funding model no longer allows', async () => {
     const w = mountDrawer(full)
     await flushPromises()
-    const selects = w.findAllComponents({ name: 'ElSelect' })
-    await selects[0]!.vm.$emit('update:modelValue', 'SELF')
+    const funding = w.findAllComponents({ name: 'ElRadioGroup' })[0]!
+    await funding.vm.$emit('update:modelValue', 'SELF')
     await flushPromises()
 
     w.findComponent(Drawer).vm.$emit('save')

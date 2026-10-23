@@ -153,7 +153,8 @@ public class ScholarshipChildrenWriter {
         int order = 0;
         for (ScholarshipRequest.DocumentRequirementInput d : documents) {
             mapper.insertDocumentRequirement(id, new ScholarshipDocumentRequirement(
-                    d.docType().trim().toUpperCase(Locale.ROOT), d.mandatoryOrDefault(), Texts.blankToNull(d.note())), order++);
+                    d.docType().trim().toUpperCase(Locale.ROOT), d.mandatoryOrDefault(), Texts.blankToNull(d.note()),
+                    Texts.blankToNull(d.appliesWhen())), order++);
         }
     }
 

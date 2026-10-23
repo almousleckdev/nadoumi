@@ -196,6 +196,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.revenue', i18n: true, perm: 'nad:revenue:list' },
       },
       {
+        path: 'payments',
+        name: 'Payments',
+        component: () => import('@/views/payments/index.vue'),
+        meta: { title: 'nav.items.payments', i18n: true, perm: 'nad:payment:list' },
+      },
+      {
         path: 'expenses',
         name: 'Expenses',
         component: () => import('@/views/finance/expenses.vue'),

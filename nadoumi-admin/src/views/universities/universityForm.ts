@@ -1,6 +1,6 @@
 import { inject, type InjectionKey } from 'vue'
 import {
-  type University, type UniversityInput, type PartnerStatus,
+  type University, type UniversityInput, type UniversityLink, type PartnerStatus,
 } from '@/api/university'
 import { numberOrNull, textOrNull } from '@/utils/formValues'
 
@@ -27,7 +27,7 @@ export function blankUniversityForm() {
     city: '', province: '', foundedYear: null as number | null,
     totalStudents: null as number | null, internationalStudents: null as number | null,
     facultyCount: null as number | null, website: DEFAULT_WEBSITE, rankingTier: '',
-    introduction: '', history: '', campusInfo: '', accommodationInfo: '', nearbyInfo: '',
+    introduction: '', history: '', campusInfo: '', accommodationInfo: '', nearbyInfo: '', address: '',
     admissionsEmail: DEFAULT_ADMISSIONS_EMAIL, officePhone: DEFAULT_OFFICE_PHONE,
     logoImageUrl: null as string | null, coverImageUrl: null as string | null,
     logoMediaId: null as number | null, bannerMediaId: null as number | null,
@@ -39,6 +39,7 @@ export function blankUniversityForm() {
     highlights: [] as University['highlights'],
     rankings: [] as University['rankings'],
     gallery: [] as GalleryRow[],
+    links: [] as UniversityLink[],
     departments: [] as DeptRow[],
   }
 }
@@ -54,7 +55,7 @@ export function formFromUniversity(u: University): UniversityForm {
     totalStudents: u.totalStudents, internationalStudents: u.internationalStudents,
     facultyCount: u.facultyCount, website: u.website || DEFAULT_WEBSITE, rankingTier: u.rankingTier ?? '',
     introduction: u.introduction ?? '', history: u.history ?? '', campusInfo: u.campusInfo ?? '',
-    accommodationInfo: u.accommodationInfo ?? '', nearbyInfo: u.nearbyInfo ?? '',
+    accommodationInfo: u.accommodationInfo ?? '', nearbyInfo: u.nearbyInfo ?? '', address: u.address ?? '',
     admissionsEmail: u.admissionsEmail || DEFAULT_ADMISSIONS_EMAIL, officePhone: u.officePhone || DEFAULT_OFFICE_PHONE,
     logoImageUrl: u.logoImageUrl ?? null, coverImageUrl: u.coverImageUrl ?? null,
     logoMediaId: u.logoMediaId ?? null, bannerMediaId: u.bannerMediaId ?? null,
@@ -63,6 +64,7 @@ export function formFromUniversity(u: University): UniversityForm {
     status: u.status, publishStatus: u.publishStatus, remark: u.remark ?? '',
     highlights: (u.highlights ?? []).map(h => ({ ...h })),
     rankings: (u.rankings ?? []).map(r => ({ ...r })),
+    links: (u.links ?? []).map(l => ({ kind: l.kind, value: l.value })),
     gallery: (u.gallery ?? []).map(g => ({
       imageUrl: g.imageUrl ?? null, mediaId: g.mediaId ?? null, url: g.url ?? null, caption: g.caption,
     })),
@@ -88,6 +90,7 @@ export function buildUniversityPayload(form: UniversityForm): UniversityInput {
     campusInfo: textOrNull(form.campusInfo),
     accommodationInfo: textOrNull(form.accommodationInfo),
     nearbyInfo: textOrNull(form.nearbyInfo),
+    address: textOrNull(form.address),
     admissionsEmail: textOrNull(form.admissionsEmail),
     officePhone: textOrNull(form.officePhone),
     logoImageUrl: form.logoImageUrl,
@@ -107,6 +110,9 @@ export function buildUniversityPayload(form: UniversityForm): UniversityInput {
     rankings: form.rankings
       .filter(r => r.source.trim() && r.rankPosition)
       .map(r => ({ source: r.source.trim(), rankPosition: Number(r.rankPosition), rankYear: numberOrNull(r.rankYear), note: textOrNull(r.note ?? '') })),
+    links: form.links
+      .filter(l => l.value.trim())
+      .map(l => ({ kind: l.kind, value: l.value.trim() })),
     gallery: form.gallery
       .filter(g => g.mediaId != null || Boolean(g.imageUrl?.trim()))
       .slice(0, MAX_GALLERY)

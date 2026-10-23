@@ -10,8 +10,7 @@ export interface SelfApplicantBody {
   wechatId?: string; whatsapp?: string
 }
 export interface PassportBody {
-  passportNo: string; givenName: string; familyName: string
-  dob: string; issueDate: string; expiryDate: string
+  passportNo: string; issueDate: string; expiryDate: string
   readMethod: 'MRZ' | 'MANUAL'; edited: boolean
 }
 export interface SignedFileUrl { url: string; expiresAt: string }

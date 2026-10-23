@@ -19,5 +19,11 @@ public interface ApplicantErasureMapper {
 
     int deleteWork(@Param("applicantId") long applicantId);
 
+    int deleteFamilyMembers(@Param("applicantId") long applicantId);
+
+    int deletePersons(@Param("applicantId") long applicantId);
+
+    int deletePersonal(@Param("applicantId") long applicantId);
+
     int deleteApplicant(@Param("applicantId") long applicantId);
 }

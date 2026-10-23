@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { blankProgramForm, buildProgramPayload, formFromProgram } from '@/views/programs/programForm'
+import {
+  blankOffering, blankProgramForm, buildProgramPayload, formFromProgram, offeringProblems, syncOfferingsToLevels,
+} from '@/views/programs/programForm'
 import type { Program } from '@/api/program'
 
 const program = {
@@ -14,7 +16,7 @@ const program = {
 describe('blankProgramForm', () => {
   it('starts as an active draft degree program with no levels', () => {
     expect(blankProgramForm(null)).toMatchObject({
-      universityId: null, programType: 'DEGREE', levels: [], status: 'ACTIVE', publishStatus: 'DRAFT', tuitionCurrency: 'CNY',
+      universityId: null, programType: 'DEGREE', levels: [], status: 'ACTIVE', publishStatus: 'DRAFT', offerings: [],
     })
   })
 
@@ -57,13 +59,6 @@ describe('buildProgramPayload', () => {
     expect(p.termLength).toBe('ONE_YEAR')
   })
 
-  it('sets the tuition currency only when a tuition amount is present', () => {
-    const form = blankProgramForm(3)
-    expect(buildProgramPayload(form)).toMatchObject({ tuitionAmount: null, tuitionCurrency: null })
-    form.tuitionAmount = 30000
-    expect(buildProgramPayload(form)).toMatchObject({ tuitionAmount: 30000, tuitionCurrency: 'CNY' })
-  })
-
   it('drops intakes without a term and blanks empty dates', () => {
     const form = blankProgramForm(3)
     form.intakes.push({ term: '', applicationOpen: '2026-01-01', applicationClose: null })
@@ -78,7 +73,7 @@ describe('formFromProgram', () => {
   it('copies the program into the form and turns missing text into empty strings', () => {
     expect(formFromProgram(program)).toMatchObject({
       id: 9, universityId: 3, name: 'Computer Science', nameCn: '', summary: '', remark: '',
-      levels: ['BACHELOR', 'MASTER'], imageMediaId: 55, tuitionAmount: 30000, publishStatus: 'PUBLISHED',
+      levels: ['BACHELOR', 'MASTER'], imageMediaId: 55, publishStatus: 'PUBLISHED',
     })
   })
 
@@ -89,3 +84,75 @@ describe('formFromProgram', () => {
     expect(p.intakes).toEqual([{ term: 'AUTUMN_SEPTEMBER', applicationOpen: null, applicationClose: '2026-05-01' }])
   })
 })
+
+describe('programme offerings', () => {
+  it('keeps one offering row per selected level and drops rows of removed levels', () => {
+    const form = blankProgramForm(3)
+    form.levels = ['BACHELOR', 'MASTER']
+    syncOfferingsToLevels(form)
+    expect(form.offerings.map(o => [o.level, o.durationMonths])).toEqual([['BACHELOR', 48], ['MASTER', 24]])
+
+    form.levels = ['MASTER']
+    syncOfferingsToLevels(form)
+    expect(form.offerings.map(o => o.level)).toEqual(['MASTER'])
+  })
+
+  it('does not duplicate rows or discard prices already entered', () => {
+    const form = blankProgramForm(3)
+    form.levels = ['MASTER']
+    syncOfferingsToLevels(form)
+    form.offerings[0]!.tuitionAmount = 26000
+    syncOfferingsToLevels(form)
+    expect(form.offerings).toHaveLength(1)
+    expect(form.offerings[0]!.tuitionAmount).toBe(26000)
+  })
+
+  it('gives non-degree programmes level-less rows', () => {
+    expect(blankOffering(null)).toMatchObject({ level: null, durationMonths: 12, tuitionPeriod: 'PER_YEAR', accommodationPeriod: 'PER_MONTH' })
+    const form = blankProgramForm(3)
+    form.programType = 'LANGUAGE'
+    form.levels = ['MASTER']
+    syncOfferingsToLevels(form)
+    expect(form.offerings).toEqual([])
+  })
+
+  it('reports durations below the level minimum and duplicate rows', () => {
+    const form = blankProgramForm(3)
+    form.levels = ['BACHELOR', 'PHD']
+    form.offerings = [
+      { ...blankOffering('BACHELOR'), durationMonths: 36 },
+      { ...blankOffering('PHD'), durationMonths: 36 },
+      { ...blankOffering('PHD'), durationMonths: 36 },
+    ]
+    expect(offeringProblems(form)).toEqual([
+      { kind: 'TOO_SHORT', level: 'BACHELOR', min: 48 },
+      { kind: 'DUPLICATE', level: 'PHD', min: 0 },
+    ])
+  })
+
+  it('sends offerings, derives nothing locally, and trims notes', () => {
+    const form = blankProgramForm(3)
+    Object.assign(form, { name: 'CS', levels: ['MASTER'] })
+    form.offerings = [{ ...blankOffering('MASTER'), tuitionAmount: 26000, accommodationAmount: 1200, note: '  shared  ' }]
+    const p = buildProgramPayload(form)
+    expect(p.offerings).toEqual([{
+      level: 'MASTER', durationMonths: 24, tuitionAmount: 26000, tuitionCurrency: 'CNY', tuitionPeriod: 'PER_YEAR',
+      accommodationAmount: 1200, accommodationCurrency: 'CNY', accommodationPeriod: 'PER_MONTH', note: 'shared',
+    }])
+  })
+
+  it('round-trips offerings and admission fields from a loaded programme', () => {
+    const loaded = {
+      ...program,
+      admissionRequirements: 'Bachelor degree', applicationDocuments: 'Passport', minHsk: 4, minIelts: 6, minToefl: 80,
+      applicationFeeAmount: 600, careerProspects: 'x', scholarshipInfo: 'y',
+      offerings: [{ level: 'MASTER', durationMonths: 24, tuitionAmount: 26000, tuitionCurrency: 'CNY', tuitionPeriod: 'PER_YEAR',
+        accommodationAmount: null, accommodationCurrency: null, accommodationPeriod: 'PER_MONTH', note: null }],
+    } as unknown as Program
+    const form = formFromProgram(loaded)
+    expect(form.offerings[0]).toMatchObject({ level: 'MASTER', durationMonths: 24, tuitionAmount: 26000, note: '' })
+    expect(form).toMatchObject({ minHsk: 4, minIelts: 6, minToefl: 80, applicationFeeAmount: 600, admissionRequirements: 'Bachelor degree' })
+    expect(buildProgramPayload(form)).toMatchObject({ minHsk: 4, applicationFeeAmount: 600, applicationFeeCurrency: 'CNY' })
+  })
+})
+

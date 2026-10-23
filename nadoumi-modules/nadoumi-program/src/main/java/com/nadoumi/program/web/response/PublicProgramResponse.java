@@ -29,12 +29,23 @@ public record PublicProgramResponse(
         String tuitionCurrency,
         BigDecimal tuitionAmountUsd,
         String summary,
+        String admissionRequirements,
+        String applicationDocuments,
+        String careerProspects,
+        String scholarshipInfo,
+        Integer minHsk,
+        BigDecimal minIelts,
+        Integer minToefl,
+        BigDecimal applicationFeeAmount,
+        String applicationFeeCurrency,
+        BigDecimal applicationFeeAmountUsd,
         Long imageMediaId,
         String imageUrl,
         boolean featured,
         boolean hot,
         List<ProgramResponse.Major> majors,
-        List<ProgramResponse.Intake> intakes) {
+        List<ProgramResponse.Intake> intakes,
+        List<ProgramResponse.Offering> offerings) {
 
     public static PublicProgramResponse card(Program p) {
         return build(p, false, null, null);
@@ -72,9 +83,16 @@ public record PublicProgramResponse(
                 full.name(), full.slug(), full.nameCn(), full.programType(), full.levels(), full.field(),
                 full.termLength(), full.teachingLanguage(), full.durationMonths(),
                 full.tuitionAmount(), full.tuitionCurrency(), full.tuitionAmountUsd(), full.summary(),
+                detail ? full.admissionRequirements() : null,
+                detail ? full.applicationDocuments() : null,
+                detail ? full.careerProspects() : null,
+                detail ? full.scholarshipInfo() : null,
+                full.minHsk(), full.minIelts(), full.minToefl(),
+                full.applicationFeeAmount(), full.applicationFeeCurrency(), full.applicationFeeAmountUsd(),
                 full.imageMediaId(), full.imageUrl(),
                 full.featured(), full.hot(),
                 detail ? full.majors() : null,
-                detail ? full.intakes() : null);
+                detail ? full.intakes() : null,
+                detail ? full.offerings() : null);
     }
 }

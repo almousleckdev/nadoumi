@@ -43,7 +43,7 @@ class StaffScholarshipTest extends AbstractNadIntegrationTest {
              "accommodations":[{"roomType":"SINGLE","amount":1200.00,"currency":"CNY","note":"AC, private bathroom"},
                                {"roomType":"DOUBLE","amount":700.00,"currency":"CNY","note":"AC, shared bathroom, WiFi"}],
              "documentRequirements":[{"docType":"PASSPORT","mandatory":true},
-                                     {"docType":"DEGREE","mandatory":true},
+                                     {"docType":"DEGREE_CERTIFICATE","mandatory":true},
                                      {"docType":"STUDY_PLAN","mandatory":false,"note":"1–2 pages"}]}""";
 
     private long createPublished(String token) throws Exception {

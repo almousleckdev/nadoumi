@@ -6,7 +6,6 @@ import {
   isDegree as isDegreeKind,
 } from '@/api/program'
 import FormSection from '@/components/ui/FormSection.vue'
-import { useUsdHint } from '@/composables/useUsdHint'
 import { useProgramForm } from '../programForm'
 
 defineProps<{
@@ -17,10 +16,8 @@ const emit = defineEmits<{ universityChange: [] }>()
 
 const { t } = useI18n()
 const form = useProgramForm()
-const { usdHint } = useUsdHint()
 
 const isDegree = computed(() => isDegreeKind(form.programType))
-const tuitionUsdPreview = computed(() => usdHint(form.tuitionAmount))
 </script>
 
 <template>
@@ -126,56 +123,24 @@ const tuitionUsdPreview = computed(() => usdHint(form.tuitionAmount))
         {{ t('program.levelsHint') }}
       </p>
     </el-form-item>
-    <div class="row">
-      <el-form-item :label="t('program.durationMonths')">
-        <el-input-number
-          v-model="form.durationMonths"
-          :min="1"
-          :max="120"
-          controls-position="right"
-          style="width: 100%"
-        />
-      </el-form-item>
-      <el-form-item
-        v-if="!isDegree"
-        :label="t('program.termLength')"
+    <el-form-item
+      v-if="!isDegree"
+      :label="t('program.termLength')"
+    >
+      <el-select
+        v-model="form.termLength"
+        clearable
+        style="width: 100%"
+        :placeholder="t('program.termLengthPlaceholder')"
       >
-        <el-select
-          v-model="form.termLength"
-          clearable
-          style="width: 100%"
-          :placeholder="t('program.termLengthPlaceholder')"
-        >
-          <el-option
-            v-for="tl in TERM_LENGTHS"
-            :key="tl"
-            :value="tl"
-            :label="t(`program.termLengthMap.${tl}`)"
-          />
-        </el-select>
-      </el-form-item>
-    </div>
-    <div class="row">
-      <el-form-item
-        :label="t('program.tuitionAmountRmb')"
-        class="w-40"
-      >
-        <el-input-number
-          v-model="form.tuitionAmount"
-          :min="0"
-          :precision="2"
-          :step="1000"
-          controls-position="right"
-          style="width: 100%"
+        <el-option
+          v-for="tl in TERM_LENGTHS"
+          :key="tl"
+          :value="tl"
+          :label="t(`program.termLengthMap.${tl}`)"
         />
-      </el-form-item>
-      <el-form-item :label="t('program.tuitionUsd')">
-        <span class="tuition-usd">{{ tuitionUsdPreview }}</span>
-      </el-form-item>
-    </div>
-    <p class="fx-note">
-      {{ t('program.tuitionFxNote') }}
-    </p>
+      </el-select>
+    </el-form-item>
   </FormSection>
 </template>
 

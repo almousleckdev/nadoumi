@@ -109,7 +109,8 @@ public record ScholarshipRequest(
     }
 
     public record DocumentRequirementInput(@NotBlank @Size(max = 48) String docType,
-            Boolean mandatory, @Size(max = 400) String note) {
+            Boolean mandatory, @Size(max = 400) String note,
+            @jakarta.validation.constraints.Pattern(regexp = "MINOR|IN_CHINA|STUDIED_IN_CHINA|MASTER_OR_DOCTORAL|DOCTORAL") String appliesWhen) {
 
         public boolean mandatoryOrDefault() {
             return mandatory == null || mandatory;

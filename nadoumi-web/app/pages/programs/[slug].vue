@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { applyRoute } from '~/utils/applyView'
 import type { ProgramDetail } from '~/types/catalog'
 import type { DetailFact } from '~/components/catalog/DetailFacts.vue'
-import { programTuition } from '~/utils/programDisplay'
+import { cheapest, durationRange, formatDuration, offeringMoney } from '~/utils/programDisplay'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -13,7 +14,13 @@ useSeo(
   p.value?.summary?.slice(0, 155) ?? t('home.programDiscovery.description'),
 )
 
-const applyTo = computed(() => localePath(status.value === 'authed' ? '/dashboard' : '/register'))
+// a signed-in student goes straight to the apply screen; a guest signs in first and is returned to it
+const applyTo = computed(() => {
+  const slug = p.value?.slug
+  if (!slug) return localePath('/register')
+  const apply = localePath(applyRoute('programme', slug))
+  return status.value === 'authed' ? apply : localePath({ path: '/login', query: { redirect: apply } })
+})
 const universityTo = computed(() =>
   p.value ? localePath(`/universities/${p.value.universitySlug ?? p.value.universityId}`) : '#')
 
@@ -28,11 +35,18 @@ const levelLabels = computed(() => {
 const facts = computed<DetailFact[]>(() => {
   const x = p.value
   if (!x) return []
+  const range = durationRange(x.offerings ?? [])
+  const duration = !range ? '' : range.min === range.max
+    ? formatDuration(range.min, t)
+    : `${formatDuration(range.min, t)} – ${formatDuration(range.max, t)}`
+  const tuition = cheapest(x.offerings ?? [], 'tuitionAmount')
+  const room = cheapest(x.offerings ?? [], 'accommodationAmount')
   const all: DetailFact[] = [
     { label: t('program.language'), value: x.teachingLanguage ? t(`program.lang.${x.teachingLanguage}`) : '', icon: 'messages' },
     { label: t('program.field'), value: x.field ?? '', icon: 'education' },
-    { label: t('program.durationLabel'), value: x.durationMonths ? t('program.duration', { months: x.durationMonths }) : '', icon: 'clock' },
-    { label: t('program.tuition'), value: programTuition(x).cny, icon: 'award', tone: 'price' },
+    { label: t('program.durationLabel'), value: duration, icon: 'clock' },
+    { label: t('program.tuitionFrom'), value: offeringMoney(tuition?.tuitionAmount, tuition?.tuitionAmountUsd, tuition?.tuitionCurrency), icon: 'award', tone: 'price' },
+    { label: t('program.accommodationFrom'), value: offeringMoney(room?.accommodationAmount, room?.accommodationAmountUsd, room?.accommodationCurrency), icon: 'location', tone: 'price' },
   ]
   return all.filter(f => f.value)
 })
@@ -67,6 +81,8 @@ const facts = computed<DetailFact[]>(() => {
     <DetailCard v-if="p.summary" :title="t('program.fallbackTitle')">
       <p class="whitespace-pre-line leading-7 text-slate-700">{{ p.summary }}</p>
     </DetailCard>
+    <ProgramOfferings :offerings="p.offerings ?? []" />
+    <ProgramAdmission :program="p" />
     <ProgramMajors :majors="p.majors ?? []" />
     <ProgramIntakes :intakes="p.intakes" />
 

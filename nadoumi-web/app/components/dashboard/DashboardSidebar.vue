@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { DashboardIconName } from './icons'
 
-const props = defineProps<{ collapsed?: boolean }>()
+defineProps<{ collapsed?: boolean }>()
 const emit = defineEmits<{ navigate: [] }>()
 
 const { t } = useI18n()
@@ -20,6 +20,12 @@ const { data: notificationCount } = useAsyncData('sidebar-badges', async () => {
   return notifs.count
 })
 const badgeCounts = computed(() => ({ messages: unreadMessages.value, notifications: notificationCount.value ?? 0 }))
+
+function badgeFor(to: string): number {
+  if (to === '/dashboard/messages') return badgeCounts.value.messages
+  if (to === '/dashboard/notifications') return badgeCounts.value.notifications
+  return 0
+}
 
 
 interface NavItem { to: string, key: string, icon: DashboardIconName, badge?: number }
@@ -45,6 +51,7 @@ const groups: NavGroup[] = [
       { to: '/dashboard/location', key: 'dashboard.nav.location', icon: 'location' },
       { to: '/dashboard/work', key: 'dashboard.nav.work', icon: 'work' },
       { to: '/dashboard/contacts', key: 'dashboard.nav.contacts', icon: 'contacts' },
+      { to: '/dashboard/family', key: 'dashboard.nav.family', icon: 'profile' },
     ],
   },
   {
@@ -59,11 +66,6 @@ function isActive(to: string): boolean {
   return route.path === path || (to !== '/dashboard' && route.path.startsWith(`${path}/`))
 }
 
-const linkClass = (active: boolean) => [
-  'my-0.5 flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors',
-  active ? 'bg-brand-600 text-white' : 'text-[var(--sidebar-fg)] hover:bg-[var(--ink-800)] hover:text-white',
-  props.collapsed ? 'justify-center' : '',
-]
 </script>
 
 <template>
@@ -72,33 +74,33 @@ const linkClass = (active: boolean) => [
       <p v-if="group.heading && !collapsed" class="mb-1 mt-2 px-2.5 text-[11px] font-semibold uppercase tracking-wide text-[var(--sidebar-fg-muted)]">
         {{ t(group.heading) }}
       </p>
-      <NuxtLink
+      <SidebarItem
         v-for="item in group.items"
         :key="item.to"
         :to="localePath(item.to)"
+        :active="isActive(item.to)"
+        :collapsed="collapsed"
         :title="collapsed ? t(item.key) : undefined"
-        :class="linkClass(isActive(item.to))"
         @click="emit('navigate')"
       >
-        <DashboardIcon :name="item.icon" :size="18" class="shrink-0" />
-        <span v-show="!collapsed" class="truncate flex-1">{{ t(item.key) }}</span>
-        <span v-if="!collapsed && (item.to === '/dashboard/messages' ? badgeCounts?.messages : item.to === '/dashboard/notifications' ? badgeCounts?.notifications : 0)" class="ml-auto inline-flex h-5 items-center justify-center rounded-full bg-brand-500 px-2 text-[10px] font-bold text-white shadow-sm ring-1 ring-inset ring-brand-500/20">
-          {{ item.to === '/dashboard/messages' ? badgeCounts?.messages : badgeCounts?.notifications }}
-        </span>
-      </NuxtLink>
+        <template #icon><DashboardIcon :name="item.icon" :size="18" class="shrink-0" /></template>
+        {{ t(item.key) }}
+        <template v-if="!collapsed && badgeFor(item.to)" #trailing>
+          <span class="inline-flex h-5 items-center justify-center rounded-full bg-brand-600 px-2 text-[10px] font-bold text-white">{{ badgeFor(item.to) }}</span>
+        </template>
+      </SidebarItem>
     </div>
 
     <div class="flex-1" />
 
-    <button
-      type="button"
+    <SidebarItem
       data-test="sidebar-sign-out"
+      :collapsed="collapsed"
       :title="collapsed ? t('common.signOut') : undefined"
-      :class="linkClass(false)"
       @click="askSignOut(); emit('navigate')"
     >
-      <DashboardIcon name="logout" :size="18" class="shrink-0" />
-      <span v-show="!collapsed" class="truncate">{{ t('common.signOut') }}</span>
-    </button>
+      <template #icon><DashboardIcon name="logout" :size="18" class="shrink-0" /></template>
+      {{ t('common.signOut') }}
+    </SidebarItem>
   </nav>
 </template>

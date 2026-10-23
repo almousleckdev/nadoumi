@@ -6,7 +6,13 @@ import com.nadoumi.application.web.response.StudentApplicationResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.security.access.prepost.PreAuthorize;
+import com.nadoumi.application.service.ApplicationChecklistService;
+import com.nadoumi.application.web.request.StartApplicationRequest;
+import com.nadoumi.application.web.response.ChecklistItemResponse;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,9 +30,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class StudentApplicationController {
 
     private final StudentApplicationService service;
+    private final ApplicationChecklistService checklist;
 
-    public StudentApplicationController(StudentApplicationService service) {
+    public StudentApplicationController(StudentApplicationService service, ApplicationChecklistService checklist) {
         this.service = service;
+        this.checklist = checklist;
     }
 
     @GetMapping
@@ -34,10 +42,24 @@ public class StudentApplicationController {
         return service.listMine();
     }
 
+    /** Starts a draft for an applicant the caller may act for; the grant is checked inside the service. */
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public StudentApplicationResponse create(@Valid @RequestBody StartApplicationRequest req) {
+        return service.create(req);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@na.canAccessApplication(#id, 'VIEW_APPLICATION')")
     public StudentApplicationResponse get(@PathVariable Long id) {
         return service.get(id);
+    }
+
+    /** The documents this application needs and where the student stands on each. */
+    @GetMapping("/{id}/documents/checklist")
+    @PreAuthorize("@na.canAccessApplication(#id, 'VIEW_APPLICATION')")
+    public List<ChecklistItemResponse> checklist(@PathVariable Long id) {
+        return checklist.checklist(id).stream().map(ChecklistItemResponse::of).toList();
     }
 
     @PutMapping("/{id}")

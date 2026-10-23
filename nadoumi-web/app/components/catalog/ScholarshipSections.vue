@@ -78,6 +78,7 @@ const conditions = computed(() => [
       >
         <span class="min-w-0">
           <span class="font-medium text-slate-900">{{ t(`scholarships.doc.${d.docType}`, d.docType) }}</span>
+          <span v-if="d.appliesWhen" class="block text-sm text-slate-500">{{ t(`scholarships.cond.${d.appliesWhen}`) }}</span>
           <span v-if="d.note" class="block text-sm text-slate-500">{{ d.note }}</span>
         </span>
         <span class="shrink-0 text-sm" :class="d.mandatory ? 'font-semibold text-slate-900' : 'text-slate-500'">

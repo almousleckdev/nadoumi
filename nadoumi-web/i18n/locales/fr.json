@@ -425,7 +425,8 @@
       "interests": "Centres d’intérêt",
       "location": "Localisation",
       "work": "Expérience",
-      "applications": "Mes candidatures"
+      "applications": "Mes candidatures",
+      "family": "Famille et garants"
     },
     "welcome": "Content de vous revoir, {name}",
     "overviewBlurb": "Complétez votre profil de candidat pour que l'équipe puisse commencer à vous proposer des opportunités.",
@@ -710,7 +711,8 @@
       "type": {
         "PROGRAM_WITH_SCHOLARSHIP": "Programme avec bourse",
         "PROGRAM_ONLY": "Candidature à un programme",
-        "UNKNOWN": "Candidature"
+        "UNKNOWN": "Candidature",
+        "SCHOLARSHIP_ONLY": "Candidature à une bourse"
       },
       "status": {
         "DRAFT": "Brouillon",
@@ -787,7 +789,6 @@
     "intro": "Quelques étapes pour préparer votre profil de candidat. Vous pourrez revenir modifier chaque section plus tard.",
     "progress": "Étape {n} sur {total}",
     "next": "Suivant",
-    "back": "Retour",
     "finish": "Terminer",
     "skip": "Passer pour l'instant",
     "saved": "Enregistré",
@@ -854,7 +855,6 @@
       "none": "Aucune photo",
       "tooSmall": "L'image doit mesurer au moins {px}x{px} pixels.",
       "saved": "Photo enregistrée",
-      "current": "Photo actuelle",
       "save": "Enregistrer la photo"
     },
     "upload": {
@@ -894,8 +894,6 @@
     },
     "progressLabel": "Progression de l'inscription",
     "optionalTag": "Facultatif",
-    "helpTitle": "Besoin d'aide ?",
-    "helpBody": "Notre équipe vous guide avec plaisir. Écrivez à support{'@'}nadoumi.com.",
     "eyebrow": "Étape {n} sur {total}"
   },
   "university": {
@@ -919,7 +917,30 @@
     "contact": "Contact officiel",
     "website": "Site officiel",
     "admissionsEmail": "Admissions",
-    "officePhone": "Téléphone"
+    "officePhone": "Téléphone",
+    "address": "Adresse",
+    "viewOnMap": "Voir sur la carte",
+    "channels": "Canaux officiels",
+    "departments": "Départements et facultés",
+    "programmeCount": "{n} programmes",
+    "statIntlShare": "Étudiants internationaux",
+    "statProgrammes": "Programmes",
+    "statLevels": "Niveaux proposés",
+    "statTuitionFrom": "Frais à partir de",
+    "link": {
+      "ADMISSIONS": "Page des admissions",
+      "VIRTUAL_TOUR": "Visite virtuelle",
+      "WIKIPEDIA": "Wikipédia",
+      "FACEBOOK": "Facebook",
+      "X": "X",
+      "INSTAGRAM": "Instagram",
+      "YOUTUBE": "YouTube",
+      "LINKEDIN": "LinkedIn",
+      "TIKTOK": "TikTok",
+      "WECHAT": "WeChat",
+      "WEIBO": "Weibo"
+    },
+    "wechatId": "Identifiant WeChat"
   },
   "program": {
     "fallbackTitle": "Programme",
@@ -971,7 +992,36 @@
     "majorsIntro": "Domaines dans lesquels vous pouvez vous spécialiser au sein de ce programme.",
     "tuitionNote": "Défini par l'université. Le montant en USD est indicatif.",
     "universityLabel": "Université",
-    "viewAll": "Voir tous les programmes"
+    "viewAll": "Voir tous les programmes",
+    "durationYears": "{n} an | {n} ans",
+    "tuitionFrom": "Frais de scolarité à partir de",
+    "accommodationFrom": "Hébergement à partir de",
+    "offerings": {
+      "title": "Options du programme",
+      "description": "Durée, frais de scolarité et hébergement pour chaque niveau.",
+      "duration": "Durée",
+      "tuition": "Frais de scolarité",
+      "accommodation": "Hébergement",
+      "noPrice": "Demandez à notre équipe",
+      "period": {
+        "PER_YEAR": "par an",
+        "PER_SEMESTER": "par semestre",
+        "PER_MONTH": "par mois",
+        "TOTAL": "au total"
+      },
+      "notePrefix": "Note"
+    },
+    "admission": {
+      "requirements": "Conditions d’admission",
+      "language": "Exigences linguistiques",
+      "hsk": "HSK {n} ou plus",
+      "ielts": "IELTS {n} ou plus",
+      "toefl": "TOEFL {n} ou plus",
+      "documents": "Documents requis",
+      "applicationFee": "Frais de dossier",
+      "scholarships": "Bourses",
+      "career": "Débouchés"
+    }
   },
   "scholarships": {
     "searchLabel": "Rechercher des bourses",
@@ -1112,14 +1162,19 @@
     },
     "doc": {
       "PASSPORT": "Passeport",
-      "DEGREE": "Diplôme",
       "TRANSCRIPT": "Relevé de notes",
-      "LANGUAGE_CERT": "Certificat de langue",
       "VISA": "Visa",
       "PHYSICAL_EXAM": "Examen médical",
       "STUDY_PLAN": "Projet d'études",
       "RECOMMENDATION_LETTER": "Lettre de recommandation",
-      "OTHER": "Autre document"
+      "OTHER": "Autre document",
+      "DEGREE_CERTIFICATE": "Diplôme",
+      "LANGUAGE_TEST_REPORT": "Certificat de langue",
+      "PERSONAL_STATEMENT": "Lettre de motivation",
+      "FINANCIAL_PROOF": "Justificatif financier (relevé bancaire)",
+      "POLICE_CLEARANCE": "Casier judiciaire",
+      "PHOTO": "Photo d’identité",
+      "CV": "CV"
     },
     "elig": {
       "age": "Âge",
@@ -1138,7 +1193,14 @@
     "colPrice": "Prix",
     "colDoc": "Document",
     "colRequirement": "Exigence",
-    "colNotes": "Remarques"
+    "colNotes": "Remarques",
+    "cond": {
+      "MINOR": "Uniquement si vous avez moins de 18 ans",
+      "IN_CHINA": "Uniquement si vous êtes actuellement en Chine",
+      "STUDIED_IN_CHINA": "Uniquement si vous avez étudié en Chine",
+      "MASTER_OR_DOCTORAL": "Uniquement pour un master ou un doctorat",
+      "DOCTORAL": "Uniquement pour un doctorat"
+    }
   },
   "guides": {
     "more": "Plus de guides",
@@ -2124,10 +2186,9 @@
   },
   "passport": {
     "title": "Passeport",
-    "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport, puis confirmez les informations ci-dessous.",
+    "guidance": "Téléversez une photo ou un scan net de la page photo de votre passeport, puis saisissez son numéro et ses dates.",
     "none": "Aucun passeport téléversé",
     "formats": "JPEG, PNG ou PDF, jusqu'à 10 Mo",
-    "expiresOn": "Expire le {date}",
     "detailsTitle": "Informations du passeport",
     "fields": {
       "passportNo": "Numéro de passeport",
@@ -2329,6 +2390,23 @@
       "EN": "Anglais",
       "ZH": "Chinois",
       "EN_ZH": "Anglais et chinois"
+    },
+    "maritalStatus": {
+      "SINGLE": "Célibataire",
+      "MARRIED": "Marié(e)",
+      "OTHER": "Autre"
+    },
+    "familyRelation": {
+      "FATHER": "Père",
+      "MOTHER": "Mère",
+      "SPOUSE": "Conjoint(e)",
+      "SIBLING": "Frère ou sœur",
+      "OTHER": "Autre parent"
+    },
+    "personGender": {
+      "FEMALE": "Femme",
+      "MALE": "Homme",
+      "UNSPECIFIED": "Préfère ne pas dire"
     }
   },
   "news": {
@@ -2395,5 +2473,195 @@
     "visaExpired": "Ce visa a déjà expiré.",
     "needOne": "Ajoutez-en au moins un.",
     "needCities": "Ajoutez au moins trois provinces ou villes."
+  },
+  "payment": {
+    "title": "Frais de dossier",
+    "intro": "Réglez les frais de dossier Nadoumi pour soumettre votre candidature. Elle reste enregistrée tant que vous n’avez pas payé.",
+    "amount": "Montant",
+    "payee": "Bénéficiaire",
+    "reference": "Référence de paiement",
+    "referenceHint": "Indiquez cette référence dans la note du paiement si votre application le permet.",
+    "copy": "Copier",
+    "copied": "Référence copiée",
+    "pay": "Payer maintenant",
+    "payAgain": "Payer à nouveau",
+    "payToSubmit": "Réglez les frais de dossier pour soumettre votre candidature.",
+    "timeLeft": "Temps restant pour payer",
+    "qrAlt": "QR code de paiement",
+    "step1": "Ouvrez votre application bancaire ou de paiement et scannez le QR code.",
+    "step2": "Payez exactement {amount}.",
+    "step3": "Indiquez la référence dans la note du paiement.",
+    "step4": "Saisissez ensuite le numéro de transaction et téléversez une capture d’écran ci-dessous.",
+    "transactionNo": "Numéro de transaction",
+    "transactionNoHint": "Indiqué sur votre reçu (6 à 40 lettres ou chiffres).",
+    "screenshot": "Capture d’écran du paiement",
+    "fileHint": "JPEG, PNG ou PDF, {mb} Mo maximum",
+    "iHavePaid": "J’ai payé",
+    "cancel": "Fermer le paiement",
+    "verifyingTitle": "Vérification en cours",
+    "verifyingBody": "Nous avons reçu les détails de votre paiement. Notre équipe le confirmera et vous serez informé.",
+    "confirmedTitle": "Paiement confirmé",
+    "confirmedBody": "Vos frais de dossier sont réglés. Vous pouvez maintenant soumettre votre candidature.",
+    "rejectedTitle": "Votre paiement n’a pas été accepté",
+    "expiredTitle": "Le temps de paiement est écoulé",
+    "expiredBody": "Vous disposez de 15 minutes pour payer une fois le QR code affiché. Recommencez quand vous êtes prêt. Si vous avez déjà payé, contactez le support avec votre référence.",
+    "errors": {
+      "qrFailed": "Le QR code n’a pas pu être chargé. Fermez le paiement et réessayez.",
+      "txnInvalid": "Saisissez le numéro de transaction de votre paiement (6 à 40 lettres ou chiffres).",
+      "screenshotRequired": "Téléversez une capture d’écran de votre paiement.",
+      "fileType": "Téléversez un fichier JPEG, PNG ou PDF.",
+      "windowClosed": "Le temps de paiement est écoulé. Démarrez un nouveau paiement.",
+      "txnReused": "Ce numéro de transaction a déjà été utilisé.",
+      "noSession": "Aucun paiement n’est ouvert. Démarrez d’abord un paiement.",
+      "beingVerified": "Votre paiement a déjà été signalé et est en cours de vérification.",
+      "paymentRequired": "Réglez les frais de dossier avant de soumettre."
+    },
+    "documents": {
+      "title": "Vos documents",
+      "preparing": "Nous préparons votre reçu et votre formulaire de candidature. Ils apparaissent ici dans un instant, et le reçu vous est envoyé par email.",
+      "receipt": "Reçu de paiement",
+      "form": "Formulaire de candidature",
+      "download": "Télécharger le PDF",
+      "failed": "Le document n’a pas pu être téléchargé. Réessayez.",
+      "resend": "Me renvoyer le reçu par email",
+      "resent": "Reçu envoyé. Vérifiez votre boîte de réception.",
+      "resendWait": "Le reçu vient d’être envoyé. Réessayez dans quelques minutes."
+    }
+  },
+  "apply": {
+    "title": "Postuler",
+    "blurb": "Commencez votre candidature.",
+    "back": "Retour",
+    "noTarget": "Choisissez un programme ou une bourse pour postuler.",
+    "notFound": "Nous n’avons pas trouvé ce pour quoi vous souhaitez postuler. Il n’est peut-être plus ouvert.",
+    "studentTitle": "Qui postule",
+    "studentLegend": "Étudiant",
+    "unnamedStudent": "Étudiant",
+    "noStudents": "Complétez votre profil étudiant avant de postuler.",
+    "intakeTitle": "Rentrée",
+    "intakeLabel": "Choisissez une rentrée",
+    "intakePlaceholder": "Sélectionnez une rentrée",
+    "noIntake": "Ce programme n’a aucune rentrée ouverte aux candidatures pour le moment.",
+    "nextTitle": "Et ensuite",
+    "nextBody": "Nous enregistrons aussitôt un brouillon de candidature. Vous réglez ensuite les frais de dossier Nadoumi, quand vous le souhaitez, puis vous soumettez votre candidature. Votre brouillon reste enregistré jusqu’à la soumission.",
+    "start": "Commencer la candidature",
+    "continueDraft": "Reprendre votre brouillon",
+    "draftExists": "Vous avez déjà un brouillon de candidature pour ceci."
+  },
+  "family": {
+    "title": "Famille et garants",
+    "blurb": "Le formulaire de candidature Nadoumi demande ces informations. Remplissez-les une fois, nous les réutilisons pour chaque candidature.",
+    "personal": {
+      "title": "Informations personnelles",
+      "marital": "Situation familiale",
+      "religion": "Religion",
+      "placeOfBirth": "Lieu de naissance",
+      "officialLanguage": "Langue officielle de votre pays",
+      "permanentAddress": "Adresse permanente",
+      "postcode": "Code postal"
+    },
+    "member": {
+      "title": "Membres de la famille",
+      "rule": "Ajoutez vos deux parents. Si un parent est décédé, indiquez-le et ajoutez au moins deux frères et sœurs ou autres proches.",
+      "empty": "Aucun membre de la famille ajouté.",
+      "add": "Ajouter un membre de la famille",
+      "relation": "Lien de parenté",
+      "fullName": "Nom complet",
+      "dateOfBirth": "Date de naissance",
+      "nationality": "Nationalité",
+      "deceased": "Cette personne est décédée",
+      "deceasedTag": "Décédé(e)",
+      "note": "Remarque",
+      "noteHint": "Par exemple, l’année et une brève raison.",
+      "company": "Entreprise",
+      "position": "Poste",
+      "companyAddress": "Adresse de l’entreprise",
+      "phone": "Téléphone",
+      "email": "Email"
+    },
+    "supporter": {
+      "title": "Garant financier",
+      "hint": "La personne qui finance vos études. Ses informations doivent correspondre à votre relevé bancaire ou à la lettre de garantie."
+    },
+    "chinaEmergency": {
+      "title": "Contact d’urgence en Chine",
+      "hint": "Une personne en Chine que nous pouvons joindre si nous ne vous joignons pas."
+    },
+    "person": {
+      "fullName": "Nom complet",
+      "relationship": "Lien avec vous",
+      "gender": "Genre",
+      "phone": "Téléphone",
+      "email": "Email",
+      "position": "Poste",
+      "company": "Entreprise ou établissement",
+      "companyAddress": "Adresse de l’entreprise",
+      "homeAddress": "Adresse personnelle"
+    },
+    "readiness": {
+      "title": "Complétez votre formulaire de candidature",
+      "body": "Ces parties du formulaire de candidature Nadoumi sont encore vides. Vous pouvez soumettre quand même, mais le formulaire les indiquera comme non renseignées.",
+      "fill": "Les remplir",
+      "PERSONAL_DETAILS": "Informations personnelles",
+      "FAMILY": "Membres de la famille",
+      "SUPPORTER": "Garant financier",
+      "CHINA_EMERGENCY": "Contact d’urgence en Chine",
+      "SIGNATURE": "Signature"
+    }
+  },
+  "checklist": {
+    "title": "Documents à téléverser",
+    "blurb": "Voici les documents nécessaires à cette candidature. Téléversez chacun en PDF, JPEG ou PNG. L’équipe Nadoumi les examine après votre soumission.",
+    "mandatory": "Obligatoire",
+    "optional": "Facultatif",
+    "upload": "Téléverser",
+    "uploadAgain": "Téléverser à nouveau",
+    "uploaded": "Document téléversé",
+    "badType": "Téléversez un fichier PDF, JPEG ou PNG dans la limite de taille.",
+    "uploadToSubmit": "Téléversez les documents obligatoires pour soumettre votre candidature.",
+    "status": {
+      "MISSING": "Non téléversé"
+    },
+    "errors": {
+      "required": "Téléversez les documents obligatoires avant de soumettre."
+    }
+  },
+  "signature": {
+    "title": "Votre signature",
+    "blurb": "Le formulaire de candidature n’est pas valable sans votre signature. Dessinez-la ci-dessous ou téléversez une image nette. Vous ne le faites qu’une fois.",
+    "padLabel": "Zone de dessin de la signature",
+    "clear": "Effacer",
+    "save": "Enregistrer la signature",
+    "upload": "Téléverser une image",
+    "redo": "Signer à nouveau",
+    "saved": "Signature enregistrée",
+    "onFile": "Votre signature est enregistrée et sera imprimée sur le formulaire de candidature.",
+    "badType": "Téléversez une image PNG ou JPEG dans la limite de taille.",
+    "signToSubmit": "Ajoutez votre signature pour soumettre votre candidature.",
+    "errors": {
+      "required": "Ajoutez votre signature avant de soumettre."
+    }
+  },
+  "templates": {
+    "title": "Formulaires à remplir",
+    "blurb": "Téléchargez ces formulaires, remplissez-les puis téléversez-les avec vos documents ci-dessous.",
+    "download": "Télécharger",
+    "failed": "Le fichier n’a pas pu être téléchargé. Réessayez."
+  },
+  "verify": {
+    "title": "Vérifier un document",
+    "blurb": "Vérifiez que Nadoumi a bien émis le reçu ou le formulaire de candidature qui vous a été remis.",
+    "missing": "Scannez le QR code du document pour ouvrir cette page avec ses informations.",
+    "failed": "Nous ne pouvons pas vérifier ce document pour le moment. Réessayez dans un instant.",
+    "valid": "Ce document a bien été émis par Nadoumi.",
+    "invalid": "Nous n’avons pas pu vérifier ce document. Il a peut-être été modifié, ou le code est incorrect.",
+    "kind": "Document",
+    "number": "Numéro",
+    "issuedOn": "Émis le",
+    "privacy": "Par confidentialité, aucune donnée personnelle n’est affichée ici.",
+    "kinds": {
+      "RECEIPT": "Reçu de paiement",
+      "APPLICATION_FORM": "Formulaire de candidature"
+    }
   }
 }

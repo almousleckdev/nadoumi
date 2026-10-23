@@ -7,7 +7,7 @@ import ApplicationDetail from '~/pages/dashboard/applications/[id].vue'
 import type { StudentApplicationDto } from '~/types/catalog'
 
 const APP = (over: Partial<StudentApplicationDto> = {}): StudentApplicationDto => ({
-  id: 7, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
+  id: 7, applicantId: 1, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
   currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-15T10:00:00',
   timeline: ['APPLICATION_CREATED', 'STAGE_SUBMIT', 'CASE_ASSIGNED', 'STAGE_CLAIM'], ...over,
 })
@@ -16,9 +16,19 @@ const list = vi.fn()
 const get = vi.fn()
 const submit = vi.fn()
 const withdraw = vi.fn()
+const checklist = vi.fn()
+const templates = vi.fn()
 mockNuxtImport('useRoute', () => () => ({ params: { id: '7' }, path: '/dashboard/applications/7' }))
+// the fee is settled in these tests; the payment panel has its own suite
+mockNuxtImport('useApplicationPayment', () => () => ({
+  overview: async () => ({ state: 'CONFIRMED', required: true, settled: true, canStart: false, amount: 300, currency: 'CNY', payee: '', reference: 'NAD-TEST0001', expiresAt: null, secondsLeft: 0, rejectionReason: null }),
+}))
+mockNuxtImport('useApplicantSignature', () => () => ({
+  status: async () => ({ signed: true, signedAt: '2026-10-22T10:00:00' }),
+  image: async () => new Blob(['x'], { type: 'image/png' }),
+}))
 vi.mock('~/composables/useApplications', () => ({
-  useApplications: () => ({ list, get, submit, withdraw }),
+  useApplications: () => ({ list, get, submit, withdraw, checklist, templates, template: vi.fn() }),
 }))
 
 beforeEach(() => {
@@ -26,6 +36,8 @@ beforeEach(() => {
   get.mockReset().mockResolvedValue(APP())
   submit.mockReset()
   withdraw.mockReset()
+  checklist.mockReset().mockResolvedValue([])
+  templates.mockReset().mockResolvedValue([])
 })
 
 async function mountList() {
