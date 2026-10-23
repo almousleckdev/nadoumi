@@ -59,7 +59,7 @@ public class ApplicationOutboxEmitter {
             return;
         }
         JSONObject payload = new JSONObject();
-        payload.put("applicationRef", "APP-" + application.getId());
+        payload.put("applicationRef", application.getReference());
         payload.put("opportunityTitle", opportunityTitle(application));
         if (status != null) {
             payload.put("status", status);
@@ -70,7 +70,7 @@ public class ApplicationOutboxEmitter {
 
     private void emitToStaffQueue(Application application, long actorUserId) {
         JSONObject payload = new JSONObject();
-        payload.put("applicationRef", "APP-" + application.getId());
+        payload.put("applicationRef", application.getReference());
         payload.put("opportunityTitle", opportunityTitle(application));
         payload.put("applicationId", application.getId());
         payload.put("audiencePermission", STAFF_QUEUE_PERMISSION);

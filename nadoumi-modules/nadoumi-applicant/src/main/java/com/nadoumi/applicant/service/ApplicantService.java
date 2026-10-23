@@ -73,6 +73,21 @@ public class ApplicantService {
         return ApplicantResponse.of(a, true);
     }
 
+    /** A student or agent starting an application for someone else: a new applicant they act for as AGENT. */
+    @Transactional(rollbackFor = Exception.class)
+    public ApplicantResponse createForOther(SelfApplicantRequest req) {
+        if (!caller.isExternal()) {
+            throw new AccessDeniedException("staff create applicants via /api/staff/applicants");
+        }
+        Applicant a = new Applicant();
+        applyProfile(a, req);
+        a.setStatus(ApplicantStatus.ACTIVE);
+        a.setCreateBy(String.valueOf(caller.requireUserId()));
+        mapper.insert(a);
+        grants.grantAgentOnCreation(caller.requireUserId(), a.getId());
+        return ApplicantResponse.of(a, true);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public ApplicantResponse createByStaff(StaffCreateApplicantRequest req) {
         Applicant a = new Applicant();

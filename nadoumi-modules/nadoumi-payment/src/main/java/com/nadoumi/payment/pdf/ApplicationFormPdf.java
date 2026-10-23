@@ -49,7 +49,7 @@ public class ApplicationFormPdf {
                     new String[] {"Form no.", m.formNo()},
                     new String[] {"Application", m.applicationRef()},
                     new String[] {"Generated", PdfText.stamp(m.generatedAt())},
-                    new String[] {"Application fee", "PAID  " + m.paymentReference()}), m.photo());
+                    new String[] {"Application fee", m.paymentReference() == null ? "Not paid yet" : "PAID  " + m.paymentReference()}), m.photo());
             opportunity(page, m);
             personal(page, d);
             tests(page, d.testScores());

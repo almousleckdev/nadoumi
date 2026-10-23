@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     :model-value="modelValue"
-    :title="detail ? `#${detail.application.id} · ${typeLabel(detail.application.applicationType)}` : t('applications.title')"
+    :title="detail ? `${detail.application.reference ?? `#${detail.application.id}`} · ${typeLabel(detail.application.applicationType)}` : t('applications.title')"
     size="640"
     @update:model-value="emit('update:modelValue', $event)"
   >

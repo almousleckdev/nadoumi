@@ -433,6 +433,8 @@ export interface NotificationView {
  */
 export interface StudentApplicationDto {
   id: number
+  /** The readable application number, for example NAD20261023001. */
+  reference: string | null
   /** The student the application is for (the caller may act for several). */
   applicantId: number
   applicationType: string | null

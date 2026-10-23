@@ -112,10 +112,10 @@ final class PdfFixtures {
     }
 
     static Description programme() {
-        return new Description(Kind.PROGRAM, "MBBS", "Fudan University", "AUTUMN_SEPTEMBER");
+        return new Description("NAD20261022042", Kind.PROGRAM, "MBBS", "Fudan University", "AUTUMN_SEPTEMBER");
     }
 
     static Description scholarship() {
-        return new Description(Kind.SCHOLARSHIP, "CSC Master Scholarship", null, null);
+        return new Description("NAD20261022043", Kind.SCHOLARSHIP, "CSC Master Scholarship", null, null);
     }
 }

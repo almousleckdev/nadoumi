@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ApplicationReadService {
 
     /** The few facts another module needs about an application. */
-    public record ApplicationFacts(long id, long applicantId, String status, boolean draft) {
+    public record ApplicationFacts(long id, String reference, long applicantId, String status, boolean draft) {
     }
 
     private static final String DRAFT_STATUS = "DRAFT";
@@ -31,7 +31,7 @@ public class ApplicationReadService {
         if (application == null) {
             return Optional.empty();
         }
-        return Optional.of(new ApplicationFacts(application.getId(), application.getApplicantId(),
+        return Optional.of(new ApplicationFacts(application.getId(), application.getReference(), application.getApplicantId(),
                 application.getCurrentStatus(), DRAFT_STATUS.equals(application.getCurrentStatus())));
     }
 }

@@ -33,6 +33,7 @@ class ApplicationOutboxEmitterTest {
     private static Application application() {
         Application a = new Application();
         a.setId(77L);
+        a.setReference("NAD20261023001");
         a.setApplicantId(5L);
         a.setProgramId(11L);
         return a;
@@ -81,7 +82,7 @@ class ApplicationOutboxEmitterTest {
         assertThat(payload.getValue())
                 .contains("\"opportunityTitle\":\"your application\"")
                 .contains("\"status\":\"IN_REVIEW\"")
-                .contains("APP-77");
+                .contains("NAD20261023001");
     }
 
     @Test

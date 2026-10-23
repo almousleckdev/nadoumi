@@ -142,7 +142,7 @@ watch(openId, (id) => { drawerOpen.value = id !== undefined })
 watch(drawerOpen, (open) => { if (!open) openId.value = undefined })
 
 const columns = computed(() => [
-  { prop: 'id', label: t('applications.ref'), width: 90 },
+  { prop: 'reference', label: t('applications.ref'), width: 160 },
   { prop: 'applicantId', label: t('applications.applicant'), width: 110 },
   { prop: 'applicationType', label: t('applications.type'), minWidth: 210 },
   { prop: 'currentStageName', label: t('applications.stage'), minWidth: 190 },

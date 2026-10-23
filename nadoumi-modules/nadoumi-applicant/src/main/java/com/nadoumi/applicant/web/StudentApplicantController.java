@@ -78,6 +78,13 @@ public class StudentApplicantController {
         return service.createAboutMe(req);
     }
 
+    /** Starts a new applicant for another person, whom the caller then completes and applies for as their agent. */
+    @PostMapping("/other")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ApplicantResponse createForOther(@Valid @RequestBody SelfApplicantRequest req) {
+        return service.createForOther(req);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("@na.canAccessApplicant(#id, 'VIEW_PROFILE')")
     public ApplicantResponse get(@PathVariable Long id) {

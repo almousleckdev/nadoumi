@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationReferenceMapper">
+
+    <!-- last_insert_id(expr) keeps the new number for this connection, so two applications started at the same moment never share one -->
+    <insert id="take">
+        insert into nad_application_reference_counter (ref_date, last_seq)
+        values (#{day}, last_insert_id(1))
+        on duplicate key update last_seq = last_insert_id(last_seq + 1)
+    </insert>
+
+    <select id="lastTaken" resultType="int">
+        select last_insert_id()
+    </select>
+</mapper>

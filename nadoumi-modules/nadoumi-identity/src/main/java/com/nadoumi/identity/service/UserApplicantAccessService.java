@@ -52,6 +52,21 @@ public class UserApplicantAccessService {
     }
 
     /**
+     * A user who applies on behalf of another person creates that person's applicant record and becomes its ACTIVE AGENT:
+     * allowed to complete the profile, upload documents and submit, but not to hand the record to anyone else.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public UserApplicantAccess grantAgentOnCreation(Long userId, Long applicantId) {
+        UserApplicantAccess agent = newGrant(applicantId, AccessRole.AGENT, AccessGrantStatus.ACTIVE);
+        agent.setUserId(userId);
+        agent.setGrantedByUserId(userId);
+        agent.setGrantedAt(LocalDateTime.now());
+        agent.setCreateBy(String.valueOf(userId));
+        mapper.insert(agent);
+        return agent;
+    }
+
+    /**
      * Staff-created applicant: a transitional staff-held ACTIVE OWNER
      * ({@code is_interim=1}, expires in {@value #INTERIM_OWNER_DAYS} days) plus a
      * PENDING OWNER invite to {@code invitedEmail}.

@@ -64,7 +64,7 @@ class ApplicationPaymentServiceTest {
         when(settings.applicationFee()).thenReturn(new BigDecimal("300.00"));
         when(settings.payee()).thenReturn("Nadoumi");
         when(applications.find(APPLICATION_ID)).thenReturn(Optional.of(
-                new ApplicationFacts(APPLICATION_ID, APPLICANT_ID, "DRAFT", true)));
+                new ApplicationFacts(APPLICATION_ID, "NAD20261023001", APPLICANT_ID, "DRAFT", true)));
         when(caller.requireUserId()).thenReturn(USER_ID);
         when(names.of(APPLICANT_ID)).thenReturn("Ada Lovelace");
         when(references.next()).thenReturn("NAD-7K3Q9FXT");
@@ -139,7 +139,7 @@ class ApplicationPaymentServiceTest {
     @Test
     void shouldRefuseToOpenASession_whenTheApplicationIsNoLongerADraft() {
         when(applications.find(APPLICATION_ID)).thenReturn(Optional.of(
-                new ApplicationFacts(APPLICATION_ID, APPLICANT_ID, "SUBMITTED", false)));
+                new ApplicationFacts(APPLICATION_ID, "NAD20261023001", APPLICANT_ID, "SUBMITTED", false)));
 
         assertThatThrownBy(() -> service.start(APPLICATION_ID)).isInstanceOf(PaymentConflictException.class);
     }

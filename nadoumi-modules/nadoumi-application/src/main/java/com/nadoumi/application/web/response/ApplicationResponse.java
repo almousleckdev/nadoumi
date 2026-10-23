@@ -7,6 +7,7 @@ import com.nadoumi.common.text.Texts;
 /** List/summary shape — staff and student list endpoints. Never the persistence entity. */
 public record ApplicationResponse(
         Long id,
+        String reference,
         Long applicantId,
         String applicationType,
         Long programId,
@@ -22,7 +23,7 @@ public record ApplicationResponse(
 
     public static ApplicationResponse of(Application a, WfStage stage) {
         return new ApplicationResponse(
-                a.getId(), a.getApplicantId(),
+                a.getId(), a.getReference(), a.getApplicantId(),
                 a.getApplicationType() == null ? null : a.getApplicationType().name(),
                 a.getProgramId(), a.getScholarshipId(), a.getIntakeId(),
                 stage == null ? null : stage.getCode(), stage == null ? null : stage.getName(),

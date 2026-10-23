@@ -58,7 +58,7 @@ public class PaymentEvents {
     private static JSONObject base(ApplicationPayment payment) {
         JSONObject payload = new JSONObject();
         payload.put("applicationId", payment.getApplicationId());
-        payload.put("applicationRef", "APP-" + payment.getApplicationId());
+        payload.put("applicationRef", payment.getApplicationReference());
         payload.put("paymentId", payment.getId());
         payload.put("reference", payment.getReference());
         payload.put("amount", payment.getAmount().toPlainString() + " " + payment.getCurrency());

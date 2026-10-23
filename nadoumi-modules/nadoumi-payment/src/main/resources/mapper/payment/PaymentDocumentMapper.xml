@@ -61,7 +61,7 @@
     </select>
 
     <select id="findConfirmedWithoutReceipt" resultMap="com.nadoumi.payment.mapper.PaymentMapper.payment">
-        select p.id, p.application_id, p.applicant_id, p.applicant_name, p.kind, p.amount, p.currency, p.method,
+        select p.id, p.application_id, p.application_reference, p.applicant_id, p.applicant_name, p.kind, p.amount, p.currency, p.method,
                p.reference, p.status, p.expires_at, p.student_txn_no, p.proof_media_id, p.submitted_at,
                p.verified_by, p.verified_at, p.rejection_reason, p.version, p.create_by, p.create_time,
                p.update_by, p.update_time
@@ -72,7 +72,7 @@
     </select>
 
     <select id="findAwaitingFinalForm" resultMap="com.nadoumi.payment.mapper.PaymentMapper.payment">
-        select p.id, p.application_id, p.applicant_id, p.applicant_name, p.kind, p.amount, p.currency, p.method,
+        select p.id, p.application_id, p.application_reference, p.applicant_id, p.applicant_name, p.kind, p.amount, p.currency, p.method,
                p.reference, p.status, p.expires_at, p.student_txn_no, p.proof_media_id, p.submitted_at,
                p.verified_by, p.verified_at, p.rejection_reason, p.version, p.create_by, p.create_time,
                p.update_by, p.update_time

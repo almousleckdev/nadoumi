@@ -48,6 +48,10 @@ public class ApplicationChecklistService {
         }
     }
 
+    /** The document type of the filled-in application form the applicant uploads back. */
+    public static final String APPLICATION_FORM = "APPLICATION_FORM";
+    private static final String FORM_NOTE = "Download the form, fill it in and upload it.";
+
     private static final Comparator<Document> BEST_FIRST = Comparator
             .comparingInt((Document d) -> rank(d.getStatus()))
             .thenComparing(Comparator.comparing(Document::getId).reversed());
@@ -58,16 +62,18 @@ public class ApplicationChecklistService {
     private final DocumentService documents;
     private final ApplicantDossierService dossiers;
     private final ProgramService programs;
+    private final ApplicationTemplateService templates;
 
     public ApplicationChecklistService(ApplicationMapper applications, DocumentRequirementService requirements,
             ScholarshipAdminService scholarships, DocumentService documents,
-            ApplicantDossierService dossiers, ProgramService programs) {
+            ApplicantDossierService dossiers, ProgramService programs, ApplicationTemplateService templates) {
         this.applications = applications;
         this.requirements = requirements;
         this.scholarships = scholarships;
         this.documents = documents;
         this.dossiers = dossiers;
         this.programs = programs;
+        this.templates = templates;
     }
 
     @Transactional(readOnly = true)
@@ -104,6 +110,10 @@ public class ApplicationChecklistService {
 
     private Map<String, Wanted> wanted(Application application, Facts facts) {
         Map<String, Wanted> byType = new LinkedHashMap<>();
+        // when the opportunity gives a form to fill in, the filled-in form is required and comes first
+        if (!templates.forApplication(application.getId()).isEmpty()) {
+            byType.put(APPLICATION_FORM, new Wanted(APPLICATION_FORM, true, FORM_NOTE));
+        }
         if (application.getProgramId() != null) {
             for (DocumentRequirement r : requirements.checklistFor(RequirementScope.PROGRAM, application.getProgramId())) {
                 if (applies(r.getAppliesWhen(), facts)) {
