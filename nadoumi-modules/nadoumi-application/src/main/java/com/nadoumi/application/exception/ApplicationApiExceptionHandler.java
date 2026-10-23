@@ -38,6 +38,13 @@ public class ApplicationApiExceptionHandler {
         return pd;
     }
 
+    @ExceptionHandler(ProfileIncompleteException.class)
+    public ProblemDetail profileIncomplete(ProfileIncompleteException e) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+        pd.setDetail(e.getMessage());
+        return pd;
+    }
+
     @ExceptionHandler(SignatureRequiredException.class)
     public ProblemDetail signatureRequired(SignatureRequiredException e) {
         ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);

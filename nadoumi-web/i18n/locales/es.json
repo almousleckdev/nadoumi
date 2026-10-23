@@ -2535,6 +2535,8 @@
     "back": "Volver",
     "noTarget": "Elige un programa o una beca para solicitar.",
     "notFound": "No encontramos lo que quieres solicitar. Puede que ya no esté abierto.",
+    "profileUnfinished": "{name} no ha terminado su perfil. Puedes iniciar la solicitud, pero solo se podrá enviar cuando su perfil esté completo.",
+    "finishProfile": "Terminar el perfil de {name}",
     "studentTitle": "Quién solicita",
     "studentLegend": "Estudiante",
     "unnamedStudent": "Estudiante",

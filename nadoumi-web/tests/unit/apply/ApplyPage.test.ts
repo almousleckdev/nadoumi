@@ -12,7 +12,8 @@ mockNuxtImport('useApplicant', () => () => ({ listMine: api.listMine }))
 mockNuxtImport('navigateTo', () => api.navigateTo)
 vi.mock('~/composables/useApplications', () => ({ useApplications: () => ({ list: api.list, start: api.start }) }))
 
-const student = (id: number, given: string) => ({ id, givenName: given, familyName: 'Diallo', email: `${given}@example.test` })
+const student = (id: number, given: string, onboardingComplete = true) =>
+  ({ id, givenName: given, familyName: 'Diallo', email: `${given}@example.test`, onboardingComplete })
 const programme = {
   kind: 'programme', id: 5, slug: 'mbbs-fudan', title: 'MBBS', universityName: 'Fudan University',
   intakes: [{ id: 9, term: 'AUTUMN_SEPTEMBER' }, { id: 10, term: 'SPRING_MARCH' }],
@@ -74,6 +75,20 @@ describe('apply page', () => {
     await flushPromises()
 
     expect(api.start).toHaveBeenCalledWith({ applicantId: 3, applicationType: 'SCHOLARSHIP_ONLY', scholarshipId: 7 })
+  })
+
+  it('warns that a student whose profile is unfinished cannot be submitted yet, and sends them to finish it', async () => {
+    api.load.mockResolvedValue({ kind: 'scholarship', id: 7, slug: 'csc-master', title: 'CSC Master' })
+    api.listMine.mockResolvedValue([student(3, 'Amina'), student(4, 'Moussa', false)])
+    const w = await mountPage({ scholarship: 'csc-master' })
+
+    expect(w.find('[data-test="profile-unfinished"]').exists()).toBe(false) // Amina is ready
+    await w.find('[data-test="student-4"] input').setValue(true)
+    expect(w.find('[data-test="profile-unfinished"]').text()).toContain('Moussa Diallo has not finished their profile')
+
+    await w.find('[data-test="finish-profile"]').trigger('click')
+    expect(api.navigateTo).toHaveBeenCalledWith('/onboarding')
+    useSession().activeApplicantId.value = null // the session state is shared between tests
   })
 
   it('offers to continue an existing draft instead of starting a duplicate', async () => {

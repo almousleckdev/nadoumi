@@ -39,6 +39,8 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     @Autowired private RedisCache redisCache;
     @Autowired private PaymentDocumentWorker documentsWorker;
     @Autowired private LoggingMailSender mailbox;
+    /** Applicants whose profile is complete; ids are never reused, so this is safe across tests. */
+    private final java.util.Set<Long> profileDone = new java.util.HashSet<>();
 
     private String staffAuth;
     private long programId;
@@ -290,7 +292,32 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         return out.toByteArray();
     }
 
+    /** Everything the submit gate asks of an applicant besides the fee, the documents and the signature. */
+    private void completeProfile(Student s) throws Exception {
+        jdbc.update("update nad_applicant set onboarded_at = now() where id = ?", s.applicantId());
+        String url = s.applicantUrl();
+        String person = "{\"fullName\":\"Ibrahima Diallo\",\"relationship\":\"Father\",\"gender\":\"MALE\",\"phone\":\"+224611111111\"}";
+        send(url + "/personal-details", "PUT", s, "{\"maritalStatus\":\"SINGLE\",\"religion\":\"Muslim\","
+                + "\"placeOfBirth\":\"Conakry\",\"permanentAddress\":\"12 Rue du Port\"}");
+        send(url + "/people/supporter", "PUT", s, person);
+        send(url + "/people/china-emergency", "PUT", s, person);
+        send(url + "/family", "POST", s, "{\"relation\":\"FATHER\",\"fullName\":\"Ibrahima Diallo\"}");
+        send(url + "/family", "POST", s, "{\"relation\":\"MOTHER\",\"fullName\":\"Fatoumata Diallo\"}");
+    }
+
+    private void send(String url, String method, Student s, String json) throws Exception {
+        mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request(
+                        org.springframework.http.HttpMethod.valueOf(method), url)
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON).content(json)
+                        .header("Authorization", bearer(s.token())))
+                .andExpect(status().is2xxSuccessful());
+    }
+
     private void sign(Student s) throws Exception {
+        if (!profileDone.contains(s.applicantId())) {
+            completeProfile(s);
+            profileDone.add(s.applicantId());
+        }
         mvc.perform(multipart(s.applicantUrl() + "/signature")
                         .file(new MockMultipartFile("file", "signature.png", "image/png", signaturePng()))
                         .header("Authorization", bearer(s.token())))
@@ -633,6 +660,13 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         mvc.perform(post("/api/staff/payments/" + paymentId(app) + "/confirm").header("Authorization", staffAuth))
                 .andExpect(status().isOk());
 
+        // the profile is checked before the signature: nothing is finished yet
+        submitApplication(s, app).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("profile")))
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("ONBOARDING")))
+                .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("FAMILY")));
+        completeProfile(s);
+        profileDone.add(s.applicantId());
         submitApplication(s, app).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.detail").value(org.hamcrest.Matchers.containsString("sign")));
         sign(s);

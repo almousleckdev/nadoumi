@@ -1,9 +1,11 @@
 package com.nadoumi.application.service;
 
 import com.nadoumi.applicant.service.SignatureService;
+import com.nadoumi.applicant.service.SubmissionReadinessService;
 import com.nadoumi.application.domain.Application;
 import com.nadoumi.application.exception.DocumentsRequiredException;
 import com.nadoumi.application.exception.PaymentRequiredException;
+import com.nadoumi.application.exception.ProfileIncompleteException;
 import com.nadoumi.application.exception.SignatureRequiredException;
 import com.nadoumi.application.mapper.ApplicationMapper;
 import java.util.List;
@@ -21,13 +23,15 @@ public class SubmitGate {
     private final ApplicationChecklistService checklist;
     private final ApplicationMapper applications;
     private final SignatureService signatures;
+    private final SubmissionReadinessService readiness;
 
     public SubmitGate(PaymentGuardProvider payments, ApplicationChecklistService checklist,
-            ApplicationMapper applications, SignatureService signatures) {
+            ApplicationMapper applications, SignatureService signatures, SubmissionReadinessService readiness) {
         this.payments = payments;
         this.checklist = checklist;
         this.applications = applications;
         this.signatures = signatures;
+        this.readiness = readiness;
     }
 
     public void require(long applicationId) {
@@ -39,6 +43,13 @@ public class SubmitGate {
             throw new DocumentsRequiredException("upload the required documents before submitting: " + String.join(", ", missing));
         }
         Application application = applications.findById(applicationId);
+        if (application != null) {
+            List<String> unfinished = readiness.missing(application.getApplicantId());
+            if (!unfinished.isEmpty()) {
+                throw new ProfileIncompleteException(
+                        "finish the applicant's profile before submitting: " + String.join(", ", unfinished));
+            }
+        }
         if (application == null || !signatures.isOnFile(application.getApplicantId())) {
             throw new SignatureRequiredException("sign the application form before submitting");
         }

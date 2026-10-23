@@ -6,9 +6,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.nadoumi.applicant.service.SignatureService;
+import com.nadoumi.applicant.service.SubmissionReadinessService;
 import com.nadoumi.application.domain.Application;
 import com.nadoumi.application.exception.DocumentsRequiredException;
 import com.nadoumi.application.exception.PaymentRequiredException;
+import com.nadoumi.application.exception.ProfileIncompleteException;
 import com.nadoumi.application.exception.SignatureRequiredException;
 import com.nadoumi.application.mapper.ApplicationMapper;
 import java.util.List;
@@ -22,7 +24,8 @@ class SubmitGateTest {
     private final ApplicationChecklistService checklist = mock(ApplicationChecklistService.class);
     private final ApplicationMapper applications = mock(ApplicationMapper.class);
     private final SignatureService signatures = mock(SignatureService.class);
-    private final SubmitGate gate = new SubmitGate(payments, checklist, applications, signatures);
+    private final SubmissionReadinessService readiness = mock(SubmissionReadinessService.class);
+    private final SubmitGate gate = new SubmitGate(payments, checklist, applications, signatures, readiness);
 
     private void application() {
         Application a = new Application();
@@ -54,6 +57,7 @@ class SubmitGateTest {
         when(checklist.missingMandatory(ID)).thenReturn(List.of());
         application();
         when(signatures.isOnFile(9L)).thenReturn(true);
+        when(readiness.missing(9L)).thenReturn(List.of());
 
         assertThatCode(() -> gate.require(ID)).doesNotThrowAnyException();
     }
@@ -66,5 +70,17 @@ class SubmitGateTest {
         when(signatures.isOnFile(9L)).thenReturn(false);
 
         assertThatThrownBy(() -> gate.require(ID)).isInstanceOf(SignatureRequiredException.class);
+    }
+
+    @Test
+    void shouldNameTheUnfinishedProfileSections_beforeTheSignature() {
+        when(payments.isSettled(ID, PaymentGuardProvider.APPLICATION_FEE)).thenReturn(true);
+        when(checklist.missingMandatory(ID)).thenReturn(List.of());
+        application();
+        when(readiness.missing(9L)).thenReturn(List.of("ONBOARDING", "FAMILY"));
+
+        assertThatThrownBy(() -> gate.require(ID))
+                .isInstanceOf(ProfileIncompleteException.class)
+                .hasMessageContaining("ONBOARDING").hasMessageContaining("FAMILY");
     }
 }

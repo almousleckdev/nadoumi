@@ -2535,6 +2535,8 @@
     "back": "Back",
     "noTarget": "Choose a programme or scholarship to apply for.",
     "notFound": "We could not find what you want to apply for. It may no longer be open.",
+    "profileUnfinished": "{name} has not finished their profile. You can start the application, but it can only be submitted once their profile is complete.",
+    "finishProfile": "Finish {name}'s profile",
     "studentTitle": "Who is applying",
     "studentLegend": "Student",
     "unnamedStudent": "Student",
