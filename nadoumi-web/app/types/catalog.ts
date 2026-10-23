@@ -239,6 +239,8 @@ export interface ProgramCard {
   summary?: string | null
   featured: boolean
   hot: boolean
+  /** "Recommended by Nadoumi". */
+  recommended?: boolean
   /** Resolved image URL — absolute (Cloudinary) when set, else `null` (programmes may have no image). */
   imageUrl?: string | null
 }

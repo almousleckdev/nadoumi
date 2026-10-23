@@ -191,6 +191,11 @@
         "title": "Featured programmes",
         "description": "Programmes worth a look from universities in our catalog."
       },
+      "programRecommended": {
+        "eyebrow": "Programmes",
+        "title": "Recommended programmes",
+        "description": "Programmes picked by the Nadoumi team."
+      },
       "programHot": {
         "eyebrow": "Programmes",
         "title": "Hot programmes",

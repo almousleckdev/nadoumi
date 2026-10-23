@@ -44,6 +44,9 @@ defineExpose({ uploadTasks })
       <el-form-item :label="t('program.featured')">
         <el-switch v-model="form.featured" />
       </el-form-item>
+      <el-form-item :label="t('program.recommendedByNadoumi')">
+        <el-switch v-model="form.recommended" />
+      </el-form-item>
       <el-form-item :label="t('program.hot')">
         <el-switch v-model="form.hot" />
       </el-form-item>

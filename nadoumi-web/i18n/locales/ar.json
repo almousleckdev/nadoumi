@@ -191,6 +191,11 @@
         "title": "برامج مميزة",
         "description": "برامج تستحق الاطلاع من جامعات كتالوجنا."
       },
+      "programRecommended": {
+        "eyebrow": "البرامج",
+        "title": "برامج موصى بها",
+        "description": "برامج اختارها فريق نادومي."
+      },
       "programHot": {
         "eyebrow": "البرامج",
         "title": "برامج رائجة",

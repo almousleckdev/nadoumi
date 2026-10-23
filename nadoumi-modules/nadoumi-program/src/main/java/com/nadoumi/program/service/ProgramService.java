@@ -159,6 +159,12 @@ public class ProgramService {
 
     public PageResponse<PublicProgramResponse> publicList(String q, Long universityId, ProgramType type,
             ProgramTeachingLanguage language, String field, Boolean featured, Boolean hot, int page, int size) {
+        return publicList(q, universityId, type, language, field, featured, null, hot, page, size);
+    }
+
+    public PageResponse<PublicProgramResponse> publicList(String q, Long universityId, ProgramType type,
+            ProgramTeachingLanguage language, String field, Boolean featured, Boolean recommended, Boolean hot,
+            int page, int size) {
         if (universityId != null) {
             universityService.publicGet(String.valueOf(universityId)); // 404 if the university is not public
         }
@@ -166,7 +172,7 @@ public class ProgramService {
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
         List<Program> rows = mapper.search(
-                ProgramSearch.publicCatalog(q, universityId, type, language, field, featured, hot));
+                ProgramSearch.publicCatalog(q, universityId, type, language, field, featured, hot, recommended));
         long rawTotal = new PageInfo<>(rows).getTotal();
         // A programme whose university has since been unpublished is a transient
         // state -- drop it here (the university publish check is UniversityService's,
@@ -187,7 +193,7 @@ public class ProgramService {
     public List<PublicProgramResponse> publicListForUniversity(String universityIdOrSlug) {
         var uni = universityService.publicGet(universityIdOrSlug); // 404 if not public
         List<Program> rows = mapper.search(
-                ProgramSearch.publicCatalog(null, uni.id(), null, null, null, null, null));
+                ProgramSearch.publicCatalog(null, uni.id(), null, null, null, null, null, null));
         rows.forEach(p -> applyUniversity(p, new UniRef(uni.name(), uni.slug(), uni.city(), uni.province())));
         return rows.stream().map(p -> PublicProgramResponse.card(p, imageUrl(p), usd(p))).toList();
     }
@@ -344,6 +350,7 @@ public class ProgramService {
         }
         p.setFeatured(Boolean.TRUE.equals(req.featured()));
         p.setHot(Boolean.TRUE.equals(req.hot()));
+        p.setRecommended(Boolean.TRUE.equals(req.recommended()));
         p.setStatus(req.status());
         p.setPublishStatus(req.publishStatus());
         p.setRemark(Texts.blankToNull(req.remark()));

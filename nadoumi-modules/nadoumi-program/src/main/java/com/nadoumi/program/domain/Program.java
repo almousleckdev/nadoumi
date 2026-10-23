@@ -42,6 +42,7 @@ public class Program {
     private Long imageMediaId;
     private boolean featured;
     private boolean hot;
+    private boolean recommended;
     private PublishStatus publishStatus;
     private ProgramStatus status;
     private String createBy;
@@ -137,6 +138,8 @@ public class Program {
     public boolean isFeatured() { return featured; }
     public void setFeatured(boolean featured) { this.featured = featured; }
 
+    public boolean isRecommended() { return recommended; }
+    public void setRecommended(boolean recommended) { this.recommended = recommended; }
     public boolean isHot() { return hot; }
     public void setHot(boolean hot) { this.hot = hot; }
 

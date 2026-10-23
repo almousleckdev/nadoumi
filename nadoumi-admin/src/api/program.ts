@@ -106,6 +106,7 @@ export interface Program {
   applicationFeeCurrency: string | null
   featured: boolean
   hot: boolean
+  recommended: boolean
   status: ProgramStatus
   publishStatus: PublishStatus
   remark: string | null
@@ -141,6 +142,7 @@ export interface ProgramInput {
   applicationFeeCurrency?: string | null
   featured: boolean
   hot: boolean
+  recommended: boolean
   status: ProgramStatus
   publishStatus: PublishStatus
   remark?: string | null

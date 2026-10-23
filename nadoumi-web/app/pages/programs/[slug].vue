@@ -87,6 +87,7 @@ const facts = computed<DetailFact[]>(() => {
       >
         <template #badges>
           <HeroBadge v-for="lv in levelLabels" :key="lv">{{ lv }}</HeroBadge>
+          <HeroBadge v-if="p.recommended">{{ t('catalog.recommendedShort') }}</HeroBadge>
           <HeroBadge v-if="p.hot">{{ t('program.hot') }}</HeroBadge>
           <HeroBadge v-if="p.featured">{{ t('catalog.featured') }}</HeroBadge>
         </template>

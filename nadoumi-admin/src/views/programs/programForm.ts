@@ -83,7 +83,7 @@ export function blankProgramForm(lockedUniversityId: number | null) {
     imageMediaId: null as number | null,
     majors: [] as { majorId: number | null, name: string, nameCn: string | null, departmentId: number | null, level: DegreeLevel | null }[],
     intakes: [] as { term: string, applicationOpen: string | null, applicationClose: string | null }[],
-    featured: false, hot: false,
+    featured: false, hot: false, recommended: false,
     status: 'ACTIVE' as ProgramInput['status'],
     publishStatus: 'DRAFT' as ProgramInput['publishStatus'],
     remark: '',
@@ -123,7 +123,7 @@ export function formFromProgram(p: Program): ProgramForm {
     intakes: p.intakes.map(i => ({
       term: i.term, applicationOpen: i.applicationOpen ?? null, applicationClose: i.applicationClose ?? null,
     })),
-    featured: p.featured, hot: p.hot,
+    featured: p.featured, hot: p.hot, recommended: p.recommended ?? false,
     status: p.status, publishStatus: p.publishStatus, remark: p.remark ?? '',
   }
 }
@@ -160,7 +160,7 @@ export function buildProgramPayload(form: ProgramForm): ProgramInput {
       note: textOrNull(o.note),
     })),
     imageMediaId: form.imageMediaId,
-    featured: form.featured, hot: form.hot,
+    featured: form.featured, hot: form.hot, recommended: form.recommended,
     status: form.status, publishStatus: form.publishStatus, remark: textOrNull(form.remark),
     majors: isDegree
       ? form.majors.filter(m => m.majorId != null || m.name.trim()).map(m => ({

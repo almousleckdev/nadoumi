@@ -191,6 +191,11 @@
         "title": "Programas destacados",
         "description": "Programas que vale la pena ver en las universidades de nuestro catálogo."
       },
+      "programRecommended": {
+        "eyebrow": "Programas",
+        "title": "Programas recomendados",
+        "description": "Programas elegidos por el equipo de Nadoumi."
+      },
       "programHot": {
         "eyebrow": "Programas",
         "title": "Programas populares",

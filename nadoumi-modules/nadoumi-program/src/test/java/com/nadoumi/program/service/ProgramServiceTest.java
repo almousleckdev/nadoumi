@@ -50,7 +50,7 @@ class ProgramServiceTest {
                 universityId, name, "计算机科学", ProgramType.DEGREE, List.of("BACHELOR"), "Engineering", null,
                 null, "A four-year programme.", null, null, null, null, null, null, null, null, null, null,
                 false, false, ProgramStatus.ACTIVE, PublishStatus.DRAFT, "note",
-                majors, intakes, List.of(), null);
+                majors, intakes, List.of(), null, null);
     }
 
     private static ProgramRequest req(Long universityId, String name) {

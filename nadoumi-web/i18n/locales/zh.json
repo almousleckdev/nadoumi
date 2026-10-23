@@ -191,6 +191,11 @@
         "title": "精选专业项目",
         "description": "我们目录中各大学值得关注的专业项目。"
       },
+      "programRecommended": {
+        "eyebrow": "专业项目",
+        "title": "Nadoumi 推荐专业",
+        "description": "由 Nadoumi 团队精选的专业项目。"
+      },
       "programHot": {
         "eyebrow": "专业项目",
         "title": "热门专业项目",

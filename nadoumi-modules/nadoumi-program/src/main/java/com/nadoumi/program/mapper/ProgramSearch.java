@@ -18,17 +18,18 @@ public record ProgramSearch(
         String field,
         Boolean featured,
         Boolean hot,
+        Boolean recommended,
         ProgramStatus status,
         PublishStatus publishStatus) {
 
     public static ProgramSearch staff(String q, Long universityId, ProgramType type,
             ProgramTeachingLanguage language, String field, ProgramStatus status) {
-        return new ProgramSearch(q, universityId, type, language, field, null, null, status, null);
+        return new ProgramSearch(q, universityId, type, language, field, null, null, null, status, null);
     }
 
     public static ProgramSearch publicCatalog(String q, Long universityId, ProgramType type,
-            ProgramTeachingLanguage language, String field, Boolean featured, Boolean hot) {
-        return new ProgramSearch(q, universityId, type, language, field, featured, hot,
+            ProgramTeachingLanguage language, String field, Boolean featured, Boolean hot, Boolean recommended) {
+        return new ProgramSearch(q, universityId, type, language, field, featured, hot, recommended,
                 ProgramStatus.ACTIVE, PublishStatus.PUBLISHED);
     }
 }

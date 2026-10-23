@@ -24,6 +24,13 @@ const base: PCard = {
 }
 
 describe('ProgramCard', () => {
+  it('badges a programme recommended by Nadoumi', async () => {
+    const w = await mountSuspended(ProgramCard, { props: { program: { ...base, recommended: true } } })
+    expect(w.text()).toContain('Recommended')
+    const plain = await mountSuspended(ProgramCard, { props: { program: base } })
+    expect(plain.text()).not.toContain('Recommended')
+  })
+
   it('shows the city and province of the offering university, and nothing when they are unknown', async () => {
     const located = await mountSuspended(ProgramCard, {
       props: { program: { ...base, universityCity: 'Beijing', universityProvince: 'Beijing Municipality' } },

@@ -208,4 +208,26 @@ class StaffProgramTest extends AbstractNadIntegrationTest {
                         .content(body.replace("[\"csc\",\"PROVINCIAL\"]", "[]")))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.scholarshipCategories.length()").value(0));
     }
+
+    @Test
+    void a_programme_can_be_recommended_by_nadoumi_and_filtered_on_it() throws Exception {
+        createStaff("prog_rec", "nadoumi_super_admin");
+        String token = staffToken("prog_rec");
+        long uni = createUniversity(token, "Tsinghua University", "PUBLISHED");
+
+        mvc.perform(post("/api/staff/programs").header("Authorization", bearer(token))
+                        .contentType("application/json")
+                        .content(programBody(uni, "PUBLISHED").replace("\"majors\":", "\"recommended\":true,\"majors\":")))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.recommended").value(true));
+        mvc.perform(post("/api/staff/programs").header("Authorization", bearer(token))
+                        .contentType("application/json")
+                        .content(programBody(uni, "PUBLISHED").replace("  MBA  ", "Plain programme")))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.recommended").value(false));
+
+        mvc.perform(get("/api/public/programs?recommended=true"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].recommended").value(true));
+        mvc.perform(get("/api/public/programs"))
+                .andExpect(jsonPath("$.totalElements").value(2));
+    }
 }
