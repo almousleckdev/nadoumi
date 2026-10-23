@@ -48,4 +48,19 @@ describe('SiteFooter', () => {
     expect(hrefs.some(h => h.startsWith('https://www.tiktok.com/@nadoumi.consultin'))).toBe(true)
     expect(hrefs.some(h => h.includes('linkedin.com'))).toBe(false)
   })
+
+  it('anchors the contact popovers to the footer row on phones, so they never widen the page', async () => {
+    const w = await mountSuspended(SiteFooter)
+
+    // on a phone the WeChat button sits right of the WhatsApp one; a popover anchored to its own button ran past the
+    // screen edge (402px on a 375px phone) and made every public page scroll sideways
+    const popovers = w.findAll('[data-test$="-popover"]')
+    expect(popovers.length).toBe(2)
+    for (const popover of popovers) {
+      const wrapper = popover.element.parentElement!
+      expect(wrapper.className).toContain('sm:relative')
+      expect(wrapper.className).not.toMatch(/(^|\s)relative(\s|$)/)
+      expect(wrapper.parentElement!.className).toMatch(/(^|\s)relative(\s|$)/)
+    }
+  })
 })

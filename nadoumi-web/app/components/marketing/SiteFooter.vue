@@ -31,7 +31,7 @@ const legal = [
           <img :src="logoUrl" alt="Nadoumi" class="h-10 w-auto" width="160" height="40">
           <p class="mt-3 text-sm text-slate-600">{{ t('footer.mission') }}</p>
 
-          <div class="mt-5 flex items-center gap-3">
+          <div class="relative mt-5 flex items-center gap-3">
             <WhatsAppContact />
             <WeChatContact />
           </div>

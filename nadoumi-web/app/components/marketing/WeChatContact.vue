@@ -5,7 +5,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="group relative inline-block">
+  <div class="group inline-block sm:relative">
     <button
       type="button"
       :aria-label="t('footer.wechat')"
