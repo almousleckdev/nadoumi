@@ -1,10 +1,11 @@
 import type {
-  FamilyMemberDto, FormReadinessDto, PersonalDetailsDto, PersonDto, PersonRole,
+  FamilyMemberDto, FormReadinessDto, MailingChoice, PersonalDetailsDto, PersonDto, PersonRole,
 } from '~/types/family'
 
 export interface PersonalDetailsBody {
   maritalStatus?: string; religion?: string; placeOfBirth?: string; officialLanguage?: string
   permanentAddress?: string; permanentPostcode?: string
+  currentPostcode?: string; mailingChoice?: MailingChoice; mailingAddress?: string; mailingPostcode?: string
 }
 export interface FamilyMemberBody {
   relation: string; fullName: string; deceased: boolean

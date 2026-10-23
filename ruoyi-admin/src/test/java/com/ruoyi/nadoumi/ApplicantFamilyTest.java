@@ -48,7 +48,17 @@ class ApplicantFamilyTest extends AbstractStudentIntegrationTest {
         send(s, "PUT", "/personal-details", "{\"maritalStatus\":\"SINGLE\",\"religion\":\"Muslim\",\"placeOfBirth\":\"Conakry\","
                 + "\"officialLanguage\":\"French\",\"permanentAddress\":\"12 Rue du Port\"}")
                 .andExpect(status().isOk()).andExpect(jsonPath("$.maritalStatus").value("SINGLE"));
-        send(s, "GET", "/personal-details", null).andExpect(status().isOk()).andExpect(jsonPath("$.religion").value("Muslim"));
+        send(s, "GET", "/personal-details", null).andExpect(status().isOk()).andExpect(jsonPath("$.religion").value("Muslim"))
+                .andExpect(jsonPath("$.mailingChoice").value("CURRENT"));
+        // the delivery address is kept only when it is a separate one
+        send(s, "PUT", "/personal-details", "{\"maritalStatus\":\"SINGLE\",\"religion\":\"Muslim\",\"placeOfBirth\":\"Conakry\",\"officialLanguage\":\"French\",\"permanentAddress\":\"12 Rue du Port\","
+                + "\"mailingChoice\":\"OTHER\",\"mailingAddress\":\"5 Avenue Centrale\","
+                + "\"mailingPostcode\":\"3000\",\"currentPostcode\":\"2000\"}")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.mailingAddress").value("5 Avenue Centrale"))
+                .andExpect(jsonPath("$.currentPostcode").value("2000"));
+        send(s, "PUT", "/personal-details", "{\"maritalStatus\":\"SINGLE\",\"religion\":\"Muslim\",\"placeOfBirth\":\"Conakry\",\"officialLanguage\":\"French\",\"permanentAddress\":\"12 Rue du Port\","
+                + "\"mailingChoice\":\"PERMANENT\",\"mailingAddress\":\"ignored\"}")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.mailingAddress").doesNotExist());
         send(s, "PUT", "/people/supporter", PERSON).andExpect(status().isOk()).andExpect(jsonPath("$.role").value("SUPPORTER"));
         send(s, "PUT", "/people/china-emergency", PERSON).andExpect(status().isOk());
         send(s, "POST", "/family", FATHER).andExpect(status().isCreated());

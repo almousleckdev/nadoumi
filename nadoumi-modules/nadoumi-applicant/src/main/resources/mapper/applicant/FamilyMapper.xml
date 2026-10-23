@@ -11,6 +11,10 @@
         <result property="officialLanguage"  column="official_language"/>
         <result property="permanentAddress"  column="permanent_address"/>
         <result property="permanentPostcode" column="permanent_postcode"/>
+        <result property="currentPostcode"   column="current_postcode"/>
+        <result property="mailingChoice"     column="mailing_choice"/>
+        <result property="mailingAddress"    column="mailing_address"/>
+        <result property="mailingPostcode"   column="mailing_postcode"/>
         <result property="signatureMediaId"  column="signature_media_id"/>
         <result property="signatureAt"       column="signature_at"/>
     </resultMap>
@@ -58,7 +62,8 @@
 
     <select id="findPersonal" resultMap="personal">
         select id, applicant_id, marital_status, religion, place_of_birth, official_language, permanent_address,
-               permanent_postcode, signature_media_id, signature_at
+               permanent_postcode, current_postcode, mailing_choice, mailing_address, mailing_postcode,
+               signature_media_id, signature_at
         from nad_applicant_personal where applicant_id = #{applicantId}
     </select>
 
@@ -72,17 +77,21 @@
             useGeneratedKeys="true" keyProperty="id">
         insert into nad_applicant_personal
             (applicant_id, marital_status, religion, place_of_birth, official_language, permanent_address,
-             permanent_postcode, create_by, create_time)
+             permanent_postcode, current_postcode, mailing_choice, mailing_address, mailing_postcode,
+             create_by, create_time)
         values
             (#{applicantId}, #{maritalStatus}, #{religion}, #{placeOfBirth}, #{officialLanguage}, #{permanentAddress},
-             #{permanentPostcode}, '', now())
+             #{permanentPostcode}, #{currentPostcode}, #{mailingChoice}, #{mailingAddress}, #{mailingPostcode},
+             '', now())
     </insert>
 
     <update id="updatePersonal" parameterType="com.nadoumi.applicant.domain.ApplicantPersonal">
         update nad_applicant_personal set
             marital_status = #{maritalStatus}, religion = #{religion}, place_of_birth = #{placeOfBirth},
             official_language = #{officialLanguage}, permanent_address = #{permanentAddress},
-            permanent_postcode = #{permanentPostcode}, update_time = now()
+            permanent_postcode = #{permanentPostcode}, current_postcode = #{currentPostcode},
+            mailing_choice = #{mailingChoice}, mailing_address = #{mailingAddress},
+            mailing_postcode = #{mailingPostcode}, update_time = now()
         where applicant_id = #{applicantId}
     </update>
 

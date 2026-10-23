@@ -58,9 +58,9 @@ class PdfDocumentsTest {
 
         assertThat(form).contains("Personal information", "P1234567", "2032-01-09", "IELTS", "6.5",
                 "High school", "Lycee de Conakry", "Clinique Sante", "present", "Medicine", "Hangzhou",
-                "Marital status", "Single", "Muslim", "Place of birth", "Ibrahima Diallo", "Fatoumata Diallo", "(deceased)",
+                "Marital status", "Single", "Muslim", "Place of birth", "Ibrahima Diallo", "Fatoumata Diallo", "(unavailable)",
                 "Passed away", "Financial supporter", "Port Authority", "Emergency contact in China", "Li Wei",
-                "Applicant affirmation",
+                "Applicant affirmation", "5 Avenue Centrale",
                 "Applicant's signature", "NAD-APP-2026-000042", "PAID");
     }
 

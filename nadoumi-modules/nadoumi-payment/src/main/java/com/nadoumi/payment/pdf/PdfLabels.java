@@ -31,7 +31,7 @@ final class PdfLabels {
             Map.entry("WeChat", "微信"), Map.entry("Country of residence", "居住国"), Map.entry("Marital status", "婚姻状况"),
             Map.entry("Religion", "宗教"), Map.entry("Place of birth", "出生地"), Map.entry("Official language", "官方语言"),
             Map.entry("Permanent address", "永久地址"), Map.entry("Currently in China", "目前在中国"),
-            Map.entry("Current address", "现住址"), Map.entry("Language and test scores", "语言及考试成绩"),
+            Map.entry("Current address", "现住址"), Map.entry("Documents sent to", "录取材料寄送地址"), Map.entry("Language and test scores", "语言及考试成绩"),
             Map.entry("Test", "考试"), Map.entry("Score", "分数"), Map.entry("Taken", "考试日期"), Map.entry("Expires", "有效期"),
             Map.entry("Education background", "教育背景"), Map.entry("Level", "层次"), Map.entry("Institution", "院校"),
             Map.entry("Country", "国家"), Map.entry("Field", "专业"), Map.entry("Period", "起止时间"), Map.entry("GPA", "成绩绩点"),

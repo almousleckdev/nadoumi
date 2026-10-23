@@ -48,5 +48,9 @@ describe('person and personal details', () => {
   it('starts the personal form empty and sends only what was filled', () => {
     expect(personalForm(null).maritalStatus).toBe('')
     expect(personalBody({ ...personalForm(null), religion: ' Muslim ' })).toMatchObject({ religion: 'Muslim', maritalStatus: undefined })
+    expect(personalForm(null).mailingChoice).toBe('CURRENT')
+    const other = { ...personalForm(null), mailingChoice: 'OTHER' as const, mailingAddress: ' 5 Avenue ', mailingPostcode: '3000' }
+    expect(personalBody(other)).toMatchObject({ mailingChoice: 'OTHER', mailingAddress: '5 Avenue', mailingPostcode: '3000' })
+    expect(personalBody({ ...other, mailingChoice: 'PERMANENT' })).toMatchObject({ mailingAddress: undefined, mailingPostcode: undefined })
   })
 })

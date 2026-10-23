@@ -127,6 +127,12 @@ Legend used throughout, as required by `CLAUDE.md` §5:
 > conditions (minor, in China, degree level), formats and word counts, templates to download, waiving a requirement, the signed application
 > form as a required upload.
 >
+> **Update 2026-10-23 (addresses and family wording): IMPLEMENTED.** The Nadoumi form asks for current and permanent contact addresses and
+> says the agency receives the admission documents, so the personal details now also hold the current post code and an *Admission
+> documents delivery address*: the student's current address, the permanent address, or a separate address (V123). The application
+> form PDF prints the resolved address ("Documents sent to"). The family checkbox "This person has died" is now "Not living or not in
+> contact" (the form rule is unchanged: a parent who is unavailable needs a note and at least two siblings or relatives).
+
 > **Update 2026-10-22 (family data): the missing onboarding data is IMPLEMENTED (§6.3).** `/dashboard/family` holds four
 > sections, each saved once on the applicant and reused for every application: **personal details** (marital status, religion,
 > place of birth, official language, permanent address and post code), **family members** (father, mother, spouse, siblings,

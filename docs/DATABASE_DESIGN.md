@@ -445,3 +445,5 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - **V120** adds `nad_document_template` (polymorphic `scope` PROGRAM/SCHOLARSHIP + `ref_id`, title, file name, `media_id` to a PROTECTED media asset). Manual rollback is in the file header.
 
 - **V121** adds `verify_code` (random, 12 characters) to `nad_payment_document`, backfills existing rows, and indexes `doc_number`. Manual rollback is in the file header.
+- **V122** activates the three seeded application workflows (`PROGRAM_ONLY_V1`, `PROGRAM_WITH_SCHOLARSHIP_V1`, `SCHOLARSHIP_ONLY_V1`) that are still DRAFT and whose code has no ACTIVE version. There is no admin screen or endpoint for activation, so without it no application could start on a fresh environment.
+- **V123** adds `current_postcode`, `mailing_choice` (`CURRENT` | `PERMANENT` | `OTHER`, default `CURRENT`), `mailing_address` and `mailing_postcode` to `nad_applicant_personal`. The current address itself stays in `nad_applicant_residence`. `mailing_address` and `mailing_postcode` are only kept for `OTHER`; the application form prints the address that receives the admission documents, resolved from the choice.
