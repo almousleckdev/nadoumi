@@ -45,6 +45,7 @@ export const NAV: NavGroup[] = [
     items: [
       { key: 'universities', path: '/universities', icon: 'School', perm: 'nad:university:list', status: 'implemented' },
       { key: 'programs', path: '/programs', icon: 'Notebook', perm: 'nad:program:list', status: 'implemented' },
+      { key: 'majors', path: '/majors', icon: 'Collection', perm: 'nad:major:list', status: 'implemented' },
       { key: 'scholarships', path: '/scholarships', icon: 'Medal', perm: 'nad:scholarship:list', status: 'implemented' },
     ],
   },

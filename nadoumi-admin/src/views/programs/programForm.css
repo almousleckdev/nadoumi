@@ -14,3 +14,4 @@
 .offering__money :deep(.el-form-item__content) { gap: 8px; flex-wrap: wrap; }
 .offering__money :deep(.w-32) { width: 8rem; }
 .offering__problem { margin-top: 8px; }
+.line__major { flex: 1; min-width: 0; }

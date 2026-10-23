@@ -23,6 +23,8 @@ export const isDegree = (t: ProgramType) => t === 'DEGREE'
 
 export interface ProgramMajor {
   id?: number
+  /** The shared catalogue major this row links to (nad_major). Send it to pick a catalogue major. */
+  majorId?: number | null
   name: string
   nameCn: string | null
   departmentId?: number | null

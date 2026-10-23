@@ -64,9 +64,9 @@ public record ProgramResponse(
         }
     }
 
-    public record Major(Long id, String name, String nameCn, Long departmentId, String departmentName, String level) {
+    public record Major(Long id, Long majorId, String name, String nameCn, Long departmentId, String departmentName, String level) {
         static Major of(ProgramMajor m) {
-            return new Major(m.getId(), m.getName(), m.getNameCn(), m.getDepartmentId(), m.getDepartmentName(), m.getLevel());
+            return new Major(m.getId(), m.getMajorId(), m.getName(), m.getNameCn(), m.getDepartmentId(), m.getDepartmentName(), m.getLevel());
         }
     }
 

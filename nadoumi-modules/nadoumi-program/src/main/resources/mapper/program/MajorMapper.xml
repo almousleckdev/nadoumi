@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.program.mapper.MajorMapper">
+
+    <resultMap id="major" type="com.nadoumi.program.domain.Major">
+        <id     property="id"           column="id"/>
+        <result property="name"         column="name"/>
+        <result property="nameCn"       column="name_cn"/>
+        <result property="discipline"   column="discipline"/>
+        <result property="programCount" column="program_count"/>
+    </resultMap>
+
+    <select id="findById" resultMap="major">
+        select id, name, name_cn, discipline, 0 as program_count from nad_major where id = #{id}
+    </select>
+
+    <select id="findByName" resultMap="major">
+        select id, name, name_cn, discipline, 0 as program_count from nad_major where name = #{name}
+    </select>
+
+    <select id="search" resultMap="major">
+        select m.id, m.name, m.name_cn, m.discipline,
+               (select count(*) from nad_program_major pm where pm.major_id = m.id) as program_count
+        from nad_major m
+        <where>
+            <if test="q != null and q != ''">
+                and (m.name like concat('%', #{q}, '%') or m.name_cn like concat('%', #{q}, '%'))
+            </if>
+            <if test="discipline != null and discipline != ''">
+                and m.discipline = #{discipline}
+            </if>
+        </where>
+        order by m.name asc
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.program.domain.Major" useGeneratedKeys="true" keyProperty="id">
+        insert into nad_major (name, name_cn, discipline, create_by, create_time)
+        values (#{name}, #{nameCn}, #{discipline}, #{createBy}, now())
+    </insert>
+
+    <update id="update" parameterType="com.nadoumi.program.domain.Major">
+        update nad_major set name = #{name}, name_cn = #{nameCn}, discipline = #{discipline},
+                             update_by = #{updateBy}, update_time = now()
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from nad_major where id = #{id}
+    </delete>
+
+    <select id="countLinks" resultType="int">
+        select count(*) from nad_program_major where major_id = #{id}
+    </select>
+
+    <update id="moveLinks">
+        update nad_program_major set major_id = #{toId} where major_id = #{fromId} and id > 0
+    </update>
+</mapper>

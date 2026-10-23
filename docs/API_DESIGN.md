@@ -529,3 +529,7 @@ programme is no longer edited in the admin; the public page shows it only for pr
 **Public programme location (2026-10-23).** `PublicProgramResponse` carries `universityCity` and `universityProvince` (read from the owning university through
 `UniversityService`, never a join) so the programme card and detail page can show where it is. `remark` (internal notes), `partnerStatus`, `referenceCode`
 and publish status stay staff-only and are never part of a public response; the admin university page shows them.
+
+**Staff majors (2026-10-23).** `GET/POST /api/staff/majors`, `PUT/DELETE /api/staff/majors/{id}`, `POST /api/staff/majors/bulk` (pasted lines, existing names reused),
+`POST /api/staff/majors/{id}/merge` (moves programme links, deletes the duplicate). Perms `nad:major:list|add|edit|remove`. Deleting a major that programmes use is refused (merge it).
+A programme's `majors[]` input takes `majorId` (pick from the catalogue) or `name` (matched to, or added to, the catalogue); responses carry `majorId`.

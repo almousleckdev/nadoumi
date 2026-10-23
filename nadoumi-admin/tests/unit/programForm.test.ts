@@ -41,18 +41,23 @@ describe('buildProgramPayload', () => {
   it('keeps levels and majors for degree programs and ignores the term length', () => {
     const form = blankProgramForm(3)
     Object.assign(form, { name: 'CS', levels: ['MASTER'], termLength: 'ONE_YEAR' })
-    form.majors.push({ name: ' AI ', nameCn: '', departmentId: 4, level: 'MASTER' })
-    form.majors.push({ name: '  ', nameCn: null, departmentId: null, level: null })
+    form.majors.push({ majorId: null, name: ' AI ', nameCn: '', departmentId: 4, level: 'MASTER' })
+    form.majors.push({ majorId: null, name: '  ', nameCn: null, departmentId: null, level: null })
+    form.majors.push({ majorId: 12, name: 'Data Science', nameCn: '数据科学', departmentId: null, level: 'MASTER' })
     const p = buildProgramPayload(form)
     expect(p.levels).toEqual(['MASTER'])
     expect(p.termLength).toBeNull()
-    expect(p.majors).toEqual([{ name: 'AI', nameCn: null, departmentId: 4, level: 'MASTER' }])
+    expect(p.majors).toEqual([
+      { majorId: null, name: 'AI', nameCn: null, departmentId: 4, level: 'MASTER' },
+      // a picked catalogue major sends only its id; the catalogue supplies the title
+      { majorId: 12, name: '', nameCn: null, departmentId: null, level: 'MASTER' },
+    ])
   })
 
   it('drops levels and majors and keeps the term length for non-degree programs', () => {
     const form = blankProgramForm(3)
     Object.assign(form, { name: 'Language', programType: 'LANGUAGE', levels: ['MASTER'], termLength: 'ONE_YEAR' })
-    form.majors.push({ name: 'AI', nameCn: null, departmentId: null, level: null })
+    form.majors.push({ majorId: null, name: 'AI', nameCn: null, departmentId: null, level: null })
     const p = buildProgramPayload(form)
     expect(p.levels).toEqual([])
     expect(p.majors).toEqual([])
@@ -80,7 +85,7 @@ describe('formFromProgram', () => {
   it('survives a round trip through buildProgramPayload', () => {
     const p = buildProgramPayload(formFromProgram(program))
     expect(p).toMatchObject({ universityId: 3, name: 'Computer Science', levels: ['BACHELOR', 'MASTER'], imageMediaId: 55 })
-    expect(p.majors).toEqual([{ name: 'AI', nameCn: null, departmentId: 4, level: 'MASTER' }])
+    expect(p.majors).toEqual([{ majorId: null, name: 'AI', nameCn: null, departmentId: 4, level: 'MASTER' }])
     expect(p.intakes).toEqual([{ term: 'AUTUMN_SEPTEMBER', applicationOpen: null, applicationClose: '2026-05-01' }])
   })
 })

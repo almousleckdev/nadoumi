@@ -5,6 +5,7 @@ public class ProgramMajor {
 
     private Long id;
     private Long programId;
+    private Long majorId;
     private Long departmentId;
     private String departmentName;
     private String level;
@@ -18,6 +19,8 @@ public class ProgramMajor {
     public Long getProgramId() { return programId; }
     public void setProgramId(Long programId) { this.programId = programId; }
 
+    public Long getMajorId() { return majorId; }
+    public void setMajorId(Long majorId) { this.majorId = majorId; }
     public Long getDepartmentId() { return departmentId; }
     public void setDepartmentId(Long departmentId) { this.departmentId = departmentId; }
 

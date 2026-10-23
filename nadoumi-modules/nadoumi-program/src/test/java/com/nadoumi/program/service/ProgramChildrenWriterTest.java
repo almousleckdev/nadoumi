@@ -22,6 +22,7 @@ import com.nadoumi.program.web.request.ProgramRequest;
 import com.nadoumi.university.service.DepartmentService;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -32,7 +33,8 @@ class ProgramChildrenWriterTest {
 
     private final ProgramMapper mapper = mock(ProgramMapper.class);
     private final DepartmentService departmentService = mock(DepartmentService.class);
-    private final ProgramChildrenWriter writer = new ProgramChildrenWriter(mapper, departmentService);
+    private final MajorService majors = mock(MajorService.class);
+    private final ProgramChildrenWriter writer = new ProgramChildrenWriter(mapper, departmentService, majors);
 
     private static Program program(ProgramType type) {
         Program p = new Program();
@@ -55,6 +57,20 @@ class ProgramChildrenWriterTest {
 
     private static ProgramRequest.MajorInput major(String name, Long departmentId, String level) {
         return new ProgramRequest.MajorInput(name, null, departmentId, level);
+    }
+
+    @BeforeEach
+    void stubCatalogue() {
+        when(majors.findOrCreate(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any()))
+                .thenAnswer(call -> catalogueMajor(1L, call.getArgument(0), call.getArgument(1)));
+    }
+
+    static com.nadoumi.program.domain.Major catalogueMajor(long id, String name, String nameCn) {
+        com.nadoumi.program.domain.Major m = new com.nadoumi.program.domain.Major();
+        m.setId(id);
+        m.setName(name);
+        m.setNameCn(nameCn);
+        return m;
     }
 
     @Test
@@ -104,6 +120,45 @@ class ProgramChildrenWriterTest {
         assertThat(saved.getAllValues()).extracting(ProgramMajor::getName).containsExactly("AI", "Data");
         assertThat(saved.getAllValues()).extracting(ProgramMajor::getSortOrder).containsExactly(0, 1);
         assertThat(saved.getAllValues().get(0).getLevel()).isEqualTo("MASTER");
+    }
+
+    @Test
+    void shouldLinkAPickedCatalogueMajor_andUseItsTitle() {
+        when(majors.require(7L)).thenReturn(catalogueMajor(7L, "Computer Science", "计算机科学"));
+        var captor = org.mockito.ArgumentCaptor.forClass(com.nadoumi.program.domain.ProgramMajor.class);
+
+        writer.replace(program(ProgramType.DEGREE), request(List.of("BACHELOR"),
+                List.of(new ProgramRequest.MajorInput(null, null, null, "BACHELOR", 7L)), null));
+
+        verify(mapper).insertMajor(captor.capture());
+        assertThat(captor.getValue().getMajorId()).isEqualTo(7L);
+        assertThat(captor.getValue().getName()).isEqualTo("Computer Science");
+        assertThat(captor.getValue().getNameCn()).isEqualTo("计算机科学");
+        verify(majors, never()).findOrCreate(anyString(), org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void shouldKeepTheProgrammesOwnTitle_whenItOverridesTheCatalogueOne() {
+        when(majors.require(7L)).thenReturn(catalogueMajor(7L, "Computer Science", "计算机科学"));
+        var captor = org.mockito.ArgumentCaptor.forClass(com.nadoumi.program.domain.ProgramMajor.class);
+
+        writer.replace(program(ProgramType.DEGREE), request(List.of("MASTER"),
+                List.of(new ProgramRequest.MajorInput("Software Engineering", null, null, "MASTER", 7L)), null));
+
+        verify(mapper).insertMajor(captor.capture());
+        assertThat(captor.getValue().getMajorId()).isEqualTo(7L);
+        assertThat(captor.getValue().getName()).isEqualTo("Software Engineering");
+    }
+
+    @Test
+    void shouldAddATypedMajorToTheCatalogue_soEveryRowIsLinked() {
+        var captor = org.mockito.ArgumentCaptor.forClass(com.nadoumi.program.domain.ProgramMajor.class);
+
+        writer.replace(program(ProgramType.DEGREE), request(List.of("BACHELOR"), List.of(major("Finance", null, null)), null));
+
+        verify(majors).findOrCreate("Finance", null);
+        verify(mapper).insertMajor(captor.capture());
+        assertThat(captor.getValue().getMajorId()).isEqualTo(1L);
     }
 
     @Test
