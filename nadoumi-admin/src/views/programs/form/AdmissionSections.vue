@@ -58,6 +58,9 @@ const { usdHint } = useUsdHint()
         maxlength="4000"
         :placeholder="t('program.admission.documentsPlaceholder')"
       />
+    <p class="field-hint">
+        {{ t('program.admission.documentsHint') }}
+      </p>
     </el-form-item>
     <div class="row">
       <el-form-item :label="t('program.admission.applicationFee')">

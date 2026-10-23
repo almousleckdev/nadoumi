@@ -466,7 +466,7 @@ export default {
     saveFirst: 'Save the record first, then add templates.',
     titlePlaceholder: 'Title, for example Application form template',
     upload: 'Upload a file',
-    titleRequired: 'Enter a title first.',
+    titleRequired: 'Enter a title first, then upload the file.',
     tooLarge: 'The file is larger than {mb} MB.',
   },
 
@@ -558,7 +558,8 @@ export default {
       minHsk: 'Minimum HSK level',
       minIelts: 'Minimum IELTS',
       minToefl: 'Minimum TOEFL',
-      documents: 'Required documents',
+      documents: 'Documents listed on the public page',
+      documentsHint: 'Information for visitors only, one per line. What students must upload is set under Required documents.',
       documentsPlaceholder: 'One document per line',
       applicationFee: 'Application fee (RMB)',
       scholarships: 'Scholarships that fund this programme',
