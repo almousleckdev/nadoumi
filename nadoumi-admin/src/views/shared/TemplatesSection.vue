@@ -4,19 +4,21 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import { Delete, Upload } from '@element-plus/icons-vue'
 import {
-  addTemplate, listTemplates, removeTemplate, TEMPLATE_ACCEPT, TEMPLATE_MAX_MB,
+  addTemplate, listTemplates, removeTemplate, TEMPLATE_ACCEPT, TEMPLATE_MAX_MB, withKnownType,
   type DocumentTemplate, type TemplateScope,
 } from '@/api/documentTemplate'
 import FormSection from '@/components/ui/FormSection.vue'
 
 /**
  * The form templates of one programme or scholarship (for example the application form to fill in and send back).
- * It saves on its own, straight away, so it is available once the record exists.
+ * Once the record exists a file is saved straight away. On a new record the files are held here and uploaded by the
+ * drawer through `flush(id)` right after the record is created.
  */
 const props = defineProps<{ scope: TemplateScope, refId: number | null }>()
 
 const { t } = useI18n()
 const templates = ref<DocumentTemplate[]>([])
+const staged = ref<{ title: string, file: File }[]>([])
 const title = ref('')
 const busy = ref(false)
 const canPick = computed(() => !busy.value && title.value.trim().length > 0)
@@ -29,14 +31,19 @@ async function onFile(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   input.value = ''
-  if (!file || props.refId == null || !title.value.trim()) return
+  if (!file || !title.value.trim()) return
   if (file.size > TEMPLATE_MAX_MB * 1024 * 1024) {
     ElMessage.warning(t('template.tooLarge', { mb: TEMPLATE_MAX_MB }))
     return
   }
+  if (props.refId == null) {
+    staged.value = [...staged.value, { title: title.value.trim(), file: withKnownType(file) }]
+    title.value = ''
+    return
+  }
   busy.value = true
   try {
-    await addTemplate(props.scope, props.refId, title.value.trim(), file)
+    await addTemplate(props.scope, props.refId, title.value.trim(), withKnownType(file))
     title.value = ''
     ElMessage.success(t('common.saved'))
     await load()
@@ -46,13 +53,33 @@ async function onFile(event: Event) {
   }
 }
 
+function unstage(index: number) {
+  staged.value = staged.value.filter((_, i) => i !== index)
+}
+
+/** Uploads the files held for a new record; true when every one was saved. */
+async function flush(refId: number): Promise<boolean> {
+  const pending = staged.value
+  let allSaved = true
+  for (const item of pending) {
+    try {
+      await addTemplate(props.scope, refId, item.title, item.file)
+      staged.value = staged.value.filter(s => s !== item)
+    }
+    catch {
+      allSaved = false
+    }
+  }
+  return allSaved
+}
+
 async function remove(template: DocumentTemplate) {
   await removeTemplate(template.id)
   await load()
 }
 
 watch(() => props.refId, load, { immediate: true })
-defineExpose({ load })
+defineExpose({ load, flush })
 </script>
 
 <template>
@@ -66,7 +93,29 @@ defineExpose({ load })
     >
       {{ t('template.saveFirst') }}
     </p>
-    <template v-else>
+    <div>
+      <ul
+        v-if="staged.length"
+        class="list"
+      >
+        <li
+          v-for="(item, index) in staged"
+          :key="`${item.title}-${index}`"
+          class="row"
+        >
+          <span class="name">
+            <strong>{{ item.title }}</strong>
+            <span class="file">{{ item.file.name }}</span>
+          </span>
+          <el-button
+            link
+            type="danger"
+            :icon="Delete"
+            :aria-label="t('common.delete')"
+            @click="unstage(index)"
+          />
+        </li>
+      </ul>
       <ul
         v-if="templates.length"
         class="list"
@@ -118,7 +167,7 @@ defineExpose({ load })
           >
         </label>
       </div>
-    </template>
+    </div>
   </FormSection>
 </template>
 

@@ -24,6 +24,21 @@ export function removeTemplate(id: number): Promise<void> {
   return request({ url: `/api/staff/document-templates/${id}`, method: 'delete' })
 }
 
+const TYPE_BY_EXTENSION: Record<string, string> = {
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+}
+
+/**
+ * Browsers often report an empty or generic type for Word files (it depends on the system), which the server refuses.
+ * The extension is what the person picked, so the file is re-labelled with the matching type before it is sent.
+ */
+export function withKnownType(file: File): File {
+  const known = TYPE_BY_EXTENSION[file.name.split('.').pop()?.toLowerCase() ?? '']
+  return known && file.type !== known ? new File([file], file.name, { type: known }) : file
+}
+
 /** PDF and Word files, as the server accepts them. */
 export const TEMPLATE_ACCEPT = '.pdf,.doc,.docx'
 export const TEMPLATE_MAX_MB = 10

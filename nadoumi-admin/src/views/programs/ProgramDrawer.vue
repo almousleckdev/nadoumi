@@ -28,6 +28,7 @@ const { t } = useI18n()
 
 const formRef = ref<FormInstance>()
 const saving = ref(false)
+const templatesRef = ref<InstanceType<typeof TemplatesSection>>()
 const publishing = ref<InstanceType<typeof PublishingSections>>()
 const deferredImages = useDeferredImages()
 const universities = ref<{ id: number, name: string }[]>([])
@@ -111,7 +112,8 @@ async function save() {
     const imagesOk = props.program
       ? true
       : await deferredImages.flush(publishing.value?.uploadTasks(saved.id) ?? [])
-    if (imagesOk) ElMessage.success(t('common.saved'))
+    const templatesOk = props.program ? true : await (templatesRef.value?.flush(saved.id) ?? true)
+    if (imagesOk && templatesOk) ElMessage.success(t('common.saved'))
     emit('update:modelValue', false)
     emit('saved', saved)
   }
@@ -148,6 +150,7 @@ defineExpose({ form, save, rules })
       <StructureSections :departments="departments" />
       <DocumentsSection />
       <TemplatesSection
+        ref="templatesRef"
         scope="programs"
         :ref-id="program?.id ?? null"
       />
