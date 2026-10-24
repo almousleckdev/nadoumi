@@ -11,6 +11,12 @@ is built on Vue 2**. Full staff permission detail: `docs/PERMISSION_CATALOGUE.md
 
 ---
 
+> **2026-10-25 (operations dashboard):** the dashboard gains an Applications group built from the live staff APIs, gated by
+> `nad:application:list` and `nad:payment:list`: submitted, in review, offers and enrolled, and payments waiting for
+> confirmation (exact per-status totals from `useApplicationPipeline`, one count query per status). Below it sit a donut of
+> applications per status and a table of the latest applications that opens the case page. The "not yet available" cards for
+> Applications and Payments are gone; only Payroll remains for the platform owner.
+
 ## 1. What exists today (EXISTING)
 
 ### 1.0 Two frontends, one target — authoritative

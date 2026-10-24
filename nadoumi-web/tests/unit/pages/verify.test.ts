@@ -25,8 +25,8 @@ describe('verify page', () => {
     expect(w.text()).toContain('Scan the QR code')
   })
 
-  it('shows the kind, number and date of a valid document, and nothing personal', async () => {
-    api.publicGet.mockResolvedValue({ valid: true, kind: 'RECEIPT', number: 'NAD-RCT-2026-000007', issuedOn: '2026-10-22' })
+  it('shows the kind, number and date of a valid document', async () => {
+    api.publicGet.mockResolvedValue({ valid: true, kind: 'RECEIPT', number: 'NAD-RCT-2026-000007', issuedOn: '2026-10-22', details: null })
     const w = await mountPage({ number: 'NAD-RCT-2026-000007', code: 'ABCD2345EFGH' })
 
     expect(api.publicGet).toHaveBeenCalledWith('documents/verify', { number: 'NAD-RCT-2026-000007', code: 'ABCD2345EFGH' })
@@ -35,8 +35,23 @@ describe('verify page', () => {
     expect(w.text()).toContain('2026-10-22')
   })
 
+  it('shows the student, programme and fee line behind a valid application form', async () => {
+    api.publicGet.mockResolvedValue({
+      valid: true, kind: 'APPLICATION_FORM', number: 'NAD-APP-2026-000007', issuedOn: '2026-10-22',
+      details: {
+        applicantName: 'Amina Diallo', applicationReference: 'NAD2026007', opportunity: 'MBBS', universityName: 'Fudan University',
+        intake: 'AUTUMN_SEPTEMBER', feeAmount: 300, currency: 'CNY', feeStatus: 'CONFIRMED',
+        feePaidAt: '2026-10-22T06:30:00Z', issuedAt: '2026-10-22T06:31:00Z',
+      },
+    })
+    const w = await mountPage({ number: 'NAD-APP-2026-000007', code: 'ABCD2345EFGH' })
+
+    const text = w.find('[data-test="details"]').text()
+    for (const part of ['Amina Diallo', 'NAD2026007', 'MBBS', 'Fudan University', 'Paid and confirmed']) expect(text).toContain(part)
+  })
+
   it('says it could not verify a document that does not match', async () => {
-    api.publicGet.mockResolvedValue({ valid: false, kind: null, number: null, issuedOn: null })
+    api.publicGet.mockResolvedValue({ valid: false, kind: null, number: null, issuedOn: null, details: null })
     const w = await mountPage({ number: 'NAD-RCT-2026-000007', code: 'WRONGWRONGWR' })
 
     expect(w.find('[data-test="invalid"]').exists()).toBe(true)

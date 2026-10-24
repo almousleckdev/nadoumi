@@ -2794,10 +2794,26 @@
     "kind": "Document",
     "number": "Number",
     "issuedOn": "Issued on",
-    "privacy": "For privacy, no personal details are shown here.",
+    "privacy": "Only the details needed to check this document are shown. Contact and passport details are never shown.",
     "kinds": {
       "RECEIPT": "Payment receipt",
       "APPLICATION_FORM": "Application form"
+    },
+    "student": "Student",
+    "application": "Application number",
+    "opportunity": "Programme or scholarship",
+    "university": "University",
+    "intake": "Intake",
+    "fee": "Application fee",
+    "feeStatus": "Fee status",
+    "feePaidAt": "Fee paid on",
+    "feeStatuses": {
+      "PENDING": "Awaiting payment",
+      "PROOF_SUBMITTED": "Paid, being checked by Nadoumi",
+      "CONFIRMED": "Paid and confirmed",
+      "REJECTED": "Payment not accepted",
+      "EXPIRED": "Expired",
+      "CANCELLED": "Cancelled"
     }
   }
 }

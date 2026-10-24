@@ -650,6 +650,9 @@ export default {
     clear: 'Clear filters',
   },
   dashboard: {
+    pipelineTitle: 'Where applications are',
+    latestApplications: 'Latest applications',
+    noApplications: 'No applications have been submitted yet.',
     title: 'Operations dashboard',
     subtitle: 'A live view of the Nadoumi pipeline. Sections light up as each domain is built, with no placeholder numbers.',
     refresh: 'Refresh',
@@ -685,6 +688,7 @@ export default {
     status: 'Status',
     registered: 'Registered',
     groups: {
+      applications: 'Applications',
       platform: 'Platform',
       applicants: 'Applicants',
       finance: 'Finance',
@@ -694,6 +698,11 @@ export default {
     noAccessTitle: 'Nothing to show here yet',
     noAccessBody: 'Your account has no data-scoped permissions. Ask an administrator to assign you a role.',
     k: {
+      applicationsSubmitted: 'Applications submitted',
+      applicationsInReview: 'In review',
+      applicationsOffers: 'Offers and enrolled',
+      paymentsToConfirm: 'Payments to confirm',
+      needsAction: 'Needs action',
       totalStudents: 'Total students',
       totalUniversities: 'Total universities',
       totalProgrammes: 'Total programmes',
