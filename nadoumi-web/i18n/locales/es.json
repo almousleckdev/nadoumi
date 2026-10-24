@@ -2580,7 +2580,8 @@
       "resend": "Enviarme el recibo de nuevo",
       "resent": "Recibo enviado. Revisa tu bandeja de entrada.",
       "resendWait": "El recibo se envió hace un momento. Inténtalo de nuevo en unos minutos."
-    }
+    },
+    "submittedIntro": "Nadoumi tiene tu solicitud, pero no recibió la tasa. Paga de nuevo e informa del pago para que avance."
   },
   "applyFlow": {
     "onBehalf": "Estás completando los datos de {name}. Donde una pregunta diga «tú» o «tu», se refiere a {name}.",

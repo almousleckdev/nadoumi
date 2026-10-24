@@ -40,6 +40,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ApplicationPaymentService {
 
+    private static final String CLOSED_STATUS_PREFIX = "CLOSED_";
+
     private static final String KIND = PaymentGuardProvider.APPLICATION_FEE;
     private static final String METHOD_QR = "QR";
     private static final Pattern TXN_NO = Pattern.compile("[A-Za-z0-9_-]{6,40}");
@@ -92,12 +94,12 @@ public class ApplicationPaymentService {
         if (fee.signum() <= 0) {
             return respond(app);
         }
-        if (!app.draft()) {
-            throw new PaymentConflictException("a payment can only be started while the application is a draft");
-        }
         ApplicationPayment open = expireIfOverdue(mapper.findOpen(applicationId, KIND));
         if (open != null || mapper.countConfirmed(applicationId, KIND) > 0) {
             return respond(app);
+        }
+        if (!mayStartPayment(app, mapper.findLatest(applicationId, KIND))) {
+            throw new PaymentConflictException("a payment can only be started on a draft, or again after staff rejected it");
         }
         LocalDateTime since = LocalDateTime.now(clock).minus(SESSION_CAP_WINDOW);
         if (mapper.countSessionsSince(applicationId, KIND, since) >= MAX_SESSIONS_PER_WINDOW) {
@@ -252,7 +254,7 @@ public class ApplicationPaymentService {
         PaymentStatus status = latest.getStatus();
         // reported counts as paid for the student: the Submit button follows it, staff verify the money afterwards
         boolean settled = status == PaymentStatus.CONFIRMED || status == PaymentStatus.PROOF_SUBMITTED;
-        boolean canStart = app.draft() && !status.isOpen() && !settled;
+        boolean canStart = mayStartPayment(app, latest) && !status.isOpen() && !settled;
         long secondsLeft = status == PaymentStatus.PENDING
                 ? Math.max(0, Duration.between(now(), latest.getExpiresAt()).getSeconds()) : 0;
         // while a session or confirmation exists the amount is the snapshot; otherwise the current fee for a new one
@@ -261,6 +263,18 @@ public class ApplicationPaymentService {
                 settings.payee(), latest.getReference(),
                 latest.getExpiresAt().toInstant(ZoneOffset.UTC).toString(), secondsLeft,
                 status == PaymentStatus.REJECTED ? latest.getRejectionReason() : null);
+    }
+
+    /**
+     * A draft can always be paid. A submitted application can be paid again only when staff rejected the payment it was
+     * submitted with (the fee is not refundable, so a rejected payment leaves it unpaid); a closed one never can.
+     */
+    private static boolean mayStartPayment(ApplicationFacts app, ApplicationPayment latest) {
+        if (app.draft()) {
+            return true;
+        }
+        boolean closed = app.status() != null && app.status().startsWith(CLOSED_STATUS_PREFIX);
+        return !closed && latest != null && latest.getStatus() == PaymentStatus.REJECTED;
     }
 
     private ApplicationFacts requireApplication(long applicationId) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { StudentApplicationDto } from '~/types/catalog'
-import { isClosed, safeTimeline } from '~/utils/applicationView'
+import { isClosed, isSubmitted, safeTimeline } from '~/utils/applicationView'
 import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
@@ -125,10 +125,10 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
           </div>
         </SectionCard>
 
-        <SectionCard :title="t('dashboard.applications.paymentTitle')">
-          <PaymentPanel :application-id="id" />
-          <p class="mt-3 text-xs text-slate-500">{{ t('dashboard.applications.feeNote') }}</p>
-        </SectionCard>
+        <div class="grid gap-2">
+          <PaymentPanel :application-id="id" :submitted="isSubmitted(application.currentStatus)" />
+          <p class="text-xs text-slate-500">{{ t('dashboard.applications.feeNote') }}</p>
+        </div>
 
         <DocumentChecklistCard v-if="!closed" :application-id="id" :applicant-id="application.applicantId" />
 

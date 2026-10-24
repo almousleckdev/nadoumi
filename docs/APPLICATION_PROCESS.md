@@ -51,6 +51,13 @@
 > Nadoumi application fee by QR (15 minutes), then Submit. Submit is locked, with the reason shown, until every step is done and the fee is paid;
 > the server enforces the same (`SubmitGate`: fee, documents, the applicant's onboarding and form data, signature) for every actor.
 >
+> **Paying again after a rejection (2026-10-25).** The fee is not refundable and staff verify it after the student reports it, so a payment can be
+> rejected on an application that is already submitted. Such an application stays with Nadoumi but is unpaid. The student may then open a new
+> payment session on it (`POST /api/student/applications/{id}/payment/session`): allowed on a draft, or on a non-closed application whose latest
+> payment is `REJECTED`; refused (nothing new opened) otherwise. They report the new payment with a new transaction number, it reaches the staff
+> payment queue as `PROOF_SUBMITTED`, and staff confirm it as usual. The student sees the staff reason, a "fee was not received" explanation and
+> **Pay again** on the application page; the rejection already notifies them. Gap: the applications list and Overview do not yet flag it.
+
 > **Application number (changed 2026-10-25).** `NAD` + the year (China time) + the year's running number: `NAD2027001`, `NAD2027002`, ... The count starts again at 001 when the new year begins in China; past 999 it grows (`NAD20271000`). References issued before the change keep the old `NAD20261023001` form. The counter reuses `nad_application_reference_counter`, keyed by 1 January of the year (no migration). It replaces the database id
 > everywhere a person sees it (student and staff screens, emails, receipts, the form PDF, the payment queue).
 

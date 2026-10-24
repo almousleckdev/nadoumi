@@ -4,10 +4,10 @@ import { isStartable } from '~/utils/paymentView'
 
 /**
  * The Nadoumi application fee of an application. A draft stays saved whether or not it is paid; this panel
- * is how the student pays: open the QR (15 minutes), pay in their banking app, then report the payment.
+ * is how the student pays (a submitted application can be paid again only after staff rejected the payment): open the QR (15 minutes), pay in their banking app, then report the payment.
  * It tells its parent whether the fee is settled so the Submit button can follow.
  */
-const props = defineProps<{ applicationId: number }>()
+const props = defineProps<{ applicationId: number, submitted?: boolean }>()
 const emit = defineEmits<{ settled: [value: boolean] }>()
 
 const { t } = useI18n()
@@ -133,7 +133,7 @@ const amount = computed(() => offeringMoney(payment.value?.amount, null, payment
         <NAlert v-else-if="state === 'EXPIRED'" tone="warning" :title="t('payment.expiredTitle')">
           {{ t('payment.expiredBody') }}
         </NAlert>
-        <p class="text-sm text-slate-600">{{ t('payment.intro') }}</p>
+        <p class="text-sm text-slate-600">{{ submitted ? t('payment.submittedIntro') : t('payment.intro') }}</p>
         <p class="text-sm">
           <span class="text-slate-500">{{ t('payment.amount') }}</span>
           <span class="ms-2 font-display text-xl font-bold tabular-nums text-red-600">{{ amount }}</span>

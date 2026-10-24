@@ -130,6 +130,16 @@ describe('PaymentPanel', () => {
     expect(w.find('[data-test="pay"]').exists()).toBe(true)
   })
 
+  it('tells a student whose submitted application lost its payment that the fee was not received, and lets them pay again', async () => {
+    api.overview.mockResolvedValue(dto({ state: 'REJECTED', rejectionReason: 'Amount does not match' }))
+    const w = await mountSuspended(PaymentPanel, { props: { applicationId: 5, submitted: true } })
+    await flushPromises()
+
+    expect(w.text()).toContain('the fee was not received')
+    expect(w.text()).not.toContain('stays saved until you pay')
+    expect(w.find('[data-test="pay"]').attributes('disabled')).toBeUndefined()
+  })
+
   it('renders nothing when no fee is required', async () => {
     api.overview.mockResolvedValue(dto({ state: 'NOT_REQUIRED', required: false, settled: true }))
     const w = await mountSuspended(PaymentPanel, { props: { applicationId: 5 } })
