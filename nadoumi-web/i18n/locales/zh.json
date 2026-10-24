@@ -491,7 +491,12 @@
       "colScholarship": "奖学金",
       "colCountry": "国家",
       "colFunding": "资助方式",
-      "colDeadline": "截止日期"
+      "colDeadline": "截止日期",
+      "focusTitle": "您的申请",
+      "viewApplication": "查看申请",
+      "focusDraft": "您有一份未完成的 {title} 申请。完成并支付申请费后即可发送给 Nadoumi。",
+      "focusEmpty": "您还没有申请。找到项目或奖学金，几步即可申请。",
+      "browseProgrammes": "浏览项目"
     },
     "notifications": {
       "title": "通知",

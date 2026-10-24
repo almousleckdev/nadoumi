@@ -105,6 +105,7 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
             </div>
             <ApplicationStatusBadge :status="application.currentStatus" />
           </div>
+          <div class="mt-5"><ApplicationTracker :status="application.currentStatus" /></div>
           <p class="mt-4 text-sm text-slate-600" data-test="status-note">{{ statusNote }}</p>
         </div>
 

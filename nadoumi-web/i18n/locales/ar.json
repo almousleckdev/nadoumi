@@ -491,7 +491,12 @@
       "colScholarship": "المنحة",
       "colCountry": "البلد",
       "colFunding": "التمويل",
-      "colDeadline": "الموعد النهائي"
+      "colDeadline": "الموعد النهائي",
+      "focusTitle": "طلبك",
+      "viewApplication": "عرض الطلب",
+      "focusDraft": "لديك طلب غير مكتمل لـ {title}. أكمله وادفع الرسوم لإرساله إلى نادومي.",
+      "focusEmpty": "لم تقدم أي طلب بعد. ابحث عن برنامج أو منحة وقدّم في خطوات قليلة.",
+      "browseProgrammes": "تصفح البرامج"
     },
     "notifications": {
       "title": "الإشعارات",
