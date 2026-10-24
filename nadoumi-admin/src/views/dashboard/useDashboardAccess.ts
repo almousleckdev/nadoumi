@@ -6,6 +6,8 @@ export function useDashboardAccess() {
 
   const canSeeApplicants = computed(() => userStore.hasPerm('nad:applicant:list'))
   const canSeeFinance = computed(() => userStore.hasPerm('nad:finance:view'))
+  const canSeeApplications = computed(() => userStore.hasPerm('nad:application:list'))
+  const canSeePayments = computed(() => userStore.hasPerm('nad:payment:list'))
   const canSeeTasks = computed(() => userStore.hasPerm('nad:task:list'))
   const canSeeCatalog = computed(() => userStore.hasPerm('nad:program:list'))
   const canSeeUniversities = computed(() => userStore.hasPerm('nad:university:list'))
@@ -16,10 +18,11 @@ export function useDashboardAccess() {
   const showPlatform = computed(() =>
     canSeeStudents.value || canSeeApplicants.value || canSeeUniversities.value
     || canSeeCatalog.value || canSeeScholarships.value)
-  const nothingVisible = computed(() => !showPlatform.value && !canSeeFinance.value && !canSeeTasks.value)
+  const showOperations = computed(() => canSeeApplications.value || canSeePayments.value)
+  const nothingVisible = computed(() => !showPlatform.value && !showOperations.value && !canSeeFinance.value && !canSeeTasks.value)
 
   return {
-    canSeeApplicants, canSeeFinance, canSeeTasks, canSeeCatalog, canSeeUniversities,
+    canSeeApplicants, canSeeApplications, canSeePayments, showOperations, canSeeFinance, canSeeTasks, canSeeCatalog, canSeeUniversities,
     canSeeScholarships, canSeeStudents, isOwner, showPlatform, nothingVisible,
   }
 }

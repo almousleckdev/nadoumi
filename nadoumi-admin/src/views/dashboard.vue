@@ -6,7 +6,7 @@
     >
       <template #actions>
         <el-button
-          :loading="loading || finance.loading.value"
+          :loading="loading || finance.loading.value || pipeline.loading.value"
           :icon="Refresh"
           @click="refreshAll"
         >
@@ -67,6 +67,31 @@
       :applicant-total="stats?.total ?? null"
       :applicant-state="cardState"
     />
+
+    <ApplicationsGroup
+      v-if="access.showOperations.value"
+      :pipeline="pipeline"
+      :access="access"
+    />
+
+    <div
+      v-if="access.canSeeApplications.value"
+      class="dash__split dash__split--pipeline"
+    >
+      <DashboardPanel
+        :title="t('dashboard.pipelineTitle')"
+        :slices="pipelineChart"
+        :caption="t('dashboard.k.applicationsSubmitted')"
+        :loading="pipeline.loading.value"
+        :empty-title="t('dashboard.noApplications')"
+        empty-icon="Document"
+        view-all-to="/applications"
+      />
+      <LatestApplications
+        :rows="pipeline.latest.value"
+        :loading="pipeline.loading.value"
+      />
+    </div>
 
     <FinanceGroup
       v-if="access.canSeeFinance.value"
@@ -163,6 +188,10 @@ import DashboardPanel from './dashboard/DashboardPanel.vue'
 import PlatformGroup from './dashboard/PlatformGroup.vue'
 import FinanceGroup from './dashboard/FinanceGroup.vue'
 import ApplicantsGroup from './dashboard/ApplicantsGroup.vue'
+import ApplicationsGroup from './dashboard/ApplicationsGroup.vue'
+import LatestApplications from './dashboard/LatestApplications.vue'
+import { useApplicationPipeline } from './dashboard/useApplicationPipeline'
+import { useApplicationLabels } from './applications/useApplicationLabels'
 import { countBy, openTasks, prioritySlices, statusSlices, topUniversitySlices } from './dashboard/dashboardMath'
 import { useDashboardAccess } from './dashboard/useDashboardAccess'
 import { useFinanceOverview } from './dashboard/useFinanceOverview'
@@ -181,6 +210,8 @@ const userStore = useUserStore()
 // ever sees, and only ever fetches, what their role allows.
 const access = useDashboardAccess()
 const platformCounts = usePlatformCounts(access)
+const pipeline = useApplicationPipeline(access)
+const { statusLabel } = useApplicationLabels()
 const { data: stats, loading, error, refresh } = useApplicantStats()
 const finance = useFinanceOverview(() => access.canSeeFinance.value)
 const tasks = useGatedLoader(
@@ -202,6 +233,7 @@ const activity = useGatedLoader(
 const cardState = computed<'ok' | 'loading' | 'error'>(() =>
   error.value ? 'error' : (loading.value && !stats.value ? 'loading' : 'ok'))
 
+const pipelineChart = computed(() => pipeline.slices.value.map(s => ({ label: statusLabel(s.key), value: s.value })))
 const applicantChart = computed(() => statusSlices((stats.value?.recent ?? []).map(r => r.status)))
 const taskChart = computed(() => prioritySlices(tasks.data.value, p => t(`tasks.priorityMap.${p}`)))
 const activityChart = computed(() =>
@@ -216,12 +248,11 @@ function refreshAll() {
   tasks.load()
   catalog.load()
   platformCounts.load()
+  pipeline.load()
   activity.load()
 }
 
 const comingSoon = [
-  { key: 'applications', domain: 'Application' },
-  { key: 'payments', domain: 'Payment' },
   { key: 'payroll', domain: 'Payroll' },
 ] as const
 
@@ -242,8 +273,15 @@ onMounted(refreshAll)
   border: 1px solid var(--nad-line);
   border-radius: var(--nad-radius);
 }
+.dash__split--pipeline {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+}
+.dash__split > :deep(*) {
+  min-width: 0;
+}
 @media (max-width: 900px) {
-  .dash__split {
+  .dash__split,
+  .dash__split--pipeline {
     grid-template-columns: 1fr;
   }
 }

@@ -650,6 +650,9 @@ export default {
     clear: '清除筛选条件',
   },
   dashboard: {
+    pipelineTitle: '申请所处阶段',
+    latestApplications: '最新申请',
+    noApplications: '还没有已提交的申请。',
     title: '运营仪表盘',
     subtitle: 'Nadoumi 业务的实时概览。各板块将随对应模块上线逐步启用，不显示任何占位数据。',
     refresh: '刷新',
@@ -685,6 +688,7 @@ export default {
     status: '状态',
     registered: '注册时间',
     groups: {
+      applications: '申请',
       platform: '平台',
       applicants: '申请人',
       finance: '财务',
@@ -694,6 +698,11 @@ export default {
     noAccessTitle: '此处暂无内容',
     noAccessBody: '您的账户尚未获得数据权限范围，请联系管理员分配角色。',
     k: {
+      applicationsSubmitted: '已提交申请',
+      applicationsInReview: '审核中',
+      applicationsOffers: '录取与入学',
+      paymentsToConfirm: '待确认付款',
+      needsAction: '需要处理',
       totalStudents: '学生总数',
       totalUniversities: '院校总数',
       totalProgrammes: '专业项目总数',

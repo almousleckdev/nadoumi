@@ -14,7 +14,11 @@ const api = vi.hoisted(() => ({
   listUsers: vi.fn(),
   listMyNotifications: vi.fn(),
   refreshStats: vi.fn(),
+  listApplications: vi.fn(),
+  listPayments: vi.fn(),
 }))
+vi.mock('@/api/application', () => ({ listApplications: api.listApplications }))
+vi.mock('@/api/payment', () => ({ listPayments: api.listPayments }))
 vi.mock('@/api/finance', () => ({ getFinanceSummary: api.getFinanceSummary }))
 vi.mock('@/api/hr', () => ({ listTasks: api.listTasks }))
 vi.mock('@/api/program', () => ({ listPrograms: api.listPrograms }))
@@ -69,6 +73,16 @@ describe('Dashboard', () => {
     api.listUniversities.mockResolvedValue({ totalElements: 12, content: [] })
     api.listScholarships.mockResolvedValue({ totalElements: 9, content: [] })
     api.listUsers.mockResolvedValue({ total: 250, rows: [] })
+    api.listPayments.mockResolvedValue({ totalElements: 4, content: [] })
+    api.listApplications.mockImplementation(async (params: { status?: string }) => {
+      if (params.status === 'IN_REVIEW') return { totalElements: 5, content: [] }
+      if (params.status === 'OFFER') return { totalElements: 2, content: [] }
+      if (params.status) return { totalElements: 0, content: [] }
+      return { totalElements: 7, content: [{
+        id: 31, reference: 'NAD2026007', applicantName: 'Amina Diallo', opportunityTitle: 'MBBS', universityName: 'Fudan University',
+        currentStatus: 'IN_REVIEW', assigneeName: null, submittedAt: '2026-10-24T10:00:00',
+      }] }
+    })
     api.listMyNotifications.mockResolvedValue({ content: [{ type: 'APPLICATION_UPDATE' }, { type: 'APPLICATION_UPDATE' }] })
   })
 
@@ -120,6 +134,23 @@ describe('Dashboard', () => {
     expect(api.listTasks).toHaveBeenCalledWith({ page: 0, size: 8 })
     expect(w.text()).toContain('Fudan')
     expect(w.text()).toContain('Tsinghua')
+  })
+
+  it('shows the application pipeline, the payment queue and the newest applications to staff who may see them', async () => {
+    useUserStore().permissions = ['nad:application:list', 'nad:payment:list']
+    const w = await mountDashboard()
+    expect(api.listPayments).toHaveBeenCalledWith({ status: 'PROOF_SUBMITTED', page: 0, size: 1 })
+    const text = w.text()
+    for (const part of ['Applications submitted', 'Payments to confirm', 'Latest applications', 'Amina Diallo', 'Fudan University', 'Unassigned']) {
+      expect(text).toContain(part)
+    }
+  })
+
+  it('does not ask for applications or payments without their permissions', async () => {
+    useUserStore().permissions = ['nad:task:list']
+    await mountDashboard()
+    expect(api.listApplications).not.toHaveBeenCalled()
+    expect(api.listPayments).not.toHaveBeenCalled()
   })
 
   it('always loads the callers own activity feed', async () => {
