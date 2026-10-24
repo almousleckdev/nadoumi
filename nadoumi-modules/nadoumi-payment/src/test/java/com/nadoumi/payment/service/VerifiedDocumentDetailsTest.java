@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.nadoumi.applicant.service.ApplicantDossierService;
 import com.nadoumi.application.service.ApplicationOpportunityService;
 import com.nadoumi.application.service.ApplicationOpportunityService.Description;
 import com.nadoumi.payment.domain.ApplicationPayment;
@@ -18,8 +19,8 @@ class VerifiedDocumentDetailsTest {
 
     private final PaymentMapper payments = mock(PaymentMapper.class);
     private final ApplicationOpportunityService opportunities = mock(ApplicationOpportunityService.class);
-    private final ApplicantNames names = mock(ApplicantNames.class);
-    private final VerifiedDocumentDetails details = new VerifiedDocumentDetails(payments, opportunities, names);
+    private final ApplicantDossierService dossiers = mock(ApplicantDossierService.class);
+    private final VerifiedDocumentDetails details = new VerifiedDocumentDetails(payments, opportunities, dossiers);
 
     private static PaymentDocument document() {
         PaymentDocument d = new PaymentDocument();
@@ -38,7 +39,10 @@ class VerifiedDocumentDetailsTest {
         payment.setStatus(PaymentStatus.CONFIRMED);
         payment.setVerifiedAt(LocalDateTime.of(2026, 10, 22, 6, 30));
         when(payments.findById(5L)).thenReturn(payment);
-        when(names.of(3L)).thenReturn("Amina Diallo");
+        var dossier = mock(com.nadoumi.applicant.service.ApplicantDossier.class, org.mockito.Mockito.RETURNS_DEEP_STUBS);
+        when(dossier.profile().givenName()).thenReturn("Amina");
+        when(dossier.profile().familyName()).thenReturn("Diallo");
+        when(dossiers.read(3L)).thenReturn(dossier);
         when(opportunities.describe(9L)).thenReturn(new Description("NAD2026007", null, "MBBS", "Fudan University", "AUTUMN_SEPTEMBER"));
 
         var shown = details.of(document()).orElseThrow();
