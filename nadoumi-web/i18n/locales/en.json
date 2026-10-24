@@ -2580,7 +2580,8 @@
       "resend": "Email me the receipt again",
       "resent": "Receipt sent. Check your inbox.",
       "resendWait": "The receipt was sent a moment ago. Try again in a few minutes."
-    }
+    },
+    "submittedIntro": "Nadoumi has your application, but the fee was not received. Pay again and report the payment so it can move forward."
   },
   "applyFlow": {
     "onBehalf": "You are completing the details of {name}. Wherever a question says \"you\" or \"your\", it means {name}.",

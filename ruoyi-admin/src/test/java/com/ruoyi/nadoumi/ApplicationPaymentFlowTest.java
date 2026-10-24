@@ -198,6 +198,48 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
+    void shouldLetAStudentPayAgain_whenStaffRejectTheFeeOfASubmittedApplication() throws Exception {
+        Student s = register("pay", "repay");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        reportPayment(s, app, "BANK7000001").andExpect(status().isOk());
+        submitApplication(s, app).andExpect(status().isOk());
+        mvc.perform(post("/api/staff/payments/" + paymentId(app) + "/reject").header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"Amount does not match\"}")).andExpect(status().isOk());
+
+        // the application is submitted, yet the student may pay again
+        mvc.perform(get(url(app, "")).header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$.state").value("REJECTED")).andExpect(jsonPath("$.canStart").value(true))
+                .andExpect(jsonPath("$.rejectionReason").value("Amount does not match"));
+        openSession(s, app).andExpect(status().isOk()).andExpect(jsonPath("$.state").value("PENDING"));
+        reportPayment(s, app, "BANK7000002").andExpect(status().isOk())
+                .andExpect(jsonPath("$.state").value("PROOF_SUBMITTED"));
+
+        mvc.perform(post("/api/staff/payments/" + paymentId(app) + "/confirm").header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.status").value("CONFIRMED"));
+        // once confirmed there is nothing left to pay
+        openSession(s, app).andExpect(status().isOk()).andExpect(jsonPath("$.state").value("CONFIRMED"))
+                .andExpect(jsonPath("$.canStart").value(false));
+    }
+
+    @Test
+    void shouldNotOpenASecondPayment_onASubmittedApplicationWhoseFeeWasNotRejected() throws Exception {
+        Student s = register("pay", "norepay");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        reportPayment(s, app, "BANK7000003").andExpect(status().isOk());
+        submitApplication(s, app).andExpect(status().isOk());
+
+        mvc.perform(get(url(app, "")).header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$.canStart").value(false));
+        openSession(s, app).andExpect(status().isOk()).andExpect(jsonPath("$.state").value("PROOF_SUBMITTED"));
+        assertThat(jdbc.queryForObject("select count(*) from nad_application_payment where application_id = ?",
+                Integer.class, app)).isEqualTo(1);
+    }
+
+    @Test
     void shouldHideOpenCancelledAndExpiredPaymentsAndDraftApplications_fromStaff() throws Exception {
         Student s = register("pay", "inbox");
         long app = draftFor(s);
