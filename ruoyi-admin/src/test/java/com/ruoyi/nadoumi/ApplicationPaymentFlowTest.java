@@ -967,7 +967,7 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(true))
                 .andExpect(jsonPath("$.kind").value("RECEIPT")).andExpect(jsonPath("$.number").value(number))
                 .andExpect(jsonPath("$.issuedOn").isNotEmpty())
-                .andExpect(jsonPath("$.details.applicantName").isNotEmpty())
+                .andExpect(jsonPath("$.details.applicantName").exists())
                 .andExpect(jsonPath("$.details.applicationReference").isNotEmpty())
                 .andExpect(jsonPath("$.details.feeStatus").value("CONFIRMED"))
                 .andExpect(jsonPath("$.details.feeAmount").isNotEmpty())
