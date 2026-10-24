@@ -4,6 +4,10 @@ import com.nadoumi.application.domain.WfDefinition;
 import com.nadoumi.application.domain.WfStage;
 import com.nadoumi.application.mapper.ApplicationSearch;
 import com.nadoumi.application.service.ApplicationAdminService;
+import com.nadoumi.application.web.request.AdvanceRequest;
+import com.nadoumi.application.web.response.NextStepResponse;
+import com.nadoumi.application.web.response.StaffApplicationRow;
+import com.nadoumi.application.web.response.StaffUserResponse;
 import com.nadoumi.application.web.request.AssignRequest;
 import com.nadoumi.application.web.request.DecisionRequest;
 import com.nadoumi.application.web.request.SkipTaskRequest;
@@ -44,7 +48,7 @@ public class StaffApplicationController {
 
     @GetMapping
     @PreAuthorize("@ss.hasPermi('nad:application:list')")
-    public PageResponse<ApplicationResponse> list(
+    public PageResponse<StaffApplicationRow> list(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String applicationType,
             @RequestParam(required = false) String status,
@@ -85,6 +89,25 @@ public class StaffApplicationController {
     public ApplicationResponse transition(@PathVariable Long id, @PathVariable String code,
             @Valid @RequestBody TransitionRequest req) {
         return service.transition(id, code, req);
+    }
+
+    @GetMapping("/assignees")
+    @PreAuthorize("@ss.hasPermi('nad:application:assign')")
+    public List<StaffUserResponse> assignees() {
+        return service.assignees();
+    }
+
+    @GetMapping("/{id}/next-steps")
+    @PreAuthorize("@ss.hasPermi('nad:application:view')")
+    public List<NextStepResponse> nextSteps(@PathVariable Long id) {
+        return service.nextSteps(id);
+    }
+
+    @PostMapping("/{id}/advance")
+    @PreAuthorize("@ss.hasPermi('nad:application:transition')")
+    @Log(title = "Application status change", businessType = BusinessType.UPDATE)
+    public ApplicationResponse advance(@PathVariable Long id, @Valid @RequestBody AdvanceRequest req) {
+        return service.advance(id, req);
     }
 
     @PostMapping("/{id}/decisions")

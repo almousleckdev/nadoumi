@@ -487,7 +487,11 @@
       "deadlines": "Próximos plazos",
       "deadlinesEmpty": "No hay plazos próximos que mostrar.",
       "activity": "Actividad reciente",
-      "activityEmpty": "Nada que mostrar todavía."
+      "activityEmpty": "Nada que mostrar todavía.",
+      "colScholarship": "Beca",
+      "colCountry": "País",
+      "colFunding": "Financiación",
+      "colDeadline": "Fecha límite"
     },
     "notifications": {
       "title": "Notificaciones",
@@ -697,7 +701,7 @@
     "applications": {
       "continue": "Continuar",
       "title": "Mis solicitudes",
-      "blurb": "Sigue cada solicitud que has iniciado, desde el borrador hasta la decisión.",
+      "blurb": "Las solicitudes que ha pagado y enviado a Nadoumi.",
       "detailTitle": "Solicitud",
       "empty": "Aún no has iniciado ninguna solicitud.",
       "browse": "Explorar becas",
@@ -707,14 +711,6 @@
       "notFound": "No pudimos encontrar esta solicitud.",
       "timeline": "Progreso",
       "timelineEmpty": "Aún no hay novedades.",
-      "actions": "Acciones",
-      "submit": "Enviar solicitud",
-      "submitHint": "Esta solicitud sigue siendo un borrador. Envíala cuando los datos estén listos.",
-      "submitted": "Tu solicitud ha sido enviada.",
-      "withdraw": "Retirar solicitud",
-      "withdrawReason": "¿Por qué la retiras?",
-      "withdrawConfirm": "Confirmar retiro",
-      "withdrawnNotice": "Tu solicitud ha sido retirada.",
       "type": {
         "PROGRAM_WITH_SCHOLARSHIP": "Programa con beca",
         "PROGRAM_ONLY": "Solicitud de programa",
@@ -740,6 +736,32 @@
         "offerAccepted": "Aceptaste la oferta",
         "offerDeclined": "Rechazaste la oferta",
         "stageChanged": "Tu solicitud pasó a la siguiente etapa"
+      },
+      "colReference": "Solicitud",
+      "colOpportunity": "Programa / beca",
+      "colStudent": "Estudiante",
+      "colStage": "Etapa",
+      "colStatus": "Estado",
+      "colSubmitted": "Enviada",
+      "draftsTitle": "Solicitudes sin terminar",
+      "draftsBlurb": "Aún no enviadas. Termínelas y pague la tasa de solicitud para enviarlas.",
+      "noneSubmitted": "Aún no ha enviado ninguna solicitud.",
+      "feeNote": "La tasa de solicitud no es reembolsable.",
+      "detailsTitle": "Detalles de la solicitud",
+      "university": "Universidad",
+      "intake": "Convocatoria",
+      "viewForm": "Ver el formulario de solicitud",
+      "formTitle": "Formulario de solicitud",
+      "paymentTitle": "Pago",
+      "statusNote": {
+        "IN_REVIEW": "Nadoumi está revisando su solicitud. Le escribimos en cada cambio.",
+        "SUBMITTED_TO_UNIVERSITY": "Su solicitud se ha enviado a la universidad. Le escribimos cuando responda.",
+        "DECISION": "La universidad está decidiendo. Le escribimos en cuanto haya novedades.",
+        "OFFER": "Tiene una oferta. Revise su correo para los siguientes pasos.",
+        "PRE_DEPARTURE": "Enhorabuena. Nadoumi le ayuda a preparar la salida.",
+        "CLOSED_SUCCESS": "Está matriculado. Enhorabuena.",
+        "CLOSED_UNSUCCESSFUL": "Esta solicitud no tuvo éxito.",
+        "default": "Nadoumi está trabajando en su solicitud."
       }
     }
   },
@@ -1234,7 +1256,7 @@
           "title": "Seis pasos hasta la matrícula"
         },
         "checklist": {
-    "view": "Ver",
+          "view": "Ver",
           "eyebrow": "Lista de verificación",
           "title": "Documentos que necesitarás"
         },
@@ -2657,7 +2679,11 @@
       "mailingTitle": "¿Dónde enviamos tus documentos de admisión?",
       "mailingHint": "Tu carta de admisión y los papeles del visado se envían aquí. Elige una dirección donde alguien pueda recibirlos.",
       "mailingAddress": "Dirección de entrega",
-      "mailing": { "CURRENT": "Mi dirección actual", "PERMANENT": "Mi dirección permanente", "OTHER": "Otra dirección" }
+      "mailing": {
+        "CURRENT": "Mi dirección actual",
+        "PERMANENT": "Mi dirección permanente",
+        "OTHER": "Otra dirección"
+      }
     },
     "member": {
       "title": "Familiares",

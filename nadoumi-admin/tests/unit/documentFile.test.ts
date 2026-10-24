@@ -13,11 +13,21 @@ beforeEach(() => {
 })
 
 describe('openDocumentFile', () => {
-  it('opens a signed URL in a new tab', async () => {
+  it('opens a signed URL in a new tab when viewing', async () => {
     documentContent.mockResolvedValue(new Blob([JSON.stringify({ url: 'https://signed.example/f' })], { type: 'application/json' }))
-    await openDocumentFile(3, 2)
-    expect(documentContent).toHaveBeenCalledWith(3, 2)
+    await openDocumentFile(3, 2, 'view')
+    expect(documentContent).toHaveBeenCalledWith(3, 2, true)
     expect(open).toHaveBeenCalledWith('https://signed.example/f', '_blank', 'noopener')
+  })
+
+  it('asks for a download link, not an inline one, when downloading', async () => {
+    documentContent.mockResolvedValue(new Blob([JSON.stringify({ url: 'https://signed.example/f' })], { type: 'application/json' }))
+    const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+    await openDocumentFile(3, 2, 'download')
+    expect(documentContent).toHaveBeenCalledWith(3, 2, false)
+    expect(open).not.toHaveBeenCalled()
+    expect(click).toHaveBeenCalledOnce()
+    click.mockRestore()
   })
 
   it('refuses a non-http(s) URL rather than opening it', async () => {

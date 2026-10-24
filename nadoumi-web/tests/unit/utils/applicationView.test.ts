@@ -20,9 +20,10 @@ describe('status helpers', () => {
   })
 
   it('picks a tone per outcome and detects closed applications', () => {
-    expect(statusTone('CLOSED_SUCCESS')).toBe('success')
+    // chips are neutral; only an unsuccessful outcome reads as an error
+    expect(statusTone('CLOSED_SUCCESS')).toBe('neutral')
     expect(statusTone('CLOSED_UNSUCCESSFUL')).toBe('danger')
-    expect(statusTone('DRAFT')).toBe('warning')
+    expect(statusTone('DRAFT')).toBe('neutral')
     expect(isClosed('CLOSED_WITHDRAWN')).toBe(true)
     expect(isClosed('IN_REVIEW')).toBe(false)
   })

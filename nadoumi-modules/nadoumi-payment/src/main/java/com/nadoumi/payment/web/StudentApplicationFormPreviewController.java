@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/** A look at the application form before it is paid for and sent: the same form, marked as a preview. */
+/** The student's own look at the application form: a marked preview before the payment is reported, the real form after. */
 @RestController
 @RequestMapping("/api/student/applications/{id}/form-preview")
 public class StudentApplicationFormPreviewController {
@@ -31,7 +31,7 @@ public class StudentApplicationFormPreviewController {
     @PreAuthorize("@na.canAccessApplication(#id, 'VIEW_APPLICATION')")
     public ResponseEntity<byte[]> preview(@PathVariable Long id) {
         long applicantId = applications.find(id).orElseThrow(() -> new NadNotFoundException("application not found")).applicantId();
-        byte[] pdf = documents.previewForm(id, applicantId);
+        byte[] pdf = documents.currentForm(id, applicantId);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_PDF)
                 .contentLength(pdf.length)

@@ -7,6 +7,12 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 
 ---
 
+> **2026-10-24:** `NTable` (`app/components/ui/NTable.vue`) is the shared data table: a real table from `md` up and
+> stacked labelled cards below, so the page never scrolls sideways. The student applications list and the dashboard's
+> applications and recommended-scholarships cards use it. Status chips are neutral; only an unsuccessful outcome is red
+> (§24). There is no withdraw action: the application fee is not refundable. The admin application page is
+> `views/applications/detail.vue` (the drawer is gone).
+
 ## 1. State of the frontend in this repo (EXISTING)
 
 - The `ruoyi-ui/` directory was **deleted from the repo** at commit `ec987ab9`

@@ -487,7 +487,11 @@
       "deadlines": "Upcoming deadlines",
       "deadlinesEmpty": "No upcoming deadlines to show.",
       "activity": "Recent activity",
-      "activityEmpty": "Nothing to show yet."
+      "activityEmpty": "Nothing to show yet.",
+      "colScholarship": "Scholarship",
+      "colCountry": "Country",
+      "colFunding": "Funding",
+      "colDeadline": "Deadline"
     },
     "notifications": {
       "title": "Notifications",
@@ -697,7 +701,7 @@
     "applications": {
       "continue": "Continue",
       "title": "My Applications",
-      "blurb": "Track every application you have started, from draft to decision.",
+      "blurb": "The applications you have paid for and submitted to Nadoumi.",
       "detailTitle": "Application",
       "empty": "You have not started an application yet.",
       "browse": "Browse scholarships",
@@ -707,14 +711,6 @@
       "notFound": "We could not find this application.",
       "timeline": "Progress",
       "timelineEmpty": "No updates yet.",
-      "actions": "Actions",
-      "submit": "Submit application",
-      "submitHint": "This application is still a draft. Submit it when the details are ready.",
-      "submitted": "Your application has been submitted.",
-      "withdraw": "Withdraw application",
-      "withdrawReason": "Why are you withdrawing?",
-      "withdrawConfirm": "Confirm withdrawal",
-      "withdrawnNotice": "Your application has been withdrawn.",
       "type": {
         "PROGRAM_WITH_SCHOLARSHIP": "Programme with scholarship",
         "PROGRAM_ONLY": "Programme application",
@@ -740,6 +736,32 @@
         "offerAccepted": "You accepted the offer",
         "offerDeclined": "You declined the offer",
         "stageChanged": "Your application moved to the next stage"
+      },
+      "colReference": "Application",
+      "colOpportunity": "Programme / scholarship",
+      "colStudent": "Student",
+      "colStage": "Stage",
+      "colStatus": "Status",
+      "colSubmitted": "Submitted",
+      "draftsTitle": "Unfinished applications",
+      "draftsBlurb": "Not sent yet. Finish them and pay the application fee to submit.",
+      "noneSubmitted": "You have not submitted an application yet.",
+      "feeNote": "The application fee is not refundable.",
+      "detailsTitle": "Application details",
+      "university": "University",
+      "intake": "Intake",
+      "viewForm": "View the application form",
+      "formTitle": "Application form",
+      "paymentTitle": "Payment",
+      "statusNote": {
+        "IN_REVIEW": "Nadoumi is reviewing your application. We email you at every change.",
+        "SUBMITTED_TO_UNIVERSITY": "Your application has been sent to the university. We email you when it answers.",
+        "DECISION": "The university is deciding. We email you as soon as there is news.",
+        "OFFER": "You have an offer. Check your email for what to do next.",
+        "PRE_DEPARTURE": "Congratulations. Nadoumi is helping you prepare to leave.",
+        "CLOSED_SUCCESS": "You are enrolled. Congratulations.",
+        "CLOSED_UNSUCCESSFUL": "This application was not successful.",
+        "default": "Nadoumi is working on your application."
       }
     }
   },
@@ -1234,7 +1256,7 @@
           "title": "Six steps to enrolment"
         },
         "checklist": {
-    "view": "View",
+          "view": "View",
           "eyebrow": "Checklist",
           "title": "Documents you will need"
         },
@@ -2657,7 +2679,11 @@
       "mailingTitle": "Where should we send your admission documents?",
       "mailingHint": "Your admission notice and visa papers are sent here. Choose the address where someone can receive them.",
       "mailingAddress": "Delivery address",
-      "mailing": { "CURRENT": "My current home address", "PERMANENT": "My permanent address", "OTHER": "A different address" }
+      "mailing": {
+        "CURRENT": "My current home address",
+        "PERMANENT": "My permanent address",
+        "OTHER": "A different address"
+      }
     },
     "member": {
       "title": "Family members",

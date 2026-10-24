@@ -1,4 +1,3 @@
-import { useToast } from '~/composables/useToast'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mockNuxtImport, mountSuspended } from '@nuxt/test-utils/runtime'
 import { flushPromises } from '@vue/test-utils'
@@ -9,13 +8,13 @@ import type { StudentApplicationDto } from '~/types/catalog'
 const APP = (over: Partial<StudentApplicationDto> = {}): StudentApplicationDto => ({
   id: 7, reference: 'NAD20261023001', applicantId: 1, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
   currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-15T10:00:00',
-  timeline: ['APPLICATION_CREATED', 'STAGE_SUBMIT', 'CASE_ASSIGNED', 'STAGE_CLAIM'], ...over,
+  timeline: ['APPLICATION_CREATED', 'STAGE_SUBMIT', 'CASE_ASSIGNED', 'STAGE_CLAIM'],
+  title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', ...over,
 })
 
 const list = vi.fn()
 const get = vi.fn()
 const submit = vi.fn()
-const withdraw = vi.fn()
 const checklist = vi.fn()
 const templates = vi.fn()
 const navigateTo = vi.hoisted(() => vi.fn())
@@ -30,7 +29,7 @@ mockNuxtImport('useApplicantSignature', () => () => ({
   image: async () => new Blob(['x'], { type: 'image/png' }),
 }))
 vi.mock('~/composables/useApplications', () => ({
-  useApplications: () => ({ list, get, submit, withdraw, checklist, templates, template: vi.fn() }),
+  useApplications: () => ({ list, get, submit, checklist, formPreview: vi.fn(), templates, template: vi.fn() }),
 }))
 
 beforeEach(() => {
@@ -38,7 +37,6 @@ beforeEach(() => {
   list.mockReset().mockResolvedValue([APP()])
   get.mockReset().mockResolvedValue(APP())
   submit.mockReset()
-  withdraw.mockReset()
   checklist.mockReset().mockResolvedValue([])
   templates.mockReset().mockResolvedValue([])
 })
@@ -54,8 +52,6 @@ async function mountDetail() {
   return w
 }
 
-const toastMessages = () => useToast().toasts.value.map(t => t.message)
-
 describe('dashboard applications list', () => {
   it('shows an honest empty state that points at scholarships, never fake applications', async () => {
     list.mockResolvedValueOnce([])
@@ -64,13 +60,27 @@ describe('dashboard applications list', () => {
     expect(w.findAll('a').some(a => a.attributes('href')?.includes('/scholarships'))).toBe(true)
   })
 
-  it('lists real applications with a translated status and a link to the detail page', async () => {
+  it('lists submitted applications as a table with a translated status and a link to the detail page', async () => {
     const w = await mountList()
-    expect(w.text()).toContain('Programme with scholarship')
+    expect(w.find('[data-test="applications-table"]').exists()).toBe(true)
+    expect(w.text()).toContain('MBBS')
+    expect(w.text()).toContain('Fudan University')
+    expect(w.text()).toContain('Amina Diallo')
     expect(w.text()).toContain('Eligibility review')
     expect(w.text()).toContain('In review')
     expect(w.text()).toContain('NAD20261023001')
     expect(w.findAll('a').some(a => a.attributes('href')?.endsWith('/dashboard/applications/7'))).toBe(true)
+  })
+
+  it('never lists a withdrawn application, and keeps drafts apart from the submitted table', async () => {
+    list.mockResolvedValueOnce([
+      APP({ id: 8, reference: 'NAD20261023002', currentStatus: 'CLOSED_WITHDRAWN' }),
+      APP({ id: 9, reference: 'NAD20261023003', currentStatus: 'DRAFT', submittedAt: null }),
+    ])
+    const w = await mountList()
+    expect(w.text()).not.toContain('NAD20261023002')
+    expect(w.find('[data-test="drafts"]').exists()).toBe(true)
+    expect(w.find('[data-test="applications-table"]').exists()).toBe(false)
   })
 
   it('sends a draft to the step-by-step flow and invites the student to continue', async () => {
@@ -87,7 +97,7 @@ describe('dashboard applications list', () => {
     list.mockResolvedValueOnce([APP()])
     await w.findAll('button').find(b => b.text() === 'Try again')!.trigger('click')
     await flushPromises()
-    expect(w.text()).toContain('Programme with scholarship')
+    expect(w.text()).toContain('MBBS')
   })
 })
 
@@ -100,7 +110,8 @@ describe('dashboard application detail', () => {
     expect(timeline).toContain('Your application moved to the next stage')
     expect(timeline).not.toContain('CASE_ASSIGNED')
     expect(timeline).not.toContain('STAGE_CLAIM')
-    expect(w.text()).toContain('Current stage: Eligibility review')
+    expect(w.text()).toContain('Eligibility review')
+    expect(w.text()).toContain('Fudan University')
   })
 
   it('shows a not-found message when the server refuses or does not know the application', async () => {
@@ -127,20 +138,10 @@ describe('dashboard application detail', () => {
     expect(navigateTo).toHaveBeenCalledWith('/apply/7', { replace: true })
   })
 
-  it('requires a reason before withdrawing, then withdraws', async () => {
-    withdraw.mockResolvedValue(APP({ currentStatus: 'CLOSED_WITHDRAWN', currentStageName: 'Withdrawn' }))
+  it('offers no withdrawal: the application fee is not refundable', async () => {
     const w = await mountDetail()
-    await w.find('[data-test="withdraw-start"]').trigger('click')
-
-    await w.find('[data-test="withdraw-confirm"]').trigger('click')
-    await flushPromises()
-    expect(withdraw).not.toHaveBeenCalled()
-
-    await w.find('#withdraw-reason').setValue('Changed plans')
-    await w.find('[data-test="withdraw-confirm"]').trigger('click')
-    await flushPromises()
-    expect(withdraw).toHaveBeenCalledWith(7, 'Changed plans')
-    expect(toastMessages()).toContain('Your application has been withdrawn.')
     expect(w.find('[data-test="withdraw-start"]').exists()).toBe(false)
+    expect(w.text()).not.toContain('Withdraw application')
+    expect(w.text()).toContain('The application fee is not refundable.')
   })
 })

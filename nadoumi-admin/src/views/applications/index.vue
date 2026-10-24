@@ -45,14 +45,21 @@
           :value="s"
         />
       </el-select>
-      <el-input-number
+      <el-select
         v-model="filters.assigneeUserId"
-        :min="1"
-        :controls="false"
-        :placeholder="t('applications.assigneeId')"
-        style="width: 150px"
+        :placeholder="t('applications.assignee')"
+        clearable
+        filterable
+        style="width: 220px"
         @change="reload"
-      />
+      >
+        <el-option
+          v-for="s in staff"
+          :key="s.userId"
+          :label="s.name"
+          :value="s.userId"
+        />
+      </el-select>
       <el-button
         :icon="Search"
         @click="reload"
@@ -70,20 +77,26 @@
       :empty-title="t('applications.emptyTitle')"
       clickable-rows
       @retry="load"
-      @row-click="(r) => (openId = (r as Application).id)"
+      @row-click="(r) => router.push(`/applications/${(r as ApplicationRow).id}`)"
     >
-      <template #cell-applicationType="{ row }">
-        {{ typeLabel((row as Application).applicationType) }}
+      <template #cell-opportunityTitle="{ row }">
+        <div class="opp">
+          <span>{{ (row as ApplicationRow).opportunityTitle }}</span>
+          <small v-if="(row as ApplicationRow).universityName">{{ (row as ApplicationRow).universityName }}</small>
+        </div>
       </template>
       <template #cell-currentStatus="{ row }">
         <StatusBadge
-          :status="(row as Application).currentStatus"
+          :status="(row as ApplicationRow).currentStatus"
           :map="STATUS_TONES"
-          :label="statusLabel((row as Application).currentStatus)"
+          :label="statusLabel((row as ApplicationRow).currentStatus)"
         />
       </template>
-      <template #cell-assigneeUserId="{ row }">
-        {{ (row as Application).assigneeUserId ?? t('applications.unassigned') }}
+      <template #cell-assigneeName="{ row }">
+        {{ (row as ApplicationRow).assigneeName ?? t('applications.unassigned') }}
+      </template>
+      <template #cell-submittedAt="{ row }">
+        {{ formatDateTime((row as ApplicationRow).submittedAt) }}
       </template>
     </DataTable>
 
@@ -93,17 +106,12 @@
       :total="total"
       @change="load"
     />
-
-    <ApplicationDrawer
-      v-model="drawerOpen"
-      :application-id="openId"
-      @changed="load"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { Search } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
@@ -111,18 +119,21 @@ import FilterBar from '@/components/ui/FilterBar.vue'
 import DataTable from '@/components/ui/DataTable.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import Pagination from '@/components/ui/Pagination.vue'
-import ApplicationDrawer from './ApplicationDrawer.vue'
 import { usePagedList } from '@/composables/usePagedList'
-import { listApplications, type Application } from '@/api/application'
+import { listApplications, listAssignees, type ApplicationRow, type StaffUser } from '@/api/application'
+import { useUserStore } from '@/stores/user'
+import { formatDateTime } from '@/utils/date'
 import { APPLICATION_TYPES, STATUSES, STATUS_TONES } from './vocabulary'
 
 const { t, te } = useI18n()
+const router = useRouter()
+const staff = ref<StaffUser[]>([])
 
 const emptyFilters = () => ({
   q: '', applicationType: '', status: '', assigneeUserId: undefined as number | undefined,
 })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
-  usePagedList<Application, ReturnType<typeof emptyFilters>>({
+  usePagedList<ApplicationRow, ReturnType<typeof emptyFilters>>({
     emptyFilters,
     firstPage: 0,
     size: 20,
@@ -136,25 +147,27 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
     }),
   })
 
-const openId = ref<number | undefined>()
-const drawerOpen = ref(false)
-watch(openId, (id) => { drawerOpen.value = id !== undefined })
-watch(drawerOpen, (open) => { if (!open) openId.value = undefined })
-
 const columns = computed(() => [
   { prop: 'reference', label: t('applications.ref'), width: 160 },
-  { prop: 'applicantId', label: t('applications.applicant'), width: 110 },
-  { prop: 'applicationType', label: t('applications.type'), minWidth: 210 },
-  { prop: 'currentStageName', label: t('applications.stage'), minWidth: 190 },
-  { prop: 'currentStatus', label: t('applications.status'), width: 200, align: 'center' as const },
-  { prop: 'assigneeUserId', label: t('applications.assignee'), width: 130 },
+  { prop: 'applicantName', label: t('applications.applicant'), minWidth: 170 },
+  { prop: 'opportunityTitle', label: t('applications.opportunity'), minWidth: 240 },
+  { prop: 'currentStageName', label: t('applications.stage'), minWidth: 170 },
+  { prop: 'currentStatus', label: t('applications.status'), width: 180, align: 'center' as const },
+  { prop: 'assigneeName', label: t('applications.assignee'), minWidth: 150 },
   { prop: 'submittedAt', label: t('applications.submitted'), minWidth: 170 },
 ])
 
-const typeLabel = (type: string | null) =>
-  type && te(`applications.typeMap.${type}`) ? t(`applications.typeMap.${type}`) : (type ?? '')
 const statusLabel = (status: string | null) =>
   status && te(`applications.statusMap.${status}`) ? t(`applications.statusMap.${status}`) : (status ?? '')
 
-onMounted(load)
+// the assignee filter lists staff only for those allowed to assign; everyone else filters by the table
+onMounted(async () => {
+  load()
+  if (useUserStore().hasPerm('nad:application:assign')) staff.value = await listAssignees().catch(() => [])
+})
 </script>
+
+<style scoped>
+.opp { display: grid; gap: 2px; }
+.opp small { color: var(--nad-ink-soft, #64748b); }
+</style>

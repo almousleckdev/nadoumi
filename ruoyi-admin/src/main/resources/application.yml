@@ -181,7 +181,7 @@ nadoumi:
     assetBaseUrl: ${NADOUMI_BRAND_ASSET_BASE_URL:https://api.nadoumi.com}
     wordmark: ${NADOUMI_BRAND_WORDMARK:Nadoumi}
     logoPath: ${NADOUMI_BRAND_LOGO_PATH:/email/nadoumi-logo.png}
-    preferencesPath: ${NADOUMI_BRAND_PREFERENCES_PATH:/account/notifications}
+    preferencesPath: ${NADOUMI_BRAND_PREFERENCES_PATH:/dashboard/notifications}
     contact:
       emails: ${NADOUMI_BRAND_EMAILS:support@nadoumi.com}
       phones: ${NADOUMI_BRAND_PHONES:+86 159 0823 7607}

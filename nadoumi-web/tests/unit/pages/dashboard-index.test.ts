@@ -96,11 +96,13 @@ describe('dashboard index', () => {
 
   it('summarises the real applications, with their status, instead of the empty state', async () => {
     listApplications.mockResolvedValueOnce([
-      { id: 7, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
-        currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-01T00:00:00', timeline: [] },
+      { id: 7, reference: 'NAD20260101001', applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
+        currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-01T00:00:00', timeline: [],
+        title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo' },
     ])
     const w = await mountPage()
-    expect(w.text()).toContain('Programme with scholarship')
+    expect(w.text()).toContain('MBBS')
+    expect(w.text()).toContain('NAD20260101001')
     expect(w.text()).toContain('In review')
     expect(w.text()).not.toContain("You haven't started an application yet")
   })

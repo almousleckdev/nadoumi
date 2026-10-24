@@ -29,7 +29,7 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="grid min-w-0 gap-6">
     <WelcomeCelebration v-if="showWelcome && primary" :name="primary.givenName" @dismiss="dismissWelcome" />
 
     <AsyncState :pending="pending" :error="loadError">
@@ -55,24 +55,20 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
         <NButton class="mt-4" :to="localePath('/dashboard/profile')">{{ t('dashboard.quickProfile') }}</NButton>
       </SectionCard>
 
-      <div v-else class="grid gap-6">
+      <div v-else class="grid min-w-0 gap-6">
         <OverviewProfileHeader :applicant="primary" />
+        <OverviewApplicationsCard v-bind="applications" />
+        <OverviewRecommendedCard v-bind="recommended" />
 
-        <div class="grid gap-6 lg:grid-cols-3">
-          <div class="grid gap-6 lg:col-span-2">
-            <OverviewApplicationsCard v-bind="applications" />
-            <OverviewRecommendedCard v-bind="recommended" />
-          </div>
-
-          <div class="grid gap-6">
-            <OverviewDocumentsCard
-              :pending="documents.pending"
-              :photo-status="documents.photoStatus"
-              :passport-status="documents.passportStatus"
-            />
-            <OverviewDeadlinesCard v-bind="deadlines" />
-            <OverviewActivityCard v-bind="activity" />
-          </div>
+        <div class="grid min-w-0 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <OverviewDocumentsCard
+            class="min-w-0"
+            :pending="documents.pending"
+            :photo-status="documents.photoStatus"
+            :passport-status="documents.passportStatus"
+          />
+          <OverviewDeadlinesCard class="min-w-0" v-bind="deadlines" />
+          <OverviewActivityCard class="min-w-0 md:col-span-2 xl:col-span-1" v-bind="activity" />
         </div>
       </div>
     </AsyncState>

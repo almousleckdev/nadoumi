@@ -42,7 +42,7 @@ class ApplicationSubmitPaymentGateTest {
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final StudentApplicationService service = new StudentApplicationService(
             applicationMapper, mock(WfDefinitionMapper.class), mock(ApplicationEventMapper.class), workflow,
-            mock(NadoumiAccessService.class), caller);
+            mock(NadoumiAccessService.class), caller, opportunities(), applicants());
 
     private Application draft() {
         Application a = new Application();
@@ -52,6 +52,22 @@ class ApplicationSubmitPaymentGateTest {
         when(applicationMapper.findById(ID)).thenReturn(a);
         when(caller.requireUserId()).thenReturn(1L);
         return a;
+    }
+
+    private static ApplicationOpportunityService opportunities() {
+        var opportunities = mock(ApplicationOpportunityService.class);
+        when(opportunities.describe(org.mockito.ArgumentMatchers.anyLong())).thenReturn(
+                new ApplicationOpportunityService.Description("NAD1", ApplicationOpportunityService.Kind.PROGRAM, "MBBS", "Fudan University", "Autumn"));
+        return opportunities;
+    }
+
+    private static com.nadoumi.applicant.service.ApplicantService applicants() {
+        var applicants = mock(com.nadoumi.applicant.service.ApplicantService.class);
+        var applicant = mock(com.nadoumi.applicant.web.response.ApplicantResponse.class);
+        when(applicant.givenName()).thenReturn("Amina");
+        when(applicant.familyName()).thenReturn("Diallo");
+        when(applicants.get(org.mockito.ArgumentMatchers.any())).thenReturn(applicant);
+        return applicants;
     }
 
     @Test
@@ -83,15 +99,15 @@ class ApplicationSubmitPaymentGateTest {
     }
 
     @Test
-    void shouldStillLetAStudentWithdrawAndRespondToAnOffer() {
+    void shouldLetAStudentRespondToAnOffer_butNeverWithdraw() {
         Application a = draft();
         when(workflow.execute(eq(ID), any(), eq(1L), eq(false), any(), eq(3))).thenReturn(a);
 
-        service.transition(ID, "withdraw", "Changed plans");
         service.transition(ID, "accept_offer", null);
         service.transition(ID, "decline_offer", null);
+        // the application fee is not refundable, so a student cannot withdraw
+        assertThatThrownBy(() -> service.transition(ID, "withdraw", "Changed plans")).isInstanceOf(NadForbiddenException.class);
 
-        verify(workflow).execute(eq(ID), eq("withdraw"), eq(1L), eq(false), eq("Changed plans"), eq(3));
         verify(workflow).execute(eq(ID), eq("accept_offer"), eq(1L), eq(false), any(), eq(3));
         verify(workflow).execute(eq(ID), eq("decline_offer"), eq(1L), eq(false), any(), eq(3));
     }

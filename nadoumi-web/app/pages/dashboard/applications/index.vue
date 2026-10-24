@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { StudentApplicationDto } from '~/types/catalog'
+import { isDraft, isSubmitted } from '~/utils/applicationView'
 import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
@@ -8,7 +9,7 @@ const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { list } = useApplications()
 
-const formatDate = (iso: string) => formatTimestamp(iso, locale.value)
+const formatDate = (iso: string | null) => (iso ? formatTimestamp(iso, locale.value) : '')
 
 const items = ref<StudentApplicationDto[]>([])
 const pending = ref(true)
@@ -29,13 +30,26 @@ async function load() {
 }
 await load()
 
-const typeLabel = (type: string | null) => (type ? t(`dashboard.applications.type.${type}`, t('dashboard.applications.type.UNKNOWN')) : t('dashboard.applications.type.UNKNOWN'))
+const submitted = computed<StudentApplicationDto[]>(() => items.value.filter((a: StudentApplicationDto) => isSubmitted(a.currentStatus)))
+const drafts = computed<StudentApplicationDto[]>(() => items.value.filter((a: StudentApplicationDto) => isDraft(a.currentStatus)))
+
+// the table is generic; inside AsyncState the slot's row type is not inferred, so name it once here
+const asApplication = (row: unknown) => row as StudentApplicationDto
+
+const columns = computed(() => [
+  { key: 'reference', label: t('dashboard.applications.colReference') },
+  { key: 'title', label: t('dashboard.applications.colOpportunity') },
+  { key: 'applicantName', label: t('dashboard.applications.colStudent') },
+  { key: 'currentStageName', label: t('dashboard.applications.colStage') },
+  { key: 'currentStatus', label: t('dashboard.applications.colStatus') },
+  { key: 'submittedAt', label: t('dashboard.applications.colSubmitted') },
+])
 
 useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
 </script>
 
 <template>
-  <div class="grid gap-6">
+  <div class="grid min-w-0 gap-6">
     <header>
       <h1 class="font-display text-xl font-bold text-slate-900">{{ t('dashboard.applications.title') }}</h1>
       <p class="mt-1 text-sm text-slate-500">{{ t('dashboard.applications.blurb') }}</p>
@@ -44,8 +58,8 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
     <AsyncState :pending="pending" :error="error" :empty="!items.length">
       <template #loading>
         <div class="grid gap-3" data-test="applications-loading">
-          <NSkeleton class="h-20 w-full rounded-xl" />
-          <NSkeleton class="h-20 w-full rounded-xl" />
+          <NSkeleton class="h-12 w-full rounded-lg" />
+          <NSkeleton class="h-12 w-full rounded-lg" />
         </div>
       </template>
       <template #error>
@@ -65,29 +79,46 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
         </SectionCard>
       </template>
 
-      <ul class="grid gap-3">
-        <li v-for="a in items" :key="a.id">
-          <NuxtLink
-            :to="a.currentStatus === 'DRAFT' ? localePath(`/apply/${a.id}`) : localePath(`/dashboard/applications/${a.id}`)"
-            class="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 no-underline transition-colors hover:border-brand-300"
-          >
-            <span class="min-w-0">
-              <span v-if="a.reference" class="block font-display font-semibold tabular-nums text-slate-900" data-test="application-reference">{{ a.reference }}</span>
-              <span class="block text-sm font-medium text-slate-700">{{ typeLabel(a.applicationType) }}</span>
-              <span class="mt-0.5 block text-sm text-slate-500">
-                <template v-if="a.currentStageName">{{ a.currentStageName }}</template>
-                <template v-if="a.submittedAt">
-                  <span v-if="a.currentStageName"> · </span>{{ t('dashboard.applications.submittedOn', { date: formatDate(a.submittedAt) }) }}
-                </template>
-              </span>
-            </span>
-            <span class="flex items-center gap-3">
-              <span v-if="a.currentStatus === 'DRAFT'" class="text-sm font-semibold text-slate-900">{{ t('dashboard.applications.continue') }}</span>
-              <ApplicationStatusBadge :status="a.currentStatus" />
-            </span>
-          </NuxtLink>
-        </li>
-      </ul>
+      <div class="grid min-w-0 gap-6">
+        <section v-if="drafts.length" class="grid gap-3" data-test="drafts">
+          <div>
+            <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.applications.draftsTitle') }}</h2>
+            <p class="text-sm text-slate-500">{{ t('dashboard.applications.draftsBlurb') }}</p>
+          </div>
+          <ul class="grid gap-2">
+            <li v-for="d in drafts" :key="d.id">
+              <NuxtLink
+                :to="localePath(`/apply/${d.id}`)"
+                class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm no-underline hover:bg-slate-50"
+              >
+                <span class="min-w-0">
+                  <span class="block truncate font-medium text-slate-900">{{ d.title }}</span>
+                  <span class="block truncate text-slate-500">{{ [d.universityName, d.applicantName].filter(Boolean).join(' · ') }}</span>
+                </span>
+                <span class="font-semibold text-slate-900">{{ t('dashboard.applications.continue') }}</span>
+              </NuxtLink>
+            </li>
+          </ul>
+        </section>
+
+        <p v-if="!submitted.length" class="text-sm text-slate-500" data-test="no-submitted">{{ t('dashboard.applications.noneSubmitted') }}</p>
+        <NTable v-else :columns="columns" :rows="submitted" row-key="id" data-test="applications-table">
+          <template #cell-reference="{ row }">
+            <NuxtLink
+              :to="localePath(`/dashboard/applications/${asApplication(row).id}`)"
+              class="font-display font-semibold tabular-nums text-slate-900 underline-offset-2 hover:underline"
+              data-test="application-reference"
+            >{{ asApplication(row).reference }}</NuxtLink>
+          </template>
+          <template #cell-title="{ row }">
+            <span class="block font-medium text-slate-900">{{ asApplication(row).title }}</span>
+            <span v-if="asApplication(row).universityName" class="block text-slate-500">{{ asApplication(row).universityName }}</span>
+          </template>
+          <template #cell-currentStatus="{ row }"><ApplicationStatusBadge :status="asApplication(row).currentStatus" /></template>
+          <template #cell-submittedAt="{ row }">{{ formatDate(asApplication(row).submittedAt) }}</template>
+        </NTable>
+        <p v-if="submitted.length" class="text-xs text-slate-500">{{ t('dashboard.applications.feeNote') }}</p>
+      </div>
     </AsyncState>
   </div>
 </template>
