@@ -65,14 +65,17 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
         <NAlert v-if="applicationsError" tone="danger">{{ t('errors.loadSection') }}</NAlert>
         <OverviewStatsRow v-else :stats="stats" :documents-ready="documents.ready" :documents-total="DOCUMENTS_TOTAL" />
 
-        <div class="grid min-w-0 gap-6 lg:grid-cols-3">
+        <div class="grid min-w-0 gap-6 lg:grid-cols-3 lg:items-start">
           <OverviewFocusCard class="min-w-0 lg:col-span-2" v-bind="focus" />
           <OverviewStageChartCard class="min-w-0" :distribution="distribution" :pending="applicationsPending" />
         </div>
 
-        <div class="grid min-w-0 gap-6 lg:grid-cols-3">
-          <OverviewRecommendedCard class="min-w-0 lg:col-span-2" v-bind="recommended" />
-          <div class="grid min-w-0 content-start gap-6">
+        <div class="grid min-w-0 gap-6 lg:grid-cols-3 lg:items-start">
+          <div class="grid min-w-0 gap-6 lg:col-span-2">
+            <OverviewRecommendedCard class="min-w-0" v-bind="recommended" />
+            <OverviewActivityCard class="min-w-0" v-bind="activity" />
+          </div>
+          <div class="grid min-w-0 gap-6">
             <OverviewChecklistCard
               :completeness="completeness"
               :pending="documents.pending"
@@ -82,8 +85,6 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
             <OverviewDeadlinesCard v-bind="deadlines" />
           </div>
         </div>
-
-        <OverviewActivityCard class="min-w-0" v-bind="activity" />
       </div>
     </AsyncState>
   </div>

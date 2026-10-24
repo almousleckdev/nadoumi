@@ -12,9 +12,9 @@ const localePath = useLocalePath()
     <template #actions>
       <NTextLink :to="localePath('/dashboard/documents')">{{ t('dashboard.home.manageDocuments') }}</NTextLink>
     </template>
-    <div class="flex flex-wrap items-center gap-5">
+    <div class="grid justify-items-center gap-5">
       <ProgressRing :percent="completeness" :label="t('dashboard.completeness')" />
-      <ul class="grid min-w-0 flex-1 gap-3 text-sm">
+      <ul class="grid w-full min-w-0 gap-3 text-sm">
         <li class="flex items-center justify-between gap-3">
           <NuxtLink :to="localePath('/dashboard/profile')" class="text-slate-700 hover:underline">{{ t('dashboard.completeness') }}</NuxtLink>
           <span class="font-semibold tabular-nums text-slate-900">{{ completeness }}%</span>

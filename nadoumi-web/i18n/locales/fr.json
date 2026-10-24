@@ -474,13 +474,10 @@
     },
     "home": {
       "subtitle": "Voici un aperçu de votre parcours de candidature aux bourses.",
-      "applications": "Candidatures",
-      "applicationsEmpty": "Vous n'avez pas encore commencé de candidature.",
       "browseScholarships": "Parcourir les bourses",
       "recommended": "Bourses recommandées",
       "recommendedEmpty": "Pas encore de recommandations. Revenez bientôt.",
       "viewAll": "Tout voir",
-      "documents": "Documents",
       "manageDocuments": "Gérer les documents",
       "docPhoto": "Photo de profil",
       "docPassport": "Passeport",
@@ -723,7 +720,6 @@
       "empty": "Vous n'avez pas encore commencé de candidature.",
       "browse": "Parcourir les bourses",
       "submittedOn": "Soumise le {date}",
-      "currentStage": "Étape actuelle : {stage}",
       "backToList": "Retour à mes candidatures",
       "notFound": "Nous n'avons pas trouvé cette candidature.",
       "timeline": "Progression",
@@ -781,7 +777,8 @@
         "default": "Nadoumi traite votre candidature."
       },
       "colProgress": "Avancement",
-      "stepOf": "Étape {n} sur {total}"
+      "stepOf": "Étape {n} sur {total}",
+      "statUnfinished": "Non terminées"
     }
   },
   "validation": {
@@ -2663,23 +2660,14 @@
   },
   "apply": {
     "title": "Postuler",
-    "blurb": "Commencez votre candidature.",
-    "back": "Retour",
     "noTarget": "Choisissez un programme ou une bourse pour postuler.",
     "notFound": "Nous n’avons pas trouvé ce pour quoi vous souhaitez postuler. Il n’est peut-être plus ouvert.",
-    "profileUnfinished": "{name} n'a pas terminé son profil. Vous pouvez commencer la candidature, mais elle ne pourra être soumise qu'une fois son profil complet.",
-    "finishProfile": "Terminer le profil de {name}",
-    "studentTitle": "Qui postule",
     "studentLegend": "Étudiant",
     "unnamedStudent": "Étudiant",
-    "noStudents": "Complétez votre profil étudiant avant de postuler.",
     "intakeTitle": "Rentrée",
     "intakeLabel": "Choisissez une rentrée",
     "intakePlaceholder": "Sélectionnez une rentrée",
     "noIntake": "Ce programme n’a aucune rentrée ouverte aux candidatures pour le moment.",
-    "nextTitle": "Et ensuite",
-    "nextBody": "Nous enregistrons aussitôt un brouillon de candidature. Vous réglez ensuite les frais de dossier Nadoumi, quand vous le souhaitez, puis vous soumettez votre candidature. Votre brouillon reste enregistré jusqu’à la soumission.",
-    "start": "Commencer la candidature",
     "continueDraft": "Reprendre votre brouillon",
     "draftExists": "Vous avez déjà un brouillon de candidature pour ceci."
   },
@@ -2754,7 +2742,6 @@
     "uploadAgain": "Téléverser à nouveau",
     "uploaded": "Document téléversé",
     "badType": "Téléversez un fichier PDF, JPEG ou PNG dans la limite de taille.",
-    "uploadToSubmit": "Téléversez les documents obligatoires pour soumettre votre candidature.",
     "status": {
       "MISSING": "Non téléversé"
     },
@@ -2773,7 +2760,6 @@
     "saved": "Signature enregistrée",
     "onFile": "Votre signature est enregistrée et sera imprimée sur le formulaire de candidature.",
     "badType": "Téléversez une image PNG ou JPEG dans la limite de taille.",
-    "signToSubmit": "Ajoutez votre signature pour soumettre votre candidature.",
     "errors": {
       "required": "Ajoutez votre signature avant de soumettre."
     }

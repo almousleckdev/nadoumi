@@ -53,7 +53,12 @@ export function useApplicant() {
   const p = <T>(path: string, opts?: Parameters<typeof studentFetch>[1]) => studentFetch<T>(path, opts)
 
   return {
-    listMine: () => p<ApplicantDto[]>('applicants', undefined),
+    // a lapsed session answers 200 with an error body rather than a list; treat it as a failed load
+    listMine: async () => {
+      const mine = await p<ApplicantDto[]>('applicants', undefined)
+      if (!Array.isArray(mine)) throw new Error('applicants did not load')
+      return mine
+    },
     create: (b: SelfApplicantBody) => p<ApplicantDto>('applicants', { method: 'POST', body: clean(b) }),
     /** A new applicant for another person, whom the caller then completes and applies for as their agent. */
     createForOther: (b: SelfApplicantBody) => p<ApplicantDto>('applicants/other', { method: 'POST', body: clean(b) }),

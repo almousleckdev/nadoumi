@@ -474,13 +474,10 @@
     },
     "home": {
       "subtitle": "Aquí tienes un resumen de tu proceso de solicitud de becas.",
-      "applications": "Solicitudes",
-      "applicationsEmpty": "Todavía no has iniciado ninguna solicitud.",
       "browseScholarships": "Explorar becas",
       "recommended": "Becas recomendadas",
       "recommendedEmpty": "Todavía no hay recomendaciones. Vuelve pronto.",
       "viewAll": "Ver todo",
-      "documents": "Documentos",
       "manageDocuments": "Gestionar documentos",
       "docPhoto": "Foto de perfil",
       "docPassport": "Pasaporte",
@@ -723,7 +720,6 @@
       "empty": "Aún no has iniciado ninguna solicitud.",
       "browse": "Explorar becas",
       "submittedOn": "Enviada el {date}",
-      "currentStage": "Etapa actual: {stage}",
       "backToList": "Volver a mis solicitudes",
       "notFound": "No pudimos encontrar esta solicitud.",
       "timeline": "Progreso",
@@ -781,7 +777,8 @@
         "default": "Nadoumi está trabajando en su solicitud."
       },
       "colProgress": "Progreso",
-      "stepOf": "Paso {n} de {total}"
+      "stepOf": "Paso {n} de {total}",
+      "statUnfinished": "Sin terminar"
     }
   },
   "validation": {
@@ -2663,23 +2660,14 @@
   },
   "apply": {
     "title": "Solicitar",
-    "blurb": "Empieza tu solicitud.",
-    "back": "Volver",
     "noTarget": "Elige un programa o una beca para solicitar.",
     "notFound": "No encontramos lo que quieres solicitar. Puede que ya no esté abierto.",
-    "profileUnfinished": "{name} no ha terminado su perfil. Puedes iniciar la solicitud, pero solo se podrá enviar cuando su perfil esté completo.",
-    "finishProfile": "Terminar el perfil de {name}",
-    "studentTitle": "Quién solicita",
     "studentLegend": "Estudiante",
     "unnamedStudent": "Estudiante",
-    "noStudents": "Completa tu perfil de estudiante antes de solicitar.",
     "intakeTitle": "Convocatoria",
     "intakeLabel": "Elige una convocatoria",
     "intakePlaceholder": "Selecciona una convocatoria",
     "noIntake": "Este programa no tiene ninguna convocatoria abierta ahora mismo.",
-    "nextTitle": "Qué sigue",
-    "nextBody": "Guardamos enseguida un borrador de solicitud. Después pagas la tasa de solicitud de Nadoumi cuando quieras y envías tu solicitud. El borrador queda guardado hasta que la envíes.",
-    "start": "Empezar solicitud",
     "continueDraft": "Continuar tu borrador",
     "draftExists": "Ya tienes un borrador de solicitud para esto."
   },
@@ -2754,7 +2742,6 @@
     "uploadAgain": "Subir de nuevo",
     "uploaded": "Documento subido",
     "badType": "Sube un archivo PDF, JPEG o PNG dentro del límite de tamaño.",
-    "uploadToSubmit": "Sube los documentos obligatorios para enviar tu solicitud.",
     "status": {
       "MISSING": "Sin subir"
     },
@@ -2773,7 +2760,6 @@
     "saved": "Firma guardada",
     "onFile": "Tu firma está guardada y se imprimirá en el formulario de solicitud.",
     "badType": "Sube una imagen PNG o JPEG dentro del límite de tamaño.",
-    "signToSubmit": "Añade tu firma para enviar tu solicitud.",
     "errors": {
       "required": "Añade tu firma antes de enviar."
     }

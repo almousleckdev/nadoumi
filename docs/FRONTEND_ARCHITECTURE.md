@@ -26,6 +26,13 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 > Charts are inline SVG in neutral slate shades (CLAUDE.md §24); the headline numbers come from `applicationStats` and
 > `stageDistribution` in `utils/applicationView.ts`. The old `ApplicationsCard` and `DocumentsCard` are removed.
 
+> **2026-10-25 (dashboard layout fixes, checked in a browser):** `DonutChart` and the readiness ring now stack their legend or rows
+> under the graphic so they fit a one-third card without clipping; the Overview columns use `items-start` so a short card no
+> longer stretches to its neighbour (Recommended and Recent activity share the wide column, Readiness and Deadlines the narrow
+> one). `listMine` rejects a non-list answer, so a lapsed session no longer crashes the onboarding page. Dead `apply.*`,
+> `checklist.uploadToSubmit`, `signature.signToSubmit` and old `dashboard.home` keys were removed from all five locales. Not
+> verified: phone widths (the browser window could not go below 1280px); the layouts rely on single-column rules under 480px.
+
 ## 1. State of the frontend in this repo (EXISTING)
 
 - The `ruoyi-ui/` directory was **deleted from the repo** at commit `ec987ab9`

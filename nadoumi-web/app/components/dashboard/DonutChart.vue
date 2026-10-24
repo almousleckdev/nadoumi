@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** A donut of neutral slate shades; the centre slot carries the total. Segments are drawn as stroke arcs on one circle. */
+/** A donut of neutral slate shades with its legend underneath, so it fits any card width; the centre slot carries the total. Segments are drawn as stroke arcs on one circle. */
 export interface DonutSegment { key: string, label: string, value: number }
 
 const props = defineProps<{ segments: DonutSegment[] }>()
@@ -30,7 +30,7 @@ const arcs = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-wrap items-center gap-6">
+  <div class="grid justify-items-center gap-5">
     <div class="relative h-36 w-36 shrink-0">
       <svg viewBox="0 0 100 100" class="h-full w-full -rotate-90" role="img" :aria-label="segments.map(s => `${s.label}: ${s.value}`).join(', ')">
         <circle cx="50" cy="50" :r="RADIUS" fill="none" class="stroke-slate-100" stroke-width="12" />
@@ -42,7 +42,7 @@ const arcs = computed(() => {
       </svg>
       <div class="absolute inset-0 grid place-items-center text-center"><slot /></div>
     </div>
-    <ul class="grid min-w-0 flex-1 gap-2 text-sm">
+    <ul class="grid w-full min-w-0 gap-2 text-sm">
       <li v-for="a in arcs" :key="a.key" class="flex items-center gap-2">
         <span class="h-2.5 w-2.5 shrink-0 rounded-full" :class="a.swatch" aria-hidden="true" />
         <span class="min-w-0 flex-1 truncate text-slate-600">{{ a.label }}</span>

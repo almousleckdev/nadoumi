@@ -474,13 +474,10 @@
     },
     "home": {
       "subtitle": "这是您的奖学金申请之旅概览。",
-      "applications": "申请",
-      "applicationsEmpty": "您还没有开始任何申请。",
       "browseScholarships": "浏览奖学金",
       "recommended": "推荐奖学金",
       "recommendedEmpty": "暂无推荐内容，请稍后再来查看。",
       "viewAll": "查看全部",
-      "documents": "文件",
       "manageDocuments": "管理文件",
       "docPhoto": "证件照",
       "docPassport": "护照",
@@ -723,7 +720,6 @@
       "empty": "您还没有开始任何申请。",
       "browse": "浏览奖学金",
       "submittedOn": "提交于 {date}",
-      "currentStage": "当前阶段：{stage}",
       "backToList": "返回我的申请",
       "notFound": "找不到该申请。",
       "timeline": "进度",
@@ -781,7 +777,8 @@
         "default": "Nadoumi正在处理您的申请。"
       },
       "colProgress": "进度",
-      "stepOf": "第 {n} 步，共 {total} 步"
+      "stepOf": "第 {n} 步，共 {total} 步",
+      "statUnfinished": "未完成"
     }
   },
   "validation": {
@@ -2663,23 +2660,14 @@
   },
   "apply": {
     "title": "申请",
-    "blurb": "开始你的申请。",
-    "back": "返回",
     "noTarget": "请选择要申请的项目或奖学金。",
     "notFound": "找不到你要申请的内容，可能已不再开放。",
-    "profileUnfinished": "{name} 尚未完成个人资料。您可以先开始申请，但需在其资料完整后才能提交。",
-    "finishProfile": "完成 {name} 的资料",
-    "studentTitle": "申请人",
     "studentLegend": "学生",
     "unnamedStudent": "学生",
-    "noStudents": "申请前请先完善学生资料。",
     "intakeTitle": "入学批次",
     "intakeLabel": "选择入学批次",
     "intakePlaceholder": "请选择入学批次",
     "noIntake": "该项目目前没有开放申请的入学批次。",
-    "nextTitle": "接下来",
-    "nextBody": "我们会立即保存一份申请草稿。接着你可以随时支付 Nadoumi 申请费，然后提交申请。提交之前，草稿会一直保存。",
-    "start": "开始申请",
     "continueDraft": "继续你的草稿",
     "draftExists": "你已经有一份针对此项目的申请草稿。"
   },
@@ -2754,7 +2742,6 @@
     "uploadAgain": "重新上传",
     "uploaded": "材料已上传",
     "badType": "请上传不超过大小限制的 PDF、JPEG 或 PNG 文件。",
-    "uploadToSubmit": "请先上传必需的材料，再提交申请。",
     "status": {
       "MISSING": "未上传"
     },
@@ -2773,7 +2760,6 @@
     "saved": "签名已保存",
     "onFile": "你的签名已保存，将打印在申请表上。",
     "badType": "请上传不超过大小限制的 PNG 或 JPEG 图片。",
-    "signToSubmit": "请先添加签名，再提交申请。",
     "errors": {
       "required": "提交前请添加你的签名。"
     }

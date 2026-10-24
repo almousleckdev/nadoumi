@@ -68,9 +68,9 @@ public class ChatDirectoryService {
         }).toList();
     }
 
-    /** "42", "STU-42", "APP-42" and "#42" all mean the number 42; whether it is a student or an application id is decided by what matches. */
+    /** "42", "STU-42" and "#42" all mean the student number 42; an application is found by its reference (NAD2026001), matched as text. */
     private static Long parseReference(String query) {
-        String digits = query.replaceFirst("(?i)^(stu|app|student|application)?[\\s#:-]*", "");
+        String digits = query.replaceFirst("(?i)^(stu|student)?[\\s#:-]*", "");
         if (digits.isEmpty() || digits.length() > 18 || !digits.chars().allMatch(Character::isDigit)) {
             return null;
         }
