@@ -1,5 +1,6 @@
 package com.nadoumi.payment.service;
 
+import com.nadoumi.applicant.service.ApplicantDossierService;
 import com.nadoumi.application.service.ApplicationOpportunityService;
 import com.nadoumi.payment.domain.ApplicationPayment;
 import com.nadoumi.payment.domain.PaymentDocument;
@@ -25,12 +26,12 @@ public class VerifiedDocumentDetails {
 
     private final PaymentMapper payments;
     private final ApplicationOpportunityService opportunities;
-    private final ApplicantNames names;
+    private final ApplicantDossierService dossiers;
 
-    public VerifiedDocumentDetails(PaymentMapper payments, ApplicationOpportunityService opportunities, ApplicantNames names) {
+    public VerifiedDocumentDetails(PaymentMapper payments, ApplicationOpportunityService opportunities, ApplicantDossierService dossiers) {
         this.payments = payments;
         this.opportunities = opportunities;
-        this.names = names;
+        this.dossiers = dossiers;
     }
 
     @Transactional(readOnly = true)
@@ -41,9 +42,17 @@ public class VerifiedDocumentDetails {
         }
         var opportunity = opportunities.describe(document.getApplicationId());
         LocalDateTime paidAt = payment.getVerifiedAt() != null ? payment.getVerifiedAt() : payment.getSubmittedAt();
-        return Optional.of(new Details(names.of(payment.getApplicantId()), opportunity.reference(), opportunity.title(),
+        return Optional.of(new Details(fullName(payment), opportunity.reference(), opportunity.title(),
                 opportunity.universityName(), opportunity.intake(), payment.getAmount(), payment.getCurrency(),
                 payment.getStatus().name(), instant(paidAt), instant(document.getGeneratedAt())));
+    }
+
+    /** The caller is anonymous, so this reads the applicant through the dossier, not the access-checked applicant service. */
+    private String fullName(ApplicationPayment payment) {
+        var profile = dossiers.read(payment.getApplicantId()).profile();
+        String full = ((profile.givenName() == null ? "" : profile.givenName()) + " "
+                + (profile.familyName() == null ? "" : profile.familyName())).strip();
+        return full.isEmpty() ? payment.getApplicantName() : full;
     }
 
     private static String instant(LocalDateTime utc) {

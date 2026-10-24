@@ -967,7 +967,12 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
                 .andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(true))
                 .andExpect(jsonPath("$.kind").value("RECEIPT")).andExpect(jsonPath("$.number").value(number))
                 .andExpect(jsonPath("$.issuedOn").isNotEmpty())
-                .andExpect(jsonPath("$.studentName").doesNotExist()).andExpect(jsonPath("$.amount").doesNotExist());
+                .andExpect(jsonPath("$.details.applicantName").exists())
+                .andExpect(jsonPath("$.details.applicationReference").isNotEmpty())
+                .andExpect(jsonPath("$.details.feeStatus").value("CONFIRMED"))
+                .andExpect(jsonPath("$.details.feeAmount").isNotEmpty())
+                // contact and passport details never leave through the public page
+                .andExpect(jsonPath("$.details.email").doesNotExist()).andExpect(jsonPath("$.details.passportNo").doesNotExist());
         mvc.perform(get("/api/public/documents/verify").param("number", number).param("code", "AAAAAAAAAAAA"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(false)).andExpect(jsonPath("$.kind").doesNotExist());
         mvc.perform(get("/api/public/documents/verify").param("number", "NAD-RCT-2099-999999").param("code", code))
