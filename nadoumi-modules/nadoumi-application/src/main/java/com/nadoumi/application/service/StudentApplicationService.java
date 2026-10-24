@@ -33,16 +33,21 @@ public class StudentApplicationService {
     private final WorkflowService workflow;
     private final NadoumiAccessService access;
     private final CurrentCaller caller;
+    private final ApplicationOpportunityService opportunities;
+    private final com.nadoumi.applicant.service.ApplicantService applicants;
 
     public StudentApplicationService(ApplicationMapper applicationMapper, WfDefinitionMapper definitionMapper,
             ApplicationEventMapper eventMapper, WorkflowService workflow, NadoumiAccessService access,
-            CurrentCaller caller) {
+            CurrentCaller caller, ApplicationOpportunityService opportunities,
+            com.nadoumi.applicant.service.ApplicantService applicants) {
         this.applicationMapper = applicationMapper;
         this.definitionMapper = definitionMapper;
         this.eventMapper = eventMapper;
         this.workflow = workflow;
         this.access = access;
         this.caller = caller;
+        this.opportunities = opportunities;
+        this.applicants = applicants;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -95,16 +100,16 @@ public class StudentApplicationService {
         return toResponse(updated);
     }
 
-    /** The only transitions a student may run directly; everything else belongs to staff or to {@link #submit}. */
-    static final java.util.Set<String> STUDENT_TRANSITIONS = java.util.Set.of("accept_offer", "decline_offer", "withdraw");
+    /**
+     * The only transitions a student may run directly; everything else belongs to staff or to {@link #submit}.
+     * There is no withdrawal: the application fee is not refundable, so a submitted application stays with Nadoumi.
+     */
+    static final java.util.Set<String> STUDENT_TRANSITIONS = java.util.Set.of("accept_offer", "decline_offer");
 
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse transition(Long id, String code, String reason) {
         if (!STUDENT_TRANSITIONS.contains(code)) {
             throw new NadForbiddenException("this action is not available to students");
-        }
-        if ("withdraw".equals(code) && (reason == null || reason.isBlank())) {
-            throw new NadBadRequestException("a reason is required to withdraw");
         }
         Application current = load(id);
         Application updated = workflow.execute(id, code, caller.requireUserId(), false, reason, current.getVersion());
@@ -125,6 +130,11 @@ public class StudentApplicationService {
         List<String> timeline = eventMapper.findByApplication(application.getId()).stream()
                 .map(ApplicationEvent::getEventType)
                 .toList();
-        return StudentApplicationResponse.of(application, stage, timeline);
+        // ApplicationOpportunityService leaves the university out of anything that involves a scholarship
+        var opportunity = opportunities.describe(application.getId());
+        var applicant = applicants.get(application.getApplicantId());
+        return StudentApplicationResponse.of(application, stage, timeline, opportunity.title(),
+                opportunity.universityName(), opportunity.intake(),
+                (applicant.givenName() + " " + applicant.familyName()).strip());
     }
 }

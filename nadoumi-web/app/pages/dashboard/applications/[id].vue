@@ -5,11 +5,12 @@ import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
-const { get, withdraw } = useApplications()
-const { busy, notice, error: actionError, run } = useAsyncAction()
+const { get, formPreview } = useApplications()
+const { busy, error: actionError, run } = useAsyncAction()
+const { file: previewFile, open: previewOpen, showBlob } = useDocumentPreview()
 
 const id = Number(route.params.id)
 const formatDate = (iso: string) => formatTimestamp(iso, locale.value)
@@ -40,28 +41,38 @@ await load()
 if (application.value?.currentStatus === 'DRAFT') await navigateTo(localePath(`/apply/${id}`), { replace: true })
 
 const timeline = computed(() => safeTimeline(application.value?.timeline ?? []))
-const canWithdraw = computed(() => !isClosed(application.value?.currentStatus ?? null))
+const closed = computed(() => isClosed(application.value?.currentStatus ?? null))
+const statusNote = computed(() => {
+  const key = `dashboard.applications.statusNote.${application.value?.currentStatus ?? ''}`
+  return te(key) ? t(key) : t('dashboard.applications.statusNote.default')
+})
 
-const withdrawing = ref(false)
-const reason = ref('')
-const reasonMissing = ref(false)
-async function onWithdraw() {
-  reasonMissing.value = !reason.value.trim()
-  if (reasonMissing.value) return
-  const updated = await run(() => withdraw(id, reason.value.trim()), t('dashboard.applications.withdrawnNotice'))
-  if (updated) {
-    application.value = updated
-    withdrawing.value = false
-    reason.value = ''
-  }
+const facts = computed(() => {
+  const a = application.value
+  if (!a) return []
+  return [
+    { label: t('dashboard.applications.colStudent'), value: a.applicantName },
+    { label: t('dashboard.applications.colOpportunity'), value: a.title },
+    { label: t('dashboard.applications.university'), value: a.universityName },
+    { label: t('dashboard.applications.intake'), value: a.intake && te(`program.intake.${a.intake}`) ? t(`program.intake.${a.intake}`) : a.intake },
+    { label: t('dashboard.applications.colStage'), value: a.currentStageName },
+    { label: t('dashboard.applications.colSubmitted'), value: a.submittedAt ? formatDate(a.submittedAt) : null },
+  ].filter(f => f.value)
+})
+
+async function viewForm() {
+  await run(async () => {
+    showBlob(t('dashboard.applications.formTitle'), await formPreview(id))
+    return true
+  })
 }
 
 useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'))
 </script>
 
 <template>
-  <div class="grid gap-6">
-    <NuxtLink :to="localePath('/dashboard/applications')" class="text-sm font-medium text-brand-700 no-underline hover:underline">
+  <div class="grid min-w-0 gap-6">
+    <NuxtLink :to="localePath('/dashboard/applications')" class="text-sm font-medium text-slate-700 no-underline hover:underline">
       {{ t('dashboard.applications.backToList') }}
     </NuxtLink>
 
@@ -82,59 +93,55 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
         <NAlert tone="warning">{{ t('dashboard.applications.notFound') }}</NAlert>
       </template>
 
-      <div v-if="application" class="grid gap-6">
+      <div v-if="application" class="grid min-w-0 gap-6">
         <div class="rounded-xl border border-slate-200 bg-white p-5">
           <div class="flex flex-wrap items-start justify-between gap-3">
-            <div>
+            <div class="min-w-0">
               <h1 class="font-display text-xl font-bold tabular-nums text-slate-900" data-test="application-reference">
                 {{ application.reference ?? '' }}
               </h1>
-              <p class="mt-0.5 text-sm font-medium text-slate-700">
-                {{ t(`dashboard.applications.type.${application.applicationType ?? 'UNKNOWN'}`, t('dashboard.applications.type.UNKNOWN')) }}
-              </p>
-              <p v-if="application.currentStageName" class="mt-1 text-sm text-slate-500">
-                {{ t('dashboard.applications.currentStage', { stage: application.currentStageName }) }}
-              </p>
-              <p v-if="application.submittedAt" class="mt-0.5 text-sm text-slate-500">
-                {{ t('dashboard.applications.submittedOn', { date: formatDate(application.submittedAt) }) }}
-              </p>
+              <p class="mt-1 text-sm font-medium text-slate-700">{{ application.title }}</p>
+              <p v-if="application.universityName" class="text-sm text-slate-500">{{ application.universityName }}</p>
             </div>
             <ApplicationStatusBadge :status="application.currentStatus" />
           </div>
+          <p class="mt-4 text-sm text-slate-600" data-test="status-note">{{ statusNote }}</p>
         </div>
 
-        <NAlert v-if="notice" tone="success">{{ notice }}</NAlert>
         <NAlert v-if="actionError" tone="danger">{{ actionError }}</NAlert>
+
+        <SectionCard :title="t('dashboard.applications.detailsTitle')">
+          <dl class="grid gap-x-8 gap-y-3 sm:grid-cols-2" data-test="facts">
+            <div v-for="f in facts" :key="f.label" class="min-w-0">
+              <dt class="text-xs font-medium uppercase tracking-wide text-slate-500">{{ f.label }}</dt>
+              <dd class="mt-0.5 break-words text-sm text-slate-900">{{ f.value }}</dd>
+            </div>
+          </dl>
+          <div class="mt-4">
+            <NButton variant="secondary" size="sm" :loading="busy" data-test="view-form" @click="viewForm">
+              {{ t('dashboard.applications.viewForm') }}
+            </NButton>
+          </div>
+        </SectionCard>
+
+        <SectionCard :title="t('dashboard.applications.paymentTitle')">
+          <PaymentPanel :application-id="id" />
+          <p class="mt-3 text-xs text-slate-500">{{ t('dashboard.applications.feeNote') }}</p>
+        </SectionCard>
+
+        <DocumentChecklistCard v-if="!closed" :application-id="id" :applicant-id="application.applicantId" />
 
         <SectionCard :title="t('dashboard.applications.timeline')">
           <p v-if="!timeline.length" class="text-sm text-slate-500">{{ t('dashboard.applications.timelineEmpty') }}</p>
           <ol v-else class="grid gap-3" data-test="timeline">
             <li v-for="(key, i) in timeline" :key="i" class="flex items-start gap-3 text-sm text-slate-700">
-              <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-brand-500" aria-hidden="true" />
+              <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-slate-400" aria-hidden="true" />
               {{ t(`dashboard.applications.event.${key}`) }}
             </li>
           </ol>
         </SectionCard>
-
-        <SectionCard v-if="canWithdraw" :title="t('dashboard.applications.actions')">
-          <div class="grid gap-4">
-            <div>
-              <NButton v-if="!withdrawing" variant="secondary" data-test="withdraw-start" @click="withdrawing = true">
-                {{ t('dashboard.applications.withdraw') }}
-              </NButton>
-              <div v-else class="grid gap-2" data-test="withdraw-form">
-                <label for="withdraw-reason" class="text-sm font-medium text-slate-700">{{ t('dashboard.applications.withdrawReason') }}</label>
-                <NTextarea id="withdraw-reason" v-model="reason" :rows="3" :invalid="reasonMissing" :maxlength="500" />
-                <p v-if="reasonMissing" class="text-sm text-red-600">{{ t('validation.required') }}</p>
-                <div class="flex gap-2">
-                  <NButton :loading="busy" data-test="withdraw-confirm" @click="onWithdraw">{{ t('dashboard.applications.withdrawConfirm') }}</NButton>
-                  <NButton variant="ghost" :disabled="busy" @click="withdrawing = false">{{ t('common.cancel') }}</NButton>
-                </div>
-              </div>
-            </div>
-          </div>
-        </SectionCard>
       </div>
     </AsyncState>
+    <DocumentViewer v-model="previewOpen" :file="previewFile" />
   </div>
 </template>

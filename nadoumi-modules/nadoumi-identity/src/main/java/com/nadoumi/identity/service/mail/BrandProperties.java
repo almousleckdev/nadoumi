@@ -41,7 +41,7 @@ public record BrandProperties(
         assetBaseUrl = assetBaseUrl == null || assetBaseUrl.isBlank() ? baseUrl : stripTrailingSlash(assetBaseUrl.trim());
         logoPath = blankTo(logoPath, "/email/nadoumi-logo.png");
         wordmark = blankTo(wordmark, "Nadoumi");
-        preferencesPath = blankTo(preferencesPath, "/account/notifications");
+        preferencesPath = blankTo(preferencesPath, "/dashboard/notifications");
         contact = contact == null ? new Contact(List.of(), List.of(), null, null) : contact;
         social = social == null ? new Social(null, null, null, null) : social;
     }

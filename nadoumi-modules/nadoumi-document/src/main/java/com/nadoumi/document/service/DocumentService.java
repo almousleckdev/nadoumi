@@ -189,11 +189,20 @@ public class DocumentService {
     }
 
     public DocumentContent staffContent(long documentId, long versionNo, MediaAccessLogContext ctx) {
+        return staffContent(documentId, versionNo, ctx, false);
+    }
+
+    /** {@code inline} asks for a link the browser renders (the staff viewer); otherwise the file is delivered as a download. */
+    public DocumentContent staffContent(long documentId, long versionNo, MediaAccessLogContext ctx, boolean inline) {
         get(documentId);
-        return content(documentId, versionNo, ctx);
+        return content(documentId, versionNo, ctx, inline);
     }
 
     private DocumentContent content(long documentId, long versionNo, MediaAccessLogContext ctx) {
+        return content(documentId, versionNo, ctx, false);
+    }
+
+    private DocumentContent content(long documentId, long versionNo, MediaAccessLogContext ctx, boolean inline) {
         DocumentVersion version = versionsOf(documentId).stream()
                 .filter(v -> v.getVersionNo() == versionNo)
                 .findFirst()
@@ -208,7 +217,8 @@ public class DocumentService {
         if (asset.accessClass() == MediaAccessClass.SENSITIVE) {
             return new DocumentContent.Proxy(media.openProxyStream(version.getMediaAssetId(), ctx));
         }
-        return new DocumentContent.Redirect(media.issueSignedUrl(version.getMediaAssetId(), ctx));
+        return new DocumentContent.Redirect(inline ? media.issueInlineSignedUrl(version.getMediaAssetId(), ctx)
+                : media.issueSignedUrl(version.getMediaAssetId(), ctx));
     }
 
     // ---- helpers ----

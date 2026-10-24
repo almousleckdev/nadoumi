@@ -17,6 +17,12 @@ public interface ApplicationMapper {
     List<Application> findByApplicant(@Param("applicantId") Long applicantId);
 
     /** Just the owning applicant id — backs {@code ApplicationApplicantResolverImpl}. */
+    /** Active Nadoumi staff (every account that is not a student), for the assignment picker. */
+    List<StaffUserRow> findAssignableStaff();
+
+    /** Display names of any accounts (staff and students) behind the audit trail's user ids. */
+    List<StaffUserRow> findUserNames(@Param("ids") java.util.Collection<Long> ids);
+
     Long findApplicantId(@Param("id") Long id);
 
     int insert(Application application);

@@ -230,6 +230,56 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
+    void shouldLetStaffAssignChangeStatusAndDownloadTheForm_andNeverLetAStudentWithdraw() throws Exception {
+        Student s = register("pay", "manage");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        reportPayment(s, app, "BANKMANAGE1").andExpect(status().isOk());
+        submitApplication(s, app).andExpect(status().isOk());
+
+        // the fee is not refundable: a student cannot withdraw a submitted application
+        mvc.perform(post("/api/student/applications/" + app + "/transitions/withdraw").header("Authorization", bearer(s.token()))
+                        .contentType("application/json").content("{\"reason\":\"changed my mind\"}"))
+                .andExpect(status().isForbidden());
+
+        // staff see who applied and what for, with names instead of ids
+        mvc.perform(get("/api/staff/applications/" + app).header("Authorization", staffAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.applicant.name").exists())
+                .andExpect(jsonPath("$.opportunity.title").isNotEmpty())
+                .andExpect(jsonPath("$.history[0].toStageName").value("Submitted"));
+
+        // assignment: pick from the staff list, never an arbitrary id
+        long staffId = jdbc.queryForObject("select user_id from sys_user where user_name = 'pay_ops'", Long.class);
+        mvc.perform(get("/api/staff/applications/assignees").header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[?(@.userId == " + staffId + ")]").isNotEmpty());
+        long studentUserId = jdbc.queryForObject("select user_id from nad_user_applicant_access where applicant_id = ? limit 1", Long.class, s.applicantId());
+        mvc.perform(post("/api/staff/applications/" + app + "/assign").header("Authorization", staffAuth)
+                        .contentType("application/json").content("{\"assigneeUserId\":" + studentUserId + "}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(post("/api/staff/applications/" + app + "/assign").header("Authorization", staffAuth)
+                        .contentType("application/json").content("{\"assigneeUserId\":" + staffId + "}"))
+                .andExpect(status().isOk());
+        mvc.perform(get("/api/staff/applications/" + app).header("Authorization", staffAuth))
+                .andExpect(jsonPath("$.assigneeName").isNotEmpty());
+
+        // changing the status: the available steps, then one step, which e-mails the student
+        mvc.perform(get("/api/staff/applications/" + app + "/next-steps").header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].label").isNotEmpty());
+        int version = jdbc.queryForObject("select version from nad_application where id = ?", Integer.class, app);
+        mvc.perform(post("/api/staff/applications/" + app + "/advance").header("Authorization", staffAuth)
+                        .contentType("application/json").content("{\"code\":\"claim\",\"note\":\"Looks complete\",\"version\":" + version + "}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.currentStageName").value("Eligibility review"));
+        assertThat(jdbc.queryForObject("select count(*) from nad_outbox_event where type = 'ApplicationStatusChanged' and aggregate_id = ?",
+                Integer.class, app)).isEqualTo(1);
+
+        // the submitted form is downloadable by staff, with the payment line
+        mvc.perform(get("/api/staff/applications/" + app + "/form").header("Authorization", staffAuth))
+                .andExpect(status().isOk()).andExpect(content().contentType("application/pdf"));
+    }
+
+    @Test
     void shouldRefuseASecondConfirmation_withoutBookingTheFeeTwice() throws Exception {
         Student s = register("pay", "twice");
         long app = draftFor(s);
@@ -685,7 +735,7 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         Student s = register("pay", "bypass");
         long app = draftFor(s);
 
-        // the generic transition call is for offer responses and withdrawal only
+        // the generic transition call is for offer responses only (the fee is not refundable, so there is no withdrawal)
         mvc.perform(post("/api/student/applications/" + app + "/transitions/submit").header("Authorization", bearer(s.token())))
                 .andExpect(status().isForbidden());
         mvc.perform(post("/api/student/applications/" + app + "/transitions/claim").header("Authorization", bearer(s.token())))

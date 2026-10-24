@@ -19,13 +19,20 @@ public record StudentApplicationResponse(
         String currentStageName,
         String currentStatus,
         String submittedAt,
-        List<String> timeline) {
+        List<String> timeline,
+        /** The programme or scholarship title; the university only for a programme-only application (never for a scholarship). */
+        String title,
+        String universityName,
+        String intake,
+        String applicantName) {
 
-    public static StudentApplicationResponse of(Application a, WfStage stage, List<String> timeline) {
+    public static StudentApplicationResponse of(Application a, WfStage stage, List<String> timeline, String title,
+            String universityName, String intake, String applicantName) {
         return new StudentApplicationResponse(
                 a.getId(), a.getReference(), a.getApplicantId(), a.getApplicationType() == null ? null : a.getApplicationType().name(),
                 a.getProgramId(), a.getScholarshipId(), a.getIntakeId(),
                 stage == null ? null : stage.getName(), a.getCurrentStatus(),
-                a.getSubmittedAt() == null ? null : a.getSubmittedAt().toString(), timeline);
+                a.getSubmittedAt() == null ? null : a.getSubmittedAt().toString(), timeline, title, universityName, intake,
+                applicantName);
     }
 }

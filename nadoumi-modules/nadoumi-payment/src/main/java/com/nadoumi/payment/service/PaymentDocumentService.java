@@ -14,6 +14,7 @@ import com.nadoumi.common.media.MediaOwnerRef;
 import com.nadoumi.common.media.ProxyStream;
 import com.nadoumi.payment.config.PaymentSettings;
 import com.nadoumi.payment.domain.ApplicationPayment;
+import com.nadoumi.payment.domain.enums.PaymentStatus;
 import com.nadoumi.payment.domain.PaymentDocument;
 import com.nadoumi.payment.domain.enums.DocumentKind;
 import com.nadoumi.payment.mapper.PaymentDocumentMapper;
@@ -66,10 +67,13 @@ public class PaymentDocumentService {
     private final PaymentSettings settings;
     private final Clock clock;
     private final DocumentVerification verification;
+    private final com.nadoumi.payment.mapper.PaymentMapper payments;
 
     public PaymentDocumentService(PaymentDocumentMapper documents, ReceiptPdf receiptPdf, ApplicationFormPdf formPdf,
             ApplicationOpportunityService opportunities, ApplicantDossierService dossiers, MediaGateway media,
-            PaymentSettings settings, Clock clock, DocumentVerification verification) {
+            PaymentSettings settings, Clock clock, DocumentVerification verification,
+            com.nadoumi.payment.mapper.PaymentMapper payments) {
+        this.payments = payments;
         this.documents = documents;
         this.receiptPdf = receiptPdf;
         this.formPdf = formPdf;
@@ -122,6 +126,22 @@ public class PaymentDocumentService {
                 null, dossier, dossiers.photoJpeg(applicantId).orElse(null),
                 signature.map(SignatureService.SignatureOnFile::png).orElse(null),
                 signature.map(SignatureService.SignatureOnFile::signedOn).orElse(null), null));
+    }
+
+    /**
+     * The application form as it stands now, with the real payment line once the student has reported the payment. Not stored or
+     * numbered by itself: it is rebuilt from the profile as it stands, so staff always read the submitted data.
+     */
+    @Transactional(readOnly = true)
+    public byte[] currentForm(long applicationId, long applicantId) {
+        var payment = payments.findLatest(applicationId, com.nadoumi.application.service.PaymentGuardProvider.APPLICATION_FEE);
+        boolean reported = payment != null && (payment.getStatus() == PaymentStatus.PROOF_SUBMITTED
+                || payment.getStatus() == PaymentStatus.CONFIRMED);
+        if (!reported) {
+            return previewForm(applicationId, applicantId);
+        }
+        return formPdf.render(formModel(payment, opportunities.describe(applicationId), dossiers.read(applicantId),
+                clock.instant(), null));
     }
 
     /** The latest receipt and form of an application, newest version of each kind. */

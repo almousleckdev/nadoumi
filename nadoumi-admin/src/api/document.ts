@@ -61,9 +61,9 @@ export const rejectDocument = (id: number, reason: string) =>
  * The file of one version: a JSON `{ url }` (signed URL) for ordinary types, or the
  * streamed bytes for sensitive ones. Both arrive as a Blob; the caller inspects its type.
  */
-export const documentContent = (id: number, versionNo: number) =>
+export const documentContent = (id: number, versionNo: number, inline = false) =>
   request.get<unknown, Blob>(`/api/staff/documents/${id}/versions/${versionNo}/content`, {
-    params: { json: 1 },
+    params: { json: 1, ...(inline ? { inline: 1 } : {}) },
     responseType: 'blob',
   })
 

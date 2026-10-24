@@ -5,6 +5,12 @@ defineProps<{ items: StudentApplicationDto[], pending: boolean, error: unknown }
 
 const { t } = useI18n()
 const localePath = useLocalePath()
+
+const columns = computed(() => [
+  { key: 'reference', label: t('dashboard.applications.colReference') },
+  { key: 'title', label: t('dashboard.applications.colOpportunity') },
+  { key: 'currentStatus', label: t('dashboard.applications.colStatus') },
+])
 </script>
 
 <template>
@@ -22,18 +28,15 @@ const localePath = useLocalePath()
         <NButton size="sm" :to="localePath('/scholarships')">{{ t('dashboard.home.browseScholarships') }}</NButton>
       </div>
     </div>
-    <ul v-else class="grid gap-3" data-test="applications-summary">
-      <li v-for="a in items" :key="a.id">
-        <NuxtLink
-          :to="localePath(`/dashboard/applications/${a.id}`)"
-          class="flex items-center justify-between gap-3 text-sm no-underline hover:underline"
-        >
-          <span class="min-w-0 truncate text-slate-700">
-            {{ t(`dashboard.applications.type.${a.applicationType ?? 'UNKNOWN'}`, t('dashboard.applications.type.UNKNOWN')) }}
-          </span>
-          <ApplicationStatusBadge :status="a.currentStatus" />
-        </NuxtLink>
-      </li>
-    </ul>
+    <NTable v-else :columns="columns" :rows="items" row-key="id" data-test="applications-summary">
+      <template #cell-reference="{ row }">
+        <NuxtLink :to="localePath(`/dashboard/applications/${row.id}`)" class="font-display font-semibold tabular-nums text-slate-900 underline-offset-2 hover:underline">{{ row.reference }}</NuxtLink>
+      </template>
+      <template #cell-title="{ row }">
+        <span class="block font-medium text-slate-900">{{ row.title }}</span>
+        <span v-if="row.universityName" class="block text-slate-500">{{ row.universityName }}</span>
+      </template>
+      <template #cell-currentStatus="{ row }"><ApplicationStatusBadge :status="row.currentStatus" /></template>
+    </NTable>
   </SectionCard>
 </template>

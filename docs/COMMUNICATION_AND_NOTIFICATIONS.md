@@ -228,7 +228,7 @@ One shared, non-boxed Nadoumi email design backs **every** transactional email
   rendered `nad_notification_template` body in `EmailLayout` and adds a
   per-type CTA (`SCHOLARSHIP_*` → `/scholarships`, `PROGRAM_PUBLISHED` →
   `/programs`, `UNIVERSITY_PUBLISHED` → `/universities`, `CONTACT_INQUIRY_RECEIVED`
-  / `TASK_PROGRESS` → `/admin`, `APPLICATION_*` → `/account/applications`). The
+  / `TASK_PROGRESS` → `/admin`, `APPLICATION_*` → `/dashboard/applications`). The
   `NotificationChannel.send` SPI gained a `String type` argument for this.
 - **Welcome email:** see §4.4.
 - **Application emails:** `NotificationType.APPLICATION_SUBMITTED` /

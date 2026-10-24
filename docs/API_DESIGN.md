@@ -539,3 +539,20 @@ A programme's `majors[]` input takes `majorId` (pick from the catalogue) or `nam
 **Programme recommended flag (2026-10-23).** `ProgramRequest.recommended`, `recommended` on the programme responses, and `GET /api/public/programs?recommended=true`. The public card and detail page badge it; the home page has a "Recommended programmes" rail (`programRecommended`).
 
 **Application wizard backend (2026-10-23).** Applications carry `reference` (`NAD20261023001`) in student, staff and payment responses; staff search matches it. `POST /api/student/applicants/other` creates a new applicant for another person and makes the caller its ACTIVE AGENT (edit, upload, submit; not hand over). `GET /api/student/applications/{id}/form-preview` returns the application form PDF as it stands, marked as a preview, before payment. The documents checklist puts a required `APPLICATION_FORM` first whenever the programme or scholarship has a form template to fill in.
+
+
+## Staff application management (2026-10-24)
+
+| Method and path | Permission | Purpose |
+|---|---|---|
+| `GET /api/staff/applications` | `nad:application:list` | Submitted applications only (never `DRAFT` or `CLOSED_WITHDRAWN`), with applicant, programme, university and assignee names. `q` matches the reference or the applicant's name. |
+| `GET /api/staff/applications/{id}` | `nad:application:view` | Detail with applicant and opportunity summaries, names for every actor and the activity log. |
+| `GET /api/staff/applications/assignees` | `nad:application:assign` | Active staff the application can be assigned to. `assign` rejects any other user id. |
+| `GET /api/staff/applications/{id}/next-steps` | `nad:application:view` | Status changes available from the current stage, each with `blockedReason` or null. |
+| `POST /api/staff/applications/{id}/advance` | `nad:application:transition` | Takes one step: records the decision the step stands for, then moves the application; the student is emailed. |
+| `GET /api/staff/applications/{id}/form` | `nad:application:view` | The submitted application form (PDF, attachment). |
+| `GET /api/staff/documents/{id}/versions/{n}/content?json=1&inline=1` | `nad:document:download` | `inline=1` returns a link the browser renders (View); without it the link forces a download. |
+| `POST /api/student/applications/{id}/payment/hold` | `SUBMIT_APPLICATION` | Stops the QR clock while the receipt is filled in (session held 30 minutes). |
+
+`StudentApplicationResponse` now carries `title`, `universityName` (null for anything that involves a scholarship), `intake` and
+`applicantName`. A student can no longer run the `withdraw` transition.

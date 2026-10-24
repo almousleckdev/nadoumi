@@ -446,4 +446,9 @@ export interface StudentApplicationDto {
   /** `null` while the application is still a draft. */
   submittedAt: string | null
   timeline: string[]
+  /** The programme or scholarship title; the university only for a programme-only application. */
+  title: string | null
+  universityName: string | null
+  intake: string | null
+  applicantName: string | null
 }

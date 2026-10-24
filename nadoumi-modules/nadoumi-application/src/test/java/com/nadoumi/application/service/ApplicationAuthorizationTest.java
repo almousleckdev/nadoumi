@@ -37,7 +37,23 @@ class ApplicationAuthorizationTest {
     private final CurrentCaller caller = mock(CurrentCaller.class);
 
     private final StudentApplicationService service = new StudentApplicationService(
-            applicationMapper, definitionMapper, eventMapper, workflow, access, caller);
+            applicationMapper, definitionMapper, eventMapper, workflow, access, caller, opportunities(), applicants());
+
+    private static ApplicationOpportunityService opportunities() {
+        var opportunities = mock(ApplicationOpportunityService.class);
+        when(opportunities.describe(org.mockito.ArgumentMatchers.anyLong())).thenReturn(
+                new ApplicationOpportunityService.Description("NAD1", ApplicationOpportunityService.Kind.PROGRAM, "MBBS", "Fudan University", "Autumn"));
+        return opportunities;
+    }
+
+    private static com.nadoumi.applicant.service.ApplicantService applicants() {
+        var applicants = mock(com.nadoumi.applicant.service.ApplicantService.class);
+        var applicant = mock(com.nadoumi.applicant.web.response.ApplicantResponse.class);
+        when(applicant.givenName()).thenReturn("Amina");
+        when(applicant.familyName()).thenReturn("Diallo");
+        when(applicants.get(org.mockito.ArgumentMatchers.any())).thenReturn(applicant);
+        return applicants;
+    }
 
     @Test
     void starting_a_draft_for_an_applicant_with_no_grant_is_refused_before_the_engine_runs() {
@@ -89,7 +105,9 @@ class ApplicationAuthorizationTest {
                 mock(com.nadoumi.application.mapper.ApplicationTaskMapper.class),
                 mock(com.nadoumi.application.mapper.ApplicationStageHistoryMapper.class),
                 mock(com.nadoumi.application.mapper.ApplicationEventMapper.class),
-                mock(com.nadoumi.application.mapper.ApplicationDecisionMapper.class), workflow);
+                mock(com.nadoumi.application.mapper.ApplicationDecisionMapper.class), workflow,
+                mock(com.nadoumi.application.mapper.WfInstanceMapper.class), mock(GuardEvaluator.class), opportunities(),
+                applicants());
         when(adminMapper.searchStaff(org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
 
         ApplicationSearch scoped = new ApplicationSearch(null, null, null, null, null, 99L);

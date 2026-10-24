@@ -20,6 +20,25 @@
 > the filled-in **Application form** (`APPLICATION_FORM`) is a required document: the student downloads the form on its row, fills it in and uploads it back.
 >
 > **Last step.** Preview (the application form PDF as it stands, `GET /api/student/applications/{id}/form-preview`, marked as a preview), the
+> **REDESIGNED 2026-10-24 (staff case management and the student's own screens).**
+>
+> - **Fee not refundable.** A student cannot withdraw (`withdraw` is no longer a student transition). Existing withdrawn
+>   applications are hidden from the student list.
+> - **Staff case page** (`/applications/:id` in the admin): applicant, programme and university, assignee (names, never ids),
+>   the submitted application form (PDF, downloadable), documents (View and Download), payment and its proof, the stage
+>   checklist, an activity log in words and the recorded decisions.
+> - **Assign** picks from `GET /api/staff/applications/assignees` (active staff only; the server rejects any other id).
+> - **Change status** lists `GET /api/staff/applications/{id}/next-steps` (the transitions out of the current stage, with why one
+>   is blocked) and `POST /api/staff/applications/{id}/advance`. The engine requires a formal decision before some moves
+>   (for example "Eligible" before Document collection): taking the step records that decision with the officer's note as
+>   its rationale, then moves the application. The separate "Record decision" button and the typed transition code are gone.
+>   `ops_manager` and `nadoumi_super_admin` may take any staff step.
+> - **Student email on every status change**: `ApplicationStatusChanged` names the stage ("Eligibility review"); template
+>   wording is V135.
+> - **Student screens**: `/dashboard/applications` is a table of submitted applications (drafts sit above it with a Continue
+>   link); the detail page shows the programme, payment (receipt and form downloads), documents and progress; the dashboard
+>   home lists applications and recommended scholarships as tables.
+>
 > **UPDATED 2026-10-24 (payment and staff inbox).** The student can Submit as soon as the payment is *reported* (transaction
 > number and receipt, `PROOF_SUBMITTED`); staff verify the money afterwards from the submitted application. The 15-minute QR
 > clock stops when the student starts the receipt (`POST /payment/hold` extends the session to 30 minutes, never shortens it).

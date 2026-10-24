@@ -36,11 +36,15 @@ final class DocumentContentResponses {
     }
 
     static ResponseEntity<?> respond(DocumentContent content, String json, HttpServletRequest request) {
+        return respond(content, json, request, false);
+    }
+
+    static ResponseEntity<?> respond(DocumentContent content, String json, HttpServletRequest request, boolean inline) {
         if (content instanceof DocumentContent.Redirect redirect) {
             return redirect(redirect.url(), json, request);
         }
         if (content instanceof DocumentContent.Proxy proxy) {
-            return proxy(proxy.stream());
+            return proxy(proxy.stream(), inline);
         }
         throw new IllegalStateException("unknown DocumentContent variant: " + content);
     }
@@ -54,7 +58,7 @@ final class DocumentContentResponses {
         return ResponseEntity.status(HttpStatus.FOUND).location(URI.create(signed.url())).build();
     }
 
-    private static ResponseEntity<StreamingResponseBody> proxy(ProxyStream stream) {
+    private static ResponseEntity<StreamingResponseBody> proxy(ProxyStream stream, boolean inline) {
         StreamingResponseBody body = out -> {
             try (var in = stream.body()) {
                 byte[] buffer = new byte[BUFFER_SIZE];
@@ -68,15 +72,15 @@ final class DocumentContentResponses {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
                 .header(HttpHeaders.CONTENT_LENGTH, String.valueOf(stream.contentLength()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition(stream.downloadFilename()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition(stream.downloadFilename(), inline))
                 .header(HttpHeaders.CACHE_CONTROL, "no-store")
                 .header("X-Content-Type-Options", "nosniff")
                 .body(body);
     }
 
-    private static String contentDisposition(String filename) {
+    private static String contentDisposition(String filename, boolean inline) {
         String safe = filename == null ? "download" : filename;
-        return String.format(Locale.ROOT, "attachment; filename=\"%s\"", safe.replace("\"", ""));
+        return String.format(Locale.ROOT, "%s; filename=\"%s\"", inline ? "inline" : "attachment", safe.replace("\"", ""));
     }
 
     private static long actorUserId() {

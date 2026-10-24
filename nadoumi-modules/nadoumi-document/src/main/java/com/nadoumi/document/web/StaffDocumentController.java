@@ -48,9 +48,12 @@ public class StaffDocumentController {
     @GetMapping("/{id}/versions/{versionNo}/content")
     @PreAuthorize("@ss.hasPermi('nad:document:download')")
     public ResponseEntity<?> content(@PathVariable long id, @PathVariable long versionNo,
-            @RequestParam(required = false) String json, HttpServletRequest request) {
-        DocumentContent content = service.staffContent(id, versionNo, DocumentContentResponses.accessContext(request, id));
-        return DocumentContentResponses.respond(content, json, request);
+            @RequestParam(required = false) String json, @RequestParam(required = false) String inline,
+            HttpServletRequest request) {
+        boolean forViewing = "1".equals(inline);
+        DocumentContent content = service.staffContent(id, versionNo, DocumentContentResponses.accessContext(request, id),
+                forViewing);
+        return DocumentContentResponses.respond(content, json, request, forViewing);
     }
 
     @PostMapping("/{id}/verify")

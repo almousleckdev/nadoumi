@@ -1,7 +1,8 @@
 import type { ApplicantDto, Page, ScholarshipCard } from '~/types/catalog'
 import type { DocumentStatus } from '~/constants/onboarding'
+import { isSubmitted } from '~/utils/applicationView'
 
-const APPLICATION_PREVIEW_COUNT = 3
+const APPLICATION_PREVIEW_COUNT = 5
 const DEADLINE_FETCH_SIZE = 8
 const DEADLINE_PREVIEW_COUNT = 4
 const RECOMMENDED_COUNT = 4
@@ -53,7 +54,7 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
     () => listApplications(),
     { default: () => null },
   )
-  const applications = computed(() => (applicationsData.value ?? []).slice(0, APPLICATION_PREVIEW_COUNT))
+  const applications = computed(() => (applicationsData.value ?? []).filter(a => isSubmitted(a.currentStatus)).slice(0, APPLICATION_PREVIEW_COUNT))
 
   const { data: activityData, pending: activityPending, error: activityError } = useLazyAsyncData(
     'dash-activity',

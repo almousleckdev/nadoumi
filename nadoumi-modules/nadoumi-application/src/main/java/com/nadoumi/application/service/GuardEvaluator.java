@@ -82,7 +82,8 @@ public class GuardEvaluator {
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    private static List<String> predicatesIn(String guardJson) {
+    /** The predicates a guard lists, in order. */
+    public static List<String> predicatesIn(String guardJson) {
         if (guardJson == null || guardJson.isBlank()) {
             return List.of();
         }
@@ -94,7 +95,8 @@ public class GuardEvaluator {
         return all.stream().map(String::valueOf).toList();
     }
 
-    private boolean evaluateOne(String predicate, Application application) {
+    /** One predicate such as {@code ALL_MANDATORY_TASKS_DONE} against an application. */
+    public boolean evaluateOne(String predicate, Application application) {
         String[] parts = predicate.split(":");
         String name = parts[0];
         return switch (name) {

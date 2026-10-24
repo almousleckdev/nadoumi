@@ -10,7 +10,8 @@ const scholarship: ApplyTarget = { kind: 'scholarship', id: 7, slug: 'csc-master
 
 const app = (over: Partial<StudentApplicationDto>): StudentApplicationDto => ({
   id: 1, reference: 'NAD20261023001', applicantId: 3, applicationType: 'PROGRAM_ONLY', programId: 5, scholarshipId: null, intakeId: 9,
-  currentStageName: 'Draft', currentStatus: 'DRAFT', submittedAt: null, timeline: [], ...over,
+  currentStageName: 'Draft', currentStatus: 'DRAFT', submittedAt: null, timeline: [],
+  title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', ...over,
 })
 
 describe('parseApplyQuery', () => {

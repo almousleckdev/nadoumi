@@ -172,7 +172,7 @@ public class WorkflowService {
         if ("submit".equals(transition.getCode())) {
             submitGate.require(applicationId); // fee paid and documents in, for any actor
         }
-        if (staffActor && transition.getRoleRequired() != null && !SecurityUtils.hasRole(transition.getRoleRequired())) {
+        if (staffActor && transition.getRoleRequired() != null && !holdsRole(transition.getRoleRequired())) {
             throw new NadForbiddenException("this transition requires the '" + transition.getRoleRequired() + "' role");
         }
         if (!guards.tasksBlockingExitDone(applicationId)) {
@@ -185,6 +185,12 @@ public class WorkflowService {
         applyTransition(application, instance, transition, actorUserId, reason, expectedVersion);
         chainAutoTransitions(applicationMapper.findById(applicationId), instance, actorUserId);
         return applicationMapper.findById(applicationId);
+    }
+
+    /** Org-wide managers and super admins may take any staff step; everyone else needs the step's own role. */
+    static boolean holdsRole(String required) {
+        return SecurityUtils.hasRole(required) || SecurityUtils.hasRole("ops_manager")
+                || SecurityUtils.hasRole("nadoumi_super_admin");
     }
 
     /** One transition's effects, in the caller's transaction. */
@@ -227,7 +233,8 @@ public class WorkflowService {
             emitter.submitted(applicationMapper.findById(application.getId()), actorUserId);
         }
         else {
-            emitter.statusChanged(applicationMapper.findById(application.getId()), toStage.getStatusLabel());
+            // the student reads the stage name ("Eligibility review"), not the coarse status code
+            emitter.statusChanged(applicationMapper.findById(application.getId()), toStage.getName());
         }
     }
 

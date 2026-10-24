@@ -40,16 +40,16 @@ export function statusKey(status: string | null): string {
   return status && KNOWN_STATUSES.has(status) ? status : 'unknown'
 }
 
-export type StatusTone = 'neutral' | 'brand' | 'success' | 'warning' | 'danger'
+export type StatusTone = 'neutral' | 'danger'
 
+/** Chips are neutral (CLAUDE.md §24); only an unsuccessful outcome reads as an error. */
 export function statusTone(status: string | null): StatusTone {
-  switch (status) {
-    case 'CLOSED_SUCCESS': return 'success'
-    case 'CLOSED_UNSUCCESSFUL': return 'danger'
-    case 'CLOSED_WITHDRAWN': return 'neutral'
-    case 'DRAFT': return 'warning'
-    default: return 'brand'
-  }
+  return status === 'CLOSED_UNSUCCESSFUL' ? 'danger' : 'neutral'
 }
+
+/** The applications a student sees in their list: paid for and sent. Drafts are finished in the apply flow. */
+export const isSubmitted = (status: string | null): boolean => status !== 'DRAFT' && status !== 'CLOSED_WITHDRAWN'
+
+export const isDraft = (status: string | null): boolean => status === 'DRAFT'
 
 export const isClosed = (status: string | null): boolean => Boolean(status?.startsWith('CLOSED_'))
