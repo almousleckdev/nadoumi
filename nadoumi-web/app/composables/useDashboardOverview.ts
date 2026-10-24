@@ -1,8 +1,7 @@
 import type { ApplicantDto, Page, ScholarshipCard, StudentApplicationDto } from '~/types/catalog'
 import type { DocumentStatus } from '~/constants/onboarding'
-import { isSubmitted } from '~/utils/applicationView'
+import { applicationStats, isSubmitted, stageDistribution } from '~/utils/applicationView'
 
-const APPLICATION_PREVIEW_COUNT = 5
 const DEADLINE_FETCH_SIZE = 8
 const DEADLINE_PREVIEW_COUNT = 4
 const RECOMMENDED_COUNT = 4
@@ -59,7 +58,9 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
     .filter((a: StudentApplicationDto) => isSubmitted(a.currentStatus))
     .sort((a: StudentApplicationDto, b: StudentApplicationDto) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''))[0] ?? null)
   const draft = computed(() => allApplications.value.find((a: StudentApplicationDto) => a.currentStatus === 'DRAFT') ?? null)
-  const applications = computed(() => (applicationsData.value ?? []).filter(a => isSubmitted(a.currentStatus)).slice(0, APPLICATION_PREVIEW_COUNT))
+  const statuses = computed(() => allApplications.value.map((a: StudentApplicationDto) => a.currentStatus))
+  const stats = computed(() => applicationStats(statuses.value))
+  const distribution = computed(() => stageDistribution(statuses.value))
 
   const { data: activityData, pending: activityPending, error: activityError } = useLazyAsyncData(
     'dash-activity',
@@ -69,11 +70,14 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
   const activity = computed(() => activityData.value?.content ?? [])
 
   return {
-    documents: reactive({ pending: docsPending, photoStatus, passportStatus: passportDocStatus }),
+    documents: reactive({ pending: docsPending, photoStatus, passportStatus: passportDocStatus, ready: computed(() => Number(photoStatus.value === 'done') + Number(passportDocStatus.value === 'done')) }),
     deadlines: reactive({ items: deadlines, pending: deadlinesPending, error: deadlinesError }),
     recommended: reactive({ items: recommended, pending: recommendedPending, error: recommendedError }),
     focus: reactive({ latest, draft, pending: applicationsPending }),
-    applications: reactive({ items: applications, pending: applicationsPending, error: applicationsError }),
+    stats,
+    distribution,
+    applicationsPending,
+    applicationsError,
     activity: reactive({ items: activity, pending: activityPending, error: activityError }),
   }
 }

@@ -69,7 +69,8 @@ describe('dashboard index', () => {
 
   it('shows honest empty states for applications, recommendations, deadlines and activity — never fake data', async () => {
     const w = await mountPage()
-    expect(w.text()).toContain("You haven't started an application yet")
+    expect(w.text()).toContain('You have not applied yet')
+    expect(w.find('[data-test="chart-empty"]').exists()).toBe(true)
     expect(w.text()).toContain('No recommendations yet')
     expect(w.text()).toContain('No upcoming deadlines')
     expect(w.text()).toContain('Nothing to show yet')
@@ -104,7 +105,9 @@ describe('dashboard index', () => {
     expect(w.text()).toContain('MBBS')
     expect(w.text()).toContain('NAD20260101001')
     expect(w.text()).toContain('In review')
-    expect(w.text()).not.toContain("You haven't started an application yet")
+    expect(w.text()).not.toContain('You have not applied yet')
+    expect(w.findAll('[data-test="donut-arc"]')).toHaveLength(1)
+    expect(w.findAll('[data-test="stat-value"]').map(el => el.text())).toEqual(['1', '1', '0', '0/2'])
   })
 
   it('shows an inline error, not the empty state, when applications fail to load', async () => {

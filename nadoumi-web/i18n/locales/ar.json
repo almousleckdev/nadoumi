@@ -492,11 +492,23 @@
       "colCountry": "البلد",
       "colFunding": "التمويل",
       "colDeadline": "الموعد النهائي",
-      "focusTitle": "طلبك",
+      "focusTitle": "أحدث طلب",
       "viewApplication": "عرض الطلب",
       "focusDraft": "لديك طلب غير مكتمل لـ {title}. أكمله وادفع الرسوم لإرساله إلى نادومي.",
       "focusEmpty": "لم تقدم أي طلب بعد. ابحث عن برنامج أو منحة وقدّم في خطوات قليلة.",
-      "browseProgrammes": "تصفح البرامج"
+      "browseProgrammes": "تصفح البرامج",
+      "findOpportunity": "ابحث عن فرصة",
+      "statSubmitted": "المقدّمة",
+      "statInProgress": "قيد المعالجة",
+      "statOffers": "العروض",
+      "statDocuments": "المستندات الجاهزة",
+      "statDrafts": "{n} غير مكتملة",
+      "chartTitle": "أين وصلت طلباتك",
+      "chartTotal": "طلبات",
+      "chartEmpty": "ستظهر هنا الطلبات التي ترسلها.",
+      "readiness": "جاهزيتك",
+      "daysLeft": "متبقٍ {n} أيام",
+      "allApplications": "كل الطلبات"
     },
     "notifications": {
       "title": "الإشعارات",
@@ -767,7 +779,9 @@
         "CLOSED_SUCCESS": "تم قبولك وتسجيلك. تهانينا.",
         "CLOSED_UNSUCCESSFUL": "لم ينجح هذا الطلب.",
         "default": "تعمل نادومي على طلبك."
-      }
+      },
+      "colProgress": "التقدّم",
+      "stepOf": "الخطوة {n} من {total}"
     }
   },
   "validation": {

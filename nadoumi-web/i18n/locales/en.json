@@ -492,11 +492,23 @@
       "colCountry": "Country",
       "colFunding": "Funding",
       "colDeadline": "Deadline",
-      "focusTitle": "Your application",
+      "focusTitle": "Latest application",
       "viewApplication": "View application",
       "focusDraft": "You have an unfinished application for {title}. Finish it and pay the application fee to send it to Nadoumi.",
       "focusEmpty": "You have not applied yet. Find a programme or scholarship and apply in a few steps.",
-      "browseProgrammes": "Browse programmes"
+      "browseProgrammes": "Browse programmes",
+      "findOpportunity": "Find an opportunity",
+      "statSubmitted": "Submitted",
+      "statInProgress": "In progress",
+      "statOffers": "Offers",
+      "statDocuments": "Documents ready",
+      "statDrafts": "{n} unfinished",
+      "chartTitle": "Where your applications are",
+      "chartTotal": "applications",
+      "chartEmpty": "Applications you send will appear here.",
+      "readiness": "Your readiness",
+      "daysLeft": "{n} days left",
+      "allApplications": "All applications"
     },
     "notifications": {
       "title": "Notifications",
@@ -767,7 +779,9 @@
         "CLOSED_SUCCESS": "You are enrolled. Congratulations.",
         "CLOSED_UNSUCCESSFUL": "This application was not successful.",
         "default": "Nadoumi is working on your application."
-      }
+      },
+      "colProgress": "Progress",
+      "stepOf": "Step {n} of {total}"
     }
   },
   "validation": {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { StudentApplicationDto } from '~/types/catalog'
-import { isDraft, isSubmitted } from '~/utils/applicationView'
+import { applicationStats, isDraft, isSubmitted } from '~/utils/applicationView'
 import { formatTimestamp } from '~/utils/dates'
 
 definePageMeta({ layout: 'dashboard', middleware: ['auth', 'onboarding'] })
@@ -36,12 +36,13 @@ const drafts = computed<StudentApplicationDto[]>(() => items.value.filter((a: St
 // the table is generic; inside AsyncState the slot's row type is not inferred, so name it once here
 const asApplication = (row: unknown) => row as StudentApplicationDto
 
+const stats = computed(() => applicationStats(items.value.map((a: StudentApplicationDto) => a.currentStatus)))
+
 const columns = computed(() => [
-  { key: 'reference', label: t('dashboard.applications.colReference') },
   { key: 'title', label: t('dashboard.applications.colOpportunity') },
-  { key: 'applicantName', label: t('dashboard.applications.colStudent') },
-  { key: 'currentStageName', label: t('dashboard.applications.colStage') },
+  { key: 'reference', label: t('dashboard.applications.colReference') },
   { key: 'currentStatus', label: t('dashboard.applications.colStatus') },
+  { key: 'progress', label: t('dashboard.applications.colProgress') },
   { key: 'submittedAt', label: t('dashboard.applications.colSubmitted') },
 ])
 
@@ -80,6 +81,13 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
       </template>
 
       <div class="grid min-w-0 gap-6">
+        <div class="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-4" data-test="applications-stats">
+          <StatTile icon="applications" :label="t('dashboard.home.statSubmitted')" :value="stats.submitted" />
+          <StatTile icon="clock" :label="t('dashboard.home.statInProgress')" :value="stats.inProgress" />
+          <StatTile icon="award" :label="t('dashboard.home.statOffers')" :value="stats.offers" />
+          <StatTile icon="documents" :label="t('dashboard.applications.draftsTitle')" :value="stats.drafts" />
+        </div>
+
         <section v-if="drafts.length" class="grid gap-3" data-test="drafts">
           <div>
             <h2 class="font-display text-base font-semibold text-slate-900">{{ t('dashboard.applications.draftsTitle') }}</h2>
@@ -106,15 +114,19 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
           <template #cell-reference="{ row }">
             <NuxtLink
               :to="localePath(`/dashboard/applications/${asApplication(row).id}`)"
-              class="font-display font-semibold tabular-nums text-slate-900 underline-offset-2 hover:underline"
+              class="font-semibold tabular-nums text-slate-900 underline-offset-2 hover:underline"
               data-test="application-reference"
             >{{ asApplication(row).reference }}</NuxtLink>
           </template>
           <template #cell-title="{ row }">
             <span class="block font-medium text-slate-900">{{ asApplication(row).title }}</span>
-            <span v-if="asApplication(row).universityName" class="block text-slate-500">{{ asApplication(row).universityName }}</span>
+            <span class="block text-slate-500">{{ [asApplication(row).universityName, asApplication(row).applicantName].filter(Boolean).join(' · ') }}</span>
           </template>
-          <template #cell-currentStatus="{ row }"><ApplicationStatusBadge :status="asApplication(row).currentStatus" /></template>
+          <template #cell-progress="{ row }"><StageMeter :status="asApplication(row).currentStatus" /></template>
+          <template #cell-currentStatus="{ row }">
+            <ApplicationStatusBadge :status="asApplication(row).currentStatus" />
+            <span class="mt-1 block text-xs text-slate-500">{{ asApplication(row).currentStageName }}</span>
+          </template>
           <template #cell-submittedAt="{ row }">{{ formatDate(asApplication(row).submittedAt) }}</template>
         </NTable>
         <p v-if="submitted.length" class="text-xs text-slate-500">{{ t('dashboard.applications.feeNote') }}</p>

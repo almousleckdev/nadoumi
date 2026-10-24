@@ -492,11 +492,23 @@
       "colCountry": "国家",
       "colFunding": "资助方式",
       "colDeadline": "截止日期",
-      "focusTitle": "您的申请",
+      "focusTitle": "最近的申请",
       "viewApplication": "查看申请",
       "focusDraft": "您有一份未完成的 {title} 申请。完成并支付申请费后即可发送给 Nadoumi。",
       "focusEmpty": "您还没有申请。找到项目或奖学金，几步即可申请。",
-      "browseProgrammes": "浏览项目"
+      "browseProgrammes": "浏览项目",
+      "findOpportunity": "查找申请机会",
+      "statSubmitted": "已提交",
+      "statInProgress": "进行中",
+      "statOffers": "录取与奖学金",
+      "statDocuments": "已备文件",
+      "statDrafts": "{n} 份未完成",
+      "chartTitle": "申请进展分布",
+      "chartTotal": "份申请",
+      "chartEmpty": "提交后的申请会显示在这里。",
+      "readiness": "准备情况",
+      "daysLeft": "还剩 {n} 天",
+      "allApplications": "全部申请"
     },
     "notifications": {
       "title": "通知",
@@ -767,7 +779,9 @@
         "CLOSED_SUCCESS": "您已入学。恭喜。",
         "CLOSED_UNSUCCESSFUL": "此申请未获通过。",
         "default": "Nadoumi正在处理您的申请。"
-      }
+      },
+      "colProgress": "进度",
+      "stepOf": "第 {n} 步，共 {total} 步"
     }
   },
   "validation": {
