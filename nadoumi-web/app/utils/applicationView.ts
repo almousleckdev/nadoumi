@@ -63,3 +63,28 @@ export const TRACKER_STEPS = [
 export function trackerIndex(status: string | null): number {
   return TRACKER_STEPS.findIndex(step => step === status)
 }
+
+const IN_PROGRESS = new Set(['IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION'])
+const OFFERED = new Set(['OFFER', 'PRE_DEPARTURE', 'CLOSED_SUCCESS'])
+
+export interface ApplicationStats { submitted: number, inProgress: number, offers: number, drafts: number }
+
+/** The headline numbers on the dashboard: what was sent, what is still moving, what turned into an offer. */
+export function applicationStats(statuses: readonly (string | null)[]): ApplicationStats {
+  return {
+    submitted: statuses.filter(isSubmitted).length,
+    inProgress: statuses.filter(s => s !== null && IN_PROGRESS.has(s)).length,
+    offers: statuses.filter(s => s !== null && OFFERED.has(s)).length,
+    drafts: statuses.filter(isDraft).length,
+  }
+}
+
+export interface StageCount { status: string, count: number }
+
+/** Submitted applications counted per status, in path order, empty stages left out. */
+export function stageDistribution(statuses: readonly (string | null)[]): StageCount[] {
+  const order = [...TRACKER_STEPS, 'CLOSED_UNSUCCESSFUL']
+  return order
+    .map(status => ({ status, count: statuses.filter(s => s === status).length }))
+    .filter(entry => entry.count > 0)
+}

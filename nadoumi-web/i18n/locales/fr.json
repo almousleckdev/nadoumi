@@ -492,11 +492,23 @@
       "colCountry": "Pays",
       "colFunding": "Financement",
       "colDeadline": "Date limite",
-      "focusTitle": "Votre candidature",
+      "focusTitle": "Dernière candidature",
       "viewApplication": "Voir la candidature",
       "focusDraft": "Vous avez une candidature non terminée pour {title}. Terminez-la et payez les frais pour l'envoyer à Nadoumi.",
       "focusEmpty": "Vous n'avez pas encore postulé. Trouvez un programme ou une bourse et postulez en quelques étapes.",
-      "browseProgrammes": "Voir les programmes"
+      "browseProgrammes": "Voir les programmes",
+      "findOpportunity": "Trouver une opportunité",
+      "statSubmitted": "Envoyées",
+      "statInProgress": "En cours",
+      "statOffers": "Offres",
+      "statDocuments": "Documents prêts",
+      "statDrafts": "{n} non terminée(s)",
+      "chartTitle": "Où en sont vos candidatures",
+      "chartTotal": "candidatures",
+      "chartEmpty": "Les candidatures que vous envoyez apparaîtront ici.",
+      "readiness": "Votre préparation",
+      "daysLeft": "{n} jours restants",
+      "allApplications": "Toutes les candidatures"
     },
     "notifications": {
       "title": "Notifications",
@@ -767,7 +779,9 @@
         "CLOSED_SUCCESS": "Vous êtes inscrit. Félicitations.",
         "CLOSED_UNSUCCESSFUL": "Cette candidature n'a pas abouti.",
         "default": "Nadoumi traite votre candidature."
-      }
+      },
+      "colProgress": "Avancement",
+      "stepOf": "Étape {n} sur {total}"
     }
   },
   "validation": {

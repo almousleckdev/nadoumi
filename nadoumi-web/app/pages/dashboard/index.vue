@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
+import { profileCompleteness } from '~/utils/profileCompleteness'
 import OverviewProfileHeader from '~/components/dashboard/overview/ProfileHeader.vue'
 import OverviewFocusCard from '~/components/dashboard/overview/FocusCard.vue'
-import OverviewApplicationsCard from '~/components/dashboard/overview/ApplicationsCard.vue'
+import OverviewStatsRow from '~/components/dashboard/overview/StatsRow.vue'
+import OverviewStageChartCard from '~/components/dashboard/overview/StageChartCard.vue'
 import OverviewRecommendedCard from '~/components/dashboard/overview/RecommendedCard.vue'
-import OverviewDocumentsCard from '~/components/dashboard/overview/DocumentsCard.vue'
+import OverviewChecklistCard from '~/components/dashboard/overview/ProfileChecklistCard.vue'
 import OverviewDeadlinesCard from '~/components/dashboard/overview/DeadlinesCard.vue'
 import OverviewActivityCard from '~/components/dashboard/overview/ActivityCard.vue'
 
@@ -24,7 +26,9 @@ async function dismissWelcome() {
   await markWelcomed(applicant.id).catch(() => undefined)
 }
 
-const { documents, deadlines, recommended, applications, activity, focus } = useDashboardOverview(primary)
+const { documents, deadlines, recommended, stats, distribution, applicationsPending, applicationsError, activity, focus } = useDashboardOverview(primary)
+const completeness = computed(() => (primary.value ? profileCompleteness(primary.value) : 0))
+const DOCUMENTS_TOTAL = 2
 
 useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 </script>
@@ -58,20 +62,28 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 
       <div v-else class="grid min-w-0 gap-6">
         <OverviewProfileHeader :applicant="primary" />
-        <OverviewFocusCard v-bind="focus" />
-        <OverviewApplicationsCard v-bind="applications" />
-        <OverviewRecommendedCard v-bind="recommended" />
+        <NAlert v-if="applicationsError" tone="danger">{{ t('errors.loadSection') }}</NAlert>
+        <OverviewStatsRow v-else :stats="stats" :documents-ready="documents.ready" :documents-total="DOCUMENTS_TOTAL" />
 
-        <div class="grid min-w-0 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          <OverviewDocumentsCard
-            class="min-w-0"
-            :pending="documents.pending"
-            :photo-status="documents.photoStatus"
-            :passport-status="documents.passportStatus"
-          />
-          <OverviewDeadlinesCard class="min-w-0" v-bind="deadlines" />
-          <OverviewActivityCard class="min-w-0 md:col-span-2 xl:col-span-1" v-bind="activity" />
+        <div class="grid min-w-0 gap-6 lg:grid-cols-3">
+          <OverviewFocusCard class="min-w-0 lg:col-span-2" v-bind="focus" />
+          <OverviewStageChartCard class="min-w-0" :distribution="distribution" :pending="applicationsPending" />
         </div>
+
+        <div class="grid min-w-0 gap-6 lg:grid-cols-3">
+          <OverviewRecommendedCard class="min-w-0 lg:col-span-2" v-bind="recommended" />
+          <div class="grid min-w-0 content-start gap-6">
+            <OverviewChecklistCard
+              :completeness="completeness"
+              :pending="documents.pending"
+              :photo-status="documents.photoStatus"
+              :passport-status="documents.passportStatus"
+            />
+            <OverviewDeadlinesCard v-bind="deadlines" />
+          </div>
+        </div>
+
+        <OverviewActivityCard class="min-w-0" v-bind="activity" />
       </div>
     </AsyncState>
   </div>

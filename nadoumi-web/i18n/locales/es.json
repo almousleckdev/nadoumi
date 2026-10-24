@@ -492,11 +492,23 @@
       "colCountry": "País",
       "colFunding": "Financiación",
       "colDeadline": "Fecha límite",
-      "focusTitle": "Su solicitud",
+      "focusTitle": "Última solicitud",
       "viewApplication": "Ver la solicitud",
       "focusDraft": "Tiene una solicitud sin terminar para {title}. Termínela y pague la tasa para enviarla a Nadoumi.",
       "focusEmpty": "Aún no ha solicitado nada. Encuentre un programa o una beca y solicite en unos pasos.",
-      "browseProgrammes": "Ver programas"
+      "browseProgrammes": "Ver programas",
+      "findOpportunity": "Buscar una oportunidad",
+      "statSubmitted": "Enviadas",
+      "statInProgress": "En curso",
+      "statOffers": "Ofertas",
+      "statDocuments": "Documentos listos",
+      "statDrafts": "{n} sin terminar",
+      "chartTitle": "En qué punto están tus solicitudes",
+      "chartTotal": "solicitudes",
+      "chartEmpty": "Las solicitudes que envíes aparecerán aquí.",
+      "readiness": "Tu preparación",
+      "daysLeft": "Quedan {n} días",
+      "allApplications": "Todas las solicitudes"
     },
     "notifications": {
       "title": "Notificaciones",
@@ -767,7 +779,9 @@
         "CLOSED_SUCCESS": "Está matriculado. Enhorabuena.",
         "CLOSED_UNSUCCESSFUL": "Esta solicitud no tuvo éxito.",
         "default": "Nadoumi está trabajando en su solicitud."
-      }
+      },
+      "colProgress": "Progreso",
+      "stepOf": "Paso {n} de {total}"
     }
   },
   "validation": {

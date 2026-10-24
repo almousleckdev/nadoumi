@@ -18,6 +18,14 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 > next, or the unfinished application, or a prompt to apply. The tracker is also on the application detail page. Done steps are
 > filled slate, the current step ringed, an unsuccessful outcome red.
 
+> **2026-10-24 (dashboard redesign):** the student Overview is one story with no duplicated applications list: `StatsRow`
+> (four `StatTile`s: sent, in progress, offers, documents ready), then `FocusCard` (latest application and tracker) beside
+> `StageChartCard` (`DonutChart` of applications per stage), then the recommended scholarships table beside
+> `ProfileChecklistCard` (`ProgressRing` plus photo and passport status) and `DeadlinesCard` (bars on a 90 day scale).
+> `/dashboard/applications` gets the same tiles above its table, and the table gains a `StageMeter` progress column.
+> Charts are inline SVG in neutral slate shades (CLAUDE.md §24); the headline numbers come from `applicationStats` and
+> `stageDistribution` in `utils/applicationView.ts`. The old `ApplicationsCard` and `DocumentsCard` are removed.
+
 ## 1. State of the frontend in this repo (EXISTING)
 
 - The `ruoyi-ui/` directory was **deleted from the repo** at commit `ec987ab9`
