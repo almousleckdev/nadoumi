@@ -53,3 +53,13 @@ export const isSubmitted = (status: string | null): boolean => status !== 'DRAFT
 export const isDraft = (status: string | null): boolean => status === 'DRAFT'
 
 export const isClosed = (status: string | null): boolean => Boolean(status?.startsWith('CLOSED_'))
+
+/** The path a submitted application follows, in order; the tracker marks how far it has got. */
+export const TRACKER_STEPS = [
+  'IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION', 'OFFER', 'PRE_DEPARTURE', 'CLOSED_SUCCESS',
+] as const
+
+/** Index of the step an application is on, or -1 when it is not on the path (draft, unsuccessful, unknown). */
+export function trackerIndex(status: string | null): number {
+  return TRACKER_STEPS.findIndex(step => step === status)
+}

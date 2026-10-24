@@ -491,7 +491,12 @@
       "colScholarship": "Bourse",
       "colCountry": "Pays",
       "colFunding": "Financement",
-      "colDeadline": "Date limite"
+      "colDeadline": "Date limite",
+      "focusTitle": "Votre candidature",
+      "viewApplication": "Voir la candidature",
+      "focusDraft": "Vous avez une candidature non terminée pour {title}. Terminez-la et payez les frais pour l'envoyer à Nadoumi.",
+      "focusEmpty": "Vous n'avez pas encore postulé. Trouvez un programme ou une bourse et postulez en quelques étapes.",
+      "browseProgrammes": "Voir les programmes"
     },
     "notifications": {
       "title": "Notifications",

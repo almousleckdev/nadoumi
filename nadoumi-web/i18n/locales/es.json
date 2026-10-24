@@ -491,7 +491,12 @@
       "colScholarship": "Beca",
       "colCountry": "País",
       "colFunding": "Financiación",
-      "colDeadline": "Fecha límite"
+      "colDeadline": "Fecha límite",
+      "focusTitle": "Su solicitud",
+      "viewApplication": "Ver la solicitud",
+      "focusDraft": "Tiene una solicitud sin terminar para {title}. Termínela y pague la tasa para enviarla a Nadoumi.",
+      "focusEmpty": "Aún no ha solicitado nada. Encuentre un programa o una beca y solicite en unos pasos.",
+      "browseProgrammes": "Ver programas"
     },
     "notifications": {
       "title": "Notificaciones",

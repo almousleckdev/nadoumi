@@ -13,6 +13,11 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 > (§24). There is no withdraw action: the application fee is not refundable. The admin application page is
 > `views/applications/detail.vue` (the drawer is gone).
 
+> **2026-10-24 (student dashboard):** the home page opens with `FocusCard`: the latest submitted application with an
+> `ApplicationTracker` (In review, Sent to university, Awaiting decision, Offer, Pre-departure, Enrolled) and what happens
+> next, or the unfinished application, or a prompt to apply. The tracker is also on the application detail page. Done steps are
+> filled slate, the current step ringed, an unsuccessful outcome red.
+
 ## 1. State of the frontend in this repo (EXISTING)
 
 - The `ruoyi-ui/` directory was **deleted from the repo** at commit `ec987ab9`

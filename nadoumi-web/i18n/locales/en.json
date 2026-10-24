@@ -491,7 +491,12 @@
       "colScholarship": "Scholarship",
       "colCountry": "Country",
       "colFunding": "Funding",
-      "colDeadline": "Deadline"
+      "colDeadline": "Deadline",
+      "focusTitle": "Your application",
+      "viewApplication": "View application",
+      "focusDraft": "You have an unfinished application for {title}. Finish it and pay the application fee to send it to Nadoumi.",
+      "focusEmpty": "You have not applied yet. Find a programme or scholarship and apply in a few steps.",
+      "browseProgrammes": "Browse programmes"
     },
     "notifications": {
       "title": "Notifications",

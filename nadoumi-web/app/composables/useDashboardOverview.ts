@@ -1,4 +1,4 @@
-import type { ApplicantDto, Page, ScholarshipCard } from '~/types/catalog'
+import type { ApplicantDto, Page, ScholarshipCard, StudentApplicationDto } from '~/types/catalog'
 import type { DocumentStatus } from '~/constants/onboarding'
 import { isSubmitted } from '~/utils/applicationView'
 
@@ -54,6 +54,11 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
     () => listApplications(),
     { default: () => null },
   )
+  const allApplications = computed<StudentApplicationDto[]>(() => applicationsData.value ?? [])
+  const latest = computed(() => allApplications.value
+    .filter((a: StudentApplicationDto) => isSubmitted(a.currentStatus))
+    .sort((a: StudentApplicationDto, b: StudentApplicationDto) => (b.submittedAt ?? '').localeCompare(a.submittedAt ?? ''))[0] ?? null)
+  const draft = computed(() => allApplications.value.find((a: StudentApplicationDto) => a.currentStatus === 'DRAFT') ?? null)
   const applications = computed(() => (applicationsData.value ?? []).filter(a => isSubmitted(a.currentStatus)).slice(0, APPLICATION_PREVIEW_COUNT))
 
   const { data: activityData, pending: activityPending, error: activityError } = useLazyAsyncData(
@@ -67,6 +72,7 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
     documents: reactive({ pending: docsPending, photoStatus, passportStatus: passportDocStatus }),
     deadlines: reactive({ items: deadlines, pending: deadlinesPending, error: deadlinesError }),
     recommended: reactive({ items: recommended, pending: recommendedPending, error: recommendedError }),
+    focus: reactive({ latest, draft, pending: applicationsPending }),
     applications: reactive({ items: applications, pending: applicationsPending, error: applicationsError }),
     activity: reactive({ items: activity, pending: activityPending, error: activityError }),
   }

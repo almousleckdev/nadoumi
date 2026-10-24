@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ApplicantDto } from '~/types/catalog'
 import OverviewProfileHeader from '~/components/dashboard/overview/ProfileHeader.vue'
+import OverviewFocusCard from '~/components/dashboard/overview/FocusCard.vue'
 import OverviewApplicationsCard from '~/components/dashboard/overview/ApplicationsCard.vue'
 import OverviewRecommendedCard from '~/components/dashboard/overview/RecommendedCard.vue'
 import OverviewDocumentsCard from '~/components/dashboard/overview/DocumentsCard.vue'
@@ -23,7 +24,7 @@ async function dismissWelcome() {
   await markWelcomed(applicant.id).catch(() => undefined)
 }
 
-const { documents, deadlines, recommended, applications, activity } = useDashboardOverview(primary)
+const { documents, deadlines, recommended, applications, activity, focus } = useDashboardOverview(primary)
 
 useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 </script>
@@ -57,6 +58,7 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
 
       <div v-else class="grid min-w-0 gap-6">
         <OverviewProfileHeader :applicant="primary" />
+        <OverviewFocusCard v-bind="focus" />
         <OverviewApplicationsCard v-bind="applications" />
         <OverviewRecommendedCard v-bind="recommended" />
 
