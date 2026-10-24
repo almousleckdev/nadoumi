@@ -2794,10 +2794,26 @@
     "kind": "文件类型",
     "number": "编号",
     "issuedOn": "签发日期",
-    "privacy": "为保护隐私，此处不显示任何个人信息。",
+    "privacy": "这里只显示核对文件所需的信息，不会显示联系方式和护照信息。",
     "kinds": {
       "RECEIPT": "付款收据",
       "APPLICATION_FORM": "申请表"
+    },
+    "student": "学生",
+    "application": "申请编号",
+    "opportunity": "项目或奖学金",
+    "university": "大学",
+    "intake": "入学季",
+    "fee": "申请费",
+    "feeStatus": "费用状态",
+    "feePaidAt": "缴费时间",
+    "feeStatuses": {
+      "PENDING": "等待付款",
+      "PROOF_SUBMITTED": "已付款，Nadoumi 核实中",
+      "CONFIRMED": "已付款并确认",
+      "REJECTED": "付款未被接受",
+      "EXPIRED": "已过期",
+      "CANCELLED": "已取消"
     }
   }
 }

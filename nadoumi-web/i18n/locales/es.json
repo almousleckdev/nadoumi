@@ -2794,10 +2794,26 @@
     "kind": "Documento",
     "number": "Número",
     "issuedOn": "Emitido el",
-    "privacy": "Por privacidad, aquí no se muestran datos personales.",
+    "privacy": "Solo se muestran los datos necesarios para comprobar este documento. Nunca se muestran contacto ni pasaporte.",
     "kinds": {
       "RECEIPT": "Recibo de pago",
       "APPLICATION_FORM": "Formulario de solicitud"
+    },
+    "student": "Estudiante",
+    "application": "Número de solicitud",
+    "opportunity": "Programa o beca",
+    "university": "Universidad",
+    "intake": "Convocatoria",
+    "fee": "Tasa de solicitud",
+    "feeStatus": "Estado de la tasa",
+    "feePaidAt": "Tasa pagada el",
+    "feeStatuses": {
+      "PENDING": "Pendiente de pago",
+      "PROOF_SUBMITTED": "Pagada, Nadoumi la está comprobando",
+      "CONFIRMED": "Pagada y confirmada",
+      "REJECTED": "Pago no aceptado",
+      "EXPIRED": "Caducada",
+      "CANCELLED": "Cancelada"
     }
   }
 }

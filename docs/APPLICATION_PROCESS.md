@@ -51,7 +51,7 @@
 > Nadoumi application fee by QR (15 minutes), then Submit. Submit is locked, with the reason shown, until every step is done and the fee is paid;
 > the server enforces the same (`SubmitGate`: fee, documents, the applicant's onboarding and form data, signature) for every actor.
 >
-> **Application number.** `NAD` + the start date (China time) + the day's running number: `NAD20261023001`, `NAD20261023002`, ... It replaces the database id
+> **Application number (changed 2026-10-25).** `NAD` + the year (China time) + the year's running number: `NAD2027001`, `NAD2027002`, ... The count starts again at 001 when the new year begins in China; past 999 it grows (`NAD20271000`). References issued before the change keep the old `NAD20261023001` form. The counter reuses `nad_application_reference_counter`, keyed by 1 January of the year (no migration). It replaces the database id
 > everywhere a person sees it (student and staff screens, emails, receipts, the form PDF, the payment queue).
 
 

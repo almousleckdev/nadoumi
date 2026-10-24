@@ -2794,10 +2794,26 @@
     "kind": "Document",
     "number": "Numéro",
     "issuedOn": "Émis le",
-    "privacy": "Par confidentialité, aucune donnée personnelle n’est affichée ici.",
+    "privacy": "Seuls les détails nécessaires à la vérification sont affichés. Les coordonnées et le passeport ne sont jamais affichés.",
     "kinds": {
       "RECEIPT": "Reçu de paiement",
       "APPLICATION_FORM": "Formulaire de candidature"
+    },
+    "student": "Étudiant",
+    "application": "Numéro de candidature",
+    "opportunity": "Programme ou bourse",
+    "university": "Université",
+    "intake": "Rentrée",
+    "fee": "Frais de dossier",
+    "feeStatus": "Statut des frais",
+    "feePaidAt": "Frais payés le",
+    "feeStatuses": {
+      "PENDING": "En attente de paiement",
+      "PROOF_SUBMITTED": "Payé, en cours de vérification par Nadoumi",
+      "CONFIRMED": "Payé et confirmé",
+      "REJECTED": "Paiement non accepté",
+      "EXPIRED": "Expiré",
+      "CANCELLED": "Annulé"
     }
   }
 }

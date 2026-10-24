@@ -600,14 +600,14 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
-    void shouldNumberApplicationsNadDateAndTheDaysRunningNumber() throws Exception {
+    void shouldNumberApplicationsNadYearAndTheYearsRunningNumber() throws Exception {
         Student s = register("pay", "ref1");
         long first = draftFor(s);
         String one = JsonPath.read(mvc.perform(get("/api/student/applications/" + first).header("Authorization", bearer(s.token())))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), "$.reference");
-        assertThat(one).matches("NAD\\d{8}\\d{3,}");
+        assertThat(one).matches("NAD\\d{4}\\d{3,}");
 
-        // a second application on the same day continues the day's numbering
+        // a second application in the same year continues the year's numbering
         long second = draftFor(register("pay", "ref2"));
         String two = JsonPath.read(mvc.perform(get("/api/staff/applications/" + second).header("Authorization", staffAuth))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), "$.application.reference");
