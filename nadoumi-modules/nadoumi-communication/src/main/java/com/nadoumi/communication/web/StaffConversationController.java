@@ -61,7 +61,7 @@ public class StaffConversationController {
         return Map.of("count", conversations.unreadCount());
     }
 
-    /** Finds students to chat with by student id, application id or name; a few results at a time. */
+    /** Finds students to chat with by student id, application reference (NAD2026001) or name; a few results at a time. */
     @GetMapping("/chat/students")
     @PreAuthorize("@ss.hasPermi('nad:conversation:participate')")
     public List<StudentSearchResult> searchStudents(@RequestParam(name = "q", defaultValue = "") String q) {

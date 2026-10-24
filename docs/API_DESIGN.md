@@ -520,6 +520,8 @@ Requirement conditions (EXISTING, 2026-10-22): programme requirement items and s
 
 Templates (EXISTING, 2026-10-22): staff `GET|POST /api/staff/document-templates/programs/{id}` and `.../scholarships/{id}` (multipart `title` + `file`; `nad:program:*` / `nad:scholarship:*`), `DELETE /api/staff/document-templates/{id}`; students `GET /api/student/applications/{id}/templates` and `.../templates/{templateId}` (attachment, `no-store`).
 
+Staff chat student search (`GET /api/staff/chat/students?q=`) finds a student by student id, by application reference (`NAD2026001`, exact) or by name (2026-10-25; the old application-id match is gone since references replaced ids on screen).
+
 Document verification (EXISTING, 2026-10-23): `GET /api/public/documents/verify?number=&code=` (anonymous, 20/min/IP) returns `{valid, kind, number, issuedOn, details}`; `valid` is false and the rest null for any pair that does not match. For a valid pair `details` (2026-10-25) carries what the printed QR shows: `applicantName`, `applicationReference`, `opportunity`, `universityName`, `intake`, `feeAmount`, `currency`, `feeStatus`, `feePaidAt`, `issuedAt` (UTC instants). The unguessable 12 character code is the only key and the IP rate limit stays; contact, passport and account details are never returned.
 
 **Public: `GET /api/public/document-requirements/programs/{programId}` (2026-10-23, anonymous).** Returns `[{docType, mandatory, notes, appliesWhen}]`: the same

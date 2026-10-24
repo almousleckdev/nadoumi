@@ -85,7 +85,7 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
           <StatTile icon="applications" :label="t('dashboard.home.statSubmitted')" :value="stats.submitted" />
           <StatTile icon="clock" :label="t('dashboard.home.statInProgress')" :value="stats.inProgress" />
           <StatTile icon="award" :label="t('dashboard.home.statOffers')" :value="stats.offers" />
-          <StatTile icon="documents" :label="t('dashboard.applications.draftsTitle')" :value="stats.drafts" />
+          <StatTile icon="documents" :label="t('dashboard.applications.statUnfinished')" :value="stats.drafts" />
         </div>
 
         <section v-if="drafts.length" class="grid gap-3" data-test="drafts">

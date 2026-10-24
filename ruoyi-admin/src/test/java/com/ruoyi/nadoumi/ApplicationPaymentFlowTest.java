@@ -615,6 +615,17 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
+    void shouldLetStaffFindAStudentToChatWith_byTheApplicationReference() throws Exception {
+        Student s = register("pay", "chatref");
+        long app = draftFor(s);
+        String reference = jdbc.queryForObject("select reference from nad_application where id = ?", String.class, app);
+
+        mvc.perform(get("/api/staff/chat/students").param("q", reference).header("Authorization", staffAuth))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].matchedApplicationId").value(app));
+    }
+
+    @Test
     void shouldShowAnonymousVisitorsTheSameDocumentsStudentsAreAskedFor() throws Exception {
         requireDocuments("{\"requirements\":[{\"docType\":\"PASSPORT\",\"mandatory\":true},"
                 + "{\"docType\":\"PHOTO\",\"mandatory\":false,\"notes\":\"white background\"}]}");

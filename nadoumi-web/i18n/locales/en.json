@@ -474,13 +474,10 @@
     },
     "home": {
       "subtitle": "Here's an overview of your scholarship journey.",
-      "applications": "Applications",
-      "applicationsEmpty": "You haven't started an application yet.",
       "browseScholarships": "Browse scholarships",
       "recommended": "Recommended scholarships",
       "recommendedEmpty": "No recommendations yet. Check back soon.",
       "viewAll": "View all",
-      "documents": "Documents",
       "manageDocuments": "Manage documents",
       "docPhoto": "Profile photo",
       "docPassport": "Passport",
@@ -723,7 +720,6 @@
       "empty": "You have not started an application yet.",
       "browse": "Browse scholarships",
       "submittedOn": "Submitted {date}",
-      "currentStage": "Current stage: {stage}",
       "backToList": "Back to my applications",
       "notFound": "We could not find this application.",
       "timeline": "Progress",
@@ -781,7 +777,8 @@
         "default": "Nadoumi is working on your application."
       },
       "colProgress": "Progress",
-      "stepOf": "Step {n} of {total}"
+      "stepOf": "Step {n} of {total}",
+      "statUnfinished": "Unfinished"
     }
   },
   "validation": {
@@ -2663,23 +2660,14 @@
   },
   "apply": {
     "title": "Apply",
-    "blurb": "Start your application.",
-    "back": "Back",
     "noTarget": "Choose a programme or scholarship to apply for.",
     "notFound": "We could not find what you want to apply for. It may no longer be open.",
-    "profileUnfinished": "{name} has not finished their profile. You can start the application, but it can only be submitted once their profile is complete.",
-    "finishProfile": "Finish {name}'s profile",
-    "studentTitle": "Who is applying",
     "studentLegend": "Student",
     "unnamedStudent": "Student",
-    "noStudents": "Complete your student profile before applying.",
     "intakeTitle": "Intake",
     "intakeLabel": "Choose an intake",
     "intakePlaceholder": "Select an intake",
     "noIntake": "This programme has no intake open for applications right now.",
-    "nextTitle": "What happens next",
-    "nextBody": "We save a draft application straight away. Next you pay the Nadoumi application fee, which you can do any time, then submit your application. Your draft stays saved until you submit.",
-    "start": "Start application",
     "continueDraft": "Continue your draft",
     "draftExists": "You already have a draft application for this."
   },
@@ -2754,7 +2742,6 @@
     "uploadAgain": "Upload again",
     "uploaded": "Document uploaded",
     "badType": "Upload a PDF, JPEG or PNG file within the size limit.",
-    "uploadToSubmit": "Upload the required documents to submit your application.",
     "status": {
       "MISSING": "Not uploaded"
     },
@@ -2773,7 +2760,6 @@
     "saved": "Signature saved",
     "onFile": "Your signature is on file and will be printed on the application form.",
     "badType": "Upload a PNG or JPEG image within the size limit.",
-    "signToSubmit": "Add your signature to submit your application.",
     "errors": {
       "required": "Add your signature before submitting."
     }
