@@ -2,38 +2,28 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createMemoryHistory } from 'vue-router'
 import { createPinia, setActivePinia } from 'pinia'
-import { ref } from 'vue'
 import { mountOpts } from '../../helpers'
 
 const api = vi.hoisted(() => ({
-  getFinanceSummary: vi.fn(),
+  getFinanceOverview: vi.fn(),
   listTasks: vi.fn(),
   listPrograms: vi.fn(),
   listUniversities: vi.fn(),
   listScholarships: vi.fn(),
   listUsers: vi.fn(),
   listMyNotifications: vi.fn(),
-  refreshStats: vi.fn(),
   listApplications: vi.fn(),
   listPayments: vi.fn(),
 }))
-vi.mock('@/api/application', () => ({ listApplications: api.listApplications }))
-vi.mock('@/api/payment', () => ({ listPayments: api.listPayments }))
-vi.mock('@/api/finance', () => ({ getFinanceSummary: api.getFinanceSummary }))
+vi.mock('@/api/finance', () => ({ getFinanceOverview: api.getFinanceOverview }))
 vi.mock('@/api/hr', () => ({ listTasks: api.listTasks }))
 vi.mock('@/api/program', () => ({ listPrograms: api.listPrograms }))
 vi.mock('@/api/university', () => ({ listUniversities: api.listUniversities }))
 vi.mock('@/api/scholarship', () => ({ listScholarships: api.listScholarships }))
 vi.mock('@/api/system', () => ({ listUsers: api.listUsers }))
 vi.mock('@/api/notification', () => ({ listMyNotifications: api.listMyNotifications }))
-vi.mock('@/composables/useApplicantStats', () => ({
-  useApplicantStats: () => ({
-    data: ref({ total: 120, new30d: 8, incomplete: 3, active: 40, sampled: false, sampledCount: 0, recent: [{ status: 'NEW' }, { status: 'NEW' }, { status: 'IN_REVIEW' }] }),
-    loading: ref(false),
-    error: ref(null),
-    refresh: api.refreshStats,
-  }),
-}))
+vi.mock('@/api/application', () => ({ listApplications: api.listApplications }))
+vi.mock('@/api/payment', () => ({ listPayments: api.listPayments }))
 
 import Dashboard from '@/views/dashboard.vue'
 import { useUserStore } from '@/stores/user'
@@ -43,17 +33,21 @@ const router = createRouter({
   routes: [{ path: '/:x(.*)*', component: { template: '<div />' } }],
 })
 
-const financeSummary = {
-  byCurrency: [
-    { currency: 'CNY', revenue: '10000', expenses: '4000', net: '6000' },
-    { currency: 'USD', revenue: '100', expenses: '20', net: '80' },
-  ],
+const months = Array.from({ length: 12 }, (_, i) => ({
+  month: `2026-${String(i + 1).padStart(2, '0')}`, revenue: i === 9 ? 1200 : 0, expenses: i === 9 ? 500 : 0, net: i === 9 ? 700 : 0,
+}))
+const overview = {
+  currency: 'CNY', currencies: ['CNY'], asOf: '2026-10-25',
+  kpis: {
+    revenueToday: 300, revenueMonth: 1200, revenueMonthPrev: 900, expensesMonth: 500, expensesMonthPrev: 700,
+    netMonth: 700, netMonthPrev: 200, revenueYtd: 9000, expensesYtd: 4000, netYtd: 5000,
+    receivables: 600, receivablesCount: 2, payables: 250, payablesCount: 3,
+  },
+  months, revenueBySource: [], expenseByCategory: [],
 }
 
 async function mountDashboard() {
-  const w = mount(Dashboard, {
-    global: { ...mountOpts().global, plugins: [...mountOpts().global.plugins, router] },
-  })
+  const w = mount(Dashboard, { global: { ...mountOpts().global, plugins: [...mountOpts().global.plugins, router] } })
   await flushPromises()
   return w
 }
@@ -61,19 +55,22 @@ async function mountDashboard() {
 describe('Dashboard', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    useUserStore().userId = 3
     Object.values(api).forEach(fn => fn.mockReset())
-    api.getFinanceSummary.mockResolvedValue(financeSummary)
+    api.getFinanceOverview.mockResolvedValue(overview)
     api.listTasks.mockResolvedValue({ content: [
-      { status: 'PENDING', priority: 'HIGH' }, { status: 'IN_PROGRESS', priority: 'HIGH' },
-      { status: 'DONE', priority: 'LOW' }, { status: 'PENDING', priority: 'LOW' },
+      { id: 1, title: 'Call the Fudan office', status: 'PENDING', priority: 'HIGH', dueDate: '2020-01-01' },
+      { id: 2, title: 'Review scholarship list', status: 'IN_PROGRESS', priority: 'LOW', dueDate: '2999-01-01' },
+      { id: 3, title: 'Done already', status: 'COMPLETED', priority: 'LOW', dueDate: null },
     ] })
-    api.listPrograms.mockResolvedValue({ totalElements: 30, content: [
-      { universityName: 'Fudan' }, { universityName: 'Fudan' }, { universityName: 'Tsinghua' },
-    ] })
+    api.listPrograms.mockResolvedValue({ totalElements: 30, content: [] })
     api.listUniversities.mockResolvedValue({ totalElements: 12, content: [] })
     api.listScholarships.mockResolvedValue({ totalElements: 9, content: [] })
     api.listUsers.mockResolvedValue({ total: 250, rows: [] })
     api.listPayments.mockResolvedValue({ totalElements: 4, content: [] })
+    api.listMyNotifications.mockResolvedValue({ content: [
+      { id: 1, type: 'APPLICATION_UPDATE', title: 'Application NAD2026001 moved to review', body: '', createdAt: '2026-10-25T08:00:00', read: false },
+    ] })
     api.listApplications.mockImplementation(async (params: { status?: string }) => {
       if (params.status === 'IN_REVIEW') return { totalElements: 5, content: [] }
       if (params.status === 'OFFER') return { totalElements: 2, content: [] }
@@ -83,97 +80,79 @@ describe('Dashboard', () => {
         currentStatus: 'IN_REVIEW', assigneeName: null, submittedAt: '2026-10-24T10:00:00',
       }] }
     })
-    api.listMyNotifications.mockResolvedValue({ content: [{ type: 'APPLICATION_UPDATE' }, { type: 'APPLICATION_UPDATE' }] })
   })
 
   it('shows the no-access state and fetches nothing scoped for an account without permissions', async () => {
     useUserStore().permissions = []
     const w = await mountDashboard()
     expect(w.text()).toContain('Nothing to show here yet')
-    expect(api.listUsers).not.toHaveBeenCalled()
-    expect(api.listUniversities).not.toHaveBeenCalled()
-    expect(api.listPrograms).not.toHaveBeenCalled()
-    expect(api.listScholarships).not.toHaveBeenCalled()
-    expect(api.getFinanceSummary).not.toHaveBeenCalled()
-    expect(api.listTasks).not.toHaveBeenCalled()
-    expect(api.refreshStats).not.toHaveBeenCalled()
-  })
-
-  it('fetches only what a finance-only account may see', async () => {
-    useUserStore().permissions = ['nad:finance:view']
-    const w = await mountDashboard()
-    expect(api.getFinanceSummary).toHaveBeenCalledTimes(3)
-    expect(api.listUsers).not.toHaveBeenCalled()
-    expect(api.listPrograms).not.toHaveBeenCalled()
-    expect(api.listTasks).not.toHaveBeenCalled()
-    expect(api.refreshStats).not.toHaveBeenCalled()
-    expect(w.text()).toContain('CNY 10,000')
-  })
-
-  it('shows the largest-revenue currency net margin for finance', async () => {
-    useUserStore().permissions = ['nad:finance:view']
-    const w = await mountDashboard()
-    expect(w.text()).toContain('CNY 4,000')
-    expect(w.text()).toContain('CNY 6,000')
-    expect(w.text()).toContain('60%')
-  })
-
-  it('shows platform totals for an account that holds each list permission', async () => {
-    useUserStore().permissions = ['system:user:list', 'nad:university:list', 'nad:program:list', 'nad:scholarship:list']
-    const w = await mountDashboard()
-    expect(api.listUsers).toHaveBeenCalledWith({ userType: '10', pageNum: 1, pageSize: 1 })
-    expect(w.text()).toContain('250')
-    expect(w.text()).toContain('12')
-    expect(w.text()).toContain('30')
-    expect(w.text()).toContain('9')
-  })
-
-  it('counts open tasks only and groups the catalogue by university', async () => {
-    useUserStore().permissions = ['nad:task:list', 'nad:program:list']
-    const w = await mountDashboard()
-    expect(api.listTasks).toHaveBeenCalledWith({ page: 0, size: 8 })
-    expect(w.text()).toContain('Fudan')
-    expect(w.text()).toContain('Tsinghua')
-  })
-
-  it('shows the application pipeline, the payment queue and the newest applications to staff who may see them', async () => {
-    useUserStore().permissions = ['nad:application:list', 'nad:payment:list']
-    const w = await mountDashboard()
-    expect(api.listPayments).toHaveBeenCalledWith({ status: 'PROOF_SUBMITTED', page: 0, size: 1 })
-    const text = w.text()
-    for (const part of ['Applications submitted', 'Payments to confirm', 'Latest applications', 'Amina Diallo', 'Fudan University', 'Unassigned']) {
-      expect(text).toContain(part)
+    for (const fn of [api.listUsers, api.listUniversities, api.listPrograms, api.listScholarships, api.getFinanceOverview,
+      api.listTasks, api.listApplications, api.listPayments]) {
+      expect(fn).not.toHaveBeenCalled()
     }
   })
 
-  it('does not ask for applications or payments without their permissions', async () => {
-    useUserStore().permissions = ['nad:task:list']
+  it('shows a finance-only account the money figures and nothing else', async () => {
+    useUserStore().permissions = ['nad:finance:view']
+    const w = await mountDashboard()
+    const text = w.text()
+    expect(api.getFinanceOverview).toHaveBeenCalledTimes(1)
+    expect(text).toContain('CNY 1,200')
+    expect(text).toContain('+33% vs last month')
+    expect(text).toContain('Bills to pay')
+    expect(api.listUsers).not.toHaveBeenCalled()
+    expect(api.listApplications).not.toHaveBeenCalled()
+    expect(api.listTasks).not.toHaveBeenCalled()
+  })
+
+  it('puts what needs a person first: payments to confirm, applications in review, own tasks with the overdue count, bills', async () => {
+    useUserStore().permissions = ['*:*:*']
+    const w = await mountDashboard()
+    const att = (key: string) => w.find(`[data-test="attention-${key}"]`).text()
+    expect(att('payments')).toContain('4')
+    expect(att('review')).toContain('5')
+    expect(att('tasks')).toContain('2')
+    expect(att('tasks')).toContain('1 overdue')
+    expect(att('bills')).toContain('3')
+    // the work assigned to the signed-in user, not the tasks they created
+    expect(api.listTasks).toHaveBeenCalledWith(expect.objectContaining({ assigneeUserId: 3 }))
+    expect(api.listTasks).not.toHaveBeenCalledWith(expect.objectContaining({ mine: true }))
+  })
+
+  it('shows the pipeline, the latest applications, own open tasks, activity and the catalogue to the platform owner', async () => {
+    useUserStore().permissions = ['*:*:*']
+    const w = await mountDashboard()
+    const text = w.text()
+    expect(w.findAll('[data-test="funnel-row"]')).toHaveLength(7)
+    for (const part of ['Amina Diallo', 'Fudan University', 'Call the Fudan office', 'Review scholarship list', 'moved to review', 'Total universities', '250']) {
+      expect(text).toContain(part)
+    }
+    expect(text).not.toContain('Done already')
+  })
+
+  it('does not ask for applications, payments or tasks without their permissions', async () => {
+    useUserStore().permissions = ['nad:university:list']
     await mountDashboard()
     expect(api.listApplications).not.toHaveBeenCalled()
     expect(api.listPayments).not.toHaveBeenCalled()
+    expect(api.listTasks).not.toHaveBeenCalled()
+    expect(api.listUniversities).toHaveBeenCalled()
   })
 
   it('always loads the callers own activity feed', async () => {
-    useUserStore().permissions = ['nad:task:list']
+    useUserStore().permissions = ['nad:university:list']
     await mountDashboard()
-    expect(api.listMyNotifications).toHaveBeenCalledWith({ page: 0, size: 8 })
-  })
-
-  it('shows the roadmap only to the platform owner', async () => {
-    useUserStore().permissions = ['nad:task:list']
-    expect((await mountDashboard()).text()).not.toContain('Payroll')
-    useUserStore().permissions = ['*:*:*']
-    expect((await mountDashboard()).text()).toContain('Payroll')
+    expect(api.listMyNotifications).toHaveBeenCalledWith({ page: 0, size: 6 })
   })
 
   it('refreshes every permitted source when the refresh button is pressed', async () => {
     useUserStore().permissions = ['*:*:*']
     const w = await mountDashboard()
-    api.getFinanceSummary.mockClear()
-    api.refreshStats.mockClear()
+    api.getFinanceOverview.mockClear()
+    api.listTasks.mockClear()
     await w.findAll('button').find(b => b.text() === 'Refresh')!.trigger('click')
     await flushPromises()
-    expect(api.refreshStats).toHaveBeenCalledOnce()
-    expect(api.getFinanceSummary).toHaveBeenCalledTimes(3)
+    expect(api.getFinanceOverview).toHaveBeenCalledTimes(1)
+    expect(api.listTasks).toHaveBeenCalledTimes(1)
   })
 })

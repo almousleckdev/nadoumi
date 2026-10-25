@@ -67,6 +67,7 @@ declare module 'vue' {
     FilterBar: typeof import('./src/components/ui/FilterBar.vue')['default']
     FormSection: typeof import('./src/components/ui/FormSection.vue')['default']
     ImageUpload: typeof import('./src/components/ui/ImageUpload.vue')['default']
+    KpiCard: typeof import('./src/components/dashboard/KpiCard.vue')['default']
     LoadingState: typeof import('./src/components/ui/LoadingState.vue')['default']
     MoneyField: typeof import('./src/components/ui/MoneyField.vue')['default']
     PageHeader: typeof import('./src/components/PageHeader.vue')['default']
@@ -78,6 +79,7 @@ declare module 'vue' {
     StatePanel: typeof import('./src/components/ui/StatePanel.vue')['default']
     StatusBadge: typeof import('./src/components/ui/StatusBadge.vue')['default']
     StatusReasonDialog: typeof import('./src/components/ui/StatusReasonDialog.vue')['default']
+    TrendChart: typeof import('./src/components/dashboard/TrendChart.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

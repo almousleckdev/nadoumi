@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import type { ApplicationRow } from '@/api/application'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
-import { formatDateTime } from '@/utils/date'
 import { useApplicationLabels } from '@/views/applications/useApplicationLabels'
 import { STATUS_TONES } from '@/views/applications/vocabulary'
 
@@ -81,14 +80,6 @@ const { statusLabel } = useApplicationLabels()
       >
         <template #default="{ row }">
           {{ row.assigneeName ?? t('applications.unassigned') }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        :label="t('applications.submitted')"
-        width="170"
-      >
-        <template #default="{ row }">
-          {{ formatDateTime(row.submittedAt) }}
         </template>
       </el-table-column>
     </el-table>

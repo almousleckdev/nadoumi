@@ -24,6 +24,8 @@ is built on Vue 2**. Full staff permission detail: `docs/PERMISSION_CATALOGUE.md
 
 > **2026-10-25 (finance):** `/finance` is now the finance overview (`views/finance/summary.vue`): eight KPI cards with month on month change, a notice for payments waiting to be confirmed, a twelve month revenue, expenses and net chart (`overview/TrendChart.vue`, inline SVG with a zero line so a loss month reads correctly), revenue by source and expenses by category, a currency picker and a CSV export. `/finance/ledger` is a new page listing every money in and money out entry with filters and the same export. The sidebar marks only the longest matching item active.
 
+> **2026-10-25 (dashboard redesign):** the admin dashboard is an operations console, not a wall of counters. Order: a greeting; an **attention strip** (payments to confirm, applications in review, my open tasks with the overdue count, bills to pay), each card a link and flagged only when it needs action (payments, overdue tasks); four headline KPIs (students, applications submitted, revenue and net this month with change on last month); then a two thirds column (application pipeline bars per status, latest applications, a six month revenue and expenses chart) beside a third (my tasks soonest due first, recent activity, catalogue counts). Every block is gated on the permission behind its API and nothing else is fetched. Finance figures come from `/api/staff/finance/overview`; the old per-domain stat groups, donut charts, the applicant-stats sampler and the "not yet available" cards were removed. `KpiCard` and `TrendChart` are shared with the finance overview.
+
 ## 1. What exists today (EXISTING)
 
 ### 1.0 Two frontends, one target — authoritative

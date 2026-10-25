@@ -184,8 +184,8 @@ import PageHeader from '@/components/PageHeader.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import { exportLedger, getFinanceOverview, type FinanceOverview } from '@/api/finance'
 import { saveBlob } from '@/utils/download'
-import KpiCard from './overview/KpiCard.vue'
-import TrendChart from './overview/TrendChart.vue'
+import KpiCard from '@/components/dashboard/KpiCard.vue'
+import TrendChart from '@/components/dashboard/TrendChart.vue'
 import BreakdownList from './overview/BreakdownList.vue'
 
 const { t, te } = useI18n()

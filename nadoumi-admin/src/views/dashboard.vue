@@ -1,12 +1,12 @@
 <template>
   <div class="nad-page dash">
     <PageHeader
-      :title="t('dashboard.title')"
-      :subtitle="t('dashboard.subtitle')"
+      :title="greeting"
+      :subtitle="t('dashboard.subtitle', { date: todayLabel })"
     >
       <template #actions>
         <el-button
-          :loading="loading || finance.loading.value || pipeline.loading.value"
+          :loading="busy"
           :icon="Refresh"
           @click="refreshAll"
         >
@@ -33,8 +33,8 @@
     </el-alert>
 
     <el-alert
-      v-if="error"
-      :title="error"
+      v-if="pipeline.failed.value || finance.failed.value"
+      :title="t('dashboard.loadError')"
       type="error"
       show-icon
       :closable="false"
@@ -51,7 +51,7 @@
     <el-card
       v-if="access.nothingVisible.value"
       shadow="never"
-      class="dash__panel dash__row"
+      class="dash__row dash__empty"
     >
       <EmptyState
         :title="t('dashboard.noAccessTitle')"
@@ -60,112 +60,85 @@
       />
     </el-card>
 
-    <PlatformGroup
-      v-if="access.showPlatform.value"
-      :access="access"
-      :counts="platformCounts.counts.value"
-      :applicant-total="stats?.total ?? null"
-      :applicant-state="cardState"
-    />
-
-    <ApplicationsGroup
-      v-if="access.showOperations.value"
-      :pipeline="pipeline"
-      :access="access"
-    />
-
-    <div
-      v-if="access.canSeeApplications.value"
-      class="dash__split dash__split--pipeline"
-    >
-      <DashboardPanel
-        :title="t('dashboard.pipelineTitle')"
-        :slices="pipelineChart"
-        :caption="t('dashboard.k.applicationsSubmitted')"
-        :loading="pipeline.loading.value"
-        :empty-title="t('dashboard.noApplications')"
-        empty-icon="Document"
-        view-all-to="/applications"
+    <template v-else>
+      <AttentionStrip
+        v-if="attention.length"
+        :items="attention"
       />
-      <LatestApplications
-        :rows="pipeline.latest.value"
-        :loading="pipeline.loading.value"
-      />
-    </div>
 
-    <FinanceGroup
-      v-if="access.canSeeFinance.value"
-      :overview="finance"
-    />
+      <div
+        v-if="kpis.length"
+        class="dash__kpis"
+      >
+        <KpiCard
+          v-for="k in kpis"
+          :key="k.key"
+          :label="k.label"
+          :value="k.value"
+          :tone="k.tone"
+          :delta="k.delta ?? null"
+          :delta-good="k.deltaGood"
+          :hint="k.hint"
+          :to="k.to"
+        />
+      </div>
 
-    <ApplicantsGroup
-      v-if="access.canSeeApplicants.value"
-      :stats="stats"
-      :state="cardState"
-      :error="error"
-    />
+      <div class="dash__grid">
+        <div class="dash__main">
+          <PipelineFunnel
+            v-if="access.canSeeApplications.value"
+            :per-status="pipeline.perStatus.value"
+            :loading="pipeline.loading.value"
+          />
+          <LatestApplications
+            v-if="access.canSeeApplications.value"
+            :rows="pipeline.latest.value"
+            :loading="pipeline.loading.value"
+          />
+          <section
+            v-if="finance.overview.value"
+            class="dash__card"
+          >
+            <div class="dash__card-head">
+              <h3 class="dash__card-title">
+                {{ t('dashboard.financeTitle') }}
+              </h3>
+              <el-button
+                link
+                type="primary"
+                @click="router.push('/finance')"
+              >
+                {{ t('dashboard.openFinance') }}
+              </el-button>
+            </div>
+            <TrendChart
+              :months="finance.overview.value.months.slice(-6)"
+              :currency="finance.overview.value.currency"
+              :revenue-label="t('finance.revenue')"
+              :expenses-label="t('finance.expenses')"
+              :net-label="t('finance.net')"
+            />
+          </section>
+        </div>
 
-    <div
-      v-if="access.canSeeCatalog.value || access.canSeeApplicants.value"
-      class="dash__split"
-    >
-      <DashboardPanel
-        v-if="access.canSeeCatalog.value"
-        :title="t('dashboard.popularUniversities')"
-        :slices="catalog.data.value"
-        :caption="t('dashboard.k.totalProgrammes')"
-        :loading="catalog.loading.value"
-        :empty-title="t('dashboard.noProgrammes')"
-        empty-icon="Notebook"
-      />
-      <DashboardPanel
-        v-if="access.canSeeApplicants.value"
-        :title="t('dashboard.recentApplicants')"
-        :slices="applicantChart"
-        :caption="t('dashboard.byStatus')"
-        :loading="loading && !stats"
-        :empty-title="t('dashboard.noApplicants')"
-        empty-icon="User"
-        view-all-to="/applicants"
-      />
-    </div>
-
-    <div
-      v-if="!access.nothingVisible.value"
-      class="dash__split"
-    >
-      <DashboardPanel
-        v-if="access.canSeeTasks.value"
-        :title="t('dashboard.myTasks')"
-        :slices="taskChart"
-        :caption="t('dashboard.byPriority')"
-        :loading="tasks.loading.value"
-        :empty-title="t('dashboard.noOpenTasks')"
-        empty-icon="Select"
-        view-all-to="/tasks"
-      />
-      <DashboardPanel
-        :title="t('dashboard.recentActivity')"
-        :slices="activityChart"
-        :caption="t('dashboard.byType')"
-        :loading="activity.loading.value"
-        :empty-title="t('dashboard.noActivity')"
-        empty-icon="Bell"
-        view-all-to="/notifications"
-      />
-    </div>
-
-    <DashboardGroup
-      v-if="access.isOwner.value"
-      :title="t('dashboard.groups.notYet')"
-    >
-      <ComingSoonCard
-        v-for="c in comingSoon"
-        :key="c.key"
-        :label="t(`dashboard.k.${c.key}`)"
-        :domain="c.domain"
-      />
-    </DashboardGroup>
+        <div class="dash__side">
+          <MyTasksPanel
+            v-if="access.canSeeTasks.value"
+            :tasks="tasks.shown.value"
+            :loading="tasks.loading.value"
+            :today="today"
+          />
+          <ActivityPanel
+            :items="activity.data.value"
+            :loading="activity.loading.value"
+          />
+          <CatalogPanel
+            v-if="catalogRows.length"
+            :rows="catalogRows"
+          />
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -175,114 +148,149 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { Refresh } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
-import { useApplicantStats } from '@/composables/useApplicantStats'
-import { listTasks } from '@/api/hr'
-import { listPrograms } from '@/api/program'
 import { listMyNotifications } from '@/api/notification'
 import PageHeader from '@/components/PageHeader.vue'
-import DashboardGroup from '@/components/dashboard/DashboardGroup.vue'
-import ComingSoonCard from '@/components/dashboard/ComingSoonCard.vue'
+import KpiCard from '@/components/dashboard/KpiCard.vue'
+import TrendChart from '@/components/dashboard/TrendChart.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
-import { humanize } from '@/utils/text'
-import DashboardPanel from './dashboard/DashboardPanel.vue'
-import PlatformGroup from './dashboard/PlatformGroup.vue'
-import FinanceGroup from './dashboard/FinanceGroup.vue'
-import ApplicantsGroup from './dashboard/ApplicantsGroup.vue'
-import ApplicationsGroup from './dashboard/ApplicationsGroup.vue'
+import AttentionStrip, { type AttentionItem } from './dashboard/AttentionStrip.vue'
+import PipelineFunnel from './dashboard/PipelineFunnel.vue'
 import LatestApplications from './dashboard/LatestApplications.vue'
+import MyTasksPanel from './dashboard/MyTasksPanel.vue'
+import ActivityPanel from './dashboard/ActivityPanel.vue'
+import CatalogPanel, { type CatalogRow } from './dashboard/CatalogPanel.vue'
 import { useApplicationPipeline } from './dashboard/useApplicationPipeline'
-import { useApplicationLabels } from './applications/useApplicationLabels'
-import { countBy, openTasks, prioritySlices, statusSlices, topUniversitySlices } from './dashboard/dashboardMath'
 import { useDashboardAccess } from './dashboard/useDashboardAccess'
-import { useFinanceOverview } from './dashboard/useFinanceOverview'
+import { useFinanceGlance } from './dashboard/useFinanceGlance'
 import { useGatedLoader } from './dashboard/useGatedLoader'
+import { useMyTasks } from './dashboard/useMyTasks'
 import { usePlatformCounts } from './dashboard/usePlatformCounts'
 
-const TASK_SAMPLE_SIZE = 8
-const ACTIVITY_SAMPLE_SIZE = 8
-const CATALOG_SAMPLE_SIZE = 200
+const ACTIVITY_SAMPLE_SIZE = 6
+const MORNING_UNTIL_HOUR = 12
+const AFTERNOON_UNTIL_HOUR = 18
+
+interface Kpi {
+  key: string
+  label: string
+  value: string
+  tone?: 'good' | 'bad'
+  delta?: string | null
+  deltaGood?: boolean
+  hint?: string
+  to?: string
+}
 
 const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 
-// Every section is gated on the permission its API needs — a staff member only
-// ever sees, and only ever fetches, what their role allows.
+// Every block is gated on the permission its API needs: a staff member only sees, and only fetches, what their role allows.
 const access = useDashboardAccess()
 const platformCounts = usePlatformCounts(access)
 const pipeline = useApplicationPipeline(access)
-const { statusLabel } = useApplicationLabels()
-const { data: stats, loading, error, refresh } = useApplicantStats()
-const finance = useFinanceOverview(() => access.canSeeFinance.value)
-const tasks = useGatedLoader(
-  [] as ReturnType<typeof openTasks>,
-  () => access.canSeeTasks.value,
-  async () => openTasks((await listTasks({ page: 0, size: TASK_SAMPLE_SIZE })).content),
-)
-const catalog = useGatedLoader(
-  [] as ReturnType<typeof topUniversitySlices>,
-  () => access.canSeeCatalog.value,
-  async () => topUniversitySlices((await listPrograms({ page: 0, size: CATALOG_SAMPLE_SIZE })).content),
-)
+const finance = useFinanceGlance(access)
+const now = new Date()
+const today = now.toISOString().slice(0, 10)
+const tasks = useMyTasks(access, () => userStore.userId, () => today)
 const activity = useGatedLoader(
   [] as Awaited<ReturnType<typeof listMyNotifications>>['content'],
   () => true,
   async () => (await listMyNotifications({ page: 0, size: ACTIVITY_SAMPLE_SIZE })).content,
 )
 
-const cardState = computed<'ok' | 'loading' | 'error'>(() =>
-  error.value ? 'error' : (loading.value && !stats.value ? 'loading' : 'ok'))
+const busy = computed(() => pipeline.loading.value || finance.loading.value || tasks.loading.value)
 
-const pipelineChart = computed(() => pipeline.slices.value.map(s => ({ label: statusLabel(s.key), value: s.value })))
-const applicantChart = computed(() => statusSlices((stats.value?.recent ?? []).map(r => r.status)))
-const taskChart = computed(() => prioritySlices(tasks.data.value, p => t(`tasks.priorityMap.${p}`)))
-const activityChart = computed(() =>
-  [...countBy(activity.data.value, a => a.type)].map(([type, value]) => ({
-    label: t(`notifications.typeMap.${type}`, humanize(type)),
-    value,
-  })))
+const greeting = computed(() => {
+  const hour = now.getHours()
+  const part = hour < MORNING_UNTIL_HOUR ? 'morning' : hour < AFTERNOON_UNTIL_HOUR ? 'afternoon' : 'evening'
+  return t(`dashboard.greeting.${part}`, { name: userStore.nickName })
+})
+const todayLabel = computed(() => now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }))
 
-function refreshAll() {
-  if (access.canSeeApplicants.value) refresh()
-  finance.load()
-  tasks.load()
-  catalog.load()
-  platformCounts.load()
-  pipeline.load()
-  activity.load()
+const money = (v: number, currency: string) => `${currency} ${Number(v).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+function delta(now: number, prev: number): string | null {
+  if (!prev) return null
+  const pct = Math.round(((now - prev) / Math.abs(prev)) * 100)
+  return t('finance.vsLastMonth', { change: `${pct >= 0 ? '+' : ''}${pct}%` })
 }
 
-const comingSoon = [
-  { key: 'payroll', domain: 'Payroll' },
-] as const
+// what needs a person today, most urgent first; a block only appears for the permission behind it
+const attention = computed<AttentionItem[]>(() => {
+  const items: AttentionItem[] = []
+  if (access.canSeePayments.value) {
+    items.push({ key: 'payments', label: t('dashboard.k.paymentsToConfirm'), count: pipeline.paymentsToConfirm.value, to: '/payments', urgent: true })
+  }
+  if (access.canSeeApplications.value) {
+    items.push({ key: 'review', label: t('dashboard.k.applicationsInReview'), count: pipeline.inReview.value, to: '/applications' })
+  }
+  if (access.canSeeTasks.value) {
+    items.push({
+      key: 'tasks', label: t('dashboard.k.myOpenTasks'), count: tasks.total.value, to: '/tasks', urgent: tasks.overdue.value > 0,
+      detail: tasks.overdue.value ? t('dashboard.k.overdue', { n: tasks.overdue.value }) : undefined,
+    })
+  }
+  const o = finance.overview.value
+  if (o) {
+    items.push({ key: 'bills', label: t('dashboard.k.billsToPay'), count: o.kpis.payablesCount, to: '/expenses' })
+  }
+  return items
+})
+
+const kpis = computed<Kpi[]>(() => {
+  const list: Kpi[] = []
+  if (access.canSeeStudents.value && platformCounts.counts.value.students !== null) {
+    list.push({ key: 'students', label: t('dashboard.k.totalStudents'), value: String(platformCounts.counts.value.students) })
+  }
+  if (access.canSeeApplications.value) {
+    list.push({ key: 'applications', label: t('dashboard.k.applicationsSubmitted'), value: String(pipeline.total.value), to: '/applications' })
+  }
+  const o = finance.overview.value
+  if (o) {
+    const k = o.kpis
+    list.push(
+      {
+        key: 'revenue', label: t('finance.kRevenueMonth'), value: money(k.revenueMonth, o.currency),
+        delta: delta(k.revenueMonth, k.revenueMonthPrev), deltaGood: k.revenueMonth >= k.revenueMonthPrev, to: '/finance',
+      },
+      {
+        key: 'net', label: t('finance.kNetMonth'), value: money(k.netMonth, o.currency), tone: k.netMonth >= 0 ? 'good' : 'bad',
+        delta: delta(k.netMonth, k.netMonthPrev), deltaGood: k.netMonth >= k.netMonthPrev, to: '/finance',
+      },
+    )
+  }
+  return list
+})
+
+const catalogRows = computed<CatalogRow[]>(() => {
+  const c = platformCounts.counts.value
+  const rows: CatalogRow[] = []
+  if (access.canSeeUniversities.value) rows.push({ key: 'universities', label: t('dashboard.k.totalUniversities'), count: c.universities, to: '/universities' })
+  if (access.canSeeCatalog.value) rows.push({ key: 'programmes', label: t('dashboard.k.totalProgrammes'), count: c.programmes, to: '/programs' })
+  if (access.canSeeScholarships.value) rows.push({ key: 'scholarships', label: t('dashboard.k.totalScholarships'), count: c.scholarships, to: '/scholarships' })
+  return rows
+})
+
+function refreshAll() {
+  pipeline.load()
+  finance.load()
+  tasks.load()
+  platformCounts.load()
+  activity.load()
+}
 
 onMounted(refreshAll)
 </script>
 
 <style scoped>
-.dash__row {
-  margin-bottom: 16px;
-}
-.dash__split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 28px;
-}
-.dash__panel {
-  border: 1px solid var(--nad-line);
-  border-radius: var(--nad-radius);
-}
-.dash__split--pipeline {
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-}
-.dash__split > :deep(*) {
-  min-width: 0;
-}
-@media (max-width: 900px) {
-  .dash__split,
-  .dash__split--pipeline {
-    grid-template-columns: 1fr;
-  }
-}
+.dash__row { margin-bottom: 16px; }
+.dash__kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.dash__grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.dash__main, .dash__side { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.dash__main > :deep(.latest) { margin-bottom: 0; }
+.dash__card { border: 1px solid var(--nad-line, #e5e7eb); border-radius: var(--nad-radius, 8px); padding: 16px 18px; background: var(--nad-surface, #fff); min-width: 0; }
+.dash__card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.dash__card-title { margin: 0; font-size: 14px; font-weight: 650; color: var(--nad-ink, #0f172a); }
+.dash__empty { border: 1px solid var(--nad-line); border-radius: var(--nad-radius); }
+@media (max-width: 1100px) { .dash__grid { grid-template-columns: minmax(0, 1fr); } }
 </style>
