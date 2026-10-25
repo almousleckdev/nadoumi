@@ -12,10 +12,12 @@ const form = useEmployeeForm()
 
 <template>
   <FormSection :title="t('employees.secEmployment')">
-    <el-form-item :label="t('employees.position')">
+    <el-form-item
+      :label="t('employees.position')"
+      prop="positionId"
+    >
       <el-select
         v-model="form.positionId"
-        clearable
         filterable
         style="width: 100%"
       >

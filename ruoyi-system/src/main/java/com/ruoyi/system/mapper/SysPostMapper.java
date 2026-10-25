@@ -96,4 +96,10 @@ public interface SysPostMapper
      * @return 结果
      */
     public SysPost checkPostCodeUnique(String postCode);
+
+    /** The highest generated code that starts with the prefix (longest, then largest), or null. */
+    public String selectMaxCodeWithPrefix(@org.apache.ibatis.annotations.Param("prefix") String prefix);
+
+    /** The largest display order in use, or null when there are no posts. */
+    public Integer selectMaxSort();
 }
