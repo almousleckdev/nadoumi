@@ -1,18 +1,10 @@
 import { documentContent } from '@/api/document'
+import { saveBlob } from '@/utils/download'
 import { safeHref } from '@/utils/url'
 
 const JSON_TYPE = 'application/json'
 
 export type DocumentFileMode = 'view' | 'download'
-
-function saveAs(blob: Blob, name: string) {
-  const objectUrl = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = objectUrl
-  link.download = name
-  link.click()
-  URL.revokeObjectURL(objectUrl)
-}
 
 /**
  * Opens one document version. `view` shows it in a new tab, `download` saves it as a file. The backend picks the
@@ -39,5 +31,5 @@ export async function openDocumentFile(documentId: number, versionNo: number, mo
     window.open(URL.createObjectURL(blob), '_blank', 'noopener')
     return
   }
-  saveAs(blob, `document-${documentId}-v${versionNo}`)
+  saveBlob(blob, `document-${documentId}-v${versionNo}`)
 }

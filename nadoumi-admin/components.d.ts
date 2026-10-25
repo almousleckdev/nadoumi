@@ -12,6 +12,7 @@ declare module 'vue' {
     ComingSoonCard: typeof import('./src/components/dashboard/ComingSoonCard.vue')['default']
     DashboardGroup: typeof import('./src/components/dashboard/DashboardGroup.vue')['default']
     DataTable: typeof import('./src/components/ui/DataTable.vue')['default']
+    DeleteWithReasonDialog: typeof import('./src/components/ui/DeleteWithReasonDialog.vue')['default']
     DescriptionList: typeof import('./src/components/ui/DescriptionList.vue')['default']
     DonutChart: typeof import('./src/components/dashboard/DonutChart.vue')['default']
     DonutChartSkeleton: typeof import('./src/components/dashboard/DonutChartSkeleton.vue')['default']

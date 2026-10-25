@@ -1,25 +1,38 @@
 <template>
   <div class="nad-page">
     <PageHeader
-      :title="t('earnings.title')"
-      :subtitle="t('earnings.subtitle')"
+      :title="t('finance.title')"
+      :subtitle="t('finance.subtitle')"
     >
       <template #actions>
-        <el-date-picker
-          v-model="range"
-          type="daterange"
-          value-format="YYYY-MM-DD"
-          :start-placeholder="t('earnings.from')"
-          :end-placeholder="t('earnings.to')"
-          :clearable="false"
+        <el-select
+          v-model="currency"
+          style="width: 110px"
+          :aria-label="t('finance.currency')"
+          data-test="currency"
           @change="load"
-        />
+        >
+          <el-option
+            v-for="c in overview?.currencies ?? [currency]"
+            :key="c"
+            :label="c"
+            :value="c"
+          />
+        </el-select>
         <el-button
           :icon="Refresh"
           :loading="loading"
           @click="load"
         >
           {{ t('common.refresh') }}
+        </el-button>
+        <el-button
+          :icon="Download"
+          :loading="exporting"
+          data-test="export"
+          @click="exportYear"
+        >
+          {{ t('finance.exportYear') }}
         </el-button>
       </template>
     </PageHeader>
@@ -30,125 +43,135 @@
       @retry="load"
     />
 
-    <template v-else>
-      <section
-        v-for="line in summary?.byCurrency ?? []"
-        :key="line.currency"
-        class="earn-ccy"
-      >
-        <h3 class="earn-ccy__h">
-          {{ line.currency }}
-        </h3>
-        <div class="earn-cards">
-          <div class="earn-card">
-            <span class="earn-card__k">{{ t('earnings.revenue') }}</span>
-            <span class="earn-card__v earn-pos">{{ fmt(line.revenue, line.currency) }}</span>
-          </div>
-          <div class="earn-card">
-            <span class="earn-card__k">{{ t('earnings.expenses') }}</span>
-            <span class="earn-card__v earn-neg">{{ fmt(line.expenses, line.currency) }}</span>
-          </div>
-          <div class="earn-card earn-card--net">
-            <span class="earn-card__k">{{ t('earnings.net') }}</span>
-            <span
-              class="earn-card__v"
-              :class="Number(line.net) >= 0 ? 'earn-pos' : 'earn-neg'"
-            >{{ fmt(line.net, line.currency) }}</span>
-          </div>
-        </div>
-        <div class="earn-bar">
-          <div
-            class="earn-bar__fill"
-            :style="{ width: pct(line) + '%' }"
-          />
-        </div>
-        <p class="earn-bar__cap">
-          {{ t('earnings.marginCap', { pct: pct(line) }) }}
-        </p>
-      </section>
-
-      <el-empty
-        v-if="!loading && !hasData"
-        :description="t('earnings.emptyAll')"
-      >
-        <el-button
-          type="primary"
-          @click="router.push('/revenue')"
-        >
-          {{ t('revenue.new') }}
-        </el-button>
-        <el-button @click="router.push('/expenses')">
-          {{ t('expenses.new') }}
-        </el-button>
-      </el-empty>
+    <template v-else-if="overview">
+      <div class="fin-kpis">
+        <KpiCard
+          :label="t('finance.kRevenueMonth')"
+          :value="money(k.revenueMonth)"
+          :delta="delta(k.revenueMonth, k.revenueMonthPrev)"
+          :delta-good="k.revenueMonth >= k.revenueMonthPrev"
+        />
+        <KpiCard
+          :label="t('finance.kExpensesMonth')"
+          :value="money(k.expensesMonth)"
+          :delta="delta(k.expensesMonth, k.expensesMonthPrev)"
+          :delta-good="k.expensesMonth <= k.expensesMonthPrev"
+        />
+        <KpiCard
+          :label="t('finance.kNetMonth')"
+          :value="money(k.netMonth)"
+          :tone="k.netMonth >= 0 ? 'good' : 'bad'"
+          :delta="delta(k.netMonth, k.netMonthPrev)"
+          :delta-good="k.netMonth >= k.netMonthPrev"
+        />
+        <KpiCard
+          :label="t('finance.kRevenueToday')"
+          :value="money(k.revenueToday)"
+          :hint="overview.asOf"
+        />
+        <KpiCard
+          :label="t('finance.kRevenueYtd')"
+          :value="money(k.revenueYtd)"
+        />
+        <KpiCard
+          :label="t('finance.kExpensesYtd')"
+          :value="money(k.expensesYtd)"
+        />
+        <KpiCard
+          :label="t('finance.kNetYtd')"
+          :value="money(k.netYtd)"
+          :tone="k.netYtd >= 0 ? 'good' : 'bad'"
+          :hint="t('finance.margin', { pct: margin })"
+        />
+        <KpiCard
+          :label="t('finance.kPayables')"
+          :value="money(k.payables)"
+          :hint="t('finance.payablesHint', { n: k.payablesCount })"
+          to="/expenses"
+          data-test="payables"
+        />
+      </div>
 
       <div
-        v-if="hasData"
-        class="earn-split"
+        v-if="k.receivablesCount > 0"
+        class="fin-attention"
+        data-test="receivables"
+        role="link"
+        tabindex="0"
+        @click="router.push('/payments')"
+        @keyup.enter="router.push('/payments')"
       >
-        <div class="earn-panel">
-          <h4 class="earn-panel__h">
-            {{ t('earnings.revenueBySource') }}
-          </h4>
-          <ul
-            v-if="summary?.revenueBySource?.length"
-            class="earn-list"
-          >
-            <li
-              v-for="b in summary.revenueBySource"
-              :key="b.label + b.currency"
-              class="earn-list__row"
-            >
-              <span class="earn-list__label">{{ b.label || t('earnings.unlabelled') }}</span>
-              <span class="earn-list__bar">
-                <span
-                  class="earn-list__bar-fill"
-                  :style="{ width: barWidth(b.total, revenueMax) }"
-                />
-              </span>
-              <span class="earn-list__val">{{ b.currency }} {{ n(b.total) }}</span>
-            </li>
-          </ul>
-          <p
-            v-else
-            class="earn-panel__empty"
-          >
-            {{ t('earnings.empty') }}
-          </p>
-        </div>
+        <strong>{{ money(k.receivables) }}</strong>
+        <span>{{ t('finance.receivablesHint', { n: k.receivablesCount }) }}</span>
+        <el-button
+          link
+          type="primary"
+        >
+          {{ t('finance.reviewPayments') }}
+        </el-button>
+      </div>
 
-        <div class="earn-panel">
-          <h4 class="earn-panel__h">
-            {{ t('earnings.expenseByCategory') }}
-          </h4>
-          <ul
-            v-if="summary?.expenseByCategory?.length"
-            class="earn-list"
-          >
-            <li
-              v-for="b in summary.expenseByCategory"
-              :key="b.label + b.currency"
-              class="earn-list__row"
-            >
-              <span class="earn-list__label">{{ b.label || t('earnings.unlabelled') }}</span>
-              <span class="earn-list__bar">
-                <span
-                  class="earn-list__bar-fill earn-list__bar-fill--exp"
-                  :style="{ width: barWidth(b.total, expenseMax) }"
-                />
-              </span>
-              <span class="earn-list__val">{{ b.currency }} {{ n(b.total) }}</span>
-            </li>
-          </ul>
-          <p
-            v-else
-            class="earn-panel__empty"
-          >
-            {{ t('earnings.empty') }}
-          </p>
-        </div>
+      <section class="fin-card">
+        <h3 class="fin-card__h">
+          {{ t('finance.trendTitle') }}
+        </h3>
+        <TrendChart
+          :months="overview.months"
+          :currency="overview.currency"
+          :revenue-label="t('finance.revenue')"
+          :expenses-label="t('finance.expenses')"
+          :net-label="t('finance.net')"
+        />
+      </section>
+
+      <div class="fin-split">
+        <section class="fin-card">
+          <h3 class="fin-card__h">
+            {{ t('finance.sourcesTitle') }}
+          </h3>
+          <BreakdownList
+            :rows="sources"
+            :empty="t('finance.empty')"
+            :currency="overview.currency"
+          />
+        </section>
+        <section class="fin-card">
+          <h3 class="fin-card__h">
+            {{ t('finance.categoriesTitle') }}
+          </h3>
+          <BreakdownList
+            :rows="categories"
+            :empty="t('finance.empty')"
+            :currency="overview.currency"
+            tone="muted"
+          />
+        </section>
+      </div>
+
+      <div class="fin-actions">
+        <el-button
+          type="primary"
+          @click="router.push('/finance/ledger')"
+        >
+          {{ t('finance.openLedger') }}
+        </el-button>
+        <el-button @click="router.push('/revenue')">
+          {{ t('finance.recordRevenue') }}
+        </el-button>
+        <el-button @click="router.push('/expenses')">
+          {{ t('finance.newExpense') }}
+        </el-button>
+        <el-button @click="router.push('/payroll')">
+          {{ t('nav.items.payroll') }}
+        </el-button>
       </div>
     </template>
+
+    <el-skeleton
+      v-else
+      :rows="8"
+      animated
+    />
   </div>
 </template>
 
@@ -156,51 +179,46 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { Refresh } from '@element-plus/icons-vue'
+import { Download, Refresh } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
-import { getFinanceSummary, type FinanceSummary, type CurrencyLine } from '@/api/finance'
+import { exportLedger, getFinanceOverview, type FinanceOverview } from '@/api/finance'
+import { saveBlob } from '@/utils/download'
+import KpiCard from './overview/KpiCard.vue'
+import TrendChart from './overview/TrendChart.vue'
+import BreakdownList from './overview/BreakdownList.vue'
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const router = useRouter()
 
-const range = ref<[string, string]>([
-  `${new Date().getFullYear()}-01-01`,
-  new Date().toISOString().slice(0, 10),
-])
-const summary = ref<FinanceSummary | null>(null)
+const currency = ref('CNY')
+const overview = ref<FinanceOverview | null>(null)
 const loading = ref(false)
+const exporting = ref(false)
 const error = ref<string | null>(null)
 
-const hasData = computed(() => Boolean(
-  summary.value?.byCurrency?.length
-  || summary.value?.revenueBySource?.length
-  || summary.value?.expenseByCategory?.length))
-const revenueMax = computed(() =>
-  Math.max(1, ...(summary.value?.revenueBySource ?? []).map(b => Number(b.total))))
-const expenseMax = computed(() =>
-  Math.max(1, ...(summary.value?.expenseByCategory ?? []).map(b => Number(b.total))))
+const k = computed(() => overview.value!.kpis)
+const margin = computed(() => (k.value.revenueYtd > 0 ? Math.round((k.value.netYtd / k.value.revenueYtd) * 100) : 0))
 
-function n(v: number | string): string {
-  return Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 })
-}
-function fmt(v: number | string, ccy: string): string {
-  return `${ccy} ${n(v)}`
-}
-function barWidth(v: number | string, max: number): string {
-  return `${Math.max(2, (Number(v) / max) * 100)}%`
-}
-function pct(line: CurrencyLine): number {
-  const rev = Number(line.revenue)
-  if (rev <= 0) return 0
-  return Math.max(0, Math.round((Number(line.net) / rev) * 100))
+const label = (group: string, raw: string) => (te(`${group}.${raw}`) ? t(`${group}.${raw}`) : raw)
+const sources = computed(() => (overview.value?.revenueBySource ?? []).map(b => ({ ...b, label: label('revenue.sourceMap', b.label) })))
+const categories = computed(() => overview.value?.expenseByCategory ?? [])
+
+const money = (v: number) => `${currency.value} ${Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+
+/** "+12% vs last month", or null when last month had nothing to compare with. */
+function delta(now: number, prev: number): string | null {
+  if (!prev) return null
+  const pct = Math.round(((now - prev) / Math.abs(prev)) * 100)
+  return t('finance.vsLastMonth', { change: `${pct >= 0 ? '+' : ''}${pct}%` })
 }
 
 async function load() {
   loading.value = true
   error.value = null
   try {
-    summary.value = await getFinanceSummary({ from: range.value[0], to: range.value[1] })
+    overview.value = await getFinanceOverview(currency.value)
+    currency.value = overview.value.currency
   }
   catch (e) {
     error.value = (e as Error)?.message || t('state.errorTitle')
@@ -210,37 +228,31 @@ async function load() {
   }
 }
 
+async function exportYear() {
+  exporting.value = true
+  try {
+    const year = new Date().getFullYear()
+    saveBlob(await exportLedger({ currency: currency.value, from: `${year}-01-01` }), `nadoumi-ledger-${year}.csv`)
+  }
+  finally {
+    exporting.value = false
+  }
+}
+
 onMounted(load)
 </script>
 
 <style scoped>
-.earn-ccy { margin-bottom: 22px; }
-.earn-ccy__h { margin: 0 0 10px; font-size: 13px; letter-spacing: 0.04em; color: var(--nad-ink-soft, #64748b); }
-.earn-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.earn-card {
-  border: 1px solid var(--nad-line, #e5e7eb); border-radius: 10px; padding: 14px 16px;
-  display: flex; flex-direction: column; gap: 6px; background: var(--nad-surface, #fff);
+.fin-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.fin-attention {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; padding: 12px 16px; margin-bottom: 16px;
+  border: 1px solid var(--el-color-warning-light-5, #fcd34d); background: var(--el-color-warning-light-9, #fffbeb);
+  border-radius: 12px; cursor: pointer;
 }
-.earn-card--net { background: var(--nad-surface-2, #f8fafc); }
-.earn-card__k { font-size: 12px; color: var(--nad-ink-soft, #64748b); }
-.earn-card__v { font-size: 20px; font-weight: 680; font-variant-numeric: tabular-nums; }
-.earn-pos { color: var(--el-color-success, #16a34a); }
-.earn-neg { color: var(--el-color-danger, #dc2626); }
-.earn-bar { height: 6px; border-radius: 3px; background: var(--nad-line, #e5e7eb); margin-top: 10px; overflow: hidden; }
-.earn-bar__fill { height: 100%; background: var(--el-color-success, #16a34a); }
-.earn-bar__cap { margin: 4px 0 0; font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }
-.earn-split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
-.earn-panel { border: 1px solid var(--nad-line, #e5e7eb); border-radius: 10px; padding: 16px; }
-.earn-panel__h { margin: 0 0 12px; font-size: 13px; }
-.earn-panel__empty { color: var(--nad-ink-faint, #9ca3af); font-size: 13px; margin: 0; }
-.earn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.earn-list__row { display: grid; grid-template-columns: 140px 1fr auto; align-items: center; gap: 10px; font-size: 13px; }
-.earn-list__bar { height: 8px; background: var(--nad-line, #e5e7eb); border-radius: 4px; overflow: hidden; }
-.earn-list__bar-fill { display: block; height: 100%; background: var(--nad-brand-500, #6366f1); }
-.earn-list__bar-fill--exp { background: var(--el-color-warning, #d97706); }
-.earn-list__val { font-variant-numeric: tabular-nums; color: var(--nad-ink-soft, #64748b); }
-@media (max-width: 860px) {
-  .earn-cards { grid-template-columns: 1fr; }
-  .earn-split { grid-template-columns: 1fr; }
-}
+.fin-card { border: 1px solid var(--nad-line, #e5e7eb); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; background: var(--nad-surface, #fff); min-width: 0; }
+.fin-card__h { margin: 0 0 12px; font-size: 14px; font-weight: 650; color: var(--nad-ink, #0f172a); }
+.fin-split { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fin-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 24px; }
+@media (max-width: 1100px) { .fin-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .fin-kpis, .fin-split { grid-template-columns: 1fr; } }
 </style>

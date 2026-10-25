@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.finance.mapper.LedgerMapper">
+
+    <select id="search" resultType="com.nadoumi.finance.domain.LedgerEntry">
+        select l.kind, l.id, l.occurredOn, l.title, l.category, l.reference, l.amount, l.currency
+        from (
+            select 'REVENUE' as kind, r.id as id, r.received_on as occurredOn, r.title as title, r.source as category,
+                   r.reference as reference, r.amount as amount, r.currency as currency
+            from nad_revenue r
+            union all
+            select 'EXPENSE' as kind, e.id as id, e.spent_on as occurredOn, e.title as title,
+                   coalesce(c.name, 'Uncategorised') as category, e.receipt_no as reference, e.amount as amount,
+                   e.currency as currency
+            from nad_expense e left join nad_expense_category c on c.id = e.category_id
+            where e.status in ('APPROVED', 'PAID')
+        ) l
+        <where>
+            <if test="kind != null and kind != ''"> and l.kind = #{kind} </if>
+            <if test="currency != null and currency != ''"> and l.currency = #{currency} </if>
+            <if test="q != null and q != ''"> and (l.title like concat('%', #{q}, '%') or l.reference like concat('%', #{q}, '%') or l.category like concat('%', #{q}, '%')) </if>
+            <if test="from != null"> and l.occurredOn &gt;= #{from} </if>
+            <if test="to != null"> and l.occurredOn &lt;= #{to} </if>
+        </where>
+        order by l.occurredOn desc, l.id desc
+    </select>
+</mapper>

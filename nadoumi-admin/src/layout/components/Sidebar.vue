@@ -61,8 +61,12 @@ const groups = computed(() =>
   })).filter(g => g.items.length > 0),
 )
 
+const matches = (path: string) => route.path === path || route.path.startsWith(`${path}/`)
+
+// the longest matching item wins, so /finance/ledger lights up Ledger and not Finance overview as well
 function isActive(path: string): boolean {
-  return route.path === path || route.path.startsWith(`${path}/`)
+  if (!matches(path)) return false
+  return !NAV.some(g => g.items.some(i => i.path.length > path.length && matches(i.path)))
 }
 </script>
 

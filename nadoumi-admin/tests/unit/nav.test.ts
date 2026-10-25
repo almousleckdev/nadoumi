@@ -8,7 +8,7 @@ describe('nav manifest', () => {
   it('exposes exactly the built screens as implemented routes', () => {
     expect(implementedPaths().sort()).toEqual([
       '/applicants', '/applications', '/audit', '/config', '/conversations', '/dashboard', '/departments', '/dict',
-      '/employees', '/expenses', '/finance', '/jobs', '/loginlog', '/majors', '/menus', '/news', '/notifications', '/payments', '/payroll', '/posts',
+      '/employees', '/expenses', '/finance', '/finance/ledger', '/jobs', '/loginlog', '/majors', '/menus', '/news', '/notifications', '/payments', '/payroll', '/posts',
       '/programs', '/revenue', '/roles', '/scholarships', '/support', '/tasks', '/universities',
     ])
   })

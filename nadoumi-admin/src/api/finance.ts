@@ -164,3 +164,79 @@ export interface FinanceSummary {
 
 export const getFinanceSummary = (params: { from?: string, to?: string } = {}) =>
   request.get<unknown, FinanceSummary>('/api/staff/finance/summary', { params })
+
+/*--- overview and ledger -- */
+
+export interface FinanceKpis {
+  revenueToday: number
+  revenueMonth: number
+  revenueMonthPrev: number
+  expensesMonth: number
+  expensesMonthPrev: number
+  netMonth: number
+  netMonthPrev: number
+  revenueYtd: number
+  expensesYtd: number
+  netYtd: number
+  /** Reported fees staff have not confirmed yet. */
+  receivables: number
+  receivablesCount: number
+  /** Expenses submitted or approved but not paid. */
+  payables: number
+  payablesCount: number
+}
+
+export interface FinanceMonth {
+  /** yyyy-MM */
+  month: string
+  revenue: number
+  expenses: number
+  net: number
+}
+
+export interface FinanceBucket {
+  label: string
+  total: number
+  count: number
+}
+
+export interface FinanceOverview {
+  currency: string
+  currencies: string[]
+  asOf: string
+  kpis: FinanceKpis
+  months: FinanceMonth[]
+  revenueBySource: FinanceBucket[]
+  expenseByCategory: FinanceBucket[]
+}
+
+export interface LedgerEntry {
+  kind: 'REVENUE' | 'EXPENSE'
+  id: number
+  occurredOn: string
+  title: string
+  category: string | null
+  reference: string | null
+  amount: number
+  currency: string
+}
+
+export interface LedgerQuery {
+  kind?: string
+  q?: string
+  currency?: string
+  from?: string
+  to?: string
+  page?: number
+  size?: number
+}
+
+export const getFinanceOverview = (currency?: string) =>
+  request.get<unknown, FinanceOverview>('/api/staff/finance/overview', { params: { currency } })
+
+export const listLedger = (params: LedgerQuery) =>
+  request.get<unknown, Page<LedgerEntry>>('/api/staff/finance/ledger', { params })
+
+/** The CSV as a Blob; the file needs the session, so it cannot be a plain link. */
+export const exportLedger = (params: Omit<LedgerQuery, 'page' | 'size'>) =>
+  request.get<unknown, Blob>('/api/staff/finance/ledger/export', { params, responseType: 'blob' })
