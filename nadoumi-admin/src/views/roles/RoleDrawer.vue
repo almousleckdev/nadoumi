@@ -1,7 +1,7 @@
 <template>
   <Drawer
     :model-value="modelValue"
-    :title="t(isEdit ? 'roles.edit' : 'roles.new')"
+    :title="t(isEdit ? 'roles.edit' : copying ? 'roles.copy' : 'roles.new')"
     :saving="saving"
     size="520"
     @update:model-value="(v: boolean) => emit('update:modelValue', v)"
@@ -59,6 +59,15 @@
       </el-form-item>
       <el-form-item :label="t('roles.menus')">
         <div class="role-tree">
+          <el-input
+            v-model="filterText"
+            :placeholder="t('roles.filterMenus')"
+            clearable
+            size="small"
+            class="role-tree__filter"
+            data-test="menu-filter"
+            @input="treeRef?.filter(filterText)"
+          />
           <el-checkbox v-model="form.menuCheckStrictly">
             {{ t('roles.checkStrictly') }}
           </el-checkbox>
@@ -70,6 +79,7 @@
             node-key="id"
             :check-strictly="!form.menuCheckStrictly"
             :default-checked-keys="checkedKeys"
+            :filter-node-method="matchMenu"
             style="max-height: 320px; overflow: auto"
           />
         </div>
@@ -96,11 +106,14 @@ import {
   type SysMenu, type SysRole,
 } from '@/api/system'
 
-const props = defineProps<{ modelValue: boolean, roleId?: number }>()
+/** `copyFromId` opens a new role pre-filled from an existing one (its permissions and scope), to be saved under a new key. */
+const props = defineProps<{ modelValue: boolean, roleId?: number, copyFromId?: number }>()
 const emit = defineEmits<{ 'update:modelValue': [v: boolean], 'saved': [] }>()
 const { t } = useI18n()
 
 const isEdit = computed(() => props.roleId != null)
+const copying = computed(() => !isEdit.value && props.copyFromId != null)
+const filterText = ref('')
 const treeRef = ref<InstanceType<typeof ElTree>>()
 const menuTree = ref<Array<{ id: number, label: string, children?: unknown[] }>>([])
 const checkedKeys = ref<number[]>([])
@@ -137,11 +150,14 @@ const { formRef, form, loading, saving, save, reset } = useDrawerForm<RoleForm>(
   isOpen: () => props.modelValue,
   blank,
   load: async (form) => {
-    if (isEdit.value) {
-      const [detail, tree] = await Promise.all([getRole(props.roleId!), roleMenuTreeselect(props.roleId!)])
+    const sourceId = props.roleId ?? props.copyFromId
+    if (sourceId != null) {
+      const [detail, tree] = await Promise.all([getRole(sourceId), roleMenuTreeselect(sourceId)])
       const r = detail.data
       Object.assign(form, {
-        roleId: r.roleId, roleName: r.roleName, roleKey: r.roleKey, roleSort: r.roleSort,
+        roleId: isEdit.value ? r.roleId : undefined,
+        roleName: copying.value ? t('roles.copyOf', { name: r.roleName }) : r.roleName,
+        roleKey: copying.value ? '' : r.roleKey, roleSort: r.roleSort,
         dataScope: r.dataScope, status: r.status,
         menuCheckStrictly: r.menuCheckStrictly ?? true, remark: r.remark ?? '',
       })
@@ -169,8 +185,12 @@ const { formRef, form, loading, saving, save, reset } = useDrawerForm<RoleForm>(
     else await createRole(body)
   },
   onSaved: () => emit('saved'),
-  onReset: () => { checkedKeys.value = [] },
+  onReset: () => { checkedKeys.value = []; filterText.value = '' },
 })
+
+function matchMenu(value: string, data: { label?: string }): boolean {
+  return !value || (data.label ?? '').toLowerCase().includes(value.toLowerCase())
+}
 
 function collectMenuIds(): number[] {
   const checked = (treeRef.value?.getCheckedKeys(false) ?? []) as number[]
@@ -180,6 +200,7 @@ function collectMenuIds(): number[] {
 </script>
 
 <style scoped>
+.role-tree__filter { margin-bottom: 8px; }
 .role-tree {
   width: 100%;
   border: 1px solid var(--nad-line, #e2e8f0);

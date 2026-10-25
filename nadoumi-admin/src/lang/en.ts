@@ -926,6 +926,7 @@ export default {
     noEmail: 'no email',
   },
   roles: {
+    members: 'Members', duplicate: 'Duplicate', copy: 'Duplicate role', copyOf: '{name} (copy)', filterMenus: 'Filter permissions…',
     title: 'Roles', subtitle: 'Permission sets assigned to staff. Each role bundles menu and button permissions.',
     new: 'New role', edit: 'Edit role', searchPlaceholder: 'Search role name…',
     name: 'Name', key: 'Key', sort: 'Display order', dataScope: 'Data scope', status: 'Status', statusLabel: 'Active',
@@ -977,6 +978,7 @@ export default {
     },
   },
   departments: {
+    members: 'People',
     title: 'Departments', subtitle: 'The Nadoumi org structure. Staff belong to a department for data-scope rules.',
     new: 'New department', edit: 'Edit department', addChild: 'Add sub-department', root: 'Root',
     name: 'Name', order: 'Display order', leader: 'Leader', phone: 'Phone', email: 'Email',
@@ -985,6 +987,7 @@ export default {
     deleteTitle: 'Delete department', deleteConfirm: 'Delete {name}?',
   },
   posts: {
+    members: 'People',
     title: 'Posts', subtitle: 'Job titles that can be attached to a staff member.',
     new: 'New post', edit: 'Edit post', searchPlaceholder: 'Search post name…',
     code: 'Code', name: 'Name', sort: 'Display order', statusLabel: 'Enabled', remark: 'Notes',
@@ -1058,6 +1061,7 @@ export default {
     freqMap: { MONTHLY: 'month', ANNUAL: 'year', WEEKLY: 'week', HOURLY: 'hour' },
   },
   tasks: {
+    scopeAll: 'All', scopeAssigned: 'Assigned to me',
     title: 'Tasks', subtitle: 'Assign work to the team and track it: pending → in progress → completed → approved. Progress notifies the creator, the assignee and admins.',
     new: 'New task', edit: 'Edit task', searchPlaceholder: 'Search task title…',
     taskTitle: 'Title', description: 'Description', priority: 'Priority', status: 'Status',

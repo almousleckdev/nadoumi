@@ -925,6 +925,7 @@ export default {
     noEmail: '无邮箱',
   },
   roles: {
+    members: '成员', duplicate: '复制', copy: '复制角色', copyOf: '{name}（副本）', filterMenus: '筛选权限…',
     title: '角色', subtitle: '分配给员工的权限集合。每个角色包含一组菜单与按钮权限。',
     new: '新增角色', edit: '编辑角色', searchPlaceholder: '搜索角色名称…',
     name: '名称', key: '权限字符', sort: '显示顺序', dataScope: '数据范围', status: '状态', statusLabel: '启用',
@@ -976,6 +977,7 @@ export default {
     },
   },
   departments: {
+    members: '人数',
     title: '部门', subtitle: 'Nadoumi 组织架构。员工归属于某个部门，用于数据权限范围规则。',
     new: '新增部门', edit: '编辑部门', addChild: '新增下级部门', root: '根目录',
     name: '名称', order: '显示顺序', leader: '负责人', phone: '联系电话', email: '邮箱',
@@ -984,6 +986,7 @@ export default {
     deleteTitle: '删除部门', deleteConfirm: '确定要删除 {name} 吗？',
   },
   posts: {
+    members: '人数',
     title: '岗位', subtitle: '可分配给员工的职位名称。',
     new: '新增岗位', edit: '编辑岗位', searchPlaceholder: '搜索岗位名称…',
     code: '编码', name: '名称', sort: '显示顺序', statusLabel: '启用', remark: '备注',
@@ -1057,6 +1060,7 @@ export default {
     freqMap: { MONTHLY: '月', ANNUAL: '年', WEEKLY: '周', HOURLY: '小时' },
   },
   tasks: {
+    scopeAll: '全部', scopeAssigned: '分配给我',
     title: '任务', subtitle: '为团队分配工作并跟踪进度：待处理 → 进行中 → 已完成 → 已审批。进度变化会通知创建人、负责人及管理员。',
     new: '新增任务', edit: '编辑任务', searchPlaceholder: '搜索任务标题…',
     taskTitle: '标题', description: '描述', priority: '优先级', status: '状态',

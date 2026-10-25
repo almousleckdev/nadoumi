@@ -35,24 +35,31 @@
         min-width="220"
       />
       <el-table-column
-        :label="t('departments.order')"
-        prop="orderNum"
-        width="90"
-        align="center"
-      />
-      <el-table-column
         :label="t('departments.leader')"
-        prop="leader"
-        min-width="120"
-      />
+        min-width="170"
+      >
+        <template #default="{ row }">
+          {{ row.leader }}
+          <div
+            v-if="row.phone"
+            class="dept__sub"
+          >
+            {{ row.phone }}
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column
-        :label="t('departments.phone')"
-        prop="phone"
-        width="140"
-      />
+        :label="t('departments.members')"
+        width="120"
+        align="center"
+      >
+        <template #default="{ row }">
+          <span data-test="dept-members">{{ totalMembers(row as SysDept) }}</span>
+        </template>
+      </el-table-column>
       <el-table-column
         :label="t('departments.status')"
-        width="90"
+        width="120"
         align="center"
       >
         <template #default="{ row }">
@@ -61,8 +68,9 @@
       </el-table-column>
       <el-table-column
         :label="t('common.actions')"
-        width="200"
+        width="270"
         align="right"
+        class-name="dept__actions"
       >
         <template #default="{ row }">
           <el-button
@@ -114,6 +122,7 @@ import DeptDrawer from './DeptDrawer.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { listDepts, deleteDept, type SysDept } from '@/api/system'
+import { useOrgOverview } from '@/composables/useOrgOverview'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -125,6 +134,7 @@ const error = ref<string | null>(null)
 const drawerOpen = ref(false)
 const editingId = ref<number | undefined>()
 const parentId = ref<number | undefined>()
+const { load: loadOrg, members } = useOrgOverview()
 
 function buildTree(flat: SysDept[]): SysDept[] {
   const byId = new Map<number, SysDept & { children: SysDept[] }>()
@@ -154,7 +164,12 @@ async function load() {
 }
 function openCreate(pid?: number) { editingId.value = undefined; parentId.value = pid ?? 0; drawerOpen.value = true }
 function openEdit(id: number) { editingId.value = id; parentId.value = undefined; drawerOpen.value = true }
-function onSaved() { drawerOpen.value = false; load() }
+function onSaved() { drawerOpen.value = false; load(); loadOrg() }
+
+/** People in the department and everything under it, so a parent shows its whole team. */
+function totalMembers(dept: SysDept): number {
+  return members('departments', dept.deptId) + (dept.children ?? []).reduce((sum, child) => sum + totalMembers(child), 0)
+}
 
 async function doDelete(row: SysDept) {
   if (row.children?.length) {
@@ -171,5 +186,10 @@ async function doDelete(row: SysDept) {
   load()
 }
 
-onMounted(load)
+onMounted(() => { load(); loadOrg() })
 </script>
+
+<style scoped>
+.dept__sub { font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }
+:deep(.dept__actions .cell) { white-space: nowrap; }
+</style>

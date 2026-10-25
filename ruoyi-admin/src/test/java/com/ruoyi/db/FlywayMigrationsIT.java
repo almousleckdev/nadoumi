@@ -106,9 +106,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V138 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V139 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(129);
+        assertThat(applied).isEqualTo(130);
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_wf_definition WHERE status = 'ACTIVE'")).isEqualTo("3");
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
@@ -411,6 +411,10 @@ class FlywayMigrationsIT {
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job WHERE job_id IN (1,2,3)")).isEqualTo("0");
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key = 'nadoumi_super_admin'")).isEqualTo("1");
 
+        // V139 — a starting organisation: departments under the root and posts with generated codes
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_dept WHERE parent_id = 100 AND create_by = 'flyway-V139'")).isEqualTo("6");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_post WHERE create_by = 'flyway-V139' AND post_code REGEXP '^NA[0-9]{10}$'")).isEqualTo("9");
+
         // V7 — email-first student identity
         assertThat(single(ds, "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() "
                 + "AND table_name = 'sys_user' AND column_name = 'email_verified'")).isEqualTo("1");
@@ -460,7 +464,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(128); // V2..V138, same gaps as above
+        assertThat(applied).isEqualTo(129); // V2..V139, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

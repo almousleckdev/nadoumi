@@ -44,6 +44,9 @@
       row-key="postId"
       @retry="load"
     >
+      <template #cell-members="{ row }">
+        {{ members('posts', (row as SysPost).postId) }}
+      </template>
       <template #cell-status="{ row }">
         <StatusBadge :status="row.status === '0' ? 'ACTIVE' : 'CLOSED'" />
       </template>
@@ -137,8 +140,10 @@ import {
   listPosts, getPost, createPost, updatePost, deletePosts, type SysPost,
 } from '@/api/system'
 import { usePagedList } from '@/composables/usePagedList'
+import { useOrgOverview } from '@/composables/useOrgOverview'
 
 const { t } = useI18n()
+const { load: loadOrg, members } = useOrgOverview()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
@@ -168,6 +173,7 @@ const rules = {
 const columns = computed(() => [
   { prop: 'postCode', label: t('posts.code'), minWidth: 140 },
   { prop: 'postName', label: t('posts.name'), minWidth: 160 },
+  { prop: 'members', label: t('posts.members'), width: 100, align: 'center' as const },
   { prop: 'status', label: t('posts.statusLabel'), width: 100, align: 'center' as const },
   { prop: 'actions', label: t('common.actions'), width: 150, align: 'right' as const },
 ])
@@ -205,5 +211,5 @@ async function doDelete(row: SysPost) {
   load()
 }
 
-onMounted(load)
+onMounted(() => { load(); loadOrg() })
 </script>
