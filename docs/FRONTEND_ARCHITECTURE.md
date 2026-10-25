@@ -33,6 +33,10 @@ Status: **BASELINE** · **EXISTING** · **PLANNED** · **OPEN**.
 > `checklist.uploadToSubmit`, `signature.signToSubmit` and old `dashboard.home` keys were removed from all five locales. Not
 > verified: phone widths (the browser window could not go below 1280px); the layouts rely on single-column rules under 480px.
 
+> **2026-10-25 (phone widths, checked with device emulation at 390px):** the Overview and Applications pages have no sideways scroll;
+> stat tiles are a two by two grid on phones and four across from `xl`; tables stack into labelled cards below `md`. Payment problems
+> (`paymentNeeded`) show as red text and a banner (red is allowed for errors only).
+
 ## 1. State of the frontend in this repo (EXISTING)
 
 - The `ruoyi-ui/` directory was **deleted from the repo** at commit `ec987ab9`

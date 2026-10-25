@@ -778,7 +778,11 @@
       },
       "colProgress": "进度",
       "stepOf": "第 {n} 步，共 {total} 步",
-      "statUnfinished": "未完成"
+      "statUnfinished": "未完成",
+      "paymentNeeded": "需要付款",
+      "paymentNeededBanner": "Nadoumi 尚未收到你部分申请的申请费。请打开这些申请并重新付款，申请才能继续推进。",
+      "payAgain": "重新付款",
+      "paymentNeededNote": "Nadoumi 无法确认你的付款。请重新付款，申请才能继续推进。"
     }
   },
   "validation": {

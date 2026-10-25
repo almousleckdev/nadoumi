@@ -26,7 +26,7 @@ async function dismissWelcome() {
   await markWelcomed(applicant.id).catch(() => undefined)
 }
 
-const { documents, deadlines, recommended, stats, distribution, applicationsPending, applicationsError, activity, focus } = useDashboardOverview(primary)
+const { documents, deadlines, recommended, stats, paymentNeeded, distribution, applicationsPending, applicationsError, activity, focus } = useDashboardOverview(primary)
 const completeness = computed(() => (primary.value ? profileCompleteness(primary.value) : 0))
 const DOCUMENTS_TOTAL = 2
 
@@ -63,7 +63,11 @@ useSeo(t('dashboard.nav.overview'), t('dashboard.overviewBlurb'))
       <div v-else class="grid min-w-0 gap-6">
         <OverviewProfileHeader :applicant="primary" />
         <NAlert v-if="applicationsError" tone="danger">{{ t('errors.loadSection') }}</NAlert>
-        <OverviewStatsRow v-else :stats="stats" :documents-ready="documents.ready" :documents-total="DOCUMENTS_TOTAL" />
+        <NAlert v-else-if="paymentNeeded" tone="danger" data-test="payment-banner">
+          {{ t('dashboard.applications.paymentNeededBanner') }}
+          <NuxtLink :to="localePath('/dashboard/applications')" class="ms-1 font-semibold underline">{{ t('dashboard.home.allApplications') }}</NuxtLink>
+        </NAlert>
+        <OverviewStatsRow v-if="!applicationsError" :stats="stats" :documents-ready="documents.ready" :documents-total="DOCUMENTS_TOTAL" />
 
         <div class="grid min-w-0 gap-6 lg:grid-cols-3 lg:items-start">
           <OverviewFocusCard class="min-w-0 lg:col-span-2" v-bind="focus" />

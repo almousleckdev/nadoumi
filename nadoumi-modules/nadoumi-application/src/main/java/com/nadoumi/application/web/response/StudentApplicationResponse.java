@@ -24,15 +24,17 @@ public record StudentApplicationResponse(
         String title,
         String universityName,
         String intake,
-        String applicantName) {
+        String applicantName,
+        /** True when the application is with Nadoumi but its fee is not on record (rejected or deleted by staff): the student must pay again. */
+        boolean paymentNeeded) {
 
     public static StudentApplicationResponse of(Application a, WfStage stage, List<String> timeline, String title,
-            String universityName, String intake, String applicantName) {
+            String universityName, String intake, String applicantName, boolean paymentNeeded) {
         return new StudentApplicationResponse(
                 a.getId(), a.getReference(), a.getApplicantId(), a.getApplicationType() == null ? null : a.getApplicationType().name(),
                 a.getProgramId(), a.getScholarshipId(), a.getIntakeId(),
                 stage == null ? null : stage.getName(), a.getCurrentStatus(),
                 a.getSubmittedAt() == null ? null : a.getSubmittedAt().toString(), timeline, title, universityName, intake,
-                applicantName);
+                applicantName, paymentNeeded);
     }
 }

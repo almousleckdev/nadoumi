@@ -56,7 +56,7 @@
 > payment session on it (`POST /api/student/applications/{id}/payment/session`): allowed on a draft, or on a non-closed application whose latest
 > payment is `REJECTED`; refused (nothing new opened) otherwise. They report the new payment with a new transaction number, it reaches the staff
 > payment queue as `PROOF_SUBMITTED`, and staff confirm it as usual. The student sees the staff reason, a "fee was not received" explanation and
-> **Pay again** on the application page; the rejection already notifies them. Gap: the applications list and Overview do not yet flag it.
+> **Pay again** on the application page; the rejection already notifies them. `GET /api/student/applications` carries `paymentNeeded` (open application, no paid or reported fee on record); the applications list shows a red **Payment needed** under the status with a banner, and the Overview shows a banner and **Pay again** on the latest application.
 
 > **Application number (changed 2026-10-25).** `NAD` + the year (China time) + the year's running number: `NAD2027001`, `NAD2027002`, ... The count starts again at 001 when the new year begins in China; past 999 it grows (`NAD20271000`). References issued before the change keep the old `NAD20261023001` form. The counter reuses `nad_application_reference_counter`, keyed by 1 January of the year (no migration). It replaces the database id
 > everywhere a person sees it (student and staff screens, emails, receipts, the form PDF, the payment queue).

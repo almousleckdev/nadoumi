@@ -778,7 +778,11 @@
       },
       "colProgress": "التقدّم",
       "stepOf": "الخطوة {n} من {total}",
-      "statUnfinished": "غير مكتملة"
+      "statUnfinished": "غير مكتملة",
+      "paymentNeeded": "مطلوب دفع",
+      "paymentNeededBanner": "لم تستلم Nadoumi الرسوم لبعض طلباتك. افتحها وادفع مرة أخرى حتى تتابع مسارها.",
+      "payAgain": "ادفع مرة أخرى",
+      "paymentNeededNote": "تعذّر على Nadoumi تأكيد دفعك. ادفع مرة أخرى ليتابع هذا الطلب مساره."
     }
   },
   "validation": {

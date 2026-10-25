@@ -35,11 +35,12 @@ public class StudentApplicationService {
     private final CurrentCaller caller;
     private final ApplicationOpportunityService opportunities;
     private final com.nadoumi.applicant.service.ApplicantService applicants;
+    private final PaymentGuardProvider payments;
 
     public StudentApplicationService(ApplicationMapper applicationMapper, WfDefinitionMapper definitionMapper,
             ApplicationEventMapper eventMapper, WorkflowService workflow, NadoumiAccessService access,
             CurrentCaller caller, ApplicationOpportunityService opportunities,
-            com.nadoumi.applicant.service.ApplicantService applicants) {
+            com.nadoumi.applicant.service.ApplicantService applicants, PaymentGuardProvider payments) {
         this.applicationMapper = applicationMapper;
         this.definitionMapper = definitionMapper;
         this.eventMapper = eventMapper;
@@ -48,6 +49,7 @@ public class StudentApplicationService {
         this.caller = caller;
         this.opportunities = opportunities;
         this.applicants = applicants;
+        this.payments = payments;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -135,6 +137,13 @@ public class StudentApplicationService {
         var applicant = applicants.get(application.getApplicantId());
         return StudentApplicationResponse.of(application, stage, timeline, opportunity.title(),
                 opportunity.universityName(), opportunity.intake(),
-                (applicant.givenName() + " " + applicant.familyName()).strip());
+                (applicant.givenName() + " " + applicant.familyName()).strip(), paymentNeeded(application));
+    }
+
+    /** Submitted and still open, yet no paid or reported fee on record: staff rejected or deleted it. */
+    private boolean paymentNeeded(Application application) {
+        String status = application.getCurrentStatus();
+        boolean open = status != null && !"DRAFT".equals(status) && !status.startsWith("CLOSED_");
+        return open && !payments.isPaidOrReported(application.getId(), PaymentGuardProvider.APPLICATION_FEE);
     }
 }

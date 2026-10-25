@@ -451,4 +451,6 @@ export interface StudentApplicationDto {
   universityName: string | null
   intake: string | null
   applicantName: string | null
+  /** The application is with Nadoumi but its fee is not on record (staff rejected or deleted it): pay again. */
+  paymentNeeded: boolean
 }

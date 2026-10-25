@@ -297,6 +297,28 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
     }
 
     @Test
+    void shouldFlagASubmittedApplicationWhoseFeeStaffRejected_inTheStudentsApplicationList() throws Exception {
+        Student s = register("pay", "flag");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        reportPayment(s, app, "BANK7200001").andExpect(status().isOk());
+        submitApplication(s, app).andExpect(status().isOk());
+        mvc.perform(get("/api/student/applications").header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$[0].paymentNeeded").value(false));
+
+        mvc.perform(post("/api/staff/payments/" + paymentId(app) + "/reject").header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"Amount does not match\"}")).andExpect(status().isOk());
+        mvc.perform(get("/api/student/applications").header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$[0].paymentNeeded").value(true));
+
+        openSession(s, app).andExpect(status().isOk());
+        reportPayment(s, app, "BANK7200002").andExpect(status().isOk());
+        mvc.perform(get("/api/student/applications").header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$[0].paymentNeeded").value(false));
+    }
+
+    @Test
     void shouldHideOpenCancelledAndExpiredPaymentsAndDraftApplications_fromStaff() throws Exception {
         Student s = register("pay", "inbox");
         long app = draftFor(s);

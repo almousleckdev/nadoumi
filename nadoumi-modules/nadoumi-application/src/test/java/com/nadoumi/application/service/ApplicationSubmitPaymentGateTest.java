@@ -42,7 +42,7 @@ class ApplicationSubmitPaymentGateTest {
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final StudentApplicationService service = new StudentApplicationService(
             applicationMapper, mock(WfDefinitionMapper.class), mock(ApplicationEventMapper.class), workflow,
-            mock(NadoumiAccessService.class), caller, opportunities(), applicants());
+            mock(NadoumiAccessService.class), caller, opportunities(), applicants(), mock(PaymentGuardProvider.class));
 
     private Application draft() {
         Application a = new Application();

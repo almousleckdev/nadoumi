@@ -60,6 +60,7 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
   const draft = computed(() => allApplications.value.find((a: StudentApplicationDto) => a.currentStatus === 'DRAFT') ?? null)
   const statuses = computed(() => allApplications.value.map((a: StudentApplicationDto) => a.currentStatus))
   const stats = computed(() => applicationStats(statuses.value))
+  const paymentNeeded = computed(() => allApplications.value.some((a: StudentApplicationDto) => a.paymentNeeded))
   const distribution = computed(() => stageDistribution(statuses.value))
 
   const { data: activityData, pending: activityPending, error: activityError } = useLazyAsyncData(
@@ -75,6 +76,7 @@ export function useDashboardOverview(primary: Ref<ApplicantDto | null | undefine
     recommended: reactive({ items: recommended, pending: recommendedPending, error: recommendedError }),
     focus: reactive({ latest, draft, pending: applicationsPending }),
     stats,
+    paymentNeeded,
     distribution,
     applicationsPending,
     applicationsError,

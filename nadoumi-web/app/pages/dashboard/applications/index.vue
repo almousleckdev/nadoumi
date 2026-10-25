@@ -36,6 +36,7 @@ const drafts = computed<StudentApplicationDto[]>(() => items.value.filter((a: St
 // the table is generic; inside AsyncState the slot's row type is not inferred, so name it once here
 const asApplication = (row: unknown) => row as StudentApplicationDto
 
+const needPayment = computed(() => submitted.value.some((a: StudentApplicationDto) => a.paymentNeeded))
 const stats = computed(() => applicationStats(items.value.map((a: StudentApplicationDto) => a.currentStatus)))
 
 const columns = computed(() => [
@@ -81,7 +82,7 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
       </template>
 
       <div class="grid min-w-0 gap-6">
-        <div class="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-4" data-test="applications-stats">
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4" data-test="applications-stats">
           <StatTile icon="applications" :label="t('dashboard.home.statSubmitted')" :value="stats.submitted" />
           <StatTile icon="clock" :label="t('dashboard.home.statInProgress')" :value="stats.inProgress" />
           <StatTile icon="award" :label="t('dashboard.home.statOffers')" :value="stats.offers" />
@@ -109,6 +110,7 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
           </ul>
         </section>
 
+        <NAlert v-if="needPayment" tone="danger" data-test="payment-banner">{{ t('dashboard.applications.paymentNeededBanner') }}</NAlert>
         <p v-if="!submitted.length" class="text-sm text-slate-500" data-test="no-submitted">{{ t('dashboard.applications.noneSubmitted') }}</p>
         <NTable v-else :columns="columns" :rows="submitted" row-key="id" data-test="applications-table">
           <template #cell-reference="{ row }">
@@ -125,6 +127,12 @@ useSeo(t('dashboard.applications.title'), t('dashboard.applications.blurb'))
           <template #cell-progress="{ row }"><StageMeter :status="asApplication(row).currentStatus" /></template>
           <template #cell-currentStatus="{ row }">
             <ApplicationStatusBadge :status="asApplication(row).currentStatus" />
+            <NuxtLink
+              v-if="asApplication(row).paymentNeeded"
+              :to="localePath(`/dashboard/applications/${asApplication(row).id}`)"
+              class="mt-1 block text-xs font-semibold text-red-600 underline-offset-2 hover:underline"
+              data-test="payment-needed"
+            >{{ t('dashboard.applications.paymentNeeded') }}</NuxtLink>
             <span class="mt-1 block text-xs text-slate-500">{{ asApplication(row).currentStageName }}</span>
           </template>
           <template #cell-submittedAt="{ row }">{{ formatDate(asApplication(row).submittedAt) }}</template>

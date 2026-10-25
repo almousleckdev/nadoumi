@@ -8,7 +8,7 @@ import { trackerIndex } from '~/utils/applicationView'
 const app = (over: Partial<StudentApplicationDto> = {}): StudentApplicationDto => ({
   id: 7, reference: 'NAD20261024001', applicantId: 1, applicationType: 'PROGRAM_ONLY', programId: 1, scholarshipId: null, intakeId: 1,
   currentStageName: 'Eligibility review', currentStatus: 'SUBMITTED_TO_UNIVERSITY', submittedAt: '2026-10-24T10:00:00', timeline: [],
-  title: 'MBBS', universityName: 'Fudan University', intake: 'AUTUMN_SEPTEMBER', applicantName: 'Amina Diallo', ...over,
+  title: 'MBBS', universityName: 'Fudan University', intake: 'AUTUMN_SEPTEMBER', applicantName: 'Amina Diallo', paymentNeeded: false, ...over,
 })
 
 describe('trackerIndex', () => {
