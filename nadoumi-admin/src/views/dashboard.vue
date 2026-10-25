@@ -192,7 +192,7 @@ const pipeline = useApplicationPipeline(access)
 const finance = useFinanceGlance(access)
 const now = new Date()
 const today = now.toISOString().slice(0, 10)
-const tasks = useMyTasks(access, () => today)
+const tasks = useMyTasks(access, () => userStore.userId, () => today)
 const activity = useGatedLoader(
   [] as Awaited<ReturnType<typeof listMyNotifications>>['content'],
   () => true,

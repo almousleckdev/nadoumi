@@ -55,6 +55,7 @@ async function mountDashboard() {
 describe('Dashboard', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    useUserStore().userId = 3
     Object.values(api).forEach(fn => fn.mockReset())
     api.getFinanceOverview.mockResolvedValue(overview)
     api.listTasks.mockResolvedValue({ content: [
@@ -113,7 +114,9 @@ describe('Dashboard', () => {
     expect(att('tasks')).toContain('2')
     expect(att('tasks')).toContain('1 overdue')
     expect(att('bills')).toContain('3')
-    expect(api.listTasks).toHaveBeenCalledWith(expect.objectContaining({ mine: true }))
+    // the work assigned to the signed-in user, not the tasks they created
+    expect(api.listTasks).toHaveBeenCalledWith(expect.objectContaining({ assigneeUserId: 3 }))
+    expect(api.listTasks).not.toHaveBeenCalledWith(expect.objectContaining({ mine: true }))
   })
 
   it('shows the pipeline, the latest applications, own open tasks, activity and the catalogue to the platform owner', async () => {

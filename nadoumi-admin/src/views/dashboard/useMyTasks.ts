@@ -10,11 +10,12 @@ const TASKS_SHOWN = 6
 type Access = ReturnType<typeof useDashboardAccess>
 
 /** The caller's own open tasks, soonest due first, with how many are already overdue. */
-export function useMyTasks(access: Access, today: () => string) {
+export function useMyTasks(access: Access, userId: () => number | null, today: () => string) {
   const loader = useGatedLoader(
     [] as Task[],
-    () => access.canSeeTasks.value,
-    async () => openTasks((await listTasks({ mine: true, page: 0, size: TASK_SAMPLE_SIZE })).content),
+    () => access.canSeeTasks.value && userId() !== null,
+    // `mine` on this endpoint means created by me; what a person has to do is the work assigned to them
+    async () => openTasks((await listTasks({ assigneeUserId: userId() ?? undefined, page: 1, size: TASK_SAMPLE_SIZE })).content),
   )
 
   const sorted = computed(() => [...loader.data.value].sort((a, b) =>
