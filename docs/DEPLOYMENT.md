@@ -253,3 +253,26 @@ listed in `nadoumi.flyway.rerunnable-versions` (default `121`, written to be saf
 rows and realigns checksums; it never touches application tables. Any other failed migration still stops the start. For a one-off
 override set `NADOUMI_FLYWAY_REPAIR_ON_START=true` for a single start and remove it afterwards. Add a version to the rerunnable list
 only after making its script rerunnable and testing a rerun (see `MigrationV121RerunTest`).
+
+## Runbook: login fails with "Expected one result (or null) to be returned by selectOne(), but found: 2" (2026-10-25)
+
+**Cause.** `sys_user.user_name` had no unique constraint, so a double submit or two concurrent creations could leave two
+active rows (`del_flag = '0'`) with the same user name, and the login lookup found both. **Root cause:** the new-hire form (`EmployeeService.create`) created the staff account without the uniqueness check; it now has it. **Prevention (V136 + V137).** V136
+renames all but one active duplicate to `<name>_<user_id>` (the most recent login keeps the name; ties go to the lowest `user_id`; no
+account is deleted and each renamed row's `remark` holds its old name). V137 adds a unique index over active rows only, so a second active row is refused by the database
+and the API answers 409 "That value is already in use"; a soft-deleted name can be reused.
+
+**If it still happens (or to fix it before the release is deployed)** — Railway, project `extraordinary-vibrancy`, service
+`MySQL`, tab *Data* or *Connect* (shell): `mysql -uroot -p"$MYSQL_ROOT_PASSWORD" railway`
+
+1. Find the duplicates (never select the `password` column):
+   `select user_id, user_name, user_type, status, create_time, login_date from sys_user where del_flag = '0' and user_name in (select user_name from sys_user where del_flag = '0' group by user_name having count(*) > 1) order by user_name, user_id;`
+2. Decide which row to keep (the one the person has logged in with, or the one that holds the right roles:
+   `select * from sys_user_role where user_id in (<ids>);`).
+3. Give each other account its own user name (they may be real people): `update sys_user set user_name = '<new unique name>' where user_id = <id>;` Soft-delete (`del_flag = '2'`) only a true stray.
+4. Log in again. If the kept row has the wrong password, set a new bcrypt hash (generate it locally, do not type a real password
+   into a shared shell history): `update sys_user set password = '<bcrypt hash>' where user_id = <kept id>;` then change the
+   password after login.
+5. Deploy the release that contains V136 and V137 so it cannot recur. Flyway applies them on start; check the service log for
+   "Successfully applied 2 migrations" and `select version, success from flyway_schema_history order by installed_rank desc limit 3;`.
+

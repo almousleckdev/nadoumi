@@ -106,9 +106,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V135 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V137 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(126);
+        assertThat(applied).isEqualTo(128);
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_wf_definition WHERE status = 'ACTIVE'")).isEqualTo("3");
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
@@ -420,6 +420,35 @@ class FlywayMigrationsIT {
     }
 
     @Test
+    void duplicateActiveUserNames_areRenamedThenForbidden_butSoftDeletedNamesCanBeReused() throws Exception {
+        DataSource ds = freshSchema("dup_username_db");
+        flyway(ds).target(MigrationVersion.fromVersion("135")).load().migrate();
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            st.execute("INSERT INTO sys_user (user_id, user_name, nick_name, login_date) VALUES (9001, 'twin', 'Twin A', NULL)");
+            st.execute("INSERT INTO sys_user (user_id, user_name, nick_name, login_date) VALUES (9002, 'twin', 'Twin B', '2026-10-01 10:00:00')");
+            st.execute("INSERT INTO sys_user (user_id, user_name, nick_name, login_date) VALUES (9003, 'twin', 'Twin C', '2026-09-01 10:00:00')");
+            st.execute("INSERT INTO sys_user (user_id, user_name, nick_name) VALUES (9004, 'solo', 'Solo')");
+        }
+
+        flyway(ds).load().migrate();
+
+        // the most recent login keeps the name; the others stay active under a unique name and remember the old one
+        assertThat(single(ds, "SELECT user_id FROM sys_user WHERE user_name = 'twin'")).isEqualTo("9002");
+        assertThat(single(ds, "SELECT user_name FROM sys_user WHERE user_id = 9001")).isEqualTo("twin_9001");
+        assertThat(single(ds, "SELECT user_name FROM sys_user WHERE user_id = 9003")).isEqualTo("twin_9003");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_user WHERE user_id IN (9001, 9003) AND del_flag = '0' AND remark LIKE '%original name: twin'")).isEqualTo("2");
+        assertThat(single(ds, "SELECT del_flag FROM sys_user WHERE user_id = 9004")).isEqualTo("0");
+        try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
+            // a second active row is refused by the database
+            assertThatThrownBy(() -> st.execute("INSERT INTO sys_user (user_name, nick_name) VALUES ('Twin', 'Twin D')"))
+                    .hasMessageContaining("Duplicate entry");
+            // a name freed by a soft delete can be used again
+            st.execute("UPDATE sys_user SET del_flag = '2' WHERE user_id = 9004");
+            st.execute("INSERT INTO sys_user (user_name, nick_name) VALUES ('solo', 'Solo again')");
+        }
+    }
+
+    @Test
     void existingRuoYiDatabase_isBaselinedThenGetsOnlyTheNadoumiMigrations() throws Exception {
         DataSource ds = freshSchema("existing_db");
 
@@ -431,7 +460,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(125); // V2..V135, same gaps as above
+        assertThat(applied).isEqualTo(127); // V2..V137, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))

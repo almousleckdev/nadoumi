@@ -456,3 +456,6 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 - **V131/V132** keep that reference on `nad_application_payment.application_reference` (backfilled), so the payment queue, receipts and emails show it.
 - **V133** adds the `APPLICATION_FORM` document type: the filled-in application form the applicant uploads back.
 - **V134** marks the existing `nad_document_version` rows `CLEAN`. The service stamps new versions CLEAN (no malware scanner is wired yet) but the insert statement hard-coded `'PENDING'`, and a download is refused unless the version is CLEAN, so no uploaded document could be viewed or downloaded by anyone. The insert now writes the real value (`UploadedDocumentViewTest`).
+
+- **V136/V137 (2026-10-25)** make an active user name unique: V136 renames duplicate active `sys_user` rows to `<name>_<user_id>` (the most recent login keeps the name, lowest `user_id` on a tie; nothing is deleted), V137 adds the virtual column `sys_user.active_user_name` (the user name while `del_flag = '0'`, else NULL) with unique index `uk_sys_user_active_name`. Soft-deleted names can be reused. Runbook in `DEPLOYMENT.md`.
+
