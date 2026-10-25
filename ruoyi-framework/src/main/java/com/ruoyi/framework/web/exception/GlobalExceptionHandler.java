@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -81,6 +82,17 @@ public class GlobalExceptionHandler
         log.error(e.getMessage(), e);
         Integer code = e.getCode();
         return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
+    }
+
+    /**
+     * A unique constraint refused the write (for example a second active account with the same user name). Say so plainly
+     * instead of the generic server error; the database detail stays in the log.
+     */
+    @ExceptionHandler(DuplicateKeyException.class)
+    public AjaxResult handleDuplicateKey(DuplicateKeyException e, HttpServletRequest request)
+    {
+        log.warn("request '{}' hit a unique constraint: {}", request.getRequestURI(), e.getMostSpecificCause().getMessage());
+        return AjaxResult.error(HttpStatus.CONFLICT, "That value is already in use. Choose a different one.");
     }
 
     /**
