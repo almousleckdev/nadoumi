@@ -202,6 +202,12 @@ export const routes: RouteRecordRaw[] = [
         meta: { title: 'nav.items.earnings', i18n: true, perm: 'nad:finance:view' },
       },
       {
+        path: 'finance/ledger',
+        name: 'Ledger',
+        component: () => import('@/views/finance/ledger.vue'),
+        meta: { title: 'nav.items.ledger', i18n: true, perm: 'nad:finance:view' },
+      },
+      {
         path: 'revenue',
         name: 'Revenue',
         component: () => import('@/views/finance/revenue.vue'),

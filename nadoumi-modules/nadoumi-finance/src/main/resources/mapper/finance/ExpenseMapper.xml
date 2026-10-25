@@ -122,4 +122,28 @@
                 from nad_expense_category) s), 100), 1)
     </insert>
 
+
+    <select id="sumInRange" resultType="java.math.BigDecimal">
+        select coalesce(sum(amount), 0) from nad_expense
+        where status in ('APPROVED', 'PAID') and currency = #{currency}
+          and spent_on &gt;= #{from} and spent_on &lt;= #{to}
+    </select>
+
+    <select id="monthlyTotals" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select date_format(spent_on, '%Y-%m') as bucket, currency, sum(amount) as total, count(*) as count
+        from nad_expense
+        where status in ('APPROVED', 'PAID') and currency = #{currency}
+          and spent_on &gt;= #{from} and spent_on &lt;= #{to}
+        group by bucket, currency
+    </select>
+
+    <select id="payablesByCurrency" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select currency, sum(amount) as total, count(*) as count
+        from nad_expense where status in ('SUBMITTED', 'APPROVED')
+        group by currency
+    </select>
+
+    <select id="currencies" resultType="java.lang.String">
+        select distinct currency from nad_expense order by currency
+    </select>
 </mapper>

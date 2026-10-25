@@ -68,6 +68,9 @@ public interface PaymentMapper {
 
     int deleteById(@Param("id") long id);
 
+    /** Reported but unconfirmed fees on submitted applications, per currency: what finance counts as receivable. */
+    List<com.nadoumi.finance.domain.MoneyTotal> awaitingConfirmationTotals();
+
     int insertEvent(@Param("paymentId") long paymentId, @Param("from") PaymentStatus from,
             @Param("to") PaymentStatus to, @Param("actorKind") String actorKind, @Param("actorId") Long actorId,
             @Param("note") String note, @Param("at") LocalDateTime at);

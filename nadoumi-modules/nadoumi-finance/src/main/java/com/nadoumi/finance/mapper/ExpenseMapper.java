@@ -35,4 +35,15 @@ public interface ExpenseMapper {
 
     /** Inserts an ad-hoc category; the generated id is set on {@code category}. */
     int insertCategory(ExpenseCategory category);
+
+    /** Sum of the currency's APPROVED or PAID expenses spent in the window (both ends inclusive); never null. */
+    java.math.BigDecimal sumInRange(@Param("currency") String currency, @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /** APPROVED or PAID expenses per calendar month ({@code bucket} = yyyy-MM) for one currency. */
+    List<MoneyTotal> monthlyTotals(@Param("currency") String currency, @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /** Submitted or approved but not yet paid, per currency: money the company owes. */
+    List<MoneyTotal> payablesByCurrency();
+
+    List<String> currencies();
 }

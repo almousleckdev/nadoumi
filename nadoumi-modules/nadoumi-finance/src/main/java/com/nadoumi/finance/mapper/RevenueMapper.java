@@ -27,4 +27,13 @@ public interface RevenueMapper {
     List<MoneyTotal> totalsByCurrency(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
     List<MoneyTotal> totalsBySource(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /** Sum of the currency's revenue received in the window (both ends inclusive); never null. */
+    java.math.BigDecimal sumInRange(@Param("currency") String currency, @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /** Revenue per calendar month ({@code bucket} = yyyy-MM) for one currency. */
+    List<MoneyTotal> monthlyTotals(@Param("currency") String currency, @Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    /** Every currency that has revenue, for the currency picker. */
+    List<String> currencies();
 }

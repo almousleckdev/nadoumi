@@ -68,6 +68,7 @@ export const NAV: NavGroup[] = [
     key: 'finance',
     items: [
       { key: 'earnings', path: '/finance', icon: 'TrendCharts', perm: 'nad:finance:view', status: 'implemented' },
+      { key: 'ledger', path: '/finance/ledger', icon: 'Tickets', perm: 'nad:finance:view', status: 'implemented' },
       { key: 'revenue', path: '/revenue', icon: 'Money', perm: 'nad:revenue:list', status: 'implemented' },
       { key: 'expenses', path: '/expenses', icon: 'Wallet', perm: 'nad:expense:list', status: 'implemented' },
       { key: 'payroll', path: '/payroll', icon: 'Coin', perm: 'nad:payroll:view', status: 'implemented' },

@@ -14,6 +14,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import com.nadoumi.finance.domain.LedgerEntry;
+import com.nadoumi.finance.service.FinanceOverviewService;
+import com.nadoumi.finance.service.LedgerService;
+import com.nadoumi.finance.web.response.FinanceOverview;
+import java.nio.charset.StandardCharsets;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +39,13 @@ public class StaffRevenueController {
 
     private final RevenueService service;
     private final FinanceSummaryService summaryService;
+    private final FinanceOverviewService overviewService;
+    private final LedgerService ledgerService;
 
-    public StaffRevenueController(RevenueService service, FinanceSummaryService summaryService) {
+    public StaffRevenueController(RevenueService service, FinanceSummaryService summaryService,
+            FinanceOverviewService overviewService, LedgerService ledgerService) {
+        this.overviewService = overviewService;
+        this.ledgerService = ledgerService;
         this.service = service;
         this.summaryService = summaryService;
     }
@@ -84,5 +97,41 @@ public class StaffRevenueController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return summaryService.summary(from, to);
+    }
+
+    @GetMapping("/finance/overview")
+    @PreAuthorize("@ss.hasPermi('nad:finance:view')")
+    public FinanceOverview overview(@RequestParam(required = false) String currency) {
+        return overviewService.overview(currency);
+    }
+
+    @GetMapping("/finance/ledger")
+    @PreAuthorize("@ss.hasPermi('nad:finance:view')")
+    public PageResponse<LedgerEntry> ledger(
+            @RequestParam(required = false) String kind,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String currency,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ledgerService.list(kind, q, currency, from, to, page, size);
+    }
+
+    /** The ledger as a spreadsheet file; expenses are negative amounts. */
+    @GetMapping("/finance/ledger/export")
+    @PreAuthorize("@ss.hasPermi('nad:finance:view')")
+    @Log(title = "Finance ledger export", businessType = BusinessType.EXPORT)
+    public ResponseEntity<byte[]> exportLedger(
+            @RequestParam(required = false) String kind,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String currency,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        byte[] body = ledgerService.exportCsv(kind, q, currency, from, to).getBytes(StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .contentType(new MediaType("text", "csv", StandardCharsets.UTF_8))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"nadoumi-ledger.csv\"")
+                .body(body);
     }
 }

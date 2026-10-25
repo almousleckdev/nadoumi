@@ -90,4 +90,19 @@
         order by total desc
     </select>
 
+    <select id="sumInRange" resultType="java.math.BigDecimal">
+        select coalesce(sum(amount), 0) from nad_revenue
+        where currency = #{currency} and received_on &gt;= #{from} and received_on &lt;= #{to}
+    </select>
+
+    <select id="monthlyTotals" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select date_format(received_on, '%Y-%m') as bucket, currency, sum(amount) as total, count(*) as count
+        from nad_revenue
+        where currency = #{currency} and received_on &gt;= #{from} and received_on &lt;= #{to}
+        group by bucket, currency
+    </select>
+
+    <select id="currencies" resultType="java.lang.String">
+        select distinct currency from nad_revenue order by currency
+    </select>
 </mapper>

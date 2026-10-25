@@ -171,6 +171,14 @@
         delete from nad_application_payment where id = #{id}
     </delete>
 
+    <select id="awaitingConfirmationTotals" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select p.currency as currency, sum(p.amount) as total, count(*) as count
+        from nad_application_payment p
+        join nad_application a on a.id = p.application_id
+        where p.status = 'PROOF_SUBMITTED' and a.current_status &lt;&gt; 'DRAFT'
+        group by p.currency
+    </select>
+
     <insert id="insertEvent">
         insert into nad_application_payment_event (payment_id, from_status, to_status, actor_kind, actor_id, note, created_at)
         values (#{paymentId}, #{from}, #{to}, #{actorKind}, #{actorId}, #{note}, #{at})
