@@ -257,9 +257,9 @@ only after making its script rerunnable and testing a rerun (see `MigrationV121R
 ## Runbook: login fails with "Expected one result (or null) to be returned by selectOne(), but found: 2" (2026-10-25)
 
 **Cause.** `sys_user.user_name` had no unique constraint, so a double submit or two concurrent creations could leave two
-active rows (`del_flag = '0'`) with the same user name, and the login lookup found both. **Prevention (V136 + V137).** V136
-soft-deletes all but one active duplicate (the most recent login is kept; ties go to the lowest `user_id`; each removed row's
-`remark` names the kept one). V137 adds a unique index over active rows only, so a second active row is refused by the database
+active rows (`del_flag = '0'`) with the same user name, and the login lookup found both. **Root cause:** the new-hire form (`EmployeeService.create`) created the staff account without the uniqueness check; it now has it. **Prevention (V136 + V137).** V136
+renames all but one active duplicate to `<name>_<user_id>` (the most recent login keeps the name; ties go to the lowest `user_id`; no
+account is deleted and each renamed row's `remark` holds its old name). V137 adds a unique index over active rows only, so a second active row is refused by the database
 and the API answers 409 "That value is already in use"; a soft-deleted name can be reused.
 
 **If it still happens (or to fix it before the release is deployed)** — Railway, project `extraordinary-vibrancy`, service
@@ -269,7 +269,7 @@ and the API answers 409 "That value is already in use"; a soft-deleted name can 
    `select user_id, user_name, user_type, status, create_time, login_date from sys_user where del_flag = '0' and user_name in (select user_name from sys_user where del_flag = '0' group by user_name having count(*) > 1) order by user_name, user_id;`
 2. Decide which row to keep (the one the person has logged in with, or the one that holds the right roles:
    `select * from sys_user_role where user_id in (<ids>);`).
-3. Soft-delete the others (reversible): `update sys_user set del_flag = '2', remark = 'duplicate, removed by hand' where user_id in (<ids to remove>);`
+3. Give each other account its own user name (they may be real people): `update sys_user set user_name = '<new unique name>' where user_id = <id>;` Soft-delete (`del_flag = '2'`) only a true stray.
 4. Log in again. If the kept row has the wrong password, set a new bcrypt hash (generate it locally, do not type a real password
    into a shared shell history): `update sys_user set password = '<bcrypt hash>' where user_id = <kept id>;` then change the
    password after login.

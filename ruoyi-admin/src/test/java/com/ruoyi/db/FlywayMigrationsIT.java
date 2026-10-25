@@ -420,7 +420,7 @@ class FlywayMigrationsIT {
     }
 
     @Test
-    void duplicateActiveUserNames_areCleanedUpThenForbidden_butSoftDeletedNamesCanBeReused() throws Exception {
+    void duplicateActiveUserNames_areRenamedThenForbidden_butSoftDeletedNamesCanBeReused() throws Exception {
         DataSource ds = freshSchema("dup_username_db");
         flyway(ds).target(MigrationVersion.fromVersion("135")).load().migrate();
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
@@ -432,9 +432,11 @@ class FlywayMigrationsIT {
 
         flyway(ds).load().migrate();
 
-        // the most recent login is kept, the others are soft-deleted (not removed) and say which one won
-        assertThat(single(ds, "SELECT user_id FROM sys_user WHERE user_name = 'twin' AND del_flag = '0'")).isEqualTo("9002");
-        assertThat(single(ds, "SELECT COUNT(*) FROM sys_user WHERE user_name = 'twin' AND del_flag = '2' AND remark LIKE '%kept user_id 9002'")).isEqualTo("2");
+        // the most recent login keeps the name; the others stay active under a unique name and remember the old one
+        assertThat(single(ds, "SELECT user_id FROM sys_user WHERE user_name = 'twin'")).isEqualTo("9002");
+        assertThat(single(ds, "SELECT user_name FROM sys_user WHERE user_id = 9001")).isEqualTo("twin_9001");
+        assertThat(single(ds, "SELECT user_name FROM sys_user WHERE user_id = 9003")).isEqualTo("twin_9003");
+        assertThat(single(ds, "SELECT COUNT(*) FROM sys_user WHERE user_id IN (9001, 9003) AND del_flag = '0' AND remark LIKE '%original name: twin'")).isEqualTo("2");
         assertThat(single(ds, "SELECT del_flag FROM sys_user WHERE user_id = 9004")).isEqualTo("0");
         try (Connection c = ds.getConnection(); Statement st = c.createStatement()) {
             // a second active row is refused by the database

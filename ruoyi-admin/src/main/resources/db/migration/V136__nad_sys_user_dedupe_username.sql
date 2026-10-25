@@ -1,16 +1,17 @@
 -- V136: data fix that must run before V137 adds the unique index.
 --
--- sys_user.user_name had no unique constraint, so a double submit or two concurrent creations could leave two ACTIVE
--- rows (del_flag = '0') with the same user name. selectUserByUserName then returned two rows and login failed with
--- "Expected one result (or null) to be returned by selectOne(), but found: 2".
+-- sys_user.user_name had no unique constraint, so the new-hire form (which created a staff account without checking the
+-- name) could leave two ACTIVE rows (del_flag = '0') with the same user name. selectUserByUserName then returned two rows and
+-- login failed with "Expected one result (or null) to be returned by selectOne(), but found: 2".
 --
--- For every user name that is active more than once, KEEP one row and soft-delete the others (del_flag = '2'; no row is
--- removed, so nothing referencing it breaks). The kept row is the one that logged in most recently; accounts that never
--- logged in rank last, and the lowest user_id wins a tie. Each soft-deleted row says which one was kept in its remark.
--- This is a no-op on a database without duplicates.
+-- Both accounts may belong to real people, so nothing is deleted. For every user name that is active more than once, ONE row
+-- keeps the name (the one that logged in most recently; accounts that never logged in rank last; the lowest user_id wins a
+-- tie) and each other row is RENAMED to <name>_<user_id> (cut to fit the 30 character column). Their password, roles and
+-- employee record are untouched; the person signs in with the new name until an administrator gives them a better one. The
+-- remark holds the old name. This is a no-op on a database without duplicates.
 --
--- Manual rollback (does not recreate the failed logins, and must be done before V137 is applied or after dropping its index):
---   update sys_user set del_flag = '0', remark = null where update_by = 'flyway-V136';
+-- Manual rollback (only possible before V137 is applied, or after dropping its index): for each row with
+-- update_by = 'flyway-V136', set user_name back to the name written at the end of its remark.
 
 update sys_user d
 join (
@@ -21,8 +22,8 @@ join (
     group by user_name
     having count(*) > 1
 ) k on k.user_name = d.user_name
-set d.del_flag = '2',
+set d.remark = concat('duplicate user name renamed by V136, original name: ', d.user_name),
+    d.user_name = concat(left(d.user_name, 30 - char_length(cast(d.user_id as char)) - 1), '_', d.user_id),
     d.update_by = 'flyway-V136',
-    d.update_time = now(),
-    d.remark = concat('duplicate user name, soft-deleted by V136; kept user_id ', k.keep_id)
+    d.update_time = now()
 where d.del_flag = '0' and d.user_id <> k.keep_id;
