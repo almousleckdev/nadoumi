@@ -111,6 +111,10 @@ public class EmployeeService {
             u.setUserType(STAFF_USER_TYPE);
             u.setStatus(StringUtils.hasText(req.userStatus()) ? req.userStatus() : "0");
             u.setDeptId(req.deptId());
+            // the Users screen checks this before it inserts; this path creates the account itself, so it must too
+            if (!userService.checkUserNameUnique(u)) {
+                throw new NadBadRequestException("the username '" + u.getUserName() + "' is already taken");
+            }
             u.setPassword(SecurityUtils.encryptPassword(req.password()));
             if (req.roleIds() != null && !req.roleIds().isEmpty()) {
                 u.setRoleIds(req.roleIds().toArray(new Long[0]));
