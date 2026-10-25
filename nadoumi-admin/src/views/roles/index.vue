@@ -45,6 +45,15 @@
       :empty-title="t('roles.emptyTitle')"
       @retry="load"
     >
+      <template #cell-roleName="{ row }">
+        <strong>{{ (row as SysRole).roleName }}</strong>
+        <div class="role__key">
+          {{ (row as SysRole).roleKey }}
+        </div>
+      </template>
+      <template #cell-members="{ row }">
+        {{ members('roles', (row as SysRole).roleId) }}
+      </template>
       <template #cell-dataScope="{ row }">
         {{ t(`roles.scope.${(row as SysRole).dataScope}`) }}
       </template>
@@ -64,6 +73,15 @@
             @click="openEdit(row as SysRole)"
           >
             {{ t('common.edit') }}
+          </el-button>
+          <el-button
+            v-if="userStore.hasPerm('system:role:add')"
+            link
+            type="primary"
+            data-test="copy-role"
+            @click="openCopy(row as SysRole)"
+          >
+            {{ t('roles.duplicate') }}
           </el-button>
           <el-button
             v-if="userStore.hasPerm('system:role:remove')"
@@ -91,6 +109,7 @@
     <RoleDrawer
       v-model="drawerOpen"
       :role-id="editingId"
+      :copy-from-id="copyFromId"
       @saved="onSaved"
     />
   </div>
@@ -110,6 +129,7 @@ import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { listRoles, deleteRoles, changeRoleStatus, type SysRole } from '@/api/system'
 import { usePagedList } from '@/composables/usePagedList'
+import { useOrgOverview } from '@/composables/useOrgOverview'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -129,19 +149,21 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
 
 const drawerOpen = ref(false)
 const editingId = ref<number | undefined>()
+const copyFromId = ref<number | undefined>()
+const { load: loadOrg, members } = useOrgOverview()
 
 const columns = computed(() => [
-  { prop: 'roleName', label: t('roles.name'), minWidth: 160 },
-  { prop: 'roleKey', label: t('roles.key'), minWidth: 140 },
-  { prop: 'roleSort', label: t('roles.sort'), width: 80, align: 'center' as const },
-  { prop: 'dataScope', label: t('roles.dataScope'), width: 150 },
+  { prop: 'roleName', label: t('roles.name'), minWidth: 220 },
+  { prop: 'members', label: t('roles.members'), width: 100, align: 'center' as const },
+  { prop: 'dataScope', label: t('roles.dataScope'), minWidth: 170 },
   { prop: 'status', label: t('roles.status'), width: 90, align: 'center' as const },
-  { prop: 'actions', label: t('common.actions'), width: 160, align: 'right' as const },
+  { prop: 'actions', label: t('common.actions'), width: 210, align: 'right' as const },
 ])
 
-function openCreate() { editingId.value = undefined; drawerOpen.value = true }
-function openEdit(row: SysRole) { editingId.value = row.roleId; drawerOpen.value = true }
-function onSaved() { drawerOpen.value = false; load() }
+function openCreate() { editingId.value = undefined; copyFromId.value = undefined; drawerOpen.value = true }
+function openEdit(row: SysRole) { editingId.value = row.roleId; copyFromId.value = undefined; drawerOpen.value = true }
+function openCopy(row: SysRole) { editingId.value = undefined; copyFromId.value = row.roleId; drawerOpen.value = true }
+function onSaved() { drawerOpen.value = false; load(); loadOrg() }
 
 async function toggleStatus(row: SysRole, active: boolean) {
   const next = active ? '0' : '1'
@@ -164,5 +186,9 @@ async function doDelete(row: SysRole) {
   load()
 }
 
-onMounted(load)
+onMounted(() => { load(); loadOrg() })
 </script>
+
+<style scoped>
+.role__key { font-size: 12px; color: var(--nad-ink-faint, #9ca3af); }
+</style>

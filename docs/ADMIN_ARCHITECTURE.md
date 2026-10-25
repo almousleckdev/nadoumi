@@ -24,6 +24,8 @@ is built on Vue 2**. Full staff permission detail: `docs/PERMISSION_CATALOGUE.md
 
 > **2026-10-25 (finance):** `/finance` is now the finance overview (`views/finance/summary.vue`): eight KPI cards with month on month change, a notice for payments waiting to be confirmed, a twelve month revenue, expenses and net chart (`overview/TrendChart.vue`, inline SVG with a zero line so a loss month reads correctly), revenue by source and expenses by category, a currency picker and a CSV export. `/finance/ledger` is a new page listing every money in and money out entry with filters and the same export. The sidebar marks only the longest matching item active.
 
+> **2026-10-25 (people structure):** Roles show name with key, **members**, data scope and status, can be **duplicated** (the drawer opens pre-filled from an existing role, key blank) and the permission tree has a filter. Departments show leader (with phone), **people** (own team plus sub-departments), and no longer wrap their actions. Posts show people holding them. Tasks gain status chips with counts (click to filter) and a scope switch All, Assigned to me, Created by me; the backend's `mine` filter means created by me, so "assigned to me" uses `assigneeUserId`. V139 seeds six departments and nine posts to start from.
+
 ## 1. What exists today (EXISTING)
 
 ### 1.0 Two frontends, one target — authoritative

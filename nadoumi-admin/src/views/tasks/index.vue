@@ -16,6 +16,25 @@
       </template>
     </PageHeader>
 
+    <div
+      class="task-chips"
+      role="group"
+      :aria-label="t('tasks.status')"
+    >
+      <button
+        v-for="s in TASK_STATUSES"
+        :key="s"
+        type="button"
+        class="task-chip"
+        :class="{ 'task-chip--on': filters.status === s }"
+        :data-test="`chip-${s}`"
+        @click="pickStatus(s)"
+      >
+        <span class="task-chip__n">{{ counts[s] ?? 0 }}</span>
+        {{ t(`tasks.statusMap.${s}`) }}
+      </button>
+    </div>
+
     <FilterBar
       :dirty="dirty"
       @clear="clearFilters"
@@ -56,12 +75,21 @@
           :value="p"
         />
       </el-select>
-      <el-checkbox
-        v-model="filters.mine"
+      <el-radio-group
+        v-model="filters.scope"
+        data-test="scope"
         @change="reload"
       >
-        {{ t('tasks.createdByMe') }}
-      </el-checkbox>
+        <el-radio-button value="">
+          {{ t('tasks.scopeAll') }}
+        </el-radio-button>
+        <el-radio-button value="assigned">
+          {{ t('tasks.scopeAssigned') }}
+        </el-radio-button>
+        <el-radio-button value="created">
+          {{ t('tasks.createdByMe') }}
+        </el-radio-button>
+      </el-radio-group>
       <el-button
         :icon="Search"
         @click="reload"
@@ -143,7 +171,7 @@ const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const emptyFilters = () => ({ q: '', status: '', priority: '', mine: false })
+const emptyFilters = () => ({ q: '', status: '', priority: '', scope: '' as '' | 'assigned' | 'created' })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
   usePagedList<Task, ReturnType<typeof emptyFilters>>({
     emptyFilters,
@@ -153,7 +181,8 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
       q: f.q || undefined,
       status: f.status || undefined,
       priority: f.priority || undefined,
-      mine: f.mine || undefined,
+      mine: f.scope === 'created' || undefined,
+      assigneeUserId: f.scope === 'assigned' ? (userStore.userId ?? undefined) : undefined,
       page: index,
       size,
     }),
@@ -172,8 +201,25 @@ const columns = computed(() => [
   { prop: 'createdByName', label: t('tasks.createdBy'), minWidth: 130 },
 ])
 
+// one count per status for the chips above the list, in the caller's current scope
+const counts = ref<Record<string, number>>({})
+async function loadCounts() {
+  const f = filters
+  const pairs = await Promise.all(TASK_STATUSES.map(async status => [status, (await listTasks({
+    status, page: 1, size: 1,
+    mine: f.scope === 'created' || undefined,
+    assigneeUserId: f.scope === 'assigned' ? (userStore.userId ?? undefined) : undefined,
+  })).totalElements ?? 0] as const))
+  counts.value = Object.fromEntries(pairs)
+}
+
+function pickStatus(status: string) {
+  filters.status = filters.status === status ? '' : status
+  reload()
+}
+
 function openCreate() { editingId.value = undefined; drawerOpen.value = true }
-function onSaved() { drawerOpen.value = false; load(); if (detail.value) openDetail(detail.value.id) }
+function onSaved() { drawerOpen.value = false; load(); loadCounts(); if (detail.value) openDetail(detail.value.id) }
 
 async function openDetail(id: number) { detail.value = await getTask(id) }
 function editFromDetail(task: Task) { editingId.value = task.id; drawerOpen.value = true }
@@ -193,6 +239,7 @@ async function move(task: Task, to: string) {
   ElMessage.success(t('common.saved'))
   await openDetail(task.id)
   load()
+  loadCounts()
 }
 
 async function removeTask(task: Task) {
@@ -205,11 +252,20 @@ async function removeTask(task: Task) {
   ElMessage.success(t('common.deleted'))
   detail.value = null
   load()
+  loadCounts()
 }
 
-onMounted(load)
+onMounted(() => { load(); loadCounts() })
 </script>
 
 <style scoped>
+.task-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.task-chip {
+  display: inline-flex; align-items: baseline; gap: 8px; padding: 8px 14px; border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer;
+  border: 1px solid var(--nad-line, #e5e7eb); background: var(--nad-surface, #fff); color: var(--nad-ink-soft, #475569);
+}
+.task-chip:hover, .task-chip:focus-visible { border-color: var(--el-color-primary); outline: none; }
+.task-chip--on { border-color: var(--el-color-primary); background: var(--el-color-primary-light-9, #fff7ed); color: var(--nad-ink, #0f172a); }
+.task-chip__n { font-weight: 700; font-size: 16px; font-variant-numeric: tabular-nums; color: var(--nad-ink, #0f172a); }
 .task-overdue { color: var(--nad-danger, #dc2626); font-weight: 600; }
 </style>

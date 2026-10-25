@@ -38,6 +38,8 @@ const openRow = async (w: ReturnType<typeof mount>) => {
   await flushPromises()
 }
 
+const listCalls = () => hr.listTasks.mock.calls.map(c => c[0] as { size?: number, status?: string, assigneeUserId?: number, mine?: boolean })
+
 const buttons = (w: ReturnType<typeof mount>) => w.findAll('button').map(b => b.text())
 
 describe('Tasks page', () => {
@@ -92,7 +94,8 @@ describe('Tasks page', () => {
     await actions[0]!.trigger('click')
     await flushPromises()
     expect(hr.changeTaskStatus).toHaveBeenCalledWith(7, 'COMPLETED', undefined)
-    expect(hr.listTasks).toHaveBeenCalledTimes(2)
+    // the list loads once on open and once after the move (the one-row count calls feed the chips)
+    expect(listCalls().filter(c => c.size !== 1)).toHaveLength(2)
   })
 
   it('deletes a task only after confirmation and closes the drawer', async () => {
@@ -122,5 +125,23 @@ describe('Tasks page', () => {
     const w = await mountPage()
     await openRow(w)
     expect(w.find('.td-actions').findAll('button').some(b => b.text() === 'Edit')).toBe(false)
+  })
+
+  it('shows how many tasks are in each status as chips, and filters by one when it is clicked', async () => {
+    hr.listTasks.mockImplementation(async (p: { status?: string, size?: number }) =>
+      p.size === 1 ? { content: [], totalElements: p.status === 'PENDING' ? 4 : 1 } : { content: [baseTask], totalElements: 1 })
+    const w = await mountPage()
+    expect(w.find('[data-test="chip-PENDING"]').text()).toContain('4')
+    await w.find('[data-test="chip-IN_PROGRESS"]').trigger('click')
+    await flushPromises()
+    expect(listCalls().some(c => c.size !== 1 && c.status === 'IN_PROGRESS')).toBe(true)
+  })
+
+  it('lists only the tasks assigned to the signed-in user in the Assigned to me scope', async () => {
+    useUserStore().userId = 3
+    const w = await mountPage()
+    await w.findAll('.el-radio-button')[1]!.find('input').setValue(true)
+    await flushPromises()
+    expect(listCalls().some(c => c.size !== 1 && c.assigneeUserId === 3 && !c.mine)).toBe(true)
   })
 })
