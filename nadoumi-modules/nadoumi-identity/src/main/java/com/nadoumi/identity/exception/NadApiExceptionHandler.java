@@ -1,6 +1,7 @@
 package com.nadoumi.identity.exception;
 
 import com.nadoumi.common.exception.NadBadRequestException;
+import com.nadoumi.common.exception.NadConflictException;
 import com.nadoumi.common.exception.NadForbiddenException;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.ruoyi.common.exception.RateLimitExceededException;
@@ -45,6 +46,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class NadApiExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(NadApiExceptionHandler.class);
+
+    @ExceptionHandler(NadConflictException.class)
+    public ProblemDetail conflict(NadConflictException e) {
+        return problem(HttpStatus.CONFLICT, e.getMessage());
+    }
 
     @ExceptionHandler(NadNotFoundException.class)
     public ProblemDetail notFound(NadNotFoundException e) {

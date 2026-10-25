@@ -137,9 +137,10 @@ class ApplicationPaymentServiceTest {
     }
 
     @Test
-    void shouldRefuseToOpenASession_whenTheApplicationIsNoLongerADraft() {
+    void shouldRefuseToOpenASession_whenTheApplicationIsSubmittedAndItsLastPaymentWasNotRejected() {
         when(applications.find(APPLICATION_ID)).thenReturn(Optional.of(
-                new ApplicationFacts(APPLICATION_ID, "NAD20261023001", APPLICANT_ID, "SUBMITTED", false)));
+                new ApplicationFacts(APPLICATION_ID, "NAD20261023001", APPLICANT_ID, "IN_REVIEW", false)));
+        when(mapper.findLatest(APPLICATION_ID, KIND)).thenReturn(payment(PaymentStatus.EXPIRED, NOW.minusDays(1)));
 
         assertThatThrownBy(() -> service.start(APPLICATION_ID)).isInstanceOf(PaymentConflictException.class);
     }

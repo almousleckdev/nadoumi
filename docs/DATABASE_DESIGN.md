@@ -459,3 +459,4 @@ deletes `nad_program` before `nad_department` before `nad_university`, so the ne
 
 - **V136/V137 (2026-10-25)** make an active user name unique: V136 renames duplicate active `sys_user` rows to `<name>_<user_id>` (the most recent login keeps the name, lowest `user_id` on a tie; nothing is deleted), V137 adds the virtual column `sys_user.active_user_name` (the user name while `del_flag = '0'`, else NULL) with unique index `uk_sys_user_active_name`. Soft-deleted names can be reused. Runbook in `DEPLOYMENT.md`.
 
+- **V138 (2026-10-25)** seeds the buttons `nad:application:remove` and `nad:payment:remove` under their menus and grants them to role 3 only.

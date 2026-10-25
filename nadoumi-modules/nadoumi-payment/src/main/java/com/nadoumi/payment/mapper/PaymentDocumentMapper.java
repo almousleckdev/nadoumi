@@ -68,6 +68,14 @@ public interface PaymentDocumentMapper {
 
     int deleteByApplicantId(@Param("applicantId") long applicantId);
 
+    List<Long> findMediaIdsByApplication(@Param("applicationId") long applicationId);
+
+    int deleteByApplicationId(@Param("applicationId") long applicationId);
+
+    List<Long> findMediaIdsByPayment(@Param("paymentId") long paymentId);
+
+    int deleteByPaymentId(@Param("paymentId") long paymentId);
+
     /** A person an email can go to. */
     record Recipient(Long userId, String email, String name) {
     }

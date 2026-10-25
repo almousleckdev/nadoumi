@@ -67,6 +67,14 @@
         delete from nad_application where applicant_id = #{applicantId}
     </delete>
 
+    <delete id="removeById">
+        delete from nad_application where id = #{id}
+    </delete>
+
+    <delete id="removeAccessGrants">
+        delete from nad_user_applicant_access where application_id = #{applicationId}
+    </delete>
+
     <select id="findApplicantId" resultType="java.lang.Long">
         select applicant_id from nad_application where id = #{id}
     </select>

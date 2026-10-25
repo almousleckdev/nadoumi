@@ -11,6 +11,12 @@ public interface ApplicationMapper {
     /** Permanent erasure of an applicant; child rows cascade. */
     int removeByApplicantId(@Param("applicantId") long applicantId);
 
+    /** Deletes one application; its events, history, tasks, decisions, snapshots and workflow state cascade. */
+    int removeById(@Param("id") long id);
+
+    /** Access grants scoped to the application (an agent's delegation), which restrict the delete. */
+    int removeAccessGrants(@Param("applicationId") long applicationId);
+
     List<Application> searchStaff(ApplicationSearch filter);
 
     /** All applications for one applicant, newest first — the student "my applications" list. */

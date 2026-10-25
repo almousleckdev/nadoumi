@@ -45,6 +45,15 @@
             {{ t('applications.assign') }}
           </el-button>
           <el-button
+            v-if="canDelete"
+            type="danger"
+            plain
+            data-test="delete"
+            @click="deleteOpen = true"
+          >
+            {{ t('common.delete') }}
+          </el-button>
+          <el-button
             v-if="canChange && !closed"
             type="success"
             data-test="change-status"
@@ -104,6 +113,13 @@
       </AppTabs>
     </template>
 
+    <DeleteWithReasonDialog
+      v-model="deleteOpen"
+      :title="t('applications.deleteTitle')"
+      :message="t('applications.deleteBody', { ref: detail?.application.reference ?? '' })"
+      :busy="saving"
+      @confirm="doDelete"
+    />
     <AssignDialog
       v-model="assignOpen"
       :saving="saving"
@@ -136,12 +152,13 @@ import type { Tab } from '@/components/ui/types'
 import { useUserStore } from '@/stores/user'
 import { formatDateTime } from '@/utils/date'
 import {
-  advanceApplication, assignApplication, claimApplication, completeApplicationTask, getApplication,
+  advanceApplication, assignApplication, claimApplication, completeApplicationTask, deleteApplication, getApplication,
   skipApplicationTask, type ApplicationDetail,
 } from '@/api/application'
 import { isClosedStatus, STATUS_TONES } from './vocabulary'
 import { useApplicationLabels } from './useApplicationLabels'
 import AssignDialog from './detail/AssignDialog.vue'
+import DeleteWithReasonDialog from '@/components/ui/DeleteWithReasonDialog.vue'
 import StatusDialog from './detail/StatusDialog.vue'
 import FormPanel from './detail/FormPanel.vue'
 import DocumentsPanel from './detail/DocumentsPanel.vue'
@@ -170,6 +187,8 @@ const statusOpen = ref(false)
 // Permission checks only decide which controls to show; every action is authorised by the backend.
 const canClaim = computed(() => userStore.hasPerm('nad:application:claim') && detail.value?.application.assigneeUserId == null)
 const canAssign = computed(() => userStore.hasPerm('nad:application:assign'))
+const canDelete = computed(() => userStore.hasPerm('nad:application:remove'))
+const deleteOpen = ref(false)
 const canChange = computed(() => userStore.hasPerm('nad:application:transition'))
 const closed = computed(() => isClosedStatus(detail.value?.application.currentStatus ?? null))
 
@@ -238,6 +257,22 @@ async function run(fn: () => Promise<unknown>): Promise<boolean> {
 }
 
 const claim = () => run(() => claimApplication(id))
+
+async function doDelete(reason: string) {
+  saving.value = true
+  try {
+    await deleteApplication(id, reason)
+    ElMessage.success(t('applications.deleted'))
+    deleteOpen.value = false
+    router.push('/applications')
+  }
+  catch {
+    // the shared request client already toasts the server's message
+  }
+  finally {
+    saving.value = false
+  }
+}
 
 async function assign(userId: number) {
   if (await run(() => assignApplication(id, userId))) assignOpen.value = false

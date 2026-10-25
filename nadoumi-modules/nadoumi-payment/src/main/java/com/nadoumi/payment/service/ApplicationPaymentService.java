@@ -248,7 +248,7 @@ public class ApplicationPaymentService {
         }
         ApplicationPayment latest = mapper.findLatest(app.id(), KIND);
         if (latest == null) {
-            return new StudentPaymentResponse("NOT_STARTED", true, false, app.draft(), fee,
+            return new StudentPaymentResponse("NOT_STARTED", true, false, mayStartPayment(app, null), fee,
                     PaymentSettings.CURRENCY, settings.payee(), null, null, 0, null);
         }
         PaymentStatus status = latest.getStatus();
@@ -267,14 +267,15 @@ public class ApplicationPaymentService {
 
     /**
      * A draft can always be paid. A submitted application can be paid again only when staff rejected the payment it was
-     * submitted with (the fee is not refundable, so a rejected payment leaves it unpaid); a closed one never can.
+     * submitted with or deleted it (the fee is not refundable, so it is otherwise never paid twice); a closed one never can.
      */
     private static boolean mayStartPayment(ApplicationFacts app, ApplicationPayment latest) {
         if (app.draft()) {
             return true;
         }
         boolean closed = app.status() != null && app.status().startsWith(CLOSED_STATUS_PREFIX);
-        return !closed && latest != null && latest.getStatus() == PaymentStatus.REJECTED;
+        // no payment at all means staff deleted it: the application is unpaid again
+        return !closed && (latest == null || latest.getStatus() == PaymentStatus.REJECTED);
     }
 
     private ApplicationFacts requireApplication(long applicationId) {

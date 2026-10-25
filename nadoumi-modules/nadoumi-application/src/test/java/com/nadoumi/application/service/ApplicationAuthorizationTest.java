@@ -107,7 +107,7 @@ class ApplicationAuthorizationTest {
                 mock(com.nadoumi.application.mapper.ApplicationEventMapper.class),
                 mock(com.nadoumi.application.mapper.ApplicationDecisionMapper.class), workflow,
                 mock(com.nadoumi.application.mapper.WfInstanceMapper.class), mock(GuardEvaluator.class), opportunities(),
-                applicants());
+                applicants(), java.util.List.of());
         when(adminMapper.searchStaff(org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
 
         ApplicationSearch scoped = new ApplicationSearch(null, null, null, null, null, 99L);

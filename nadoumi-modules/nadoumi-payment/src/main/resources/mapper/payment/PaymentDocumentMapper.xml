@@ -155,6 +155,25 @@
         where payment_id in (select id from nad_application_payment where applicant_id = #{applicantId})
     </delete>
 
+    <select id="findMediaIdsByApplication" resultType="java.lang.Long">
+        select d.media_id from nad_payment_document d
+        join nad_application_payment p on p.id = d.payment_id
+        where p.application_id = #{applicationId} and d.media_id is not null
+    </select>
+
+    <delete id="deleteByApplicationId">
+        delete from nad_payment_document
+        where payment_id in (select id from nad_application_payment where application_id = #{applicationId})
+    </delete>
+
+    <select id="findMediaIdsByPayment" resultType="java.lang.Long">
+        select media_id from nad_payment_document where payment_id = #{paymentId} and media_id is not null
+    </select>
+
+    <delete id="deleteByPaymentId">
+        delete from nad_payment_document where payment_id = #{paymentId}
+    </delete>
+
     <select id="findRecipient" resultMap="recipient">
         select user_id, email, nick_name from sys_user
         where user_id = #{userId} and del_flag = '0' and status = '0'

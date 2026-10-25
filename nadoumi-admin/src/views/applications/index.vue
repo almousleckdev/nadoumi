@@ -98,6 +98,24 @@
       <template #cell-submittedAt="{ row }">
         {{ formatDateTime((row as ApplicationRow).submittedAt) }}
       </template>
+      <template #cell-actions="{ row }">
+        <el-button
+          link
+          type="primary"
+          @click.stop="router.push(`/applications/${(row as ApplicationRow).id}`)"
+        >
+          {{ t('applications.view') }}
+        </el-button>
+        <el-button
+          v-if="canDelete"
+          link
+          type="danger"
+          data-test="delete-row"
+          @click.stop="askDelete(row as ApplicationRow)"
+        >
+          {{ t('common.delete') }}
+        </el-button>
+      </template>
     </DataTable>
 
     <Pagination
@@ -105,6 +123,14 @@
       v-model:size="size"
       :total="total"
       @change="load"
+    />
+
+    <DeleteWithReasonDialog
+      v-model="deleteOpen"
+      :title="t('applications.deleteTitle')"
+      :message="t('applications.deleteBody', { ref: target?.reference ?? '' })"
+      :busy="deleting"
+      @confirm="doDelete"
     />
   </div>
 </template>
@@ -119,8 +145,10 @@ import FilterBar from '@/components/ui/FilterBar.vue'
 import DataTable from '@/components/ui/DataTable.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import Pagination from '@/components/ui/Pagination.vue'
+import DeleteWithReasonDialog from '@/components/ui/DeleteWithReasonDialog.vue'
+import { ElMessage } from 'element-plus'
 import { usePagedList } from '@/composables/usePagedList'
-import { listApplications, listAssignees, type ApplicationRow, type StaffUser } from '@/api/application'
+import { deleteApplication, listApplications, listAssignees, type ApplicationRow, type StaffUser } from '@/api/application'
 import { useUserStore } from '@/stores/user'
 import { formatDateTime } from '@/utils/date'
 import { APPLICATION_TYPES, STATUSES, STATUS_TONES } from './vocabulary'
@@ -155,10 +183,35 @@ const columns = computed(() => [
   { prop: 'currentStatus', label: t('applications.status'), width: 180, align: 'center' as const },
   { prop: 'assigneeName', label: t('applications.assignee'), minWidth: 150 },
   { prop: 'submittedAt', label: t('applications.submitted'), minWidth: 170 },
+  { prop: 'actions', label: t('common.actions'), width: 130, align: 'right' as const },
 ])
 
 const statusLabel = (status: string | null) =>
   status && te(`applications.statusMap.${status}`) ? t(`applications.statusMap.${status}`) : (status ?? '')
+
+const canDelete = computed(() => useUserStore().hasPerm('nad:application:remove'))
+const deleteOpen = ref(false)
+const deleting = ref(false)
+const target = ref<ApplicationRow | null>(null)
+
+function askDelete(row: ApplicationRow) {
+  target.value = row
+  deleteOpen.value = true
+}
+
+async function doDelete(reason: string) {
+  if (!target.value) return
+  deleting.value = true
+  try {
+    await deleteApplication(target.value.id, reason)
+    ElMessage.success(t('applications.deleted'))
+    deleteOpen.value = false
+    await load()
+  }
+  finally {
+    deleting.value = false
+  }
+}
 
 // the assignee filter lists staff only for those allowed to assign; everyone else filters by the table
 onMounted(async () => {
