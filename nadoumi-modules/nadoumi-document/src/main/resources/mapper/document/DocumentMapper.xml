@@ -66,4 +66,8 @@
     <delete id="deleteDraft">
         delete from nad_document where id = #{id} and status = 'DRAFT'
     </delete>
+
+    <update id="detachFromApplication">
+        update nad_document set application_id = null where application_id = #{applicationId}
+    </update>
 </mapper>

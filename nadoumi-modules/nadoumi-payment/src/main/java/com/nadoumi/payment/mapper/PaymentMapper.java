@@ -60,6 +60,14 @@ public interface PaymentMapper {
 
     int deleteByApplicantId(@Param("applicantId") long applicantId);
 
+    List<Long> findProofMediaIdsByApplication(@Param("applicationId") long applicationId);
+
+    int deleteByApplicationId(@Param("applicationId") long applicationId);
+
+    int countConfirmedAny(@Param("applicationId") long applicationId);
+
+    int deleteById(@Param("id") long id);
+
     int insertEvent(@Param("paymentId") long paymentId, @Param("from") PaymentStatus from,
             @Param("to") PaymentStatus to, @Param("actorKind") String actorKind, @Param("actorId") Long actorId,
             @Param("note") String note, @Param("at") LocalDateTime at);

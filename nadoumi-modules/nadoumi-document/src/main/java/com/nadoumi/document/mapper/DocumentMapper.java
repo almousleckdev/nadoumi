@@ -27,4 +27,7 @@ public interface DocumentMapper {
 
     /** Only while status = DRAFT — a submitted document is never hard-deleted. */
     int deleteDraft(@Param("id") long id);
+
+    /** Keeps the applicant's documents but drops their link to an application that is being deleted. */
+    int detachFromApplication(@org.apache.ibatis.annotations.Param("applicationId") long applicationId);
 }

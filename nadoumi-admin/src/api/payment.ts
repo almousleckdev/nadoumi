@@ -42,3 +42,7 @@ export const rejectPayment = (id: number, reason: string) =>
 /** The proof bytes; needs the session, so it is fetched as a Blob and shown via an object URL. */
 export const fetchPaymentProof = (id: number) =>
   request.get<unknown, Blob>(`${P}/${id}/proof`, { responseType: 'blob' })
+
+/** Permanent; the server refuses a confirmed payment. */
+export const deletePayment = (id: number, reason: string) =>
+  request.delete<unknown, void>(`${P}/${id}`, { data: { reason } })

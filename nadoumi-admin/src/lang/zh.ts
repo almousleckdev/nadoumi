@@ -1,5 +1,8 @@
 export default {
   common: {
+    reasonLabel: '原因',
+    reasonPlaceholder: '为什么要删除？该原因会记录在操作日志中。',
+    reasonTooShort: '请至少填写 {min} 个字符。',
     signIn: '登录',
     signOut: '退出登录',
     username: '用户名',
@@ -1151,6 +1154,9 @@ export default {
     },
   },
   applications: {
+    deleteTitle: '删除申请',
+    deleteBody: '永久删除 {ref}，包括其付款、历史和任务？此操作无法撤销。已有确认付款的申请不能删除。',
+    deleted: '申请已删除',
     title: '申请', subtitle: '学生已付款并提交的申请。打开一个申请即可查看全部内容、指派给员工并推进其状态。',
     searchPlaceholder: '搜索编号或申请人姓名…', ref: '编号', applicant: '申请人', type: '类型', stage: '阶段', status: '状态',
     opportunity: '项目 / 奖学金', university: '大学', intake: '入学批次', email: '邮箱', phone: '电话', nationality: '国籍',
@@ -1255,6 +1261,9 @@ export default {
     emptyAll: '该期间暂无收入或已批准的支出记录。',
   },
   payment: {
+    deleteTitle: '删除付款',
+    deleteBody: '永久删除付款 {ref} 及其凭证？已确认的付款不能删除。如果申请是凭这笔付款提交的，学生可以重新付款。',
+    deleted: '付款已删除',
     title: '支付',
     subtitle: '核实学生通过转账支付的申请费。金额以人民币计。',
     searchPlaceholder: '支付编号、交易单号、学生姓名…',

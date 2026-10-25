@@ -5,6 +5,7 @@ import com.nadoumi.common.media.ProxyStream;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.payment.domain.enums.PaymentStatus;
 import com.nadoumi.payment.service.PaymentVerificationService;
+import com.nadoumi.payment.web.request.DeletePaymentRequest;
 import com.nadoumi.payment.web.request.RejectPaymentRequest;
 import com.nadoumi.payment.web.response.StaffPaymentResponse;
 import com.ruoyi.common.annotation.Log;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -83,6 +85,14 @@ public class StaffPaymentController {
     @Log(title = "Application payment", businessType = BusinessType.UPDATE)
     public StaffPaymentResponse reject(@PathVariable long id, @Valid @RequestBody RejectPaymentRequest req) {
         return service.reject(id, req.reason());
+    }
+
+    /** Permanent. A confirmed payment is booked revenue and is refused. */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('nad:payment:remove')")
+    @Log(title = "Application payment", businessType = BusinessType.DELETE)
+    public void delete(@PathVariable long id, @Valid @RequestBody DeletePaymentRequest req) {
+        service.delete(id, req.reason());
     }
 
     private static MediaAccessLogContext accessContext(HttpServletRequest request) {

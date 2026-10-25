@@ -71,6 +71,15 @@
         >
           {{ t('payment.review') }}
         </el-button>
+        <el-button
+          v-if="canDelete && (row as StaffPayment).status !== 'CONFIRMED'"
+          link
+          type="danger"
+          data-test="delete-row"
+          @click.stop="askDelete(row as StaffPayment)"
+        >
+          {{ t('common.delete') }}
+        </el-button>
       </template>
     </DataTable>
 
@@ -81,6 +90,13 @@
       @change="load"
     />
 
+    <DeleteWithReasonDialog
+      v-model="deleteOpen"
+      :title="t('payment.deleteTitle')"
+      :message="t('payment.deleteBody', { ref: target?.reference ?? '' })"
+      :busy="deleting"
+      @confirm="doDelete"
+    />
     <PaymentDrawer
       v-model="drawerOpen"
       :payment-id="selectedId"
@@ -103,7 +119,10 @@ import { PAYMENT_TONES } from './paymentTones'
 import { usePagedList } from '@/composables/usePagedList'
 import { cny } from '@/utils/money'
 import { formatDateTime } from '@/utils/date'
-import { listPayments, PAYMENT_STATUSES, type StaffPayment } from '@/api/payment'
+import { deletePayment, listPayments, PAYMENT_STATUSES, type StaffPayment } from '@/api/payment'
+import { useUserStore } from '@/stores/user'
+import DeleteWithReasonDialog from '@/components/ui/DeleteWithReasonDialog.vue'
+import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 
@@ -120,6 +139,30 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
       size,
     }),
   })
+
+const canDelete = computed(() => useUserStore().hasPerm('nad:payment:remove'))
+const deleteOpen = ref(false)
+const deleting = ref(false)
+const target = ref<StaffPayment | null>(null)
+
+function askDelete(p: StaffPayment) {
+  target.value = p
+  deleteOpen.value = true
+}
+
+async function doDelete(reason: string) {
+  if (!target.value) return
+  deleting.value = true
+  try {
+    await deletePayment(target.value.id, reason)
+    ElMessage.success(t('payment.deleted'))
+    deleteOpen.value = false
+    await load()
+  }
+  finally {
+    deleting.value = false
+  }
+}
 
 const drawerOpen = ref(false)
 const selectedId = ref<number | null>(null)

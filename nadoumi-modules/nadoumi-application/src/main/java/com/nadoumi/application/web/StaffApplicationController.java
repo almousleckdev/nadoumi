@@ -10,6 +10,7 @@ import com.nadoumi.application.web.response.StaffApplicationRow;
 import com.nadoumi.application.web.response.StaffUserResponse;
 import com.nadoumi.application.web.request.AssignRequest;
 import com.nadoumi.application.web.request.DecisionRequest;
+import com.nadoumi.application.web.request.DeleteApplicationRequest;
 import com.nadoumi.application.web.request.SkipTaskRequest;
 import com.nadoumi.application.web.request.StartApplicationRequest;
 import com.nadoumi.application.web.request.TransitionRequest;
@@ -25,6 +26,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -108,6 +110,14 @@ public class StaffApplicationController {
     @Log(title = "Application status change", businessType = BusinessType.UPDATE)
     public ApplicationResponse advance(@PathVariable Long id, @Valid @RequestBody AdvanceRequest req) {
         return service.advance(id, req);
+    }
+
+    /** Permanent. Refused while a confirmed payment exists, since that money is booked revenue. */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("@ss.hasPermi('nad:application:remove')")
+    @Log(title = "Application", businessType = BusinessType.DELETE)
+    public void delete(@PathVariable Long id, @Valid @RequestBody DeleteApplicationRequest req) {
+        service.delete(id, req.reason());
     }
 
     @PostMapping("/{id}/decisions")

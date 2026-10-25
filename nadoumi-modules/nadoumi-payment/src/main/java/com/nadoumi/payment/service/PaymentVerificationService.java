@@ -17,11 +17,14 @@ import com.nadoumi.identity.access.CurrentCaller;
 import com.nadoumi.payment.domain.ApplicationPayment;
 import com.nadoumi.payment.domain.enums.PaymentStatus;
 import com.nadoumi.payment.exception.PaymentConflictException;
+import com.nadoumi.payment.mapper.PaymentDocumentMapper;
 import com.nadoumi.payment.mapper.PaymentMapper;
 import com.nadoumi.payment.web.response.StaffPaymentResponse;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class PaymentVerificationService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentVerificationService.class);
     private static final String KIND = PaymentGuardProvider.APPLICATION_FEE;
 
     private final PaymentMapper mapper;
@@ -43,9 +47,11 @@ public class PaymentVerificationService {
     private final PaymentEvents events;
     private final CurrentCaller caller;
     private final Clock clock;
+    private final PaymentDocumentMapper documents;
 
     public PaymentVerificationService(PaymentMapper mapper, MediaGateway media, RevenueService revenue,
-            PaymentEvents events, CurrentCaller caller, Clock clock) {
+            PaymentEvents events, CurrentCaller caller, Clock clock, PaymentDocumentMapper documents) {
+        this.documents = documents;
         this.mapper = mapper;
         this.media = media;
         this.revenue = revenue;
@@ -111,6 +117,28 @@ public class PaymentVerificationService {
         ApplicationPayment rejected = load(id);
         events.rejected(rejected, cleaned);
         return StaffPaymentResponse.of(rejected);
+    }
+
+    /**
+     * Deletes a payment that was never confirmed (a wrong or fraudulent report, a test): its proof and receipts go with it.
+     * A confirmed payment is booked revenue and is refused. If the application was submitted with this payment, the student
+     * can then pay again.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(long id, String reason) {
+        ApplicationPayment payment = load(id);
+        if (payment.getStatus() == PaymentStatus.CONFIRMED) {
+            throw new PaymentConflictException("a confirmed payment is booked revenue and cannot be deleted");
+        }
+        long actor = caller.requireUserId();
+        documents.findMediaIdsByPayment(id).forEach(mediaId -> media.softDelete(mediaId, actor));
+        documents.deleteByPaymentId(id);
+        if (payment.getProofMediaId() != null) {
+            media.softDelete(payment.getProofMediaId(), actor);
+        }
+        mapper.deleteById(id);
+        log.warn("payment {} ({}, application {}) deleted by user {}; status {}; reason: {}", id, payment.getReference(),
+                payment.getApplicationReference(), actor, payment.getStatus(), reason);
     }
 
     /** A payment that is waiting for a decision, and that the caller is allowed to decide. */

@@ -1,5 +1,8 @@
 export default {
   common: {
+    reasonLabel: 'Reason',
+    reasonPlaceholder: 'Why is this being deleted? It is kept in the operation log.',
+    reasonTooShort: 'Write at least {min} characters.',
     signIn: 'Sign in',
     signOut: 'Sign out',
     username: 'Username',
@@ -1152,6 +1155,9 @@ export default {
     },
   },
   applications: {
+    deleteTitle: 'Delete application',
+    deleteBody: 'Delete {ref} permanently, with its payments, history and tasks? This cannot be undone. An application with a confirmed payment cannot be deleted.',
+    deleted: 'Application deleted',
     title: 'Applications', subtitle: 'Applications students have paid for and submitted. Open one to read everything, assign it to a staff member and move it through its statuses.',
     searchPlaceholder: 'Search reference or applicant name…', ref: 'Reference', applicant: 'Applicant', type: 'Type', stage: 'Stage', status: 'Status',
     opportunity: 'Programme / scholarship', university: 'University', intake: 'Intake', email: 'Email', phone: 'Phone', nationality: 'Nationality',
@@ -1256,6 +1262,9 @@ export default {
     emptyAll: 'No revenue or approved expenses recorded for this period yet.',
   },
   payment: {
+    deleteTitle: 'Delete payment',
+    deleteBody: 'Delete payment {ref} permanently, with its proof? A confirmed payment cannot be deleted. If the application was submitted with it, the student can pay again.',
+    deleted: 'Payment deleted',
     title: 'Payments',
     subtitle: 'Verify application-fee payments students have paid by transfer. Amounts are in RMB.',
     searchPlaceholder: 'Reference, transaction no., student name…',

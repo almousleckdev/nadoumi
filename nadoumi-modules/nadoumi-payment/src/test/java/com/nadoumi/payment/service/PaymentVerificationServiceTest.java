@@ -40,7 +40,8 @@ class PaymentVerificationServiceTest {
     private final PaymentEvents events = mock(PaymentEvents.class);
     private final CurrentCaller caller = mock(CurrentCaller.class);
     private final PaymentVerificationService service = new PaymentVerificationService(
-            mapper, mock(MediaGateway.class), revenue, events, caller, Clock.fixed(NOW_INSTANT, ZoneOffset.UTC));
+            mapper, mock(MediaGateway.class), revenue, events, caller, Clock.fixed(NOW_INSTANT, ZoneOffset.UTC),
+            mock(com.nadoumi.payment.mapper.PaymentDocumentMapper.class));
 
     @BeforeEach
     void setUp() {

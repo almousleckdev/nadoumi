@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.nadoumi.application.web.request.AdvanceRequest;
 import com.nadoumi.application.web.response.NextStepResponse;
 import com.nadoumi.application.web.response.StaffApplicationRow;
@@ -43,6 +45,7 @@ import com.nadoumi.application.web.response.ApplicationResponse;
 import com.nadoumi.application.web.response.DecisionResponse;
 import com.nadoumi.application.web.response.StageHistoryResponse;
 import com.nadoumi.application.web.response.TaskResponse;
+import com.nadoumi.common.erasure.ApplicationDeletionParticipant;
 import com.nadoumi.common.exception.NadNotFoundException;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
@@ -60,6 +63,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ApplicationAdminService {
 
+    private static final Logger log = LoggerFactory.getLogger(ApplicationAdminService.class);
+
     private final ApplicationMapper applicationMapper;
     private final WfDefinitionMapper definitionMapper;
     private final ApplicationTaskMapper taskMapper;
@@ -71,6 +76,7 @@ public class ApplicationAdminService {
     private final GuardEvaluator guards;
     private final ApplicationOpportunityService opportunities;
     private final ApplicantService applicants;
+    private final List<ApplicationDeletionParticipant> deletionParticipants;
 
     /** Steps that belong to the student or to the submit flow, never offered to staff. */
     private static final Set<String> NOT_A_STAFF_STEP = Set.of("submit", "accept_offer", "decline_offer", "withdraw");
@@ -80,7 +86,7 @@ public class ApplicationAdminService {
             ApplicationTaskMapper taskMapper, ApplicationStageHistoryMapper historyMapper,
             ApplicationEventMapper eventMapper, ApplicationDecisionMapper decisionMapper, WorkflowService workflow,
             WfInstanceMapper instanceMapper, GuardEvaluator guards, ApplicationOpportunityService opportunities,
-            ApplicantService applicants) {
+            ApplicantService applicants, List<ApplicationDeletionParticipant> deletionParticipants) {
         this.applicationMapper = applicationMapper;
         this.definitionMapper = definitionMapper;
         this.taskMapper = taskMapper;
@@ -92,6 +98,7 @@ public class ApplicationAdminService {
         this.guards = guards;
         this.opportunities = opportunities;
         this.applicants = applicants;
+        this.deletionParticipants = deletionParticipants;
     }
 
     @Transactional(readOnly = true)
@@ -371,6 +378,22 @@ public class ApplicationAdminService {
             throw new NadBadRequestException("the assignee must be an active staff member");
         }
         workflow.assign(id, req.assigneeUserId(), AuditActor.userId());
+    }
+
+    /**
+     * Permanently deletes an application, for example one created by mistake or by testing. Every module that holds data for
+     * it is asked first and may refuse (a confirmed payment is booked revenue and is never deleted); then each removes what it
+     * owns and the application goes with its history. The reason is written to the log with the actor, the reference and the status.
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void delete(Long id, String reason) {
+        Application application = load(id);
+        deletionParticipants.forEach(p -> p.assertDeletable(id));
+        deletionParticipants.forEach(p -> p.deleteFor(id));
+        applicationMapper.removeAccessGrants(id);
+        applicationMapper.removeById(id);
+        log.warn("application {} ({}) deleted by user {}; status {}; reason: {}", id, application.getReference(),
+                AuditActor.userId(), application.getCurrentStatus(), reason);
     }
 
     @Transactional(rollbackFor = Exception.class)

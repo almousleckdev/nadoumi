@@ -155,3 +155,7 @@ export const assignApplication = (id: number, assigneeUserId: number) =>
 
 export const claimApplication = (id: number) =>
   request.post<unknown, void>(`/api/staff/applications/${id}/claim`)
+
+/** Permanent; the server refuses while a confirmed payment exists. */
+export const deleteApplication = (id: number, reason: string) =>
+  request.delete<unknown, void>(`/api/staff/applications/${id}`, { data: { reason } })

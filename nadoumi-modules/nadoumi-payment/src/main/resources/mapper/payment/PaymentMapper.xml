@@ -154,6 +154,23 @@
         delete from nad_application_payment where applicant_id = #{applicantId}
     </delete>
 
+    <select id="findProofMediaIdsByApplication" resultType="java.lang.Long">
+        select proof_media_id from nad_application_payment
+        where application_id = #{applicationId} and proof_media_id is not null
+    </select>
+
+    <delete id="deleteByApplicationId">
+        delete from nad_application_payment where application_id = #{applicationId}
+    </delete>
+
+    <select id="countConfirmedAny" resultType="java.lang.Integer">
+        select count(*) from nad_application_payment where application_id = #{applicationId} and status = 'CONFIRMED'
+    </select>
+
+    <delete id="deleteById">
+        delete from nad_application_payment where id = #{id}
+    </delete>
+
     <insert id="insertEvent">
         insert into nad_application_payment_event (payment_id, from_status, to_status, actor_kind, actor_id, note, created_at)
         values (#{paymentId}, #{from}, #{to}, #{actorKind}, #{actorId}, #{note}, #{at})

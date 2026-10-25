@@ -1,6 +1,7 @@
 package com.ruoyi.nadoumi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -237,6 +238,62 @@ class ApplicationPaymentFlowTest extends AbstractStudentIntegrationTest {
         openSession(s, app).andExpect(status().isOk()).andExpect(jsonPath("$.state").value("PROOF_SUBMITTED"));
         assertThat(jdbc.queryForObject("select count(*) from nad_application_payment where application_id = ?",
                 Integer.class, app)).isEqualTo(1);
+    }
+
+    @Test
+    void shouldDeleteAnApplicationWithItsPayments_butRefuseOneWithAConfirmedPayment() throws Exception {
+        Student s = register("pay", "del1");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        reportPayment(s, app, "BANK7100001").andExpect(status().isOk());
+        submitApplication(s, app).andExpect(status().isOk());
+
+        // a reason is required, and a student cannot delete
+        mvc.perform(delete("/api/staff/applications/" + app).header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"x\"}")).andExpect(status().isBadRequest());
+        mvc.perform(delete("/api/staff/applications/" + app).header("Authorization", bearer(s.token()))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"test data\"}")).andExpect(status().is4xxClientError());
+
+        mvc.perform(delete("/api/staff/applications/" + app).header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"created while testing\"}")).andExpect(status().isOk());
+        assertThat(jdbc.queryForObject("select count(*) from nad_application where id = ?", Integer.class, app)).isZero();
+        assertThat(jdbc.queryForObject("select count(*) from nad_application_payment where application_id = ?", Integer.class, app)).isZero();
+
+        // a confirmed payment is booked revenue: the application stays
+        Student c = register("pay", "del2");
+        long confirmed = draftFor(c);
+        payAndConfirm(c, confirmed, "BANK7100002");
+        mvc.perform(delete("/api/staff/applications/" + confirmed).header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"created while testing\"}")).andExpect(status().isConflict());
+        assertThat(jdbc.queryForObject("select count(*) from nad_application where id = ?", Integer.class, confirmed)).isEqualTo(1);
+    }
+
+    @Test
+    void shouldDeleteAnUnconfirmedPayment_andLetTheStudentPayAgain_butNeverAConfirmedOne() throws Exception {
+        Student s = register("pay", "del3");
+        long app = draftFor(s);
+        openSession(s, app).andExpect(status().isOk());
+        sign(s);
+        reportPayment(s, app, "BANK7100003").andExpect(status().isOk());
+        submitApplication(s, app).andExpect(status().isOk());
+        long first = paymentId(app);
+
+        mvc.perform(delete("/api/staff/payments/" + first).header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"wrong screenshot\"}")).andExpect(status().isOk());
+        assertThat(jdbc.queryForObject("select count(*) from nad_application_payment where id = ?", Integer.class, first)).isZero();
+
+        // the submitted application is unpaid again, so the student may pay
+        mvc.perform(get(url(app, "")).header("Authorization", bearer(s.token())))
+                .andExpect(jsonPath("$.state").value("NOT_STARTED")).andExpect(jsonPath("$.canStart").value(true));
+        openSession(s, app).andExpect(status().isOk()).andExpect(jsonPath("$.state").value("PENDING"));
+        reportPayment(s, app, "BANK7100004").andExpect(status().isOk());
+        long second = paymentId(app);
+        mvc.perform(post("/api/staff/payments/" + second + "/confirm").header("Authorization", staffAuth)).andExpect(status().isOk());
+
+        mvc.perform(delete("/api/staff/payments/" + second).header("Authorization", staffAuth)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"reason\":\"cleaning up\"}")).andExpect(status().isConflict());
+        assertThat(jdbc.queryForObject("select count(*) from nad_application_payment where id = ?", Integer.class, second)).isEqualTo(1);
     }
 
     @Test
