@@ -778,7 +778,11 @@
       },
       "colProgress": "Progreso",
       "stepOf": "Paso {n} de {total}",
-      "statUnfinished": "Sin terminar"
+      "statUnfinished": "Sin terminar",
+      "paymentNeeded": "Pago necesario",
+      "paymentNeededBanner": "Nadoumi no ha recibido la tasa de algunas de tus solicitudes. Ábrelas y paga de nuevo para que avancen.",
+      "payAgain": "Pagar de nuevo",
+      "paymentNeededNote": "Nadoumi no pudo confirmar tu pago. Paga de nuevo para que esta solicitud avance."
     }
   },
   "validation": {

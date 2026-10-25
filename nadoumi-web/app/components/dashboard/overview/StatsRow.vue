@@ -7,7 +7,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-4">
+  <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
     <StatTile icon="applications" :label="t('dashboard.home.statSubmitted')" :value="stats.submitted" :hint="stats.drafts ? t('dashboard.home.statDrafts', { n: stats.drafts }) : undefined" />
     <StatTile icon="clock" :label="t('dashboard.home.statInProgress')" :value="stats.inProgress" />
     <StatTile icon="award" :label="t('dashboard.home.statOffers')" :value="stats.offers" />

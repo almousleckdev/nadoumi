@@ -37,7 +37,7 @@ class ApplicationAuthorizationTest {
     private final CurrentCaller caller = mock(CurrentCaller.class);
 
     private final StudentApplicationService service = new StudentApplicationService(
-            applicationMapper, definitionMapper, eventMapper, workflow, access, caller, opportunities(), applicants());
+            applicationMapper, definitionMapper, eventMapper, workflow, access, caller, opportunities(), applicants(), mock(PaymentGuardProvider.class));
 
     private static ApplicationOpportunityService opportunities() {
         var opportunities = mock(ApplicationOpportunityService.class);

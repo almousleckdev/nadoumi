@@ -36,7 +36,11 @@ const note = computed(() => {
         <NButton size="sm" :to="localePath(`/dashboard/applications/${latest.id}`)">{{ t('dashboard.home.viewApplication') }}</NButton>
       </div>
       <ApplicationTracker :status="latest.currentStatus" />
-      <p class="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{{ note }}</p>
+      <div v-if="latest.paymentNeeded" class="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3" data-test="focus-payment-needed">
+        <p class="text-sm font-medium text-red-700">{{ t('dashboard.applications.paymentNeededNote') }}</p>
+        <NButton size="sm" :to="localePath(`/dashboard/applications/${latest.id}`)">{{ t('dashboard.applications.payAgain') }}</NButton>
+      </div>
+      <p v-else class="rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">{{ note }}</p>
     </div>
 
     <div v-else-if="draft" class="grid gap-3" data-test="focus-draft">

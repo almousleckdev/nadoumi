@@ -110,6 +110,18 @@ describe('dashboard index', () => {
     expect(w.findAll('[data-test="stat-value"]').map(el => el.text())).toEqual(['1', '1', '0', '0/2'])
   })
 
+  it('warns about an application whose fee staff rejected, and still shows the stat tiles', async () => {
+    listApplications.mockResolvedValueOnce([
+      { id: 7, reference: 'NAD2026001', applicationType: 'PROGRAM_ONLY', programId: 1, scholarshipId: null, intakeId: 3,
+        currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-01T00:00:00', timeline: [],
+        title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', paymentNeeded: true },
+    ])
+    const w = await mountPage()
+    expect(w.find('[data-test="payment-banner"]').exists()).toBe(true)
+    expect(w.find('[data-test="focus-payment-needed"]').text()).toContain('Pay again')
+    expect(w.findAll('[data-test="stat-value"]').length).toBe(4)
+  })
+
   it('shows an inline error, not the empty state, when applications fail to load', async () => {
     listApplications.mockRejectedValueOnce(new Error('boom'))
     const w = await mountPage()

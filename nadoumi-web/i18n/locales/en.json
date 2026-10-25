@@ -778,7 +778,11 @@
       },
       "colProgress": "Progress",
       "stepOf": "Step {n} of {total}",
-      "statUnfinished": "Unfinished"
+      "statUnfinished": "Unfinished",
+      "paymentNeeded": "Payment needed",
+      "paymentNeededBanner": "Nadoumi has not received the fee for some of your applications. Open them and pay again so they can move forward.",
+      "payAgain": "Pay again",
+      "paymentNeededNote": "Nadoumi could not confirm your payment. Pay again to keep this application moving."
     }
   },
   "validation": {
