@@ -51,7 +51,7 @@ public class SysPost extends BaseEntity
         this.postId = postId;
     }
 
-    @NotBlank(message = "岗位编码不能为空")
+    // blank on create: the service generates it (NA + date + running number)
     @Size(min = 0, max = 64, message = "岗位编码长度不能超过64个字符")
     public String getPostCode()
     {
@@ -75,7 +75,7 @@ public class SysPost extends BaseEntity
         this.postName = postName;
     }
 
-    @NotNull(message = "显示顺序不能为空")
+    // not asked for any more: a new post goes to the end of the list
     public Integer getPostSort()
     {
         return postSort;

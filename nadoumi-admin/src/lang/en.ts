@@ -1023,6 +1023,7 @@ export default {
     title: 'Employees', subtitle: 'Internal Nadoumi team: the staff account plus the employment record (position, compensation, dates).',
     new: 'New employee', edit: 'Edit employee', searchPlaceholder: 'Search name, username or employee no…',
     name: 'Name', position: 'Position', positionTitle: 'Title override',
+    positionRequired: 'Choose a position',
     positionTitleHint: 'Leave blank to use the selected position name',
     dept: 'Department', manager: 'Reports to', type: 'Type', status: 'Status',
     startDate: 'Start date', probationEnd: 'Probation ends', endDate: 'End date',

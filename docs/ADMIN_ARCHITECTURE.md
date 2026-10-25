@@ -17,6 +17,11 @@ is built on Vue 2**. Full staff permission detail: `docs/PERMISSION_CATALOGUE.md
 > applications per status and a table of the latest applications that opens the case page. The "not yet available" cards for
 > Applications and Payments are gone; only Payroll remains for the platform owner.
 
+> **2026-10-25 (posts and employees):** a new post no longer asks for a code or a display order. The server assigns the code as
+> `NA` + the date in China time + that day's running number (`NA2026102501`) and puts the post at the end of the order; the code is
+> shown read-only when editing. The employee form requires a Position (`positionId` is `@NotNull` on `EmployeeRequest` and the
+> drawer marks it required). Posts in the position list are the same `sys_post` rows.
+
 ## 1. What exists today (EXISTING)
 
 ### 1.0 Two frontends, one target — authoritative

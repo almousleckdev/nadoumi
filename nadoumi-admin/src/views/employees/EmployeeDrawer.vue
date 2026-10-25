@@ -36,6 +36,7 @@ const rules = {
   password: [{ required: true, min: 5, max: 20, trigger: 'blur', message: t('employees.pwdRule') }],
   nickName: [{ required: true, trigger: 'blur', message: t('common.required') }],
   email: [{ type: 'email' as const, trigger: 'blur', message: t('employees.emailInvalid') }],
+  positionId: [{ required: true, trigger: 'change', message: t('employees.positionRequired') }],
   startDate: [{ required: true, trigger: 'change', message: t('common.required') }],
 }
 

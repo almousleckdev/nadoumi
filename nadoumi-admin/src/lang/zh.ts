@@ -1022,6 +1022,7 @@ export default {
     title: '员工', subtitle: 'Nadoumi 内部团队：员工账户及其任职记录（职位、薪酬、日期）。',
     new: '新增员工', edit: '编辑员工', searchPlaceholder: '搜索姓名、用户名或工号…',
     name: '姓名', position: '职位', positionTitle: '自定义职位名称',
+    positionRequired: '请选择职位',
     positionTitleHint: '留空则使用所选职位的默认名称',
     dept: '部门', manager: '汇报对象', type: '雇佣类型', status: '状态',
     startDate: '入职日期', probationEnd: '试用期结束', endDate: '离职日期',

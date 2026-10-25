@@ -87,22 +87,19 @@
         label-width="120px"
       >
         <el-form-item
+          v-if="editing != null"
           :label="t('posts.code')"
-          prop="postCode"
         >
-          <el-input v-model="form.postCode" />
+          <el-input
+            v-model="form.postCode"
+            disabled
+          />
         </el-form-item>
         <el-form-item
           :label="t('posts.name')"
           prop="postName"
         >
           <el-input v-model="form.postName" />
-        </el-form-item>
-        <el-form-item :label="t('posts.sort')">
-          <el-input-number
-            v-model="form.postSort"
-            :min="0"
-          />
         </el-form-item>
         <el-form-item :label="t('posts.statusLabel')">
           <el-switch
@@ -161,17 +158,16 @@ const drawerOpen = ref(false)
 const saving = ref(false)
 const editing = ref<number | undefined>()
 const formRef = ref<FormInstance>()
-const blank = () => ({ postCode: '', postName: '', postSort: 0, status: '0', remark: '' })
+// the code (NA + date + number) and the display order are assigned by the server
+const blank = () => ({ postCode: '', postName: '', status: '0', remark: '' })
 const form = reactive<Partial<SysPost>>(blank())
 const rules = {
-  postCode: [{ required: true, trigger: 'blur', message: t('common.required') }],
   postName: [{ required: true, trigger: 'blur', message: t('common.required') }],
 }
 
 const columns = computed(() => [
   { prop: 'postCode', label: t('posts.code'), minWidth: 140 },
   { prop: 'postName', label: t('posts.name'), minWidth: 160 },
-  { prop: 'postSort', label: t('posts.sort'), width: 80, align: 'center' as const },
   { prop: 'status', label: t('posts.statusLabel'), width: 100, align: 'center' as const },
   { prop: 'actions', label: t('common.actions'), width: 150, align: 'right' as const },
 ])

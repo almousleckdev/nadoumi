@@ -72,6 +72,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 		 where post_code=#{postCode} limit 1
 	</select>
 	
+	<select id="selectMaxCodeWithPrefix" resultType="java.lang.String">
+		select post_code from sys_post where post_code like concat(#{prefix}, '%')
+		order by char_length(post_code) desc, post_code desc limit 1
+	</select>
+
+	<select id="selectMaxSort" resultType="java.lang.Integer">
+		select max(post_sort) from sys_post
+	</select>
+
 	<update id="updatePost" parameterType="SysPost">
  		update sys_post
  		<set>

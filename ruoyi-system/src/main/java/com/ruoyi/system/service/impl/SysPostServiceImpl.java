@@ -1,5 +1,8 @@
 package com.ruoyi.system.service.impl;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,10 @@ import com.ruoyi.system.service.ISysPostService;
 @Service
 public class SysPostServiceImpl implements ISysPostService
 {
+    private static final String POST_CODE_PREFIX = "NA";
+    private static final DateTimeFormatter POST_CODE_DAY = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
+
     @Autowired
     private SysPostMapper postMapper;
 
@@ -161,7 +168,36 @@ public class SysPostServiceImpl implements ISysPostService
     @Override
     public int insertPost(SysPost post)
     {
+        if (StringUtils.isEmpty(post.getPostCode()))
+        {
+            post.setPostCode(nextPostCode(LocalDate.now(BUSINESS_ZONE)));
+        }
+        if (post.getPostSort() == null)
+        {
+            Integer max = postMapper.selectMaxSort();
+            post.setPostSort(max == null ? 1 : max + 1);
+        }
         return postMapper.insertPost(post);
+    }
+
+    /** NA + the date (China time) + that day's running number, for example NA2026102501. */
+    String nextPostCode(LocalDate day)
+    {
+        String prefix = POST_CODE_PREFIX + day.format(POST_CODE_DAY);
+        String last = postMapper.selectMaxCodeWithPrefix(prefix);
+        int next = 1;
+        if (last != null && last.length() > prefix.length())
+        {
+            try
+            {
+                next = Integer.parseInt(last.substring(prefix.length())) + 1;
+            }
+            catch (NumberFormatException e)
+            {
+                // a hand-written code that merely starts with the prefix: ignore it and start from the first number
+            }
+        }
+        return prefix + String.format("%02d", next);
     }
 
     /**

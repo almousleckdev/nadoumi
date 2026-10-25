@@ -24,7 +24,7 @@ public record EmployeeRequest(
         String userStatus,
         List<Long> roleIds,
         // employment
-        Long positionId,
+        @NotNull Long positionId,
         @Size(max = 120) String positionTitle,
         Long deptId,
         Long managerUserId,
