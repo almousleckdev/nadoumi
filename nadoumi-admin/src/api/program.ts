@@ -104,6 +104,8 @@ export interface Program {
   minToefl: number | null
   applicationFeeAmount: number | null
   applicationFeeCurrency: string | null
+  serviceFeeAmount: number | null
+  serviceFeeCurrency: string | null
   featured: boolean
   hot: boolean
   recommended: boolean
@@ -140,6 +142,8 @@ export interface ProgramInput {
   minToefl?: number | null
   applicationFeeAmount?: number | null
   applicationFeeCurrency?: string | null
+  serviceFeeAmount?: number | null
+  serviceFeeCurrency?: string | null
   featured: boolean
   hot: boolean
   recommended: boolean

@@ -34,7 +34,7 @@ watch(collapsed, (v: boolean) => {
 
     <SidebarFrame
       :home-to="localePath('/dashboard')"
-      class="fixed inset-y-0 start-0 z-40 w-[244px] -translate-x-full transition-transform duration-200 lg:static lg:translate-x-0 lg:shrink-0 rtl:translate-x-full rtl:lg:translate-x-0"
+      class="fixed inset-y-0 start-0 z-40 w-[244px] -translate-x-full transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:shrink-0 rtl:translate-x-full rtl:lg:translate-x-0"
       :class="[mobileOpen ? 'translate-x-0 rtl:translate-x-0' : '', collapsed ? 'lg:w-[76px]' : 'lg:w-[244px]']"
     >
       <DashboardSidebar :collapsed="collapsed && !mobileOpen" @navigate="mobileOpen = false" />

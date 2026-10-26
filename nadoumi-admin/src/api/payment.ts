@@ -27,7 +27,9 @@ export interface StaffPayment {
 
 const P = '/api/staff/payments'
 
-export const listPayments = (params: { status?: string, q?: string, page?: number, size?: number }) =>
+export const PAYMENT_KINDS = ['APPLICATION_FEE', 'SERVICE_FEE'] as const
+
+export const listPayments = (params: { status?: string, q?: string, applicationId?: number, kind?: string, page?: number, size?: number }) =>
   request.get<unknown, Page<StaffPayment>>(P, { params })
 
 export const getPayment = (id: number) => request.get<unknown, StaffPayment>(`${P}/${id}`)

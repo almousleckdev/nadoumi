@@ -94,6 +94,38 @@ class ApplicationPaymentServiceTest {
         return new MockMultipartFile("file", "proof.png", "image/png", new byte[] {1, 2, 3});
     }
 
+    // ---- the service fee ----
+
+    @Test
+    void shouldOnlyOpenAServiceFeeSession_afterTheAdmissionIsConfirmed() {
+        when(applications.serviceFee(APPLICATION_ID)).thenReturn(new BigDecimal("1500.00"));
+        when(applications.find(APPLICATION_ID)).thenReturn(Optional.of(
+                new ApplicationFacts(APPLICATION_ID, "NAD20261023001", APPLICANT_ID, "OFFER_ACCEPTED", false)));
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.start(APPLICATION_ID, "SERVICE_FEE"))
+                .isInstanceOf(com.nadoumi.payment.exception.PaymentConflictException.class);
+        verify(mapper, never()).insert(any());
+
+        when(applications.find(APPLICATION_ID)).thenReturn(Optional.of(
+                new ApplicationFacts(APPLICATION_ID, "NAD20261023001", APPLICANT_ID, "ADMISSION_CONFIRMED", false)));
+        service.start(APPLICATION_ID, "SERVICE_FEE");
+
+        ArgumentCaptor<ApplicationPayment> saved = ArgumentCaptor.forClass(ApplicationPayment.class);
+        verify(mapper).insert(saved.capture());
+        assertThat(saved.getValue().getKind()).isEqualTo("SERVICE_FEE");
+        assertThat(saved.getValue().getAmount()).isEqualByComparingTo("1500.00");
+    }
+
+    @Test
+    void shouldNotAskForAServiceFee_whenTheOpportunityHasNone() {
+        when(applications.serviceFee(APPLICATION_ID)).thenReturn(BigDecimal.ZERO);
+
+        StudentPaymentResponse r = service.start(APPLICATION_ID, "SERVICE_FEE");
+
+        assertThat(r.state()).isEqualTo("NOT_REQUIRED");
+        verify(mapper, never()).insert(any());
+    }
+
     // ---- starting a session ----
 
     @Test

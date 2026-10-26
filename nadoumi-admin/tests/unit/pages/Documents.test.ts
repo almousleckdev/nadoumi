@@ -187,7 +187,7 @@ describe('DocumentDrawer', () => {
     const w = drawer(doc())
     await button(w, 'download').trigger('click')
     await flushPromises()
-    expect(openDocumentFile).toHaveBeenCalledWith(1, 1)
+    expect(openDocumentFile).toHaveBeenCalledWith(1, 1, 'download', 'application/pdf')
   })
 
   it('shows the reviewer reason on a rejected document', async () => {

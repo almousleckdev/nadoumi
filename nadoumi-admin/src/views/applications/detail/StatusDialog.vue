@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { listNextSteps, type NextStep } from '@/api/application'
+import { NOTE_REQUIRED_STEPS } from '../vocabulary'
 
 const open = defineModel<boolean>({ required: true })
 const props = defineProps<{ saving: boolean, applicationId: number }>()
@@ -12,6 +13,7 @@ const steps = ref<NextStep[]>([])
 const loading = ref(false)
 const code = ref('')
 const note = ref('')
+const needsNote = computed(() => NOTE_REQUIRED_STEPS.includes(code.value))
 
 watch(open, async (isOpen) => {
   if (!isOpen) return
@@ -75,12 +77,16 @@ watch(open, async (isOpen) => {
         label-position="top"
         class="sd-note"
       >
-        <el-form-item :label="t('applications.note')">
+        <el-form-item
+          :label="t('applications.note')"
+          :required="needsNote"
+        >
           <el-input
             v-model="note"
             type="textarea"
             :rows="3"
-            :placeholder="t('applications.noteHint')"
+            :placeholder="needsNote ? t('applications.noteRequiredHint') : t('applications.noteHint')"
+            data-test="status-note"
           />
         </el-form-item>
       </el-form>
@@ -92,7 +98,7 @@ watch(open, async (isOpen) => {
       <el-button
         type="primary"
         :loading="saving"
-        :disabled="!code"
+        :disabled="!code || (needsNote && !note.trim())"
         data-test="status-submit"
         @click="emit('submit', { code, note: note.trim() })"
       >

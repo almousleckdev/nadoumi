@@ -159,3 +159,59 @@ export const claimApplication = (id: number) =>
 /** Permanent; the server refuses while a confirmed payment exists. */
 export const deleteApplication = (id: number, reason: string) =>
   request.delete<unknown, void>(`/api/staff/applications/${id}`, { data: { reason } })
+
+// ---- interviews (nad:application:view / :transition) ----
+
+export interface Interview {
+  id: number
+  /** ISO instant in UTC. */
+  startsAt: string
+  durationMinutes: number
+  platform: string | null
+  meetingUrl: string
+  instructions: string | null
+  status: 'SCHEDULED' | 'CANCELLED'
+}
+
+export interface ScheduleInterview {
+  /** An ISO date-time that carries its offset, for example `2026-11-02T15:00:00+08:00`. */
+  startsAt: string
+  durationMinutes: number
+  platform?: string
+  meetingUrl: string
+  instructions?: string
+}
+
+export const listInterviews = (id: number) =>
+  request.get<unknown, Interview[]>(`/api/staff/applications/${id}/interviews`)
+
+export const scheduleInterview = (id: number, body: ScheduleInterview) =>
+  request.post<unknown, Interview>(`/api/staff/applications/${id}/interviews`, body)
+
+export const cancelInterview = (id: number, interviewId: number) =>
+  request.post<unknown, void>(`/api/staff/applications/${id}/interviews/${interviewId}/cancel`)
+
+// ---- admission letter and JW202 ----
+
+export type LetterKind = 'ADMISSION_LETTER' | 'JW202'
+
+export interface Letter {
+  kind: LetterKind
+  fileName: string | null
+  locked: boolean
+  uploadedAt: string | null
+}
+
+export const listLetters = (id: number) =>
+  request.get<unknown, Letter[]>(`/api/staff/applications/${id}/letters`)
+
+export const uploadLetter = (id: number, kind: LetterKind, file: File) => {
+  const body = new FormData()
+  body.append('kind', kind)
+  body.append('file', file)
+  return request.post<unknown, Letter>(`/api/staff/applications/${id}/letters`, body)
+}
+
+/** The file, as a Blob: it needs the session, so it is fetched and shown through an object URL. */
+export const fetchLetter = (id: number, kind: LetterKind) =>
+  request.get<unknown, Blob>(`/api/staff/applications/${id}/letters/${kind}`, { responseType: 'blob' })

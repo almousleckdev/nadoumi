@@ -93,7 +93,7 @@
         />
         <PaymentPanel
           v-else-if="tab === 'payment'"
-          :reference="detail.application.reference"
+          :application-id="detail.application.id"
         />
         <TasksPanel
           v-else-if="tab === 'tasks'"
@@ -109,6 +109,18 @@
         <DecisionsPanel
           v-else-if="tab === 'decisions'"
           :detail="detail"
+        />
+        <InterviewPanel
+          v-else-if="tab === 'interview'"
+          :application-id="detail.application.id"
+          :can-schedule="canChange && detail.application.currentStatus === INTERVIEW_STATUS"
+          @changed="load"
+        />
+        <LettersPanel
+          v-else-if="tab === 'letters'"
+          :application-id="detail.application.id"
+          :can-upload="canChange && !!detail.application.currentStatus && ADMISSION_DOCUMENT_STATUSES.includes(detail.application.currentStatus)"
+          @changed="load"
         />
       </AppTabs>
     </template>
@@ -155,7 +167,7 @@ import {
   advanceApplication, assignApplication, claimApplication, completeApplicationTask, deleteApplication, getApplication,
   skipApplicationTask, type ApplicationDetail,
 } from '@/api/application'
-import { isClosedStatus, STATUS_TONES } from './vocabulary'
+import { ADMISSION_DOCUMENT_STATUSES, INTERVIEW_STATUS, isClosedStatus, STATUS_TONES } from './vocabulary'
 import { useApplicationLabels } from './useApplicationLabels'
 import AssignDialog from './detail/AssignDialog.vue'
 import DeleteWithReasonDialog from '@/components/ui/DeleteWithReasonDialog.vue'
@@ -166,8 +178,10 @@ import PaymentPanel from './detail/PaymentPanel.vue'
 import TasksPanel from './detail/TasksPanel.vue'
 import ActivityPanel from './detail/ActivityPanel.vue'
 import DecisionsPanel from './detail/DecisionsPanel.vue'
+import InterviewPanel from './detail/InterviewPanel.vue'
+import LettersPanel from './detail/LettersPanel.vue'
 
-type TabKey = 'form' | 'documents' | 'payment' | 'tasks' | 'activity' | 'decisions'
+type TabKey = 'form' | 'documents' | 'payment' | 'tasks' | 'activity' | 'decisions' | 'interview' | 'letters'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -192,10 +206,20 @@ const deleteOpen = ref(false)
 const canChange = computed(() => userStore.hasPerm('nad:application:transition'))
 const closed = computed(() => isClosedStatus(detail.value?.application.currentStatus ?? null))
 
+// the interview and the admission documents only matter from the status that asks for them on
+const hasInterview = computed(() => detail.value?.application.currentStatus === INTERVIEW_STATUS
+  || detail.value?.events.some(e => e.eventType.startsWith('INTERVIEW_')) === true)
+const hasLetters = computed(() => {
+  const status = detail.value?.application.currentStatus
+  return !!status && ADMISSION_DOCUMENT_STATUSES.includes(status)
+})
+
 const tabs = computed<Tab[]>(() => [
   { key: 'form', label: t('applications.tabForm') },
   { key: 'documents', label: t('applications.tabDocuments') },
   { key: 'payment', label: t('applications.tabPayment') },
+  ...(hasInterview.value ? [{ key: 'interview', label: t('applications.tabInterview') }] : []),
+  ...(hasLetters.value ? [{ key: 'letters', label: t('applications.tabLetters') }] : []),
   { key: 'tasks', label: t('applications.tabTasks'), count: detail.value?.tasks.filter(x => x.status === 'OPEN').length },
   { key: 'activity', label: t('applications.tabActivity'), count: detail.value?.events.length },
   { key: 'decisions', label: t('applications.tabDecisions'), count: detail.value?.decisions.length },

@@ -42,6 +42,8 @@ public record ProgramRequest(
         @Min(0) @Max(120) Integer minToefl,
         @PositiveOrZero BigDecimal applicationFeeAmount,
         @Size(min = 3, max = 3) String applicationFeeCurrency,
+        @PositiveOrZero BigDecimal serviceFeeAmount,
+        @Size(min = 3, max = 3) String serviceFeeCurrency,
         Long imageMediaId,
         Boolean featured,
         Boolean hot,

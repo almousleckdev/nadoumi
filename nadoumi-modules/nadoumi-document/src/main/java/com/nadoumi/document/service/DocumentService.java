@@ -188,21 +188,20 @@ public class DocumentService {
         return content(documentId, versionNo, ctx);
     }
 
+    /**
+     * Staff always receive the bytes through the backend, so the stored content type and filename decide how the file
+     * opens; a provider link would answer with its own disposition and a generic type.
+     */
     public DocumentContent staffContent(long documentId, long versionNo, MediaAccessLogContext ctx) {
-        return staffContent(documentId, versionNo, ctx, false);
-    }
-
-    /** {@code inline} asks for a link the browser renders (the staff viewer); otherwise the file is delivered as a download. */
-    public DocumentContent staffContent(long documentId, long versionNo, MediaAccessLogContext ctx, boolean inline) {
         get(documentId);
-        return content(documentId, versionNo, ctx, inline);
+        return content(documentId, versionNo, ctx, true);
     }
 
     private DocumentContent content(long documentId, long versionNo, MediaAccessLogContext ctx) {
         return content(documentId, versionNo, ctx, false);
     }
 
-    private DocumentContent content(long documentId, long versionNo, MediaAccessLogContext ctx, boolean inline) {
+    private DocumentContent content(long documentId, long versionNo, MediaAccessLogContext ctx, boolean alwaysProxy) {
         DocumentVersion version = versionsOf(documentId).stream()
                 .filter(v -> v.getVersionNo() == versionNo)
                 .findFirst()
@@ -214,11 +213,10 @@ public class DocumentService {
         StoredAsset asset = media.find(version.getMediaAssetId())
                 .orElseThrow(() -> new NadNotFoundException("underlying media asset missing"));
         recordEvent(documentId, "DOWNLOADED", null);
-        if (asset.accessClass() == MediaAccessClass.SENSITIVE) {
+        if (alwaysProxy || asset.accessClass() == MediaAccessClass.SENSITIVE) {
             return new DocumentContent.Proxy(media.openProxyStream(version.getMediaAssetId(), ctx));
         }
-        return new DocumentContent.Redirect(inline ? media.issueInlineSignedUrl(version.getMediaAssetId(), ctx)
-                : media.issueSignedUrl(version.getMediaAssetId(), ctx));
+        return new DocumentContent.Redirect(media.issueSignedUrl(version.getMediaAssetId(), ctx));
     }
 
     // ---- helpers ----

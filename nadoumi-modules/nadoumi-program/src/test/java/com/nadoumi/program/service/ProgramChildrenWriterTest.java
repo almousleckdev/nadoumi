@@ -52,6 +52,7 @@ class ProgramChildrenWriterTest {
                 null, null, null,                       // field, termLength, teachingLanguage
                 null, null, null, null, null,           // summary, admission, documents, career, scholarships
                 null, null, null, null, null,           // minHsk, minIelts, minToefl, application fee + currency
+                null, null,                             // service fee + currency
                 null,                                   // imageMediaId
                 false, false, null, null, null,         // featured, hot, status, publishStatus, remark
                 majors, intakes, null, null, null);
@@ -155,6 +156,7 @@ class ProgramChildrenWriterTest {
     private ProgramRequest withScholarships(List<String> codes) {
         return new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("BACHELOR"),
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null,
                 false, false, null, null, null, null, null, null, codes, null);
     }
 
@@ -265,6 +267,7 @@ class ProgramChildrenWriterTest {
                 new java.math.BigDecimal("1200"), null, null, " shared room ");
         var req = new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("MASTER"),
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null,
                 false, false, null, null, null, null, null, List.of(offering), null, null);
 
         writer.replace(program(ProgramType.DEGREE), req);
@@ -285,6 +288,7 @@ class ProgramChildrenWriterTest {
         var tooShort = new ProgramRequest.OfferingInput("BACHELOR", 36, null, null, null, null, null, null, null);
         var req = new ProgramRequest(UNIVERSITY_ID, "CS", null, ProgramType.DEGREE, List.of("BACHELOR"),
                 null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                null, null,
                 false, false, null, null, null, null, null, List.of(tooShort), null, null);
 
         assertThatThrownBy(() -> writer.replace(program(ProgramType.DEGREE), req))

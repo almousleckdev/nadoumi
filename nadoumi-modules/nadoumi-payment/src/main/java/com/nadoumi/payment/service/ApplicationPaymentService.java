@@ -43,6 +43,7 @@ public class ApplicationPaymentService {
     private static final String CLOSED_STATUS_PREFIX = "CLOSED_";
 
     private static final String KIND = PaymentGuardProvider.APPLICATION_FEE;
+    private static final String ADMISSION_CONFIRMED_STATUS = "ADMISSION_CONFIRMED";
     private static final String METHOD_QR = "QR";
     private static final Pattern TXN_NO = Pattern.compile("[A-Za-z0-9_-]{6,40}");
     private static final int REFERENCE_ATTEMPTS = 3;
@@ -81,39 +82,56 @@ public class ApplicationPaymentService {
     /** The current payment state of an application. Also closes a session whose window has run out. */
     @Transactional(rollbackFor = Exception.class)
     public StudentPaymentResponse overview(long applicationId) {
+        return overview(applicationId, KIND);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public StudentPaymentResponse overview(long applicationId, String kind) {
         ApplicationFacts app = requireApplication(applicationId);
-        expireIfOverdue(mapper.findOpen(applicationId, KIND));
-        return respond(app);
+        expireIfOverdue(mapper.findOpen(applicationId, kind));
+        return respond(app, kind);
     }
 
     /** Opens a payment session, or returns the one that is already open or confirmed. */
     @Transactional(rollbackFor = Exception.class)
     public StudentPaymentResponse start(long applicationId) {
+        return start(applicationId, KIND);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public StudentPaymentResponse start(long applicationId, String kind) {
         ApplicationFacts app = requireApplication(applicationId);
-        BigDecimal fee = settings.applicationFee();
+        BigDecimal fee = feeFor(app, kind);
         if (fee.signum() <= 0) {
-            return respond(app);
+            return respond(app, kind);
         }
-        ApplicationPayment open = expireIfOverdue(mapper.findOpen(applicationId, KIND));
-        if (open != null || mapper.countConfirmed(applicationId, KIND) > 0) {
-            return respond(app);
+        ApplicationPayment open = expireIfOverdue(mapper.findOpen(applicationId, kind));
+        if (open != null || mapper.countConfirmed(applicationId, kind) > 0) {
+            return respond(app, kind);
         }
-        if (!mayStartPayment(app, mapper.findLatest(applicationId, KIND))) {
-            throw new PaymentConflictException("a payment can only be started on a draft, or again after staff rejected it");
+        if (!mayStartPayment(app, mapper.findLatest(applicationId, kind), kind)) {
+            throw new PaymentConflictException(KIND.equals(kind)
+                    ? "a payment can only be started on a draft, or again after staff rejected it"
+                    : "the service fee can only be paid once the admission is confirmed");
         }
         LocalDateTime since = LocalDateTime.now(clock).minus(SESSION_CAP_WINDOW);
-        if (mapper.countSessionsSince(applicationId, KIND, since) >= MAX_SESSIONS_PER_WINDOW) {
+        if (mapper.countSessionsSince(applicationId, kind, since) >= MAX_SESSIONS_PER_WINDOW) {
             throw new PaymentThrottledException("too many payment attempts today; contact support");
         }
-        insertSession(app, fee);
-        return respond(app);
+        insertSession(app, kind, fee);
+        return respond(app, kind);
     }
 
     /** The QR image, only while the student's session is open. */
     @Transactional(rollbackFor = Exception.class)
     public QrImage qr(long applicationId) {
+        return qr(applicationId, KIND);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public QrImage qr(long applicationId, String kind) {
         requireApplication(applicationId);
-        ApplicationPayment open = expireIfOverdue(mapper.findOpen(applicationId, KIND));
+        ApplicationPayment open = expireIfOverdue(mapper.findOpen(applicationId, kind));
         if (open == null || open.getStatus() != PaymentStatus.PENDING) {
             throw new PaymentConflictException("there is no open payment session; start a payment first");
         }
@@ -123,12 +141,17 @@ public class ApplicationPaymentService {
     /** Reports the payment: the bank transaction number and a screenshot, inside the 15-minute window. */
     @Transactional(rollbackFor = Exception.class)
     public StudentPaymentResponse submitProof(long applicationId, String transactionNo, MultipartFile proof) {
+        return submitProof(applicationId, KIND, transactionNo, proof);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public StudentPaymentResponse submitProof(long applicationId, String kind, String transactionNo, MultipartFile proof) {
         ApplicationFacts app = requireApplication(applicationId);
         String txn = normalizeTxn(transactionNo);
         if (proof == null || proof.isEmpty()) {
             throw new NadBadRequestException("a screenshot of the payment is required");
         }
-        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, KIND));
+        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, kind));
         if (payment == null || payment.getStatus() != PaymentStatus.PENDING) {
             throw new PaymentConflictException("the payment window has closed; start a new payment");
         }
@@ -156,7 +179,7 @@ public class ApplicationPaymentService {
         }
         record(payment.getId(), PaymentStatus.PENDING, PaymentStatus.PROOF_SUBMITTED, "STUDENT", userId, null);
         events.proofSubmitted(mapper.findById(payment.getId()), userId);
-        return respond(app);
+        return respond(app, kind);
     }
 
     /**
@@ -165,23 +188,33 @@ public class ApplicationPaymentService {
      */
     @Transactional(rollbackFor = Exception.class)
     public StudentPaymentResponse hold(long applicationId) {
+        return hold(applicationId, KIND);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public StudentPaymentResponse hold(long applicationId, String kind) {
         ApplicationFacts app = requireApplication(applicationId);
-        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, KIND));
+        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, kind));
         if (payment != null && payment.getStatus() == PaymentStatus.PENDING) {
             LocalDateTime now = now();
             mapper.extendExpiry(payment.getId(), now.plus(PaymentSettings.PAYMENT_HOLD_WINDOW), now,
                     String.valueOf(caller.requireUserId()));
         }
-        return respond(app);
+        return respond(app, kind);
     }
 
     /** Closes the session. Once a proof is reported it can no longer be cancelled; staff decide. */
     @Transactional(rollbackFor = Exception.class)
     public StudentPaymentResponse cancel(long applicationId) {
+        return cancel(applicationId, KIND);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public StudentPaymentResponse cancel(long applicationId, String kind) {
         ApplicationFacts app = requireApplication(applicationId);
-        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, KIND));
+        ApplicationPayment payment = expireIfOverdue(mapper.findOpen(applicationId, kind));
         if (payment == null) {
-            return respond(app);
+            return respond(app, kind);
         }
         if (payment.getStatus() != PaymentStatus.PENDING) {
             throw new PaymentConflictException("the payment was already reported and is being verified");
@@ -190,18 +223,18 @@ public class ApplicationPaymentService {
         if (mapper.markCancelled(payment.getId(), payment.getVersion(), now(), String.valueOf(userId)) == 1) {
             record(payment.getId(), PaymentStatus.PENDING, PaymentStatus.CANCELLED, "STUDENT", userId, null);
         }
-        return respond(app);
+        return respond(app, kind);
     }
 
     // ---- internals ----
 
-    private void insertSession(ApplicationFacts app, BigDecimal fee) {
+    private void insertSession(ApplicationFacts app, String kind, BigDecimal fee) {
         ApplicationPayment payment = new ApplicationPayment();
         payment.setApplicationId(app.id());
         payment.setApplicationReference(app.reference());
         payment.setApplicantId(app.applicantId());
         payment.setApplicantName(applicantNames.of(app.applicantId()));
-        payment.setKind(KIND);
+        payment.setKind(kind);
         payment.setAmount(fee);
         payment.setCurrency(PaymentSettings.CURRENCY);
         payment.setMethod(METHOD_QR);
@@ -219,7 +252,7 @@ public class ApplicationPaymentService {
             }
             catch (DuplicateKeyException e) {
                 // a concurrent request opened the session first, or the reference collided
-                if (mapper.findOpen(app.id(), KIND) != null) {
+                if (mapper.findOpen(app.id(), kind) != null) {
                     return;
                 }
             }
@@ -237,24 +270,29 @@ public class ApplicationPaymentService {
             record(payment.getId(), PaymentStatus.PENDING, PaymentStatus.EXPIRED, "SYSTEM", null, null);
             return null;
         }
-        return mapper.findOpen(payment.getApplicationId(), KIND);
+        return mapper.findOpen(payment.getApplicationId(), payment.getKind());
     }
 
-    private StudentPaymentResponse respond(ApplicationFacts app) {
-        BigDecimal fee = settings.applicationFee();
+    /** The fee for a kind: the global application fee, or the service fee of the application's programme or scholarship. */
+    private BigDecimal feeFor(ApplicationFacts app, String kind) {
+        return PaymentGuardProvider.SERVICE_FEE.equals(kind) ? applications.serviceFee(app.id()) : settings.applicationFee();
+    }
+
+    private StudentPaymentResponse respond(ApplicationFacts app, String kind) {
+        BigDecimal fee = feeFor(app, kind);
         if (fee.signum() <= 0) {
             return new StudentPaymentResponse("NOT_REQUIRED", false, true, false, BigDecimal.ZERO,
                     PaymentSettings.CURRENCY, settings.payee(), null, null, 0, null);
         }
-        ApplicationPayment latest = mapper.findLatest(app.id(), KIND);
+        ApplicationPayment latest = mapper.findLatest(app.id(), kind);
         if (latest == null) {
-            return new StudentPaymentResponse("NOT_STARTED", true, false, mayStartPayment(app, null), fee,
+            return new StudentPaymentResponse("NOT_STARTED", true, false, mayStartPayment(app, null, kind), fee,
                     PaymentSettings.CURRENCY, settings.payee(), null, null, 0, null);
         }
         PaymentStatus status = latest.getStatus();
         // reported counts as paid for the student: the Submit button follows it, staff verify the money afterwards
         boolean settled = status == PaymentStatus.CONFIRMED || status == PaymentStatus.PROOF_SUBMITTED;
-        boolean canStart = mayStartPayment(app, latest) && !status.isOpen() && !settled;
+        boolean canStart = mayStartPayment(app, latest, kind) && !status.isOpen() && !settled;
         long secondsLeft = status == PaymentStatus.PENDING
                 ? Math.max(0, Duration.between(now(), latest.getExpiresAt()).getSeconds()) : 0;
         // while a session or confirmation exists the amount is the snapshot; otherwise the current fee for a new one
@@ -269,7 +307,12 @@ public class ApplicationPaymentService {
      * A draft can always be paid. A submitted application can be paid again only when staff rejected the payment it was
      * submitted with or deleted it (the fee is not refundable, so it is otherwise never paid twice); a closed one never can.
      */
-    private static boolean mayStartPayment(ApplicationFacts app, ApplicationPayment latest) {
+    private static boolean mayStartPayment(ApplicationFacts app, ApplicationPayment latest, String kind) {
+        if (PaymentGuardProvider.SERVICE_FEE.equals(kind)) {
+            // asked for once, after the university confirmed the admission; a lapsed or refused attempt may be repeated
+            return ADMISSION_CONFIRMED_STATUS.equals(app.status()) && (latest == null || !latest.getStatus().isOpen()
+                    && latest.getStatus() != PaymentStatus.CONFIRMED && latest.getStatus() != PaymentStatus.PROOF_SUBMITTED);
+        }
         if (app.draft()) {
             return true;
         }

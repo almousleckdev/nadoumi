@@ -1,11 +1,10 @@
 import { computed, ref } from 'vue'
 import { listApplications, type ApplicationRow } from '@/api/application'
 import { listPayments } from '@/api/payment'
-import { STATUSES } from '@/views/applications/vocabulary'
+import { IN_REVIEW_STATUSES, OFFER_STATUSES, STATUSES } from '@/views/applications/vocabulary'
 import type { useDashboardAccess } from './useDashboardAccess'
 
 const LATEST_COUNT = 6
-const OFFER_STATUSES = ['OFFER', 'PRE_DEPARTURE', 'CLOSED_SUCCESS']
 
 type Access = ReturnType<typeof useDashboardAccess>
 
@@ -18,7 +17,7 @@ export function useApplicationPipeline(access: Access) {
   const failed = ref(false)
 
   const total = computed(() => Object.values(perStatus.value).reduce((sum, n) => sum + n, 0))
-  const inReview = computed(() => perStatus.value.IN_REVIEW ?? 0)
+  const inReview = computed(() => IN_REVIEW_STATUSES.reduce((sum, s) => sum + (perStatus.value[s] ?? 0), 0))
   const offers = computed(() => OFFER_STATUSES.reduce((sum, s) => sum + (perStatus.value[s] ?? 0), 0))
   const slices = computed(() => STATUSES
     .filter(s => (perStatus.value[s] ?? 0) > 0)

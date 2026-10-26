@@ -565,3 +565,15 @@ A programme's `majors[]` input takes `majorId` (pick from the catalogue) or `nam
 
 **Org head counts (2026-10-25).** `GET /api/staff/org/overview` (any of `system:role:list`, `system:dept:list`, `system:post:list`) returns `{roles, departments, posts}`, each a map of id to people: active staff holding a role, employees (not terminated) per department and per post. An id with nobody behind it is absent. The Roles, Departments and Posts screens show it as a People column; a department shows its own team plus everything under it.
 
+
+
+## Added 2026-10-26 (staff)
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /api/staff/finance/ledger/totals`, `/api/staff/revenue/totals`, `/api/staff/expenses/totals` | Sums of the rows a filter matches, per currency |
+| `GET /api/staff/payments?kind=` | Filter the payment queue by `APPLICATION_FEE` or `SERVICE_FEE` |
+| `GET/POST /api/staff/applications/{id}/interviews`, `POST .../{interviewId}/cancel` | Schedule, reschedule and cancel an interview (instant with offset, stored UTC) |
+| `GET/POST /api/staff/applications/{id}/letters`, `GET .../letters/{kind}` | Upload and read the admission letter / JW202 |
+| `GET /api/student/applications/{id}/interviews`, `.../letters`, `.../letters/{kind}` | Student reads; a letter is 402 until the service fee is confirmed |
+| `/api/student/applications/{id}/service-fee/*` | The service fee: same session, QR, proof flow as `/payment/*` |

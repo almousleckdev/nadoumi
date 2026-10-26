@@ -114,7 +114,7 @@ describe('dashboard index', () => {
     listApplications.mockResolvedValueOnce([
       { id: 7, reference: 'NAD2026001', applicationType: 'PROGRAM_ONLY', programId: 1, scholarshipId: null, intakeId: 3,
         currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-01T00:00:00', timeline: [],
-        title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', paymentNeeded: true },
+        title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', paymentNeeded: true, actionNote: null },
     ])
     const w = await mountPage()
     expect(w.find('[data-test="payment-banner"]').exists()).toBe(true)

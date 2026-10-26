@@ -39,7 +39,7 @@ final class PdfFixtures {
         return new ReceiptModel("NAD-RCT-2026-000007", Instant.parse("2026-10-22T06:30:00Z"), "Amina Diallo",
                 "APL-1234", "amina@example.test", "APP-42", "MBBS", university, "AUTUMN_SEPTEMBER",
                 "NAD-AB12CD34", "BANK1234567", Instant.parse("2026-10-22T06:29:00Z"),
-                new BigDecimal("300"), "CNY", "Sichuan Nadoumi Education Consulting Co., Ltd.", VERIFY_URL);
+                new BigDecimal("300"), "CNY", "Sichuan Nadoumi Education Consulting Co., Ltd.", ReceiptModel.APPLICATION_FEE_NAME, VERIFY_URL);
     }
 
     static ApplicationFormModel form(Description opportunity, String studentName) {

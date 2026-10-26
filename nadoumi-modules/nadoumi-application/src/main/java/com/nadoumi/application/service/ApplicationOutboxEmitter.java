@@ -48,8 +48,17 @@ public class ApplicationOutboxEmitter {
         emit(application, OutboxEventTypes.APPLICATION_STATUS_CHANGED, status);
     }
 
+    /** Tells the applicant's users something needs their attention; {@code headline} is the email subject. */
+    public void update(Application application, String headline, String message) {
+        emit(application, OutboxEventTypes.APPLICATION_UPDATE, null, headline, message);
+    }
+
     /** Payload keys match the templates already seeded in V55 — do not rename without updating them too. */
     private void emit(Application application, String outboxType, String status) {
+        emit(application, outboxType, status, null, null);
+    }
+
+    private void emit(Application application, String outboxType, String status, String headline, String message) {
         List<Long> recipients = accessService.listForApplicant(application.getApplicantId()).stream()
                 .filter(g -> g.getStatus() == AccessGrantStatus.ACTIVE)
                 .map(UserApplicantAccess::getUserId)
@@ -63,6 +72,10 @@ public class ApplicationOutboxEmitter {
         payload.put("opportunityTitle", opportunityTitle(application));
         if (status != null) {
             payload.put("status", status);
+        }
+        if (headline != null) {
+            payload.put("headline", headline);
+            payload.put("message", message);
         }
         payload.put("recipientUserIds", recipients);
         outboxWriter.write("application", application.getId(), outboxType, payload.toJSONString());

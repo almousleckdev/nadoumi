@@ -1,5 +1,34 @@
 # Nadoumi — Student Application Process
 
+> **UPDATED 2026-10-26: fifteen-status workflow, documents loop, interviews, service fee and admission documents (V140 to V143).**
+>
+> - **Statuses are the stages** (EXISTING). New applications run on version 2 of `PROGRAM_ONLY_V1` and `SCHOLARSHIP_ONLY_V1`
+>   (V140): Submitted, Under review, Documents required, Ready for university submission, Submitted to university, Under
+>   university review, Interview required, Conditional offer, Offer received, Offer accepted, Waitlisted, Admission confirmed, then
+>   Enrolled, Rejected, Withdrawn (closed codes keep `CLOSED_SUCCESS`, `CLOSED_UNSUCCESSFUL`, `CLOSED_WITHDRAWN`). Version 1 is retired
+>   for new applications only; a running application stays pinned to the definition it started on. Scholarship applications say
+>   "provider" where programmes say "university" (the university is never named for a scholarship). `PROGRAM_WITH_SCHOLARSHIP_V1` is untouched (legacy).
+> - **Documents required is a loop on the same application.** Staff take `request_documents` with a mandatory note; the student
+>   gets an email and the note on the application page, fixes the documents and runs the student step `resubmit` back to Under review.
+>   `resubmit` is not `submit`: `SubmitGate` and the fee are never run again, no application or payment is created, a second
+>   `resubmit` is refused (the case is no longer in that stage), and a stage checklist is not handed out twice when a case returns to a stage.
+> - **Notes are mandatory** for `request_documents`, `ineligible`, `reject` and `mark_withdrawn`. Staff withdrawal is `mark_withdrawn`;
+>   a student still cannot withdraw (the fee is not refundable). A student accepting or declining an offer records the formal
+>   `APPLICANT_RESPONSE` decision itself.
+> - **Interviews** (`nad_application_interview`, V141). Staff schedule one while the status is Interview required
+>   (`POST /api/staff/applications/{id}/interviews`). The admin enters a Beijing wall time; the request carries it with `+08:00`, the
+>   server stores the UTC instant, refuses a past time and a non-https link, and keeps at most one SCHEDULED interview per application (virtual
+>   generated key + unique index). Rescheduling cancels the open one. The student is emailed in Beijing time and UTC and the dashboard shows
+>   it in their own zone and in Beijing time (`GET /api/student/applications/{id}/interviews`).
+> - **Service fee** (`SERVICE_FEE` payment kind, V142). A programme now has `service_fee_amount` like a scholarship. Once the status is
+>   Admission confirmed the student pays it through the same QR, proof and staff-verification flow
+>   (`/api/student/applications/{id}/service-fee/*`); a confirmed fee is booked as revenue source `SERVICE_FEE`; no fee configured means nothing is asked.
+> - **Admission letter and JW202** (`nad_application_letter`, V143). Staff upload them in the admin Admission documents tab once the admission
+>   is confirmed. The server releases them to the student only when the service fee is CONFIRMED (402 otherwise); a locked row never shows
+>   its file name. Both are streamed by the backend and access-logged.
+> - **Generic notification.** `APPLICATION_UPDATE` (headline + message) carries documents-required notes, interviews and the service-fee messages.
+>
+
 > **REBUILT 2026-10-23 — read this block first; it replaces every earlier description of the student-facing flow below.**
 >
 > The application is its own step-by-step flow at `/apply` (outside the student dashboard, in the same fixed full-screen shell as onboarding: step

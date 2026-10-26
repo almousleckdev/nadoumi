@@ -79,6 +79,8 @@
             and exists (select 1 from nad_application a
                         where a.id = nad_application_payment.application_id and a.current_status &lt;&gt; 'DRAFT')
             <if test="status != null">and status = #{status}</if>
+            <if test="applicationId != null">and application_id = #{applicationId}</if>
+            <if test="kind != null and kind != ''">and kind = #{kind}</if>
             <if test="q != null and q != ''">
                 and (reference like concat('%', #{q}, '%')
                      or student_txn_no like concat('%', #{q}, '%')

@@ -15,6 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import com.nadoumi.finance.domain.LedgerEntry;
+import com.nadoumi.finance.domain.LedgerTotal;
+import com.nadoumi.finance.domain.MoneyTotal;
+import java.util.List;
 import com.nadoumi.finance.service.FinanceOverviewService;
 import com.nadoumi.finance.service.LedgerService;
 import com.nadoumi.finance.web.response.FinanceOverview;
@@ -60,6 +63,16 @@ public class StaffRevenueController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return service.list(q, source, from, to, page, size);
+    }
+
+    @GetMapping("/revenue/totals")
+    @PreAuthorize("@ss.hasPermi('nad:revenue:list')")
+    public List<MoneyTotal> totals(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String source,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return service.totals(q, source, from, to);
     }
 
     @GetMapping("/revenue/{id}")
@@ -116,6 +129,17 @@ public class StaffRevenueController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ledgerService.list(kind, q, currency, from, to, page, size);
+    }
+
+    @GetMapping("/finance/ledger/totals")
+    @PreAuthorize("@ss.hasPermi('nad:finance:view')")
+    public List<LedgerTotal> ledgerTotals(
+            @RequestParam(required = false) String kind,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String currency,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return ledgerService.totals(kind, q, currency, from, to);
     }
 
     /** The ledger as a spreadsheet file; expenses are negative amounts. */

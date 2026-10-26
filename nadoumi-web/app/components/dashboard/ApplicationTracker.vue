@@ -14,7 +14,7 @@ const unsuccessful = computed(() => props.status === 'CLOSED_UNSUCCESSFUL')
     <p v-if="unsuccessful" class="mb-3 text-sm font-medium text-red-600" data-test="tracker-unsuccessful">
       {{ t('dashboard.applications.status.CLOSED_UNSUCCESSFUL') }}
     </p>
-    <ol class="grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-3 lg:grid-cols-6" data-test="tracker">
+    <ol class="grid grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-3 lg:grid-cols-8" data-test="tracker">
       <li v-for="(step, i) in TRACKER_STEPS" :key="step" class="min-w-0" :aria-current="i === current ? 'step' : undefined">
         <div class="flex items-center gap-2">
           <span

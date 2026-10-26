@@ -71,6 +71,17 @@
         order by r.received_on desc, r.id desc
     </select>
 
+    <select id="totalsMatching" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select r.currency as currency, sum(r.amount) as total, count(*) as count from nad_revenue r
+        <where>
+            <if test="q != null and q != ''"> and (r.title like concat('%', #{q}, '%') or r.reference like concat('%', #{q}, '%')) </if>
+            <if test="source != null and source != ''"> and r.source = #{source} </if>
+            <if test="from != null"> and r.received_on &gt;= #{from} </if>
+            <if test="to != null"> and r.received_on &lt;= #{to} </if>
+        </where>
+        group by r.currency
+    </select>
+
     <select id="totalsByCurrency" resultType="com.nadoumi.finance.domain.MoneyTotal">
         select currency, sum(amount) as total, count(*) as count from nad_revenue
         <where>

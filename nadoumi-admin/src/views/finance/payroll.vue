@@ -41,8 +41,21 @@
         </div>
       </div>
 
+      <FilterBar
+        :dirty="query !== ''"
+        @clear="query = ''"
+      >
+        <el-input
+          v-model="query"
+          :placeholder="t('payroll.searchPlaceholder')"
+          clearable
+          style="width: 280px"
+          data-test="payroll-search"
+        />
+      </FilterBar>
+
       <DataTable
-        :rows="summary?.rows ?? []"
+        :rows="visibleRows"
         :columns="columns"
         :loading="loading"
         row-key="employeeId"
@@ -72,6 +85,7 @@ import { useI18n } from 'vue-i18n'
 import { Refresh } from '@element-plus/icons-vue'
 import PageHeader from '@/components/PageHeader.vue'
 import DataTable from '@/components/ui/DataTable.vue'
+import FilterBar from '@/components/ui/FilterBar.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import ErrorState from '@/components/ui/ErrorState.vue'
 import { getPayroll, type PayrollSummary, type PayrollRow } from '@/api/hr'
@@ -79,6 +93,15 @@ import { getPayroll, type PayrollSummary, type PayrollRow } from '@/api/hr'
 const { t } = useI18n()
 
 const summary = ref<PayrollSummary | null>(null)
+const query = ref('')
+
+// the whole payroll is one small response, so searching it needs no round trip
+const visibleRows = computed(() => {
+  const needle = query.value.trim().toLowerCase()
+  const rows = summary.value?.rows ?? []
+  if (!needle) return rows
+  return rows.filter(r => [r.name, r.deptName, r.positionTitle].some(v => v?.toLowerCase().includes(needle)))
+})
 const loading = ref(false)
 const error = ref<string | null>(null)
 

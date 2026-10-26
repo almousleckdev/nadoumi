@@ -54,6 +54,9 @@ public enum NotificationType {
     /** An application's stage/status changed — the applicant's linked users are told. */
     APPLICATION_STATUS_CHANGED(true, "Application status updated", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
 
+    /** Something needs the applicant's attention on an application — the applicant's linked users are told. */
+    APPLICATION_UPDATE(true, "Application update", Set.of(NotificationChannelKind.EMAIL), NotificationScope.TARGETED),
+
     /** A student's application is waiting for staff — staff who work the application queue are told. */
     APPLICATION_RECEIVED(false, "New application", Set.of(), NotificationScope.TARGETED),
 

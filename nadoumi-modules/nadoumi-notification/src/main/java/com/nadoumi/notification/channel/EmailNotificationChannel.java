@@ -69,7 +69,7 @@ public class EmailNotificationChannel implements NotificationChannel {
             case "PROGRAM_PUBLISHED" -> new Cta("View programmes", brand.url("/programs"));
             case "UNIVERSITY_PUBLISHED" -> new Cta("View universities", brand.url("/universities"));
             case "ARTICLE_PUBLISHED" -> new Cta("Read the article", brand.url("/news"));
-            case "APPLICATION_SUBMITTED", "APPLICATION_STATUS_CHANGED" ->
+            case "APPLICATION_SUBMITTED", "APPLICATION_STATUS_CHANGED", "APPLICATION_UPDATE" ->
                     new Cta("View your application", brand.url("/dashboard/applications"));
             case "CONTACT_INQUIRY_RECEIVED", "TASK_PROGRESS" ->
                     new Cta("Open the admin console", brand.url("/admin"));

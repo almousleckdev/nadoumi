@@ -7,7 +7,12 @@ import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.LedgerEntry;
 import com.nadoumi.finance.mapper.LedgerMapper;
+import com.nadoumi.finance.domain.LedgerTotal;
+import com.nadoumi.finance.domain.MoneyTotal;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +39,22 @@ public class LedgerService {
         List<LedgerEntry> rows = mapper.search(Texts.blankToNull(kind), Texts.blankToNull(q), Texts.blankToNull(currency), from, to);
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows, page, size, total);
+    }
+
+    /** The rows matching the filter, added up per currency: what came in, what went out, and the difference. */
+    @Transactional(readOnly = true)
+    public List<LedgerTotal> totals(String kind, String q, String currency, LocalDate from, LocalDate to) {
+        Map<String, BigDecimal[]> byCurrency = new TreeMap<>();
+        Map<String, Long> entries = new TreeMap<>();
+        for (MoneyTotal row : mapper.totals(Texts.blankToNull(kind), Texts.blankToNull(q), Texts.blankToNull(currency), from, to)) {
+            BigDecimal[] sums = byCurrency.computeIfAbsent(row.getCurrency(), c -> new BigDecimal[] {BigDecimal.ZERO, BigDecimal.ZERO});
+            sums["REVENUE".equals(row.getBucket()) ? 0 : 1] = sums["REVENUE".equals(row.getBucket()) ? 0 : 1].add(row.getTotal());
+            entries.merge(row.getCurrency(), row.getCount(), Long::sum);
+        }
+        return byCurrency.entrySet().stream()
+                .map(e -> new LedgerTotal(e.getKey(), e.getValue()[0], e.getValue()[1],
+                        e.getValue()[0].subtract(e.getValue()[1]), entries.get(e.getKey())))
+                .toList();
     }
 
     /** The same rows as a CSV, expenses written as negative amounts. */

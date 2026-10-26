@@ -343,6 +343,9 @@ public class ProgramService {
         p.setApplicationFeeAmount(req.applicationFeeAmount());
         p.setApplicationFeeCurrency(req.applicationFeeAmount() == null ? null
                 : req.applicationFeeCurrency() == null ? "CNY" : upperOrNull(req.applicationFeeCurrency()));
+        p.setServiceFeeAmount(req.serviceFeeAmount());
+        p.setServiceFeeCurrency(req.serviceFeeAmount() == null ? null
+                : req.serviceFeeCurrency() == null ? "CNY" : upperOrNull(req.serviceFeeCurrency()));
         // Primarily set through the dedicated upload endpoint; only overwrite from
         // the request when the client actually sent a value.
         if (req.imageMediaId() != null) {

@@ -13,6 +13,9 @@ public interface PaymentGuardProvider {
     /** The Nadoumi application fee a student pays before submitting. */
     String APPLICATION_FEE = "APPLICATION_FEE";
 
+    /** The Nadoumi service fee a student pays once admission is confirmed, before the admission letter and JW202 are released. */
+    String SERVICE_FEE = "SERVICE_FEE";
+
     boolean isSettled(long applicationId, String kind);
 
     /**

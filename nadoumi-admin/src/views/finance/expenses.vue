@@ -57,6 +57,15 @@
           :value="c.id"
         />
       </el-select>
+      <el-date-picker
+        v-model="filters.range"
+        type="daterange"
+        value-format="YYYY-MM-DD"
+        :shortcuts="shortcuts"
+        :start-placeholder="t('earnings.from')"
+        :end-placeholder="t('earnings.to')"
+        @change="reload"
+      />
       <el-button
         :icon="Search"
         @click="reload"
@@ -64,6 +73,8 @@
         {{ t('common.search') }}
       </el-button>
     </FilterBar>
+
+    <TotalsStrip :groups="totalGroups" />
 
     <DataTable
       :rows="rows"
@@ -173,11 +184,13 @@ import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { dualMoney } from '@/utils/money'
 import {
-  listExpenses, deleteExpense, changeExpenseStatus, listExpenseCategories, expenseReceiptUrl,
+  listExpenses, deleteExpense, getExpenseTotals, changeExpenseStatus, listExpenseCategories, expenseReceiptUrl,
   EXPENSE_STATUSES, EXPENSE_TRANSITIONS,
-  type Expense, type ExpenseStatus, type ExpenseCategory,
+  type Expense, type ExpenseStatus, type ExpenseCategory, type MoneyTotal,
 } from '@/api/finance'
 import { usePagedList } from '@/composables/usePagedList'
+import TotalsStrip from '@/components/finance/TotalsStrip.vue'
+import { rangeShortcuts } from '@/utils/dateShortcuts'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
@@ -186,19 +199,41 @@ const userStore = useUserStore()
 const canApprove = computed(() => userStore.hasPerm('nad:expense:approve'))
 
 const categories = ref<ExpenseCategory[]>([])
-const emptyFilters = () => ({ q: '', status: '', categoryId: undefined as number | undefined })
+const shortcuts = computed(() => rangeShortcuts([
+  t('finance.shortcutThisMonth'), t('finance.shortcutLastMonth'), t('finance.shortcutLast30'), t('finance.shortcutThisYear'),
+]))
+const totals = ref<MoneyTotal[]>([])
+const totalGroups = computed(() => totals.value.map(r => ({
+  currency: r.currency,
+  items: [
+    { key: 'sum', label: t('finance.totalSpent'), value: `${r.currency} ${Number(r.total).toLocaleString('en-US', { maximumFractionDigits: 2 })}`, tone: 'bad' as const },
+    { key: 'n', label: t('finance.totalEntries'), value: String(r.count) },
+  ],
+})))
+
+const emptyFilters = () => ({ q: '', status: '', categoryId: undefined as number | undefined, range: null as [string, string] | null })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
   usePagedList<Expense, ReturnType<typeof emptyFilters>>({
     emptyFilters,
     firstPage: 1,
     size: 20,
-    fetch: (f, { index, size }) => listExpenses({
-      q: f.q || undefined,
-      status: f.status || undefined,
-      categoryId: f.categoryId,
-      page: index,
-      size,
-    }),
+    fetch: (f, { index, size }) => {
+      // the totals follow the filters, not the page, so they are asked for once per filter change
+      if (index === 0) {
+        getExpenseTotals({
+          q: f.q || undefined, status: f.status || undefined, categoryId: f.categoryId, from: f.range?.[0], to: f.range?.[1],
+        }).then((r) => { totals.value = r }).catch(() => { totals.value = [] })
+      }
+      return listExpenses({
+        q: f.q || undefined,
+        status: f.status || undefined,
+        categoryId: f.categoryId,
+        from: f.range?.[0],
+        to: f.range?.[1],
+        page: index,
+        size,
+      })
+    },
   })
 
 const drawerOpen = ref(false)

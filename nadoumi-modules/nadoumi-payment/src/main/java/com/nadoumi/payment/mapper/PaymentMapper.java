@@ -37,7 +37,8 @@ public interface PaymentMapper {
 
     int countConfirmed(@Param("applicationId") long applicationId, @Param("kind") String kind);
 
-    List<ApplicationPayment> search(@Param("status") PaymentStatus status, @Param("q") String q);
+    List<ApplicationPayment> search(@Param("status") PaymentStatus status, @Param("q") String q,
+            @Param("applicationId") Long applicationId, @Param("kind") String kind);
 
     int markProofSubmitted(@Param("id") long id, @Param("version") int version, @Param("txnNo") String txnNo,
             @Param("proofMediaId") long proofMediaId, @Param("now") LocalDateTime now, @Param("by") String by);

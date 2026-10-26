@@ -123,7 +123,7 @@ describe('Dashboard', () => {
     useUserStore().permissions = ['*:*:*']
     const w = await mountDashboard()
     const text = w.text()
-    expect(w.findAll('[data-test="funnel-row"]')).toHaveLength(7)
+    expect(w.findAll('[data-test="funnel-row"]')).toHaveLength(16) // the fourteen statuses, plus the two first-workflow ones that have applications
     for (const part of ['Amina Diallo', 'Fudan University', 'Call the Fudan office', 'Review scholarship list', 'moved to review', 'Total universities', '250']) {
       expect(text).toContain(part)
     }

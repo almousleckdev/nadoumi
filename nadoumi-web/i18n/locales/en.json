@@ -642,7 +642,11 @@
       "photoFailed": "The photo could not be uploaded. Please try again.",
       "photoBadType": "Choose a JPEG, PNG or WebP image.",
       "photoTooBig": "The photo must be smaller than {mb} MB.",
-      "studentId": "Student ID"
+      "studentId": "Student ID",
+      "documents": {
+        "title": "Documents",
+        "blurb": "Your passport, certificates and other files live in one place. Open it to upload or review them."
+      }
     },
     "changePassword": "Change password",
     "pwCurrent": "Current password",
@@ -738,9 +742,20 @@
         "OFFER": "Offer received",
         "PRE_DEPARTURE": "Pre-departure",
         "CLOSED_SUCCESS": "Enrolled",
-        "CLOSED_UNSUCCESSFUL": "Unsuccessful",
+        "CLOSED_UNSUCCESSFUL": "Rejected",
         "CLOSED_WITHDRAWN": "Withdrawn",
-        "unknown": "In progress"
+        "unknown": "In progress",
+        "SUBMITTED": "Submitted",
+        "UNDER_REVIEW": "Under review",
+        "DOCUMENTS_REQUIRED": "Documents required",
+        "READY_FOR_UNIVERSITY_SUBMISSION": "Ready to send",
+        "UNDER_UNIVERSITY_REVIEW": "University review",
+        "INTERVIEW_REQUIRED": "Interview required",
+        "CONDITIONAL_OFFER": "Conditional offer",
+        "OFFER_RECEIVED": "Offer received",
+        "OFFER_ACCEPTED": "Offer accepted",
+        "WAITLISTED": "Waitlisted",
+        "ADMISSION_CONFIRMED": "Admission confirmed"
       },
       "event": {
         "created": "Application started",
@@ -774,7 +789,18 @@
         "PRE_DEPARTURE": "Congratulations. Nadoumi is helping you prepare to leave.",
         "CLOSED_SUCCESS": "You are enrolled. Congratulations.",
         "CLOSED_UNSUCCESSFUL": "This application was not successful.",
-        "default": "Nadoumi is working on your application."
+        "default": "Nadoumi is working on your application.",
+        "SUBMITTED": "We received your application and will start reviewing it soon.",
+        "UNDER_REVIEW": "Nadoumi is checking your application. We email you at every change.",
+        "DOCUMENTS_REQUIRED": "Some documents are missing or need to be corrected. Update them and send your application back. You do not pay again.",
+        "READY_FOR_UNIVERSITY_SUBMISSION": "Your application is complete and ready to be sent to the university.",
+        "UNDER_UNIVERSITY_REVIEW": "The university is evaluating your application. We email you when it answers.",
+        "INTERVIEW_REQUIRED": "You must attend an interview. The date, time and link are shown below.",
+        "CONDITIONAL_OFFER": "You are offered a place if you meet specific conditions. Nadoumi will explain them.",
+        "OFFER_RECEIVED": "You have an offer. Accept it to continue.",
+        "OFFER_ACCEPTED": "You accepted the offer. Nadoumi is confirming your admission.",
+        "WAITLISTED": "You are on the waiting list. We email you as soon as there is a place or a decision.",
+        "ADMISSION_CONFIRMED": "Your admission is confirmed. Pay the Nadoumi service fee to receive your admission letter and JW202."
       },
       "colProgress": "Progress",
       "stepOf": "Step {n} of {total}",
@@ -782,7 +808,44 @@
       "paymentNeeded": "Payment needed",
       "paymentNeededBanner": "Nadoumi has not received the fee for some of your applications. Open them and pay again so they can move forward.",
       "payAgain": "Pay again",
-      "paymentNeededNote": "Nadoumi could not confirm your payment. Pay again to keep this application moving."
+      "paymentNeededNote": "Nadoumi could not confirm your payment. Pay again to keep this application moving.",
+      "documentsRequired": {
+        "title": "Documents required",
+        "body": "Nadoumi needs more from you on this application:",
+        "howTo": "Upload or correct the documents below, then send the application back. It stays the same application and you do not pay again.",
+        "sendBack": "Send back for review",
+        "sent": "Your application is back with Nadoumi."
+      },
+      "interview": {
+        "title": "Interview",
+        "waiting": "Nadoumi will send the interview date and link here and by email.",
+        "beijing": "Beijing time (UTC+8)",
+        "yours": "Your time ({zone})",
+        "length": "{minutes} minutes",
+        "join": "Join the interview"
+      },
+      "offer": {
+        "title": "Your offer",
+        "body": "The university offered you a place. Accept it to continue with your admission.",
+        "conditionalBody": "The university offered you a place if you meet specific conditions. Accept to continue; Nadoumi will guide you through the conditions.",
+        "accept": "Accept the offer",
+        "decline": "Decline the offer",
+        "accepted": "You accepted the offer.",
+        "declineTitle": "Decline this offer?",
+        "declineBody": "Declining closes this application. The application fee is not refundable.",
+        "declineConfirm": "Decline the offer"
+      },
+      "admission": {
+        "title": "Admission letter and JW202",
+        "help": "Nadoumi releases these two documents after the Nadoumi service fee is paid and confirmed.",
+        "notYet": "Nadoumi is preparing this document.",
+        "locked": "Available after you pay the Nadoumi service fee.",
+        "open": "Open",
+        "kind": {
+          "ADMISSION_LETTER": "Admission letter",
+          "JW202": "JW202 form"
+        }
+      }
     }
   },
   "validation": {
@@ -2585,7 +2648,13 @@
       "resent": "Receipt sent. Check your inbox.",
       "resendWait": "The receipt was sent a moment ago. Try again in a few minutes."
     },
-    "submittedIntro": "Nadoumi has your application, but the fee was not received. Pay again and report the payment so it can move forward."
+    "submittedIntro": "Nadoumi has your application, but the fee was not received. Pay again and report the payment so it can move forward.",
+    "service": {
+      "title": "Nadoumi service fee",
+      "intro": "Your admission is confirmed. Pay the Nadoumi service fee to receive your admission letter and JW202 form.",
+      "confirmedTitle": "Service fee confirmed",
+      "confirmedBody": "Thank you. Your admission letter and JW202 form are available below."
+    }
   },
   "applyFlow": {
     "onBehalf": "You are completing the details of {name}. Wherever a question says \"you\" or \"your\", it means {name}.",

@@ -251,7 +251,8 @@ async function onDownload(versionNo: number) {
   if (!props.doc) return
   downloading.value = versionNo
   try {
-    await openDocumentFile(props.doc.id, versionNo)
+    const version = props.doc.versions.find(v => v.versionNo === versionNo)
+    await openDocumentFile(props.doc.id, versionNo, 'download', version?.contentType)
   }
   finally {
     downloading.value = null

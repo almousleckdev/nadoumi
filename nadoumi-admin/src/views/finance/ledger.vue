@@ -62,6 +62,7 @@
         v-model="filters.range"
         type="daterange"
         value-format="YYYY-MM-DD"
+        :shortcuts="shortcuts"
         :start-placeholder="t('earnings.from')"
         :end-placeholder="t('earnings.to')"
         @change="reload"
@@ -73,6 +74,8 @@
         {{ t('common.search') }}
       </el-button>
     </FilterBar>
+
+    <TotalsStrip :groups="totalGroups" />
 
     <DataTable
       :rows="rows"
@@ -119,7 +122,9 @@ import DataTable from '@/components/ui/DataTable.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import StatusBadge from '@/components/ui/StatusBadge.vue'
 import { usePagedList } from '@/composables/usePagedList'
-import { exportLedger, listLedger, type LedgerEntry } from '@/api/finance'
+import { exportLedger, getLedgerTotals, listLedger, type LedgerEntry, type LedgerTotal } from '@/api/finance'
+import TotalsStrip, { type TotalsItem } from '@/components/finance/TotalsStrip.vue'
+import { rangeShortcuts } from '@/utils/dateShortcuts'
 import { saveBlob } from '@/utils/download'
 
 const CURRENCIES = ['CNY', 'USD']
@@ -129,6 +134,21 @@ type Row = LedgerEntry & { key: string }
 const { t, te } = useI18n()
 const exporting = ref(false)
 
+const shortcuts = computed(() => rangeShortcuts([
+  t('finance.shortcutThisMonth'), t('finance.shortcutLastMonth'), t('finance.shortcutLast30'), t('finance.shortcutThisYear'),
+]))
+const totals = ref<LedgerTotal[]>([])
+const amount = (v: number, currency: string) => `${currency} ${Number(v).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+const totalGroups = computed(() => totals.value.map(r => ({
+  currency: r.currency,
+  items: [
+    { key: 'in', label: t('ledger.in'), value: amount(r.revenue, r.currency), tone: 'good' },
+    { key: 'out', label: t('ledger.out'), value: amount(r.expenses, r.currency), tone: 'bad' },
+    { key: 'net', label: t('finance.net'), value: amount(r.net, r.currency), tone: r.net >= 0 ? 'good' : 'bad' },
+    { key: 'n', label: t('finance.totalEntries'), value: String(r.entries) },
+  ] satisfies TotalsItem[],
+})))
+
 const emptyFilters = () => ({ q: '', kind: '', currency: '', range: null as [string, string] | null })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
   usePagedList<Row, ReturnType<typeof emptyFilters>>({
@@ -136,6 +156,12 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
     firstPage: 0,
     size: 20,
     fetch: async (f, { index, size }) => {
+      // the totals follow the filters, not the page, so they are asked for once per filter change
+      if (index === 0) {
+        getLedgerTotals({
+          q: f.q || undefined, kind: f.kind || undefined, currency: f.currency || undefined, from: f.range?.[0], to: f.range?.[1],
+        }).then((r) => { totals.value = r }).catch(() => { totals.value = [] })
+      }
       const result = await listLedger({
         q: f.q || undefined, kind: f.kind || undefined, currency: f.currency || undefined,
         from: f.range?.[0], to: f.range?.[1], page: index, size,

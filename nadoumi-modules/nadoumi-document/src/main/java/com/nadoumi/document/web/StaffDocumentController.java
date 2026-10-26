@@ -51,8 +51,7 @@ public class StaffDocumentController {
             @RequestParam(required = false) String json, @RequestParam(required = false) String inline,
             HttpServletRequest request) {
         boolean forViewing = "1".equals(inline);
-        DocumentContent content = service.staffContent(id, versionNo, DocumentContentResponses.accessContext(request, id),
-                forViewing);
+        DocumentContent content = service.staffContent(id, versionNo, DocumentContentResponses.accessContext(request, id));
         return DocumentContentResponses.respond(content, json, request, forViewing);
     }
 

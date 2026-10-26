@@ -2,6 +2,9 @@ package com.nadoumi.application.service;
 
 import com.nadoumi.application.domain.Application;
 import com.nadoumi.application.mapper.ApplicationMapper;
+import com.nadoumi.program.service.ProgramService;
+import com.nadoumi.scholarship.service.ScholarshipAdminService;
+import java.math.BigDecimal;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +23,31 @@ public class ApplicationReadService {
     private static final String DRAFT_STATUS = "DRAFT";
 
     private final ApplicationMapper mapper;
+    private final ProgramService programs;
+    private final ScholarshipAdminService scholarships;
 
-    public ApplicationReadService(ApplicationMapper mapper) {
+    public ApplicationReadService(ApplicationMapper mapper, ProgramService programs, ScholarshipAdminService scholarships) {
         this.mapper = mapper;
+        this.programs = programs;
+        this.scholarships = scholarships;
+    }
+
+    /**
+     * The Nadoumi service fee (RMB) of the application's programme, else of its scholarship; zero when neither sets one.
+     * It is read live, so a payment session keeps the amount it was opened with while a new one follows the catalogue.
+     */
+    @Transactional(readOnly = true)
+    public BigDecimal serviceFee(long applicationId) {
+        Application application = mapper.findById(applicationId);
+        if (application == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal fee = application.getProgramId() == null ? null : programs.get(application.getProgramId()).serviceFeeAmount();
+        if ((fee == null || fee.signum() <= 0) && application.getScholarshipId() != null) {
+            var money = scholarships.get(application.getScholarshipId()).view().serviceFee();
+            fee = money == null ? null : money.amountRmb();
+        }
+        return fee == null || fee.signum() <= 0 ? BigDecimal.ZERO : fee;
     }
 
     @Transactional(readOnly = true)

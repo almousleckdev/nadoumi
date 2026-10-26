@@ -1,17 +1,22 @@
 <script setup lang="ts">
+import type { FeeVariant } from '~/composables/useApplicationPayment'
 import type { PaymentState, StudentPaymentDto } from '~/types/payment'
 import { isStartable } from '~/utils/paymentView'
 
 /**
- * The Nadoumi application fee of an application. A draft stays saved whether or not it is paid; this panel
+ * The Nadoumi fee of an application: the application fee by default, or (variant `service`) the service fee asked for once
+ * the admission is confirmed. A draft stays saved whether or not it is paid; this panel
  * is how the student pays (a submitted application can be paid again only after staff rejected the payment): open the QR (15 minutes), pay in their banking app, then report the payment.
  * It tells its parent whether the fee is settled so the Submit button can follow.
  */
-const props = defineProps<{ applicationId: number, submitted?: boolean }>()
+const props = withDefaults(defineProps<{ applicationId: number, submitted?: boolean, variant?: FeeVariant }>(), {
+  variant: 'application',
+})
 const emit = defineEmits<{ settled: [value: boolean] }>()
 
 const { t } = useI18n()
-const api = useApplicationPayment(props.applicationId)
+const api = useApplicationPayment(props.applicationId, props.variant)
+const copy = (key: string) => t(props.variant === 'service' ? `payment.service.${key}` : `payment.${key}`)
 const { busy, error, run } = useAsyncAction()
 
 const payment = ref<StudentPaymentDto | null>(null)
@@ -91,7 +96,7 @@ const amount = computed(() => offeringMoney(payment.value?.amount, null, payment
 </script>
 
 <template>
-  <SectionCard v-if="!payment || payment.required || loadFailed" :title="t('payment.title')">
+  <SectionCard v-if="!payment || payment.required || loadFailed" :title="copy('title')">
     <NSkeleton v-if="!payment && !loadFailed" class="h-24 w-full rounded-xl" />
     <NAlert v-else-if="loadFailed" tone="danger">
       {{ t('errors.loadSection') }}
@@ -105,12 +110,12 @@ const amount = computed(() => offeringMoney(payment.value?.amount, null, payment
       <div v-if="state === 'CONFIRMED'" class="flex items-start gap-3" data-test="state-confirmed">
         <span class="mt-0.5 shrink-0 text-brand-600"><DashboardIcon name="check" :size="22" /></span>
         <div>
-          <p class="font-display text-lg font-semibold text-slate-900">{{ t('payment.confirmedTitle') }}</p>
-          <p class="text-sm text-slate-600">{{ t('payment.confirmedBody') }}</p>
+          <p class="font-display text-lg font-semibold text-slate-900">{{ copy('confirmedTitle') }}</p>
+          <p class="text-sm text-slate-600">{{ copy('confirmedBody') }}</p>
           <p class="mt-1 font-mono text-xs text-slate-500">{{ payment.reference }}</p>
         </div>
       </div>
-      <PaymentDocuments v-if="state === 'CONFIRMED'" :application-id="applicationId" />
+      <PaymentDocuments v-if="state === 'CONFIRMED' && variant === 'application'" :application-id="applicationId" />
 
       <!-- reported, waiting for the Nadoumi team -->
       <div v-else-if="state === 'PROOF_SUBMITTED'" data-test="state-verifying">
@@ -133,7 +138,7 @@ const amount = computed(() => offeringMoney(payment.value?.amount, null, payment
         <NAlert v-else-if="state === 'EXPIRED'" tone="warning" :title="t('payment.expiredTitle')">
           {{ t('payment.expiredBody') }}
         </NAlert>
-        <p class="text-sm text-slate-600">{{ submitted ? t('payment.submittedIntro') : t('payment.intro') }}</p>
+        <p class="text-sm text-slate-600">{{ submitted && variant === 'application' ? t('payment.submittedIntro') : copy('intro') }}</p>
         <p class="text-sm">
           <span class="text-slate-500">{{ t('payment.amount') }}</span>
           <span class="ms-2 font-display text-xl font-bold tabular-nums text-red-600">{{ amount }}</span>

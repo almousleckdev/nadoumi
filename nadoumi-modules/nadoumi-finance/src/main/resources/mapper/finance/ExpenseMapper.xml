@@ -82,6 +82,18 @@
         order by e.spent_on desc, e.id desc
     </select>
 
+    <select id="totalsMatching" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select e.currency as currency, sum(e.amount) as total, count(*) as count from nad_expense e
+        <where>
+            <if test="q != null and q != ''"> and (e.title like concat('%', #{q}, '%') or e.vendor like concat('%', #{q}, '%') or e.receipt_no like concat('%', #{q}, '%')) </if>
+            <if test="status != null and status != ''"> and e.status = #{status} </if>
+            <if test="categoryId != null"> and e.category_id = #{categoryId} </if>
+            <if test="from != null"> and e.spent_on &gt;= #{from} </if>
+            <if test="to != null"> and e.spent_on &lt;= #{to} </if>
+        </where>
+        group by e.currency
+    </select>
+
     <select id="maxReceiptSeq" resultType="java.lang.Integer">
         select max(cast(substring_index(receipt_no, '-', -1) as unsigned))
         from nad_expense where receipt_no like concat(#{prefix}, '%')
