@@ -21,6 +21,10 @@ public interface ExpenseMapper {
     List<Expense> search(@Param("q") String q, @Param("status") String status,
             @Param("categoryId") Long categoryId, @Param("from") LocalDate from, @Param("to") LocalDate to);
 
+    /** The rows {@link #search} would return, summed per currency. */
+    List<com.nadoumi.finance.domain.MoneyTotal> totalsMatching(@Param("q") String q, @Param("status") String status,
+            @Param("categoryId") Long categoryId, @Param("from") LocalDate from, @Param("to") LocalDate to);
+
     Integer maxReceiptSeq(@Param("prefix") String prefix);
 
     /** Per-currency totals for expenses within the window; {@code status} optional (defaults to PAID + APPROVED). */

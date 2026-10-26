@@ -34,6 +34,9 @@ import com.ruoyi.common.utils.SecurityUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class WorkflowService {
+
+    private static final String DOCUMENTS_REQUIRED_STAGE = "DOCUMENTS_REQUIRED";
+    private static final String ADMISSION_CONFIRMED_STAGE = "ADMISSION_CONFIRMED";
 
     private final WfDefinitionMapper definitionMapper;
     private final ApplicationMapper applicationMapper;
@@ -59,6 +65,7 @@ public class WorkflowService {
     private final ApplicationOutboxEmitter emitter;
     private final SubmitGate submitGate;
     private final ApplicationReferenceService references;
+    private final PaymentGuardProvider payments;
 
     public WorkflowService(WfDefinitionMapper definitionMapper, ApplicationMapper applicationMapper,
             WfInstanceMapper instanceMapper, ApplicationTaskMapper taskMapper,
@@ -66,7 +73,7 @@ public class WorkflowService {
             ApplicationDecisionMapper decisionMapper, GuardEvaluator guards, ProgramService programService,
             ScholarshipAdminService scholarshipAdminService, WorkflowDefinitionService definitions,
             ApplicationSnapshotWriter snapshots, ApplicationOutboxEmitter emitter, SubmitGate submitGate,
-            ApplicationReferenceService references) {
+            ApplicationReferenceService references, PaymentGuardProvider payments) {
         this.definitionMapper = definitionMapper;
         this.applicationMapper = applicationMapper;
         this.instanceMapper = instanceMapper;
@@ -82,6 +89,7 @@ public class WorkflowService {
         this.emitter = emitter;
         this.submitGate = submitGate;
         this.references = references;
+        this.payments = payments;
     }
 
     // draft creation
@@ -232,10 +240,31 @@ public class WorkflowService {
             snapshots.writeSubmitSnapshots(application.getId(), application.getApplicantId());
             emitter.submitted(applicationMapper.findById(application.getId()), actorUserId);
         }
+        else if (DOCUMENTS_REQUIRED_STAGE.equals(toStage.getCode()) && reason != null && !reason.isBlank()) {
+            // the student needs to read what is wrong, not only that the status changed
+            emitter.update(applicationMapper.findById(application.getId()),
+                    "Documents required for your application " + application.getReference(),
+                    "Nadoumi needs more from you:\n\n" + reason.trim()
+                            + "\n\nUpdate your documents in your dashboard and send the application back. You do not pay again.");
+        }
+        else if (ADMISSION_CONFIRMED_STAGE.equals(toStage.getCode())) {
+            emitter.update(applicationMapper.findById(application.getId()),
+                    "Your admission is confirmed (" + application.getReference() + ")", admissionConfirmedMessage(application));
+        }
         else {
             // the student reads the stage name ("Eligibility review"), not the coarse status code
             emitter.statusChanged(applicationMapper.findById(application.getId()), toStage.getName());
         }
+    }
+
+    /** Tells the student what happens next: the service fee first when there is one, then the letter and the JW202. */
+    private String admissionConfirmedMessage(Application application) {
+        boolean feeDue = !payments.isSettled(application.getId(), PaymentGuardProvider.SERVICE_FEE);
+        return feeDue
+                ? "The admission is confirmed. To receive your admission letter and JW202 form, pay the Nadoumi service fee "
+                        + "from your application page in your dashboard."
+                : "The admission is confirmed. Your admission letter and JW202 form will appear in your dashboard "
+                        + "as soon as Nadoumi uploads them.";
     }
 
     /** Fires any transition out of the new current stage whose guard is already true and has no open blocking task. */
@@ -332,7 +361,15 @@ public class WorkflowService {
     }
 
     private void materializeTasks(long applicationId, long stageId, long actorUserId) {
+        // a stage the case returns to (documents fixed, interview done) must not hand out its checklist twice
+        Set<Long> already = taskMapper.findByApplication(applicationId).stream()
+                .map(ApplicationTask::getWfStageTaskTemplateId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
         for (WfStageTaskTemplate template : definitionMapper.findTaskTemplates(stageId)) {
+            if (already.contains(template.getId())) {
+                continue;
+            }
             ApplicationTask task = new ApplicationTask();
             task.setApplicationId(applicationId);
             task.setWfStageTaskTemplateId(template.getId());

@@ -73,9 +73,21 @@ class PaymentVerificationServiceTest {
 
         verify(mapper).insertEvent(PAYMENT_ID, PaymentStatus.PROOF_SUBMITTED, PaymentStatus.CONFIRMED, "STAFF",
                 STAFF_ID, null, NOW);
-        verify(revenue).recordApplicationFee(new BigDecimal("300.00"), "CNY", NOW.toLocalDate(),
+        verify(revenue).recordPayment("APPLICATION_FEE", new BigDecimal("300.00"), "CNY", NOW.toLocalDate(),
                 "NAD-7K3Q9FXT", 41L, STAFF_ID);
         verify(events).confirmed(p);
+    }
+
+    @Test
+    void shouldBookAServiceFeeUnderItsOwnRevenueSource() {
+        ApplicationPayment p = payment(PaymentStatus.PROOF_SUBMITTED);
+        p.setKind("SERVICE_FEE");
+        when(mapper.markConfirmed(PAYMENT_ID, 4, STAFF_ID, NOW)).thenReturn(1);
+
+        service.confirm(PAYMENT_ID);
+
+        verify(revenue).recordPayment("SERVICE_FEE", new BigDecimal("300.00"), "CNY", NOW.toLocalDate(),
+                "NAD-7K3Q9FXT", 41L, STAFF_ID);
     }
 
     @Test
@@ -125,5 +137,21 @@ class PaymentVerificationServiceTest {
         assertThatThrownBy(() -> service.reject(PAYMENT_ID, " ")).isInstanceOf(NadBadRequestException.class);
         assertThatThrownBy(() -> service.reject(PAYMENT_ID, "x".repeat(301))).isInstanceOf(NadBadRequestException.class);
         assertThat(true).isTrue();
+    }
+
+    @Test
+    void shouldFilterTheQueueByApplication_whenAnApplicationIdIsGiven() {
+        service.list(null, " ", 41L, null, 0, 20);
+
+        verify(mapper).search(null, null, 41L, null);
+    }
+
+    @Test
+    void shouldFilterByKind_andIgnoreAnUnknownOne() {
+        service.list(null, null, null, "SERVICE_FEE", 0, 20);
+        service.list(null, null, null, "NOT_A_KIND", 0, 20);
+
+        verify(mapper).search(null, null, null, "SERVICE_FEE");
+        verify(mapper).search(null, null, null, null);
     }
 }

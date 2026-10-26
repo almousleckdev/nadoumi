@@ -37,10 +37,14 @@ public class PaymentDocumentMailer {
     public EmailMessage receipt(String to, String firstName, ApplicationPayment payment, PaymentDocument receipt,
             byte[] pdf) {
         String heading = firstName == null || firstName.isBlank() ? "Payment received" : "Payment received, " + firstName;
+        boolean serviceFee = com.nadoumi.application.service.PaymentGuardProvider.SERVICE_FEE.equals(payment.getKind());
         EmailContent content = EmailContent.builder(heading)
-                .preheader("Your Nadoumi application fee receipt")
-                .paragraphs("Thank you. We confirmed your Nadoumi application fee. Your receipt is attached to this email.\n\n"
-                        + "Next, complete your documents and submit your application.")
+                .preheader(serviceFee ? "Your Nadoumi service fee receipt" : "Your Nadoumi application fee receipt")
+                .paragraphs(serviceFee
+                        ? "Thank you. We confirmed your Nadoumi service fee. Your receipt is attached to this email.\n\n"
+                                + "Your admission letter and JW202 form are now available in your dashboard."
+                        : "Thank you. We confirmed your Nadoumi application fee. Your receipt is attached to this email.\n\n"
+                                + "Next, complete your documents and submit your application.")
                 .keyValues(List.of(
                         new Entry("Receipt no.", receipt.getDocNumber()),
                         new Entry("Application", PaymentDocumentService.applicationRef(payment)),

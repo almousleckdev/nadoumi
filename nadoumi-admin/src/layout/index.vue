@@ -79,7 +79,9 @@ watch(collapsed, (v) => {
   --aside: var(--nad-aside-w);
   display: grid;
   grid-template-columns: var(--aside) 1fr;
+  grid-template-rows: minmax(0, 1fr);
   height: 100%;
+  overflow: hidden;
   transition: grid-template-columns 0.2s ease;
 }
 .shell--collapsed {
@@ -125,6 +127,7 @@ watch(collapsed, (v) => {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
   background: var(--nad-canvas);
 }
 .shell__header {
@@ -135,6 +138,7 @@ watch(collapsed, (v) => {
 }
 .shell__main {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 .shell__scrim {

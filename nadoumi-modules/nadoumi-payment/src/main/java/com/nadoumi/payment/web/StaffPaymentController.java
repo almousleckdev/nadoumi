@@ -46,9 +46,11 @@ public class StaffPaymentController {
     public PageResponse<StaffPaymentResponse> list(
             @RequestParam(required = false) PaymentStatus status,
             @RequestParam(required = false) String q,
+            @RequestParam(required = false) Long applicationId,
+            @RequestParam(required = false) String kind,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return service.list(status, q, page, size);
+        return service.list(status, q, applicationId, kind, page, size);
     }
 
     @GetMapping("/{id}")

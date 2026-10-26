@@ -24,6 +24,10 @@ public interface RevenueMapper {
     List<Revenue> search(@Param("q") String q, @Param("source") String source,
             @Param("from") LocalDate from, @Param("to") LocalDate to);
 
+    /** The rows {@link #search} would return, summed per currency. */
+    List<MoneyTotal> totalsMatching(@Param("q") String q, @Param("source") String source,
+            @Param("from") LocalDate from, @Param("to") LocalDate to);
+
     List<MoneyTotal> totalsByCurrency(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
     List<MoneyTotal> totalsBySource(@Param("from") LocalDate from, @Param("to") LocalDate to);

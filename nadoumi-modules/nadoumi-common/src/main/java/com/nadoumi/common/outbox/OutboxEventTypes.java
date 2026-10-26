@@ -50,6 +50,12 @@ public final class OutboxEventTypes {
      */
     public static final String APPLICATION_STATUS_CHANGED = "ApplicationStatusChanged";
 
+    /**
+     * Something on an application needs the applicant's attention (documents to fix, an interview, a fee to pay).
+     * The payload carries {@code headline} and {@code message}. Aggregate: {@code application}.
+     */
+    public static final String APPLICATION_UPDATE = "ApplicationUpdate";
+
     /** A student reported an application-fee payment; staff who verify payments are told. Aggregate: {@code application}. */
     public static final String PAYMENT_PROOF_SUBMITTED = "PaymentProofSubmitted";
 

@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.nadoumi.common.outbox.OutboxEventTypes;
 import com.nadoumi.common.outbox.OutboxWriter;
 import com.nadoumi.payment.domain.ApplicationPayment;
+import com.nadoumi.application.service.PaymentGuardProvider;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -35,11 +36,38 @@ public class PaymentEvents {
     }
 
     public void confirmed(ApplicationPayment payment) {
+        if (isServiceFee(payment)) {
+            update(payment, "Service fee received", "We confirmed your Nadoumi service fee. Your admission letter and JW202 "
+                    + "form are now available in your dashboard.");
+            return;
+        }
         toApplicant(payment, OutboxEventTypes.PAYMENT_CONFIRMED, null);
     }
 
     public void rejected(ApplicationPayment payment, String reason) {
+        if (isServiceFee(payment)) {
+            update(payment, "Service fee not accepted", "We could not confirm your Nadoumi service fee payment. Reason: "
+                    + reason + "\n\nOpen your dashboard to pay again.");
+            return;
+        }
         toApplicant(payment, OutboxEventTypes.PAYMENT_REJECTED, reason);
+    }
+
+    /** The service fee has its own wording (the application-fee messages talk about submitting), so it uses the generic update. */
+    private void update(ApplicationPayment payment, String headline, String message) {
+        List<Long> users = recipients.userIdsOf(payment.getApplicantId());
+        if (users.isEmpty()) {
+            return;
+        }
+        JSONObject payload = base(payment);
+        payload.put("recipientUserIds", users);
+        payload.put("headline", headline);
+        payload.put("message", message);
+        outbox.write(AGGREGATE, payment.getApplicationId(), OutboxEventTypes.APPLICATION_UPDATE, payload.toJSONString());
+    }
+
+    private static boolean isServiceFee(ApplicationPayment payment) {
+        return PaymentGuardProvider.SERVICE_FEE.equals(payment.getKind());
     }
 
     private void toApplicant(ApplicationPayment payment, String type, String reason) {

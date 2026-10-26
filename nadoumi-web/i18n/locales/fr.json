@@ -642,7 +642,11 @@
       "photoFailed": "La photo n'a pas pu être téléversée. Réessayez.",
       "photoBadType": "Choisissez une image JPEG, PNG ou WebP.",
       "photoTooBig": "La photo doit peser moins de {mb} Mo.",
-      "studentId": "ID étudiant"
+      "studentId": "ID étudiant",
+      "documents": {
+        "title": "Documents",
+        "blurb": "Votre passeport, vos diplômes et autres fichiers sont au même endroit. Ouvrez-le pour les téléverser ou les consulter."
+      }
     },
     "changePassword": "Changer le mot de passe",
     "pwCurrent": "Mot de passe actuel",
@@ -738,9 +742,20 @@
         "OFFER": "Offre reçue",
         "PRE_DEPARTURE": "Avant le départ",
         "CLOSED_SUCCESS": "Inscrit",
-        "CLOSED_UNSUCCESSFUL": "Non retenue",
+        "CLOSED_UNSUCCESSFUL": "Refusée",
         "CLOSED_WITHDRAWN": "Retirée",
-        "unknown": "En cours"
+        "unknown": "En cours",
+        "SUBMITTED": "Soumise",
+        "UNDER_REVIEW": "En cours d’examen",
+        "DOCUMENTS_REQUIRED": "Documents requis",
+        "READY_FOR_UNIVERSITY_SUBMISSION": "Prête à envoyer",
+        "UNDER_UNIVERSITY_REVIEW": "Examen par l’université",
+        "INTERVIEW_REQUIRED": "Entretien requis",
+        "CONDITIONAL_OFFER": "Offre conditionnelle",
+        "OFFER_RECEIVED": "Offre reçue",
+        "OFFER_ACCEPTED": "Offre acceptée",
+        "WAITLISTED": "Liste d’attente",
+        "ADMISSION_CONFIRMED": "Admission confirmée"
       },
       "event": {
         "created": "Candidature commencée",
@@ -774,7 +789,18 @@
         "PRE_DEPARTURE": "Félicitations. Nadoumi vous aide à préparer votre départ.",
         "CLOSED_SUCCESS": "Vous êtes inscrit. Félicitations.",
         "CLOSED_UNSUCCESSFUL": "Cette candidature n'a pas abouti.",
-        "default": "Nadoumi traite votre candidature."
+        "default": "Nadoumi traite votre candidature.",
+        "SUBMITTED": "Nous avons reçu votre candidature et allons bientôt l’examiner.",
+        "UNDER_REVIEW": "Nadoumi vérifie votre candidature. Nous vous écrivons à chaque changement.",
+        "DOCUMENTS_REQUIRED": "Des documents manquent ou doivent être corrigés. Mettez-les à jour et renvoyez votre candidature. Vous ne payez pas une seconde fois.",
+        "READY_FOR_UNIVERSITY_SUBMISSION": "Votre candidature est complète et prête à être envoyée à l’université.",
+        "UNDER_UNIVERSITY_REVIEW": "L’université évalue votre candidature. Nous vous écrivons dès sa réponse.",
+        "INTERVIEW_REQUIRED": "Vous devez passer un entretien. La date, l’heure et le lien sont indiqués ci-dessous.",
+        "CONDITIONAL_OFFER": "Une place vous est proposée sous conditions. Nadoumi vous les expliquera.",
+        "OFFER_RECEIVED": "Vous avez une offre. Acceptez-la pour continuer.",
+        "OFFER_ACCEPTED": "Vous avez accepté l’offre. Nadoumi confirme votre admission.",
+        "WAITLISTED": "Vous êtes sur liste d’attente. Nous vous écrivons dès qu’une place ou une décision est disponible.",
+        "ADMISSION_CONFIRMED": "Votre admission est confirmée. Réglez les frais de service Nadoumi pour recevoir votre lettre d’admission et le JW202."
       },
       "colProgress": "Avancement",
       "stepOf": "Étape {n} sur {total}",
@@ -782,7 +808,44 @@
       "paymentNeeded": "Paiement requis",
       "paymentNeededBanner": "Nadoumi n'a pas reçu les frais de certaines de vos candidatures. Ouvrez-les et payez à nouveau pour qu'elles avancent.",
       "payAgain": "Payer à nouveau",
-      "paymentNeededNote": "Nadoumi n'a pas pu confirmer votre paiement. Payez à nouveau pour que cette candidature avance."
+      "paymentNeededNote": "Nadoumi n'a pas pu confirmer votre paiement. Payez à nouveau pour que cette candidature avance.",
+      "documentsRequired": {
+        "title": "Documents requis",
+        "body": "Nadoumi a besoin de plus d’informations sur cette candidature :",
+        "howTo": "Téléversez ou corrigez les documents ci-dessous, puis renvoyez la candidature. C’est la même candidature et vous ne payez pas une seconde fois.",
+        "sendBack": "Renvoyer pour examen",
+        "sent": "Votre candidature est de retour chez Nadoumi."
+      },
+      "interview": {
+        "title": "Entretien",
+        "waiting": "Nadoumi vous enverra la date et le lien de l’entretien ici et par e-mail.",
+        "beijing": "Heure de Pékin (UTC+8)",
+        "yours": "Votre heure ({zone})",
+        "length": "{minutes} minutes",
+        "join": "Rejoindre l’entretien"
+      },
+      "offer": {
+        "title": "Votre offre",
+        "body": "L’université vous propose une place. Acceptez pour poursuivre votre admission.",
+        "conditionalBody": "L’université vous propose une place sous conditions. Acceptez pour continuer ; Nadoumi vous guidera.",
+        "accept": "Accepter l’offre",
+        "decline": "Refuser l’offre",
+        "accepted": "Vous avez accepté l’offre.",
+        "declineTitle": "Refuser cette offre ?",
+        "declineBody": "Refuser clôt cette candidature. Les frais de candidature ne sont pas remboursables.",
+        "declineConfirm": "Refuser l’offre"
+      },
+      "admission": {
+        "title": "Lettre d’admission et JW202",
+        "help": "Nadoumi remet ces deux documents une fois les frais de service Nadoumi payés et confirmés.",
+        "notYet": "Nadoumi prépare ce document.",
+        "locked": "Disponible après le paiement des frais de service Nadoumi.",
+        "open": "Ouvrir",
+        "kind": {
+          "ADMISSION_LETTER": "Lettre d’admission",
+          "JW202": "Formulaire JW202"
+        }
+      }
     }
   },
   "validation": {
@@ -2585,7 +2648,13 @@
       "resent": "Reçu envoyé. Vérifiez votre boîte de réception.",
       "resendWait": "Le reçu vient d’être envoyé. Réessayez dans quelques minutes."
     },
-    "submittedIntro": "Nadoumi a votre candidature, mais les frais n'ont pas été reçus. Payez à nouveau et signalez le paiement pour que le dossier avance."
+    "submittedIntro": "Nadoumi a votre candidature, mais les frais n'ont pas été reçus. Payez à nouveau et signalez le paiement pour que le dossier avance.",
+    "service": {
+      "title": "Frais de service Nadoumi",
+      "intro": "Votre admission est confirmée. Réglez les frais de service Nadoumi pour recevoir votre lettre d’admission et le formulaire JW202.",
+      "confirmedTitle": "Frais de service confirmés",
+      "confirmedBody": "Merci. Votre lettre d’admission et le formulaire JW202 sont disponibles ci-dessous."
+    }
   },
   "applyFlow": {
     "onBehalf": "Vous renseignez les informations de {name}. Partout où une question dit « vous » ou « votre », il s'agit de {name}.",

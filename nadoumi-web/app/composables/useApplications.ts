@@ -39,5 +39,15 @@ export function useApplications() {
       body: reason ? { reason } : {},
     })
   }
-  return { list, get, start, checklist, templates, template, formPreview, submit, withdraw }
+  /** Sends a case that was returned for documents back to review. It is the same application: nothing is paid again. */
+  function resubmit(id: number) {
+    return studentFetch<StudentApplicationDto>(`applications/${id}/transitions/resubmit`, { method: 'POST', body: {} })
+  }
+  function acceptOffer(id: number) {
+    return studentFetch<StudentApplicationDto>(`applications/${id}/transitions/accept_offer`, { method: 'POST', body: {} })
+  }
+  function declineOffer(id: number) {
+    return studentFetch<StudentApplicationDto>(`applications/${id}/transitions/decline_offer`, { method: 'POST', body: {} })
+  }
+  return { list, get, start, checklist, templates, template, formPreview, submit, withdraw, resubmit, acceptOffer, declineOffer }
 }

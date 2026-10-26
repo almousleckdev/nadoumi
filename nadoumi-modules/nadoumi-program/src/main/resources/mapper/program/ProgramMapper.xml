@@ -25,6 +25,8 @@
         <result property="minToefl"               column="min_toefl"/>
         <result property="applicationFeeAmount"   column="application_fee_amount"/>
         <result property="applicationFeeCurrency" column="application_fee_currency"/>
+        <result property="serviceFeeAmount"       column="service_fee_amount"/>
+        <result property="serviceFeeCurrency"     column="service_fee_currency"/>
         <result property="imageMediaId"     column="image_media_id"/>
         <result property="featured"         column="is_featured"/>
         <result property="hot"              column="is_hot"/>
@@ -87,12 +89,14 @@
              duration_months, tuition_amount, tuition_currency, summary, image_media_id,
              admission_requirements, application_documents, career_prospects, scholarship_info,
              min_hsk, min_ielts, min_toefl, application_fee_amount, application_fee_currency,
+             service_fee_amount, service_fee_currency,
              is_featured, is_hot, is_recommended, publish_status, status, create_by, create_time, remark)
         values
             (#{universityId}, #{name}, #{nameCn}, #{slug}, #{programType}, #{field}, #{termLength}, #{teachingLanguage},
              #{durationMonths}, #{tuitionAmount}, #{tuitionCurrency}, #{summary}, #{imageMediaId},
              #{admissionRequirements}, #{applicationDocuments}, #{careerProspects}, #{scholarshipInfo},
              #{minHsk}, #{minIelts}, #{minToefl}, #{applicationFeeAmount}, #{applicationFeeCurrency},
+             #{serviceFeeAmount}, #{serviceFeeCurrency},
              #{featured}, #{hot}, #{recommended}, #{publishStatus}, #{status}, #{createBy}, now(), #{remark})
     </insert>
 
@@ -108,6 +112,7 @@
             career_prospects = #{careerProspects}, scholarship_info = #{scholarshipInfo},
             min_hsk = #{minHsk}, min_ielts = #{minIelts}, min_toefl = #{minToefl},
             application_fee_amount = #{applicationFeeAmount}, application_fee_currency = #{applicationFeeCurrency},
+            service_fee_amount = #{serviceFeeAmount}, service_fee_currency = #{serviceFeeCurrency},
             is_featured = #{featured}, is_hot = #{hot}, is_recommended = #{recommended},
             publish_status = #{publishStatus}, status = #{status},
             update_by = #{updateBy}, update_time = now(), remark = #{remark}

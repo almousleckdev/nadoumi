@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useApplicationLabels } from '@/views/applications/useApplicationLabels'
 import EmptyState from '@/components/ui/EmptyState.vue'
-import { STATUSES } from '@/views/applications/vocabulary'
+import { LEGACY_STATUSES, PIPELINE_STATUSES } from '@/views/applications/vocabulary'
 
 const props = defineProps<{ perStatus: Record<string, number>, loading: boolean }>()
 
@@ -12,7 +12,10 @@ const { t } = useI18n()
 const router = useRouter()
 const { statusLabel } = useApplicationLabels()
 
-const rows = computed(() => STATUSES.map(status => ({ status, count: props.perStatus[status] ?? 0 })))
+// the first workflow's codes only show while an application still sits on one
+const rows = computed(() => [...PIPELINE_STATUSES, ...LEGACY_STATUSES]
+  .map(status => ({ status, count: props.perStatus[status] ?? 0 }))
+  .filter(r => r.count > 0 || PIPELINE_STATUSES.includes(r.status)))
 const total = computed(() => rows.value.reduce((sum, r) => sum + r.count, 0))
 const max = computed(() => Math.max(1, ...rows.value.map(r => r.count)))
 </script>

@@ -296,4 +296,23 @@ class DocumentServiceTest {
         assertThat(content).isInstanceOf(DocumentContent.Redirect.class);
         assertThat(((DocumentContent.Redirect) content).url()).isSameAs(signed);
     }
+
+    @Test
+    void shouldProxyStaffContent_evenForAProtectedAsset() {
+        when(documents.findById(DOCUMENT_ID)).thenReturn(draftDocument());
+        DocumentVersion clean = new DocumentVersion();
+        clean.setVersionNo(1);
+        clean.setMediaAssetId(9L);
+        clean.setScanStatus(ScanStatus.CLEAN);
+        when(versions.findByDocument(DOCUMENT_ID)).thenReturn(List.of(clean));
+        when(media.find(9L)).thenReturn(java.util.Optional.of(storedAsset(9L, MediaAccessClass.PROTECTED)));
+        MediaAccessLogContext ctx = new MediaAccessLogContext(1L, APPLICANT_ID, null, DOCUMENT_ID, "10.0.0.1", "junit");
+        ProxyStream stream = new ProxyStream(new ByteArrayInputStream(new byte[0]), "application/pdf", 0, "f.pdf");
+        when(media.openProxyStream(9L, ctx)).thenReturn(stream);
+
+        DocumentContent content = service.staffContent(DOCUMENT_ID, 1, ctx);
+
+        assertThat(content).isInstanceOf(DocumentContent.Proxy.class);
+        verify(media, never()).issueSignedUrl(anyLong(), any());
+    }
 }

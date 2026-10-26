@@ -2,9 +2,11 @@ package com.nadoumi.application.service;
 
 import com.nadoumi.application.domain.Application;
 import com.nadoumi.application.domain.ApplicationEvent;
+import com.nadoumi.application.domain.ApplicationStageHistory;
 import com.nadoumi.application.domain.WfStage;
 import com.nadoumi.application.mapper.ApplicationEventMapper;
 import com.nadoumi.application.mapper.ApplicationMapper;
+import com.nadoumi.application.mapper.ApplicationStageHistoryMapper;
 import com.nadoumi.application.mapper.WfDefinitionMapper;
 import com.nadoumi.application.web.request.StartApplicationRequest;
 import com.nadoumi.application.web.request.UpdateApplicationRequest;
@@ -36,11 +38,13 @@ public class StudentApplicationService {
     private final ApplicationOpportunityService opportunities;
     private final com.nadoumi.applicant.service.ApplicantService applicants;
     private final PaymentGuardProvider payments;
+    private final ApplicationStageHistoryMapper history;
 
     public StudentApplicationService(ApplicationMapper applicationMapper, WfDefinitionMapper definitionMapper,
             ApplicationEventMapper eventMapper, WorkflowService workflow, NadoumiAccessService access,
             CurrentCaller caller, ApplicationOpportunityService opportunities,
-            com.nadoumi.applicant.service.ApplicantService applicants, PaymentGuardProvider payments) {
+            com.nadoumi.applicant.service.ApplicantService applicants, PaymentGuardProvider payments,
+            ApplicationStageHistoryMapper history) {
         this.applicationMapper = applicationMapper;
         this.definitionMapper = definitionMapper;
         this.eventMapper = eventMapper;
@@ -50,6 +54,7 @@ public class StudentApplicationService {
         this.opportunities = opportunities;
         this.applicants = applicants;
         this.payments = payments;
+        this.history = history;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -105,8 +110,15 @@ public class StudentApplicationService {
     /**
      * The only transitions a student may run directly; everything else belongs to staff or to {@link #submit}.
      * There is no withdrawal: the application fee is not refundable, so a submitted application stays with Nadoumi.
+     * {@code resubmit} returns a case from "Documents required" to review on the same application: it is not a submit,
+     * so no new application and no new fee can come out of it.
      */
-    static final java.util.Set<String> STUDENT_TRANSITIONS = java.util.Set.of("accept_offer", "decline_offer");
+    static final java.util.Set<String> STUDENT_TRANSITIONS = java.util.Set.of("accept_offer", "decline_offer", "resubmit");
+
+    private static final String DOCUMENTS_REQUIRED = "DOCUMENTS_REQUIRED";
+    private static final String RESPONSE_DECISION = "APPLICANT_RESPONSE";
+    private static final java.util.Map<String, String> RESPONSE_OUTCOMES = java.util.Map.of(
+            "accept_offer", "ACCEPTED_BY_APPLICANT", "decline_offer", "DECLINED_BY_APPLICANT");
 
     @Transactional(rollbackFor = Exception.class)
     public StudentApplicationResponse transition(Long id, String code, String reason) {
@@ -114,7 +126,13 @@ public class StudentApplicationService {
             throw new NadForbiddenException("this action is not available to students");
         }
         Application current = load(id);
-        Application updated = workflow.execute(id, code, caller.requireUserId(), false, reason, current.getVersion());
+        long userId = caller.requireUserId();
+        String outcome = RESPONSE_OUTCOMES.get(code);
+        if (outcome != null) {
+            // the student's answer is the formal decision the engine requires before it moves the case
+            workflow.recordDecision(id, RESPONSE_DECISION, outcome, reason, userId);
+        }
+        Application updated = workflow.execute(id, code, userId, false, reason, current.getVersion());
         return toResponse(updated);
     }
 
@@ -137,7 +155,20 @@ public class StudentApplicationService {
         var applicant = applicants.get(application.getApplicantId());
         return StudentApplicationResponse.of(application, stage, timeline, opportunity.title(),
                 opportunity.universityName(), opportunity.intake(),
-                (applicant.givenName() + " " + applicant.familyName()).strip(), paymentNeeded(application));
+                (applicant.givenName() + " " + applicant.familyName()).strip(), paymentNeeded(application),
+                actionNote(application));
+    }
+
+    /** The reason staff gave when they sent the case back for documents; it is written for the student to read. */
+    private String actionNote(Application application) {
+        if (!DOCUMENTS_REQUIRED.equals(application.getCurrentStatus())) {
+            return null;
+        }
+        return history.findByApplication(application.getId()).stream()
+                .filter(h -> h.getToStageId().equals(application.getCurrentStageId()))
+                .reduce((first, second) -> second)
+                .map(ApplicationStageHistory::getReason)
+                .orElse(null);
     }
 
     /** Submitted and still open, yet no paid or reported fee on record: staff rejected or deleted it. */

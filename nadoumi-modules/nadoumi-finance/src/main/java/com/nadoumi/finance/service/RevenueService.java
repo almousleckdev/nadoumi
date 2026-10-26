@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.nadoumi.common.text.Texts;
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.common.web.PageSupport;
+import com.nadoumi.finance.domain.MoneyTotal;
 import com.nadoumi.finance.domain.Revenue;
 import com.nadoumi.finance.mapper.RevenueMapper;
 import com.nadoumi.finance.web.request.RevenueRequest;
@@ -22,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RevenueService {
 
-    private static final String SOURCE_APPLICATION_FEE = "APPLICATION_FEE";
+    public static final String SOURCE_APPLICATION_FEE = "APPLICATION_FEE";
+    public static final String SOURCE_SERVICE_FEE = "SERVICE_FEE";
     private static final String RELATED_APPLICATION = "application";
 
     private final RevenueMapper mapper;
@@ -40,6 +42,12 @@ public class RevenueService {
         List<Revenue> rows = mapper.search(Texts.blankToNull(q), Texts.blankToNull(source), from, to);
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(RevenueResponse::from).toList(), page, size, total);
+    }
+
+    /** The records {@link #list} would return for these filters, summed per currency. */
+    @Transactional(readOnly = true)
+    public List<MoneyTotal> totals(String q, String source, LocalDate from, LocalDate to) {
+        return mapper.totalsMatching(Texts.blankToNull(q), Texts.blankToNull(source), from, to);
     }
 
     @Transactional(readOnly = true)
@@ -65,12 +73,19 @@ public class RevenueService {
     @Transactional(rollbackFor = Exception.class)
     public void recordApplicationFee(BigDecimal amount, String currency, LocalDate receivedOn, String reference,
             long applicationId, long recordedBy) {
+        recordPayment(SOURCE_APPLICATION_FEE, amount, currency, receivedOn, reference, applicationId, recordedBy);
+    }
+
+    /** Books a confirmed student payment as revenue under its source ({@link #SOURCE_APPLICATION_FEE} or {@link #SOURCE_SERVICE_FEE}). */
+    @Transactional(rollbackFor = Exception.class)
+    public void recordPayment(String source, BigDecimal amount, String currency, LocalDate receivedOn, String reference,
+            long applicationId, long recordedBy) {
         if (mapper.countByRelated(RELATED_APPLICATION, applicationId, reference) > 0) {
             return;
         }
         Revenue r = new Revenue();
-        r.setSource(SOURCE_APPLICATION_FEE);
-        r.setTitle("Application fee " + reference);
+        r.setSource(source);
+        r.setTitle((SOURCE_SERVICE_FEE.equals(source) ? "Service fee " : "Application fee ") + reference);
         r.setAmount(amount);
         r.setCurrency(currency.toUpperCase(Locale.ROOT));
         r.setReceivedOn(receivedOn);

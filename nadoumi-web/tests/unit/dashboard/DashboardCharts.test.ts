@@ -36,8 +36,8 @@ describe('ProgressRing', () => {
 })
 
 describe('StageMeter', () => {
-  it('shows how many of the six steps are reached', async () => {
+  it('shows how many of the eight steps are reached', async () => {
     const w = await mountSuspended(StageMeter, { props: { status: 'DECISION' } })
-    expect(w.text()).toContain('3/6')
+    expect(w.text()).toContain('4/8')
   })
 })

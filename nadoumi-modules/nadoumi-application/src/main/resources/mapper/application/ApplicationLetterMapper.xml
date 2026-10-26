@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationLetterMapper">
+
+    <resultMap id="letter" type="com.nadoumi.application.domain.ApplicationLetter">
+        <id     property="id"               column="id"/>
+        <result property="applicationId"    column="application_id"/>
+        <result property="kind"             column="kind"/>
+        <result property="mediaId"          column="media_id"/>
+        <result property="originalFilename" column="original_filename"/>
+        <result property="uploadedBy"       column="uploaded_by"/>
+        <result property="createBy"         column="create_by"/>
+        <result property="createTime"       column="create_time"/>
+    </resultMap>
+
+    <select id="findCurrent" resultMap="letter">
+        select l.* from nad_application_letter l
+        where l.application_id = #{applicationId}
+          and l.id = (select max(x.id) from nad_application_letter x
+                      where x.application_id = l.application_id and x.kind = l.kind)
+        order by l.kind
+    </select>
+
+    <select id="findCurrentOfKind" resultMap="letter">
+        select * from nad_application_letter
+        where application_id = #{applicationId} and kind = #{kind}
+        order by id desc limit 1
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.ApplicationLetter"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_letter
+            (application_id, kind, media_id, original_filename, uploaded_by, create_by, create_time)
+        values
+            (#{applicationId}, #{kind}, #{mediaId}, #{originalFilename}, #{uploadedBy}, #{createBy}, now())
+    </insert>
+
+</mapper>

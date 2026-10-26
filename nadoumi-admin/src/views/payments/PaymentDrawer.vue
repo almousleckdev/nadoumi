@@ -97,6 +97,7 @@ const items = computed(() => {
   if (!p) return []
   return [
     { label: t('payment.reference'), value: p.reference },
+    { label: t('payment.kind'), value: t(`payment.kindMap.${p.kind}`, p.kind) },
     { label: t('payment.status'), slot: 'status' },
     { label: t('payment.student'), value: p.applicantName },
     { label: t('payment.application'), value: p.applicationRef },

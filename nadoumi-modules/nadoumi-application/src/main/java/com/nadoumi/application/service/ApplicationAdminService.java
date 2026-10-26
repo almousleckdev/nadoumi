@@ -79,7 +79,9 @@ public class ApplicationAdminService {
     private final List<ApplicationDeletionParticipant> deletionParticipants;
 
     /** Steps that belong to the student or to the submit flow, never offered to staff. */
-    private static final Set<String> NOT_A_STAFF_STEP = Set.of("submit", "accept_offer", "decline_offer", "withdraw");
+    private static final Set<String> NOT_A_STAFF_STEP = Set.of("submit", "accept_offer", "decline_offer", "withdraw", "resubmit");
+    /** Steps whose reason the student reads or the file keeps, so a note is mandatory. */
+    private static final Set<String> NOTE_REQUIRED = Set.of("request_documents", "ineligible", "reject", "mark_withdrawn");
     private static final String DECISION_PREDICATE = "DECISION_RECORDED";
 
     public ApplicationAdminService(ApplicationMapper applicationMapper, WfDefinitionMapper definitionMapper,
@@ -320,6 +322,9 @@ public class ApplicationAdminService {
                 application.getCurrentStageId());
         long actor = AuditActor.userId();
         String note = req.note() == null || req.note().isBlank() ? null : req.note().trim();
+        if (note == null && NOTE_REQUIRED.contains(req.code())) {
+            throw new NadBadRequestException("write a note for this status change; the student sees it where it matters");
+        }
         for (String predicate : GuardEvaluator.predicatesIn(transition.getGuardJson())) {
             String[] parts = predicate.split(":");
             if (DECISION_PREDICATE.equals(parts[0]) && parts.length == 3 && !guards.evaluateOne(predicate, application)) {

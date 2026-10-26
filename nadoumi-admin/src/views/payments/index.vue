@@ -18,6 +18,21 @@
         @clear="reload"
       />
       <el-select
+        v-model="filters.kind"
+        :placeholder="t('payment.kind')"
+        clearable
+        style="width: 190px"
+        data-test="kind-filter"
+        @change="reload"
+      >
+        <el-option
+          v-for="k in PAYMENT_KINDS"
+          :key="k"
+          :label="t(`payment.kindMap.${k}`)"
+          :value="k"
+        />
+      </el-select>
+      <el-select
         v-model="filters.status"
         :placeholder="t('payment.status')"
         clearable
@@ -50,6 +65,9 @@
       @retry="load"
       @row-click="(r: unknown) => openReview(r as StaffPayment)"
     >
+      <template #cell-kind="{ row }">
+        {{ t(`payment.kindMap.${(row as StaffPayment).kind}`, (row as StaffPayment).kind) }}
+      </template>
       <template #cell-amount="{ row }">
         {{ cny((row as StaffPayment).amount) }}
       </template>
@@ -119,14 +137,14 @@ import { PAYMENT_TONES } from './paymentTones'
 import { usePagedList } from '@/composables/usePagedList'
 import { cny } from '@/utils/money'
 import { formatDateTime } from '@/utils/date'
-import { deletePayment, listPayments, PAYMENT_STATUSES, type StaffPayment } from '@/api/payment'
+import { deletePayment, listPayments, PAYMENT_KINDS, PAYMENT_STATUSES, type StaffPayment } from '@/api/payment'
 import { useUserStore } from '@/stores/user'
 import DeleteWithReasonDialog from '@/components/ui/DeleteWithReasonDialog.vue'
 import { ElMessage } from 'element-plus'
 
 const { t } = useI18n()
 
-const emptyFilters = () => ({ q: '', status: '' })
+const emptyFilters = () => ({ q: '', status: '', kind: '' })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
   usePagedList<StaffPayment, ReturnType<typeof emptyFilters>>({
     emptyFilters,
@@ -135,6 +153,7 @@ const { rows, total, loading, error, filters, page, size, dirty, load, reload, c
     fetch: (f, { index, size }) => listPayments({
       q: f.q || undefined,
       status: f.status || undefined,
+      kind: f.kind || undefined,
       page: index,
       size,
     }),
@@ -171,6 +190,7 @@ const columns = computed(() => [
   { prop: 'reference', label: t('payment.reference'), width: 150 },
   { prop: 'applicantName', label: t('payment.student'), minWidth: 170 },
   { prop: 'applicationRef', label: t('payment.application'), width: 120 },
+  { prop: 'kind', label: t('payment.kind'), width: 150 },
   { prop: 'amount', label: t('payment.amount'), width: 110, align: 'right' as const },
   { prop: 'studentTxnNo', label: t('payment.txnNo'), minWidth: 160 },
   { prop: 'status', label: t('payment.status'), width: 170 },

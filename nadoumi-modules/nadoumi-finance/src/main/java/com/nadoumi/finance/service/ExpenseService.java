@@ -8,6 +8,7 @@ import com.nadoumi.common.web.PageSupport;
 import com.nadoumi.finance.domain.Expense;
 import com.nadoumi.finance.domain.ExpenseCategory;
 import com.nadoumi.finance.domain.ExpenseStatus;
+import com.nadoumi.finance.domain.MoneyTotal;
 import com.nadoumi.finance.mapper.ExpenseMapper;
 import com.nadoumi.finance.web.request.ExpenseRequest;
 import com.nadoumi.finance.web.response.ExpenseResponse;
@@ -52,6 +53,12 @@ public class ExpenseService {
         List<Expense> rows = mapper.search(Texts.blankToNull(q), Texts.blankToNull(status), categoryId, from, to);
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(ExpenseResponse::from).toList(), page, size, total);
+    }
+
+    /** The expenses {@link #list} would return for these filters, summed per currency. */
+    @Transactional(readOnly = true)
+    public List<MoneyTotal> totals(String q, String status, Long categoryId, LocalDate from, LocalDate to) {
+        return mapper.totalsMatching(Texts.blankToNull(q), Texts.blankToNull(status), categoryId, from, to);
     }
 
     @Transactional(readOnly = true)

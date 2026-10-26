@@ -280,7 +280,8 @@ class FlywayMigrationsIT {
         // - 4 from V98 (EMAIL templates of the four student-only announcements) + 1 (APPLICATION_RECEIVED IN_APP)
         // + 5 from V111 (PAYMENT_PROOF_SUBMITTED IN_APP; PAYMENT_CONFIRMED and PAYMENT_REJECTED, each IN_APP + EMAIL)
         // - 1 from V113 (the PAYMENT_CONFIRMED EMAIL: the receipt email replaces it)
-        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("25");
+        // + 2 from V141 (APPLICATION_UPDATE, IN_APP + EMAIL)
+        assertThat(single(ds, "SELECT COUNT(*) FROM nad_notification_template WHERE locale = 'en'")).isEqualTo("27");
         // V34 — notification dispatch Quartz job, seeded active
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_job "
                 + "WHERE invoke_target = 'notificationDispatchJob.run()'")).isEqualTo("1");

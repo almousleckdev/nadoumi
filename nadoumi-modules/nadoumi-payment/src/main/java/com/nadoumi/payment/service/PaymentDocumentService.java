@@ -96,10 +96,17 @@ public class PaymentDocumentService {
         String receiptCode = verification.newCode();
         store(payment, DocumentKind.RECEIPT, FIRST_VERSION, receiptNumber, receiptCode,
                 receiptPdf.render(receiptModel(payment, opportunity, dossier, now, verification.url(receiptNumber, receiptCode))));
+        if (isServiceFee(payment)) {
+            return; // the application form belongs to the application fee only
+        }
         String formNumber = PaymentDocumentNumbers.applicationForm(payment);
         String formCode = verification.newCode();
         store(payment, DocumentKind.APPLICATION_FORM, FIRST_VERSION, formNumber, formCode,
                 formPdf.render(formModel(payment, opportunity, dossier, now, verification.url(formNumber, formCode))));
+    }
+
+    private static boolean isServiceFee(ApplicationPayment payment) {
+        return com.nadoumi.application.service.PaymentGuardProvider.SERVICE_FEE.equals(payment.getKind());
     }
 
     /** The application form as it stands now, stored as the version the administrators receive. */
@@ -243,7 +250,8 @@ public class PaymentDocumentService {
                 profile.publicId(), profile.email(), applicationRef(payment), opportunity.title(),
                 opportunity.universityName(), opportunity.intake(), payment.getReference(),
                 payment.getStudentTxnNo(), payment.getVerifiedAt().toInstant(ZoneOffset.UTC), payment.getAmount(),
-                payment.getCurrency(), CJK_BRACKETS.matcher(settings.payee()).replaceAll(""), verifyUrl);
+                payment.getCurrency(), CJK_BRACKETS.matcher(settings.payee()).replaceAll(""),
+                isServiceFee(payment) ? ReceiptModel.SERVICE_FEE_NAME : ReceiptModel.APPLICATION_FEE_NAME, verifyUrl);
     }
 
     private ApplicationFormModel formModel(ApplicationPayment payment, Description opportunity,

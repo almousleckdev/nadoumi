@@ -166,7 +166,9 @@ describe('programme offerings', () => {
     const form = formFromProgram(loaded)
     expect(form.offerings[0]).toMatchObject({ level: 'MASTER', durationMonths: 24, tuitionAmount: 26000, note: '' })
     expect(form).toMatchObject({ minHsk: 4, minIelts: 6, minToefl: 80, applicationFeeAmount: 600, admissionRequirements: 'Bachelor degree' })
-    expect(buildProgramPayload(form)).toMatchObject({ minHsk: 4, applicationFeeAmount: 600, applicationFeeCurrency: 'CNY' })
+    expect(buildProgramPayload(form)).toMatchObject({ minHsk: 4, applicationFeeAmount: 600, applicationFeeCurrency: 'CNY', serviceFeeAmount: null, serviceFeeCurrency: null })
+    form.serviceFeeAmount = 1500
+    expect(buildProgramPayload(form)).toMatchObject({ serviceFeeAmount: 1500, serviceFeeCurrency: 'CNY' })
   })
 })
 

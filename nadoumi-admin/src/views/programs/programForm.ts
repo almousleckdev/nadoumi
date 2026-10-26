@@ -77,6 +77,7 @@ export function blankProgramForm(lockedUniversityId: number | null) {
     scholarshipCategories: [] as string[],
     minHsk: null as number | null, minIelts: null as number | null, minToefl: null as number | null,
     applicationFeeAmount: null as number | null,
+    serviceFeeAmount: null as number | null,
     offerings: [] as OfferingRow[],
     /** Saved through its own endpoint after the programme itself, so it is not part of `buildProgramPayload`. */
     documentRequirements: [] as { docType: string, mandatory: boolean, notes: string, appliesWhen: string }[],
@@ -109,6 +110,7 @@ export function formFromProgram(p: Program): ProgramForm {
     scholarshipCategories: [...(p.scholarshipCategories ?? [])],
     minHsk: p.minHsk ?? null, minIelts: p.minIelts ?? null, minToefl: p.minToefl ?? null,
     applicationFeeAmount: p.applicationFeeAmount ?? null,
+    serviceFeeAmount: p.serviceFeeAmount ?? null,
     offerings: (p.offerings ?? []).map(o => ({
       level: o.level ?? null, durationMonths: o.durationMonths,
       tuitionAmount: o.tuitionAmount ?? null, tuitionPeriod: o.tuitionPeriod ?? 'PER_YEAR',
@@ -148,6 +150,8 @@ export function buildProgramPayload(form: ProgramForm): ProgramInput {
     minHsk: numberOrNull(form.minHsk), minIelts: numberOrNull(form.minIelts), minToefl: numberOrNull(form.minToefl),
     applicationFeeAmount: numberOrNull(form.applicationFeeAmount),
     applicationFeeCurrency: form.applicationFeeAmount != null ? 'CNY' : null,
+    serviceFeeAmount: numberOrNull(form.serviceFeeAmount),
+    serviceFeeCurrency: form.serviceFeeAmount != null ? 'CNY' : null,
     offerings: form.offerings.filter(o => o.durationMonths != null).map(o => ({
       level: isDegree ? o.level : null,
       durationMonths: o.durationMonths as number,

@@ -121,6 +121,7 @@ public class OutboxToNotificationDispatcher implements OutboxDispatcher {
             case OutboxEventTypes.TASK_PROGRESS_CHANGED -> NotificationType.TASK_PROGRESS;
             case OutboxEventTypes.APPLICATION_SUBMITTED -> NotificationType.APPLICATION_SUBMITTED;
             case OutboxEventTypes.APPLICATION_STATUS_CHANGED -> NotificationType.APPLICATION_STATUS_CHANGED;
+            case OutboxEventTypes.APPLICATION_UPDATE -> NotificationType.APPLICATION_UPDATE;
             case OutboxEventTypes.APPLICATION_RECEIVED -> NotificationType.APPLICATION_RECEIVED;
             case OutboxEventTypes.MESSAGE_POSTED -> NotificationType.MESSAGE_POSTED;
             case OutboxEventTypes.TICKET_OPENED -> NotificationType.TICKET_OPENED;

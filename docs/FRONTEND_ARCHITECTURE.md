@@ -770,3 +770,12 @@ sections, `DocumentChecklistCard`, `SignatureCard` and `PaymentPanel`, and adds 
 step needs and which steps are optional are data in `constants/apply.ts`; whether a step is done is the pure `utils/applyProgress.ts`, fed by
 `useApplyProgress`. `/dashboard/apply` only redirects here, a draft opened from the dashboard goes to `/apply/{id}`, and the dashboard detail page shows
 submitted applications only. `useDocumentPreview` (document viewer) and `useTemplateDownload` are shared by the documents page and the checklist.
+
+
+## Student application cases (2026-10-26)
+
+New student dashboard components under `app/components/dashboard/`: `DocumentsRequiredCard` (staff note + send back, same application),
+`ApplicationInterviewCard` (Beijing time and the device zone, via `utils/interviewTime.ts`), `OfferResponseCard` (accept/decline) and
+`AdmissionDocumentsCard` (service-fee `PaymentPanel variant="service"` plus the locked/released letters). `PaymentPanel` takes a `variant`
+(`application` | `service`) and `useApplicationPayment` a matching path. The tracker now has eight steps and maps every status, including the
+first workflow's codes, onto them (`applicationView.ts`). Both sidebars are fixed to the viewport height (student: `lg:sticky lg:h-screen`; admin: grid row `minmax(0, 1fr)`) so only the content scrolls.

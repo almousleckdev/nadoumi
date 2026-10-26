@@ -36,18 +36,18 @@ onMounted(async () => {
 
 const label = (code: string) => typeLabels.value.get(code) ?? code
 
-async function view(d: StaffDocument, versionNo: number) {
+async function view(d: StaffDocument, versionNo: number, contentType: string) {
   try {
-    await openDocumentFile(d.id, versionNo, 'view')
+    await openDocumentFile(d.id, versionNo, 'view', contentType)
   }
   catch {
     ElMessage.error(t('applications.fileFailed'))
   }
 }
 
-async function download(d: StaffDocument, versionNo: number) {
+async function download(d: StaffDocument, versionNo: number, contentType: string) {
   try {
-    await openDocumentFile(d.id, versionNo, 'download')
+    await openDocumentFile(d.id, versionNo, 'download', contentType)
   }
   catch {
     ElMessage.error(t('applications.fileFailed'))
@@ -112,7 +112,7 @@ const statusText = (status: string) => (te(`documents.statusMap.${status}`) ? t(
             <el-button
               size="small"
               data-test="doc-view"
-              @click="view(row.doc, row.version.versionNo)"
+              @click="view(row.doc, row.version.versionNo, row.version.contentType)"
             >
               {{ t('applications.view') }}
             </el-button>
@@ -121,7 +121,7 @@ const statusText = (status: string) => (te(`documents.statusMap.${status}`) ? t(
               type="primary"
               plain
               data-test="doc-download"
-              @click="download(row.doc, row.version.versionNo)"
+              @click="download(row.doc, row.version.versionNo, row.version.contentType)"
             >
               {{ t('documents.download') }}
             </el-button>

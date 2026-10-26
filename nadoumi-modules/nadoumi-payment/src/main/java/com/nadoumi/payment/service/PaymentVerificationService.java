@@ -22,6 +22,7 @@ import com.nadoumi.payment.mapper.PaymentMapper;
 import com.nadoumi.payment.web.response.StaffPaymentResponse;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentVerificationService {
 
     private static final Logger log = LoggerFactory.getLogger(PaymentVerificationService.class);
-    private static final String KIND = PaymentGuardProvider.APPLICATION_FEE;
+    private static final Set<String> KINDS = Set.of(PaymentGuardProvider.APPLICATION_FEE, PaymentGuardProvider.SERVICE_FEE);
 
     private final PaymentMapper mapper;
     private final MediaGateway media;
@@ -61,11 +62,12 @@ public class PaymentVerificationService {
     }
 
     @Transactional(readOnly = true)
-    public PageResponse<StaffPaymentResponse> list(PaymentStatus status, String q, int page, int size) {
+    public PageResponse<StaffPaymentResponse> list(PaymentStatus status, String q, Long applicationId, String kind, int page,
+            int size) {
         page = PageSupport.clampPage(page);
         size = PageSupport.clampSize(size);
         PageHelper.startPage(page + 1, size);
-        List<ApplicationPayment> rows = mapper.search(status, Texts.blankToNull(q));
+        List<ApplicationPayment> rows = mapper.search(status, Texts.blankToNull(q), applicationId, kind != null && KINDS.contains(kind) ? kind : null);
         long total = new PageInfo<>(rows).getTotal();
         return PageResponse.of(rows.stream().map(StaffPaymentResponse::of).toList(), page, size, total);
     }
@@ -94,7 +96,7 @@ public class PaymentVerificationService {
             throw new PaymentConflictException("this payment was already decided");
         }
         mapper.insertEvent(id, PaymentStatus.PROOF_SUBMITTED, PaymentStatus.CONFIRMED, "STAFF", verifier, null, now);
-        revenue.recordApplicationFee(payment.getAmount(), payment.getCurrency(), now.toLocalDate(),
+        revenue.recordPayment(revenueSource(payment), payment.getAmount(), payment.getCurrency(), now.toLocalDate(),
                 payment.getReference(), payment.getApplicationId(), verifier);
         ApplicationPayment confirmed = load(id);
         events.confirmed(confirmed);
@@ -141,6 +143,11 @@ public class PaymentVerificationService {
                 payment.getApplicationReference(), actor, payment.getStatus(), reason);
     }
 
+    private static String revenueSource(ApplicationPayment payment) {
+        return PaymentGuardProvider.SERVICE_FEE.equals(payment.getKind()) ? RevenueService.SOURCE_SERVICE_FEE
+                : RevenueService.SOURCE_APPLICATION_FEE;
+    }
+
     /** A payment that is waiting for a decision, and that the caller is allowed to decide. */
     private ApplicationPayment loadForDecision(long id) {
         ApplicationPayment payment = load(id);
@@ -155,7 +162,7 @@ public class PaymentVerificationService {
 
     private ApplicationPayment load(long id) {
         ApplicationPayment payment = mapper.findById(id);
-        if (payment == null || !KIND.equals(payment.getKind())) {
+        if (payment == null || !KINDS.contains(payment.getKind())) {
             throw new NadNotFoundException("payment not found");
         }
         return payment;

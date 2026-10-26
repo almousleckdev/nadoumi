@@ -39,6 +39,8 @@ public class Program {
     private Integer minToefl;
     private BigDecimal applicationFeeAmount;
     private String applicationFeeCurrency;
+    private BigDecimal serviceFeeAmount;
+    private String serviceFeeCurrency;
     private Long imageMediaId;
     private boolean featured;
     private boolean hot;
@@ -128,6 +130,12 @@ public class Program {
 
     public String getApplicationFeeCurrency() { return applicationFeeCurrency; }
     public void setApplicationFeeCurrency(String applicationFeeCurrency) { this.applicationFeeCurrency = applicationFeeCurrency; }
+
+    public BigDecimal getServiceFeeAmount() { return serviceFeeAmount; }
+    public void setServiceFeeAmount(BigDecimal serviceFeeAmount) { this.serviceFeeAmount = serviceFeeAmount; }
+
+    public String getServiceFeeCurrency() { return serviceFeeCurrency; }
+    public void setServiceFeeCurrency(String serviceFeeCurrency) { this.serviceFeeCurrency = serviceFeeCurrency; }
 
     public BigDecimal getApplicationFeeAmountUsd() { return applicationFeeAmountUsd; }
     public void setApplicationFeeAmountUsd(BigDecimal applicationFeeAmountUsd) { this.applicationFeeAmountUsd = applicationFeeAmountUsd; }

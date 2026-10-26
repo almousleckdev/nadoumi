@@ -453,4 +453,6 @@ export interface StudentApplicationDto {
   applicantName: string | null
   /** The application is with Nadoumi but its fee is not on record (staff rejected or deleted it): pay again. */
   paymentNeeded: boolean
+  /** What Nadoumi wrote when it sent the case back for documents; `null` in every other status. */
+  actionNote: string | null
 }

@@ -1,9 +1,14 @@
 import type { PaymentDocumentDto, PaymentDocumentKind, StudentPaymentDto } from '~/types/payment'
 
-/** The student's Nadoumi application fee for one application, via the BFF proxy. */
-export function useApplicationPayment(applicationId: MaybeRefOrGetter<number>) {
+/** Which fee of an application: the one paid to submit it, or the service fee paid once admission is confirmed. */
+export type FeeVariant = 'application' | 'service'
+
+const FEE_PATH: Record<FeeVariant, string> = { application: 'payment', service: 'service-fee' }
+
+/** The student's Nadoumi fee for one application, via the BFF proxy. */
+export function useApplicationPayment(applicationId: MaybeRefOrGetter<number>, variant: FeeVariant = 'application') {
   const { studentFetch } = useApi()
-  const base = () => `applications/${toValue(applicationId)}/payment`
+  const base = () => `applications/${toValue(applicationId)}/${FEE_PATH[variant]}`
 
   return {
     overview: () => studentFetch<StudentPaymentDto>(base()),

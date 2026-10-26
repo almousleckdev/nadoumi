@@ -125,6 +125,21 @@ useSeo(t('dashboard.applications.detailTitle'), t('dashboard.applications.blurb'
           </div>
         </SectionCard>
 
+        <DocumentsRequiredCard
+          v-if="application.currentStatus === 'DOCUMENTS_REQUIRED'"
+          :application-id="id"
+          :note="application.actionNote"
+          @resubmitted="load"
+        />
+        <ApplicationInterviewCard :application-id="id" :status="application.currentStatus" />
+        <OfferResponseCard
+          v-if="application.currentStatus === 'OFFER_RECEIVED' || application.currentStatus === 'CONDITIONAL_OFFER'"
+          :application-id="id"
+          :conditional="application.currentStatus === 'CONDITIONAL_OFFER'"
+          @answered="load"
+        />
+        <AdmissionDocumentsCard v-if="application.currentStatus === 'ADMISSION_CONFIRMED' || application.currentStatus === 'CLOSED_SUCCESS'" :application-id="id" />
+
         <div class="grid gap-2">
           <PaymentPanel :application-id="id" :submitted="isSubmitted(application.currentStatus)" />
           <p class="text-xs text-slate-500">{{ t('dashboard.applications.feeNote') }}</p>

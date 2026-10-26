@@ -77,6 +77,16 @@ function onOffersChange(offers: string | number | boolean | undefined) {
         />
         <span class="tuition-usd">{{ usdHint(form.applicationFeeAmount) }}</span>
       </el-form-item>
+      <el-form-item :label="t('program.admission.serviceFee')">
+        <el-input-number
+          v-model="form.serviceFeeAmount"
+          :min="0"
+          :precision="2"
+          :step="100"
+          controls-position="right"
+        />
+        <span class="tuition-usd">{{ usdHint(form.serviceFeeAmount) }}</span>
+      </el-form-item>
     </div>
     <el-form-item :label="t('program.admission.scholarships')">
       <el-radio-group

@@ -9,7 +9,7 @@ const APP = (over: Partial<StudentApplicationDto> = {}): StudentApplicationDto =
   id: 7, reference: 'NAD20261023001', applicantId: 1, applicationType: 'PROGRAM_WITH_SCHOLARSHIP', programId: 1, scholarshipId: 2, intakeId: 3,
   currentStageName: 'Eligibility review', currentStatus: 'IN_REVIEW', submittedAt: '2026-01-15T10:00:00',
   timeline: ['APPLICATION_CREATED', 'STAGE_SUBMIT', 'CASE_ASSIGNED', 'STAGE_CLAIM'],
-  title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', paymentNeeded: false, ...over,
+  title: 'MBBS', universityName: 'Fudan University', intake: 'Autumn', applicantName: 'Amina Diallo', paymentNeeded: false, actionNote: null, ...over,
 })
 
 const list = vi.fn()
@@ -146,7 +146,7 @@ describe('dashboard application detail', () => {
   })
 
   it('flags an application whose fee staff rejected, in the table and in a banner', async () => {
-    list.mockResolvedValueOnce([APP({ paymentNeeded: true })])
+    list.mockResolvedValueOnce([APP({ paymentNeeded: true, actionNote: null })])
     const w = await mountList()
     expect(w.find('[data-test="payment-needed"]').text()).toBe('Payment needed')
     expect(w.find('[data-test="payment-banner"]').text()).toContain('has not received the fee')

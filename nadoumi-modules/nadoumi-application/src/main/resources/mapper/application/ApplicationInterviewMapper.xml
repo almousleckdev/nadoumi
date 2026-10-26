@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nadoumi.application.mapper.ApplicationInterviewMapper">
+
+    <resultMap id="interview" type="com.nadoumi.application.domain.ApplicationInterview">
+        <id     property="id"              column="id"/>
+        <result property="applicationId"   column="application_id"/>
+        <result property="startsAt"        column="starts_at"/>
+        <result property="durationMinutes" column="duration_minutes"/>
+        <result property="platform"        column="platform"/>
+        <result property="meetingUrl"      column="meeting_url"/>
+        <result property="instructions"    column="instructions"/>
+        <result property="status"          column="status"/>
+        <result property="createBy"        column="create_by"/>
+        <result property="createTime"      column="create_time"/>
+    </resultMap>
+
+    <select id="findByApplication" resultMap="interview">
+        select * from nad_application_interview where application_id = #{applicationId} order by id desc
+    </select>
+
+    <select id="findScheduled" resultMap="interview">
+        select * from nad_application_interview where application_id = #{applicationId} and status = 'SCHEDULED' limit 1
+    </select>
+
+    <select id="findById" resultMap="interview">
+        select * from nad_application_interview where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.nadoumi.application.domain.ApplicationInterview"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into nad_application_interview
+            (application_id, starts_at, duration_minutes, platform, meeting_url, instructions, status, create_by, create_time)
+        values
+            (#{applicationId}, #{startsAt}, #{durationMinutes}, #{platform}, #{meetingUrl}, #{instructions}, 'SCHEDULED',
+             #{createBy}, now())
+    </insert>
+
+    <update id="cancel">
+        update nad_application_interview
+        set status = 'CANCELLED', update_by = #{updateBy}, update_time = now()
+        where id = #{id} and status = 'SCHEDULED'
+    </update>
+
+</mapper>

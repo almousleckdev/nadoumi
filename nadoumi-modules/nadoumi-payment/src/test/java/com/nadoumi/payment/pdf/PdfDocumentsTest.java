@@ -176,7 +176,7 @@ class PdfDocumentsTest {
         byte[] pdf = receipts.render(new ReceiptModel(model.receiptNo(), model.issuedAt(), model.studentName(),
                 model.studentPublicId(), model.studentEmail(), model.applicationRef(), model.opportunityTitle(),
                 model.universityName(), model.intake(), model.paymentReference(), model.transactionNo(), model.paidAt(),
-                model.amount(), model.currency(), model.payee(), null));
+                model.amount(), model.currency(), model.payee(), model.serviceName(), null));
 
         assertThat(text(pdf)).doesNotContain("Verify this document");
     }

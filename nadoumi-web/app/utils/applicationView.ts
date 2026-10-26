@@ -30,10 +30,15 @@ export function safeTimeline(events: readonly string[]): TimelineKey[] {
   return out
 }
 
-const KNOWN_STATUSES = new Set([
-  'DRAFT', 'IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION', 'OFFER', 'PRE_DEPARTURE',
-  'CLOSED_SUCCESS', 'CLOSED_UNSUCCESSFUL', 'CLOSED_WITHDRAWN',
-])
+/** Every status the UI has copy for, in the order a case moves through them (the first workflow's codes last). */
+const STATUS_ORDER = [
+  'DRAFT', 'SUBMITTED', 'UNDER_REVIEW', 'DOCUMENTS_REQUIRED', 'READY_FOR_UNIVERSITY_SUBMISSION', 'SUBMITTED_TO_UNIVERSITY',
+  'UNDER_UNIVERSITY_REVIEW', 'INTERVIEW_REQUIRED', 'WAITLISTED', 'CONDITIONAL_OFFER', 'OFFER_RECEIVED', 'OFFER_ACCEPTED',
+  'ADMISSION_CONFIRMED', 'CLOSED_SUCCESS', 'CLOSED_UNSUCCESSFUL', 'CLOSED_WITHDRAWN',
+  'IN_REVIEW', 'DECISION', 'OFFER', 'PRE_DEPARTURE',
+] as const
+
+const KNOWN_STATUSES: ReadonlySet<string> = new Set(STATUS_ORDER)
 
 /** The i18n suffix for a status label, or `unknown` for anything the UI has no copy for. */
 export function statusKey(status: string | null): string {
@@ -56,35 +61,51 @@ export const isClosed = (status: string | null): boolean => Boolean(status?.star
 
 /** The path a submitted application follows, in order; the tracker marks how far it has got. */
 export const TRACKER_STEPS = [
-  'IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION', 'OFFER', 'PRE_DEPARTURE', 'CLOSED_SUCCESS',
+  'SUBMITTED', 'UNDER_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'UNDER_UNIVERSITY_REVIEW', 'OFFER_RECEIVED', 'OFFER_ACCEPTED',
+  'ADMISSION_CONFIRMED', 'CLOSED_SUCCESS',
 ] as const
 
-/** Index of the step an application is on, or -1 when it is not on the path (draft, unsuccessful, unknown). */
-export function trackerIndex(status: string | null): number {
-  return TRACKER_STEPS.findIndex(step => step === status)
+/** Where each status sits on the path. Side states (documents, interview, waitlist) hold the step they interrupt. */
+const TRACKER_POSITION: Record<string, number> = {
+  SUBMITTED: 0,
+  UNDER_REVIEW: 1, DOCUMENTS_REQUIRED: 1, READY_FOR_UNIVERSITY_SUBMISSION: 1, IN_REVIEW: 1,
+  SUBMITTED_TO_UNIVERSITY: 2,
+  UNDER_UNIVERSITY_REVIEW: 3, INTERVIEW_REQUIRED: 3, WAITLISTED: 3, DECISION: 3,
+  OFFER_RECEIVED: 4, CONDITIONAL_OFFER: 4, OFFER: 4,
+  OFFER_ACCEPTED: 5,
+  ADMISSION_CONFIRMED: 6, PRE_DEPARTURE: 6,
+  CLOSED_SUCCESS: 7,
 }
 
-const IN_PROGRESS = new Set(['IN_REVIEW', 'SUBMITTED_TO_UNIVERSITY', 'DECISION'])
-const OFFERED = new Set(['OFFER', 'PRE_DEPARTURE', 'CLOSED_SUCCESS'])
+/** Index of the step an application is on, or -1 when it is not on the path (draft, closed unsuccessfully, unknown). */
+export function trackerIndex(status: string | null): number {
+  return status ? (TRACKER_POSITION[status] ?? -1) : -1
+}
+
+const OFFERED = new Set([
+  'OFFER_RECEIVED', 'CONDITIONAL_OFFER', 'OFFER_ACCEPTED', 'ADMISSION_CONFIRMED', 'CLOSED_SUCCESS', 'OFFER', 'PRE_DEPARTURE',
+])
 
 export interface ApplicationStats { submitted: number, inProgress: number, offers: number, drafts: number }
 
 /** The headline numbers on the dashboard: what was sent, what is still moving, what turned into an offer. */
 export function applicationStats(statuses: readonly (string | null)[]): ApplicationStats {
+  const submitted = statuses.filter(isSubmitted)
+  const offers = statuses.filter(s => s !== null && OFFERED.has(s)).length
   return {
-    submitted: statuses.filter(isSubmitted).length,
-    inProgress: statuses.filter(s => s !== null && IN_PROGRESS.has(s)).length,
-    offers: statuses.filter(s => s !== null && OFFERED.has(s)).length,
+    submitted: submitted.length,
+    inProgress: submitted.filter(s => s !== null && !isClosed(s) && !OFFERED.has(s)).length,
+    offers,
     drafts: statuses.filter(isDraft).length,
   }
 }
 
 export interface StageCount { status: string, count: number }
 
-/** Submitted applications counted per status, in path order, empty stages left out. */
+/** Submitted applications counted per status, in path order, empty statuses left out. */
 export function stageDistribution(statuses: readonly (string | null)[]): StageCount[] {
-  const order = [...TRACKER_STEPS, 'CLOSED_UNSUCCESSFUL']
-  return order
-    .map(status => ({ status, count: statuses.filter(s => s === status).length }))
+  return STATUS_ORDER
+    .filter(status => isSubmitted(status))
+    .map(status => ({ status: status as string, count: statuses.filter(s => s === status).length }))
     .filter(entry => entry.count > 0)
 }

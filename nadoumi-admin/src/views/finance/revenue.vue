@@ -42,6 +42,15 @@
           :value="s"
         />
       </el-select>
+      <el-date-picker
+        v-model="filters.range"
+        type="daterange"
+        value-format="YYYY-MM-DD"
+        :shortcuts="shortcuts"
+        :start-placeholder="t('earnings.from')"
+        :end-placeholder="t('earnings.to')"
+        @change="reload"
+      />
       <el-button
         :icon="Search"
         @click="reload"
@@ -49,6 +58,8 @@
         {{ t('common.search') }}
       </el-button>
     </FilterBar>
+
+    <TotalsStrip :groups="totalGroups" />
 
     <DataTable
       :rows="rows"
@@ -118,25 +129,48 @@ import RevenueDrawer from './RevenueDrawer.vue'
 import { useConfirm } from '@/composables/useConfirm'
 import { useUserStore } from '@/stores/user'
 import { dualMoney } from '@/utils/money'
-import { listRevenue, deleteRevenue, REVENUE_SOURCES, type Revenue } from '@/api/finance'
+import { listRevenue, deleteRevenue, getRevenueTotals, REVENUE_SOURCES, type MoneyTotal, type Revenue } from '@/api/finance'
+import TotalsStrip from '@/components/finance/TotalsStrip.vue'
+import { rangeShortcuts } from '@/utils/dateShortcuts'
 import { usePagedList } from '@/composables/usePagedList'
 
 const { t } = useI18n()
 const { confirm } = useConfirm()
 const userStore = useUserStore()
 
-const emptyFilters = () => ({ q: '', source: '' })
+const shortcuts = computed(() => rangeShortcuts([
+  t('finance.shortcutThisMonth'), t('finance.shortcutLastMonth'), t('finance.shortcutLast30'), t('finance.shortcutThisYear'),
+]))
+const totals = ref<MoneyTotal[]>([])
+const totalGroups = computed(() => totals.value.map(r => ({
+  currency: r.currency,
+  items: [
+    { key: 'sum', label: t('finance.totalReceived'), value: `${r.currency} ${Number(r.total).toLocaleString('en-US', { maximumFractionDigits: 2 })}`, tone: 'good' as const },
+    { key: 'n', label: t('finance.totalEntries'), value: String(r.count) },
+  ],
+})))
+
+const emptyFilters = () => ({ q: '', source: '', range: null as [string, string] | null })
 const { rows, total, loading, error, filters, page, size, dirty, load, reload, clearFilters } =
   usePagedList<Revenue, ReturnType<typeof emptyFilters>>({
     emptyFilters,
     firstPage: 1,
     size: 20,
-    fetch: (f, { index, size }) => listRevenue({
-      q: f.q || undefined,
-      source: f.source || undefined,
-      page: index,
-      size,
-    }),
+    fetch: (f, { index, size }) => {
+      // the totals follow the filters, not the page, so they are asked for once per filter change
+      if (index === 0) {
+        getRevenueTotals({ q: f.q || undefined, source: f.source || undefined, from: f.range?.[0], to: f.range?.[1] })
+          .then((r) => { totals.value = r }).catch(() => { totals.value = [] })
+      }
+      return listRevenue({
+        q: f.q || undefined,
+        source: f.source || undefined,
+        from: f.range?.[0],
+        to: f.range?.[1],
+        page: index,
+        size,
+      })
+    },
   })
 
 const drawerOpen = ref(false)

@@ -602,3 +602,22 @@ Chinese strings under `conversations.*`.
 major row is a searchable `MajorPicker` (type a new name to add it) and "Add several majors" adds picked, typed or pasted majors for every ticked level at once.
 
 **One scholarship image, no duplicate majors (2026-10-23).** The scholarship form has a single image (the cover; the older hero image is only a fallback for scholarships that have just that one, matching the public pages). A programme keeps one row per major and level: the server drops a repeat, the form flags it, names compare ignoring case and inner spacing.
+
+
+## Application case screen (2026-10-26)
+
+`/applications/:id` gained an Interview tab (Beijing-time scheduling, `utils/beijingTime.ts`) while the case is in Interview required, an
+Admission documents tab (letter + JW202 upload) from Admission confirmed, a payment tab that lists every payment of the application
+(the queue is filtered by `applicationId`, not by a text search), mandatory notes in the status dialog, and documents that open with their
+real type and file extension (staff content is always streamed by the backend). The programme form has a Nadoumi service fee field.
+
+
+## Finance screens (2026-10-26)
+
+- **Totals above the lists.** Ledger, Revenue and Expenses show what the rows matching the current filters add up to, per currency (money in,
+  money out, net, entries), from `GET /api/staff/finance/ledger/totals`, `/api/staff/revenue/totals` and `/api/staff/expenses/totals`.
+  They take the same filters as the list, are asked for once per filter change (not per page) and never add different currencies together.
+  A failed totals call hides the strip and leaves the list working.
+- **Date ranges.** All three lists filter by date range with quick ranges (this month, last month, last 30 days, this year).
+- **Payments queue** lists and filters by what was paid (`kind`: application fee or Nadoumi service fee); the drawer shows it too.
+- **Payroll** can be searched by name, department or position.

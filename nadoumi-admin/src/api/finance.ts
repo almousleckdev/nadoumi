@@ -240,3 +240,31 @@ export const listLedger = (params: LedgerQuery) =>
 /** The CSV as a Blob; the file needs the session, so it cannot be a plain link. */
 export const exportLedger = (params: Omit<LedgerQuery, 'page' | 'size'>) =>
   request.get<unknown, Blob>('/api/staff/finance/ledger/export', { params, responseType: 'blob' })
+
+/* --- totals of the rows a filter matches (the strip above each list) --- */
+
+/** A sum per currency; amounts of different currencies are never added together. */
+export interface MoneyTotal {
+  currency: string
+  total: number
+  count: number
+}
+
+export interface LedgerTotal {
+  currency: string
+  revenue: number
+  expenses: number
+  net: number
+  entries: number
+}
+
+type TotalsFilter = { q?: string, from?: string, to?: string }
+
+export const getLedgerTotals = (params: TotalsFilter & { kind?: string, currency?: string }) =>
+  request.get<unknown, LedgerTotal[]>('/api/staff/finance/ledger/totals', { params })
+
+export const getRevenueTotals = (params: TotalsFilter & { source?: string }) =>
+  request.get<unknown, MoneyTotal[]>('/api/staff/revenue/totals', { params })
+
+export const getExpenseTotals = (params: TotalsFilter & { status?: string, categoryId?: number }) =>
+  request.get<unknown, MoneyTotal[]>(`${E}/totals`, { params })

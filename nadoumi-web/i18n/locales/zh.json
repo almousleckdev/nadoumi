@@ -642,7 +642,11 @@
       "photoFailed": "头像上传失败，请重试。",
       "photoBadType": "请选择 JPEG、PNG 或 WebP 图片。",
       "photoTooBig": "头像必须小于 {mb} MB。",
-      "studentId": "学生编号"
+      "studentId": "学生编号",
+      "documents": {
+        "title": "文件",
+        "blurb": "您的护照、证书和其他文件都集中在这里，可前往上传或查看。"
+      }
     },
     "changePassword": "修改密码",
     "pwCurrent": "当前密码",
@@ -738,9 +742,20 @@
         "OFFER": "已收到录取通知",
         "PRE_DEPARTURE": "出发前准备",
         "CLOSED_SUCCESS": "已入学",
-        "CLOSED_UNSUCCESSFUL": "未通过",
+        "CLOSED_UNSUCCESSFUL": "已拒绝",
         "CLOSED_WITHDRAWN": "已撤回",
-        "unknown": "进行中"
+        "unknown": "进行中",
+        "SUBMITTED": "已提交",
+        "UNDER_REVIEW": "审核中",
+        "DOCUMENTS_REQUIRED": "需补充材料",
+        "READY_FOR_UNIVERSITY_SUBMISSION": "待提交大学",
+        "UNDER_UNIVERSITY_REVIEW": "大学审核中",
+        "INTERVIEW_REQUIRED": "需要面试",
+        "CONDITIONAL_OFFER": "有条件录取",
+        "OFFER_RECEIVED": "已收到录取",
+        "OFFER_ACCEPTED": "已接受录取",
+        "WAITLISTED": "候补名单",
+        "ADMISSION_CONFIRMED": "录取已确认"
       },
       "event": {
         "created": "已开始申请",
@@ -774,7 +789,18 @@
         "PRE_DEPARTURE": "恭喜。Nadoumi正在帮助您准备出发。",
         "CLOSED_SUCCESS": "您已入学。恭喜。",
         "CLOSED_UNSUCCESSFUL": "此申请未获通过。",
-        "default": "Nadoumi正在处理您的申请。"
+        "default": "Nadoumi正在处理您的申请。",
+        "SUBMITTED": "我们已收到您的申请，很快会开始审核。",
+        "UNDER_REVIEW": "Nadoumi 正在核对您的申请，每次变化我们都会邮件通知您。",
+        "DOCUMENTS_REQUIRED": "部分材料缺失或需要更正。请更新后重新提交申请，无需再次付费。",
+        "READY_FOR_UNIVERSITY_SUBMISSION": "您的申请材料已齐全，即将提交给大学。",
+        "UNDER_UNIVERSITY_REVIEW": "大学正在评估您的申请，有回复时我们会邮件通知您。",
+        "INTERVIEW_REQUIRED": "您需要参加面试，日期、时间和链接见下方。",
+        "CONDITIONAL_OFFER": "满足特定条件即可获得录取，Nadoumi 会向您说明。",
+        "OFFER_RECEIVED": "您已收到录取，请接受以继续。",
+        "OFFER_ACCEPTED": "您已接受录取，Nadoumi 正在确认您的录取。",
+        "WAITLISTED": "您在候补名单中，一有名额或结果我们会邮件通知您。",
+        "ADMISSION_CONFIRMED": "您的录取已确认。请支付 Nadoumi 服务费，以领取录取通知书和 JW202。"
       },
       "colProgress": "进度",
       "stepOf": "第 {n} 步，共 {total} 步",
@@ -782,7 +808,44 @@
       "paymentNeeded": "需要付款",
       "paymentNeededBanner": "Nadoumi 尚未收到你部分申请的申请费。请打开这些申请并重新付款，申请才能继续推进。",
       "payAgain": "重新付款",
-      "paymentNeededNote": "Nadoumi 无法确认你的付款。请重新付款，申请才能继续推进。"
+      "paymentNeededNote": "Nadoumi 无法确认你的付款。请重新付款，申请才能继续推进。",
+      "documentsRequired": {
+        "title": "需补充材料",
+        "body": "Nadoumi 需要您就这份申请补充以下内容：",
+        "howTo": "请上传或更正下方材料，然后把申请退回审核。仍是同一份申请，无需再次付费。",
+        "sendBack": "退回审核",
+        "sent": "您的申请已回到 Nadoumi。"
+      },
+      "interview": {
+        "title": "面试",
+        "waiting": "Nadoumi 会在此处和邮件中发送面试日期与链接。",
+        "beijing": "北京时间（UTC+8）",
+        "yours": "您的时间（{zone}）",
+        "length": "{minutes} 分钟",
+        "join": "加入面试"
+      },
+      "offer": {
+        "title": "您的录取",
+        "body": "大学已向您提供名额。接受后即可继续办理录取。",
+        "conditionalBody": "满足特定条件即可获得名额。请接受以继续，Nadoumi 会指导您完成条件。",
+        "accept": "接受录取",
+        "decline": "拒绝录取",
+        "accepted": "您已接受录取。",
+        "declineTitle": "拒绝此录取？",
+        "declineBody": "拒绝将关闭此申请，申请费不予退还。",
+        "declineConfirm": "拒绝录取"
+      },
+      "admission": {
+        "title": "录取通知书与 JW202",
+        "help": "Nadoumi 服务费支付并确认后，才会提供这两份文件。",
+        "notYet": "Nadoumi 正在准备此文件。",
+        "locked": "支付 Nadoumi 服务费后可查看。",
+        "open": "打开",
+        "kind": {
+          "ADMISSION_LETTER": "录取通知书",
+          "JW202": "JW202 表"
+        }
+      }
     }
   },
   "validation": {
@@ -2585,7 +2648,13 @@
       "resent": "收据已发送，请查收邮箱。",
       "resendWait": "收据刚刚发送过，请几分钟后再试。"
     },
-    "submittedIntro": "Nadoumi 已收到你的申请，但未收到申请费。请重新付款并提交付款凭证，申请才能继续推进。"
+    "submittedIntro": "Nadoumi 已收到你的申请，但未收到申请费。请重新付款并提交付款凭证，申请才能继续推进。",
+    "service": {
+      "title": "Nadoumi 服务费",
+      "intro": "您的录取已确认。请支付 Nadoumi 服务费以领取录取通知书和 JW202 表。",
+      "confirmedTitle": "服务费已确认",
+      "confirmedBody": "谢谢。您的录取通知书和 JW202 表可在下方查看。"
+    }
   },
   "applyFlow": {
     "onBehalf": "您正在填写 {name} 的资料。问题中的“您”或“您的”均指 {name}。",

@@ -2,6 +2,7 @@ package com.nadoumi.finance.web;
 
 import com.nadoumi.common.web.PageResponse;
 import com.nadoumi.finance.domain.ExpenseCategory;
+import com.nadoumi.finance.domain.MoneyTotal;
 import com.nadoumi.finance.service.ExpenseService;
 import com.nadoumi.finance.service.ReceiptWriter;
 import com.nadoumi.finance.web.request.ExpenseRequest;
@@ -59,6 +60,17 @@ public class StaffExpenseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return service.list(q, status, categoryId, from, to, page, size);
+    }
+
+    @GetMapping("/totals")
+    @PreAuthorize("@ss.hasPermi('nad:expense:list')")
+    public List<MoneyTotal> totals(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return service.totals(q, status, categoryId, from, to);
     }
 
     @GetMapping("/categories")

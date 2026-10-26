@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.nadoumi.finance.mapper.LedgerMapper">
 
-    <select id="search" resultType="com.nadoumi.finance.domain.LedgerEntry">
-        select l.kind, l.id, l.occurredOn, l.title, l.category, l.reference, l.amount, l.currency
+    <sql id="entries">
         from (
             select 'REVENUE' as kind, r.id as id, r.received_on as occurredOn, r.title as title, r.source as category,
                    r.reference as reference, r.amount as amount, r.currency as currency
@@ -22,6 +21,17 @@
             <if test="from != null"> and l.occurredOn &gt;= #{from} </if>
             <if test="to != null"> and l.occurredOn &lt;= #{to} </if>
         </where>
+    </sql>
+
+    <select id="search" resultType="com.nadoumi.finance.domain.LedgerEntry">
+        select l.kind, l.id, l.occurredOn, l.title, l.category, l.reference, l.amount, l.currency
+        <include refid="entries"/>
         order by l.occurredOn desc, l.id desc
+    </select>
+
+    <select id="totals" resultType="com.nadoumi.finance.domain.MoneyTotal">
+        select l.currency as currency, l.kind as bucket, sum(l.amount) as total, count(*) as count
+        <include refid="entries"/>
+        group by l.currency, l.kind
     </select>
 </mapper>
