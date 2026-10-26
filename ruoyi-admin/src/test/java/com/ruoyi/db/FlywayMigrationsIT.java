@@ -106,9 +106,9 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        // V1 baseline + V2..V139 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
+        // V1 baseline + V2..V143 (gaps at V12/13/15/69/70/78/84-86 are retired/reserved
         // numbers never written — see database.md; DATABASE_DESIGN.md §6 is authoritative)
-        assertThat(applied).isEqualTo(130);
+        assertThat(applied).isEqualTo(134);
         assertThat(single(ds, "SELECT COUNT(*) FROM nad_wf_definition WHERE status = 'ACTIVE'")).isEqualTo("3");
         assertThat(tableExists(ds, "nad_user_presence")).isTrue();
         // a Cloudinary delivery URL is far longer than RuoYi's stock varchar(100)
@@ -465,7 +465,7 @@ class FlywayMigrationsIT {
 
         int applied = flyway(ds).load().migrate().migrationsExecuted;
 
-        assertThat(applied).isEqualTo(129); // V2..V139, same gaps as above
+        assertThat(applied).isEqualTo(133); // V2..V143, same gaps as above
         assertThat(single(ds, "SELECT type FROM flyway_schema_history WHERE version = '1'")).isEqualTo("BASELINE");
         assertThat(tableExists(ds, "nad_applicant")).isTrue();
         assertThat(single(ds, "SELECT COUNT(*) FROM sys_role WHERE role_key IN ('ops_manager','case_officer')"))
